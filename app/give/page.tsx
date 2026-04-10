@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import DonationForm from "@/components/give/DonationForm";
@@ -23,11 +23,9 @@ function timeAgo(d: Date) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function GivePage() {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
 
   const user = await prisma.user.findUnique({
-    where:  { id: session.user.id as string },
+    where:  { id: "anonymous" },
     select: { churchId: true },
   });
 
@@ -51,7 +49,7 @@ export default async function GivePage() {
     }),
 
     prisma.donation.findMany({
-      where:   { userId: session.user.id as string, status: "COMPLETED" },
+      where:   { userId: "anonymous", status: "COMPLETED" },
       include: { fund: { select: { name: true } } },
       orderBy: { createdAt: "desc" },
       take:    8,

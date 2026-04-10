@@ -1,15 +1,13 @@
-import { auth } from "@/lib/auth";
+
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import PrayButton from "@/components/community/PrayButton";
 import PrayerRequestForm from "@/components/community/PrayerRequestForm";
 
 export default async function PrayerWallPage() {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
 
   const user = await prisma.user.findUnique({
-    where:  { id: session.user.id as string },
+    where:  { id: "anonymous" },
     select: { churchId: true },
   });
 

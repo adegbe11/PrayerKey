@@ -1,181 +1,359 @@
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
-import PrayerComposer from "@/components/pray/PrayerComposer";
-import PrayerCard from "@/components/pray/PrayerCard";
-import type { Prayer } from "@prisma/client";
+"use client";
+import { useState } from "react";
 
-// ── Stats card ────────────────────────────────────────────────────────────────
+const MOODS = ["Grateful", "Anxious", "Sad", "Hopeful", "Confused", "Joyful", "Sick", "Tired"];
 
-function StatPill({ label, value, color }: { label: string; value: number | string; color: string }) {
-  return (
-    <div
-      style={{
-        background:   "#FFFFFF",
-        borderRadius: "14px",
-        padding:      "18px 22px",
-        boxShadow:    "var(--pk-shadow-sm)",
-        display:      "flex",
-        flexDirection: "column",
-        gap:          "4px",
-        minWidth:     "120px",
-      }}
-    >
-      <p style={{ fontSize: "26px", fontWeight: 700, color, margin: 0, lineHeight: 1 }}>
-        {value}
-      </p>
-      <p style={{ fontSize: "12px", color: "var(--pk-t3)", margin: 0, fontWeight: 500 }}>
-        {label}
-      </p>
-    </div>
-  );
-}
+export default function PrayPage() {
+  const [input,   setInput]   = useState("");
+  const [moods,   setMoods]   = useState<string[]>([]);
+  const [prayer,  setPrayer]  = useState<{ title: string; prayer: string; encouragement: string; verses: { ref: string; text: string }[] } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState("");
+  const [copied,  setCopied]  = useState(false);
 
-// ── Empty state ───────────────────────────────────────────────────────────────
+  function toggleMood(m: string) {
+    setMoods((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
+  }
 
-function EmptyPrayers() {
-  return (
-    <div
-      style={{
-        background:     "#FFFFFF",
-        borderRadius:   "14px",
-        padding:        "40px 24px",
-        textAlign:      "center",
-        boxShadow:      "var(--pk-shadow-sm)",
-      }}
-    >
-      <div
-        style={{
-          width:         "56px",
-          height:        "56px",
-          borderRadius:  "50%",
-          background:    "rgba(176,124,31,0.08)",
-          display:       "flex",
-          alignItems:    "center",
-          justifyContent: "center",
-          margin:        "0 auto 16px",
-          fontSize:      "24px",
-        }}
-      >
-        🙏
-      </div>
-      <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--pk-t1)", marginBottom: "6px" }}>
-        No prayers yet
-      </p>
-      <p style={{ fontSize: "13px", color: "var(--pk-t3)", maxWidth: "240px", margin: "0 auto" }}>
-        Compose your first prayer above and let AI craft something personal for you.
-      </p>
-    </div>
-  );
-}
+  async function generate() {
+    if (!input.trim()) return;
+    setLoading(true);
+    setError("");
+    setPrayer(null);
+    try {
+      const res  = await fetch("/api/prayer/generate", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ userInput: input, moods }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      setPrayer(data);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-
-export default async function PrayPage() {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
-
-  // Fetch user's recent prayers + stats
-  const [prayers, totalCount, bookmarkCount] = await Promise.all([
-    prisma.prayer.findMany({
-      where:   { userId: session.user.id as string },
-      orderBy: { createdAt: "desc" },
-      take:    12,
-    }),
-    prisma.prayer.count({ where: { userId: session.user.id as string } }),
-    prisma.prayer.count({ where: { userId: session.user.id as string, isBookmarked: true } }),
-  ]);
-
-  // Most used mood (from flat array)
-  const allMoods = prayers.flatMap((p: Prayer) => p.mood);
-  const moodFreq = allMoods.reduce<Record<string, number>>((acc, m) => {
-    acc[m] = (acc[m] ?? 0) + 1;
-    return acc;
-  }, {});
-  const topMood = Object.entries(moodFreq).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
+  async function copy() {
+    if (!prayer) return;
+    await navigator.clipboard.writeText(prayer.prayer);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   return (
-    <div style={{ padding: "32px 24px", maxWidth: "800px", margin: "0 auto" }}>
+    <div style={{ maxWidth: "680px", margin: "0 auto", padding: "0 0 80px" }}>
 
-      {/* ── Page header ─────────────────────────────────────────────── */}
-      <div style={{ marginBottom: "32px" }}>
-        <p style={{ fontSize: "12px", color: "var(--pk-gold)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "6px" }}>
-          Prayer AI Engine
-        </p>
-        <h1 style={{ fontSize: "28px", fontWeight: 700, color: "var(--pk-t1)", margin: "0 0 8px" }}>
-          Pray
-        </h1>
-        <p style={{ fontSize: "15px", color: "var(--pk-t2)", margin: 0 }}>
-          Tell God what&apos;s on your heart. AI will craft a personal, scripture-grounded prayer for you.
-        </p>
-      </div>
-
-      {/* ── Stats row ───────────────────────────────────────────────── */}
-      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "32px" }}>
-        <StatPill label="Prayers"    value={totalCount}    color="var(--pk-t1)" />
-        <StatPill label="Bookmarked" value={bookmarkCount} color="var(--pk-gold)" />
-        <StatPill label="Top mood"   value={topMood}       color="#AF52DE" />
-      </div>
-
-      {/* ── Two-column layout ────────────────────────────────────────── */}
-      <div
-        style={{
-          display:             "grid",
-          gridTemplateColumns: prayers.length > 0 ? "1fr 320px" : "1fr",
-          gap:                 "28px",
-          alignItems:          "start",
-        }}
-      >
-        {/* Left: Composer */}
-        <div>
-          <PrayerComposer />
+      {/* ── Page header ── */}
+      <div className="animate-fadeUp" style={{ textAlign: "center", marginBottom: "48px" }}>
+        {/* Brutalist label */}
+        <div style={{
+          display:      "inline-flex",
+          alignItems:   "center",
+          gap:          "8px",
+          padding:      "4px 12px",
+          border:       "1.5px solid rgba(175,82,222,0.35)",
+          borderRadius: "4px",
+          marginBottom: "20px",
+          background:   "rgba(175,82,222,0.06)",
+          boxShadow:    "3px 3px 0 0 rgba(175,82,222,0.15)",
+        }}>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "#AF52DE", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            AI Prayer Generator
+          </span>
         </div>
 
-        {/* Right: History (only when prayers exist) */}
-        {prayers.length > 0 && (
-          <aside>
-            <p
+        <h1 style={{
+          fontSize:      "clamp(32px, 6vw, 56px)",
+          fontWeight:    800,
+          color:         "#fff",
+          margin:        "0 0 14px",
+          letterSpacing: "-0.03em",
+          lineHeight:    1.05,
+        }}>
+          Tell me what to<br />pray about.
+        </h1>
+        <p style={{
+          fontSize:    "clamp(15px, 1.4vw, 17px)",
+          color:       "rgba(255,255,255,0.42)",
+          margin:      0,
+          lineHeight:  1.65,
+          maxWidth:    "420px",
+          marginInline: "auto",
+        }}>
+          Type anything — a worry, a thank you, a situation — and we&apos;ll write a full prayer for you in seconds.
+        </p>
+      </div>
+
+      {/* ── Input card ── */}
+      <div className="animate-fadeUp delay-100" style={{
+        background:   "rgba(255,255,255,0.025)",
+        border:       "1.5px solid rgba(255,255,255,0.09)",
+        borderRadius: "20px",
+        padding:      "clamp(20px,4vw,32px)",
+        marginBottom: "16px",
+        boxShadow:    "4px 4px 0 0 rgba(255,255,255,0.03)",
+      }}>
+
+        {/* Textarea */}
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="e.g. I'm worried about my job. Please pray for my family. I'm thankful for healing..."
+          rows={5}
+          style={{
+            width:        "100%",
+            background:   "transparent",
+            border:       "none",
+            padding:      "0",
+            fontSize:     "clamp(15px, 1.4vw, 17px)",
+            color:        "#fff",
+            resize:       "none",
+            outline:      "none",
+            boxSizing:    "border-box",
+            fontFamily:   "inherit",
+            lineHeight:   1.7,
+          }}
+        />
+
+        <div style={{ height: "1px", background: "rgba(255,255,255,0.07)", margin: "16px 0" }} />
+
+        {/* Mood chips */}
+        <div>
+          <p style={{
+            fontSize:     "11px",
+            fontWeight:   700,
+            letterSpacing:"0.08em",
+            textTransform:"uppercase",
+            color:        "rgba(255,255,255,0.28)",
+            marginBottom: "10px",
+          }}>
+            How are you feeling? (optional)
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {MOODS.map((m) => {
+              const active = moods.includes(m);
+              return (
+                <button
+                  key={m}
+                  onClick={() => toggleMood(m)}
+                  style={{
+                    padding:      "8px 16px",
+                    minHeight:    "36px",
+                    borderRadius: "4px",
+                    border:       active ? "1.5px solid #AF52DE" : "1.5px solid rgba(255,255,255,0.1)",
+                    background:   active ? "rgba(175,82,222,0.14)" : "rgba(255,255,255,0.03)",
+                    color:        active ? "#AF52DE" : "rgba(255,255,255,0.45)",
+                    fontSize:     "12px",
+                    fontWeight:   active ? 700 : 500,
+                    cursor:       "pointer",
+                    transition:   "all 150ms ease",
+                    boxShadow:    active ? "2px 2px 0 0 rgba(175,82,222,0.25)" : "none",
+                    letterSpacing:"-0.01em",
+                  }}
+                >
+                  {m}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Generate button ── */}
+      <button
+        onClick={generate}
+        disabled={loading || !input.trim()}
+        style={{
+          width:        "100%",
+          padding:      "16px 28px",
+          minHeight:    "56px",
+          borderRadius: "6px",
+          border:       "2px solid",
+          borderColor:  loading || !input.trim() ? "rgba(175,82,222,0.3)" : "#AF52DE",
+          background:   loading || !input.trim() ? "rgba(175,82,222,0.15)" : "#AF52DE",
+          color:        loading || !input.trim() ? "rgba(255,255,255,0.4)" : "#fff",
+          fontSize:     "16px",
+          fontWeight:   800,
+          cursor:       loading || !input.trim() ? "not-allowed" : "pointer",
+          transition:   "all 200ms ease",
+          letterSpacing:"-0.01em",
+          boxShadow:    loading || !input.trim() ? "none" : "4px 4px 0 0 rgba(175,82,222,0.3)",
+        }}
+        onMouseEnter={e => {
+          if (loading || !input.trim()) return;
+          (e.currentTarget as HTMLButtonElement).style.transform = "translate(-2px,-2px)";
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = "6px 6px 0 0 rgba(175,82,222,0.3)";
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLButtonElement).style.transform = "translate(0,0)";
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = loading || !input.trim() ? "none" : "4px 4px 0 0 rgba(175,82,222,0.3)";
+        }}
+      >
+        {loading ? (
+          <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+            <span style={{ width: "16px", height: "16px", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
+            Writing your prayer...
+          </span>
+        ) : "✦ Generate Prayer"}
+      </button>
+
+      {/* ── Error ── */}
+      {error && (
+        <div style={{ marginTop: "16px", padding: "14px 18px", borderRadius: "8px", background: "rgba(255,59,48,0.08)", border: "1.5px solid rgba(255,59,48,0.25)", color: "#FF3B30", fontSize: "14px", boxShadow: "3px 3px 0 0 rgba(255,59,48,0.15)" }}>
+          {error}
+        </div>
+      )}
+
+      {/* ── Prayer result ── */}
+      {prayer && (
+        <div style={{ marginTop: "32px", animation: "prayerIn 480ms cubic-bezier(0.22,1,0.36,1)" }}>
+
+          {/* Title bar */}
+          <div style={{
+            display:        "flex",
+            alignItems:     "center",
+            justifyContent: "space-between",
+            padding:        "14px 20px",
+            background:     "rgba(175,82,222,0.1)",
+            border:         "1.5px solid rgba(175,82,222,0.25)",
+            borderRadius:   "12px 12px 0 0",
+            borderBottom:   "none",
+          }}>
+            <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#AF52DE", margin: 0, letterSpacing: "-0.01em" }}>
+              {prayer.title}
+            </h2>
+            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.28)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              ✦ Generated
+            </span>
+          </div>
+
+          {/* Prayer body */}
+          <div style={{
+            background:   "rgba(175,82,222,0.04)",
+            border:       "1.5px solid rgba(175,82,222,0.18)",
+            borderTop:    "none",
+            borderRadius: "0 0 0 0",
+            padding:      "clamp(20px,4vw,32px)",
+          }}>
+            <p style={{
+              fontSize:    "clamp(15px, 1.4vw, 17px)",
+              color:       "rgba(255,255,255,0.88)",
+              lineHeight:  1.85,
+              whiteSpace:  "pre-wrap",
+              margin:      0,
+              fontStyle:   "italic",
+            }}>
+              {prayer.prayer}
+            </p>
+          </div>
+
+          {/* Encouragement */}
+          <div style={{
+            padding:      "18px 24px",
+            background:   "rgba(176,124,31,0.07)",
+            border:       "1.5px solid rgba(176,124,31,0.2)",
+            borderTop:    "none",
+            borderRadius: "0",
+            borderLeft:   "4px solid #B07C1F",
+          }}>
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", margin: 0, lineHeight: 1.7 }}>
+              {prayer.encouragement}
+            </p>
+          </div>
+
+          {/* Verses */}
+          {prayer.verses?.length > 0 && (
+            <div style={{
+              padding:      "clamp(16px,3vw,24px)",
+              background:   "rgba(255,255,255,0.025)",
+              border:       "1.5px solid rgba(255,255,255,0.08)",
+              borderTop:    "none",
+              borderRadius: "0",
+            }}>
+              <p style={{ fontSize: "10px", fontWeight: 700, color: "#B07C1F", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 12px" }}>
+                Scripture
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {prayer.verses.map((v) => (
+                  <div key={v.ref} style={{
+                    padding:    "12px 16px",
+                    background: "rgba(176,124,31,0.06)",
+                    border:     "1px solid rgba(176,124,31,0.15)",
+                    borderRadius:"8px",
+                    display:    "flex",
+                    gap:        "12px",
+                    alignItems: "flex-start",
+                  }}>
+                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#B07C1F", flexShrink: 0, minWidth: "80px" }}>{v.ref}</span>
+                    <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{v.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action bar */}
+          <div style={{
+            display:      "flex",
+            gap:          "10px",
+            padding:      "16px 20px",
+            background:   "rgba(255,255,255,0.02)",
+            border:       "1.5px solid rgba(255,255,255,0.07)",
+            borderTop:    "none",
+            borderRadius: "0 0 16px 16px",
+          }}>
+            <button
+              onClick={copy}
               style={{
-                fontSize:      "12px",
-                fontWeight:    600,
-                color:         "var(--pk-t3)",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-                marginBottom:  "14px",
+                padding:      "10px 20px",
+                minHeight:    "44px",
+                borderRadius: "6px",
+                border:       "1.5px solid rgba(255,255,255,0.12)",
+                background:   copied ? "rgba(52,199,89,0.1)" : "rgba(255,255,255,0.04)",
+                color:        copied ? "#34C759" : "rgba(255,255,255,0.65)",
+                fontSize:     "13px",
+                fontWeight:   600,
+                cursor:       "pointer",
+                transition:   "all 180ms ease",
+                display:      "flex",
+                alignItems:   "center",
+                gap:          "6px",
               }}
             >
-              Recent Prayers
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {prayers.map((p: Prayer) => (
-                <PrayerCard key={p.id} prayer={p} />
-              ))}
-            </div>
-
-            {totalCount > 12 && (
-              <p
-                style={{
-                  fontSize:   "13px",
-                  color:      "var(--pk-gold)",
-                  textAlign:  "center",
-                  marginTop:  "16px",
-                  cursor:     "pointer",
-                  fontWeight: 500,
-                }}
-              >
-                View all {totalCount} prayers →
-              </p>
-            )}
-          </aside>
-        )}
-
-        {/* Empty state when no prayers */}
-        {prayers.length === 0 && (
-          <div style={{ gridColumn: "1 / -1", marginTop: "8px" }}>
-            <EmptyPrayers />
+              {copied ? "✓ Copied!" : "📋 Copy Prayer"}
+            </button>
+            <button
+              onClick={() => { setPrayer(null); setInput(""); setMoods([]); }}
+              style={{
+                padding:      "10px 20px",
+                minHeight:    "44px",
+                borderRadius: "6px",
+                border:       "1.5px solid rgba(255,255,255,0.08)",
+                background:   "transparent",
+                color:        "rgba(255,255,255,0.35)",
+                fontSize:     "13px",
+                cursor:       "pointer",
+                transition:   "all 180ms ease",
+              }}
+            >
+              New Prayer
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      <style>{`
+        textarea:focus { border-color: rgba(175,82,222,0.5) !important; }
+        textarea::placeholder { color: rgba(255,255,255,0.2); }
+        @keyframes spin    { to { transform: rotate(360deg); } }
+        @keyframes prayerIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

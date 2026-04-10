@@ -4,6 +4,11 @@
  * Start: ts-node server/socket.ts
  */
 
+// Load .env.local first — must be before any other imports that read process.env
+import * as dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+dotenv.config({ path: ".env" });
+
 import { createServer } from "http";
 import { Server, type Socket } from "socket.io";
 import { DeepgramStreamer } from "../lib/stt/deepgram-stream";
@@ -19,7 +24,9 @@ const PORT = Number(process.env.PORT ?? 3001);
 const ALLOWED_ORIGINS = [
   "https://prayerkey.com",
   "http://localhost:3000",
+  "http://localhost:3001",
   "http://localhost:3002",
+  "http://localhost:4000",
 ];
 
 // ── HTTP server + Socket.io ──────────────────────────────────────────

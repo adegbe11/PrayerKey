@@ -1,14 +1,12 @@
-import { auth } from "@/lib/auth";
+
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import CreateEventForm from "@/components/church/CreateEventForm";
 
 export default async function EventsPage() {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
 
   const viewer = await prisma.user.findUnique({
-    where:  { id: session.user.id as string },
+    where:  { id: "anonymous" },
     select: { churchId: true, role: true },
   });
 

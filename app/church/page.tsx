@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -51,11 +51,9 @@ function SectionHeader({ title, href, linkLabel }: { title: string; href: string
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function ChurchDashboard() {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
 
   const user = await prisma.user.findUnique({
-    where:  { id: session.user.id as string },
+    where:  { id: "anonymous" },
     select: { churchId: true, role: true, name: true },
   });
 

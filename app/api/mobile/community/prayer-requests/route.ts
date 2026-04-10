@@ -1,34 +1,4 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { jwtVerify } from "jose";
-
 export const dynamic = "force-dynamic";
-
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET ?? "prayerkey-dev-secret-change-in-production"
-);
-
-async function getChurchIdFromToken(req: Request): Promise<string | null> {
-  const auth = req.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) return null;
-  try {
-    const { payload } = await jwtVerify(auth.slice(7), JWT_SECRET);
-    return (payload.churchId as string) ?? null;
-  } catch {
-    return null;
-  }
-}
-
-export async function GET(req: Request) {
-  const churchId = await getChurchIdFromToken(req);
-  if (!churchId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const requests = await prisma.prayerRequest.findMany({
-    where:   { churchId, answered: false },
-    include: { user: { select: { name: true } } },
-    orderBy: [{ prayCount: "desc" }, { createdAt: "desc" }],
-    take:    30,
-  });
-
-  return NextResponse.json(requests);
-}
+export async function GET()  { return NextResponse.json({ error: "Not available" }, { status: 404 }); }
+export async function POST() { return NextResponse.json({ error: "Not available" }, { status: 404 }); }

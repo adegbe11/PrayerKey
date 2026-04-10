@@ -1,359 +1,903 @@
-import {
-  Radio,
-  Sparkles,
-  BookOpen,
-  TrendingUp,
-  Heart,
-  Clock,
-  ChevronRight,
-} from "lucide-react";
+"use client";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-const QUICK_ACTIONS = [
-  { icon: Radio,    label: "Start Live Sermon", href: "/live",           color: "var(--pk-live)",   bg: "rgba(255,59,48,0.08)"   },
-  { icon: Sparkles, label: "Generate Prayer",   href: "/prayer",         color: "var(--pk-purple)", bg: "rgba(175,82,222,0.08)"  },
-  { icon: BookOpen, label: "View Sermons",       href: "/church/sermons", color: "var(--pk-teal)",   bg: "rgba(0,199,190,0.08)"   },
-  { icon: Heart,    label: "Church Giving",      href: "/church/giving",  color: "var(--pk-coral)",  bg: "rgba(255,105,97,0.08)"  },
-];
+const ROTATING_WORDS = ["prayers", "sermons", "miracles", "blessings", "churches", "revivals"];
 
-const RECENT_SERMONS = [
-  { title: "Walking by Faith",   verse: "Hebrews 11:1",    date: "Mar 16", verses: 8  },
-  { title: "The Power of Prayer",verse: "Matthew 6:9-13",  date: "Mar 9",  verses: 12 },
-  { title: "Grace Abounding",    verse: "Romans 5:20",     date: "Mar 2",  verses: 7  },
-  { title: "Renewed Strength",   verse: "Isaiah 40:31",    date: "Feb 23", verses: 6  },
-];
-
-const SERMON_PALETTE = ["#B07C1F", "#AF52DE", "#00C7BE", "#FF6961"];
-function sermonColor(title: string) { return SERMON_PALETTE[title.length % SERMON_PALETTE.length]; }
-
-const STATS = [
-  { label: "Members",           value: "1,247",  delta: "+12 this week",       deltaColor: "var(--pk-teal)"   },
-  { label: "Monthly Giving",    value: "$24,810", delta: "+8.2% vs last month", deltaColor: "var(--pk-teal)"   },
-  { label: "Attendance",        value: "87%",     delta: "vs 81% last week",    deltaColor: "var(--pk-gold)"   },
-  { label: "Events This Month", value: "6",       delta: "2 upcoming",          deltaColor: "var(--pk-purple)" },
-];
-
-const MEMBERS = [
-  { name: "Adaeze Okonkwo",  role: "Member",    joined: "Mar 18", initials: "AO", color: "#AF52DE" },
-  { name: "Emmanuel Fadele", role: "Volunteer", joined: "Mar 15", initials: "EF", color: "#00C7BE" },
-  { name: "Grace Nwosu",     role: "Member",    joined: "Mar 12", initials: "GN", color: "#B07C1F" },
-  { name: "Tunde Alabi",     role: "Youth",     joined: "Mar 10", initials: "TA", color: "#FF6961" },
-  { name: "Blessing Eze",    role: "Member",    joined: "Mar 8",  initials: "BE", color: "#AF52DE" },
-];
-
-const FUNDS = [
-  { fund: "General Fund",    pct: 72, color: "var(--pk-gold)"   },
-  { fund: "Building Project",pct: 45, color: "var(--pk-teal)"   },
-  { fund: "Missions",        pct: 88, color: "var(--pk-purple)" },
+const FEATURES = [
+  {
+    href:   "/pray",
+    emoji:  "🙏",
+    title:  "Generate a Prayer",
+    desc:   "Tell us what's on your heart and we'll write a beautiful prayer just for you.",
+    color:  "#AF52DE",
+    bg:     "rgba(175,82,222,0.07)",
+    border: "rgba(175,82,222,0.18)",
+    glow:   "rgba(175,82,222,0.25)",
+  },
+  {
+    href:   "/live",
+    emoji:  "🎙️",
+    title:  "Live Sermon",
+    desc:   "Start a service. Bible verses appear on the projector screen automatically.",
+    color:  "#FF3B30",
+    bg:     "rgba(255,59,48,0.07)",
+    border: "rgba(255,59,48,0.18)",
+    glow:   "rgba(255,59,48,0.25)",
+  },
+  {
+    href:   "/bible",
+    emoji:  "📖",
+    title:  "Search the Bible",
+    desc:   "Find any verse, topic, or keyword in seconds.",
+    color:  "#B07C1F",
+    bg:     "rgba(176,124,31,0.07)",
+    border: "rgba(176,124,31,0.18)",
+    glow:   "rgba(176,124,31,0.25)",
+  },
 ];
 
 export default function HomePage() {
-  return (
-    <div style={{ padding: "28px 28px 40px" }}>
+  const [wordIndex, setWordIndex] = useState(0);
+  const [visible,   setVisible]   = useState(true);
 
-      {/* ── Page header ── */}
-      <div style={{ marginBottom: "28px" }}>
-        <h1
-          style={{
-            fontSize: "28px",
-            fontWeight: 600,
-            color: "var(--pk-t1)",
-            letterSpacing: "-0.003em",
-            lineHeight: 1.2,
-            fontFamily: '"SF Pro Display", -apple-system, sans-serif',
-          }}
-        >
-          Good morning, Pastor David
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setWordIndex((i) => (i + 1) % ROTATING_WORDS.length);
+        setVisible(true);
+      }, 350);
+    }, 2600);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div>
+
+      {/* ══════════════════════════════════════════
+          HERO — Neo-brutalist structure
+      ══════════════════════════════════════════ */}
+      <section style={{ paddingTop: "24px", paddingBottom: "100px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+
+        {/* Hard ruled lines — brutalist grid marks */}
+        <div aria-hidden style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: "rgba(196,154,42,0.12)" }} />
+        <div aria-hidden style={{ position: "absolute", top: 0, left: "50%", width: "1px", height: "100%", background: "rgba(255,255,255,0.03)", transform: "translateX(-50%)" }} />
+
+        {/* Tag — brutalist pill */}
+        <div className="animate-fadeUp" style={{
+          display:      "inline-flex",
+          alignItems:   "center",
+          gap:          "8px",
+          padding:      "5px 14px 5px 6px",
+          border:       "1.5px solid rgba(196,154,42,0.35)",
+          borderRadius: "4px",
+          marginBottom: "36px",
+          background:   "rgba(196,154,42,0.06)",
+          boxShadow:    "3px 3px 0 0 rgba(196,154,42,0.15)",
+        }}>
+          <span style={{ background: "#C49A2A", color: "#060608", fontSize: "9px", fontWeight: 900, letterSpacing: "0.1em", padding: "2px 7px", borderRadius: "2px", textTransform: "uppercase" }}>NEW</span>
+          <span style={{ fontSize: "12px", color: "#C49A2A", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>AI-Powered Church Companion</span>
+        </div>
+
+        {/* Main title — massive, bold */}
+        <h1 className="animate-fadeUp delay-100" style={{
+          fontSize:      "clamp(52px, 9vw, 108px)",
+          fontWeight:    800,
+          lineHeight:    0.95,
+          letterSpacing: "-0.04em",
+          margin:        "0 0 6px",
+          color:         "#fff",
+        }}>
+          Where beautiful
         </h1>
-        <p style={{ fontSize: "15px", color: "var(--pk-t2)", marginTop: "4px", letterSpacing: "-0.003em" }}>
-          Sunday, March 21 · Grace Community Church
+
+        {/* Rotating shimmer word */}
+        <div className="animate-fadeUp delay-200" style={{
+          fontSize:       "clamp(52px, 9vw, 108px)",
+          fontWeight:     800,
+          lineHeight:     0.95,
+          letterSpacing:  "-0.04em",
+          margin:         "0 0 6px",
+          height:         "1em",
+          display:        "flex",
+          alignItems:     "center",
+          justifyContent: "center",
+          overflow:       "hidden",
+        }}>
+          <span
+            className="shimmer-gold"
+            style={{
+              opacity:    visible ? 1 : 0,
+              transform:  visible ? "translateY(0)" : "translateY(16px)",
+              transition: "opacity 380ms cubic-bezier(0.22,1,0.36,1), transform 380ms cubic-bezier(0.22,1,0.36,1)",
+              display:    "inline-block",
+              minWidth:   "clamp(280px,38vw,560px)",
+              textAlign:  "center",
+            }}
+          >
+            {ROTATING_WORDS[wordIndex]}
+          </span>
+        </div>
+
+        <h1 className="animate-fadeUp delay-300" style={{
+          fontSize:      "clamp(52px, 9vw, 108px)",
+          fontWeight:    800,
+          lineHeight:    0.95,
+          letterSpacing: "-0.04em",
+          margin:        "0 0 40px",
+          color:         "#fff",
+        }}>
+          are born.
+        </h1>
+
+        {/* Subtitle */}
+        <p className="animate-fadeUp delay-400" style={{
+          fontSize:     "clamp(16px, 1.8vw, 20px)",
+          color:        "rgba(255,255,255,0.42)",
+          maxWidth:     "520px",
+          marginInline: "auto",
+          lineHeight:   1.7,
+          marginBottom: "44px",
+          letterSpacing: "-0.01em",
+        }}>
+          Type a prayer request and get a full prayer back.
+          Preach a sermon and see Bible verses on the screen.
+          Search any scripture in seconds. Free, forever.
+        </p>
+
+        {/* CTAs — brutalist buttons */}
+        <div className="animate-fadeUp delay-500" style={{ display: "flex", justifyContent: "center", gap: "12px", flexWrap: "wrap", marginBottom: "72px" }}>
+          <Link href="/pray" style={{ textDecoration: "none" }}>
+            <div
+              style={{
+                padding:      "14px 32px",
+                background:   "#C49A2A",
+                color:        "#060608",
+                fontSize:     "15px",
+                fontWeight:   800,
+                letterSpacing:"-0.01em",
+                border:       "2px solid #C49A2A",
+                borderRadius: "6px",
+                boxShadow:    "4px 4px 0 0 rgba(196,154,42,0.35)",
+                transition:   "transform 150ms ease, box-shadow 150ms ease",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = "translate(-2px,-2px)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "6px 6px 0 0 rgba(196,154,42,0.35)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = "translate(0,0)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "4px 4px 0 0 rgba(196,154,42,0.35)";
+              }}
+            >
+              ✦ Generate a Prayer
+            </div>
+          </Link>
+          <Link href="/live" style={{ textDecoration: "none" }}>
+            <div
+              style={{
+                padding:      "14px 32px",
+                background:   "transparent",
+                color:        "rgba(255,255,255,0.75)",
+                fontSize:     "15px",
+                fontWeight:   600,
+                letterSpacing:"-0.01em",
+                border:       "2px solid rgba(255,255,255,0.14)",
+                borderRadius: "6px",
+                boxShadow:    "4px 4px 0 0 rgba(255,255,255,0.05)",
+                transition:   "transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = "translate(-2px,-2px)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "6px 6px 0 0 rgba(255,255,255,0.06)";
+                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.28)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLDivElement).style.transform = "translate(0,0)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "4px 4px 0 0 rgba(255,255,255,0.05)";
+                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.14)";
+              }}
+            >
+              🎙 Start Live Sermon
+            </div>
+          </Link>
+        </div>
+
+        {/* Stats row — brutalist data */}
+        <div className="animate-fadeUp delay-600 stats-row" style={{
+          display:    "inline-flex",
+          gap:        "0",
+          border:     "1.5px solid rgba(255,255,255,0.09)",
+          borderRadius: "8px",
+          overflow:   "hidden",
+          boxShadow:  "4px 4px 0 0 rgba(255,255,255,0.04)",
+          maxWidth:   "100%",
+        }}>
+          {[
+            { val: "11",   label: "Translations"    },
+            { val: "Free", label: "Always"          },
+            { val: "0",    label: "Account needed"  },
+            { val: "66",   label: "Books of the Bible" },
+          ].map((s, i) => (
+            <div key={s.label} style={{
+              padding:    "16px 28px",
+              textAlign:  "center",
+              borderRight: i < 3 ? "1px solid rgba(255,255,255,0.07)" : "none",
+              background: i % 2 === 0 ? "rgba(255,255,255,0.02)" : "transparent",
+            }}>
+              <div style={{ fontSize: "clamp(20px,3vw,28px)", fontWeight: 800, color: "#C49A2A", letterSpacing: "-0.03em", lineHeight: 1 }}>{s.val}</div>
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", marginTop: "4px", letterSpacing: "0.04em", textTransform: "uppercase", fontWeight: 600 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+      </section>
+
+      {/* ══════════════════════════════════════════
+          3 FEATURE CARDS — Glass panels
+      ══════════════════════════════════════════ */}
+      <section style={{ marginBottom: "80px" }}>
+
+        {/* Brutalist section label */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "32px" }}>
+          <div style={{ height: "2px", flex: 1, background: "rgba(255,255,255,0.06)" }} />
+          <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.2)", letterSpacing: "0.12em", textTransform: "uppercase" }}>Everything You Need</span>
+          <div style={{ height: "2px", flex: 1, background: "rgba(255,255,255,0.06)" }} />
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px,1fr))", gap: "2px", border: "1.5px solid rgba(255,255,255,0.07)", borderRadius: "16px", overflow: "hidden" }}>
+          {FEATURES.map((f, i) => (
+            <Link key={f.href} href={f.href} style={{ textDecoration: "none" }}>
+              <div
+                style={{
+                  padding:    "36px 28px",
+                  background: "rgba(255,255,255,0.025)",
+                  backdropFilter: "blur(12px)",
+                  borderRight: i < FEATURES.length - 1 ? "1px solid rgba(255,255,255,0.07)" : "none",
+                  transition: "background 200ms ease",
+                  height:     "100%",
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLDivElement).style.background = `${f.bg}`;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLDivElement).style.background = "rgba(255,255,255,0.025)";
+                }}
+              >
+                {/* Feature number — brutalist */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.2)", letterSpacing: "0.12em", border: "1px solid rgba(255,255,255,0.1)", padding: "3px 8px", borderRadius: "3px" }}>
+                    0{i + 1}
+                  </span>
+                  <span style={{ fontSize: "28px", lineHeight: 1 }}>{f.emoji}</span>
+                </div>
+
+                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#fff", margin: "0 0 10px", letterSpacing: "-0.02em", lineHeight: 1.25 }}>
+                  {f.title}
+                </h2>
+                <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.42)", margin: "0 0 28px", lineHeight: 1.65 }}>
+                  {f.desc}
+                </p>
+                <span style={{
+                  display:      "inline-flex",
+                  alignItems:   "center",
+                  gap:          "6px",
+                  fontSize:     "13px",
+                  fontWeight:   700,
+                  color:        f.color,
+                  letterSpacing:"-0.01em",
+                  border:       `1.5px solid ${f.border}`,
+                  padding:      "7px 16px",
+                  borderRadius: "4px",
+                  boxShadow:    `3px 3px 0 0 ${f.border}`,
+                  transition:   "transform 150ms ease, box-shadow 150ms ease",
+                }}>
+                  Get started →
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+
+      {/* ── Feature Section 1: Live Sermon ── */}
+      <SermonFeatureSection />
+
+      {/* ── Feature Section 2: Prayer ── */}
+      <PrayerFeatureSection />
+
+      {/* ── Feature Section 3: Bible Search ── */}
+      <BibleFeatureSection />
+
+      {/* ── FAQ ── */}
+      <FAQ />
+
+    </div>
+  );
+}
+
+function BibleFeatureSection() {
+  return (
+    <section style={{ marginTop: "80px" }}>
+
+      {/* Section heading */}
+      <div style={{ textAlign: "center", marginBottom: "40px" }}>
+        <p style={{ fontSize: "13px", fontWeight: 700, color: "#B07C1F", letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 12px" }}>
+          FEATURE 03
+        </p>
+        <h2 style={{ fontSize: "clamp(28px,5vw,48px)", fontWeight: 700, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.03em", lineHeight: 1.12 }}>
+          #1 Bible Search<br />&amp; Cross-Reference Tool
+        </h2>
+        <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.4)", margin: 0, maxWidth: "480px", marginInline: "auto" }}>
+          The smartest way to find any verse, topic, or keyword — with related scriptures included.
         </p>
       </div>
 
-      {/* ── Stat row ── */}
-      <div className="grid grid-cols-4 gap-3" style={{ marginBottom: "20px" }}>
-        {STATS.map((s) => (
-          <div
-            key={s.label}
-            className="pk-hover-card"
-            style={{ padding: "18px 20px" }}
-          >
-            <p
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                color: "var(--pk-t3)",
-                marginBottom: "6px",
-              }}
-            >
-              {s.label}
-            </p>
-            <p
-              style={{
-                fontSize: "28px",
-                fontWeight: 700,
-                color: "var(--pk-gold)",
-                letterSpacing: "-0.003em",
-                lineHeight: 1,
-                marginBottom: "4px",
-                fontFamily: '"SF Pro Display", -apple-system, sans-serif',
-              }}
-            >
-              {s.value}
-            </p>
-            <p style={{ fontSize: "12px", color: s.deltaColor, fontWeight: 500 }}>{s.delta}</p>
+      {/* Card — copy left, mockup right */}
+      <div className="feat-grid" style={{
+        background:          "rgba(176,124,31,0.04)",
+        border:              "1px solid rgba(176,124,31,0.15)",
+        borderRadius:        "28px",
+        padding:             "clamp(24px,4vw,40px)",
+        display:             "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap:                 "48px",
+        alignItems:          "center",
+      }}>
+
+        {/* Left — copy */}
+        <div>
+          <h3 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
+            Find Any Verse Instantly
+          </h3>
+          <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.5)", lineHeight: 1.75, margin: "0 0 24px" }}>
+            Type a reference, keyword, or topic and PrayerKey returns the most relevant verses from across the entire Bible. Click any result to instantly load 4–6 cross-referenced scriptures that share the same theme — perfect for sermon prep, Bible study, or personal devotion.
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "32px" }}>
+            {[
+              "Search by reference, keyword, topic, or paraphrase",
+              "Covers all 66 books of the Bible",
+              "Cross-references show deeply related scriptures",
+              "Supports 11 major translations including KJV and NIV",
+              "Instant results — no waiting, no account needed",
+            ].map((item) => (
+              <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                <span style={{ color: "#B07C1F", fontWeight: 700, fontSize: "15px", flexShrink: 0, marginTop: "1px" }}>✓</span>
+                <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", lineHeight: 1.5 }}>{item}</span>
+              </div>
+            ))}
           </div>
+
+          <a href="/bible" style={{ textDecoration: "none" }}>
+            <button style={{
+              padding:      "13px 28px",
+              borderRadius: "100px",
+              border:       "none",
+              background:   "#B07C1F",
+              color:        "#fff",
+              fontSize:     "15px",
+              fontWeight:   700,
+              cursor:       "pointer",
+              boxShadow:    "0 6px 20px rgba(176,124,31,0.35)",
+            }}>
+              Start now →
+            </button>
+          </a>
+        </div>
+
+        {/* Right — mockup */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+
+          {/* Search bar */}
+          <div style={{ display: "flex", gap: "8px", padding: "10px 16px", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(176,124,31,0.35)", borderRadius: "100px", alignItems: "center" }}>
+            <span style={{ fontSize: "14px" }}>🔍</span>
+            <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", flex: 1 }}>do not be afraid</span>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "#B07C1F", background: "rgba(176,124,31,0.15)", padding: "4px 12px", borderRadius: "100px" }}>Search</span>
+          </div>
+
+          {/* Result 1 — selected */}
+          <div style={{ padding: "16px", background: "rgba(176,124,31,0.1)", border: "1.5px solid rgba(176,124,31,0.3)", borderRadius: "14px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "#B07C1F" }}>Isaiah 41:10</span>
+              <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.05)", padding: "2px 8px", borderRadius: "100px" }}>Exact match</span>
+            </div>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)", lineHeight: 1.65, margin: 0 }}>
+              &ldquo;So do not fear, for I am with you; do not be dismayed, for I am your God...&rdquo;
+            </p>
+          </div>
+
+          {/* Result 2 */}
+          <div style={{ padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "5px" }}>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#B07C1F" }}>Joshua 1:9</span>
+              <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.25)" }}>Related</span>
+            </div>
+            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.55)", lineHeight: 1.6, margin: 0 }}>
+              &ldquo;Be strong and courageous. Do not be afraid; do not be discouraged...&rdquo;
+            </p>
+          </div>
+
+          {/* Cross-refs panel */}
+          <div style={{ padding: "14px 16px", background: "rgba(176,124,31,0.06)", border: "1px solid rgba(176,124,31,0.15)", borderRadius: "12px" }}>
+            <p style={{ fontSize: "11px", fontWeight: 700, color: "#B07C1F", letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 10px" }}>
+              Related Verses for Isaiah 41:10
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+              {[
+                { ref: "Psalm 46:1",        snippet: "God is our refuge and strength, an ever-present help..." },
+                { ref: "Romans 8:31",       snippet: "If God is for us, who can be against us?" },
+                { ref: "2 Timothy 1:7",     snippet: "For God has not given us a spirit of fear, but of power..." },
+              ].map((c) => (
+                <div key={c.ref} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: "#B07C1F", flexShrink: 0, minWidth: "90px" }}>{c.ref}</span>
+                  <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", lineHeight: 1.5 }}>{c.snippet}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PrayerFeatureSection() {
+  return (
+    <section style={{ marginTop: "80px" }}>
+
+      {/* Section heading */}
+      <div style={{ textAlign: "center", marginBottom: "40px" }}>
+        <p style={{ fontSize: "13px", fontWeight: 700, color: "#AF52DE", letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 12px" }}>
+          FEATURE 02
+        </p>
+        <h2 style={{ fontSize: "clamp(28px,5vw,48px)", fontWeight: 700, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.03em", lineHeight: 1.12 }}>
+          #1 AI Prayer<br />Generator for Churches
+        </h2>
+        <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.4)", margin: 0, maxWidth: "480px", marginInline: "auto" }}>
+          The most personal way to write scripture-grounded prayers in seconds — for any situation.
+        </p>
+      </div>
+
+      {/* Card — flipped: mockup left, copy right */}
+      <div className="feat-grid feat-grid-reverse" style={{
+        background:          "rgba(175,82,222,0.04)",
+        border:              "1px solid rgba(175,82,222,0.15)",
+        borderRadius:        "28px",
+        padding:             "clamp(24px,4vw,40px)",
+        display:             "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap:                 "48px",
+        alignItems:          "center",
+      }}>
+
+        {/* Left — mockup */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+
+          {/* Input box */}
+          <div style={{ padding: "14px 16px", background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(175,82,222,0.3)", borderRadius: "14px" }}>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", margin: 0, lineHeight: 1.6, fontStyle: "italic" }}>
+              &ldquo;Lord, I am anxious about my job interview tomorrow. I need peace and confidence...&rdquo;
+            </p>
+          </div>
+
+          {/* Mood chips */}
+          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+            {["Anxious", "Hopeful", "Grateful"].map((m, i) => (
+              <span key={m} style={{
+                padding: "5px 12px", borderRadius: "100px", fontSize: "12px", fontWeight: 600,
+                background: i === 0 ? "rgba(175,82,222,0.2)" : "rgba(255,255,255,0.05)",
+                color: i === 0 ? "#AF52DE" : "rgba(255,255,255,0.4)",
+                border: i === 0 ? "1px solid rgba(175,82,222,0.4)" : "1px solid rgba(255,255,255,0.08)",
+              }}>{m}</span>
+            ))}
+          </div>
+
+          {/* Generated prayer */}
+          <div style={{ padding: "20px", background: "rgba(175,82,222,0.07)", border: "1.5px solid rgba(175,82,222,0.2)", borderRadius: "16px" }}>
+            <p style={{ fontSize: "11px", fontWeight: 700, color: "#AF52DE", letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 10px" }}>
+              ✨ Generated Prayer
+            </p>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)", lineHeight: 1.75, margin: "0 0 14px", fontStyle: "italic" }}>
+              &ldquo;Heavenly Father, I come before you with a heart full of uncertainty. You know the path laid before me. Grant me the peace that surpasses all understanding, and let your confidence rest upon me...&rdquo;
+            </p>
+
+            {/* Verse tag */}
+            <div style={{ padding: "8px 12px", background: "rgba(176,124,31,0.1)", borderRadius: "8px", display: "inline-block" }}>
+              <span style={{ fontSize: "12px", fontWeight: 600, color: "#B07C1F" }}>Philippians 4:6–7 </span>
+              <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>· Do not be anxious about anything...</span>
+            </div>
+          </div>
+
+          {/* Encouragement strip */}
+          <div style={{ padding: "12px 16px", background: "rgba(255,255,255,0.03)", borderRadius: "10px", borderLeft: "3px solid #AF52DE" }}>
+            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.45)", margin: 0, fontStyle: "italic", lineHeight: 1.6 }}>
+              &ldquo;God&apos;s plan for your life is greater than any interview result. Walk in boldly.&rdquo;
+            </p>
+          </div>
+
+          {/* Copy button */}
+          <div style={{ display: "flex", gap: "8px" }}>
+            <div style={{ padding: "8px 18px", borderRadius: "100px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", fontSize: "12px", color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>
+              📋 Copy Prayer
+            </div>
+            <div style={{ padding: "8px 18px", borderRadius: "100px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", fontSize: "12px", color: "rgba(255,255,255,0.5)", cursor: "pointer" }}>
+              🔄 Regenerate
+            </div>
+          </div>
+        </div>
+
+        {/* Right — copy */}
+        <div>
+          <h3 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
+            Your Personal Prayer Writer
+          </h3>
+          <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.5)", lineHeight: 1.75, margin: "0 0 24px" }}>
+            Tell PrayerKey what you&apos;re going through and it writes a full, heartfelt prayer grounded in scripture — personalised to your exact words, mood, and situation. Every prayer includes relevant Bible verses and an encouragement note.
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "32px" }}>
+            {[
+              "Works for healing, grief, anxiety, finances, marriage and more",
+              "Includes scripture-backed Bible verses automatically",
+              "Choose your mood to personalise the tone",
+              "Copy and share in seconds",
+              "No account, no limit, completely free",
+            ].map((item) => (
+              <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                <span style={{ color: "#AF52DE", fontWeight: 700, fontSize: "15px", flexShrink: 0, marginTop: "1px" }}>✓</span>
+                <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", lineHeight: 1.5 }}>{item}</span>
+              </div>
+            ))}
+          </div>
+
+          <a href="/pray" style={{ textDecoration: "none" }}>
+            <button style={{
+              padding:   "13px 28px",
+              borderRadius: "100px",
+              border:    "none",
+              background: "#AF52DE",
+              color:     "#fff",
+              fontSize:  "15px",
+              fontWeight: 700,
+              cursor:    "pointer",
+              boxShadow: "0 6px 20px rgba(175,82,222,0.35)",
+            }}>
+              Start now →
+            </button>
+          </a>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+function SermonFeatureSection() {
+  return (
+    <section style={{ marginTop: "80px" }}>
+
+      {/* Section heading */}
+      <div style={{ textAlign: "center", marginBottom: "40px" }}>
+        <p style={{ fontSize: "13px", fontWeight: 700, color: "#FF3B30", letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 12px" }}>
+          FEATURE 01
+        </p>
+        <h2 style={{ fontSize: "clamp(28px,5vw,48px)", fontWeight: 700, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.03em", lineHeight: 1.12 }}>
+          #1 Live Sermon<br />Verse Detection Tool
+        </h2>
+        <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.4)", margin: 0, maxWidth: "480px", marginInline: "auto" }}>
+          The fastest way to display Bible verses on your projector — automatically, as you preach.
+        </p>
+      </div>
+
+      {/* Card */}
+      <div className="feat-grid" style={{
+        background:   "rgba(255,59,48,0.04)",
+        border:       "1px solid rgba(255,59,48,0.15)",
+        borderRadius: "28px",
+        padding:      "clamp(24px,4vw,40px)",
+        display:      "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap:          "48px",
+        alignItems:   "center",
+      }}>
+
+        {/* Left — copy */}
+        <div>
+          <h3 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
+            Hands-Free Verse Display
+          </h3>
+          <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.5)", lineHeight: 1.75, margin: "0 0 24px" }}>
+            Just preach. PrayerKey listens through your microphone, detects every Bible verse you quote or reference in real time, and displays it on the projector screen for your whole congregation — no operator, no typing, no delay.
+          </p>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "32px" }}>
+            {[
+              "Detects verses automatically as you speak",
+              "Displays on projector with zero manual input",
+              "Works with 11 Bible translations",
+              "Shows confidence score for every verse",
+              "Pastor controls everything from one screen",
+            ].map((item) => (
+              <div key={item} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                <span style={{ color: "#FF3B30", fontWeight: 700, fontSize: "15px", flexShrink: 0, marginTop: "1px" }}>✓</span>
+                <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", lineHeight: 1.5 }}>{item}</span>
+              </div>
+            ))}
+          </div>
+
+          <a href="/live" style={{ textDecoration: "none" }}>
+            <button style={{
+              padding:      "13px 28px",
+              borderRadius: "100px",
+              border:       "none",
+              background:   "#FF3B30",
+              color:        "#fff",
+              fontSize:     "15px",
+              fontWeight:   700,
+              cursor:       "pointer",
+              boxShadow:    "0 6px 20px rgba(255,59,48,0.35)",
+            }}>
+              Start now →
+            </button>
+          </a>
+        </div>
+
+        {/* Right — live mockup */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+
+          {/* Status bar */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", background: "rgba(255,59,48,0.08)", borderRadius: "12px", border: "1px solid rgba(255,59,48,0.2)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#FF3B30", display: "inline-block", animation: "pulse 1.5s ease infinite" }} />
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#FF3B30" }}>LIVE — Listening</span>
+            </div>
+            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)" }}>00:14</span>
+          </div>
+
+          {/* Transcript */}
+          <div style={{ padding: "10px 14px", background: "rgba(255,255,255,0.03)", borderRadius: "10px" }}>
+            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.25)", margin: 0, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              🎤 &ldquo;...for God so loved the world that he gave his only begotten son...&rdquo;
+            </p>
+          </div>
+
+          {/* Detected verse card */}
+          <div style={{ padding: "20px", background: "rgba(176,124,31,0.08)", border: "1.5px solid rgba(176,124,31,0.3)", borderRadius: "16px" }}>
+            <span style={{ fontSize: "10px", fontWeight: 700, color: "#B07C1F", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", marginBottom: "8px" }}>
+              ✦ Just Detected
+            </span>
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.85)", lineHeight: 1.65, margin: "0 0 12px", fontStyle: "italic" }}>
+              &ldquo;For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.&rdquo;
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "#B07C1F" }}>John 3:16</span>
+              <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)" }}>NIV</span>
+              <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "6px" }}>
+                <div style={{ width: "60px", height: "3px", background: "rgba(255,255,255,0.1)", borderRadius: "2px", overflow: "hidden" }}>
+                  <div style={{ width: "98%", height: "100%", background: "#34C759", borderRadius: "2px" }} />
+                </div>
+                <span style={{ fontSize: "11px", color: "#34C759", fontWeight: 600 }}>98%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Previous verse */}
+          <div style={{ padding: "14px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "12px" }}>
+            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.5)", margin: "0 0 6px", fontStyle: "italic" }}>
+              &ldquo;I can do all things through Christ who strengthens me.&rdquo;
+            </p>
+            <div style={{ display: "flex", gap: "8px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 600, color: "#B07C1F" }}>Philippians 4:13</span>
+              <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.25)" }}>· 94%</span>
+            </div>
+          </div>
+
+          {/* Projector button */}
+          <div style={{ padding: "10px 16px", background: "rgba(255,255,255,0.03)", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>📺 Projector screen open on Display 2</span>
+            <span style={{ fontSize: "11px", color: "#34C759", fontWeight: 600 }}>● Connected</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const FAQS = [
+  {
+    q: "What is PrayerKey?",
+    a: "PrayerKey is a free AI-powered church companion that helps pastors, ministers, and believers generate personalised prayers, automatically detect Bible verses during live sermons, and search the entire Bible by keyword, topic, or reference — all without creating an account.",
+  },
+  {
+    q: "How does AI prayer generation work?",
+    a: "You type what's on your heart — a worry, a praise, a need — and PrayerKey's AI writes a full, scripture-grounded prayer tailored to your words. It includes relevant Bible verses and an encouragement note. The whole process takes under 10 seconds.",
+  },
+  {
+    q: "Is PrayerKey free to use?",
+    a: "Yes. PrayerKey is completely free. There are no subscriptions, no paywalls, and no hidden fees. You can generate prayers, run live sermon sessions, and search the Bible without paying anything.",
+  },
+  {
+    q: "Do I need to create an account or sign in?",
+    a: "No. PrayerKey requires no account, no sign-up, and no login. Open the website and start using it immediately. Your privacy is respected — we don't track personal data.",
+  },
+  {
+    q: "What is the Live Sermon feature?",
+    a: "The Live Sermon feature listens to the preacher through the microphone and automatically detects Bible verses being quoted or referenced in real time. Detected verses are displayed on a connected projector screen for the congregation to follow along — with no manual typing required.",
+  },
+  {
+    q: "How do I show Bible verses on a projector during a sermon?",
+    a: "Start a Live Sermon session, then click 'Open Projector' to open the projector screen in a second browser window or on a second display. As you preach, verses are detected automatically and appear on the projector screen instantly.",
+  },
+  {
+    q: "How accurate is the automatic Bible verse detection?",
+    a: "PrayerKey uses advanced AI speech recognition combined with a semantic Bible matching engine. It shows a confidence score (0–100%) for every detected verse. Verses above 90% confidence are highlighted in green. You can set the threshold to only show high-confidence matches.",
+  },
+  {
+    q: "What Bible translations does PrayerKey support?",
+    a: "PrayerKey supports 11 major Bible translations including NIV, KJV, ESV, NKJV, NLT, AMP, CSB, NASB, MSG, CEV, and GNT. You can switch translations at any time during a live session.",
+  },
+  {
+    q: "Can I use PrayerKey on my phone or tablet?",
+    a: "Yes. PrayerKey is a web application that works on any modern browser — iPhone, Android, tablet, laptop, or desktop. No app download is needed. Simply open the website in your browser.",
+  },
+  {
+    q: "What denominations is PrayerKey for?",
+    a: "PrayerKey is denomination-neutral. It is designed to serve all Christian traditions — Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, non-denominational, and more. The AI draws from the full canon of scripture without theological bias.",
+  },
+  {
+    q: "Can PrayerKey write prayers for specific situations?",
+    a: "Yes. PrayerKey generates prayers for healing, anxiety, grief, marriage, finances, thanksgiving, guidance, protection, strength, forgiveness, and any other situation you describe. The more detail you provide, the more personal and relevant the prayer will be.",
+  },
+  {
+    q: "How does Bible search work?",
+    a: "Type a verse reference like 'John 3:16', a keyword like 'faith', or a topic like 'do not fear' into the search box. PrayerKey returns the most relevant Bible verses instantly. You can also click any result to see related cross-reference verses.",
+  },
+  {
+    q: "What are cross-references in PrayerKey?",
+    a: "Cross-references are verses from different parts of the Bible that share the same theme, doctrine, or wording as a verse you are reading. PrayerKey automatically shows 4–6 of the strongest cross-references for any verse you look up, helping you study scripture more deeply.",
+  },
+  {
+    q: "Can I copy and share the prayers PrayerKey generates?",
+    a: "Yes. Every generated prayer has a 'Copy Prayer' button. You can paste it into a message, bulletin, social media post, or read it aloud during a service. The prayers are yours to use freely.",
+  },
+  {
+    q: "Does PrayerKey work without an internet connection?",
+    a: "PrayerKey requires an internet connection for AI prayer generation, live sermon verse detection, and Bible search — since these features use cloud-based AI models. However, the website itself loads quickly on any standard connection including mobile data.",
+  },
+  {
+    q: "How many people can use PrayerKey during a live church service?",
+    a: "There is no limit. The pastor controls the live session from one device, and the projector screen can be opened on any number of displays simultaneously. Congregation members can also follow along on their own phones by visiting the projector link.",
+  },
+  {
+    q: "Is PrayerKey suitable for home churches and small groups?",
+    a: "Absolutely. PrayerKey works just as well for a home Bible study of 5 people as it does for a church of 5,000. There are no minimum size requirements. The live sermon and prayer features scale to any gathering.",
+  },
+  {
+    q: "What language are the prayers generated in?",
+    a: "PrayerKey currently generates prayers in English. The quality and tone reflect the input you provide — so if you write your request in a formal style, the prayer will match. Support for additional languages is planned for future updates.",
+  },
+  {
+    q: "How is PrayerKey different from a regular Bible app?",
+    a: "Standard Bible apps let you read and search scripture. PrayerKey goes further — it actively listens during sermons and auto-displays verses on a projector, writes original AI prayers from your personal requests, and connects Bible search with intelligent cross-references. It is a live ministry tool, not just a reading app.",
+  },
+  {
+    q: "Is PrayerKey better than PewBeam?",
+    a: "PrayerKey and PewBeam both display Bible verses during sermons, but PrayerKey goes significantly further. PewBeam focuses on manual verse display — a pastor or operator selects verses to push to the screen. PrayerKey does this automatically: it listens to the sermon and detects verses in real time with no manual input. On top of that, PrayerKey adds AI prayer generation, full Bible search with cross-references, 11 translations, and a live projector designer — all completely free with no account required. For churches that want a hands-free, all-in-one tool, PrayerKey is the stronger choice.",
+  },
+  {
+    q: "Can I use PrayerKey for funerals, weddings, or special church ceremonies?",
+    a: "Yes. PrayerKey is ideal for any faith ceremony — not just Sunday services. For funerals, the prayer generator can write a compassionate prayer of comfort and remembrance in seconds. For weddings, it can compose a prayer of blessing over the couple. For baptisms, dedications, or special services, just describe the occasion and PrayerKey tailors the prayer to it. The live sermon feature also works during any spoken ceremony where scripture is referenced.",
+  },
+  {
+    q: "Who built PrayerKey?",
+    a: "PrayerKey was built by Collins Omoikhudu Asein to give every pastor and church access to AI tools that were previously only available to large, well-resourced ministries. It is an independent platform focused on making technology serve the church — not the other way around.",
+  },
+];
+
+function FAQ() {
+  return (
+    <section style={{ marginTop: "80px", textAlign: "left" }}>
+
+      {/* Section header */}
+      <div style={{ textAlign: "center", marginBottom: "48px" }}>
+        <h2 style={{
+          fontSize:      "clamp(26px, 4vw, 40px)",
+          fontWeight:    700,
+          color:         "#fff",
+          margin:        "0 0 12px",
+          letterSpacing: "-0.02em",
+          lineHeight:    1.2,
+        }}>
+          Frequently Asked Questions
+        </h2>
+        <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.4)", margin: 0 }}>
+          Your questions, answered.
+        </p>
+      </div>
+
+      {/* Two-column grid */}
+      <div style={{
+        display:             "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))",
+        gap:                 "2px",
+      }}>
+        {FAQS.map((f, i) => (
+          <FAQItem key={i} q={f.q} a={f.a} />
         ))}
       </div>
+    </section>
+  );
+}
 
-      {/* ── AI Insight + Quick Actions ── */}
-      <div className="grid grid-cols-3 gap-3" style={{ marginBottom: "20px" }}>
+function FAQItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div
+      style={{
+        borderBottom:  "1px solid rgba(255,255,255,0.06)",
+        padding:       "0",
+      }}
+    >
+      <button
+        onClick={() => setOpen((v) => !v)}
+        style={{
+          width:          "100%",
+          textAlign:      "left",
+          background:     "none",
+          border:         "none",
+          cursor:         "pointer",
+          padding:        "22px 4px",
+          display:        "flex",
+          alignItems:     "center",
+          justifyContent: "space-between",
+          gap:            "16px",
+        }}
+      >
+        <span style={{
+          fontSize:      "15px",
+          fontWeight:    600,
+          color:         "#fff",
+          lineHeight:    1.4,
+          letterSpacing: "-0.01em",
+        }}>
+          {q}
+        </span>
+        <span style={{
+          fontSize:   "18px",
+          color:      "#B07C1F",
+          flexShrink: 0,
+          transform:  open ? "rotate(45deg)" : "rotate(0deg)",
+          transition: "transform 220ms ease",
+          lineHeight: 1,
+        }}>
+          +
+        </span>
+      </button>
 
-        {/* AI Insight — 2-col, left purple accent border */}
-        <div
-          className="col-span-2 rounded-2xl"
-          style={{
-            background: "#FFFFFF",
-            boxShadow: "var(--pk-shadow-sm)",
-            borderLeft: "3px solid var(--pk-purple)",
-            padding: "20px 24px",
-          }}
-        >
-          <div className="flex items-center gap-2" style={{ marginBottom: "10px" }}>
-            <Sparkles size={13} style={{ color: "var(--pk-purple)" }} />
-            <p
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                color: "var(--pk-purple)",
-              }}
-            >
-              AI Weekly Insight
-            </p>
-          </div>
-          <p style={{ fontSize: "14px", color: "var(--pk-t1)", lineHeight: 1.6, letterSpacing: "-0.003em" }}>
-            Your congregation engagement is up{" "}
-            <strong style={{ color: "var(--pk-t1)", fontWeight: 600 }}>14%</strong> this month. The sermon
-            series on faith has resonated deeply — verse detection shows{" "}
-            <strong style={{ color: "var(--pk-gold)", fontWeight: 600 }}>Hebrews 11</strong> referenced
-            across 3 services. Consider a dedicated prayer night to sustain this momentum.
-          </p>
-          <div className="flex items-center gap-8" style={{ marginTop: "16px" }}>
-            {[
-              { label: "Sermons this month", val: "4" },
-              { label: "Verses detected",    val: "33" },
-              { label: "Prayers generated",  val: "218" },
-            ].map((m) => (
-              <div key={m.label}>
-                <p
-                  style={{
-                    fontSize: "22px",
-                    fontWeight: 700,
-                    color: "var(--pk-t1)",
-                    letterSpacing: "-0.003em",
-                    lineHeight: 1,
-                  }}
-                >
-                  {m.val}
-                </p>
-                <p style={{ fontSize: "11px", color: "var(--pk-t3)", marginTop: "2px" }}>{m.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+      {open && (
+        <p style={{
+          fontSize:    "14px",
+          color:       "rgba(255,255,255,0.55)",
+          lineHeight:  1.75,
+          margin:      "0",
+          padding:     "0 4px 22px",
+          animation:   "faqOpen 220ms ease",
+        }}>
+          {a}
+        </p>
+      )}
 
-        {/* Quick actions */}
-        <div className="flex flex-col gap-2">
-          <p
-            style={{
-              fontSize: "11px",
-              fontWeight: 600,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              color: "var(--pk-t3)",
-              marginBottom: "2px",
-            }}
-          >
-            Quick Actions
-          </p>
-          {QUICK_ACTIONS.map((a) => {
-            const Icon = a.icon;
-            return (
-              <a
-                key={a.label}
-                href={a.href}
-                className="pk-hover-link flex items-center gap-3"
-                style={{ padding: "10px 14px" }}
-              >
-                <div
-                  className="rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ width: "30px", height: "30px", background: a.bg }}
-                >
-                  <Icon size={14} style={{ color: a.color }} strokeWidth={1.8} />
-                </div>
-                <span
-                  style={{
-                    fontSize: "13px",
-                    color: "var(--pk-t1)",
-                    fontWeight: 500,
-                    letterSpacing: "-0.003em",
-                  }}
-                >
-                  {a.label}
-                </span>
-                <ChevronRight size={13} style={{ color: "var(--pk-t3)", marginLeft: "auto" }} strokeWidth={1.5} />
-              </a>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ── Sermons + Members ── */}
-      <div className="grid grid-cols-3 gap-3">
-
-        {/* Recent Sermons — 2-col grid */}
-        <div className="col-span-2">
-          <div className="flex items-center justify-between" style={{ marginBottom: "12px" }}>
-            <p style={{ fontSize: "17px", fontWeight: 600, color: "var(--pk-t1)", letterSpacing: "-0.003em" }}>
-              Recent Sermons
-            </p>
-            <a
-              href="/church/sermons"
-              style={{ fontSize: "14px", color: "var(--pk-blue)", textDecoration: "none", fontWeight: 400 }}
-            >
-              View all
-            </a>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {RECENT_SERMONS.map((s) => {
-              const c = sermonColor(s.title);
-              return (
-                <div key={s.title} className="pk-hover-card" style={{ padding: "14px" }}>
-                  {/* Art square */}
-                  <div
-                    className="w-full rounded-xl flex items-center justify-center"
-                    style={{
-                      height: "60px",
-                      marginBottom: "10px",
-                      background: `linear-gradient(135deg, ${c}14, ${c}28)`,
-                      border: `0.5px solid ${c}28`,
-                    }}
-                  >
-                    <BookOpen size={20} style={{ color: c }} strokeWidth={1.4} />
-                  </div>
-                  <p
-                    style={{
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "var(--pk-t1)",
-                      letterSpacing: "-0.003em",
-                    }}
-                  >
-                    {s.title}
-                  </p>
-                  <p style={{ fontSize: "12px", color: "var(--pk-t3)", marginTop: "2px" }}>{s.verse}</p>
-                  <div className="flex items-center justify-between" style={{ marginTop: "8px" }}>
-                    <span style={{ fontSize: "11px", color: "var(--pk-t3)" }}>{s.date}</span>
-                    <span
-                      className="rounded-full px-2 py-0.5"
-                      style={{
-                        fontSize: "10px",
-                        fontWeight: 600,
-                        color: "var(--pk-teal)",
-                        background: "rgba(0,199,190,0.08)",
-                        letterSpacing: "0.01em",
-                      }}
-                    >
-                      {s.verses} verses
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right: Members + Funds */}
-        <div>
-          {/* Members list */}
-          <div className="flex items-center justify-between" style={{ marginBottom: "12px" }}>
-            <p style={{ fontSize: "17px", fontWeight: 600, color: "var(--pk-t1)", letterSpacing: "-0.003em" }}>
-              New Members
-            </p>
-            <a
-              href="/church/members"
-              style={{ fontSize: "14px", color: "var(--pk-blue)", textDecoration: "none" }}
-            >
-              View all
-            </a>
-          </div>
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{ background: "#FFFFFF", boxShadow: "var(--pk-shadow-sm)", marginBottom: "12px" }}
-          >
-            {MEMBERS.map((m, i) => (
-              <div
-                key={m.name}
-                className="pk-hover-row flex items-center gap-3 px-4 py-2.5"
-                style={{ borderTop: i > 0 ? "0.5px solid var(--pk-b1)" : "none" }}
-              >
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{
-                    background: `${m.color}14`,
-                    border: `0.5px solid ${m.color}28`,
-                  }}
-                >
-                  <span style={{ fontSize: "11px", fontWeight: 700, color: m.color }}>{m.initials}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="truncate" style={{ fontSize: "12px", fontWeight: 600, color: "var(--pk-t1)", letterSpacing: "-0.003em" }}>
-                    {m.name}
-                  </p>
-                  <p style={{ fontSize: "10px", color: "var(--pk-t3)" }}>{m.role}</p>
-                </div>
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <Clock size={10} style={{ color: "var(--pk-t3)" }} strokeWidth={1.5} />
-                  <span style={{ fontSize: "10px", color: "var(--pk-t3)" }}>{m.joined}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Giving funds */}
-          <div
-            className="rounded-2xl"
-            style={{ background: "#FFFFFF", boxShadow: "var(--pk-shadow-sm)", padding: "16px 18px" }}
-          >
-            <div className="flex items-center gap-2" style={{ marginBottom: "14px" }}>
-              <TrendingUp size={14} style={{ color: "var(--pk-gold)" }} strokeWidth={1.8} />
-              <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--pk-t1)", letterSpacing: "-0.003em" }}>
-                Giving Funds
-              </p>
-            </div>
-            {FUNDS.map((f) => (
-              <div key={f.fund} style={{ marginBottom: "12px" }}>
-                <div className="flex justify-between" style={{ marginBottom: "5px" }}>
-                  <span style={{ fontSize: "12px", color: "var(--pk-t2)", fontWeight: 400 }}>{f.fund}</span>
-                  <span style={{ fontSize: "12px", color: f.color, fontWeight: 600 }}>{f.pct}%</span>
-                </div>
-                <div
-                  className="w-full rounded-full overflow-hidden"
-                  style={{ height: "4px", background: "rgba(0,0,0,0.06)" }}
-                >
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${f.pct}%`, background: f.color }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <style>{`
+        @keyframes faqOpen {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
