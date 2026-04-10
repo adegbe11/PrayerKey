@@ -1,15 +1,19 @@
 "use client";
 import { useState } from "react";
+import dynamic from "next/dynamic";
+
+const PrayerCardModal = dynamic(() => import("@/components/ui/PrayerCardModal"), { ssr: false });
 
 const MOODS = ["Grateful", "Anxious", "Sad", "Hopeful", "Confused", "Joyful", "Sick", "Tired"];
 
 export default function PrayPage() {
-  const [input,   setInput]   = useState("");
-  const [moods,   setMoods]   = useState<string[]>([]);
-  const [prayer,  setPrayer]  = useState<{ title: string; prayer: string; encouragement: string; verses: { ref: string; text: string }[] } | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error,   setError]   = useState("");
-  const [copied,  setCopied]  = useState(false);
+  const [input,     setInput]     = useState("");
+  const [moods,     setMoods]     = useState<string[]>([]);
+  const [prayer,    setPrayer]    = useState<{ title: string; prayer: string; encouragement: string; verses: { ref: string; text: string }[] } | null>(null);
+  const [showCard,  setShowCard]  = useState(false);
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState("");
+  const [copied,    setCopied]    = useState(false);
 
   function toggleMood(m: string) {
     setMoods((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
@@ -29,6 +33,7 @@ export default function PrayPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong");
       setPrayer(data);
+      setShowCard(true);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -305,6 +310,29 @@ export default function PrayPage() {
             borderTop:    "none",
             borderRadius: "0 0 16px 16px",
           }}>
+            {/* View Card button */}
+            <button
+              onClick={() => setShowCard(true)}
+              style={{
+                padding:      "10px 20px",
+                minHeight:    "44px",
+                borderRadius: "6px",
+                border:       "1.5px solid #B07C1F",
+                background:   "rgba(176,124,31,0.1)",
+                color:        "#C49A2A",
+                fontSize:     "13px",
+                fontWeight:   700,
+                cursor:       "pointer",
+                transition:   "all 180ms ease",
+                display:      "flex",
+                alignItems:   "center",
+                gap:          "6px",
+                boxShadow:    "2px 2px 0 0 rgba(176,124,31,0.2)",
+              }}
+            >
+              🎴 View & Download Card
+            </button>
+
             <button
               onClick={copy}
               style={{
@@ -323,7 +351,7 @@ export default function PrayPage() {
                 gap:          "6px",
               }}
             >
-              {copied ? "✓ Copied!" : "📋 Copy Prayer"}
+              {copied ? "✓ Copied!" : "📋 Copy"}
             </button>
             <button
               onClick={() => { setPrayer(null); setInput(""); setMoods([]); }}
@@ -343,6 +371,11 @@ export default function PrayPage() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* ── Prayer Card Modal ── */}
+      {showCard && prayer && (
+        <PrayerCardModal prayer={prayer} onClose={() => setShowCard(false)} />
       )}
 
       <style>{`
