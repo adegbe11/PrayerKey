@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
   ]);
 
   // Mask anonymous authors
-  const masked = testimonies.map((t) => ({
+  const masked = testimonies.map((t: (typeof testimonies)[number]) => ({
     ...t,
     user: t.anonymous ? null : t.user,
   }));
