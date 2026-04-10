@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { generatePrayer } from "@/lib/ai/prayer-generation";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30; // extend Vercel timeout to 30s for LLM calls
 
 export async function POST(req: Request) {
   try {
@@ -26,7 +27,8 @@ export async function POST(req: Request) {
       createdAt:     new Date(),
     });
   } catch (err) {
-    console.error("[api/prayer/generate]", err);
-    return NextResponse.json({ error: "Failed to generate prayer" }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[api/prayer/generate]", msg);
+    return NextResponse.json({ error: msg || "Failed to generate prayer" }, { status: 500 });
   }
 }
