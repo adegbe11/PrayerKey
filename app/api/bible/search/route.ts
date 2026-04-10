@@ -2,9 +2,12 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
+import OpenAI from "openai";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new OpenAI({
+  apiKey:  process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+});
 
 /**
  * GET /api/bible/search?q=<query>&translation=<NIV|KJV|...>
