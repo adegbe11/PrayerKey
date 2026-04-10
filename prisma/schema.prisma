@@ -1,0 +1,317 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  SUPER_ADMIN
+  CHURCH_ADMIN
+  PASTOR
+  VOLUNTEER
+  MEMBER
+}
+
+enum ChurchPlan {
+  STARTER
+  PLUS
+  CORE
+  ENTERPRISE
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// ─────────────────────────────────────────────
+// Core models
+// ─────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  avatarUrl     String?
+  password      String?
+  role          UserRole  @default(MEMBER)
+  churchId      String?
+  church        Church?   @relation(fields: [churchId], references: [id])
+  prayerStreak  Int       @default(0)
+  bestStreak    Int       @default(0)
+  lastPrayedAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  prayers        Prayer[]
+  donations      Donation[]
+  testimonies    Testimony[]
+  prayerRequests PrayerRequest[]
+  announcements  Announcement[]  @relation("AnnouncementAuthor")
+  subscription   Subscription?
+
+  // NextAuth
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Church {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  city        String?
+  country     String?
+  logoUrl     String?
+  brandColor  String?
+  plan        ChurchPlan @default(STARTER)
+  createdAt   DateTime   @default(now())
+
+  members        User[]
+  services       Service[]
+  sermons        Sermon[]
+  events         Event[]
+  givingFunds    GivingFund[]
+  donations      Donation[]
+  prayerRequests PrayerRequest[]
+  announcements  Announcement[]
+  apiKeys        ApiKey[]
+}
+
+// ─────────────────────────────────────────────
+// Live sermon + AI detection
+// ─────────────────────────────────────────────
+
+model Service {
+  id               String           @id @default(cuid())
+  churchId         String
+  church           Church           @relation(fields: [churchId], references: [id])
+  title            String
+  type             String           @default("SUNDAY_SERVICE")
+  status           String           @default("SCHEDULED")
+  startedAt        DateTime?
+  endedAt          DateTime?
+  durationSeconds  Int?
+  versesDetected   Int              @default(0)
+  isLive           Boolean          @default(false)
+  audioUrl         String?
+  transcriptRaw    String?
+  detectedVerses   VerseDetection[]
+  summaryAI        String?
+  powerMoments     Json?
+  attendanceCount  Int?
+  createdAt        DateTime         @default(now())
+}
+
+model VerseDetection {
+  id               String   @id @default(cuid())
+  serviceId        String
+  service          Service  @relation(fields: [serviceId], references: [id])
+  verseRef         String
+  verseText        String
+  translation      String   @default("NIV")
+  confidence       Float
+  detectedAt       DateTime @default(now())
+  transcriptSnippet String
+  detectionMs      Int
+}
+
+model Sermon {
+  id          String   @id @default(cuid())
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id])
+  title       String
+  date        DateTime
+  duration    Int?
+  audioUrl    String?
+  transcript  String?
+  summaryAI   String?
+  blogPostAI  String?
+  verseCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// Prayer AI engine
+// ─────────────────────────────────────────────
+
+model Prayer {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  mood            String[]
+  userInput       String
+  generatedPrayer String
+  verses          Json
+  encouragement   String?
+  isBookmarked    Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// Church management
+// ─────────────────────────────────────────────
+
+model Event {
+  id          String   @id @default(cuid())
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id])
+  title       String
+  date        DateTime
+  location    String?
+  description String?
+  attendees   Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model GivingFund {
+  id          String     @id @default(cuid())
+  churchId    String
+  church      Church     @relation(fields: [churchId], references: [id])
+  name        String
+  goal        Int?
+  description String?
+  donations   Donation[]
+  createdAt   DateTime   @default(now())
+}
+
+model Donation {
+  id              String        @id @default(cuid())
+  churchId        String
+  church          Church        @relation(fields: [churchId], references: [id])
+  userId          String?
+  user            User?         @relation(fields: [userId], references: [id])
+  fundId          String
+  fund            GivingFund    @relation(fields: [fundId], references: [id])
+  amount          Int
+  currency        String        @default("USD")
+  stripePaymentId String?
+  status          PaymentStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id])
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  plan                 String   @default("free")
+  status               String   @default("active")
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────
+// Community
+// ─────────────────────────────────────────────
+
+model Testimony {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  story     String
+  tags      String[]
+  anonymous Boolean  @default(false)
+  approved  Boolean  @default(false)
+  amenCount Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// Community & Social Layer
+// ─────────────────────────────────────────────
+
+model PrayerRequest {
+  id          String   @id @default(cuid())
+  churchId    String
+  church      Church   @relation(fields: [churchId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
+  body        String
+  anonymous   Boolean  @default(false)
+  prayCount   Int      @default(0)
+  answered    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  churchId  String
+  church    Church   @relation(fields: [churchId], references: [id])
+  authorId  String
+  author    User     @relation("AnnouncementAuthor", fields: [authorId], references: [id])
+  title     String
+  body      String
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────
+// REST API keys
+// ─────────────────────────────────────────────
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  churchId   String
+  church     Church    @relation(fields: [churchId], references: [id])
+  name       String
+  keyHash    String    @unique
+  keyPrefix  String    // first 8 chars shown in UI (e.g. "pk_live_")
+  scopes     String[]  @default(["read"])
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+}
+
+// ─────────────────────────────────────────────
+// NextAuth required models
+// ─────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}

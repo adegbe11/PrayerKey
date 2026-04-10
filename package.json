@@ -1,0 +1,57 @@
+{
+  "name": "prayerkeydesk",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 4000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "deploy": "bash scripts/deploy.sh"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
+    "@deepgram/sdk": "^5.0.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@pinecone-database/pinecone": "^7.1.0",
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "@tanstack/react-query": "^5.94.5",
+    "bcryptjs": "^3.0.3",
+    "framer-motion": "^12.38.0",
+    "groq-sdk": "^0.9.1",
+    "jose": "^6.2.2",
+    "lucide-react": "^0.577.0",
+    "next": "14.2.35",
+    "next-auth": "^5.0.0-beta.30",
+    "openai": "^6.32.0",
+    "pg": "^8.20.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.71.2",
+    "recharts": "^3.8.0",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "postcss": "^8",
+    "prisma": "^7.5.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
