@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { generatePrayer } from "@/lib/ai/prayer-generation";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 30; // extend Vercel timeout to 30s for LLM calls
+export const runtime = "nodejs";
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
   try {
