@@ -1,606 +1,270 @@
 export interface PrayerTopic {
-  slug:        string;
-  title:       string;       // page H1 + OG title
-  metaDesc:    string;       // meta description (150 chars)
-  category:    string;
-  keywords:    string[];     // long-tail variants
-  samplePrayer:string;       // static prayer (indexed by Google)
-  scripture:   { ref: string; text: string }[];
-  related:     string[];     // slugs of related topics
+  slug:         string;
+  title:        string;
+  metaDesc:     string;
+  category:     string;
+  keywords:     string[];
+  samplePrayer: string;
+  scripture:    { ref: string; text: string }[];
+  related:      string[];
 }
 
 export const PRAYER_TOPICS: PrayerTopic[] = [
   // ── HEALING ──────────────────────────────────────────────────────
-  {
-    slug: "healing",
-    title: "Prayer for Healing",
-    metaDesc: "Powerful prayer for healing — physical, emotional, and spiritual. Find comfort and restoration through scripture-based prayer.",
-    category: "Health",
-    keywords: ["prayer for healing","healing prayer","prayer for the sick","prayer for recovery","healing scriptures"],
-    samplePrayer: "Lord Jesus, You are the Great Physician, and I come before You today in need of Your healing touch. You bore my sicknesses and carried my diseases, and by Your stripes I am healed. I stand on Your Word and declare that healing flows through my body right now. Restore every cell, every tissue, every organ to perfect health. Where there is pain, let Your peace reign. Where there is weakness, let Your strength arise. I trust You, Lord, with my body, my mind, and my spirit. May this healing bring glory to Your name. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Jeremiah 17:14", text: "Heal me, Lord, and I will be healed; save me and I will be saved, for you are the one I praise." },
-      { ref: "Isaiah 53:5", text: "But he was pierced for our transgressions, he was crushed for our iniquities; the punishment that brought us peace was on him, and by his wounds we are healed." },
-    ],
-    related: ["sick-loved-one","cancer","anxiety","depression","recovery"],
-  },
-  {
-    slug: "healing-for-cancer",
-    title: "Prayer for Healing from Cancer",
-    metaDesc: "A heartfelt prayer for healing from cancer. Bring hope and faith to those battling cancer with this powerful scripture-based prayer.",
-    category: "Health",
-    keywords: ["prayer for cancer","cancer healing prayer","prayer for someone with cancer","prayer for cancer patient"],
-    samplePrayer: "Heavenly Father, I come before You with a heart full of faith, trusting in Your power to heal. Cancer is no match for Your might. You spoke the world into existence and You can speak wholeness into this body. I bind every cancerous cell and command it to wither in the name of Jesus. Strengthen the treatments, guide the doctors' hands, and let Your supernatural healing flow. Give courage and peace that surpasses all understanding. You are Jehovah Rapha — the Lord who heals. I believe. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 103:2-3", text: "Praise the Lord, my soul, and forget not all his benefits — who forgives all your sins and heals all your diseases." },
-      { ref: "Matthew 8:17", text: "He took up our infirmities and bore our diseases." },
-    ],
-    related: ["healing","sick-loved-one","recovery","strength","hope"],
-  },
-  {
-    slug: "sick-loved-one",
-    title: "Prayer for a Sick Loved One",
-    metaDesc: "Pray for a sick friend or family member. This powerful prayer brings God's healing and comfort to those you love who are suffering.",
-    category: "Health",
-    keywords: ["prayer for sick loved one","prayer for sick friend","prayer for sick family member","prayer for someone who is ill"],
-    samplePrayer: "Lord, I lift up my beloved to You right now. You see their pain, You know their struggle, and You love them even more than I do. I ask for Your healing hand to rest upon them. Surround them with Your peace, drive away fear, and fill their room with Your presence. Let the doctors and nurses be instruments of Your grace. Restore their health, renew their strength, and let this season of sickness give way to a testimony of Your faithfulness. In Jesus' mighty name, Amen.",
-    scripture: [
-      { ref: "James 5:15", text: "And the prayer offered in faith will make the sick person well; the Lord will raise them up." },
-      { ref: "Psalm 41:3", text: "The Lord sustains them on their sickbed and restores them from their bed of illness." },
-    ],
-    related: ["healing","cancer","recovery","comfort","hospital"],
-  },
-  {
-    slug: "recovery",
-    title: "Prayer for Recovery",
-    metaDesc: "A prayer for full recovery after surgery, illness or injury. Trust God to restore your strength and health completely.",
-    category: "Health",
-    keywords: ["prayer for recovery","prayer after surgery","prayer for strength during illness","recovery prayer"],
-    samplePrayer: "Father God, I thank You that You are the source of all restoration. As my body recovers, I invite Your healing power to work in every part of me. Strengthen what is weak, mend what is broken, and speed this recovery beyond what doctors expect. Let every setback be a setup for a greater testimony. I choose faith over fear, and trust over worry. You hold my days in Your hands, and I rest in that truth. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 30:2", text: "Lord my God, I called to you for help, and you healed me." },
-      { ref: "Isaiah 40:31", text: "But those who hope in the Lord will renew their strength." },
-    ],
-    related: ["healing","surgery","strength","hospital","anxiety"],
-  },
-  {
-    slug: "hospital",
-    title: "Prayer for Someone in the Hospital",
-    metaDesc: "A comforting prayer for someone in the hospital. Ask God to bring healing, peace, and His presence to hospital rooms.",
-    category: "Health",
-    keywords: ["prayer for hospital patient","hospital prayer","prayer for someone in icu","prayer for surgery"],
-    samplePrayer: "Lord Jesus, right now I pray for healing and peace over every hospital room where Your children lie. Be the Comforter, be the Healer. Guide the hands of every doctor and nurse. Let no diagnosis be final except Yours. Remove fear and replace it with faith. Restore life, restore health, restore hope. Let Your presence fill that room like sunshine. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 23:4", text: "Even though I walk through the darkest valley, I will fear no evil, for you are with me." },
-    ],
-    related: ["healing","sick-loved-one","surgery","recovery","strength"],
-  },
-  // ── EMOTIONAL / MENTAL HEALTH ───────────────────────────────────
-  {
-    slug: "anxiety",
-    title: "Prayer for Anxiety",
-    metaDesc: "Find peace through prayer for anxiety. Let go of worry and fear with this calming, scripture-based prayer for anxious hearts.",
-    category: "Mental Health",
-    keywords: ["prayer for anxiety","prayer to calm anxiety","prayer for worry","prayer for stress","anxiety prayer"],
-    samplePrayer: "Prince of Peace, the storms in my mind are loud, but Your voice is louder. I cast every anxious thought at Your feet right now. You told me not to be anxious about anything, and I choose to believe that today. Replace my fear with faith, my worry with worship, my panic with peace. Breathe Your calm into my spirit. Quiet my racing thoughts. Still my trembling heart. You are with me, and that is enough. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Philippians 4:6-7", text: "Do not be anxious about anything, but in every situation, by prayer and petition, present your requests to God. And the peace of God will guard your hearts." },
-      { ref: "1 Peter 5:7", text: "Cast all your anxiety on him because he cares for you." },
-    ],
-    related: ["depression","stress","peace","fear","mental-health"],
-  },
-  {
-    slug: "depression",
-    title: "Prayer for Depression",
-    metaDesc: "A powerful prayer for depression and sadness. Find hope, strength, and God's light in your darkest moments.",
-    category: "Mental Health",
-    keywords: ["prayer for depression","prayer when depressed","prayer for sadness","prayer for hopelessness","depression prayer"],
-    samplePrayer: "Father, the darkness feels heavy today. I can't see the way through, but I know You can. You are the lifter of my head. You promised to never leave me or forsake me, and I hold onto that promise like a lifeline. Lift this heaviness off my spirit. Remind me of Your goodness. Let joy find me again, even in small ways — a sunrise, a kind word, a reason to smile. I am not alone. You are here. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 34:18", text: "The Lord is close to the brokenhearted and saves those who are crushed in spirit." },
-      { ref: "Psalm 42:11", text: "Why, my soul, are you downcast? Put your hope in God, for I will yet praise him." },
-    ],
-    related: ["anxiety","grief","loneliness","hope","mental-health","strength"],
-  },
-  {
-    slug: "stress",
-    title: "Prayer for Stress",
-    metaDesc: "Release stress through prayer. Find rest and clarity when life feels overwhelming with this powerful prayer for stress relief.",
-    category: "Mental Health",
-    keywords: ["prayer for stress","prayer for stress relief","prayer when overwhelmed","prayer to reduce stress"],
-    samplePrayer: "Lord, I am overwhelmed. The weight of life feels heavy right now. I surrender every deadline, every pressure, every expectation to You. You promised that Your yoke is easy and Your burden is light. I trade my heavy load for Your peace. Help me to do what I can do, trust You with what I cannot, and rest in the knowledge that You are in control. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Matthew 11:28", text: "Come to me, all you who are weary and burdened, and I will give you rest." },
-      { ref: "Psalm 55:22", text: "Cast your cares on the Lord and he will sustain you." },
-    ],
-    related: ["anxiety","peace","work","rest","burnout"],
-  },
-  {
-    slug: "mental-health",
-    title: "Prayer for Mental Health",
-    metaDesc: "A prayer for mental health and emotional wellbeing. Find healing for your mind through God's Word and His perfect peace.",
-    category: "Mental Health",
-    keywords: ["prayer for mental health","prayer for sound mind","prayer for emotional healing","mental health prayer"],
-    samplePrayer: "God of all comfort, I thank You that You care about my mind as much as my body. You have not given me a spirit of fear, but of power, love, and a sound mind. I receive that sound mind today. Heal every wound in my thinking. Renew my mind with Your truth. Where lies have taken root, plant Your Word. I am not defined by my struggles — I am defined by Your love. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "2 Timothy 1:7", text: "For the Spirit God gave us does not make us timid, but gives us power, love and self-discipline." },
-      { ref: "Romans 12:2", text: "Be transformed by the renewing of your mind." },
-    ],
-    related: ["anxiety","depression","peace","strength","hope"],
-  },
-  // ── MORNING / NIGHT ─────────────────────────────────────────────
-  {
-    slug: "morning",
-    title: "Morning Prayer",
-    metaDesc: "Start your day right with a powerful morning prayer. Invite God into your day with this uplifting scripture-based morning devotion.",
-    category: "Daily Prayer",
-    keywords: ["morning prayer","prayer to start the day","daily morning prayer","good morning prayer","morning devotion"],
-    samplePrayer: "Good morning, Lord! I give You this day before it unfolds. Every hour belongs to You. Guide my steps, guard my tongue, and lead me in the paths of righteousness. Where I will face challenges today, give me wisdom. Where I encounter people, let me reflect Your love. Fill me afresh with Your Spirit and let this day count for eternity. Thank You for the gift of another day. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 5:3", text: "In the morning, Lord, you hear my voice; in the morning I lay my requests before you and wait expectantly." },
-      { ref: "Lamentations 3:22-23", text: "His compassions never fail. They are new every morning; great is your faithfulness." },
-    ],
-    related: ["daily","gratitude","protection","work","strength"],
-  },
-  {
-    slug: "night",
-    title: "Night Prayer Before Bed",
-    metaDesc: "End your day in peace with a calming night prayer before bed. Rest in God's protection and presence as you sleep.",
-    category: "Daily Prayer",
-    keywords: ["night prayer","bedtime prayer","prayer before sleep","evening prayer","prayer before bed"],
-    samplePrayer: "Lord, as this day comes to a close, I lay it all at Your feet. Thank You for protecting me, providing for me, and walking with me. Forgive me for where I fell short today. As I sleep, watch over me and my household. Let Your angels encamp around us. Quiet my mind and grant me restful sleep, that I might wake refreshed and ready to serve You again. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 4:8", text: "In peace I will lie down and sleep, for you alone, Lord, make me dwell in safety." },
-      { ref: "Psalm 121:4", text: "He who watches over Israel will neither slumber nor sleep." },
-    ],
-    related: ["morning","protection","peace","rest","daily"],
-  },
-  {
-    slug: "daily",
-    title: "Daily Prayer",
-    metaDesc: "A powerful daily prayer to keep you connected to God throughout the day. Perfect for a consistent morning or evening devotion.",
-    category: "Daily Prayer",
-    keywords: ["daily prayer","everyday prayer","simple daily prayer","prayer for today","short daily prayer"],
-    samplePrayer: "Father, I come to You today with a humble heart. I need You in every moment — in my conversations, in my decisions, in my rest and in my work. Fill me with Your Spirit. Let Your will be done in my life today, not mine. I trust You with everything I am and everything I face. Be glorified in my life today. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Matthew 6:11", text: "Give us today our daily bread." },
-      { ref: "Psalm 118:24", text: "This is the day the Lord has made; let us rejoice and be glad in it." },
-    ],
-    related: ["morning","night","gratitude","strength","peace"],
-  },
-  // ── FAMILY / RELATIONSHIPS ──────────────────────────────────────
-  {
-    slug: "family",
-    title: "Prayer for Family",
-    metaDesc: "A powerful prayer for your family — for unity, protection, love, and God's blessing over every member of your household.",
-    category: "Family",
-    keywords: ["prayer for family","family prayer","prayer for my family","prayer for family unity","blessing prayer for family"],
-    samplePrayer: "Father, I lift my family to You. You placed us together for a purpose, and I ask that Your love would be the foundation of everything we share. Where there is division, bring unity. Where there are wounds, bring healing. Protect every member of my family — physically, spiritually, and emotionally. Let our home be a place where Your presence is felt and Your love is shown. Bless us and make us a blessing. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Joshua 24:15", text: "As for me and my household, we will serve the Lord." },
-      { ref: "Psalm 128:3", text: "Your children will be like olive shoots around your table." },
-    ],
-    related: ["marriage","children","parents","unity","protection"],
-  },
-  {
-    slug: "marriage",
-    title: "Prayer for Marriage",
-    metaDesc: "Strengthen your marriage with prayer. A powerful prayer for love, unity, and restoration in your marriage relationship.",
-    category: "Family",
-    keywords: ["prayer for marriage","marriage prayer","prayer for husband and wife","prayer to save marriage","prayer for couple"],
-    samplePrayer: "Lord, I thank You for the gift of marriage. What You have joined together, no force can separate. I pray for our union — that love would always be our language, patience our practice, and forgiveness our response. Where we have hurt each other, heal those wounds. Renew the spark. Remind us why we chose each other. May our marriage be a testimony of Your faithfulness and covenant love. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Ecclesiastes 4:12", text: "A cord of three strands is not quickly broken." },
-      { ref: "1 Corinthians 13:4-5", text: "Love is patient, love is kind. It does not envy, it does not boast." },
-    ],
-    related: ["family","husband","wife","unity","forgiveness","love"],
-  },
-  {
-    slug: "husband",
-    title: "Prayer for My Husband",
-    metaDesc: "A loving prayer for your husband — for his strength, faith, protection, and purpose. Lift your husband to God in prayer today.",
-    category: "Family",
-    keywords: ["prayer for husband","prayer for my husband","wife prayer for husband","prayer for husband protection","prayer for husband strength"],
-    samplePrayer: "Lord, I lift my husband to You. You know him better than I do. I pray that You would protect him wherever he goes today. Fill him with wisdom to lead, strength to persevere, and faith to trust You in every season. Let him feel Your hand on his life. Be his confidence when he doubts, his peace when he's anxious, and his joy when life is hard. Bless the work of his hands. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Proverbs 18:10", text: "The name of the Lord is a fortified tower; the righteous run to it and are safe." },
-      { ref: "Psalm 112:1-2", text: "Blessed is the man who fears the Lord. His children will be mighty in the land." },
-    ],
-    related: ["marriage","wife","family","protection","strength"],
-  },
-  {
-    slug: "wife",
-    title: "Prayer for My Wife",
-    metaDesc: "A beautiful prayer for your wife — for her joy, health, strength, and purpose. Honor her by lifting her to God in prayer.",
-    category: "Family",
-    keywords: ["prayer for wife","prayer for my wife","prayer for wife protection","husband prayer for wife","prayer for wife strength"],
-    samplePrayer: "Father, I thank You for my wife — she is a gift I do not deserve. I pray that You would surround her with Your love today. Give her joy that is unshakeable, strength that is supernatural, and peace that passes understanding. Let her know how valued and loved she is — by You and by me. Protect her heart, bless her work, and fulfill every dream You have planted in her. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Proverbs 31:25", text: "She is clothed with strength and dignity; she can laugh at the days to come." },
-      { ref: "Song of Solomon 4:7", text: "You are altogether beautiful, my darling; there is no flaw in you." },
-    ],
-    related: ["marriage","husband","family","love","strength"],
-  },
-  {
-    slug: "children",
-    title: "Prayer for Children",
-    metaDesc: "Pray protection, wisdom, and God's blessing over your children. A powerful parental prayer for your kids every day.",
-    category: "Family",
-    keywords: ["prayer for children","prayer for my child","prayer for kids","parents prayer for children","prayer for my son","prayer for my daughter"],
-    samplePrayer: "Lord, I place my children into Your hands — the safest place they could ever be. Protect them from every harm, seen and unseen. Guard their hearts from the corruption of this world and plant Your Word deep within them. Give them wisdom beyond their years. Let them know Your love personally and walk in Your purpose all their days. Bless them and make them a blessing. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Proverbs 22:6", text: "Start children off on the way they should go, and even when they are old they will not turn from it." },
-      { ref: "Isaiah 54:13", text: "All your children will be taught by the Lord, and great will be their peace." },
-    ],
-    related: ["family","parents","school","protection","wisdom"],
-  },
-  {
-    slug: "parents",
-    title: "Prayer for Parents",
-    metaDesc: "Honor your parents with prayer. A heartfelt prayer for the health, strength, and blessing of your mother and father.",
-    category: "Family",
-    keywords: ["prayer for parents","prayer for mother and father","prayer for aging parents","prayer for my mom and dad"],
-    samplePrayer: "Lord, I honor and thank You for my parents. They have given so much of themselves for me. I lift them to You today — bless their bodies with health, their minds with clarity, and their hearts with peace. Repay every sacrifice they made with Your abundant blessing. Where they are struggling, be their strength. Where they are lonely, be their companion. Let their latter years be their greatest years. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Proverbs 20:29", text: "The glory of young men is their strength, gray hair the splendor of the old." },
-      { ref: "Exodus 20:12", text: "Honor your father and your mother, so that you may live long in the land." },
-    ],
-    related: ["family","healing","elderly","gratitude","children"],
-  },
-  // ── FINANCES / WORK ─────────────────────────────────────────────
-  {
-    slug: "financial-breakthrough",
-    title: "Prayer for Financial Breakthrough",
-    metaDesc: "Pray for a financial breakthrough. A powerful prayer for debt cancellation, provision, and God's supernatural abundance.",
-    category: "Finance",
-    keywords: ["prayer for financial breakthrough","financial breakthrough prayer","prayer for money","prayer for finances","prayer for debt","prosperity prayer"],
-    samplePrayer: "Jehovah Jireh, my Provider, I come before You in faith. You own the cattle on a thousand hills and every resource belongs to You. I ask for a financial breakthrough. Open doors that no one can shut. Bring unexpected income and supernatural provision. Cancel every debt and replace it with abundance. Teach me to steward what You give me well. I trust You not just for my needs, but for overflow that I can use to bless others. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Philippians 4:19", text: "And my God will meet all your needs according to the riches of his glory in Christ Jesus." },
-      { ref: "Malachi 3:10", text: "Test me in this, says the Lord Almighty, and see if I will not throw open the floodgates of heaven." },
-    ],
-    related: ["job","provision","debt","abundance","blessing"],
-  },
-  {
-    slug: "job",
-    title: "Prayer for a Job",
-    metaDesc: "A faith-filled prayer for employment and a new job. Trust God to open the right door and bring your dream job to you.",
-    category: "Finance",
-    keywords: ["prayer for a job","prayer for employment","prayer for job interview","prayer to get hired","prayer for new job"],
-    samplePrayer: "Father, You know my need for work. I ask You to open a door that is perfect for the gifts You have placed in me. Prepare me for the opportunity before it arrives. Give me favor with employers and let my interviews go beyond my own ability. I refuse to operate in fear — I walk in faith. The right job is already assigned to me; I ask You to lead me there. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 75:6-7", text: "No one from the east or the west can exalt themselves. It is God who judges: He brings one down, he exalts another." },
-      { ref: "Proverbs 16:3", text: "Commit to the Lord whatever you do, and he will establish your plans." },
-    ],
-    related: ["financial-breakthrough","work","provision","favor","wisdom"],
-  },
-  {
-    slug: "work",
-    title: "Prayer for Work",
-    metaDesc: "Invite God into your workplace with this powerful prayer for work — for favor, productivity, wisdom, and God's blessing on your career.",
-    category: "Finance",
-    keywords: ["prayer for work","workplace prayer","prayer for career","prayer for business","prayer before work"],
-    samplePrayer: "Lord, as I go to work today I invite You into my workplace. Be the wisdom behind every decision. Give me favor with colleagues, clients, and leadership. Let my work be excellent — a reflection of the God I serve. Guard my integrity, protect me from office politics, and let Your purpose be served through my career. May everything I put my hand to prosper. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Colossians 3:23", text: "Whatever you do, work at it with all your heart, as working for the Lord, not for human masters." },
-      { ref: "Proverbs 16:3", text: "Commit to the Lord whatever you do, and he will establish your plans." },
-    ],
-    related: ["job","financial-breakthrough","wisdom","favor","morning"],
-  },
-  // ── PROTECTION ──────────────────────────────────────────────────
-  {
-    slug: "protection",
-    title: "Prayer for Protection",
-    metaDesc: "A powerful prayer for God's protection over you and your family. Declare Psalm 91 and claim divine safety today.",
-    category: "Protection",
-    keywords: ["prayer for protection","protection prayer","prayer for safety","prayer for God's protection","Psalm 91 prayer","prayer from danger"],
-    samplePrayer: "Lord, I declare Psalm 91 over my life today. You are my refuge and my fortress, my God in whom I trust. I ask that Your angels be stationed around me and my household. No weapon formed against me shall prosper. No accident, no attack, no evil shall come near my dwelling. I walk in divine protection because I live under the shadow of the Almighty. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 91:11", text: "For he will command his angels concerning you to guard you in all your ways." },
-      { ref: "Isaiah 54:17", text: "No weapon forged against you will prevail." },
-    ],
-    related: ["family","morning","travel","danger","children"],
-  },
-  {
-    slug: "travel",
-    title: "Prayer for Safe Travel",
-    metaDesc: "A prayer for safe travel by car, plane, or any journey. Cover your trip with God's protection and arrive safely at your destination.",
-    category: "Protection",
-    keywords: ["prayer for safe travel","travel prayer","prayer before road trip","prayer for flight","prayer for journey"],
-    samplePrayer: "Father, as I travel today, I commit this journey into Your hands. Be the Navigator who guides every turn. Protect me on the roads, in the air, and on the water. Let Your angels go before me and behind me. Prevent accidents and keep every vehicle around me under Your watch. I arrive safely, in Jesus' name. Thank You for journeying with me. Amen.",
-    scripture: [
-      { ref: "Psalm 121:8", text: "The Lord will watch over your coming and going both now and forevermore." },
-      { ref: "Proverbs 3:23", text: "Then you will go on your way in safety, and your foot will not stumble." },
-    ],
-    related: ["protection","morning","family","danger"],
-  },
-  // ── FAITH / SPIRITUAL GROWTH ────────────────────────────────────
-  {
-    slug: "strength",
-    title: "Prayer for Strength",
-    metaDesc: "When you feel weak, pray for God's strength. A powerful prayer for inner strength, endurance, and perseverance through hard times.",
-    category: "Faith",
-    keywords: ["prayer for strength","strength prayer","prayer for inner strength","prayer when feeling weak","prayer for courage"],
-    samplePrayer: "Lord God, I am weak but You are strong. Right now I need Your strength, not my own. I can do all things through Christ who strengthens me — and I declare that today. Infuse me with supernatural endurance. When I want to quit, remind me why I started. When my legs give out, carry me. Let Your power be made perfect in my weakness. I will not fall — for You uphold me with Your righteous right hand. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Philippians 4:13", text: "I can do all this through him who gives me strength." },
-      { ref: "Isaiah 41:10", text: "Do not fear, for I am with you; do not be dismayed, for I am your God. I will strengthen you and help you." },
-    ],
-    related: ["courage","hope","healing","depression","perseverance"],
-  },
-  {
-    slug: "hope",
-    title: "Prayer for Hope",
-    metaDesc: "A prayer for hope when you feel hopeless. Let God restore your hope and remind you of His faithfulness and promises.",
-    category: "Faith",
-    keywords: ["prayer for hope","hope prayer","prayer when hopeless","prayer for faith","prayer for encouragement"],
-    samplePrayer: "God of hope, I come to You at the end of my own strength. Everything in me wants to give up, but I know You are not done. You make all things new. You bring life out of death. I ask You to reignite the hope inside me. Remind me of Your promises. Show me a glimpse of the future You have planned. Let hope rise like the morning sun — certain and unstoppable. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Romans 15:13", text: "May the God of hope fill you with all joy and peace as you trust in him, so that you may overflow with hope." },
-      { ref: "Jeremiah 29:11", text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future." },
-    ],
-    related: ["strength","depression","faith","encouragement","peace"],
-  },
-  {
-    slug: "faith",
-    title: "Prayer for Faith",
-    metaDesc: "Grow in faith through prayer. Ask God to increase your faith, remove doubt, and help you trust Him completely.",
-    category: "Faith",
-    keywords: ["prayer for faith","faith prayer","prayer to increase faith","prayer for belief","prayer for trust in God"],
-    samplePrayer: "Lord, I believe — help my unbelief. Where doubt has crept in, shine the light of Your truth. Where my faith has grown cold, ignite it again. I want to trust You with the audacity of Abraham, the boldness of David, and the surrender of Mary. Stretch my faith beyond what is comfortable into what is miraculous. I choose to believe Your Word over my circumstances. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Hebrews 11:1", text: "Now faith is confidence in what we hope for and assurance about what we do not see." },
-      { ref: "Mark 9:24", text: "I do believe; help me overcome my unbelief!" },
-    ],
-    related: ["hope","strength","prayer","trust","spiritual-growth"],
-  },
-  {
-    slug: "forgiveness",
-    title: "Prayer for Forgiveness",
-    metaDesc: "A prayer for God's forgiveness and to forgive others. Release guilt, shame, and bitterness through this powerful prayer.",
-    category: "Faith",
-    keywords: ["prayer for forgiveness","forgiveness prayer","prayer to forgive someone","prayer for repentance","prayer for guilt"],
-    samplePrayer: "Father, I come before You with a heart that needs Your mercy. I have fallen short, and I am sorry. Thank You for the blood of Jesus that cleanses every sin and removes every stain. I receive Your forgiveness completely — I will not carry this guilt any longer. And Lord, help me to forgive others as You have forgiven me. Release me from bitterness and fill that space with Your love. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "1 John 1:9", text: "If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness." },
-      { ref: "Ephesians 4:32", text: "Be kind and compassionate to one another, forgiving each other, just as in Christ God forgave you." },
-    ],
-    related: ["healing","peace","reconciliation","repentance","love"],
-  },
-  {
-    slug: "peace",
-    title: "Prayer for Peace",
-    metaDesc: "Find God's peace that passes understanding. A calming prayer for peace of mind, peace in relationships, and peace in the world.",
-    category: "Faith",
-    keywords: ["prayer for peace","peace prayer","prayer for peace of mind","prayer for inner peace","calming prayer"],
-    samplePrayer: "Lord Jesus, You spoke peace to a raging storm and it obeyed. I ask You to speak that same peace over my heart today. Calm the storms inside me — the racing thoughts, the unresolved conflicts, the uncertain future. Fill me with the peace that passes all understanding. Guard my heart and mind in Christ Jesus. Let me be a carrier of Your peace everywhere I go. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "John 14:27", text: "Peace I leave with you; my peace I give you. I do not give to you as the world gives. Do not let your hearts be troubled." },
-      { ref: "Isaiah 26:3", text: "You will keep in perfect peace those whose minds are steadfast, because they trust in you." },
-    ],
-    related: ["anxiety","stress","hope","healing","rest"],
-  },
+  { slug:"healing", title:"Prayer for Healing", metaDesc:"Powerful prayer for physical, emotional, and spiritual healing. Find comfort and restoration through scripture-based prayer.", category:"Health", keywords:["prayer for healing","healing prayer","prayer for the sick","prayer for recovery"], samplePrayer:"Lord Jesus, You are the Great Physician and I come before You in need of Your healing touch. You bore my sicknesses and by Your stripes I am healed. I stand on Your Word and declare that healing flows through my body right now. Restore every cell, every tissue, every organ to perfect health. Where there is pain, let Your peace reign. Where there is weakness, let Your strength arise. I trust You with my body, my mind, and my spirit. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 53:5",text:"By his wounds we are healed."},{ref:"Jeremiah 17:14",text:"Heal me, Lord, and I will be healed."}], related:["sick-loved-one","cancer","recovery","strength","hospital"] },
+
+  { slug:"healing-for-cancer", title:"Prayer for Healing from Cancer", metaDesc:"A heartfelt prayer for healing from cancer. Bring hope and faith to those battling cancer with this powerful prayer.", category:"Health", keywords:["prayer for cancer","cancer healing prayer","prayer for cancer patient"], samplePrayer:"Heavenly Father, cancer is no match for Your might. You spoke the world into existence and You can speak wholeness into this body right now. I bind every cancerous cell and command it to wither in the name of Jesus. Strengthen the treatments, guide the doctors' hands, and let Your supernatural healing flow. Give courage and peace that surpasses all understanding. You are Jehovah Rapha — the Lord who heals. I believe and receive it. In Jesus' name, Amen.", scripture:[{ref:"Psalm 103:2-3",text:"Who forgives all your sins and heals all your diseases."},{ref:"Matthew 8:17",text:"He took up our infirmities and bore our diseases."}], related:["healing","recovery","strength","hope","hospital"] },
+
+  { slug:"sick-loved-one", title:"Prayer for a Sick Loved One", metaDesc:"Pray for a sick friend or family member. Ask God's healing and comfort over those you love who are suffering.", category:"Health", keywords:["prayer for sick loved one","prayer for sick friend","prayer for sick family member"], samplePrayer:"Lord, I lift up my beloved to You. You see their pain, You know their struggle, and You love them even more than I do. I ask for Your healing hand to rest upon them. Surround them with peace, drive away fear, and fill their room with Your presence. Let every doctor and nurse be an instrument of Your grace. Restore their health and let this season give way to a testimony of Your faithfulness. In Jesus' name, Amen.", scripture:[{ref:"James 5:15",text:"The prayer offered in faith will make the sick person well."},{ref:"Psalm 41:3",text:"The Lord sustains them on their sickbed."}], related:["healing","cancer","recovery","comfort","hospital"] },
+
+  { slug:"recovery", title:"Prayer for Recovery", metaDesc:"A prayer for full recovery after surgery, illness or injury. Trust God to restore your strength and health completely.", category:"Health", keywords:["prayer for recovery","prayer after surgery","recovery prayer","prayer for strength during illness"], samplePrayer:"Father God, You are the source of all restoration. As my body recovers, I invite Your healing power to work in every part of me. Strengthen what is weak, mend what is broken, and speed this recovery beyond what doctors expect. Let every setback become a setup for a greater testimony. I choose faith over fear and trust over worry. You hold my days in Your hands and I rest in that truth. In Jesus' name, Amen.", scripture:[{ref:"Psalm 30:2",text:"Lord my God, I called to you for help, and you healed me."},{ref:"Isaiah 40:31",text:"Those who hope in the Lord will renew their strength."}], related:["healing","surgery","strength","hospital","anxiety"] },
+
+  { slug:"hospital", title:"Prayer for Someone in the Hospital", metaDesc:"A comforting prayer for someone in the hospital. Ask God's healing presence and peace into hospital rooms.", category:"Health", keywords:["prayer for hospital patient","hospital prayer","prayer before surgery","prayer for ICU"], samplePrayer:"Lord Jesus, be the Comforter and Healer in this hospital room. Guide the hands of every doctor and nurse. Let no diagnosis be final except Yours. Remove fear and replace it with faith. Restore life, restore health, restore hope. Let Your presence fill that room and may this patient rise in strength to testify of Your goodness. In Jesus' name, Amen.", scripture:[{ref:"Psalm 23:4",text:"Even though I walk through the darkest valley, I will fear no evil, for you are with me."}], related:["healing","sick-loved-one","surgery","recovery","strength"] },
+
+  { slug:"surgery", title:"Prayer Before Surgery", metaDesc:"A prayer before surgery for protection, healing, and God's guiding hand on surgeons and medical staff.", category:"Health", keywords:["prayer before surgery","surgical prayer","prayer for operation","prayer for surgeon"], samplePrayer:"Father, I place this surgery into Your hands before it begins. Guide every movement of the surgical team. Give wisdom and steady hands to the surgeons and clarity to the medical staff. Let anesthesia work perfectly and let my body respond to healing quickly. I am not afraid because I know You are in that operating room with me. I will rise from this stronger. In Jesus' name, Amen.", scripture:[{ref:"Psalm 91:11",text:"He will command his angels concerning you to guard you."},{ref:"Proverbs 3:5-6",text:"Trust in the Lord with all your heart."}], related:["healing","hospital","recovery","protection","faith"] },
+
+  { slug:"chronic-pain", title:"Prayer for Chronic Pain", metaDesc:"A prayer for relief from chronic pain. Find strength, endurance, and God's comfort in daily pain and suffering.", category:"Health", keywords:["prayer for chronic pain","prayer for pain relief","prayer for suffering","prayer for fibromyalgia","prayer for back pain"], samplePrayer:"Lord, this pain is constant and I am weary. But You see me. You feel what I feel, for You wore a crown of thorns and bore our infirmities. I ask for relief — supernatural, tangible relief. And while I wait, give me the grace to endure without bitterness. Let pain not define me; let Your strength in my weakness be my testimony. By Your stripes I am healed. In Jesus' name, Amen.", scripture:[{ref:"2 Corinthians 12:9",text:"My grace is sufficient for you, for my power is made perfect in weakness."},{ref:"Romans 8:18",text:"Our present sufferings are not worth comparing with the glory that will be revealed."}], related:["healing","recovery","strength","anxiety","depression"] },
+
+  { slug:"mental-healing", title:"Prayer for Mental and Emotional Healing", metaDesc:"A prayer for healing from emotional wounds, trauma, and inner pain. Let God restore your mind and heart completely.", category:"Health", keywords:["prayer for emotional healing","prayer for inner healing","prayer for trauma","prayer for wounded heart"], samplePrayer:"God of all comfort, I carry wounds that no one can fully see. Deep hurts, old trauma, and emotional scars that still bleed. I bring them all to You today. You are the Healer of broken hearts — not just bodies. Touch the deepest part of me and make it whole. Replace every lie I believed about myself with Your truth. Heal me from the inside out. In Jesus' name, Amen.", scripture:[{ref:"Psalm 147:3",text:"He heals the brokenhearted and binds up their wounds."},{ref:"Isaiah 61:1",text:"He has sent me to bind up the brokenhearted."}], related:["depression","anxiety","trauma","forgiveness","peace"] },
+
+  { slug:"disability", title:"Prayer for Those Living with Disability", metaDesc:"A prayer for strength, dignity, and God's purpose for those living with physical or mental disability.", category:"Health", keywords:["prayer for disability","prayer for disabled person","prayer for special needs","prayer for wheelchair"], samplePrayer:"Lord, You formed every person with intention and purpose. I pray for those living with disability today — that they would see their life through Your eyes, not the world's. You do not make mistakes. Their life has immeasurable value. Give them strength for each day, joy that is not dependent on ability, and a community that truly sees them as You see them. In Jesus' name, Amen.", scripture:[{ref:"Psalm 139:14",text:"I am fearfully and wonderfully made."},{ref:"John 9:3",text:"This happened so that the works of God might be displayed."}], related:["healing","strength","hope","mental-health","courage"] },
+
+  { slug:"addiction", title:"Prayer for Addiction and Freedom", metaDesc:"A powerful prayer for freedom from addiction — alcohol, drugs, pornography, or any bondage. Break free through Christ.", category:"Health", keywords:["prayer for addiction","prayer for alcoholic","prayer for drug addiction","prayer for sobriety","prayer for freedom from addiction"], samplePrayer:"Jesus, You came to set the captives free — and I am claiming that freedom today. This addiction has held me long enough. I renounce it in Your name and I break every chain that binds me. Fill the emptiness that I have tried to fill with this substance. Where I am weak, be strong in me. Bring the right people, the right support, and Your Holy Spirit to walk me through recovery. I am free. In Jesus' name, Amen.", scripture:[{ref:"John 8:36",text:"If the Son sets you free, you will be free indeed."},{ref:"Galatians 5:1",text:"It is for freedom that Christ has set us free."}], related:["recovery","strength","repentance","healing","mental-health"] },
+
+  { slug:"sobriety", title:"Prayer for Sobriety", metaDesc:"A daily prayer for sobriety and strength to stay clean. Invite God into your recovery journey every single day.", category:"Health", keywords:["prayer for sobriety","sobriety prayer","prayer to stay sober","AA prayer","prayer for recovery from alcoholism"], samplePrayer:"Lord, today I choose sobriety and I cannot do it without You. Give me strength to resist what tries to pull me back. When cravings come, be my shield. When memories of the past tempt me, remind me of who I am becoming. Surround me with people who build me up. And at the end of every sober day, let me give You the glory. One day at a time. In Jesus' name, Amen.", scripture:[{ref:"1 Corinthians 10:13",text:"God is faithful; he will not let you be tempted beyond what you can bear."},{ref:"Philippians 4:13",text:"I can do all this through him who gives me strength."}], related:["addiction","recovery","strength","healing","repentance"] },
+
+  { slug:"sleep", title:"Prayer for Sleep", metaDesc:"A calming prayer for restful sleep. Overcome insomnia and anxiety at night with this peaceful bedtime prayer.", category:"Health", keywords:["prayer for sleep","prayer for insomnia","bedtime prayer for sleep","prayer to sleep well","prayer for rest"], samplePrayer:"Lord, as I lay down tonight I release every thought and worry into Your hands. You neither slumber nor sleep, so I don't have to carry the burdens of tomorrow. Quiet my racing mind. Relax every muscle in my body. Let Your peace wrap around me like a blanket and carry me into deep, restorative sleep. I wake refreshed, ready for whatever You have for me. In Jesus' name, Amen.", scripture:[{ref:"Psalm 4:8",text:"In peace I will lie down and sleep, for you alone, Lord, make me dwell in safety."},{ref:"Psalm 127:2",text:"He grants sleep to those he loves."}], related:["night","anxiety","stress","rest","peace"] },
+
+  { slug:"weight-loss", title:"Prayer for Weight Loss and Health", metaDesc:"A prayer for discipline, health, and body transformation. Ask God to help you honor Him with your body.", category:"Health", keywords:["prayer for weight loss","prayer for healthy body","prayer for discipline to exercise","prayer for diet"], samplePrayer:"Lord, my body is Your temple and I want to honor You with it. Give me the discipline to make healthy choices, the motivation to be consistent, and the wisdom to care for this body You gave me. When I want to give up, remind me why I started. Let my desire for health be rooted in honoring You, not just appearance. Transform me from the inside out. In Jesus' name, Amen.", scripture:[{ref:"1 Corinthians 6:19-20",text:"Your bodies are temples of the Holy Spirit. Honor God with your bodies."},{ref:"3 John 1:2",text:"I pray that you may enjoy good health."}], related:["healing","strength","discipline","daily","gratitude"] },
+
+  // ── MENTAL HEALTH ────────────────────────────────────────────────
+  { slug:"anxiety", title:"Prayer for Anxiety", metaDesc:"Find peace through prayer for anxiety. Let go of worry and fear with this calming, scripture-based prayer.", category:"Mental Health", keywords:["prayer for anxiety","prayer to calm anxiety","prayer for worry","prayer for stress","anxiety prayer"], samplePrayer:"Prince of Peace, the storms in my mind are loud, but Your voice is louder. I cast every anxious thought at Your feet right now. You told me not to be anxious about anything, and I choose to believe that today. Replace my fear with faith, my worry with worship, my panic with peace. Breathe Your calm into my spirit. Quiet my racing thoughts. Still my trembling heart. You are with me, and that is enough. In Jesus' name, Amen.", scripture:[{ref:"Philippians 4:6-7",text:"Do not be anxious about anything... And the peace of God will guard your hearts."},{ref:"1 Peter 5:7",text:"Cast all your anxiety on him because he cares for you."}], related:["depression","stress","peace","fear","mental-health"] },
+
+  { slug:"depression", title:"Prayer for Depression", metaDesc:"A powerful prayer for depression and sadness. Find hope, strength, and God's light in your darkest moments.", category:"Mental Health", keywords:["prayer for depression","prayer when depressed","prayer for sadness","depression prayer"], samplePrayer:"Father, the darkness feels heavy today. I can't see the way through, but I know You can. You are the lifter of my head. You promised to never leave me, and I hold onto that like a lifeline. Lift this heaviness off my spirit. Remind me of Your goodness. Let joy find me again, even in small ways. I am not alone. You are here. In Jesus' name, Amen.", scripture:[{ref:"Psalm 34:18",text:"The Lord is close to the brokenhearted."},{ref:"Psalm 42:11",text:"Put your hope in God, for I will yet praise him."}], related:["anxiety","grief","loneliness","hope","mental-health"] },
+
+  { slug:"stress", title:"Prayer for Stress", metaDesc:"Release stress through prayer. Find rest and clarity when life feels overwhelming with this prayer for stress relief.", category:"Mental Health", keywords:["prayer for stress","prayer for stress relief","prayer when overwhelmed","prayer to reduce stress"], samplePrayer:"Lord, I am overwhelmed and the weight of life feels heavy. I surrender every deadline, every pressure, every expectation to You. You promised Your yoke is easy and Your burden is light. I trade my heavy load for Your peace. Help me do what I can, trust You with what I cannot, and rest knowing You are in control. In Jesus' name, Amen.", scripture:[{ref:"Matthew 11:28",text:"Come to me, all you who are weary and burdened, and I will give you rest."},{ref:"Psalm 55:22",text:"Cast your cares on the Lord and he will sustain you."}], related:["anxiety","peace","work","rest","burnout"] },
+
+  { slug:"burnout", title:"Prayer for Burnout", metaDesc:"A prayer for burnout and exhaustion. Find renewal and God's rest when you have nothing left to give.", category:"Mental Health", keywords:["prayer for burnout","prayer for exhaustion","prayer when burned out","prayer for compassion fatigue"], samplePrayer:"Lord, I am empty. The well has run dry and I have been trying to draw from nothing. Forgive me for running on my own strength for so long. Invite me beside still waters and let me lie down in green pastures. Restore my soul — not just my energy. Remind me that I am human, not a machine. Fill me with Your strength and let my output flow from Your abundance. In Jesus' name, Amen.", scripture:[{ref:"Psalm 23:2-3",text:"He makes me lie down in green pastures, he leads me beside quiet waters, he refreshes my soul."},{ref:"Isaiah 40:29",text:"He gives strength to the weary."}], related:["stress","anxiety","rest","work","healing"] },
+
+  { slug:"trauma", title:"Prayer for Trauma Healing", metaDesc:"A prayer for healing from trauma and PTSD. Let God restore what was broken and bring peace to painful memories.", category:"Mental Health", keywords:["prayer for trauma","prayer for PTSD","prayer for healing from abuse","prayer for childhood trauma","trauma healing prayer"], samplePrayer:"Lord, there are memories that still haunt me and wounds that haven't fully healed. I bring them all to You today. You were there in my darkest moments even when I didn't feel You. Begin the healing work that only You can do. Let every trigger become an opportunity to run to You instead of away. Redeem my story and use my healing to bring hope to others. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 61:3",text:"To bestow on them a crown of beauty instead of ashes."},{ref:"Joel 2:25",text:"I will repay you for the years the locusts have eaten."}], related:["mental-healing","depression","anxiety","forgiveness","peace"] },
+
+  { slug:"fear", title:"Prayer for Fear", metaDesc:"A prayer to overcome fear. Be bold and courageous through God's perfect love that drives out all fear.", category:"Mental Health", keywords:["prayer for fear","prayer to overcome fear","prayer for courage","prayer for phobia","prayer against fear"], samplePrayer:"Perfect love casts out fear, and Lord Your love is perfect. I receive it right now. Every fear that has gripped my heart — I release it to You. You have not given me a spirit of fear but of power, love, and a sound mind. I declare that I will not live in fear any longer. Where fear says 'no,' faith says 'go.' I choose faith. In Jesus' name, Amen.", scripture:[{ref:"2 Timothy 1:7",text:"God gave us a spirit not of fear but of power and love and self-control."},{ref:"1 John 4:18",text:"Perfect love drives out fear."}], related:["anxiety","courage","strength","faith","peace"] },
+
+  { slug:"loneliness", title:"Prayer for Loneliness", metaDesc:"A prayer when you feel alone and lonely. Be reminded that God is always with you and He sees your loneliness.", category:"Mental Health", keywords:["prayer for loneliness","lonely prayer","prayer when feeling alone","prayer for isolation"], samplePrayer:"Lord, loneliness has settled in and it is heavy. But You said You would never leave me or forsake me — I hold that promise tight. You see me. You know me. You chose me. Send community into my life. Open my heart to give and receive friendship. Let me know in the deepest part of me that with You, I am never truly alone. In Jesus' name, Amen.", scripture:[{ref:"Hebrews 13:5",text:"Never will I leave you; never will I forsake you."},{ref:"Psalm 68:6",text:"God sets the lonely in families."}], related:["depression","love","hope","grief","anxiety"] },
+
+  { slug:"anger", title:"Prayer for Anger", metaDesc:"A prayer to control anger and find God's peace. Release rage and bitterness and receive His calming presence.", category:"Mental Health", keywords:["prayer for anger","prayer to control anger","prayer for rage","prayer for bitterness","anger management prayer"], samplePrayer:"Lord, there is fire in me right now and it is consuming me. Help me before I say something, do something, or become something I regret. Breathe Your peace into me. Show me the root of this anger — the hurt beneath the heat. Give me the wisdom to process it well, speak truth in love, and release what is not mine to carry. Be slow to anger through me today. In Jesus' name, Amen.", scripture:[{ref:"James 1:19-20",text:"Everyone should be quick to listen, slow to speak and slow to become angry."},{ref:"Proverbs 15:1",text:"A gentle answer turns away wrath."}], related:["stress","forgiveness","peace","relationships","healing"] },
+
+  { slug:"grief", title:"Prayer for Grief", metaDesc:"A prayer for those grieving a loss. Find comfort, healing, and God's presence in the painful journey of grief.", category:"Mental Health", keywords:["prayer for grief","grief prayer","prayer for loss","prayer when grieving","prayer for bereavement"], samplePrayer:"God of all comfort, the pain of this loss is immense. Words fall short. But I know You are close to the brokenhearted. Hold me in this grief. Let me cry without shame and mourn without guilt. Remind me that death does not have the final word — You do. Carry me through this valley and in Your time, restore my joy. In Jesus' name, Amen.", scripture:[{ref:"Psalm 34:18",text:"The Lord is close to the brokenhearted."},{ref:"Revelation 21:4",text:"He will wipe every tear from their eyes."}], related:["comfort","depression","hope","loss-of-loved-one","funeral"] },
+
+  { slug:"mental-health", title:"Prayer for Mental Health", metaDesc:"A prayer for mental health and emotional wellbeing. Find healing for your mind through God's Word and His perfect peace.", category:"Mental Health", keywords:["prayer for mental health","prayer for sound mind","prayer for emotional health","mental health prayer"], samplePrayer:"God of all comfort, You care about my mind as much as my body. You have not given me a spirit of fear, but of power, love, and a sound mind. I receive that sound mind today. Heal every wound in my thinking. Renew my mind with Your truth. Where lies have taken root, plant Your Word. I am not defined by my struggles but by Your love. In Jesus' name, Amen.", scripture:[{ref:"2 Timothy 1:7",text:"God gave us a spirit of power, love and self-discipline."},{ref:"Romans 12:2",text:"Be transformed by the renewing of your mind."}], related:["anxiety","depression","peace","strength","hope"] },
+
+  // ── DAILY PRAYER ─────────────────────────────────────────────────
+  { slug:"morning", title:"Morning Prayer", metaDesc:"Start your day right with a powerful morning prayer. Invite God into your day with this uplifting scripture-based devotion.", category:"Daily Prayer", keywords:["morning prayer","prayer to start the day","daily morning prayer","good morning prayer"], samplePrayer:"Good morning, Lord! I give You this day before it unfolds. Every hour belongs to You. Guide my steps, guard my tongue, and lead me in the paths of righteousness. Where I face challenges today, give me wisdom. Where I encounter people, let me reflect Your love. Fill me afresh with Your Spirit and let this day count for eternity. In Jesus' name, Amen.", scripture:[{ref:"Psalm 5:3",text:"In the morning, Lord, you hear my voice."},{ref:"Lamentations 3:22-23",text:"His compassions are new every morning."}], related:["daily","gratitude","protection","work","strength"] },
+
+  { slug:"night", title:"Night Prayer Before Bed", metaDesc:"End your day in peace with a calming night prayer. Rest in God's protection and presence as you sleep.", category:"Daily Prayer", keywords:["night prayer","bedtime prayer","prayer before sleep","evening prayer"], samplePrayer:"Lord, as this day comes to a close, I lay it all at Your feet. Thank You for protecting me and walking with me today. Forgive me where I fell short. As I sleep, watch over me and my household. Let Your angels encamp around us. Quiet my mind and grant me restful sleep that I might wake refreshed and ready to serve You. In Jesus' name, Amen.", scripture:[{ref:"Psalm 4:8",text:"In peace I will lie down and sleep."},{ref:"Psalm 121:4",text:"He who watches over Israel will neither slumber nor sleep."}], related:["morning","protection","peace","rest","daily"] },
+
+  { slug:"daily", title:"Daily Prayer", metaDesc:"A powerful daily prayer to keep you connected to God throughout the day. Perfect for a consistent morning or evening devotion.", category:"Daily Prayer", keywords:["daily prayer","everyday prayer","simple daily prayer","prayer for today"], samplePrayer:"Father, I come to You today with a humble heart. I need You in every moment — in my conversations, my decisions, my rest and my work. Fill me with Your Spirit. Let Your will be done in my life today. I trust You with everything I am and everything I face. Be glorified through me today. In Jesus' name, Amen.", scripture:[{ref:"Matthew 6:11",text:"Give us today our daily bread."},{ref:"Psalm 118:24",text:"This is the day the Lord has made."}], related:["morning","night","gratitude","strength","peace"] },
+
+  { slug:"short-prayer", title:"Short Prayer", metaDesc:"A simple, short prayer for any moment of the day. Sometimes a few words to God are all you need.", category:"Daily Prayer", keywords:["short prayer","quick prayer","simple prayer","brief prayer","one minute prayer"], samplePrayer:"Lord, I need You. Right now, in this moment — I need You. Cover me with Your grace, guide me with Your wisdom, and fill me with Your peace. You are enough. I trust You. Amen.", scripture:[{ref:"Psalm 46:10",text:"Be still, and know that I am God."},{ref:"Matthew 6:9",text:"Our Father in heaven, hallowed be your name."}], related:["daily","morning","gratitude","peace","faith"] },
+
+  { slug:"powerful-prayer", title:"Powerful Prayer", metaDesc:"A bold and powerful prayer that moves mountains. Pray with faith, authority, and the power of God's Word.", category:"Daily Prayer", keywords:["powerful prayer","strong prayer","bold prayer","prayer that works","effective prayer"], samplePrayer:"Lord God Almighty, I come before You with boldness through the blood of Jesus. I am not timid — I am Your child and Your Word says to come boldly before Your throne. I declare Your promises over my life. Every mountain in my path must move. Every door appointed for me must open. Every plan of the enemy over my life is cancelled. I pray in faith and I expect results. In Jesus' mighty name, Amen.", scripture:[{ref:"Hebrews 4:16",text:"Let us approach God's throne of grace with confidence."},{ref:"Matthew 21:22",text:"If you believe, you will receive whatever you ask for in prayer."}], related:["faith","strength","breakthrough","blessing","daily"] },
+
+  { slug:"prayer-for-today", title:"Prayer for Today", metaDesc:"A simple prayer for today — surrendering this day to God and trusting Him with whatever lies ahead.", category:"Daily Prayer", keywords:["prayer for today","today's prayer","prayer for this day","daily prayer for today"], samplePrayer:"Father, today is a new canvas and I give You the brush. Paint this day according to Your perfect will. Prepare me for what I cannot see coming. Fill my words with grace and my heart with love. When this day ends, let me look back and see Your fingerprints on every moment. Thank You for today. In Jesus' name, Amen.", scripture:[{ref:"Psalm 118:24",text:"This is the day the Lord has made; let us rejoice."},{ref:"Proverbs 16:9",text:"In their hearts humans plan their course, but the Lord establishes their steps."}], related:["morning","daily","gratitude","guidance","peace"] },
+
+  { slug:"fasting-prayer", title:"Prayer During Fasting", metaDesc:"A prayer to pray while fasting. Combine fasting and prayer to break through spiritually and hear from God clearly.", category:"Daily Prayer", keywords:["fasting prayer","prayer while fasting","prayer for fasting","fasting and prayer","Daniel fast prayer"], samplePrayer:"Lord, I lay down the physical to pursue the spiritual. As I fast, sharpen my spiritual senses. Let distractions fall away and let Your voice become clear. I am hungry for You more than I am hungry for food. Meet me in this place of surrender. Break every spiritual chain, bring breakthrough, and reveal Yourself to me in a fresh way. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 58:6",text:"Is not this the kind of fasting I have chosen: to loose the chains of injustice?"},{ref:"Matthew 6:18",text:"Your Father, who sees what is done in secret, will reward you."}], related:["spiritual-growth","faith","breakthrough","daily","prayer"] },
+
+  { slug:"prayer-for-miracles", title:"Prayer for a Miracle", metaDesc:"A faith-filled prayer for a miracle. Believe God for the impossible and trust His power to intervene supernaturally.", category:"Daily Prayer", keywords:["prayer for miracle","miracle prayer","prayer for supernatural help","prayer for impossible situation"], samplePrayer:"Lord, I need a miracle — the kind only You can provide. My situation looks impossible to human eyes, but nothing is impossible with You. You parted seas, raised the dead, and turned water into wine. I am asking You to intervene in my life right now in a way that leaves no doubt it was You. I believe. Help my unbelief. And when the miracle comes, I will give You all the glory. In Jesus' name, Amen.", scripture:[{ref:"Luke 1:37",text:"For nothing is impossible with God."},{ref:"Jeremiah 32:17",text:"Nothing is too hard for you."}], related:["faith","breakthrough","healing","hope","financial-breakthrough"] },
+
+  // ── FAMILY ───────────────────────────────────────────────────────
+  { slug:"family", title:"Prayer for Family", metaDesc:"A powerful prayer for your family — for unity, protection, love, and God's blessing over every member.", category:"Family", keywords:["prayer for family","family prayer","prayer for my family","prayer for family unity"], samplePrayer:"Father, I lift my family to You. You placed us together for a purpose, and I ask that Your love would be the foundation of everything we share. Where there is division, bring unity. Where there are wounds, bring healing. Protect every member physically, spiritually, and emotionally. Let our home be a place where Your presence is felt and Your love is shown. In Jesus' name, Amen.", scripture:[{ref:"Joshua 24:15",text:"As for me and my household, we will serve the Lord."},{ref:"Psalm 128:3",text:"Your children will be like olive shoots around your table."}], related:["marriage","children","parents","unity","protection"] },
+
+  { slug:"marriage", title:"Prayer for Marriage", metaDesc:"Strengthen your marriage with prayer. A powerful prayer for love, unity, and restoration in your marriage.", category:"Family", keywords:["prayer for marriage","marriage prayer","prayer for husband and wife","prayer to save marriage"], samplePrayer:"Lord, I thank You for the gift of marriage. What You have joined together, no force can separate. I pray for our union — that love would always be our language, patience our practice, and forgiveness our response. Where we have hurt each other, heal those wounds. Renew the spark. May our marriage be a testimony of Your faithfulness and covenant love. In Jesus' name, Amen.", scripture:[{ref:"Ecclesiastes 4:12",text:"A cord of three strands is not quickly broken."},{ref:"1 Corinthians 13:4",text:"Love is patient, love is kind."}], related:["family","husband","wife","unity","forgiveness"] },
+
+  { slug:"husband", title:"Prayer for My Husband", metaDesc:"A loving prayer for your husband — for his strength, faith, protection, and purpose every day.", category:"Family", keywords:["prayer for husband","prayer for my husband","wife prayer for husband","prayer for husband strength"], samplePrayer:"Lord, I lift my husband to You. Protect him wherever he goes today. Fill him with wisdom to lead, strength to persevere, and faith to trust You in every season. Let him feel Your hand on his life. Be his confidence when he doubts, his peace when he's anxious, and his joy when life is hard. Bless the work of his hands. In Jesus' name, Amen.", scripture:[{ref:"Proverbs 18:10",text:"The name of the Lord is a fortified tower; the righteous run to it and are safe."}], related:["marriage","wife","family","protection","strength"] },
+
+  { slug:"wife", title:"Prayer for My Wife", metaDesc:"A beautiful prayer for your wife — for her joy, health, strength, and God's purpose in her life.", category:"Family", keywords:["prayer for wife","prayer for my wife","husband prayer for wife","prayer for wife strength"], samplePrayer:"Father, I thank You for my wife — she is a gift. I pray that You would surround her with Your love today. Give her joy that is unshakeable, strength that is supernatural, and peace that passes understanding. Let her know how valued she is — by You and by me. Protect her heart, bless her work, and fulfill every dream You planted in her. In Jesus' name, Amen.", scripture:[{ref:"Proverbs 31:25",text:"She is clothed with strength and dignity."},{ref:"Song of Solomon 4:7",text:"You are altogether beautiful, my darling."}], related:["marriage","husband","family","love","strength"] },
+
+  { slug:"children", title:"Prayer for Children", metaDesc:"Pray protection, wisdom, and God's blessing over your children. A powerful parental prayer for your kids.", category:"Family", keywords:["prayer for children","prayer for my child","prayer for kids","parents prayer for children"], samplePrayer:"Lord, I place my children into Your hands — the safest place they could ever be. Protect them from every harm. Guard their hearts from the corruption of this world and plant Your Word deep within them. Give them wisdom beyond their years and let them know Your love personally. Walk with them all their days. In Jesus' name, Amen.", scripture:[{ref:"Proverbs 22:6",text:"Start children off on the way they should go."},{ref:"Isaiah 54:13",text:"All your children will be taught by the Lord."}], related:["family","parents","school","protection","wisdom"] },
+
+  { slug:"parents", title:"Prayer for Parents", metaDesc:"Honor your parents with prayer. A heartfelt prayer for the health, strength, and blessing of your mother and father.", category:"Family", keywords:["prayer for parents","prayer for mother and father","prayer for aging parents","prayer for my parents"], samplePrayer:"Lord, I honor and thank You for my parents. They have given so much of themselves for me. I lift them to You today — bless their bodies with health, their minds with clarity, and their hearts with peace. Repay every sacrifice they made with Your abundant blessing. Where they struggle, be their strength. Where they are lonely, be their companion. In Jesus' name, Amen.", scripture:[{ref:"Exodus 20:12",text:"Honor your father and your mother."},{ref:"Proverbs 20:29",text:"Gray hair the splendor of the old."}], related:["family","healing","elderly","gratitude","children"] },
+
+  { slug:"prodigal-son", title:"Prayer for a Prodigal Child", metaDesc:"A prayer for a child who has walked away from God and family. Trust God to bring your prodigal home.", category:"Family", keywords:["prayer for prodigal son","prayer for wayward child","prayer for child who left the faith","prayer for rebellious child"], samplePrayer:"Father, like the father in the parable I watch and wait for my child to come home. My love has not wavered even when they have walked far away. I pray that the same Spirit that drew me to You would pursue them relentlessly. Remove the blinders. Let them feel the emptiness of life without You. And when they turn around to come home, run to meet them. In Jesus' name, Amen.", scripture:[{ref:"Luke 15:20",text:"While he was still a long way off, his father saw him and ran to him."},{ref:"Jeremiah 31:16",text:"Your children will return from the land of the enemy."}], related:["family","children","salvation","hope","faith"] },
+
+  { slug:"pregnancy", title:"Prayer for Pregnancy", metaDesc:"A prayer for a healthy, safe pregnancy. Cover your unborn child and the expectant mother with God's protection and grace.", category:"Family", keywords:["prayer for pregnancy","pregnancy prayer","prayer for healthy baby","prayer for expectant mother","prayer while pregnant"], samplePrayer:"Lord, I thank You for the miracle growing inside me. You are knitting this little life together with perfect care. I pray for a healthy pregnancy — protect this baby at every stage. Give me wisdom in the choices I make and peace where there is fear. Let every doctor's visit bring good news. I dedicate this child to You even before they are born. In Jesus' name, Amen.", scripture:[{ref:"Psalm 139:13",text:"You created my inmost being; you knit me together in my mother's womb."},{ref:"Jeremiah 1:5",text:"Before I formed you in the womb I knew you."}], related:["children","family","healing","protection","gratitude"] },
+
+  { slug:"miscarriage", title:"Prayer After Miscarriage", metaDesc:"A prayer for comfort and healing after miscarriage. God sees your grief and holds your little one in His arms.", category:"Family", keywords:["prayer for miscarriage","miscarriage prayer","prayer after losing a baby","prayer for healing after miscarriage"], samplePrayer:"Lord, we are broken. The loss of this little life has left a wound words cannot describe. But I trust that You hold our baby in Your arms right now, in a place with no more tears or pain. Comfort us with that truth. Heal our hearts. Give us the courage to hope again in Your time. We trust Your goodness even through our grief. In Jesus' name, Amen.", scripture:[{ref:"Matthew 5:4",text:"Blessed are those who mourn, for they will be comforted."},{ref:"Psalm 34:18",text:"The Lord is close to the brokenhearted."}], related:["grief","healing","comfort","hope","loss-of-loved-one"] },
+
+  { slug:"infertility", title:"Prayer for Infertility", metaDesc:"A prayer for couples struggling with infertility. Trust God who opened the womb of Sarah and Hannah.", category:"Family", keywords:["prayer for infertility","infertility prayer","prayer to get pregnant","prayer for conception","prayer for fertility"], samplePrayer:"Lord, You opened the womb of Sarah when it was long past hope. You heard Hannah's desperate cry and gave her Samuel. I bring my longing to You now. You see the desire of my heart for a child. If it is Your will, open my womb. And while I wait, guard my heart from bitterness. Let my hope be anchored in You and not just in a test result. In Jesus' name, Amen.", scripture:[{ref:"Psalm 113:9",text:"He settles the childless woman in her home as a happy mother of children."},{ref:"1 Samuel 1:27",text:"I prayed for this child, and the Lord has granted me what I asked of him."}], related:["pregnancy","healing","hope","faith","family"] },
+
+  { slug:"newborn-baby", title:"Prayer for a Newborn Baby", metaDesc:"A blessing prayer for a newborn baby. Dedicate your new child to God and ask for His protection and purpose.", category:"Family", keywords:["prayer for newborn","newborn baby prayer","baby blessing prayer","prayer to dedicate baby to God"], samplePrayer:"Lord, what a gift! This tiny life is a miracle in my arms. I dedicate this child to You before anything else. May their first word be love, their first step be toward You, and their life be a testimony of Your goodness. Protect them from every harm. Guide them into purpose. And let them always know they are deeply loved — by us, and even more by You. In Jesus' name, Amen.", scripture:[{ref:"Psalm 127:3",text:"Children are a heritage from the Lord, offspring a reward from him."},{ref:"Mark 10:16",text:"He took the children in his arms, placed his hands on them and blessed them."}], related:["pregnancy","children","family","protection","gratitude"] },
+
+  { slug:"single-parent", title:"Prayer for Single Parents", metaDesc:"A prayer for single mothers and fathers. Find strength, provision, and God's covering as you raise children alone.", category:"Family", keywords:["prayer for single mother","prayer for single parent","single mom prayer","prayer for single dad"], samplePrayer:"Lord, I am doing the work of two and I am weary. But You are a Father to the fatherless and a defender of the widow. Be what my children need that I cannot always be. Give me supernatural strength, wisdom, and patience. Provide for every need. Let my children see Your faithfulness through how You carry our family. I cannot do this without You and I don't have to. In Jesus' name, Amen.", scripture:[{ref:"Psalm 68:5",text:"A father to the fatherless, a defender of widows, is God in his holy dwelling."},{ref:"Isaiah 41:10",text:"I will strengthen you and help you."}], related:["family","children","strength","provision","financial-breakthrough"] },
+
+  { slug:"divorce", title:"Prayer During Divorce", metaDesc:"A prayer during divorce for healing, peace, and God's guidance through one of life's most painful transitions.", category:"Family", keywords:["prayer for divorce","divorce prayer","prayer during separation","prayer for broken marriage"], samplePrayer:"Lord, this is not the story I planned. The pain of this ending is deep. Be my strength when I have none. Give me wisdom for the decisions ahead, grace in every difficult conversation, and hope that You can still write something beautiful from this. Protect the children if there are any. And heal every heart involved — including mine. In Jesus' name, Amen.", scripture:[{ref:"Psalm 34:18",text:"The Lord is close to the brokenhearted."},{ref:"Isaiah 43:18-19",text:"Forget the former things; I am doing a new thing."}], related:["grief","healing","hope","forgiveness","family"] },
+
+  { slug:"elderly", title:"Prayer for the Elderly", metaDesc:"A prayer for elderly parents, grandparents, and seniors. Ask God for their health, dignity, and peace in their later years.", category:"Family", keywords:["prayer for elderly","prayer for old age","prayer for grandparents","prayer for seniors","prayer for aging"], samplePrayer:"Lord, I lift up those in their golden years. May they not feel forgotten or overlooked. Give them health, clarity of mind, and peace in their bodies. Let their wisdom be valued and their stories heard. In seasons of frailty, be their strength. In moments of confusion, be their clarity. And let their latter years be filled with the joy of knowing how loved they are. In Jesus' name, Amen.", scripture:[{ref:"Psalm 92:14",text:"They will still bear fruit in old age, they will stay fresh and green."},{ref:"Isaiah 46:4",text:"Even to your old age and gray hairs I am he who will sustain you."}], related:["parents","healing","gratitude","comfort","family"] },
+
+  // ── FINANCE / WORK ───────────────────────────────────────────────
+  { slug:"financial-breakthrough", title:"Prayer for Financial Breakthrough", metaDesc:"Pray for a financial breakthrough. A powerful prayer for debt cancellation, provision, and God's supernatural abundance.", category:"Finance", keywords:["prayer for financial breakthrough","financial breakthrough prayer","prayer for money","prayer for finances","prayer for debt"], samplePrayer:"Jehovah Jireh, my Provider, I come before You in faith. You own the cattle on a thousand hills and every resource belongs to You. I ask for a financial breakthrough. Open doors no one can shut. Bring unexpected income and supernatural provision. Cancel every debt and replace it with abundance. Teach me to steward what You give me well. In Jesus' name, Amen.", scripture:[{ref:"Philippians 4:19",text:"My God will meet all your needs."},{ref:"Malachi 3:10",text:"See if I will not throw open the floodgates of heaven."}], related:["job","provision","debt","abundance","blessing"] },
+
+  { slug:"job", title:"Prayer for a Job", metaDesc:"A faith-filled prayer for employment and a new job. Trust God to open the right door for your career.", category:"Finance", keywords:["prayer for a job","prayer for employment","prayer for job interview","prayer to get hired"], samplePrayer:"Father, You know my need for work. I ask You to open a door that is perfect for the gifts You placed in me. Prepare me for the opportunity before it arrives. Give me favor with employers and let my interviews go beyond my own ability. I walk in faith. The right job is already assigned to me — lead me there. In Jesus' name, Amen.", scripture:[{ref:"Psalm 75:6-7",text:"It is God who judges: He brings one down, he exalts another."},{ref:"Proverbs 16:3",text:"Commit to the Lord whatever you do."}], related:["financial-breakthrough","work","provision","favor","wisdom"] },
+
+  { slug:"work", title:"Prayer for Work", metaDesc:"Invite God into your workplace with this prayer for favor, productivity, wisdom, and God's blessing on your career.", category:"Finance", keywords:["prayer for work","workplace prayer","prayer for career","prayer before work","prayer for business"], samplePrayer:"Lord, as I go to work today I invite You into my workplace. Be the wisdom behind every decision. Give me favor with colleagues, clients, and leadership. Let my work be excellent — a reflection of the God I serve. Guard my integrity and protect me from office politics. May everything I put my hand to prosper. In Jesus' name, Amen.", scripture:[{ref:"Colossians 3:23",text:"Whatever you do, work at it with all your heart, as working for the Lord."},{ref:"Proverbs 16:3",text:"Commit to the Lord whatever you do."}], related:["job","financial-breakthrough","wisdom","favor","morning"] },
+
+  { slug:"business", title:"Prayer for Business", metaDesc:"A prayer for your business — for growth, wisdom, favor, and God's blessing on every business decision.", category:"Finance", keywords:["prayer for business","business prayer","prayer for business success","prayer for entrepreneurs","prayer for startup"], samplePrayer:"Lord, I commit this business to You. Every product, every service, every employee, every customer — all under Your hand. Give me wisdom to lead well. Bring the right clients and partners. Let our business be known not just for what we sell but for our integrity and excellence. Let it be a platform that honors You. Bless it and cause it to grow. In Jesus' name, Amen.", scripture:[{ref:"Proverbs 16:3",text:"Commit to the Lord whatever you do, and he will establish your plans."},{ref:"Deuteronomy 28:12",text:"The Lord will open the heavens... to bless all the work of your hands."}], related:["work","financial-breakthrough","wisdom","favor","provision"] },
+
+  { slug:"debt", title:"Prayer for Debt Cancellation", metaDesc:"A prayer for freedom from debt. Trust God to cancel debt, bring provision, and restore financial freedom.", category:"Finance", keywords:["prayer for debt","debt cancellation prayer","prayer to get out of debt","prayer for financial freedom"], samplePrayer:"Lord, this debt feels like a weight I cannot lift. But You are Jehovah Jireh and You have solutions I cannot imagine. I ask for supernatural debt cancellation — unexpected money, promotions, divine connections, and opportunities that only You can arrange. Teach me to be a good steward as I climb out. And as I do, let me be free to give generously to others. In Jesus' name, Amen.", scripture:[{ref:"Deuteronomy 15:6",text:"You will lend to many nations but will borrow from none."},{ref:"Proverbs 22:7",text:"The borrower is slave to the lender — but the Lord sets free."}], related:["financial-breakthrough","provision","abundance","blessing","work"] },
+
+  { slug:"provision", title:"Prayer for God's Provision", metaDesc:"A prayer trusting God as your Provider. Ask for His daily provision of every need — financial, physical, and spiritual.", category:"Finance", keywords:["prayer for provision","prayer for needs","prayer for God to provide","Jehovah Jireh prayer","prayer for daily bread"], samplePrayer:"Jehovah Jireh, You provided a ram in the thicket for Abraham and manna in the wilderness for Israel. I trust You to provide for me today. My needs are known to You before I even speak them. I refuse to worry because I have a Father who owns everything. Provide for my family today and let me see Your hand so clearly that I am moved to worship. In Jesus' name, Amen.", scripture:[{ref:"Matthew 6:31-33",text:"Do not worry... your heavenly Father knows that you need them."},{ref:"Genesis 22:14",text:"Abraham called that place The Lord Will Provide."}], related:["financial-breakthrough","debt","blessing","gratitude","faith"] },
+
+  { slug:"promotion", title:"Prayer for a Promotion", metaDesc:"A prayer for career advancement and promotion. Trust God to elevate you to your next level at work.", category:"Finance", keywords:["prayer for promotion","promotion prayer","prayer for career advancement","prayer for raise","prayer for work elevation"], samplePrayer:"Lord, I believe You are the one who promotes and elevates. I have worked with integrity and excellence and I trust You for the next level. Let the right people see my value. Open doors that no human hand can shut. Promote me for Your glory, not just my ambition. And wherever I go, let me bring honor to Your name. In Jesus' name, Amen.", scripture:[{ref:"Psalm 75:6-7",text:"It is God who judges: He brings one down, he exalts another."},{ref:"Proverbs 22:29",text:"Do you see someone skilled in their work? They will serve before kings."}], related:["work","job","favor","financial-breakthrough","wisdom"] },
+
+  { slug:"favor", title:"Prayer for Favor", metaDesc:"A prayer for God's supernatural favor at work, in relationships, and in every area of your life.", category:"Finance", keywords:["prayer for favor","favor prayer","prayer for supernatural favor","prayer for open doors","prayer for God's favor"], samplePrayer:"Lord, like Joseph You can give supernatural favor that changes a person's entire life in a single moment. I ask for that kind of favor today. Let me find favor with the people who can open doors. Let favor precede me into every room. Let people be drawn to help me without knowing why — because Your hand is on my life. I walk in divine favor today. In Jesus' name, Amen.", scripture:[{ref:"Psalm 5:12",text:"Surely, Lord, you bless the righteous; you surround them with your favor as with a shield."},{ref:"Luke 2:52",text:"Jesus grew in wisdom and stature, and in favor with God and man."}], related:["work","job","promotion","blessing","business"] },
+
+  { slug:"job-interview", title:"Prayer Before a Job Interview", metaDesc:"A prayer before a job interview. Ask God for clarity, confidence, and His favor to land the job.", category:"Finance", keywords:["prayer before job interview","interview prayer","prayer for job interview success","prayer before interview"], samplePrayer:"Lord, this interview is before me and I choose not to fear. You have been preparing me for this moment. Give me clarity of thought and the right words at the right time. Let me be confident — not in myself, but in the gifts You placed in me. Grant me favor with my interviewers. And whether or not this is the right door, I trust You to lead me to the one that is. In Jesus' name, Amen.", scripture:[{ref:"Luke 21:15",text:"I will give you words and wisdom that none of your adversaries will be able to resist."},{ref:"Proverbs 16:3",text:"Commit to the Lord whatever you do."}], related:["job","work","favor","wisdom","morning"] },
+
+  // ── PROTECTION ───────────────────────────────────────────────────
+  { slug:"protection", title:"Prayer for Protection", metaDesc:"A powerful prayer for God's protection over you and your family. Declare Psalm 91 and claim divine safety today.", category:"Protection", keywords:["prayer for protection","protection prayer","prayer for safety","Psalm 91 prayer","prayer from danger"], samplePrayer:"Lord, I declare Psalm 91 over my life today. You are my refuge and my fortress, my God in whom I trust. Let Your angels be stationed around me and my household. No weapon formed against me shall prosper. No accident, no attack, no evil shall come near my dwelling. I walk in divine protection because I live under the shadow of the Almighty. In Jesus' name, Amen.", scripture:[{ref:"Psalm 91:11",text:"He will command his angels concerning you to guard you."},{ref:"Isaiah 54:17",text:"No weapon forged against you will prevail."}], related:["family","morning","travel","danger","children"] },
+
+  { slug:"travel", title:"Prayer for Safe Travel", metaDesc:"A prayer for safe travel by car, plane, or any journey. Cover your trip with God's protection and arrive safely.", category:"Protection", keywords:["prayer for safe travel","travel prayer","prayer before road trip","prayer for flight","prayer for journey"], samplePrayer:"Father, as I travel today, I commit this journey into Your hands. Be the Navigator who guides every turn. Protect me on the roads, in the air, and on the water. Let Your angels go before me and behind me. Prevent accidents and keep every vehicle around me under Your watch. I arrive safely, in Jesus' name, Amen.", scripture:[{ref:"Psalm 121:8",text:"The Lord will watch over your coming and going."},{ref:"Proverbs 3:23",text:"Then you will go on your way in safety."}], related:["protection","morning","family","danger"] },
+
+  { slug:"danger", title:"Prayer for Deliverance from Danger", metaDesc:"A prayer for deliverance from danger, threats, and enemies. Trust God to be your shield and strong tower.", category:"Protection", keywords:["prayer for danger","prayer for deliverance","prayer from enemies","prayer against evil","prayer for safety"], samplePrayer:"Lord, I am in a place of danger and I need You now. You are my strong tower — I run to You and I am safe. Surround me with Your angels. Confuse those who come against me. Let every plan of the enemy be overturned. I will not fear because You are my shield. Bring me out of this with a testimony that glorifies Your name. In Jesus' name, Amen.", scripture:[{ref:"Proverbs 18:10",text:"The name of the Lord is a fortified tower; the righteous run to it and are safe."},{ref:"Psalm 27:1",text:"The Lord is my light and my salvation — whom shall I fear?"}], related:["protection","strength","fear","faith","enemies"] },
+
+  { slug:"spiritual-warfare", title:"Prayer for Spiritual Warfare", metaDesc:"A prayer for spiritual warfare — putting on the full armor of God and standing firm against the enemy's attacks.", category:"Protection", keywords:["prayer for spiritual warfare","warfare prayer","prayer against the enemy","prayer against spiritual attack","spiritual battle prayer"], samplePrayer:"Lord, I put on the full armor of God today. The belt of truth, the breastplate of righteousness, the shoes of peace, the shield of faith, the helmet of salvation, and the sword of the Spirit. I stand firm and I resist the devil. Every assignment of darkness against my life, my family, and my purpose — I cancel it in the name of Jesus. Greater is He who is in me than he who is in the world. In Jesus' name, Amen.", scripture:[{ref:"Ephesians 6:11",text:"Put on the full armor of God, so that you can take your stand against the devil's schemes."},{ref:"1 John 4:4",text:"Greater is he who is in you than he who is in the world."}], related:["protection","fear","strength","faith","deliverance"] },
+
+  { slug:"protection-from-enemies", title:"Prayer for Protection from Enemies", metaDesc:"A prayer for protection from enemies, jealousy, and people who wish you harm. God is your defender.", category:"Protection", keywords:["prayer from enemies","prayer for protection from evil people","prayer against jealousy","prayer against haters"], samplePrayer:"Lord, there are people who want to see me fail. But what they plan against me, You will turn to my advantage. No weapon formed against me shall prosper. I don't fight in flesh and blood — I release my enemies to You. Fight my battles, Lord. And in the meantime, let me love them as You commanded, knowing that You are my Defender. In Jesus' name, Amen.", scripture:[{ref:"Romans 8:31",text:"If God is for us, who can be against us?"},{ref:"Exodus 14:14",text:"The Lord will fight for you; you need only to be still."}], related:["protection","spiritual-warfare","enemies","forgiveness","faith"] },
+
+  { slug:"home-protection", title:"Prayer for Protection Over the Home", metaDesc:"A prayer of protection over your home and household. Invite God's presence and angels to guard your home.", category:"Protection", keywords:["prayer for home protection","prayer over the house","prayer for household","prayer to bless home","home blessing prayer"], samplePrayer:"Lord, I place a hedge of protection around this home. No evil shall enter here, no weapon shall prosper inside these walls. I plead the blood of Jesus over every door, every window, every person who lives here. Let Your peace reign in every room. Let our home be a sanctuary — a place where Your Spirit is welcome and Your presence is felt. In Jesus' name, Amen.", scripture:[{ref:"Psalm 91:10",text:"No harm will overtake you, no disaster will come near your tent."},{ref:"Deuteronomy 11:21",text:"That your days and the days of your children may be many."}], related:["protection","family","spiritual-warfare","blessing","morning"] },
+
+  // ── FAITH / SPIRITUAL GROWTH ─────────────────────────────────────
+  { slug:"strength", title:"Prayer for Strength", metaDesc:"When you feel weak, pray for God's strength. A powerful prayer for inner strength, endurance, and perseverance.", category:"Faith", keywords:["prayer for strength","strength prayer","prayer for inner strength","prayer when feeling weak","prayer for courage"], samplePrayer:"Lord God, I am weak but You are strong. Right now I need Your strength, not my own. I can do all things through Christ who strengthens me — and I declare that today. Infuse me with supernatural endurance. When I want to quit, remind me why I started. Let Your power be made perfect in my weakness. In Jesus' name, Amen.", scripture:[{ref:"Philippians 4:13",text:"I can do all this through him who gives me strength."},{ref:"Isaiah 41:10",text:"I will strengthen you and help you."}], related:["courage","hope","healing","depression","perseverance"] },
+
+  { slug:"hope", title:"Prayer for Hope", metaDesc:"A prayer for hope when you feel hopeless. Let God restore your hope and remind you of His faithfulness.", category:"Faith", keywords:["prayer for hope","hope prayer","prayer when hopeless","prayer for faith","prayer for encouragement"], samplePrayer:"God of hope, I come to You at the end of my own strength. Everything in me wants to give up, but I know You are not done. You make all things new. You bring life out of death. Reignite the hope inside me. Remind me of Your promises. Let hope rise like the morning sun — certain and unstoppable. In Jesus' name, Amen.", scripture:[{ref:"Romans 15:13",text:"May the God of hope fill you with all joy and peace."},{ref:"Jeremiah 29:11",text:"Plans to give you hope and a future."}], related:["strength","depression","faith","encouragement","peace"] },
+
+  { slug:"faith", title:"Prayer for Faith", metaDesc:"Grow in faith through prayer. Ask God to increase your faith, remove doubt, and help you trust Him completely.", category:"Faith", keywords:["prayer for faith","faith prayer","prayer to increase faith","prayer for belief","prayer for trust in God"], samplePrayer:"Lord, I believe — help my unbelief. Where doubt has crept in, shine the light of Your truth. Where my faith has grown cold, ignite it again. I want to trust You with the audacity of Abraham and the boldness of David. Stretch my faith beyond what is comfortable into what is miraculous. I choose to believe Your Word over my circumstances. In Jesus' name, Amen.", scripture:[{ref:"Hebrews 11:1",text:"Faith is confidence in what we hope for and assurance about what we do not see."},{ref:"Mark 9:24",text:"I do believe; help me overcome my unbelief!"}], related:["hope","strength","prayer","trust","spiritual-growth"] },
+
+  { slug:"forgiveness", title:"Prayer for Forgiveness", metaDesc:"A prayer for God's forgiveness and the strength to forgive others. Release guilt, shame, and bitterness.", category:"Faith", keywords:["prayer for forgiveness","forgiveness prayer","prayer to forgive someone","prayer for repentance","prayer for guilt"], samplePrayer:"Father, I come before You with a heart that needs Your mercy. I have fallen short and I am sorry. Thank You for the blood of Jesus that cleanses every sin. I receive Your forgiveness completely — I will not carry this guilt any longer. And Lord, help me to forgive others as You have forgiven me. Release me from bitterness and fill that space with Your love. In Jesus' name, Amen.", scripture:[{ref:"1 John 1:9",text:"If we confess our sins, he is faithful and just and will forgive us."},{ref:"Ephesians 4:32",text:"Forgiving each other, just as in Christ God forgave you."}], related:["healing","peace","reconciliation","repentance","love"] },
+
+  { slug:"peace", title:"Prayer for Peace", metaDesc:"Find God's peace that passes understanding. A calming prayer for peace of mind, peace in relationships, and peace in the world.", category:"Faith", keywords:["prayer for peace","peace prayer","prayer for peace of mind","prayer for inner peace"], samplePrayer:"Lord Jesus, You spoke peace to a raging storm and it obeyed. Speak that same peace over my heart today. Calm the storms inside me — the racing thoughts, the unresolved conflicts, the uncertain future. Fill me with the peace that passes all understanding. Guard my heart and mind in Christ Jesus. In Jesus' name, Amen.", scripture:[{ref:"John 14:27",text:"Peace I leave with you; my peace I give you."},{ref:"Isaiah 26:3",text:"You will keep in perfect peace those whose minds are steadfast."}], related:["anxiety","stress","hope","healing","rest"] },
+
+  { slug:"courage", title:"Prayer for Courage", metaDesc:"A bold prayer for courage to face fear, take a leap of faith, and step into your God-given calling.", category:"Faith", keywords:["prayer for courage","courage prayer","prayer for bravery","prayer to be bold","prayer for confidence"], samplePrayer:"Lord, I need the courage of Joshua stepping into the Promised Land. The task before me is bigger than I feel equipped for, but You have called me to it. So I step out in faith, not feelings. Be strong and courageous — You said it three times to Joshua and I receive it now. I will not be afraid for You are with me wherever I go. In Jesus' name, Amen.", scripture:[{ref:"Joshua 1:9",text:"Be strong and courageous. Do not be afraid; do not be discouraged."},{ref:"Deuteronomy 31:6",text:"Be strong and courageous. He will never leave you nor forsake you."}], related:["strength","fear","faith","purpose","calling"] },
+
+  { slug:"spiritual-growth", title:"Prayer for Spiritual Growth", metaDesc:"A prayer for spiritual maturity, deeper faith, and a closer relationship with God every day.", category:"Faith", keywords:["prayer for spiritual growth","prayer to grow in faith","prayer for discipleship","prayer for deeper relationship with God"], samplePrayer:"Lord, I don't want to stay where I am spiritually. I hunger for more of You — deeper revelation, greater intimacy, stronger faith. Prune whatever is hindering growth in my life. Feed me with Your Word. Let every trial produce patience and every season of waiting produce character. Transform me more into the image of Your Son. In Jesus' name, Amen.", scripture:[{ref:"2 Peter 3:18",text:"Grow in the grace and knowledge of our Lord and Savior Jesus Christ."},{ref:"John 15:5",text:"I am the vine; you are the branches."}], related:["faith","hope","prayer","worship","bible-study"] },
+
+  { slug:"worship", title:"Prayer of Worship", metaDesc:"A prayer of pure worship to God — declaring His greatness, majesty, and worthiness of all praise.", category:"Faith", keywords:["prayer of worship","worship prayer","prayer of praise","prayer to glorify God","adoration prayer"], samplePrayer:"Lord, I come before You with a heart full of worship. You are holy, You are mighty, You are worthy of everything I have. Before I ask for anything — I simply worship You. For Your faithfulness, for Your love, for who You are. Let my life be an act of worship. Let everything I do declare Your glory. You are enough. You are everything. In Jesus' name, Amen.", scripture:[{ref:"Psalm 96:9",text:"Worship the Lord in the splendor of his holiness."},{ref:"John 4:24",text:"God is spirit, and his worshipers must worship in the Spirit and in truth."}], related:["gratitude","praise","faith","spiritual-growth","morning"] },
+
+  { slug:"perseverance", title:"Prayer for Perseverance", metaDesc:"A prayer for the strength to endure and not give up. Keep going through trials with faith and perseverance.", category:"Faith", keywords:["prayer for perseverance","prayer to not give up","prayer for endurance","prayer for patience","prayer to keep going"], samplePrayer:"Lord, I am tired and I want to quit. But You did not bring me this far to leave me here. Every champion in scripture faced the moment of wanting to give up. Let me be like them — persevering through, not stopping short. Let patience have her perfect work in me. The race is not to the swift but to those who endure to the end. I will finish this. In Jesus' name, Amen.", scripture:[{ref:"James 1:3-4",text:"The testing of your faith produces perseverance."},{ref:"Galatians 6:9",text:"Let us not become weary in doing good, for at the proper time we will reap a harvest."}], related:["strength","hope","faith","courage","healing"] },
+
+  { slug:"trust", title:"Prayer to Trust God", metaDesc:"A prayer for complete trust in God — surrendering control and resting in His perfect plan and timing.", category:"Faith", keywords:["prayer to trust God","prayer for trust","prayer for surrender","prayer to let go","prayer for God's will"], samplePrayer:"Lord, I choose to trust You — not because my circumstances are perfect but because You are. I surrender my plans, my timelines, and my preferences to You. Where I don't understand, I will trust. Where I can't see, I will walk by faith. Your ways are higher than mine and Your thoughts are better than my best ideas. I lean not on my own understanding. In Jesus' name, Amen.", scripture:[{ref:"Proverbs 3:5-6",text:"Trust in the Lord with all your heart and lean not on your own understanding."},{ref:"Psalm 37:5",text:"Commit your way to the Lord; trust in him."}], related:["faith","peace","surrender","hope","strength"] },
+
   // ── GRIEF / LOSS ─────────────────────────────────────────────────
-  {
-    slug: "grief",
-    title: "Prayer for Grief",
-    metaDesc: "A prayer for those grieving a loss. Find comfort, healing, and God's presence in the painful journey of grief.",
-    category: "Grief",
-    keywords: ["prayer for grief","grief prayer","prayer for loss","prayer when grieving","prayer for bereavement"],
-    samplePrayer: "God of all comfort, the pain of this loss is immense. Words fall short. But I know that You are close to the brokenhearted. Hold me in this grief. Let me cry without shame and mourn without guilt. Remind me that death does not have the final word — You do. Carry me through this valley. And in Your time, restore my joy. Until then, just be near. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 34:18", text: "The Lord is close to the brokenhearted and saves those who are crushed in spirit." },
-      { ref: "Revelation 21:4", text: "He will wipe every tear from their eyes. There will be no more death or mourning or crying or pain." },
-    ],
-    related: ["comfort","depression","hope","loss","funeral"],
-  },
-  {
-    slug: "loss-of-loved-one",
-    title: "Prayer for Loss of a Loved One",
-    metaDesc: "A comforting prayer after the loss of a loved one. Find God's peace and comfort as you grieve and remember someone dear.",
-    category: "Grief",
-    keywords: ["prayer for loss of loved one","prayer for someone who died","prayer after death","prayer for deceased","prayer for the departed"],
-    samplePrayer: "Lord, we have lost someone so precious to us. The silence they leave behind is deafening. I thank You that they are in Your presence — where there is no more pain or sorrow. Comfort those of us still here. Bind our broken hearts together. Let the legacy of their life continue to inspire us. And give us the assurance that because of You, this goodbye is not forever. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "1 Thessalonians 4:13-14", text: "We do not want you to grieve like the rest of mankind, who have no hope. For we believe that Jesus died and rose again." },
-      { ref: "John 11:25", text: "Jesus said: I am the resurrection and the life." },
-    ],
-    related: ["grief","comfort","funeral","peace","hope"],
-  },
-  // ── SPECIAL OCCASIONS ────────────────────────────────────────────
-  {
-    slug: "birthday",
-    title: "Birthday Prayer",
-    metaDesc: "A beautiful birthday prayer for yourself or a loved one. Celebrate life and ask for God's blessing on the year ahead.",
-    category: "Celebration",
-    keywords: ["birthday prayer","prayer for birthday","birthday blessing prayer","prayer for someone's birthday","happy birthday prayer"],
-    samplePrayer: "Lord, thank You for the gift of life and another year to walk in Your purpose. On this birthday, I celebrate not just the day I was born but the reasons You created me. I ask for Your blessing on this new year of life — let it be filled with growth, joy, fruitfulness, and Your presence. May every dream You have placed inside me come alive. Thank You for sustaining me to see this day. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 90:12", text: "Teach us to number our days, that we may gain a heart of wisdom." },
-      { ref: "Jeremiah 1:5", text: "Before I formed you in the womb I knew you, before you were born I set you apart." },
-    ],
-    related: ["gratitude","blessing","hope","new-year","purpose"],
-  },
-  {
-    slug: "new-year",
-    title: "New Year Prayer",
-    metaDesc: "Start the New Year with a powerful prayer. Dedicate the coming year to God and trust Him with your hopes and dreams.",
-    category: "Celebration",
-    keywords: ["new year prayer","prayer for new year","new year blessing prayer","prayer to start new year","new beginnings prayer"],
-    samplePrayer: "Lord, as the new year begins I surrender it entirely to You. I don't know what lies ahead, but You do. I ask that Your hand guide me through every month. Fulfill Your promises. Open the doors that are meant for me. Let this be a year of breakthroughs, healings, and divine appointments. I lay down last year's pain and pick up fresh faith. This is a new year and Your mercies are new every morning. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Isaiah 43:19", text: "See, I am doing a new thing! Now it springs up; do you not perceive it?" },
-      { ref: "Lamentations 3:22-23", text: "His compassions never fail. They are new every morning." },
-    ],
-    related: ["morning","hope","blessing","purpose","faith"],
-  },
-  {
-    slug: "graduation",
-    title: "Prayer for Graduation",
-    metaDesc: "A prayer for graduation — celebrate this achievement and seek God's guidance for the next season of life.",
-    category: "Celebration",
-    keywords: ["prayer for graduation","graduation prayer","prayer for graduating student","prayer for new graduate","commencement prayer"],
-    samplePrayer: "Lord, what a milestone! I thank You for sustaining me through every exam, every late night, every moment of doubt. I could not have made it without You. Now as I step into what comes next, I ask for Your guidance. Open the right doors. Bring the right people. Give me wisdom to apply everything I've learned. This degree is Yours — may I use it for Your glory. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Proverbs 4:7", text: "The beginning of wisdom is this: Get wisdom, and whatever you get, get insight." },
-      { ref: "Joshua 1:9", text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go." },
-    ],
-    related: ["school","wisdom","new-year","purpose","job"],
-  },
-  // ── SCHOOL / STUDENTS ────────────────────────────────────────────
-  {
-    slug: "school",
-    title: "Prayer for School",
-    metaDesc: "A prayer for students in school — for focus, wisdom, and God's help in studies, exams, and every school challenge.",
-    category: "Education",
-    keywords: ["prayer for school","student prayer","prayer for students","prayer for exams","prayer for studying","school prayer"],
-    samplePrayer: "Lord, I thank You for the ability to learn. As I go to school today, sharpen my mind. Help me to focus, retain what I study, and recall it clearly when I need it. Give me wisdom that goes beyond textbooks. Let me also be a positive influence on those around me. In the stress of exams and assignments, let Your peace be my anchor. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "James 1:5", text: "If any of you lacks wisdom, you should ask God, who gives generously to all without finding fault." },
-      { ref: "Proverbs 3:5-6", text: "Trust in the Lord with all your heart and lean not on your own understanding." },
-    ],
-    related: ["wisdom","children","exam","graduation","morning"],
-  },
-  {
-    slug: "exam",
-    title: "Prayer Before an Exam",
-    metaDesc: "A prayer before an exam for clarity, recall, and calm. Trust God to help you perform your best in any test or exam.",
-    category: "Education",
-    keywords: ["prayer before exam","exam prayer","prayer for test","prayer to pass exam","prayer for academic success"],
-    samplePrayer: "Father, this exam is before me and I choose not to fear. I have studied, I have prepared, and now I trust You with the results. Clear my mind of anxiety. Help every piece of information I studied to come back to me clearly. Give me understanding for the questions I face. And when this exam is done, may the results glorify You. I can do all things through Christ who strengthens me. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Isaiah 50:4", text: "The Sovereign Lord has given me a well-instructed tongue, to know the word that sustains the weary." },
-      { ref: "Philippians 4:13", text: "I can do all this through him who gives me strength." },
-    ],
-    related: ["school","wisdom","anxiety","morning","strength"],
-  },
-  // ── SALVATION / REPENTANCE ───────────────────────────────────────
-  {
-    slug: "salvation",
-    title: "Prayer for Salvation",
-    metaDesc: "The sinner's prayer for salvation. Accept Jesus Christ as Lord and Savior with this simple but powerful prayer of faith.",
-    category: "Salvation",
-    keywords: ["prayer for salvation","sinner's prayer","prayer to accept Jesus","salvation prayer","prayer to become Christian","born again prayer"],
-    samplePrayer: "Lord Jesus, I come to You just as I am. I believe You are the Son of God, that You died for my sins and rose again on the third day. I am sorry for my sins and I ask You to forgive me. I turn away from my old life and I give You my heart. Come into my life, Lord Jesus. Be my Savior and my Lord. Write my name in Your book of life. I am Yours now and forever. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Romans 10:9", text: "If you declare with your mouth, 'Jesus is Lord,' and believe in your heart that God raised him from the dead, you will be saved." },
-      { ref: "John 3:16", text: "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life." },
-    ],
-    related: ["faith","repentance","forgiveness","baptism","new-life"],
-  },
-  {
-    slug: "repentance",
-    title: "Prayer of Repentance",
-    metaDesc: "A sincere prayer of repentance to restore your relationship with God. Come back to God with a humble and broken heart.",
-    category: "Salvation",
-    keywords: ["prayer of repentance","repentance prayer","prayer for forgiveness of sins","prayer to return to God","prayer for restoration"],
-    samplePrayer: "Father, I have gone my own way and I know it. I have sinned against You and I am truly sorry. I don't come with excuses — I come with a broken and contrite heart, which You will not despise. Wash me clean. Restore me to right relationship with You. I want to walk in Your ways again. Thank You for not giving up on me. Your arms are always open. I run back to You now. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Psalm 51:10", text: "Create in me a pure heart, O God, and renew a steadfast spirit within me." },
-      { ref: "Luke 15:20", text: "But while he was still a long way off, his father saw him and was filled with compassion for him." },
-    ],
-    related: ["salvation","forgiveness","faith","healing","restoration"],
-  },
-  // ── PURPOSE / DIRECTION ──────────────────────────────────────────
-  {
-    slug: "purpose",
-    title: "Prayer for Purpose",
-    metaDesc: "Discover your God-given purpose through prayer. Ask God to reveal your calling and lead you into a life of meaning.",
-    category: "Purpose",
-    keywords: ["prayer for purpose","prayer for direction","prayer for calling","prayer for life purpose","prayer to find my purpose"],
-    samplePrayer: "Lord, You created me on purpose for a purpose. I refuse to live a random life when You have a specific plan for me. Reveal my calling. Illuminate the gifts inside me. Align every circumstance with Your perfect will. When I drift, redirect me. When I doubt, remind me. Let me live the life You imagined for me before the world began. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Jeremiah 29:11", text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you." },
-      { ref: "Ephesians 2:10", text: "For we are God's handiwork, created in Christ Jesus to do good works, which God prepared in advance for us to do." },
-    ],
-    related: ["wisdom","direction","career","faith","new-year"],
-  },
-  {
-    slug: "wisdom",
-    title: "Prayer for Wisdom",
-    metaDesc: "Ask God for wisdom, discernment, and sound judgment in every area of your life with this powerful prayer.",
-    category: "Purpose",
-    keywords: ["prayer for wisdom","wisdom prayer","prayer for discernment","prayer for guidance","prayer for good decisions"],
-    samplePrayer: "Father of lights, from whom all wisdom comes — I need Your wisdom today. In every decision I face, large or small, guide me by Your Spirit. Give me discernment to tell the difference between good and best. Let Your Word be a lamp to my feet. I reject worldly wisdom and choose Yours. James said to ask and You give generously without finding fault — so I'm asking. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "James 1:5", text: "If any of you lacks wisdom, you should ask God, who gives generously to all without finding fault, and it will be given to you." },
-      { ref: "Proverbs 2:6", text: "For the Lord gives wisdom; from his mouth come knowledge and understanding." },
-    ],
-    related: ["purpose","faith","decision","school","guidance"],
-  },
-  // ── LOVE / RELATIONSHIPS ─────────────────────────────────────────
-  {
-    slug: "love",
-    title: "Prayer for Love",
-    metaDesc: "A prayer to receive and give love — romantic love, family love, and God's unconditional love. Open your heart through prayer.",
-    category: "Relationships",
-    keywords: ["prayer for love","love prayer","prayer to find love","prayer for a partner","prayer for relationship"],
-    samplePrayer: "Lord, You are love — and everything I need to know about love, I find in You. Fill me with Your love so I can pour it out to others. If You have a partner for me, align our paths. If I am waiting, let me not grow bitter — help me to grow. Let love not be just a feeling I chase but a choice I make daily. May I love as You have loved me. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "1 John 4:19", text: "We love because he first loved us." },
-      { ref: "Romans 5:5", text: "God's love has been poured out into our hearts through the Holy Spirit." },
-    ],
-    related: ["marriage","loneliness","relationships","healing","hope"],
-  },
-  {
-    slug: "loneliness",
-    title: "Prayer for Loneliness",
-    metaDesc: "A prayer when you feel alone and lonely. Be reminded that God is always with you and He sees your loneliness.",
-    category: "Relationships",
-    keywords: ["prayer for loneliness","lonely prayer","prayer when feeling alone","prayer for isolation","prayer for friendship"],
-    samplePrayer: "Lord, loneliness has settled in and it's heavy. But You said You would never leave me or forsake me — I hold onto that promise. You see me. You know me. You chose me. Send community into my life. Open my heart to receive friendship and to give it. Let me know in the deepest part of me that with You, I am never truly alone. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Hebrews 13:5", text: "God has said, 'Never will I leave you; never will I forsake you.'" },
-      { ref: "Psalm 68:6", text: "God sets the lonely in families." },
-    ],
-    related: ["depression","love","friendship","hope","grief"],
-  },
-  {
-    slug: "enemies",
-    title: "Prayer for Your Enemies",
-    metaDesc: "A prayer for your enemies as Jesus commanded. Find peace by releasing bitterness and praying for those who hurt you.",
-    category: "Relationships",
-    keywords: ["prayer for enemies","prayer for those who hurt me","prayer for people who wronged me","pray for enemies","prayer for haters"],
-    samplePrayer: "Lord, this is hard. But You said to pray for those who persecute me, so I obey. I pray for those who have hurt me. I release any bitterness and I bless them instead. I don't pray this in my own strength — only in Yours. Whatever they are going through that makes them treat people this way, bring them to a place of healing. And bring me to a place of peace. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Matthew 5:44", text: "But I tell you, love your enemies and pray for those who persecute you." },
-      { ref: "Romans 12:20", text: "If your enemy is hungry, feed him; if he is thirsty, give him something to drink." },
-    ],
-    related: ["forgiveness","peace","reconciliation","love","healing"],
-  },
-  // ── GRATITUDE ───────────────────────────────────────────────────
-  {
-    slug: "gratitude",
-    title: "Prayer of Gratitude",
-    metaDesc: "A thanksgiving prayer to God for His goodness and blessings. Cultivate a heart of gratitude with this uplifting prayer.",
-    category: "Thanksgiving",
-    keywords: ["prayer of gratitude","thanksgiving prayer","prayer to thank God","grateful prayer","prayer of thanks"],
-    samplePrayer: "Father, I pause today simply to say thank You. Not for what You will do — but for what You have already done. Thank You for life, for breath, for family, for salvation, for second chances. Thank You for the answered prayers I can see and the ones still on the way. You are so good and Your mercies never fail. My heart overflows with gratitude. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "1 Thessalonians 5:18", text: "Give thanks in all circumstances; for this is God's will for you in Christ Jesus." },
-      { ref: "Psalm 107:1", text: "Give thanks to the Lord, for he is good; his love endures forever." },
-    ],
-    related: ["morning","praise","blessing","joy","daily"],
-  },
-  {
-    slug: "blessing",
-    title: "Prayer for Blessings",
-    metaDesc: "Ask God for His blessing on your life, home, and family. A powerful prayer to activate God's favor and abundance.",
-    category: "Thanksgiving",
-    keywords: ["prayer for blessings","blessing prayer","prayer for God's blessing","prayer for favor","prayer for abundance"],
-    samplePrayer: "Lord, I pray the prayer of Jabez — enlarge my territory, let Your hand be with me, and keep me from evil. Bless everything I set my hand to. Let favor follow me wherever I go. Bless my home, my family, my work, and my ministry. You are a good Father who loves to give good gifts. I receive Your blessing today and I will use it to bless others. In Jesus' name, Amen.",
-    scripture: [
-      { ref: "Numbers 6:24-26", text: "The Lord bless you and keep you; the Lord make his face shine on you and be gracious to you." },
-      { ref: "1 Chronicles 4:10", text: "Oh, that you would bless me and enlarge my territory!" },
-    ],
-    related: ["gratitude","favor","financial-breakthrough","family","provision"],
-  },
+  { slug:"loss-of-loved-one", title:"Prayer for Loss of a Loved One", metaDesc:"A comforting prayer after the loss of a loved one. Find God's peace and comfort as you grieve.", category:"Grief", keywords:["prayer for loss of loved one","prayer for someone who died","prayer after death","prayer for deceased"], samplePrayer:"Lord, we have lost someone so precious to us. The silence they leave behind is deafening. I thank You that they are in Your presence — where there is no more pain or sorrow. Comfort those of us still here. Bind our broken hearts together. Give us the assurance that because of You, this goodbye is not forever. In Jesus' name, Amen.", scripture:[{ref:"1 Thessalonians 4:13",text:"We do not grieve like the rest of mankind, who have no hope."},{ref:"John 11:25",text:"I am the resurrection and the life."}], related:["grief","comfort","funeral","peace","hope"] },
+
+  { slug:"funeral", title:"Prayer for a Funeral", metaDesc:"A prayer to pray at a funeral or memorial service. Bring comfort to those who mourn with these words of hope.", category:"Grief", keywords:["prayer for funeral","funeral prayer","memorial service prayer","prayer at graveside","prayer for mourning"], samplePrayer:"Lord, we gather here with heavy hearts. But we do not grieve as those without hope. Because of You, death is not the end. We celebrate a life lived, we trust Your goodness, and we lean on each other in this moment. Comfort every heart in this room. Let Your peace that surpasses understanding keep us as we say goodbye until we meet again. In Jesus' name, Amen.", scripture:[{ref:"Revelation 21:4",text:"He will wipe every tear from their eyes. There will be no more death."},{ref:"Romans 8:38-39",text:"Neither death nor life... can separate us from the love of God."}], related:["grief","loss-of-loved-one","comfort","hope","peace"] },
+
+  { slug:"comfort", title:"Prayer for Comfort", metaDesc:"A prayer for comfort in pain and suffering. Let God, the Father of all comfort, wrap you in His love.", category:"Grief", keywords:["prayer for comfort","comfort prayer","prayer for someone in pain","prayer for God's comfort","prayer for hurting"], samplePrayer:"God of all comfort, I need Your arms around me right now. The pain is real and the weight is heavy. But You are the Father of compassion who comforts us in all our troubles. Come near. Let me feel Your presence in a tangible way. Speak peace to the storm inside me. And in Your time, use this pain to help me comfort others with the same comfort I've received. In Jesus' name, Amen.", scripture:[{ref:"2 Corinthians 1:3-4",text:"The God of all comfort, who comforts us in all our troubles."},{ref:"Matthew 5:4",text:"Blessed are those who mourn, for they will be comforted."}], related:["grief","loss-of-loved-one","healing","peace","hope"] },
+
+  { slug:"loss-of-parent", title:"Prayer for Loss of a Parent", metaDesc:"A prayer after losing a mother or father. Find comfort and peace in God's arms when a parent passes away.", category:"Grief", keywords:["prayer for loss of mother","prayer for loss of father","prayer when parent dies","prayer after losing mom","prayer after losing dad"], samplePrayer:"Lord, the one who shaped me, loved me first, and believed in me is gone. The hole they leave cannot be filled by anyone else. I thank You for giving them to me. I trust that they are with You. Help me to grieve well — to honor their memory without being paralyzed by it. Carry me through this season. In Jesus' name, Amen.", scripture:[{ref:"Psalm 27:10",text:"Though my father and mother forsake me, the Lord will receive me."},{ref:"Psalm 34:18",text:"The Lord is close to the brokenhearted."}], related:["grief","comfort","healing","hope","family"] },
+
+  { slug:"loss-of-child", title:"Prayer for Loss of a Child", metaDesc:"A prayer for the unimaginable grief of losing a child. May God's comfort meet you in this deepest pain.", category:"Grief", keywords:["prayer for loss of child","prayer when child dies","prayer for parents who lost a child","prayer for child death"], samplePrayer:"Lord, no parent should have to bury their child. This grief has no comparison. I don't have words — only tears. But I trust that You hold my child in Your arms, where there is no more pain or fear. Sustain me. I don't know how to breathe through this, but I know You do. Hold me together when everything in me wants to fall apart. In Jesus' name, Amen.", scripture:[{ref:"Matthew 18:10",text:"Their angels in heaven always see the face of my Father."},{ref:"2 Samuel 12:23",text:"I will go to him, but he will not return to me."}], related:["grief","miscarriage","comfort","healing","hope"] },
+
+  // ── CELEBRATION ──────────────────────────────────────────────────
+  { slug:"birthday", title:"Birthday Prayer", metaDesc:"A beautiful birthday prayer for yourself or a loved one. Celebrate life and ask for God's blessing on the year ahead.", category:"Celebration", keywords:["birthday prayer","prayer for birthday","birthday blessing prayer","prayer for someone's birthday"], samplePrayer:"Lord, thank You for the gift of life and another year to walk in Your purpose. On this birthday I celebrate not just the day I was born but the reasons You created me. Bless this new year of life — fill it with growth, joy, fruitfulness, and Your presence. Let every dream You placed inside me come alive. In Jesus' name, Amen.", scripture:[{ref:"Psalm 90:12",text:"Teach us to number our days."},{ref:"Jeremiah 1:5",text:"Before I formed you in the womb I knew you."}], related:["gratitude","blessing","hope","new-year","purpose"] },
+
+  { slug:"new-year", title:"New Year Prayer", metaDesc:"Start the New Year with a powerful prayer. Dedicate the coming year to God and trust Him with your hopes and dreams.", category:"Celebration", keywords:["new year prayer","prayer for new year","new year blessing","prayer to start new year"], samplePrayer:"Lord, as the new year begins I surrender it entirely to You. I don't know what lies ahead, but You do. Guide me through every month. Fulfill Your promises. Open the doors that are meant for me. I lay down last year's pain and pick up fresh faith. This is a new year and Your mercies are new every morning. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 43:19",text:"See, I am doing a new thing!"},{ref:"Lamentations 3:22-23",text:"His compassions are new every morning."}], related:["morning","hope","blessing","purpose","faith"] },
+
+  { slug:"graduation", title:"Prayer for Graduation", metaDesc:"A prayer for graduation — celebrate this achievement and seek God's guidance for the next season of life.", category:"Celebration", keywords:["prayer for graduation","graduation prayer","prayer for graduating student","commencement prayer"], samplePrayer:"Lord, what a milestone! I thank You for sustaining me through every exam, every late night, every moment of doubt. Now as I step into what comes next, I ask for Your guidance. Open the right doors. Bring the right people. Give me wisdom to apply everything I've learned for Your glory. In Jesus' name, Amen.", scripture:[{ref:"Proverbs 4:7",text:"The beginning of wisdom is this: Get wisdom."},{ref:"Joshua 1:9",text:"Be strong and courageous."}], related:["school","wisdom","new-year","purpose","job"] },
+
+  { slug:"wedding", title:"Wedding Prayer", metaDesc:"A beautiful prayer for a wedding ceremony. Ask God's blessing, love, and guidance on the couple's new life together.", category:"Celebration", keywords:["wedding prayer","prayer for wedding","prayer for bride and groom","prayer for marriage ceremony","wedding blessing"], samplePrayer:"Lord, we celebrate this covenant today. Two lives becoming one. Be the third strand in this cord that cannot easily be broken. Let love lead them, patience sustain them, and forgiveness restore them when needed. May their home be filled with Your presence and their marriage be a picture of Christ's love for the church. In Jesus' name, Amen.", scripture:[{ref:"Ecclesiastes 4:12",text:"A cord of three strands is not quickly broken."},{ref:"Genesis 2:24",text:"That is why a man leaves his father and mother and is united to his wife."}], related:["marriage","family","love","blessing","gratitude"] },
+
+  { slug:"anniversary", title:"Prayer for Wedding Anniversary", metaDesc:"A prayer for your wedding anniversary — thanking God for your spouse and asking His blessing for years ahead.", category:"Celebration", keywords:["prayer for anniversary","anniversary prayer","wedding anniversary prayer","prayer for marriage anniversary"], samplePrayer:"Lord, I thank You for these years together. Not every day was easy, but You were faithful in every season. Thank You for this person beside me. As we mark another year, renew our love, deepen our friendship, and strengthen our commitment. The best is still ahead — we have more to discover together and more years to give You glory. In Jesus' name, Amen.", scripture:[{ref:"Song of Solomon 3:4",text:"I found the one my heart loves."},{ref:"Proverbs 31:10",text:"A wife of noble character who can find? She is worth far more than rubies."}], related:["marriage","husband","wife","love","gratitude"] },
+
+  // ── EDUCATION ────────────────────────────────────────────────────
+  { slug:"school", title:"Prayer for School", metaDesc:"A prayer for students in school — for focus, wisdom, and God's help in studies, exams, and every school challenge.", category:"Education", keywords:["prayer for school","student prayer","prayer for students","school prayer","prayer for studying"], samplePrayer:"Lord, I thank You for the ability to learn. As I go to school today, sharpen my mind. Help me to focus, retain what I study, and recall it clearly when needed. Give me wisdom beyond textbooks. In the stress of exams and assignments, let Your peace be my anchor. In Jesus' name, Amen.", scripture:[{ref:"James 1:5",text:"If any of you lacks wisdom, you should ask God."},{ref:"Proverbs 3:5-6",text:"Trust in the Lord with all your heart."}], related:["wisdom","children","exam","graduation","morning"] },
+
+  { slug:"exam", title:"Prayer Before an Exam", metaDesc:"A prayer before an exam for clarity, recall, and calm. Trust God to help you perform your best in any test.", category:"Education", keywords:["prayer before exam","exam prayer","prayer for test","prayer to pass exam","prayer for academic success"], samplePrayer:"Father, this exam is before me and I choose not to fear. I have studied and prepared, and now I trust You. Clear my mind of anxiety. Let every piece of information come back to me clearly. Give me understanding for every question. When this exam is done, may the results glorify You. In Jesus' name, Amen.", scripture:[{ref:"Philippians 4:13",text:"I can do all this through him who gives me strength."},{ref:"Isaiah 50:4",text:"The Sovereign Lord has given me an instructed tongue."}], related:["school","wisdom","anxiety","morning","strength"] },
+
+  { slug:"teachers", title:"Prayer for Teachers", metaDesc:"A prayer for teachers and educators — for wisdom, patience, and the impact they have on every student they teach.", category:"Education", keywords:["prayer for teachers","teacher prayer","prayer for educators","prayer for school teachers","prayer for professors"], samplePrayer:"Lord, I lift up teachers today — those who pour themselves out for students day after day. Give them patience when it runs thin, creativity when lesson plans fall flat, and vision to see the potential in every child. Let their words plant seeds that bear fruit for decades. Honor their sacrifice. And let them know their work matters eternally. In Jesus' name, Amen.", scripture:[{ref:"James 3:1",text:"Not many of you should become teachers."},{ref:"Proverbs 11:14",text:"In an abundance of counselors there is safety."}], related:["school","children","wisdom","purpose","work"] },
+
+  // ── SALVATION ────────────────────────────────────────────────────
+  { slug:"salvation", title:"Prayer for Salvation", metaDesc:"The sinner's prayer for salvation. Accept Jesus Christ as Lord and Savior with this simple but powerful prayer of faith.", category:"Salvation", keywords:["prayer for salvation","sinner's prayer","prayer to accept Jesus","salvation prayer","born again prayer"], samplePrayer:"Lord Jesus, I believe You are the Son of God, that You died for my sins and rose again. I am sorry for my sins and I ask You to forgive me. I turn away from my old life and give You my heart. Come into my life, Lord Jesus. Be my Savior and my Lord. Write my name in Your book of life. I am Yours now and forever. In Jesus' name, Amen.", scripture:[{ref:"Romans 10:9",text:"If you declare Jesus is Lord and believe in your heart, you will be saved."},{ref:"John 3:16",text:"God so loved the world that he gave his one and only Son."}], related:["faith","repentance","forgiveness","baptism","spiritual-growth"] },
+
+  { slug:"repentance", title:"Prayer of Repentance", metaDesc:"A sincere prayer of repentance to restore your relationship with God. Come back to God with a humble and broken heart.", category:"Salvation", keywords:["prayer of repentance","repentance prayer","prayer for forgiveness of sins","prayer to return to God"], samplePrayer:"Father, I have gone my own way and I know it. I have sinned against You and I am truly sorry. I come with a broken and contrite heart. Wash me clean. Restore me to right relationship with You. I want to walk in Your ways again. Thank You for not giving up on me. Your arms are always open and I run back to You now. In Jesus' name, Amen.", scripture:[{ref:"Psalm 51:10",text:"Create in me a pure heart, O God."},{ref:"Luke 15:20",text:"His father saw him and was filled with compassion for him."}], related:["salvation","forgiveness","faith","healing","restoration"] },
+
+  { slug:"baptism", title:"Prayer for Baptism", metaDesc:"A prayer before baptism — declaring your faith in Jesus and committing to a new life in Him.", category:"Salvation", keywords:["prayer for baptism","baptism prayer","prayer before getting baptized","water baptism prayer"], samplePrayer:"Lord, as I go under the water I declare that my old self is dead and buried with Christ. As I come up, I rise as a new creation — reborn, renewed, and recommitted. I am not ashamed of the gospel. I publicly declare today that Jesus is my Lord. Fill me with Your Holy Spirit and let this be the beginning of a life that glorifies You. In Jesus' name, Amen.", scripture:[{ref:"Romans 6:4",text:"We were buried with him through baptism into death, so that we may live a new life."},{ref:"Acts 2:38",text:"Repent and be baptized, every one of you, in the name of Jesus Christ."}], related:["salvation","repentance","faith","spiritual-growth","new-life"] },
+
+  // ── PURPOSE ──────────────────────────────────────────────────────
+  { slug:"purpose", title:"Prayer for Purpose", metaDesc:"Discover your God-given purpose through prayer. Ask God to reveal your calling and lead you into a life of meaning.", category:"Purpose", keywords:["prayer for purpose","prayer for direction","prayer for calling","prayer to find my purpose"], samplePrayer:"Lord, You created me on purpose for a purpose. I refuse to live a random life when You have a specific plan for me. Reveal my calling. Illuminate the gifts inside me. Align every circumstance with Your perfect will. When I drift, redirect me. Let me live the life You imagined for me before the world began. In Jesus' name, Amen.", scripture:[{ref:"Jeremiah 29:11",text:"Plans to give you hope and a future."},{ref:"Ephesians 2:10",text:"Created in Christ Jesus to do good works, which God prepared in advance."}], related:["wisdom","direction","career","faith","new-year"] },
+
+  { slug:"wisdom", title:"Prayer for Wisdom", metaDesc:"Ask God for wisdom, discernment, and sound judgment in every area of your life with this powerful prayer.", category:"Purpose", keywords:["prayer for wisdom","wisdom prayer","prayer for discernment","prayer for guidance","prayer for good decisions"], samplePrayer:"Father of lights, from whom all wisdom comes — I need Your wisdom today. In every decision I face, guide me by Your Spirit. Give me discernment to tell the difference between good and best. Let Your Word be a lamp to my feet. I reject worldly wisdom and choose Yours. James said to ask and You give generously without finding fault — so I'm asking. In Jesus' name, Amen.", scripture:[{ref:"James 1:5",text:"Ask God, who gives generously to all without finding fault."},{ref:"Proverbs 2:6",text:"The Lord gives wisdom; from his mouth come knowledge and understanding."}], related:["purpose","faith","decision","school","guidance"] },
+
+  { slug:"direction", title:"Prayer for Direction", metaDesc:"A prayer for clear direction when you face a crossroads or major decision. Let God guide your next steps.", category:"Purpose", keywords:["prayer for direction","prayer for guidance","prayer at a crossroads","prayer for next step","prayer for God's direction"], samplePrayer:"Lord, I am at a crossroads and I genuinely do not know which way to go. I don't want to move out of impatience or fear. Guide me with Your peace — the kind that either confirms or unsettles. Speak through Your Word, through wise counsel, through circumstances. Show me the path You have prepared. I will wait until I hear clearly. In Jesus' name, Amen.", scripture:[{ref:"Psalm 32:8",text:"I will instruct you and teach you in the way you should go."},{ref:"Isaiah 30:21",text:"Whether you turn to the right or to the left, your ears will hear a voice saying, 'This is the way.'"}], related:["wisdom","purpose","faith","trust","calling"] },
+
+  { slug:"calling", title:"Prayer for Your Calling", metaDesc:"A prayer to discover and walk in your God-given calling. Ask God to reveal and confirm the specific assignment on your life.", category:"Purpose", keywords:["prayer for calling","prayer for ministry","prayer for vocation","prayer to know God's call","prayer for gifts"], samplePrayer:"Lord, I know You have a specific assignment for my life — not just a generic one but a precise calling. Reveal it clearly. Confirm it through Your Word and through the witness of the Spirit. Give me the courage to say yes when You call, even when it seems impossible. I am available. Send me. In Jesus' name, Amen.", scripture:[{ref:"Romans 11:29",text:"God's gifts and his call are irrevocable."},{ref:"Isaiah 6:8",text:"Then I heard the voice of the Lord saying, 'Whom shall I send?' And I said, 'Here am I. Send me!'"}], related:["purpose","direction","ministry","courage","faith"] },
+
+  // ── RELATIONSHIPS ────────────────────────────────────────────────
+  { slug:"love", title:"Prayer for Love", metaDesc:"A prayer to receive and give love — romantic love, family love, and God's unconditional love.", category:"Relationships", keywords:["prayer for love","love prayer","prayer to find love","prayer for a partner","prayer for relationship"], samplePrayer:"Lord, You are love and everything I know about love I find in You. Fill me with Your love so I can pour it out to others. If You have a partner for me, align our paths. If I am waiting, help me grow rather than grow bitter. Let love not be just a feeling I chase but a choice I make daily. In Jesus' name, Amen.", scripture:[{ref:"1 John 4:19",text:"We love because he first loved us."},{ref:"Romans 5:5",text:"God's love has been poured out into our hearts."}], related:["marriage","loneliness","relationships","healing","hope"] },
+
+  { slug:"enemies", title:"Prayer for Your Enemies", metaDesc:"A prayer for your enemies as Jesus commanded. Find peace by releasing bitterness and praying for those who hurt you.", category:"Relationships", keywords:["prayer for enemies","prayer for those who hurt me","prayer for people who wronged me","pray for enemies"], samplePrayer:"Lord, this is hard. But You said to pray for those who persecute me, so I obey. I pray for those who have hurt me. I release any bitterness and bless them instead. Whatever they are going through that makes them treat people this way, bring them to healing. And bring me to peace. In Jesus' name, Amen.", scripture:[{ref:"Matthew 5:44",text:"Love your enemies and pray for those who persecute you."},{ref:"Romans 12:20",text:"If your enemy is hungry, feed him."}], related:["forgiveness","peace","reconciliation","love","healing"] },
+
+  { slug:"reconciliation", title:"Prayer for Reconciliation", metaDesc:"A prayer for restored relationships and reconciliation. Ask God to heal broken friendships, family rifts, and estrangements.", category:"Relationships", keywords:["prayer for reconciliation","prayer to restore relationship","prayer for broken friendship","prayer for estranged family"], samplePrayer:"Lord, there is a relationship that is broken and I long for restoration. I do not know all the steps to get there, but You do. Soften hearts — mine and theirs. Remove pride, ego, and the need to be right. Let forgiveness be the bridge that reconnects us. And if reconciliation is not possible, give me the grace to release it with peace. In Jesus' name, Amen.", scripture:[{ref:"2 Corinthians 5:18",text:"God reconciled us to himself through Christ and gave us the ministry of reconciliation."},{ref:"Matthew 5:9",text:"Blessed are the peacemakers."}], related:["forgiveness","marriage","family","enemies","peace"] },
+
+  { slug:"friendship", title:"Prayer for True Friendship", metaDesc:"A prayer for genuine, God-sent friendships. Ask God to bring loyal, uplifting, and faithful friends into your life.", category:"Relationships", keywords:["prayer for friendship","prayer for friends","prayer to find friends","prayer for true friends","prayer for loyal friends"], samplePrayer:"Lord, I ask for the kind of friends that make me better — who speak truth in love, celebrate my wins, stand with me in hard times, and point me back to You when I drift. Remove toxic relationships and replace them with covenant ones. Give me the discernment to recognize them when they arrive and the courage to be that friend first. In Jesus' name, Amen.", scripture:[{ref:"Proverbs 17:17",text:"A friend loves at all times."},{ref:"Ecclesiastes 4:9-10",text:"Two are better than one... if either falls down, one can help the other up."}], related:["loneliness","love","community","family","gratitude"] },
+
+  // ── THANKSGIVING ─────────────────────────────────────────────────
+  { slug:"gratitude", title:"Prayer of Gratitude", metaDesc:"A thanksgiving prayer to God for His goodness and blessings. Cultivate a heart of gratitude with this uplifting prayer.", category:"Thanksgiving", keywords:["prayer of gratitude","thanksgiving prayer","prayer to thank God","grateful prayer","prayer of thanks"], samplePrayer:"Father, I pause today simply to say thank You. Not for what You will do — but for what You have already done. Thank You for life, for breath, for family, for salvation, for second chances. Thank You for the answered prayers and the ones still on the way. You are so good and Your mercies never fail. My heart overflows with gratitude. In Jesus' name, Amen.", scripture:[{ref:"1 Thessalonians 5:18",text:"Give thanks in all circumstances."},{ref:"Psalm 107:1",text:"Give thanks to the Lord, for he is good; his love endures forever."}], related:["morning","praise","blessing","joy","daily"] },
+
+  { slug:"blessing", title:"Prayer for Blessings", metaDesc:"Ask God for His blessing on your life, home, and family. A powerful prayer to activate God's favor and abundance.", category:"Thanksgiving", keywords:["prayer for blessings","blessing prayer","prayer for God's blessing","prayer for favor","prayer for abundance"], samplePrayer:"Lord, I pray the prayer of Jabez — enlarge my territory, let Your hand be with me, and keep me from evil. Bless everything I set my hand to. Let favor follow me wherever I go. Bless my home, my family, my work, and my ministry. You are a good Father who loves to give good gifts. I receive Your blessing today and will use it to bless others. In Jesus' name, Amen.", scripture:[{ref:"Numbers 6:24-26",text:"The Lord bless you and keep you."},{ref:"1 Chronicles 4:10",text:"Oh, that you would bless me and enlarge my territory!"}], related:["gratitude","favor","financial-breakthrough","family","provision"] },
+
+  { slug:"thanksgiving", title:"Prayer of Thanksgiving", metaDesc:"A powerful thanksgiving prayer to God for answered prayers, His faithfulness, and daily blessings in your life.", category:"Thanksgiving", keywords:["prayer of thanksgiving","thanksgiving day prayer","prayer of thanks to God","prayer for answered prayers"], samplePrayer:"Lord, I enter Your gates with thanksgiving and Your courts with praise. Every good thing in my life has Your fingerprints on it. Thank You for health, for family, for provision, for grace that covers all my mistakes. I will not take Your blessings for granted. Let gratitude be the posture of my heart every single day. In Jesus' name, Amen.", scripture:[{ref:"Psalm 100:4",text:"Enter his gates with thanksgiving and his courts with praise."},{ref:"Ephesians 5:20",text:"Always giving thanks to God the Father for everything."}], related:["gratitude","morning","praise","blessing","worship"] },
+
+  { slug:"praise", title:"Prayer of Praise", metaDesc:"A bold prayer of praise to God — declaring His greatness and lifting His name high in worship and adoration.", category:"Thanksgiving", keywords:["prayer of praise","praise prayer","prayer to praise God","praise and worship prayer","exalting God prayer"], samplePrayer:"Lord, You are worthy of all praise! Not because of what You do for me but because of who You are. Holy, holy, holy is the Lord God Almighty. Your glory fills the earth. Let my mouth be full of Your praise from morning until night. Let every breath be a declaration of Your greatness. I lift Your name high above every problem, every fear, every circumstance. You reign. In Jesus' name, Amen.", scripture:[{ref:"Psalm 150:6",text:"Let everything that has breath praise the Lord."},{ref:"Revelation 4:11",text:"You are worthy, our Lord and God, to receive glory and honor and power."}], related:["worship","gratitude","thanksgiving","morning","faith"] },
+
+  // ── CHURCH / MINISTRY ────────────────────────────────────────────
+  { slug:"church", title:"Prayer for the Church", metaDesc:"A prayer for the church — for unity, revival, and God's power to transform communities through His body.", category:"Ministry", keywords:["prayer for the church","church prayer","prayer for church unity","prayer for revival in the church"], samplePrayer:"Lord, let Your church be what You designed it to be — a city on a hill, a light in darkness, a community of genuine love. Remove division, pride, and tradition that stifles Your Spirit. Bring revival. Let the world look at the church and see something so different, so beautiful, that they are drawn to You. In Jesus' name, Amen.", scripture:[{ref:"Matthew 16:18",text:"I will build my church, and the gates of Hades will not overcome it."},{ref:"Ephesians 4:3",text:"Make every effort to keep the unity of the Spirit."}], related:["revival","unity","ministry","pastor","worship"] },
+
+  { slug:"pastor", title:"Prayer for Your Pastor", metaDesc:"A prayer for your pastor — for wisdom, strength, protection, and God's anointing on their ministry.", category:"Ministry", keywords:["prayer for pastor","pastor prayer","prayer for church leader","prayer for minister","prayer for preacher"], samplePrayer:"Lord, I lift my pastor to You today. Guard their heart from pride and discouragement. Give them fresh revelation every week and the courage to speak truth without compromise. Protect their family, their health, and their marriage. Let the anointing on their life never diminish but increase with every season. Thank You for gifting them to our congregation. In Jesus' name, Amen.", scripture:[{ref:"Hebrews 13:17",text:"They keep watch over you as those who must give an account."},{ref:"1 Timothy 5:17",text:"The elders who direct the affairs of the church well are worthy of double honor."}], related:["church","ministry","unity","revival","leadership"] },
+
+  { slug:"ministry", title:"Prayer for Ministry", metaDesc:"A prayer for your ministry — for God's anointing, provision, and open doors to serve His kingdom effectively.", category:"Ministry", keywords:["prayer for ministry","ministry prayer","prayer for church ministry","prayer for missionaries","prayer for kingdom work"], samplePrayer:"Lord, this ministry is Yours — every vision, every resource, every person. I am just a steward. Give me the wisdom to lead it well and the humility to remember that You build the house. Open the doors only You can open. Send the right people. Provide every resource needed. Let every soul touched be a trophy of Your grace. In Jesus' name, Amen.", scripture:[{ref:"1 Corinthians 3:6",text:"I planted the seed, Apollos watered it, but God has been making it grow."},{ref:"Psalm 127:1",text:"Unless the Lord builds the house, the builders labor in vain."}], related:["calling","church","pastor","purpose","provision"] },
+
+  { slug:"revival", title:"Prayer for Revival", metaDesc:"A bold prayer for revival — in your heart, your church, your city, and the nation. Cry out for God's Spirit to move.", category:"Ministry", keywords:["prayer for revival","revival prayer","prayer for spiritual awakening","national revival prayer","prayer for awakening"], samplePrayer:"Lord, send revival — starting with me. I cannot cry out for my nation without first asking You to revive my own heart. Set me on fire. And let that fire spread to my family, my church, my city, and my nation. Do it again, Lord — as You did in the great awakenings. Let this generation see a move of Your Spirit that transforms everything. In Jesus' name, Amen.", scripture:[{ref:"2 Chronicles 7:14",text:"If my people will humble themselves and pray, I will heal their land."},{ref:"Habakkuk 3:2",text:"Lord, I have heard of your fame; I stand in awe of your deeds, Lord. Repeat them in our day."}], related:["church","prayer","spiritual-growth","nation","repentance"] },
+
+  { slug:"missionaries", title:"Prayer for Missionaries", metaDesc:"A prayer for missionaries serving around the world — for their safety, provision, and fruitfulness in the field.", category:"Ministry", keywords:["prayer for missionaries","missionary prayer","prayer for foreign missions","prayer for mission trips"], samplePrayer:"Lord, I lift up missionaries serving around the world today. They have left comfort and familiarity to carry Your name to the nations. Protect them. Provide for them. Give them language breakthroughs, open hearts, and fruitful ministry. Sustain their families. And let the harvest they reap be worth every sacrifice they made. In Jesus' name, Amen.", scripture:[{ref:"Matthew 28:19",text:"Go and make disciples of all nations."},{ref:"Romans 10:14",text:"How can they hear without someone preaching to them?"}], related:["ministry","church","calling","protection","provision"] },
+
+  // ── NATIONS / GOVERNMENT ─────────────────────────────────────────
+  { slug:"nation", title:"Prayer for the Nation", metaDesc:"A prayer for your nation — for righteous leadership, justice, healing, and God's blessing on your country.", category:"Nation", keywords:["prayer for the nation","prayer for my country","national prayer","prayer for America","prayer for Nigeria","prayer for UK"], samplePrayer:"Lord, I stand in the gap for my nation today. Forgive our sins as a people. Heal the divisions, the injustices, the corruption. Raise up leaders who fear You and serve the people. Let righteousness flow like a river through our government, our schools, and our communities. Bless this nation and make it a blessing to the world. In Jesus' name, Amen.", scripture:[{ref:"2 Chronicles 7:14",text:"If my people humble themselves and pray, I will heal their land."},{ref:"Psalm 33:12",text:"Blessed is the nation whose God is the Lord."}], related:["government","revival","peace","justice","leaders"] },
+
+  { slug:"government", title:"Prayer for Government and Leaders", metaDesc:"A prayer for government leaders — for wisdom, integrity, and justice in those who hold positions of authority.", category:"Nation", keywords:["prayer for government","prayer for leaders","prayer for politicians","prayer for president","prayer for prime minister"], samplePrayer:"Lord, I pray for those in authority over our nation. Give them wisdom that surpasses their own. Surround them with honest advisors. Remove corruption and let integrity be the standard. May every law passed reflect Your justice and love for humanity. And where leaders fail, raise up righteous voices to speak truth. In Jesus' name, Amen.", scripture:[{ref:"1 Timothy 2:1-2",text:"I urge that petitions, prayers, intercession and thanksgiving be made for all people — for kings and all those in authority."},{ref:"Romans 13:1",text:"There is no authority except that which God has established."}], related:["nation","revival","peace","justice","leaders"] },
+
+  { slug:"justice", title:"Prayer for Justice", metaDesc:"A prayer for God's justice — for the oppressed, the marginalized, and the victims of injustice around the world.", category:"Nation", keywords:["prayer for justice","justice prayer","prayer for the oppressed","prayer for racial justice","prayer for equality"], samplePrayer:"Lord of justice, You hate injustice and love righteousness. I cry out for those who have been wronged, oppressed, overlooked, and silenced. Let justice roll like a river. Give a voice to the voiceless and sight to those who choose blindness. Change systems. Change hearts. Let the church lead with love and truth in the fight for what is right. In Jesus' name, Amen.", scripture:[{ref:"Amos 5:24",text:"Let justice roll on like a river, righteousness like a never-failing stream."},{ref:"Micah 6:8",text:"Act justly and to love mercy and to walk humbly with your God."}], related:["nation","government","peace","healing","church"] },
+
+  { slug:"peace-in-the-world", title:"Prayer for World Peace", metaDesc:"A prayer for peace in the world — for war to end, nations to reconcile, and God's kingdom to come on earth.", category:"Nation", keywords:["prayer for world peace","prayer for peace","prayer to end war","prayer for countries at war","prayer for global peace"], samplePrayer:"Prince of Peace, only You can bring lasting peace to this broken world. Speak to warring nations. Soften the hearts of those who grip weapons instead of hands. Protect civilians caught in conflict. Raise up peacemakers. And hasten the day when swords become plowshares and the knowledge of Your glory covers the earth as waters cover the sea. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 2:4",text:"They will beat their swords into plowshares."},{ref:"John 14:27",text:"Peace I leave with you; my peace I give you."}], related:["nation","government","justice","revival","healing"] },
+
+  // ── MILITARY / FIRST RESPONDERS ──────────────────────────────────
+  { slug:"military", title:"Prayer for Military", metaDesc:"A prayer for military men and women — for their protection, strength, and safe return home from service.", category:"Protection", keywords:["prayer for military","military prayer","prayer for soldiers","prayer for armed forces","prayer for troops"], samplePrayer:"Lord, I lift up every man and woman in uniform today. They stand in the gap so others can live in peace. Protect them from every danger. Give them courage, clear minds, and the resilience to endure. Comfort their families at home. And bring them back safely — changed for the better, not broken by what they've seen. In Jesus' name, Amen.", scripture:[{ref:"Psalm 91:5",text:"You will not fear the terror of night, nor the arrow that flies by day."},{ref:"Isaiah 41:10",text:"I will strengthen you and help you."}], related:["protection","strength","family","courage","healing"] },
+
+  { slug:"first-responders", title:"Prayer for First Responders", metaDesc:"A prayer for police, firefighters, paramedics, and all first responders who risk their lives serving others.", category:"Protection", keywords:["prayer for first responders","prayer for police","prayer for firefighters","prayer for paramedics","prayer for EMT"], samplePrayer:"Lord, I thank You for those who run toward danger when everyone else runs away. Cover every first responder with Your protection today. Give them quick minds, steady hands, and calm spirits. Shield them from harm. And when the weight of what they see becomes heavy, let them find rest and healing in You. In Jesus' name, Amen.", scripture:[{ref:"John 15:13",text:"Greater love has no one than this: to lay down one's life for one's friends."},{ref:"Psalm 91:11",text:"He will command his angels concerning you."}], related:["military","protection","strength","healing","courage"] },
+
+  // ── SPECIFIC SITUATIONS ──────────────────────────────────────────
+  { slug:"moving", title:"Prayer for Moving to a New Home", metaDesc:"A prayer when moving to a new home or city. Ask God to bless your new space and guide this new season of life.", category:"Daily Prayer", keywords:["prayer for moving","prayer for new home","prayer before moving","prayer for new city","house blessing prayer"], samplePrayer:"Lord, as we move into this new space, we invite Your presence in before anything else. Bless every room. Let this home be a place of peace, love, laughter, and purpose. Cover it with Your protection. May everyone who walks through these doors feel Your welcome. Thank You for this new beginning. In Jesus' name, Amen.", scripture:[{ref:"Psalm 127:1",text:"Unless the Lord builds the house, the builders labor in vain."},{ref:"Joshua 24:15",text:"As for me and my household, we will serve the Lord."}], related:["home-protection","new-year","blessing","family","gratitude"] },
+
+  { slug:"letting-go", title:"Prayer for Letting Go", metaDesc:"A prayer for letting go of the past, toxic relationships, old wounds, and anything that no longer serves your purpose.", category:"Mental Health", keywords:["prayer for letting go","prayer to let go","prayer for closure","prayer to release the past","prayer to move on"], samplePrayer:"Lord, I have been holding on to things You have already asked me to release. Today I open my hands and let go — the pain, the relationship, the outcome I cannot control, the version of my life I planned. I choose trust over control. Fill the spaces that empty out with more of You. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 43:18",text:"Forget the former things; do not dwell on the past."},{ref:"Philippians 3:13",text:"Forgetting what is behind and straining toward what is ahead."}], related:["forgiveness","peace","healing","trust","new-year"] },
+
+  { slug:"waiting-on-god", title:"Prayer While Waiting on God", metaDesc:"A prayer for the season of waiting on God. Find peace, purpose, and strength while you wait for His promises to come.", category:"Faith", keywords:["prayer for waiting","prayer while waiting on God","prayer for patience","prayer in the waiting season"], samplePrayer:"Lord, waiting is hard. My heart is impatient and my faith gets tested in the silence. But I choose to trust that You are working even when I cannot see it. Let me not waste the waiting — use this season to build character in me, to deepen my roots, and to prepare me for what is coming. Your timing is perfect. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 40:31",text:"Those who wait for the Lord will renew their strength."},{ref:"Psalm 27:14",text:"Wait for the Lord; be strong and take heart."}], related:["faith","trust","hope","patience","strength"] },
+
+  { slug:"breakthrough", title:"Prayer for Breakthrough", metaDesc:"A prayer for breakthrough in every area of your life. Ask God to break through every obstacle and open new doors.", category:"Faith", keywords:["prayer for breakthrough","breakthrough prayer","prayer for open doors","prayer for change","prayer for shift"], samplePrayer:"Lord, I have been pressing and pushing and I believe my breakthrough is near. I ask You now to burst through every obstacle. Every door that has been closed, open. Every chain that has held me back, break. Every delay that has frustrated me, turn around. I am on the edge of my breakthrough and I refuse to give up now. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 45:2",text:"I will go before you and will level the mountains."},{ref:"Micah 2:13",text:"The One who breaks open the way will go up before them."}], related:["financial-breakthrough","healing","strength","faith","hope"] },
+
+  { slug:"deliverance", title:"Prayer for Deliverance", metaDesc:"A prayer for deliverance from bondage, sin, darkness, and everything that has held you captive. Be set free today.", category:"Faith", keywords:["prayer for deliverance","deliverance prayer","prayer for freedom","prayer to break chains","prayer against bondage"], samplePrayer:"Lord Jesus, You came to set captives free. Every chain — visible and invisible — I command to break in Your name. Deliver me from every form of bondage. Where darkness has operated, let Your light flood in. I am not a victim; I am a victor through Christ. I walk free today. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 61:1",text:"He has sent me to proclaim freedom for the captives."},{ref:"Luke 4:18",text:"To set the oppressed free."}], related:["addiction","spiritual-warfare","healing","freedom","salvation"] },
+
+  { slug:"hurricane-disaster", title:"Prayer During Natural Disaster", metaDesc:"A prayer during hurricanes, earthquakes, floods, and natural disasters. Trust God to protect and provide amid chaos.", category:"Protection", keywords:["prayer for hurricane","prayer during flood","prayer during earthquake","prayer for natural disaster","prayer for storm"], samplePrayer:"Lord, the storm rages around us and we feel small. But You spoke peace to a storm on Galilee and it obeyed. Be our shelter in this disaster. Protect every life. Guide rescue teams. Provide for those who have lost everything. And in the aftermath, let the church rise to show Your love in tangible ways. In Jesus' name, Amen.", scripture:[{ref:"Nahum 1:7",text:"The Lord is good, a refuge in times of trouble."},{ref:"Psalm 46:1",text:"God is our refuge and strength, an ever-present help in trouble."}], related:["protection","healing","provision","comfort","nation"] },
+
+  { slug:"prison", title:"Prayer for Those in Prison", metaDesc:"A prayer for those in prison — for rehabilitation, peace, hope, and God's redemptive work behind bars.", category:"Nation", keywords:["prayer for prisoners","prayer for those in prison","prayer for incarcerated","prayer for jail","prayer for inmates"], samplePrayer:"Lord, You visited those in prison — You still do. I lift up everyone behind bars today. Let Your presence fill those cells. Bring hope where despair has settled. Work rehabilitation, restoration, and purpose. Let second chances be given and received. And for those wrongly convicted, bring justice. In Jesus' name, Amen.", scripture:[{ref:"Matthew 25:36",text:"I was in prison and you came to visit me."},{ref:"Psalm 146:7",text:"The Lord sets prisoners free."}], related:["justice","hope","redemption","healing","salvation"] },
 ];
 
-// Fast lookup map
+// ── Fast lookup map ─────────────────────────────────────────────────
 export const TOPIC_MAP = new Map<string, PrayerTopic>(
   PRAYER_TOPICS.map((t) => [t.slug, t])
 );
 
-// All slugs for generateStaticParams
+// ── All slugs for generateStaticParams ──────────────────────────────
 export const ALL_SLUGS = PRAYER_TOPICS.map((t) => t.slug);
