@@ -125,3 +125,18 @@ export interface EditorState {
 }
 
 export type TrimSize = '5x8' | '5.5x8.5' | '6x9' | 'a5' | '8.5x11';
+
+// ─────────────────────────────────────────
+//  RECENT BOOK TYPE
+// ─────────────────────────────────────────
+
+export interface RecentBook {
+  id: string;
+  title: string;
+  author: string;
+  wordCount: number;
+  genre: string;
+  coverColor: string;
+  lastModified: number;
+  rawText: string;
+}
