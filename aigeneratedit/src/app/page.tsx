@@ -1,29 +1,14 @@
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import StatsBar from "@/components/StatsBar";
-import FeatureGrid from "@/components/FeatureGrid";
-import TrustBar from "@/components/TrustBar";
-import HowItWorks from "@/components/HowItWorks";
-import ComparisonTable from "@/components/ComparisonTable";
-import UseCaseTabs from "@/components/UseCaseTabs";
-import Testimonials from "@/components/Testimonials";
-import CTABanner from "@/components/CTABanner";
-import Footer from "@/components/Footer";
+'use client'
 
-export default function Home() {
-  return (
-    <main className="min-h-screen" style={{ background: "#F5F5F7" }}>
-      <Navbar />
-      <Hero />
-      <StatsBar />
-      <FeatureGrid />
-      <TrustBar />
-      <HowItWorks />
-      <ComparisonTable />
-      <UseCaseTabs />
-      <Testimonials />
-      <CTABanner />
-      <Footer />
-    </main>
-  );
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+// Show onboarding by default — in production this checks auth state
+export default function RootPage() {
+  const router = useRouter()
+  useEffect(() => {
+    const done = sessionStorage.getItem('nomapal_onboarded')
+    router.replace(done ? '/discover' : '/onboarding')
+  }, [router])
+  return null
 }

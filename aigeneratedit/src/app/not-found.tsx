@@ -1,39 +1,29 @@
-import Link from "next/link";
-import { Search } from "lucide-react";
+'use client'
+
+import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center px-4">
-      <div className="max-w-md text-center">
-        <div
-          className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
-          style={{ background: "rgba(200,241,53,0.12)" }}
-        >
-          <Search size={36} style={{ color: "#8DB800" }} />
-        </div>
-        <h1
-          className="font-display text-[64px] font-bold leading-none mb-2"
-          style={{ color: "#C8F135" }}
-        >
-          404
-        </h1>
-        <p
-          className="font-display text-[24px] font-bold text-[#1D1D1F] mb-3"
-        >
-          Nothing to detect here.
-        </p>
-        <p className="text-[15px] text-[#6E6E73] mb-8">
-          This page doesn&apos;t exist — but deepfakes do. Head back and scan something real.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link href="/" className="btn-primary text-[14px] px-6 py-3 justify-center">
-            Go to Homepage
-          </Link>
-          <Link href="/detect/audio" className="btn-ghost text-[14px] px-6 py-3 justify-center">
-            Try a detector
-          </Link>
-        </div>
+    <div style={{
+      position: 'absolute', inset: 0,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      gap: 20, padding: 32, background: '#fff', textAlign: 'center',
+    }}>
+      <div style={{ fontSize: 64 }}>✈️</div>
+      <div style={{ fontSize: 28, fontWeight: 800, color: '#141414', letterSpacing: '-0.03em' }}>
+        Lost in transit.
       </div>
+      <div style={{ fontSize: 15, color: '#737373', lineHeight: 1.6 }}>
+        This page doesn't exist — but your next adventure does.
+      </div>
+      <Link href="/onboarding" style={{
+        padding: '16px 28px', background: 'var(--color-active, #FF4444)',
+        color: '#fff', borderRadius: 9999, textDecoration: 'none',
+        fontSize: 16, fontWeight: 700, transition: 'background 280ms',
+      }}>
+        Back to Nomapal
+      </Link>
     </div>
-  );
+  )
 }
