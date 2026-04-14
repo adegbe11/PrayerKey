@@ -153,7 +153,7 @@ export default function ProfilePage() {
             <span style={{ fontSize: 20, width: 28, textAlign: 'center' }}>{item.icon}</span>
             <span style={{
               flex: 1, fontSize: 15, fontWeight: 600,
-              color: (item as any).danger ? '#FF4444' : (item as any).highlight ? color : '#3b3b3b',
+              color: (item as any).danger ? '#FF5A5F' : (item as any).highlight ? color : '#3b3b3b',
               transition: 'color 280ms',
             }}>
               {item.label}

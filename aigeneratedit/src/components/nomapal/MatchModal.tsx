@@ -1,18 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation'
 import type { TravelerProfile } from '@/lib/types'
 import { useColor } from './ColorProvider'
 
-const CONFETTI_COLORS = ['#FF4444','#FF8800','#FFDD00','#44CC44','#0088FF','#3344CC','#9933CC']
+export type MatchType = 'travel' | 'destination' | 'trip'
 
-function Confetti() {
-  const pieces = Array.from({ length: 60 }, (_, i) => i)
+const CONFETTI_COLORS = ['#FF5A5F','#FF8800','#FFDD00','#44CC44','#0088FF','#3344CC','#9933CC']
+
+function Confetti({ count = 60 }: { count?: number }) {
   return (
     <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-      {pieces.map(i => (
+      {Array.from({ length: count }, (_, i) => (
         <div key={i} style={{
           position: 'absolute',
           left: `${Math.random() * 100}%`,
@@ -28,21 +28,54 @@ function Confetti() {
   )
 }
 
+const MATCH_CONFIG = {
+  travel: {
+    badge: '🤝 Travel Match',
+    headline: (name: string) => `You and ${name} want to explore!`,
+    sub: (name: string) => `${name} is open to traveling with you. Say hi and see where it goes.`,
+    primaryCTA: 'Send Message',
+    bg: 'rgba(0,0,0,0.93)',
+    accentColor: null as null | string,
+    centerIcon: '🌍',
+    confetti: 50,
+  },
+  destination: {
+    badge: '✈️ Destination Match',
+    headline: (_: string, dest?: string) => `You're both headed to ${dest ?? 'the same place'}!`,
+    sub: (name: string) => `You and ${name} have overlapping destinations. This is rare — don't miss it.`,
+    primaryCTA: 'Plan the Trip',
+    bg: 'rgba(0,16,0,0.95)',
+    accentColor: '#44CC44',
+    centerIcon: '🗺️',
+    confetti: 70,
+  },
+  trip: {
+    badge: '🚀 Trip Match',
+    headline: (name: string) => `Perfect Trip Match with ${name}!`,
+    sub: (_: string, dest?: string) => `Same destination, same vibe${dest ? ` — ${dest}` : ''}. This one's rare.`,
+    primaryCTA: 'Start Planning Together',
+    bg: 'rgba(0,0,18,0.95)',
+    accentColor: '#0088FF',
+    centerIcon: '🛫',
+    confetti: 90,
+  },
+}
+
 interface MatchModalProps {
   match: TravelerProfile
+  matchType?: MatchType
+  sharedDestination?: string
   myPhoto?: string
   onMessage: () => void
   onKeepSwiping: () => void
 }
 
-export function MatchModal({ match, myPhoto, onMessage, onKeepSwiping }: MatchModalProps) {
+export function MatchModal({ match, matchType = 'travel', sharedDestination, myPhoto, onMessage, onKeepSwiping }: MatchModalProps) {
   const { color, triggerRainbow } = useColor()
-  const [show, setShow] = useState(false)
+  const cfg = MATCH_CONFIG[matchType]
+  const accent = cfg.accentColor ?? color
 
-  useEffect(() => {
-    triggerRainbow()
-    setTimeout(() => setShow(true), 100)
-  }, [triggerRainbow])
+  useEffect(() => { triggerRainbow() }, [triggerRainbow])
 
   return (
     <AnimatePresence>
@@ -52,114 +85,113 @@ export function MatchModal({ match, myPhoto, onMessage, onKeepSwiping }: MatchMo
         exit={{ opacity: 0 }}
         style={{
           position: 'absolute', inset: 0, zIndex: 200,
-          background: 'rgba(0,0,0,0.92)',
+          background: cfg.bg,
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
         }}
       >
-        <Confetti />
+        <Confetti count={cfg.confetti} />
+
+        {/* Tier badge */}
+        <motion.div
+          initial={{ scale: 0.5, opacity: 0, y: -16 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.05 }}
+          style={{
+            padding: '6px 18px', borderRadius: 9999, marginBottom: 20,
+            background: `${accent}22`, border: `1.5px solid ${accent}55`,
+          }}
+        >
+          <span style={{ fontSize: 13, fontWeight: 800, color: accent, letterSpacing: '0.05em' }}>
+            {cfg.badge}
+          </span>
+        </motion.div>
 
         {/* Headline */}
         <motion.div
-          initial={{ scale: 0.7, opacity: 0, y: -20 }}
+          initial={{ scale: 0.8, opacity: 0, y: -10 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
-          style={{ textAlign: 'center', marginBottom: 40, padding: '0 24px' }}
+          transition={{ type: 'spring', stiffness: 280, damping: 22, delay: 0.12 }}
+          style={{ textAlign: 'center', marginBottom: 36, padding: '0 28px' }}
         >
-          <div style={{
-            fontSize: 13, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.2em',
-            color: color, marginBottom: 8, transition: 'color 280ms',
-          }}>
-            It's a Match
+          <div style={{ fontSize: 23, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: 10 }}>
+            {cfg.headline(match.name, sharedDestination)}
           </div>
-          <div style={{
-            fontSize: 28, fontWeight: 800, color: '#fff',
-            letterSpacing: '-0.02em', lineHeight: 1.2,
-          }}>
-            You're both heading<br />
-            <span style={{ color }}>{match.destinations[0] ?? 'the same way'}</span>
+          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.55 }}>
+            {cfg.sub(match.name, sharedDestination)}
           </div>
         </motion.div>
 
         {/* Photos */}
-        <div style={{ display: 'flex', gap: 20, marginBottom: 48, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 20, marginBottom: 44, alignItems: 'center' }}>
           <motion.div
             initial={{ x: -120, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.25 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.2 }}
           >
             <div style={{
-              width: 120, height: 120, borderRadius: '50%', overflow: 'hidden',
-              border: `4px solid ${color}`,
-              boxShadow: `0 0 0 4px rgba(255,255,255,0.1), 0 16px 48px ${color}44`,
-              transition: 'border-color 280ms, box-shadow 280ms',
+              width: 110, height: 110, borderRadius: '50%', overflow: 'hidden',
+              border: `4px solid ${accent}`,
+              boxShadow: `0 0 0 4px rgba(255,255,255,0.08), 0 16px 48px ${accent}44`,
             }}>
-              <img
-                src={myPhoto ?? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80'}
-                alt="You"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
+              <img src={myPhoto ?? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80'}
+                alt="You" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
           </motion.div>
 
-          {/* Rainbow burst in center */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 15, delay: 0.35 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 14, delay: 0.3 }}
             style={{
-              width: 40, height: 40, borderRadius: '50%',
-              background: `conic-gradient(${CONFETTI_COLORS.join(', ')})`,
-              boxShadow: '0 0 24px rgba(255,255,255,0.4)',
+              width: 44, height: 44, borderRadius: '50%',
+              background: matchType === 'travel'
+                ? `conic-gradient(${CONFETTI_COLORS.join(', ')})`
+                : matchType === 'destination'
+                ? 'linear-gradient(135deg, #44CC44, #0088FF)'
+                : 'linear-gradient(135deg, #0088FF, #9933CC)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: `0 0 28px ${accent}66`, fontSize: 20,
             }}
-          />
+          >
+            {cfg.centerIcon}
+          </motion.div>
 
           <motion.div
             initial={{ x: 120, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.25 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.2 }}
           >
             <div style={{
-              width: 120, height: 120, borderRadius: '50%', overflow: 'hidden',
-              border: `4px solid ${color}`,
-              boxShadow: `0 0 0 4px rgba(255,255,255,0.1), 0 16px 48px ${color}44`,
-              transition: 'border-color 280ms, box-shadow 280ms',
+              width: 110, height: 110, borderRadius: '50%', overflow: 'hidden',
+              border: `4px solid ${accent}`,
+              boxShadow: `0 0 0 4px rgba(255,255,255,0.08), 0 16px 48px ${accent}44`,
             }}>
-              <img
-                src={match.photos[0]}
-                alt={match.name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
+              <img src={match.photos[0]} alt={match.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
           </motion.div>
         </div>
 
-        {/* CTA buttons */}
+        {/* CTAs */}
         <motion.div
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.45, duration: 0.35 }}
+          transition={{ delay: 0.4, duration: 0.35 }}
           style={{ width: '100%', padding: '0 32px', display: 'flex', flexDirection: 'column', gap: 12 }}
         >
-          <button
-            onClick={onMessage}
-            style={{
-              padding: '18px', background: color, color: '#fff',
-              fontSize: 17, fontWeight: 700, borderRadius: 9999,
-              border: 'none', cursor: 'pointer', transition: 'background 280ms',
-              boxShadow: `0 8px 32px ${color}55`,
-            }}
-          >
-            Send Message
+          <button onClick={onMessage} style={{
+            padding: '18px', fontSize: 17, fontWeight: 700, borderRadius: 9999,
+            border: 'none', cursor: 'pointer', color: '#fff',
+            background: accent, boxShadow: `0 8px 32px ${accent}55`,
+          }}>
+            {cfg.primaryCTA}
           </button>
-          <button
-            onClick={onKeepSwiping}
-            style={{
-              padding: '18px', background: 'rgba(255,255,255,0.12)', color: '#fff',
-              fontSize: 17, fontWeight: 600, borderRadius: 9999,
-              border: '2px solid rgba(255,255,255,0.2)', cursor: 'pointer',
-            }}
-          >
+          <button onClick={onKeepSwiping} style={{
+            padding: '18px', background: 'rgba(255,255,255,0.10)', color: '#fff',
+            fontSize: 17, fontWeight: 600, borderRadius: 9999,
+            border: '2px solid rgba(255,255,255,0.18)', cursor: 'pointer',
+          }}>
             Keep Swiping
           </button>
         </motion.div>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Nomapal</string>
+    <string name="title_activity_main">Nomapal</string>
+    <string name="package_name">com.nomapal.app</string>
+    <string name="custom_url_scheme">com.nomapal.app</string>
+</resources>

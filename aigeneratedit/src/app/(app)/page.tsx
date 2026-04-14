@@ -170,6 +170,7 @@ export default function DiscoverPage() {
                 onLike={handleLike}
                 onNope={handleNope}
                 onSuperLike={handleSuperLike}
+                onDreamCrew={() => {}}
                 onExpand={() => isTop && setExpanded(profile)}
                 color={color}
               />
@@ -200,7 +201,7 @@ export default function DiscoverPage() {
             onClick={handleNope}
             style={{
               width: 64, height: 64, borderRadius: '50%',
-              background: nopeAnim ? '#FF4444' : 'white',
+              background: nopeAnim ? '#FF5A5F' : 'white',
               border: '2px solid #ebebeb',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', fontSize: 28,
@@ -209,7 +210,7 @@ export default function DiscoverPage() {
               transition: 'all 120ms',
             }}
           >
-            <span style={{ color: nopeAnim ? '#fff' : '#FF4444' }}>✕</span>
+            <span style={{ color: nopeAnim ? '#fff' : '#FF5A5F' }}>✕</span>
           </button>
 
           {/* Super Like */}

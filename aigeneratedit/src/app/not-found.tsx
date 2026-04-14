@@ -18,7 +18,7 @@ export default function NotFound() {
         This page doesn't exist — but your next adventure does.
       </div>
       <Link href="/onboarding" style={{
-        padding: '16px 28px', background: 'var(--color-active, #FF4444)',
+        padding: '16px 28px', background: 'var(--color-active, #FF5A5F)',
         color: '#fff', borderRadius: 9999, textDecoration: 'none',
         fontSize: 16, fontWeight: 700, transition: 'background 280ms',
       }}>

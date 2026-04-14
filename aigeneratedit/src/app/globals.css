@@ -5,7 +5,7 @@
 /* ─── Nomapal Design System ───────────────────────────────────────────────── */
 
 :root {
-  --color-1: #FF4444;
+  --color-1: #FF5A5F;
   --color-2: #FF8800;
   --color-3: #FFDD00;
   --color-4: #44CC44;
@@ -13,7 +13,7 @@
   --color-6: #3344CC;
   --color-7: #9933CC;
 
-  --color-active: #FF4444;
+  --color-active: #FF5A5F;
   --color-active-rgb: 255, 68, 68;
   --color-active-bg: rgba(255, 68, 68, 0.05);
   --color-active-bg-strong: rgba(255, 68, 68, 0.12);
@@ -36,6 +36,15 @@
   --easing-out: cubic-bezier(0.16, 1, 0.3, 1);
   --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --duration-color: 280ms;
+
+  /* ── Safe Area Insets (notch / Dynamic Island / gesture bar) ────────────── */
+  --sat: env(safe-area-inset-top,    0px);
+  --sar: env(safe-area-inset-right,  0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left,   0px);
+
+  /* Bottom nav height including home-indicator padding */
+  --nav-height: calc(64px + max(var(--sab), 8px));
 }
 
 *, *::before, *::after {
@@ -60,9 +69,9 @@ body {
 }
 
 .mobile-frame {
+  /* Desktop: phone mockup at 390×844 */
   width: 390px;
-  height: 844px;
-  max-height: 100dvh;
+  height: min(844px, 100dvh);
   background: #ffffff;
   position: relative;
   overflow: hidden;
@@ -75,12 +84,24 @@ body {
   }
 }
 
+/* Real phones ≤ 430px wide — fill the full screen edge-to-edge */
 @media (max-width: 430px) {
   .mobile-frame {
     width: 100vw;
-    height: 100dvh;
+    height: 100dvh;   /* dvh = dynamic viewport height, handles browser chrome */
+    min-width: 320px; /* never shrink below 320px (older Androids) */
   }
   body { background: #fff; }
+}
+
+/* Compact phones 360–375px — tighten horizontal spacing */
+@media (max-width: 375px) {
+  .mobile-frame { font-size: 93%; } /* 93% = 360/390 ≈ scale factor */
+}
+
+/* Very small screens 320–359px */
+@media (max-width: 359px) {
+  .mobile-frame { font-size: 87%; }
 }
 
 /* Color transition */
@@ -105,19 +126,26 @@ body {
   z-index: 10;
 }
 .stamp-like  { left: 28px;  color: #44CC44; border-color: #44CC44; transform: rotate(-20deg); }
-.stamp-nope  { right: 28px; color: #FF4444; border-color: #FF4444; transform: rotate(20deg);  }
-.stamp-super { left: 50%; transform: translateX(-50%); top: auto; bottom: 140px; color: #0088FF; border-color: #0088FF; }
+.stamp-nope  { right: 28px; color: #FF5A5F; border-color: #FF5A5F; transform: rotate(20deg);  }
+.stamp-super { left: 50%; transform: translateX(-50%); top: 60px; color: #0088FF; border-color: #0088FF; transform: translateX(-50%) rotate(-8deg); }
+.stamp-dream { left: 50%; transform: translateX(-50%) rotate(8deg); top: auto; bottom: 120px; color: #9933CC; border-color: #9933CC; }
 
 /* Bottom nav */
 .bottom-nav {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 80px;
-  background: #fff;
-  border-top: 1px solid #ebebeb;
+  position: relative;
+  flex-shrink: 0;
+  width: 100%;
+  height: var(--nav-height);
+  background: rgba(8, 6, 18, 0.97);
+  backdrop-filter: blur(48px) saturate(180%);
+  -webkit-backdrop-filter: blur(48px) saturate(180%);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.11);
   display: flex;
   align-items: flex-start;
   padding-top: 10px;
+  padding-bottom: max(var(--sab), 8px);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
   z-index: 100;
 }
 
@@ -135,7 +163,7 @@ body {
 
 /* Rainbow sweep */
 @keyframes rainbowSweep {
-  0%   { background: #FF4444; opacity: 0.85; }
+  0%   { background: #FF5A5F; opacity: 0.85; }
   14%  { background: #FF8800; }
   28%  { background: #FFDD00; }
   42%  { background: #44CC44; }
@@ -200,6 +228,9 @@ body {
 /* Hide scrollbar */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Settings section — remove last child border */
+.settings-section > *:last-child { border-bottom: none !important; }
 
 /* Confetti */
 @keyframes confettiFall {

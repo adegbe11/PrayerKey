@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { useColor } from '@/components/nomapal/ColorProvider'
+import { useAuth } from '@/lib/auth-context'
+import { subscribeToMatches, type MatchDoc } from '@/lib/db'
 import { MOCK_MATCHES } from '@/lib/mockData'
 import type { Match } from '@/lib/types'
+import { Timestamp } from 'firebase/firestore'
 
 function timeAgo(date: Date): string {
   const diff = Date.now() - date.getTime()
@@ -17,23 +20,82 @@ function timeAgo(date: Date): string {
   return `${Math.floor(hrs / 24)}d`
 }
 
+function tsToDate(ts: Timestamp | null | undefined): Date {
+  if (!ts) return new Date()
+  if (ts instanceof Timestamp) return ts.toDate()
+  return new Date()
+}
+
 export default function MessagesPage() {
   const { color, advance } = useColor()
   const router = useRouter()
-  const [matches] = useState<Match[]>(MOCK_MATCHES)
+  const { user } = useAuth()
+
+  const [firestoreMatches, setFirestoreMatches] = useState<MatchDoc[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!user) return
+    const unsub = subscribeToMatches(user.uid, (matches) => {
+      setFirestoreMatches(matches)
+      setLoading(false)
+    })
+    // If no real matches loaded in 1.5s, stop loading to show mock fallback
+    const t = setTimeout(() => setLoading(false), 1500)
+    return () => { unsub(); clearTimeout(t) }
+  }, [user])
+
+  // Use real matches if available, otherwise fall back to mock for demo
+  const useReal = firestoreMatches.length > 0
+  const uid = user?.uid ?? 'me'
+
+  const matches: Match[] = useReal
+    ? firestoreMatches.map(m => {
+        const otherProfile = m.profiles[0]?.uid === uid ? m.profiles[1] : m.profiles[0]
+        const unread = m.unreadCounts?.[uid] ?? 0
+        return {
+          id: m.id,
+          profile: {
+            id: otherProfile?.uid ?? '',
+            name: otherProfile?.name ?? '',
+            age: otherProfile?.age ?? 0,
+            photos: otherProfile?.photos?.length ? otherProfile.photos : ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80'],
+            location: otherProfile?.location ?? '',
+            destinations: otherProfile?.destinations ?? [],
+            travelDates: otherProfile?.travelDates ?? '',
+            travelStyle: (otherProfile?.travelStyle ?? []) as any,
+            travelGoal: (otherProfile?.travelGoal ?? 'open') as any,
+            bio: otherProfile?.bio ?? '',
+            interests: otherProfile?.interests ?? [],
+            budget: (otherProfile?.budget ?? 'midrange') as any,
+            languages: otherProfile?.languages ?? [],
+            verified: (otherProfile?.verified ?? 1) as any,
+          },
+          matchedAt: tsToDate(m.createdAt),
+          lastMessage: m.lastMessage ? {
+            id: 'last',
+            senderId: m.lastMessage.senderId,
+            text: m.lastMessage.text,
+            timestamp: tsToDate(m.lastMessage.timestamp),
+            status: m.lastMessage.status as any,
+          } : undefined,
+          unread,
+        }
+      })
+    : MOCK_MATCHES
+
+  function openChat(matchId: string) {
+    advance()
+    router.push(`/discover/messages/${matchId}`)
+  }
 
   const newMatches = matches.filter(m => !m.lastMessage)
   const conversations = matches.filter(m => m.lastMessage)
 
-  function openChat(matchId: string) {
-    advance()
-    router.push(`/app/messages/${matchId}`)
-  }
-
   return (
     <div style={{ position: 'absolute', inset: 0, background: '#fff', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ padding: '20px 20px 12px', borderBottom: '1px solid #ebebeb' }}>
+      <div style={{ padding: 'max(var(--sat), 20px) 20px 12px', borderBottom: '1px solid #ebebeb' }}>
         <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em', color: '#141414' }}>Messages</div>
       </div>
 
@@ -59,12 +121,11 @@ export default function MessagesPage() {
                     <div style={{
                       width: 72, height: 72, borderRadius: '50%', overflow: 'hidden',
                       border: `3px solid ${color}`,
-                      boxShadow: `0 0 0 2px rgba(255,255,255,1), 0 4px 16px ${color}33`,
+                      boxShadow: `0 0 0 2px #fff, 0 4px 16px ${color}33`,
                       transition: 'border-color 280ms, box-shadow 280ms',
                     }}>
                       <img src={match.profile.photos[0]} alt={match.profile.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
-                    {/* New indicator */}
                     <div style={{
                       position: 'absolute', bottom: 0, right: 0,
                       width: 18, height: 18, borderRadius: '50%',
@@ -79,12 +140,16 @@ export default function MessagesPage() {
           </div>
         )}
 
-        {/* Divider */}
-        <div style={{ height: 1, background: '#f5f5f5', margin: '0 20px' }} />
+        {newMatches.length > 0 && <div style={{ height: 1, background: '#f5f5f5', margin: '0 20px' }} />}
 
         {/* Conversations */}
         <div style={{ padding: '8px 0' }}>
-          {conversations.length === 0 ? (
+          {loading ? (
+            <div style={{ padding: '40px 32px', textAlign: 'center' }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>✈️</div>
+              <div style={{ fontSize: 14, color: '#999' }}>Loading matches...</div>
+            </div>
+          ) : conversations.length === 0 ? (
             <div style={{ padding: '40px 32px', textAlign: 'center' }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>💬</div>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#141414', marginBottom: 8 }}>No messages yet</div>
@@ -139,9 +204,9 @@ export default function MessagesPage() {
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {match.lastMessage && match.lastMessage.senderId === 'me' && (
+                    {match.lastMessage?.senderId === uid && (
                       <span style={{ fontSize: 12, color: match.lastMessage.status === 'read' ? color : '#999', transition: 'color 280ms' }}>
-                        {match.lastMessage.status === 'read' ? '✓✓' : match.lastMessage.status === 'delivered' ? '✓✓' : '✓'}
+                        {match.lastMessage.status === 'read' ? '✓✓' : '✓'}
                       </span>
                     )}
                     <span style={{
@@ -155,13 +220,15 @@ export default function MessagesPage() {
                 </div>
 
                 {/* Destination badge */}
-                <div style={{
-                  padding: '4px 8px', background: '#f5f5f5', borderRadius: 8,
-                  fontSize: 11, fontWeight: 700, color: '#737373',
-                  flexShrink: 0, maxWidth: 70, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                }}>
-                  ✈ {match.profile.destinations[0]}
-                </div>
+                {match.profile.destinations[0] && (
+                  <div style={{
+                    padding: '4px 8px', background: '#f5f5f5', borderRadius: 8,
+                    fontSize: 11, fontWeight: 700, color: '#737373',
+                    flexShrink: 0, maxWidth: 70, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    ✈ {match.profile.destinations[0]}
+                  </div>
+                )}
               </motion.div>
             ))
           )}

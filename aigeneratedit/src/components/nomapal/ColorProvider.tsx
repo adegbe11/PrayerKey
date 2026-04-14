@@ -15,7 +15,7 @@ interface ColorContextValue {
 
 const ColorContext = createContext<ColorContextValue>({
   colorIndex: 0,
-  color: '#FF4444',
+  color: '#FF5A5F',
   advance: () => {},
   retreat: () => {},
   setIndex: () => {},

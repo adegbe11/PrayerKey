@@ -10,6 +10,7 @@ export interface TravelerProfile {
   location: string
   destinations: string[]
   travelDates: string
+  departureDaysFromNow?: number
   travelStyle: TravelStyle[]
   travelGoal: TravelGoal
   bio: string
@@ -25,6 +26,19 @@ export interface TravelerProfile {
   reputationScore?: number
   reputationCount?: number
   distance?: string
+  // Extended profile fields
+  pronouns?: string
+  zodiac?: string
+  familyPlans?: string
+  pets?: string
+  drinking?: string
+  smoking?: string
+  workout?: string
+  diet?: string
+  loveLanguage?: string
+  communicationStyle?: string
+  relationshipGoal?: string
+  prompts?: { question: string; answer: string }[]
 }
 
 export type TravelStyle =

@@ -228,7 +228,7 @@ function TripBoardCard({ board, onApply, applied, color }: { board: TripBoard; o
           </div>
         </div>
         <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: spotsLeft <= 2 ? '#FF4444' : color, transition: 'color 280ms' }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: spotsLeft <= 2 ? '#FF5A5F' : color, transition: 'color 280ms' }}>
             {spotsLeft} spot{spotsLeft !== 1 ? 's' : ''} left
           </div>
           <div style={{ fontSize: 11, color: '#999' }}>of {board.spotsTotal}</div>
