@@ -1,9 +1,13 @@
 import { initializeApp, getApps } from 'firebase/app'
 import { getStorage } from 'firebase/storage'
-import { getAuth } from 'firebase/auth'
+import {
+  initializeAuth,
+  getAuth,
+  indexedDBLocalPersistence,
+  browserLocalPersistence,
+} from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
-// Paste your Firebase project config here (Firebase Console → Project Settings → Your apps)
 const firebaseConfig = {
   apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
   authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
@@ -17,7 +21,19 @@ const firebaseConfig = {
 // Prevent re-initialising on hot reload
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig)
 
-export const storage  = getStorage(app)
-export const auth     = getAuth(app)
-export const db       = getFirestore(app)
+// Use indexedDB persistence — required for Capacitor WebView (sessionStorage is partitioned/unavailable)
+function createAuth() {
+  try {
+    return initializeAuth(app, {
+      persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+    })
+  } catch {
+    // Already initialized — getAuth() returns the existing instance
+    return getAuth(app)
+  }
+}
+
+export const storage = getStorage(app)
+export const auth    = createAuth()
+export const db      = getFirestore(app)
 export default app

@@ -580,6 +580,16 @@ export default function OnboardingPage() {
     setAuthLoading(true)
     try {
       const provider = new GoogleAuthProvider()
+      // In Capacitor WebView, signInWithPopup is blocked — use signInWithRedirect instead.
+      // Detect Capacitor by checking for the native bridge.
+      const isCapacitor = typeof (window as any).Capacitor !== 'undefined'
+      if (isCapacitor) {
+        // signInWithRedirect stores state in indexedDB (not sessionStorage) so it works in WebView
+        const { signInWithRedirect } = await import('firebase/auth')
+        await signInWithRedirect(auth, provider)
+        // Page will reload; getRedirectResult is called on mount below
+        return
+      }
       await signInWithPopup(auth, provider)
       // Skip phone steps — go straight to name
       setStep(4)
@@ -592,6 +602,22 @@ export default function OnboardingPage() {
       setAuthLoading(false)
     }
   }
+
+  // Handle Google redirect result on mount (Capacitor flow)
+  useEffect(() => {
+    async function checkRedirect() {
+      try {
+        const { getRedirectResult } = await import('firebase/auth')
+        const result = await getRedirectResult(auth)
+        if (result?.user) {
+          setStep(4)
+          advance()
+        }
+      } catch { /* no redirect in progress */ }
+    }
+    checkRedirect()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function update<K extends keyof OnboardingState>(key: K, val: OnboardingState[K]) {
     setState(prev => ({ ...prev, [key]: val }))
