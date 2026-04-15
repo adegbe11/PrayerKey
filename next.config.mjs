@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
-
   // Silence optional native deps (pg-native, bufferutil, etc.)
   webpack: (config, { isServer }) => {
     if (isServer) {
