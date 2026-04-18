@@ -11,6 +11,9 @@ import {
   Raleway,
 } from 'next/font/google';
 import './globals.css';
+import Preloader from '@/components/Preloader';
+import SmoothScroll from '@/components/SmoothScroll';
+import Cursor from '@/components/Cursor';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -117,7 +120,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${playfair.variable} ${garamond.variable} ${cormorant.variable} ${lora.variable} ${baskerville.variable} ${cinzel.variable} ${josefin.variable} ${raleway.variable}`}
       suppressHydrationWarning
     >
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <SmoothScroll />
+        <Preloader />
+        <Cursor />
+        {children}
+      </body>
     </html>
   );
 }

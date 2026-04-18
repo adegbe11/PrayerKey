@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import Magnetic from '../Magnetic';
 
 // ─────────────────────────────────────────
 //  TYPING LAPTOP — animated manuscript that types itself
@@ -478,8 +479,15 @@ export default function Hero() {
     return () => clearInterval(t);
   }, []);
 
+  // Parallax for the hero scene
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
+  const sceneY = useTransform(scrollYProgress, [0, 1], [0, -80]);
+  const headY = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const statsY = useTransform(scrollYProgress, [0, 1], [0, -20]);
+
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden pt-16" style={{ background: '#0A0910' }}>
+    <section ref={sectionRef} className="relative min-h-screen flex items-center overflow-hidden pt-16" style={{ background: '#0A0910' }}>
       {/* Background aurora */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
@@ -504,7 +512,7 @@ export default function Hero() {
       <div className="container-wide relative z-10 py-14">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left: Copy */}
-          <div>
+          <motion.div style={{ y: headY }}>
             {/* MASSIVE Headline — Penguin-style system name */}
             <motion.div
               initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
@@ -552,6 +560,7 @@ export default function Hero() {
             <motion.div
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.45 }}
               className="flex flex-wrap gap-3 mb-6 mt-5"
+              style={{ y: statsY }}
             >
               {[
                 { num: '56,362+', label: 'Books Formatted', color: '#FFE500', textColor: '#000' },
@@ -572,13 +581,17 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.55 }}
               className="flex flex-wrap gap-4 items-center"
             >
-              <Link href="/editor" className="brutal-btn-yellow" style={{ fontSize: '16px', padding: '16px 32px' }}>
-                Format My Book
-                <ArrowRight size={16} strokeWidth={2.5} />
-              </Link>
-              <Link href="#how-it-works" className="brutal-btn-outline-white" style={{ fontSize: '15px', padding: '14px 28px' }}>
-                See how it works
-              </Link>
+              <Magnetic strength={0.4} data-cursor-label="Format">
+                <Link href="/editor" className="brutal-btn-yellow" style={{ fontSize: '16px', padding: '16px 32px' }}>
+                  Format My Book
+                  <ArrowRight size={16} strokeWidth={2.5} />
+                </Link>
+              </Magnetic>
+              <Magnetic strength={0.3}>
+                <Link href="#how-it-works" className="brutal-btn-outline-white" style={{ fontSize: '15px', padding: '14px 28px' }}>
+                  See how it works
+                </Link>
+              </Magnetic>
             </motion.div>
 
             {/* Author avatars */}
@@ -600,14 +613,14 @@ export default function Hero() {
                 <div className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>56,362 books formatted and counting</div>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
 
           {/* Right: Animated scene — laptop typing + book spread + e-reader + printer */}
           <motion.div
             initial={{ opacity: 0, x: 40, scale: 0.92 }} animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="relative"
-            style={{ minHeight: '560px', width: '100%' }}
+            style={{ minHeight: '560px', width: '100%', y: sceneY }}
           >
             {/* Glow */}
             <div className="absolute inset-0 -z-10 blur-3xl opacity-40 rounded-full"
