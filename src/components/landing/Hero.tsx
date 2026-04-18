@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Magnetic from '../Magnetic';
+import ShaderBackground from '../ShaderBackground';
 
 // ─────────────────────────────────────────
 //  TYPING LAPTOP — animated manuscript that types itself
@@ -488,6 +489,9 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen flex items-center overflow-hidden pt-16" style={{ background: '#0A0910' }}>
+      {/* WebGL animated background — purple + gold fBm field */}
+      <ShaderBackground />
+
       {/* Background aurora */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
