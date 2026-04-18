@@ -1,18 +1,29 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Star, FileDown, Eye, X } from 'lucide-react';
+import { ArrowLeft, Star, FileDown, Eye, X, Zap, Command, Wand2, ChevronDown, Loader2 } from 'lucide-react';
 import PaperbackPreview from './PaperbackPreview';
 import EbookPreview from './EbookPreview';
 import ExportModal from './ExportModal';
 import Navigator, { buildNavItems } from './Navigator';
 import type { NavItem, NavMode, StyleCategory } from './Navigator';
 import ChapterEditor from './ChapterEditor';
+import AiSettingsModal from './AiSettingsModal';
+import CommandPalette, { type Command as PaletteCommand } from './CommandPalette';
 import { formatBook, DEMO_TEXT, detectGenre } from '@/lib/formatter';
 import { getDefaultCoverForGenre } from '@/lib/covers';
 import { getTemplate } from '@/lib/templates';
 import { paginateBook } from '@/lib/paginator';
+import { useKeyboardShortcuts } from '@/lib/useKeyboardShortcuts';
+import { loadGroqKey, loadGroqModel } from '@/lib/storage';
+import {
+  generateBlurbSmart,
+  polishChapterTitles,
+  extractCharacters,
+  grammarCheck,
+  suggestTitles,
+} from '@/lib/aiAssist';
 import type { BookData, BookPage, PreviewMode, TrimSize, Genre, CoverConfig, RecentBook, NewBookMeta } from '@/types';
 
 const GENRE_COLOR_MAP: Record<string, string> = {
@@ -83,6 +94,121 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
 
   // ─── preview drawer state ───
   const [showPreview, setShowPreview] = useState(false);
+
+  // ─── AI state ───
+  const [showAiSettings, setShowAiSettings] = useState(false);
+  const [showPalette, setShowPalette] = useState(false);
+  const [showAiMenu, setShowAiMenu] = useState(false);
+  const [aiBusy, setAiBusy] = useState<string | null>(null);
+  const [aiToast, setAiToast] = useState<{ title: string; body: string } | null>(null);
+
+  const runAi = useCallback(async <T,>(taskId: string, task: () => Promise<T>): Promise<T | null> => {
+    setAiBusy(taskId);
+    try {
+      return await task();
+    } catch (err) {
+      setAiToast({
+        title: 'AI error',
+        body: err instanceof Error ? err.message : 'Request failed',
+      });
+      return null;
+    } finally {
+      setAiBusy(null);
+    }
+  }, []);
+
+  const handleAiBlurb = useCallback(async () => {
+    if (!bookData) return;
+    const key = loadGroqKey();
+    const model = loadGroqModel();
+    const result = await runAi('blurb', () => generateBlurbSmart(bookData, { apiKey: key, model }));
+    if (!result) return;
+    const body = `Tagline:\n${result.tagline}\n\nBlurb:\n${result.blurb}`;
+    try {
+      await navigator.clipboard.writeText(body);
+      setAiToast({ title: 'Blurb copied to clipboard', body });
+    } catch {
+      setAiToast({ title: 'Blurb generated', body });
+    }
+  }, [bookData, runAi]);
+
+  const handleAiTitles = useCallback(async () => {
+    if (!bookData) return;
+    const key = loadGroqKey();
+    if (!key) { setShowAiSettings(true); return; }
+    const model = loadGroqModel();
+    const result = await runAi('titles', () => suggestTitles(bookData, { apiKey: key, model }));
+    if (!result) return;
+    const body = `Titles:\n${result.titles.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n\nSubtitles:\n${result.subtitles.map((t, i) => `${i + 1}. ${t}`).join('\n')}`;
+    setAiToast({ title: 'Title ideas', body });
+  }, [bookData, runAi]);
+
+  const handleAiPolishChapters = useCallback(async () => {
+    if (!bookData) return;
+    const key = loadGroqKey();
+    if (!key) { setShowAiSettings(true); return; }
+    const model = loadGroqModel();
+    const map = await runAi('polish', () => polishChapterTitles(bookData, { apiKey: key, model }));
+    if (!map) return;
+    const changed = Object.keys(map).length;
+    if (!changed) {
+      setAiToast({ title: 'Nothing to polish', body: 'All chapters already have custom titles.' });
+      return;
+    }
+    setBookData((bd) => {
+      if (!bd) return bd;
+      return {
+        ...bd,
+        chapters: bd.chapters.map((c) => (map[c.id] ? { ...c, title: map[c.id] } : c)),
+      };
+    });
+    setAiToast({ title: `Polished ${changed} chapter title${changed > 1 ? 's' : ''}`, body: 'Applied to your book.' });
+  }, [bookData, runAi]);
+
+  const handleAiCharacters = useCallback(async () => {
+    if (!bookData) return;
+    const key = loadGroqKey();
+    if (!key) { setShowAiSettings(true); return; }
+    const model = loadGroqModel();
+    const cast = await runAi('cast', () => extractCharacters(bookData, { apiKey: key, model }));
+    if (!cast) return;
+    const body = cast.length
+      ? cast.map((c) => `\u2022 ${c.name}${c.role ? ` (${c.role})` : ''} \u2014 ${c.description}`).join('\n')
+      : 'No named characters detected.';
+    setAiToast({ title: `Character cast (${cast.length})`, body });
+  }, [bookData, runAi]);
+
+  const handleAiGrammar = useCallback(async () => {
+    if (!bookData) return;
+    const key = loadGroqKey();
+    if (!key) { setShowAiSettings(true); return; }
+    const model = loadGroqModel();
+    const issues = await runAi('grammar', () => grammarCheck(bookData, { apiKey: key, model }));
+    if (!issues) return;
+    const body = issues.length
+      ? issues.slice(0, 20).map((i) => `[${i.severity}] "${i.excerpt}"\n  \u2192 ${i.suggestion}\n  ${i.reason}`).join('\n\n')
+      : 'No issues detected.';
+    setAiToast({ title: `Grammar & style (${issues.length} issues)`, body });
+  }, [bookData, runAi]);
+
+  // handleFixMyBook is declared further down; we reference it inside closures so TDZ won't trip.
+  const paletteCommands: PaletteCommand[] = useMemo(() => [
+    { id: 'ai-blurb',    label: 'Write blurb & tagline (copy)', hint: 'AI back-cover copy', group: 'AI', icon: <Wand2 size={12} />, run: () => handleAiBlurb() },
+    { id: 'ai-titles',   label: 'Suggest titles',               hint: 'Title + subtitle ideas', group: 'AI', icon: <Wand2 size={12} />, run: () => handleAiTitles() },
+    { id: 'ai-polish',   label: 'Polish chapter titles',        hint: 'Rewrite generic chapter names', group: 'AI', icon: <Wand2 size={12} />, run: () => handleAiPolishChapters() },
+    { id: 'ai-cast',     label: 'Extract character cast',       hint: 'Auto-index characters', group: 'AI', icon: <Wand2 size={12} />, run: () => handleAiCharacters() },
+    { id: 'ai-grammar',  label: 'Grammar & style pass',         hint: 'Find issues to fix', group: 'AI', icon: <Wand2 size={12} />, run: () => handleAiGrammar() },
+    { id: 'ai-settings', label: 'AI settings\u2026',            hint: 'Connect Groq API', group: 'AI', icon: <Zap size={12} />, run: () => setShowAiSettings(true) },
+    { id: 'export',      label: 'Export book\u2026',            hint: 'PDF, EPUB, DOCX', shortcut: '\u2318E', group: 'Actions', icon: <FileDown size={12} />, run: () => { if (bookData) setShowExportModal(true); } },
+    { id: 'preview',     label: 'Toggle preview',               shortcut: '\u2318P', group: 'Actions', icon: <Eye size={12} />, run: () => setShowPreview((v) => !v) },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [bookData, handleAiBlurb, handleAiTitles, handleAiPolishChapters, handleAiCharacters, handleAiGrammar]);
+
+  useKeyboardShortcuts([
+    { combo: 'mod+k', handler: () => setShowPalette(true) },
+    { combo: 'mod+e', handler: () => { if (bookData) setShowExportModal(true); } },
+    { combo: 'mod+p', handler: () => setShowPreview((v) => !v) },
+  ]);
 
   useEffect(() => {
     if (isEditingTitle) titleInputRef.current?.select();
@@ -422,6 +548,135 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
         {/* Divider */}
         <div style={{ width: 1, height: 18, background: 'rgba(0,0,0,0.1)', flexShrink: 0 }} />
 
+        {/* Command palette trigger */}
+        <button
+          onClick={() => setShowPalette(true)}
+          title="Command palette (\u2318K)"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 4,
+            border: '1px solid rgba(0,0,0,0.18)',
+            background: 'transparent',
+            color: '#333',
+            fontSize: 11,
+            padding: '5px 10px',
+            borderRadius: 3,
+            cursor: 'pointer',
+            fontWeight: 600,
+            flexShrink: 0,
+          }}
+        >
+          <Command size={11} />
+          K
+        </button>
+
+        {/* AI menu trigger */}
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <button
+            onClick={() => setShowAiMenu((v) => !v)}
+            title="AI Studio"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              border: '1px solid rgba(0,0,0,0.18)',
+              background: showAiMenu ? 'linear-gradient(135deg,#7C3AED,#EC4899)' : 'transparent',
+              color: showAiMenu ? '#fff' : '#333',
+              fontSize: 11,
+              padding: '5px 10px',
+              borderRadius: 3,
+              cursor: 'pointer',
+              fontWeight: 700,
+            }}
+          >
+            <Zap size={11} />
+            AI
+            <ChevronDown size={9} />
+          </button>
+          <AnimatePresence>
+            {showAiMenu && (
+              <>
+                <div
+                  onClick={() => setShowAiMenu(false)}
+                  style={{ position: 'fixed', inset: 0, zIndex: 40 }}
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: -4, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 6px)',
+                    right: 0,
+                    zIndex: 50,
+                    background: 'rgba(20,18,32,0.94)',
+                    color: '#F0EEFE',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 12,
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
+                    backdropFilter: 'blur(24px) saturate(160%)',
+                    WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+                    padding: 6,
+                    width: 240,
+                    fontSize: 12,
+                  }}
+                >
+                  {([
+                    { id: 'blurb',   label: 'Write blurb & tagline',  run: () => handleAiBlurb() },
+                    { id: 'titles',  label: 'Suggest titles',         run: () => handleAiTitles() },
+                    { id: 'polish',  label: 'Polish chapter titles',  run: () => handleAiPolishChapters() },
+                    { id: 'cast',    label: 'Extract character cast', run: () => handleAiCharacters() },
+                    { id: 'grammar', label: 'Grammar & style pass',   run: () => handleAiGrammar() },
+                  ] as const).map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => { setShowAiMenu(false); item.run(); }}
+                      disabled={!bookData || aiBusy !== null}
+                      style={{
+                        width: '100%',
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        padding: '8px 10px',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-primary, #F0EEFE)',
+                        borderRadius: 8,
+                        cursor: !bookData || aiBusy ? 'wait' : 'pointer',
+                        textAlign: 'left',
+                        fontSize: 12,
+                        opacity: !bookData ? 0.45 : 1,
+                      }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                    >
+                      {aiBusy === item.id ? <Loader2 size={12} className="animate-spin" /> : <Wand2 size={12} />}
+                      {item.label}
+                    </button>
+                  ))}
+                  <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '4px 6px' }} />
+                  <button
+                    onClick={() => { setShowAiMenu(false); setShowAiSettings(true); }}
+                    style={{
+                      width: '100%',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '8px 10px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#A78BFA',
+                      borderRadius: 8,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      fontSize: 12,
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(124,58,237,0.15)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                  >
+                    <Zap size={12} />
+                    AI settings&hellip;
+                  </button>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
+
         {/* Preview button */}
         <button
           onClick={() => setShowPreview((v) => !v)}
@@ -695,6 +950,76 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
             onClose={() => setShowExportModal(false)}
             onTemplateChange={setSelectedTemplateId}
           />
+        )}
+      </AnimatePresence>
+
+      {/* COMMAND PALETTE */}
+      <AnimatePresence>
+        {showPalette && (
+          <CommandPalette
+            open={showPalette}
+            commands={paletteCommands}
+            onClose={() => setShowPalette(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* AI SETTINGS */}
+      <AnimatePresence>
+        {showAiSettings && (
+          <AiSettingsModal
+            open={showAiSettings}
+            onClose={() => setShowAiSettings(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* AI RESULT TOAST */}
+      <AnimatePresence>
+        {aiToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 14, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 14 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed z-[62] bottom-5 right-5 max-w-md"
+            style={{
+              background: 'rgba(15,13,27,0.92)',
+              color: '#F0EEFE',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '14px',
+              boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
+              backdropFilter: 'blur(24px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+              padding: '14px 16px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <div
+                style={{
+                  width: 28, height: 28, borderRadius: 8,
+                  background: 'linear-gradient(135deg,#7C3AED,#EC4899)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}
+              >
+                <Zap size={13} color="#fff" />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
+                  {aiToast.title}
+                </div>
+                <div style={{ fontSize: 11, whiteSpace: 'pre-wrap', lineHeight: 1.5, color: 'rgba(255,255,255,0.75)', maxHeight: 320, overflowY: 'auto' }}>
+                  {aiToast.body}
+                </div>
+              </div>
+              <button
+                onClick={() => setAiToast(null)}
+                style={{ color: 'rgba(255,255,255,0.5)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 2 }}
+              >
+                <X size={13} />
+              </button>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
