@@ -442,20 +442,72 @@ body {
   caret-color: #000;
 }
 
+/* Body paragraphs: standard book first-line indent, no extra spacing */
 .tiptap-content p {
-  margin: 0 0 0.15em;
+  margin: 0;
+  text-indent: 1.5em;
 }
 
+/* First paragraph after a heading: no indent (Chicago/book standard) */
+.tiptap-content h1 + p,
+.tiptap-content h2 + p,
+.tiptap-content h3 + p {
+  text-indent: 0;
+}
+
+/* Scene break resets indent on the paragraph that follows */
+.tiptap-content p.section-break + p {
+  text-indent: 0;
+}
+
+/* Inline marks */
 .tiptap-content strong { font-weight: 700; }
-.tiptap-content em    { font-style: italic; }
-.tiptap-content u     { text-decoration: underline; }
+.tiptap-content em     { font-style: italic; }
+.tiptap-content u      { text-decoration: underline; }
+.tiptap-content s      { text-decoration: line-through; }
+.tiptap-content sup    { font-size: 0.7em; vertical-align: super; }
+.tiptap-content sub    { font-size: 0.7em; vertical-align: sub; }
+
+/* TextAlign extension emits style="text-align:..." on the node */
+
+/* Headings */
+.tiptap-content h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 1.6em 0 0.5em;
+  color: #111;
+  text-indent: 0;
+  page-break-after: avoid;
+}
+.tiptap-content h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 1.4em 0 0.4em;
+  color: #222;
+  text-indent: 0;
+}
+.tiptap-content h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.4;
+  margin: 1.2em 0 0.3em;
+  color: #333;
+  text-indent: 0;
+}
 
 /* Scene break paragraph */
 .tiptap-content p.section-break {
-  text-align: center;
+  text-align: center !important;
+  text-indent: 0 !important;
   color: #aaa;
   letter-spacing: 0.35em;
-  margin: 1.2em 0;
+  margin: 1.4em 0;
   user-select: none;
 }
 
