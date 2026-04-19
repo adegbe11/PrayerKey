@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Plus, X, GripVertical } from 'lucide-react';
+import { Plus, X, GripVertical, Trash2 } from 'lucide-react';
 import type { BookData } from '@/types';
 
 export type NavMode = 'contents' | 'styles';
@@ -154,9 +154,14 @@ interface NavigatorProps {
   styleCategory: StyleCategory;
   onStyleCategoryChange: (cat: StyleCategory) => void;
   onAddElement: (item: NavItem) => void;
+  onDeleteChapter?: (chapterId: string) => void;
+  onDeleteElement?: (itemId: string) => void;
 }
 
 const STYLE_CATEGORIES: StyleCategory[] = ['All', 'Literary', 'Romance', 'Fantasy', 'Business'];
+
+// Types of items that can be removed (added elements, not core items)
+const CORE_ITEM_TYPES = new Set<NavItemType>(['cover', 'title-page', 'copyright', 'toc', 'chapter']);
 
 export default function Navigator({
   bookData,
@@ -169,12 +174,16 @@ export default function Navigator({
   styleCategory,
   onStyleCategoryChange,
   onAddElement,
+  onDeleteChapter,
+  onDeleteElement,
 }: NavigatorProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [menuPos, setMenuPos] = useState<{ top: number; left: number; width: number; openUp: boolean } | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const dragIdx = useRef<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const presentTypes = new Set(navItems.map(i => i.type));
   const available = ADDABLE_ELEMENTS.filter(el => !presentTypes.has(el.type));
@@ -260,6 +269,52 @@ export default function Navigator({
               {navItems.map((item, idx) => {
                 const isSelected = item.id === selectedId;
                 const isDragOver = dragOverIdx === idx;
+                const isHovered = hoveredId === item.id;
+                const isPendingDelete = pendingDeleteId === item.id;
+                const isDeletable = item.type === 'chapter'
+                  ? !!onDeleteChapter && (bookData?.chapters.length ?? 0) > 1
+                  : !CORE_ITEM_TYPES.has(item.type) && !!onDeleteElement;
+
+                // ── pending delete confirmation row ──
+                if (isPendingDelete) {
+                  return (
+                    <div
+                      key={item.id}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '6px 10px',
+                        background: '#fee2e2',
+                        borderLeft: '3px solid #ef4444',
+                      }}
+                    >
+                      <span style={{ flex: 1, fontSize: 11, color: '#991b1b', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        Delete &ldquo;{item.label}&rdquo;?
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPendingDeleteId(null);
+                          if (item.type === 'chapter' && item.chapterIdx !== undefined) {
+                            const ch = bookData?.chapters[item.chapterIdx];
+                            if (ch) onDeleteChapter?.(ch.id);
+                          } else {
+                            onDeleteElement?.(item.id);
+                          }
+                        }}
+                        style={{ fontSize: 10, fontWeight: 800, background: '#ef4444', color: '#fff', border: 'none', borderRadius: 3, padding: '3px 8px', cursor: 'pointer', flexShrink: 0 }}
+                      >
+                        Delete
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setPendingDeleteId(null); }}
+                        style={{ fontSize: 10, fontWeight: 600, background: 'transparent', color: '#666', border: '1px solid #ccc', borderRadius: 3, padding: '3px 7px', cursor: 'pointer', flexShrink: 0 }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  );
+                }
+
                 return (
                   <div
                     key={item.id}
@@ -268,21 +323,21 @@ export default function Navigator({
                     onDragOver={(e) => handleDragOver(e, idx)}
                     onDrop={(e) => handleDrop(e, idx)}
                     onDragEnd={handleDragEnd}
-                    onClick={() => onSelect(item)}
+                    onClick={() => { setPendingDeleteId(null); onSelect(item); }}
+                    onMouseEnter={() => setHoveredId(item.id)}
+                    onMouseLeave={() => setHoveredId(null)}
                     style={{
                       display: 'flex', alignItems: 'center',
-                      background: isSelected ? '#1a1a1a' : isDragOver ? 'rgba(0,0,0,0.08)' : 'transparent',
+                      background: isSelected ? '#1a1a1a' : isDragOver ? 'rgba(0,0,0,0.08)' : isHovered ? 'rgba(0,0,0,0.05)' : 'transparent',
                       borderLeft: isSelected ? '3px solid #FFE500' : '3px solid transparent',
                       borderTop: isDragOver ? '2px solid #FFE500' : '2px solid transparent',
                       cursor: 'pointer',
                     }}
-                    onMouseEnter={(e) => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.05)'; }}
-                    onMouseLeave={(e) => { if (!isSelected && dragOverIdx !== idx) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                   >
                     <div style={{ width: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, opacity: 0.3, cursor: 'grab', color: isSelected ? '#fff' : '#333' }}>
                       <GripVertical size={12} />
                     </div>
-                    <div style={{ flex: 1, padding: '7px 12px 7px 0', fontSize: 13, color: isSelected ? '#fff' : '#333', lineHeight: 1.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div style={{ flex: 1, padding: '7px 4px 7px 0', fontSize: 13, color: isSelected ? '#fff' : '#333', lineHeight: 1.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {item.type === 'chapter' && (
                         <span style={{ fontSize: 10, color: isSelected ? 'rgba(255,255,255,0.5)' : '#aaa', marginRight: 5 }}>
                           {item.chapterIdx !== undefined ? item.chapterIdx + 1 : ''}
@@ -290,6 +345,34 @@ export default function Navigator({
                       )}
                       {item.label}
                     </div>
+                    {/* Trash icon — visible on hover for deletable items */}
+                    {isDeletable && (isHovered || isSelected) && (
+                      <button
+                        title={item.type === 'chapter' ? 'Delete chapter' : 'Remove element'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPendingDeleteId(item.id);
+                        }}
+                        style={{
+                          width: 26, height: 26, flexShrink: 0,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: 'transparent', border: 'none', cursor: 'pointer',
+                          color: isSelected ? 'rgba(255,255,255,0.45)' : '#aaa',
+                          borderRadius: 4, marginRight: 4,
+                          transition: 'color 0.1s, background 0.1s',
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLElement).style.color = '#ef4444';
+                          (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.color = isSelected ? 'rgba(255,255,255,0.45)' : '#aaa';
+                          (e.currentTarget as HTMLElement).style.background = 'transparent';
+                        }}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
                   </div>
                 );
               })}

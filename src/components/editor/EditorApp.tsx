@@ -430,6 +430,48 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
     setNavItems(items);
   }, []);
 
+  // ─── delete a chapter by its chapter.id ───
+  const handleDeleteChapter = useCallback((chapterId: string) => {
+    setBookData(prev => {
+      if (!prev) return prev;
+      const remaining = prev.chapters.filter(c => c.id !== chapterId);
+      if (remaining.length === 0) return prev; // safety guard
+      // Renumber
+      const renumbered = remaining.map((c, i) => ({ ...c, number: i + 1 }));
+      const totalWords = renumbered.reduce((s, c) => s + c.wordCount, 0);
+      return {
+        ...prev,
+        chapters: renumbered,
+        metadata: { ...prev.metadata, wordCount: totalWords },
+      };
+    });
+    // If the deleted chapter was selected, fall back to first chapter
+    setSelectedItemId(prev => {
+      if (prev === `chapter-${chapterId}`) return 'title-page';
+      return prev;
+    });
+  }, []);
+
+  // ─── delete an added (non-core) nav element ───
+  const handleDeleteElement = useCallback((itemId: string) => {
+    setAddedElements(prev => prev.filter(e => e.id !== itemId));
+    // Also clear from bookData extras/fields if applicable
+    const fieldMap: Record<string, string> = {
+      dedication: 'dedication',
+      epigraph: 'epigraph',
+      acknowledgments: 'acknowledgments',
+      'about-author': 'aboutAuthor',
+    };
+    const field = fieldMap[itemId];
+    if (field) {
+      setBookData(prev => {
+        if (!prev) return prev;
+        return { ...prev, [field]: undefined };
+      });
+    }
+    if (selectedItemId === itemId) setSelectedItemId('title-page');
+  }, [selectedItemId]);
+
   // ─── nav selection ───
   const handleSelectNavItem = useCallback((item: NavItem) => {
     setSelectedItemId(item.id);
@@ -924,6 +966,8 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
           styleCategory={styleCategory}
           onStyleCategoryChange={setStyleCategory}
           onAddElement={handleAddElement}
+          onDeleteChapter={handleDeleteChapter}
+          onDeleteElement={handleDeleteElement}
         />
 
         {/* CENTER: Chapter Editor */}
