@@ -36,6 +36,10 @@ export async function generateEpub(bookData: BookData, template: Template): Prom
   // ── Front matter pages
   const frontMatterItems: { id: string; filename: string; label: string }[] = [];
 
+  // Half-title page
+  oebps.file('content/half-title.xhtml', buildHalfTitleXHTML(bookData, template));
+  frontMatterItems.push({ id: 'half-title', filename: 'content/half-title.xhtml', label: bookData.title });
+
   // Title page (always present)
   oebps.folder('content');
   oebps.file('content/title-page.xhtml', buildTitlePageXHTML(bookData, template));
@@ -260,6 +264,27 @@ function buildChapterXHTML(
   </div>
   <div class="chapter-body">
     ${applyDropCap(chapter.content, template)}
+  </div>
+</body>
+</html>`;
+}
+
+function buildHalfTitleXHTML(bookData: BookData, template: Template): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>${escapeXml(bookData.title)}</title>
+  <link rel="stylesheet" type="text/css" href="../styles/book.css"/>
+  <style>
+    .half-title-page { display:flex; align-items:center; justify-content:center; min-height:90vh; text-align:center; }
+    .half-title-text { font-family:${template.headingFont}; font-size:1.4em; font-weight:${template.headingWeight}; color:${template.inkColor}; text-transform:${template.headingTransform}; }
+  </style>
+</head>
+<body>
+  <div class="half-title-page">
+    <div class="half-title-text">${escapeXml(bookData.title)}</div>
   </div>
 </body>
 </html>`;

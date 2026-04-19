@@ -1065,8 +1065,21 @@ function buildPrintHTML(
 
   const yr = new Date().getFullYear();
 
-  // ---- Title page (always recto) ------------------------------------
+  // ---- Half-title page (recto, page 1) ──────────────────────────────
   if (pageNum % 2 === 0) addBlank();
+  addPage(
+    '<div style="display:flex;flex-direction:column;align-items:center;'
+    + 'justify-content:center;height:100%;text-align:center;">'
+    + '<div style="font-family:' + template.headingFont + ';'
+    + 'font-size:' + Math.round(bodyPx * 1.25) + 'px;'
+    + 'font-weight:' + template.headingWeight + ';color:' + template.inkColor + ';'
+    + 'text-transform:' + template.headingTransform + ';letter-spacing:0.04em;">'
+    + escapeHtml(bookData.title) + '</div></div>',
+    { suppressHead: true }
+  );
+
+  // ---- Title page (recto, page 3) ────────────────────────────────────
+  ensureRecto();
   addPage(
     '<div style="display:flex;flex-direction:column;align-items:center;'
     + 'justify-content:center;height:100%;text-align:center;">'
@@ -1088,7 +1101,7 @@ function buildPrintHTML(
     { suppressHead: true }
   );
 
-  // ---- Copyright page (verso) ---------------------------------------
+  // ---- Copyright page (verso, page 4) ────────────────────────────────
   addPage(
     '<div style="position:absolute;bottom:' + (folioH + 4) + 'px;left:0;right:0;'
     + 'font-size:' + Math.round(bodyPx * 0.72) + 'px;line-height:1.75;'
@@ -1102,7 +1115,7 @@ function buildPrintHTML(
     { suppressHead: true }
   );
 
-  // ---- Dedication ---------------------------------------------------
+  // ---- Dedication ─────────────────────────────────────────────────────
   if (bookData.dedication) {
     ensureRecto();
     addPage(
@@ -1115,7 +1128,7 @@ function buildPrintHTML(
     );
   }
 
-  // ---- Epigraph -----------------------------------------------------
+  // ---- Epigraph ───────────────────────────────────────────────────────
   if (bookData.epigraph) {
     ensureRecto();
     addPage(
@@ -1134,17 +1147,34 @@ function buildPrintHTML(
     );
   }
 
-  // ---- Chapters -----------------------------------------------------
+  // ---- TOC placeholder (recto) ──────────────────────────────────────
+  ensureRecto();
+  const tocSlotIdx  = allPages.length;       // index in allPages array
+  const tocStartPgNum = pageNum;             // page number for TOC
+  // Reserve 2 pages for TOC (enough for ~50 chapters)
+  allPages.push('__TOC_PLACEHOLDER_0__');
+  allPages.push('__TOC_PLACEHOLDER_1__');
+  pageNum += 2;
+
+  // ---- Chapters ─────────────────────────────────────────────────────
+  const tocEntries: Array<{ label: string; page: number }> = [];
+
   for (const chapter of bookData.chapters) {
     ensureRecto(); // chapters always start on a right-hand (odd) page
 
+    // Record this chapter's start page for the TOC
     const isMeaningful = chapter.title &&
       !/^chapter\s+\d+$/i.test(chapter.title.trim());
     const chTitle = isMeaningful ? chapter.title.trim() : 'Chapter ' + chapter.number;
+    const chNumDisplay = formatChNum(chapter.number, template.chapterNumberStyle || 'numeral');
+    const tocLabel = options.hideChapterNumbers
+      ? chTitle
+      : (template.chapterNumberStyle === 'numeral'
+          ? ('Chapter ' + chNumDisplay + (isMeaningful ? ': ' + chTitle : ''))
+          : (chNumDisplay + (isMeaningful ? '. ' + chTitle : '')));
+    tocEntries.push({ label: tocLabel, page: pageNum });
 
     const startDrop = Math.round(contentH * 0.25); // 25% drop before heading
-
-    const chNumDisplay = formatChNum(chapter.number, template.chapterNumberStyle || 'numeral');
     const chapterHeader =
       '<div style="padding-top:' + startDrop + 'px;text-align:' + template.headingAlign + ';">'
       + (!options.hideChapterNumbers
@@ -1234,7 +1264,10 @@ function buildPrintHTML(
       const paraCost = Math.max(1, Math.ceil(textLen / charsPerLine))
         + (template.paragraphStyle === 'spaced' ? 0.7 : 0);
 
-      if (linesUsed > headerLines && linesUsed + paraCost > linesPerPage) {
+      const remainingLines = linesPerPage - linesUsed;
+      // Orphan: paragraph would contribute ≥2 lines total but only 1 line fits → push to next page
+      const wouldOrphan = paraCost >= 2 && remainingLines < 2;
+      if (linesUsed > headerLines && (linesUsed + paraCost > linesPerPage || wouldOrphan)) {
         addPage(pageContent, { isChapterStart: isChapterPage, chapterTitle: chTitle });
         isChapterPage = false; pageContent = ''; linesUsed = 0;
       }
@@ -1273,6 +1306,59 @@ function buildPrintHTML(
       addPage(pageContent, { isChapterStart: isChapterPage, chapterTitle: chTitle });
     }
   }
+
+  // ---- Build and insert TOC ──────────────────────────────────────────
+  // Build two TOC pages (first always has heading, second only if needed)
+  const tocTitlePx  = Math.round(bodyPx * 1.3);
+  const tocEntryPx  = Math.round(bodyPx * 0.9);
+  const tocGap      = Math.round(tocEntryPx * 0.55);
+  const entriesPerPage = Math.max(10, Math.floor(
+    (contentH - tocTitlePx * 3) / (tocEntryPx + tocGap)
+  ));
+
+  const buildTocPageHtml = (
+    entries: Array<{ label: string; page: number }>,
+    pgNum: number,
+    showHeading: boolean
+  ): string => {
+    const even  = pgNum % 2 === 0;
+    const cLeft = even ? mOuter : mInner;
+    const entryHtml = entries.map(e => {
+      const dots = '&thinsp;.&thinsp;'.repeat(40); // will be clipped
+      return '<div style="display:flex;align-items:baseline;'
+        + 'font-family:' + template.bodyFont + ';font-size:' + tocEntryPx + 'px;'
+        + 'color:' + template.inkColor + ';margin-bottom:' + tocGap + 'px;line-height:1.2;">'
+        + '<span style="white-space:nowrap;overflow:hidden;text-overflow:clip;'
+        + 'max-width:' + Math.round(contentW * 0.78) + 'px;">' + escapeHtml(e.label) + '</span>'
+        + '<span style="flex:1;overflow:hidden;color:' + template.inkColor + ';opacity:0.3;'
+        + 'font-size:' + Math.round(tocEntryPx * 0.75) + 'px;padding:0 4px;'
+        + 'letter-spacing:0.15em;white-space:nowrap;">' + dots + '</span>'
+        + '<span style="white-space:nowrap;min-width:2.2em;text-align:right;">'
+        + e.page + '</span></div>';
+    }).join('');
+
+    return '<div class="book-page" style="width:' + pxW + 'px;height:' + pxH + 'px;'
+      + 'position:relative;overflow:hidden;background:' + (template.paperColor || '#fff') + ';">'
+      + '<div style="position:absolute;top:' + (mTop + headH) + 'px;left:' + cLeft + 'px;'
+      + 'width:' + contentW + 'px;">'
+      + (showHeading
+          ? '<div style="font-family:' + template.headingFont + ';font-size:' + tocTitlePx + 'px;'
+            + 'font-weight:' + template.headingWeight + ';color:' + template.headingColor + ';'
+            + 'text-transform:' + template.headingTransform + ';text-align:' + template.headingAlign + ';'
+            + 'margin-bottom:' + Math.round(tocTitlePx * 1.2) + 'px;">Contents</div>'
+          : '')
+      + entryHtml
+      + '</div></div>';
+  };
+
+  const page1Entries = tocEntries.slice(0, entriesPerPage);
+  const page2Entries = tocEntries.slice(entriesPerPage);
+
+  allPages[tocSlotIdx]     = buildTocPageHtml(page1Entries, tocStartPgNum,     true);
+  allPages[tocSlotIdx + 1] = page2Entries.length > 0
+    ? buildTocPageHtml(page2Entries, tocStartPgNum + 1, false)
+    : '<div class="book-page" style="width:' + pxW + 'px;height:' + pxH + 'px;'
+      + 'background:' + (template.paperColor || '#fff') + ';"></div>';
 
   // ---- Assemble final HTML ------------------------------------------
   // All fonts used across all 8 templates
@@ -1354,13 +1440,15 @@ async function generatePdfBlob(
   for (let i = 0; i < elements.length; i++) {
     if (i > 0) pdf.addPage([ptW, ptH]);
     const canvas = await html2canvas(elements[i] as HTMLElement, {
-      scale: 2,
+      scale: 3,
       useCORS: true,
       backgroundColor: template.paperColor || '#ffffff',
       logging: false,
+      imageTimeout: 0,
+      removeContainer: true,
     });
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    pdf.addImage(imgData, 'JPEG', 0, 0, ptW, ptH);
+    const imgData = canvas.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 0, 0, ptW, ptH);
   }
 
   document.body.removeChild(container);
