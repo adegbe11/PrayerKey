@@ -32,6 +32,28 @@ const GENRE_COLOR_MAP: Record<string, string> = {
   poetry: '#F0EEF8', scifi: '#0D1B3E', fiction: '#1A1828', academic: '#F2F2F0',
 };
 
+// ─── Genre to best-fit template ─────────────────────────────────────
+const GENRE_TEMPLATE_MAP: Record<string, string> = {
+  religious:  'scribner',    // warm serif authority
+  romance:    'ballantine',  // romance-specific, blush paper
+  thriller:   'minotaur',    // thriller authority, deep red accent
+  mystery:    'soho',        // literary crime, charcoal blue
+  scifi:      'orbit',       // dark sci-fi, Cinzel on near-black
+  fantasy:    'tor',         // epic fantasy, Cinzel on parchment
+  memoir:     'riverhead',   // warm narrative nonfiction
+  biography:  'riverhead',
+  business:   'hbr',         // business authority, Inter navy
+  selfhelp:   'rodale',      // health/wellness/self-help, clean green
+  poetry:     'graywolf',    // ultra-minimal, maximum whitespace
+  academic:   'meridian',    // academic stacked headings, 7x10
+  childrens:  'razorbill',   // YA contemporary energy
+  fiction:    'knopf',       // literary gold standard (default)
+};
+
+function getTemplateForGenre(genre: string): string {
+  return GENRE_TEMPLATE_MAP[genre] ?? 'knopf';
+}
+
 interface EditorAppProps {
   initialText?: string;
   initialFilename?: string;
@@ -91,6 +113,14 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [addedElements, setAddedElements] = useState<NavItem[]>([]);
   const [navItems, setNavItems] = useState<NavItem[]>(() => buildNavItems(null, []));
+
+  // ─── arranged banner (shows after auto-format) ───
+  const [arrangedBanner, setArrangedBanner] = useState<{
+    chapters: number;
+    genre: string;
+    templateName: string;
+    frontMatter: string[];
+  } | null>(null);
 
   // ─── preview drawer state ───
   const [showPreview, setShowPreview] = useState(false);
@@ -287,14 +317,18 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coverConfig]);
 
-  // ─── handleFormat (preserved) ───
+  // ─── handleFormat ───
   const handleFormat = useCallback((text: string) => {
     if (!text.trim()) return;
     setRawText(text);
     try {
       const data = formatBook(text);
       const genre = detectGenre(text);
-      const template = getTemplate(selectedTemplateId);
+
+      // Auto-select the best template for this genre
+      const autoTemplateId = getTemplateForGenre(genre);
+      const template = getTemplate(autoTemplateId);
+      setSelectedTemplateId(autoTemplateId);
 
       setBookData(data);
       setDetectedGenre(genre);
@@ -311,16 +345,27 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
       // Auto-select first chapter in navigator
       const navItems = buildNavItems(data);
       const firstChapter = navItems.find(item => item.type === 'chapter');
-      if (firstChapter) {
-        setSelectedItemId(firstChapter.id);
-      }
+      if (firstChapter) setSelectedItemId(firstChapter.id);
+
+      // Show "Book Arranged" banner with detected metadata
+      const frontMatter: string[] = [];
+      if (data.dedication)    frontMatter.push('Dedication');
+      if (data.epigraph)      frontMatter.push('Epigraph');
+      if (data.acknowledgments) frontMatter.push('Acknowledgments');
+      if (data.aboutAuthor)   frontMatter.push('About Author');
+      setArrangedBanner({
+        chapters: data.chapters.length,
+        genre,
+        templateName: template.name,
+        frontMatter,
+      });
     } catch (err) {
       console.error('Format error:', err);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTemplateId]);
+  }, []);
 
-  // ─── handleFixMyBook (preserved) ───
+  // ─── handleFixMyBook ───
   const handleFixMyBook = useCallback(() => {
     if (!rawText) return;
     setIsProcessing(true);
@@ -328,7 +373,11 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
       try {
         const data = formatBook(rawText);
         const genre = detectGenre(rawText);
-        const template = getTemplate(selectedTemplateId);
+
+        // Auto-select best template for detected genre
+        const autoTemplateId = getTemplateForGenre(genre);
+        const template = getTemplate(autoTemplateId);
+        setSelectedTemplateId(autoTemplateId);
 
         setBookData(data);
         setDetectedGenre(genre);
@@ -338,12 +387,25 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
         });
         setPages(paginateBook(data, template, coverConfig));
         setCurrentSpread(0);
+
+        // Show banner
+        const frontMatter: string[] = [];
+        if (data.dedication)      frontMatter.push('Dedication');
+        if (data.epigraph)        frontMatter.push('Epigraph');
+        if (data.acknowledgments) frontMatter.push('Acknowledgments');
+        if (data.aboutAuthor)     frontMatter.push('About Author');
+        setArrangedBanner({
+          chapters: data.chapters.length,
+          genre,
+          templateName: template.name,
+          frontMatter,
+        });
       } finally {
         setIsProcessing(false);
       }
     }, 500);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rawText, selectedTemplateId]);
+  }, [rawText]);
 
   // ─── sync navItems when bookData or addedElements changes ───
   useEffect(() => {
@@ -759,10 +821,93 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
             }}
           >
             <Star size={10} fill="#000" color="#000" />
-            {isProcessing ? 'Fixing…' : 'Re-Format'}
+            {isProcessing ? 'Fixing…' : 'Fix My Book'}
           </button>
         )}
       </div>
+
+      {/* ─── BOOK ARRANGED BANNER ─── */}
+      <AnimatePresence>
+        {arrangedBanner && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            style={{ overflow: 'hidden', flexShrink: 0 }}
+          >
+            <div
+              style={{
+                background: '#1a1a1a',
+                borderBottom: '2px solid #FFE500',
+                padding: '9px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                flexWrap: 'wrap',
+              }}
+            >
+              {/* Icon + label */}
+              <div
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  background: '#FFE500', padding: '3px 10px',
+                  fontWeight: 900, fontSize: 11, color: '#000',
+                  letterSpacing: '0.06em', flexShrink: 0,
+                }}
+              >
+                <Star size={10} fill="#000" color="#000" />
+                BOOK ARRANGED
+              </div>
+
+              {/* Stats */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, flexWrap: 'wrap' }}>
+                <BannerChip label={`${arrangedBanner.chapters} chapter${arrangedBanner.chapters !== 1 ? 's' : ''}`} />
+                <BannerChip label={arrangedBanner.genre.charAt(0).toUpperCase() + arrangedBanner.genre.slice(1)} accent />
+                <BannerChip label={`Template: ${arrangedBanner.templateName}`} />
+                {arrangedBanner.frontMatter.map(f => (
+                  <BannerChip key={f} label={f} />
+                ))}
+              </div>
+
+              {/* Action buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                <button
+                  onClick={() => setShowPreview(true)}
+                  style={{
+                    background: 'transparent', border: '1px solid rgba(255,255,255,0.25)',
+                    color: '#fff', fontSize: 11, fontWeight: 600,
+                    padding: '4px 12px', cursor: 'pointer', borderRadius: 3,
+                    display: 'flex', alignItems: 'center', gap: 5,
+                  }}
+                >
+                  <Eye size={10} /> Preview
+                </button>
+                <button
+                  onClick={() => { if (bookData) setShowExportModal(true); }}
+                  style={{
+                    background: '#FFE500', border: '1px solid #FFE500',
+                    color: '#000', fontSize: 11, fontWeight: 700,
+                    padding: '4px 12px', cursor: 'pointer', borderRadius: 3,
+                    display: 'flex', alignItems: 'center', gap: 5,
+                  }}
+                >
+                  <FileDown size={10} /> Export
+                </button>
+                <button
+                  onClick={() => setArrangedBanner(null)}
+                  style={{
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    color: 'rgba(255,255,255,0.4)', padding: 4,
+                  }}
+                >
+                  <X size={13} />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ─── MAIN 2-PANEL AREA ─── */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
@@ -1023,6 +1168,30 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────
+//  BANNER CHIP
+// ─────────────────────────────────────────
+
+function BannerChip({ label, accent }: { label: string; accent?: boolean }) {
+  return (
+    <span
+      style={{
+        fontSize: 10,
+        fontWeight: accent ? 700 : 500,
+        color: accent ? '#FFE500' : 'rgba(255,255,255,0.65)',
+        background: accent ? 'rgba(255,229,0,0.12)' : 'rgba(255,255,255,0.06)',
+        border: `1px solid ${accent ? 'rgba(255,229,0,0.3)' : 'rgba(255,255,255,0.1)'}`,
+        padding: '2px 7px',
+        letterSpacing: accent ? '0.05em' : 0,
+        textTransform: accent ? 'uppercase' : 'none',
+        whiteSpace: 'nowrap' as const,
+      }}
+    >
+      {label}
+    </span>
   );
 }
 

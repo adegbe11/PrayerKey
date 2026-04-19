@@ -339,22 +339,53 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
             <div style={{ fontSize: 12, color: '#888', marginTop: 6 }}>The world&apos;s fastest book formatter</div>
           </div>
 
-          <div style={{ width: '100%', maxWidth: 240, height: 1, background: 'rgba(0,0,0,0.1)', marginBottom: 18 }} />
+          <div style={{ width: '100%', maxWidth: 280, height: 1, background: 'rgba(0,0,0,0.1)', marginBottom: 18 }} />
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 9, alignItems: 'center', marginBottom: 18 }}>
-            <TextLink icon={<BookOpen size={13} strokeWidth={1.8} />} label="Format Your First Book" onClick={() => setScreen('new-book')} />
-            <TextLink icon={<Upload size={13} strokeWidth={1.8} />} label="Import a Manuscript" onClick={handleImportClick} />
-          </div>
+          {/* Primary action: Fix My Book */}
+          <button
+            onClick={handleImportClick}
+            style={{
+              width: '100%', maxWidth: 280,
+              background: '#1a1a1a', color: '#FFE500',
+              border: '2px solid #1a1a1a',
+              borderRadius: 6, padding: '13px 20px',
+              cursor: 'pointer', textAlign: 'left',
+              marginBottom: 10,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Upload size={16} strokeWidth={2} color="#FFE500" />
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.02em' }}>Fix My Book</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,229,0,0.6)', marginTop: 2 }}>Import .txt or .docx · auto-arrange + best template</div>
+              </div>
+            </div>
+          </button>
 
-          <div style={{ width: '100%', maxWidth: 240, height: 1, background: 'rgba(0,0,0,0.1)', marginBottom: 18 }} />
+          {/* Secondary action: New Book */}
+          <button
+            onClick={() => setScreen('new-book')}
+            style={{
+              width: '100%', maxWidth: 280,
+              background: 'transparent', color: '#333',
+              border: '1.5px solid rgba(0,0,0,0.18)',
+              borderRadius: 6, padding: '11px 20px',
+              cursor: 'pointer', textAlign: 'left',
+              marginBottom: 16,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <BookOpen size={15} strokeWidth={1.8} color="#555" />
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700 }}>Write a New Book</div>
+                <div style={{ fontSize: 10, color: '#aaa', marginTop: 2 }}>Start from scratch · full editor</div>
+              </div>
+            </div>
+          </button>
 
-          <div style={{ display: 'flex', gap: 8 }}>
-            <SplashBtn primary label="New Book" onClick={() => setScreen('new-book')} />
-            <SplashBtn label="Import File…" onClick={handleImportClick} />
-          </div>
           {importError
-            ? <div style={{ fontSize: 11, color: '#c0392b', marginTop: 8, textAlign: 'center', maxWidth: 240 }}>{importError}</div>
-            : <div style={{ fontSize: 11, color: '#aaa', marginTop: 8 }}>Supports .txt and .docx files</div>
+            ? <div style={{ fontSize: 11, color: '#c0392b', marginTop: 4, textAlign: 'center', maxWidth: 280 }}>{importError}</div>
+            : <div style={{ fontSize: 10, color: '#bbb' }}>Supports .txt and .docx files</div>
           }
         </div>
 
