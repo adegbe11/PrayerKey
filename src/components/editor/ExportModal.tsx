@@ -143,9 +143,11 @@ export default function ExportModal({
   };
 
   const [publishingTo, setPublishingTo] = useState<string | null>(null);
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   const handlePublishTo = async (platform: typeof PLATFORMS[0]) => {
     setPublishingTo(platform.id);
+    setPublishError(null);
     try {
       const JSZip = (await import('jszip')).default;
       const zip = new JSZip();
@@ -183,6 +185,8 @@ export default function ExportModal({
       window.open(platform.url, '_blank', 'noopener,noreferrer');
     } catch (err) {
       console.error(err);
+      setPublishError('Export failed. Check your book has chapters and try again.');
+      setTimeout(() => setPublishError(null), 6000);
     } finally {
       setPublishingTo(null);
     }
@@ -812,6 +816,15 @@ export default function ExportModal({
                 );
               })}
             </div>
+            {publishError && (
+              <div style={{
+                marginTop: 10, padding: '8px 12px',
+                background: '#fff0f0', border: '2px solid #c0392b',
+                fontSize: 10, fontWeight: 700, color: '#c0392b',
+              }}>
+                {publishError}
+              </div>
+            )}
           </div>
 
           {/* ── SECTION: DOWNLOAD ZIP ── */}

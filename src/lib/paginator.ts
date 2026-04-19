@@ -215,7 +215,6 @@ export function buildHalfTitlePage(bookData: BookData, template: Template): stri
 // ─────────────────────────────────────────
 
 export function buildFullTitlePage(bookData: BookData, template: Template): string {
-  const isLargeNumStyle = ['penguin', 'hbr', 'anchor', 'tor'].includes('');
   return `
     <div style="
       display:flex;flex-direction:column;align-items:center;justify-content:center;

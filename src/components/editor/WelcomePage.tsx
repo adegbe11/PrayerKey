@@ -93,6 +93,7 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
   const [screen, setScreen] = useState<'splash' | 'new-book'>('splash');
   const [recentBooks, setRecentBooks] = useState<RecentBook[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // new-book form state
@@ -114,17 +115,30 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
     const file = e.target.files?.[0];
     if (!file) return;
     const ext = file.name.split('.').pop()?.toLowerCase();
+    setImportError(null);
     if (ext === 'txt') {
       const reader = new FileReader();
       reader.onload = (ev) => { const t = ev.target?.result as string; if (t) onImportText(t, file.name); };
+      reader.onerror = () => { setImportError('Could not read file. Try again.'); setTimeout(() => setImportError(null), 5000); };
       reader.readAsText(file);
     } else if (ext === 'docx') {
       try {
         const mammoth = await import('mammoth');
         const ab = await file.arrayBuffer();
         const result = await mammoth.extractRawText({ arrayBuffer: ab });
-        if (result.value) onImportText(result.value, file.name);
-      } catch (err) { console.error('docx error:', err); }
+        if (result.value) {
+          onImportText(result.value, file.name);
+        } else {
+          setImportError('DOCX appears empty. Try saving as .txt first.');
+          setTimeout(() => setImportError(null), 5000);
+        }
+      } catch {
+        setImportError('Could not read DOCX. Try saving as .txt first.');
+        setTimeout(() => setImportError(null), 5000);
+      }
+    } else {
+      setImportError('Unsupported file type. Use .txt or .docx.');
+      setTimeout(() => setImportError(null), 5000);
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
   }, [onImportText]);
@@ -338,7 +352,10 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
             <SplashBtn primary label="New Book" onClick={() => setScreen('new-book')} />
             <SplashBtn label="Import File…" onClick={handleImportClick} />
           </div>
-          <div style={{ fontSize: 11, color: '#aaa', marginTop: 8 }}>Supports .txt and .docx files</div>
+          {importError
+            ? <div style={{ fontSize: 11, color: '#c0392b', marginTop: 8, textAlign: 'center', maxWidth: 240 }}>{importError}</div>
+            : <div style={{ fontSize: 11, color: '#aaa', marginTop: 8 }}>Supports .txt and .docx files</div>
+          }
         </div>
 
         {/* Right panel — recent books */}
