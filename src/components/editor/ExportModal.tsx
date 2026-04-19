@@ -1236,47 +1236,93 @@ function buildPrintHTML(
   }
 
   // ---- Copyright page (verso, page 4) ────────────────────────────────
-  addPage(
-    '<div style="position:absolute;bottom:' + (folioH + 4) + 'px;left:0;right:0;'
-    + 'font-size:' + Math.round(bodyPx * 0.72) + 'px;line-height:1.75;'
-    + 'color:' + template.inkColor + ';opacity:0.72;">'
-    + '<p style="margin-bottom:0.5em;">Copyright &copy; ' + yr + ' '
-    + escapeHtml(bookData.author || 'the Author') + '</p>'
-    + '<p style="margin-bottom:0.5em;">All rights reserved. No part of this publication may be '
-    + 'reproduced, distributed, or transmitted in any form or by any means without the prior '
-    + 'written permission of the publisher.</p>'
-    + '<p>Formatted with <em>Booksane</em>.</p></div>',
-    { suppressHead: true }
-  );
+  {
+    const cpxSz     = Math.round(bodyPx * 0.72); // 7.9pt
+    const cpxLh     = 1.82;
+    const cpxGap    = 'margin-bottom:' + Math.round(cpxSz * cpxLh * 0.7) + 'px;';
+    const cpxSmGap  = 'margin-bottom:' + Math.round(cpxSz * cpxLh * 0.3) + 'px;';
+    const genre     = (bookData.genre ?? bookData.metadata?.genre ?? 'fiction') as string;
+    const isFiction = ['fiction','romance','thriller','mystery','scifi','fantasy','horror','ya','childrens'].includes(genre);
+    const isMemoir  = ['memoir','biography'].includes(genre);
+    const isRelig   = genre === 'religious';
+
+    const disclaimer = isFiction
+      ? '<p style="' + cpxGap + '">This is a work of fiction. Names, characters, businesses, places, events, locales, and incidents are either the products of the author\'s imagination or used in a fictitious manner. Any resemblance to actual persons, living or dead, or actual events is purely coincidental.</p>'
+      : isMemoir
+      ? '<p style="' + cpxGap + '">This work is based on the author\'s recollections and experiences. Some names and identifying details have been changed to protect the privacy of individuals.</p>'
+      : isRelig
+      ? '<p style="' + cpxGap + '">Unless otherwise noted, scripture quotations are from the Holy Bible. All rights reserved.</p>'
+      : '';
+
+    addPage(
+      // Content sits in the bottom third — standard copyright placement
+      '<div style="position:absolute;bottom:' + Math.round(contentH * 0.06) + 'px;'
+      + 'left:0;right:0;'
+      + 'font-family:' + template.bodyFont + ';'
+      + 'font-size:' + cpxSz + 'px;'
+      + 'line-height:' + cpxLh + ';'
+      + 'color:' + template.inkColor + ';opacity:0.55;">'
+
+      + '<p style="' + cpxSmGap + '">First published ' + yr + '</p>'
+      + '<p style="' + cpxSmGap + '">Copyright \u00A9 ' + yr + ' ' + escapeHtml(bookData.author || 'the Author') + '</p>'
+      + '<p style="' + cpxGap + '">All rights reserved.</p>'
+
+      + '<p style="' + cpxGap + '">No part of this book may be reproduced in any form or by any electronic or mechanical means, including information storage and retrieval systems, without written permission from the author, except for the use of brief quotations in a book review.</p>'
+
+      + disclaimer
+
+      + '<p style="' + cpxSmGap + '">ISBN: 978-0-000000-00-0 (Paperback)</p>'
+      + '<p style="' + cpxGap + '">ISBN: 978-0-000000-01-7 (eBook)</p>'
+
+      + '<p style="' + cpxSmGap + '">First Edition</p>'
+      + '<p style="' + cpxGap + '">Printed in the United States of America</p>'
+
+      + '<p style="margin:0;letter-spacing:0.12em;">10 &nbsp; 9 &nbsp; 8 &nbsp; 7 &nbsp; 6 &nbsp; 5 &nbsp; 4 &nbsp; 3 &nbsp; 2 &nbsp; 1</p>'
+      + '</div>',
+      { suppressHead: true }
+    );
+  }
 
   // ---- Dedication ─────────────────────────────────────────────────────
+  // Traditional: italic text at 35% down, centered, nothing else on page.
   if (bookData.dedication) {
     ensureRecto();
+    const dedTop = Math.round(contentH * 0.33);
     addPage(
-      '<div style="display:flex;flex-direction:column;align-items:center;'
-      + 'justify-content:center;height:100%;text-align:center;">'
-      + '<p style="font-style:italic;font-size:' + bodyPx + 'px;line-height:1.9;'
-      + 'max-width:' + Math.round(contentW * 0.82) + 'px;color:' + template.inkColor + ';">'
-      + escapeHtml(bookData.dedication) + '</p></div>',
+      '<div style="padding-top:' + dedTop + 'px;text-align:center;">'
+      + '<div style="font-family:' + template.bodyFont + ';'
+      + 'font-style:italic;font-size:' + bodyPx + 'px;line-height:2;'
+      + 'color:' + template.inkColor + ';opacity:0.78;">'
+      + bookData.dedication.split('\n').filter(Boolean).map(l =>
+          '<p style="margin:0 0 0.3em;">' + escapeHtml(l) + '</p>'
+        ).join('')
+      + '</div></div>',
       { suppressHead: true }
     );
   }
 
   // ---- Epigraph ───────────────────────────────────────────────────────
+  // Sits at 35% from top, right-aligned, italic, with em dash attribution.
   if (bookData.epigraph) {
     ensureRecto();
+    const epTop   = Math.round(contentH * 0.33);
+    const epWidth = Math.round(contentW * 0.78);
     addPage(
-      '<div style="display:flex;flex-direction:column;justify-content:center;'
-      + 'height:100%;max-width:' + Math.round(contentW * 0.85) + 'px;">'
-      + '<p style="font-style:italic;font-size:' + bodyPx + 'px;line-height:1.9;'
-      + 'margin-bottom:0.6em;color:' + template.inkColor + ';">'
-      + '&ldquo;' + escapeHtml(bookData.epigraph) + '&rdquo;</p>'
+      '<div style="padding-top:' + epTop + 'px;display:flex;flex-direction:column;align-items:flex-end;">'
+      + '<div style="max-width:' + epWidth + 'px;text-align:right;">'
+      + '<p style="font-family:' + template.bodyFont + ';'
+      + 'font-style:italic;font-size:' + bodyPx + 'px;line-height:1.9;'
+      + 'margin-bottom:' + Math.round(bodyPx * 0.75) + 'px;'
+      + 'color:' + template.inkColor + ';opacity:0.78;">'
+      + '\u201C' + escapeHtml(bookData.epigraph) + '\u201D</p>'
       + (bookData.epigraphAttribution
-          ? '<p style="font-size:' + Math.round(bodyPx * 0.85) + 'px;'
-            + 'color:' + template.accentColor + ';text-align:right;">'
+          ? '<p style="font-family:' + template.bodyFont + ';'
+            + 'font-size:' + Math.round(bodyPx * 0.85) + 'px;'
+            + 'color:' + template.inkColor + ';opacity:0.5;'
+            + 'letter-spacing:0.02em;">'
             + '\u2014 ' + escapeHtml(bookData.epigraphAttribution) + '</p>'
           : '')
-      + '</div>',
+      + '</div></div>',
       { suppressHead: true }
     );
   }

@@ -330,29 +330,54 @@ export function buildFullTitlePage(bookData: BookData, template: Template): stri
 
 // ─────────────────────────────────────────
 //  COPYRIGHT PAGE
-//  Left-aligned, small text, at the bottom.
-//  Exactly how real publishers do it.
+//  Verso (left/even page) of title page.
+//  Small text, sits at the bottom third.
+//  Genre-smart disclaimers. No branding.
 // ─────────────────────────────────────────
 
+const FICTION_GENRES = new Set(['fiction','romance','thriller','mystery','scifi','fantasy','horror','ya','childrens']);
+const MEMOIR_GENRES  = new Set(['memoir','biography']);
+
 export function buildCopyrightPage(bookData: BookData, template: Template): string {
-  const year = new Date().getFullYear();
+  const year  = new Date().getFullYear();
+  const genre = (bookData.genre ?? bookData.metadata?.genre ?? 'fiction') as string;
+
+  // Genre-specific disclaimer
+  const disclaimer = FICTION_GENRES.has(genre)
+    ? `<p style="margin:0 0 0.55em;">This is a work of fiction. Names, characters, businesses, places, events, locales, and incidents are either the products of the author's imagination or used in a fictitious manner. Any resemblance to actual persons, living or dead, or actual events is purely coincidental.</p>`
+    : MEMOIR_GENRES.has(genre)
+    ? `<p style="margin:0 0 0.55em;">This work is based on the author's recollections and experiences. Some names and identifying details have been changed to protect the privacy of individuals.</p>`
+    : genre === 'religious'
+    ? `<p style="margin:0 0 0.55em;">Unless otherwise noted, scripture quotations are from the Holy Bible. All rights reserved.</p>`
+    : '';
+
   return `
     <div style="
-      display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;
+      display:flex;flex-direction:column;justify-content:flex-end;
       height:100%;padding:${PREVIEW_PAD_V} ${PREVIEW_PAD_H};
       background:${template.paperColor};
       box-sizing:border-box;overflow:hidden;
     ">
       <div style="
-        font-family:${template.bodyFont};font-size:6pt;
-        color:${template.inkColor};opacity:0.5;line-height:1.9;
+        font-family:${template.bodyFont};font-size:5.5pt;
+        color:${template.inkColor};opacity:0.52;line-height:1.85;
       ">
-        <p style="margin:0 0 0.4em;">Copyright &copy; ${year}${bookData.author ? ' by ' + esc(bookData.author) : ''}</p>
-        <p style="margin:0 0 0.4em;">All rights reserved. No part of this publication may be reproduced, distributed, or transmitted in any form or by any means, including photocopying, recording, or other electronic or mechanical methods, without the prior written permission of the publisher.</p>
-        <p style="margin:0 0 0.4em;">This is a work of fiction. Names, characters, places, and incidents are either the products of the author's imagination or are used fictitiously.</p>
-        <p style="margin:0 0 0.4em;">ISBN: 978-0-000000-00-0 (Paperback)<br/>ISBN: 978-0-000000-01-7 (eBook)</p>
-        <p style="margin:0 0 0.4em;">First Edition</p>
-        <p style="margin:0;">Formatted by Booksane &mdash; booksane.com</p>
+        <p style="margin:0 0 0.8em;">First published ${year}</p>
+
+        <p style="margin:0 0 0.3em;">Copyright &copy; ${year} ${bookData.author ? esc(bookData.author) : 'the Author'}</p>
+        <p style="margin:0 0 0.8em;">All rights reserved.</p>
+
+        <p style="margin:0 0 0.8em;">No part of this book may be reproduced in any form or by any electronic or mechanical means, including information storage and retrieval systems, without written permission from the author, except for the use of brief quotations in a book review.</p>
+
+        ${disclaimer}
+
+        <p style="margin:0 0 0.3em;">ISBN: 978-0-000000-00-0 (Paperback)</p>
+        <p style="margin:0 0 0.8em;">ISBN: 978-0-000000-01-7 (eBook)</p>
+
+        <p style="margin:0 0 0.3em;">First Edition</p>
+        <p style="margin:0 0 0.8em;">Printed in the United States of America</p>
+
+        <p style="margin:0;letter-spacing:0.08em;">10 &nbsp; 9 &nbsp; 8 &nbsp; 7 &nbsp; 6 &nbsp; 5 &nbsp; 4 &nbsp; 3 &nbsp; 2 &nbsp; 1</p>
       </div>
     </div>
   `;
@@ -364,27 +389,37 @@ export function buildCopyrightPage(bookData: BookData, template: Template): stri
 //  Nothing else on the page — ever.
 // ─────────────────────────────────────────
 
+// ─────────────────────────────────────────
+//  DEDICATION
+//  Sits at 35% from top — traditional standard.
+//  Italic, centered, nothing else on the page.
+// ─────────────────────────────────────────
+
 function buildDedicationPage(dedication: string, template: Template): string {
   return `
     <div style="
-      display:flex;flex-direction:column;justify-content:center;align-items:center;
-      text-align:center;height:100%;padding:${PREVIEW_PAD_V} ${PREVIEW_PAD_H};
+      height:100%;padding:${PREVIEW_PAD_V} ${PREVIEW_PAD_H};
       background:${template.paperColor};box-sizing:border-box;
+      display:flex;flex-direction:column;align-items:center;
     ">
+      <div style="flex:0.65;"></div>
       <div style="
         font-family:${template.bodyFont};font-size:7.5pt;
-        font-style:italic;color:${template.inkColor};opacity:0.72;
-        max-width:78%;line-height:1.9;
+        font-style:italic;color:${template.inkColor};opacity:0.75;
+        max-width:80%;line-height:2;text-align:center;
       ">
-        ${dedication.split('\n').map(l => `<p style="margin:0 0 0.4em;">${esc(l)}</p>`).join('')}
+        ${dedication.split('\n').filter(Boolean).map(l => `<p style="margin:0 0 0.35em;">${esc(l)}</p>`).join('')}
       </div>
+      <div style="flex:1;"></div>
     </div>
   `;
 }
 
 // ─────────────────────────────────────────
 //  EPIGRAPH
-//  Right-leaning, italic, attributed below.
+//  Sits about 35% from top, right-aligned,
+//  italic quote, attribution with em dash.
+//  This is the Knopf / FSG standard.
 // ─────────────────────────────────────────
 
 export function buildEpigraphPage(
@@ -394,24 +429,27 @@ export function buildEpigraphPage(
 ): string {
   return `
     <div style="
-      display:flex;flex-direction:column;align-items:flex-end;justify-content:center;
       height:100%;padding:${PREVIEW_PAD_V} ${PREVIEW_PAD_H};
       background:${template.paperColor};box-sizing:border-box;
+      display:flex;flex-direction:column;align-items:flex-end;
     ">
-      <div style="max-width:75%;text-align:right;">
+      <div style="flex:0.65;"></div>
+      <div style="max-width:76%;text-align:right;">
         <div style="
           font-family:${template.bodyFont};font-size:7.5pt;
-          font-style:italic;color:${template.inkColor};opacity:0.72;
-          line-height:1.85;margin-bottom:0.8em;
+          font-style:italic;color:${template.inkColor};opacity:0.75;
+          line-height:1.9;margin-bottom:0.9em;
         ">
           &ldquo;${esc(epigraph ?? '')}&rdquo;
         </div>
         ${attribution ? `
         <div style="
           font-family:${template.bodyFont};font-size:6.5pt;
-          color:${template.inkColor};opacity:0.45;
-        ">&mdash; ${esc(attribution)}</div>` : ''}
+          color:${template.inkColor};opacity:0.48;
+          letter-spacing:0.02em;
+        ">&#8212; ${esc(attribution)}</div>` : ''}
       </div>
+      <div style="flex:1;"></div>
     </div>
   `;
 }
@@ -459,19 +497,24 @@ export function buildTocPage(bookData: BookData, template: Template, tocPageNum:
       background:${template.paperColor};
       box-sizing:border-box;overflow:hidden;
     ">
-      <!-- Heading -->
+      <!-- CONTENTS heading — letter-spaced, small caps, centered -->
       <div style="
-        font-family:${template.headingFont};font-size:8pt;
+        font-family:${template.headingFont};
+        font-size:7pt;
         font-weight:${template.headingWeight};
-        text-align:${template.headingAlign};
+        text-align:center;
         color:${template.headingColor};
-        text-transform:${template.headingTransform === 'uppercase' ? 'uppercase' : 'uppercase'};
-        letter-spacing:0.12em;
-        margin-bottom:1.2em;
-        opacity:0.85;
-      ">
-        Contents
-      </div>
+        text-transform:uppercase;
+        letter-spacing:0.25em;
+        margin-bottom:0.2em;
+        opacity:0.78;
+      ">Contents</div>
+      <!-- Thin rule under heading -->
+      <div style="
+        width:20px;height:0.5px;
+        background:${template.accentColor};opacity:0.45;
+        margin:0 auto 1.1em;
+      "></div>
       <div>${items}</div>
     </div>
   `;
