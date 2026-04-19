@@ -131,6 +131,7 @@ export default function ExportModal({
   const [hideChapterNumbers, setHideChapterNumbers] = useState(false);
   const [trimSize, setTrimSize] = useState('6x9');
   const [selectedTemplateId, setSelectedTemplateId] = useState(templateId);
+  const [templateCategory, setTemplateCategory] = useState<string>('all');
   const [epubSelected, setEpubSelected] = useState(true);
   const [pdfSelected, setPdfSelected] = useState(true);
   const [wordSelected, setWordSelected] = useState(false);
@@ -403,7 +404,7 @@ export default function ExportModal({
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              marginBottom: 12,
+              marginBottom: 10,
             }}>
               <div style={{
                 background: '#000',
@@ -417,70 +418,134 @@ export default function ExportModal({
               <span style={{ fontSize: 11, fontWeight: 800, color: '#000', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                 Template
               </span>
+              <span style={{ fontSize: 9, color: '#888', fontWeight: 600, marginLeft: 2 }}>
+                {templates.length} styles
+              </span>
             </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(5, 1fr)',
-              gap: 0,
-              borderTop: '1.5px solid #eee',
-            }}>
-              {templates.map((tmpl) => {
-                const isSelected = selectedTemplateId === tmpl.id;
-                return (
-                  <button
-                    key={tmpl.id}
-                    onClick={() => handleTemplateSelect(tmpl.id)}
-                    style={{
-                      height: 72,
-                      background: isSelected ? tmpl.paperColor : '#fafafa',
-                      border: 'none',
-                      borderRight: '1.5px solid #eee',
-                      borderBottom: isSelected ? '3px solid #000' : '3px solid transparent',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 4,
-                      padding: '8px 6px',
-                      transition: 'all 0.12s',
-                      position: 'relative',
-                    }}
-                  >
-                    {isSelected && (
-                      <div style={{
-                        position: 'absolute',
-                        top: 4, right: 4,
-                        width: 7, height: 7,
-                        background: '#000',
-                        borderRadius: '50%',
-                      }} />
-                    )}
-                    <span style={{
-                      fontFamily: tmpl.headingFont,
-                      color: tmpl.headingColor,
-                      fontSize: 9,
-                      fontWeight: 700,
-                      textAlign: 'center',
-                      lineHeight: 1.2,
-                    }}>
-                      Ch. One
-                    </span>
-                    <span style={{
-                      fontSize: 7.5,
-                      color: isSelected ? '#000' : '#999',
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.04em',
-                      textAlign: 'center',
-                      lineHeight: 1.3,
-                    }}>
-                      {tmpl.name}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+
+            {/* Category filter tabs */}
+            {(() => {
+              const cats = [
+                { id: 'all', label: 'All' },
+                { id: 'fiction', label: 'Literary' },
+                { id: 'scifi', label: 'Sci-Fi & Fantasy' },
+                { id: 'mystery', label: 'Mystery' },
+                { id: 'romance', label: 'Romance' },
+                { id: 'ya', label: 'YA' },
+                { id: 'horror', label: 'Horror' },
+                { id: 'nonfiction', label: 'Nonfiction' },
+                { id: 'business', label: 'Business' },
+                { id: 'poetry', label: 'Poetry' },
+              ];
+              const filtered = templateCategory === 'all'
+                ? templates
+                : templates.filter(t => t.category === templateCategory);
+              return (
+                <>
+                  <div style={{
+                    display: 'flex',
+                    gap: 0,
+                    overflowX: 'auto',
+                    padding: '0 24px',
+                    marginBottom: 0,
+                    borderTop: '1.5px solid #eee',
+                    scrollbarWidth: 'none',
+                  }}>
+                    {cats.map(cat => {
+                      const count = cat.id === 'all' ? templates.length : templates.filter(t => t.category === cat.id).length;
+                      if (count === 0) return null;
+                      const isActive = templateCategory === cat.id;
+                      return (
+                        <button key={cat.id} onClick={() => setTemplateCategory(cat.id)} style={{
+                          padding: '6px 10px',
+                          border: 'none',
+                          borderBottom: isActive ? '2px solid #000' : '2px solid transparent',
+                          background: 'transparent',
+                          fontSize: 9,
+                          fontWeight: isActive ? 800 : 600,
+                          color: isActive ? '#000' : '#888',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          letterSpacing: '0.04em',
+                          textTransform: 'uppercase',
+                          flexShrink: 0,
+                          transition: 'all 0.1s',
+                        }}>
+                          {cat.label} <span style={{ opacity: 0.5, fontSize: 8 }}>({count})</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(5, 1fr)',
+                    gap: 0,
+                    maxHeight: 220,
+                    overflowY: 'auto',
+                    borderTop: '1.5px solid #eee',
+                  }}>
+                    {filtered.map((tmpl) => {
+                      const isSelected = selectedTemplateId === tmpl.id;
+                      return (
+                        <button
+                          key={tmpl.id}
+                          onClick={() => handleTemplateSelect(tmpl.id)}
+                          title={tmpl.description}
+                          style={{
+                            height: 72,
+                            background: isSelected ? tmpl.paperColor : '#fafafa',
+                            border: 'none',
+                            borderRight: '1.5px solid #eee',
+                            borderBottom: isSelected ? '3px solid #000' : '3px solid transparent',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 4,
+                            padding: '8px 6px',
+                            transition: 'all 0.12s',
+                            position: 'relative',
+                          }}
+                        >
+                          {isSelected && (
+                            <div style={{
+                              position: 'absolute',
+                              top: 4, right: 4,
+                              width: 7, height: 7,
+                              background: '#000',
+                              borderRadius: '50%',
+                            }} />
+                          )}
+                          <span style={{
+                            fontFamily: tmpl.headingFont,
+                            color: tmpl.headingColor,
+                            fontSize: 9,
+                            fontWeight: 700,
+                            textAlign: 'center',
+                            lineHeight: 1.2,
+                          }}>
+                            Ch. One
+                          </span>
+                          <span style={{
+                            fontSize: 7,
+                            color: isSelected ? '#000' : '#999',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.04em',
+                            textAlign: 'center',
+                            lineHeight: 1.3,
+                          }}>
+                            {tmpl.name}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
           </div>
 
           {/* ── SECTION: SETTINGS ROW ── */}
@@ -1184,23 +1249,119 @@ function buildPrintHTML(
           : (chNumDisplay + (isMeaningful ? '. ' + chTitle : '')));
     tocEntries.push({ label: tocLabel, page: pageNum });
 
-    const startDrop = Math.round(contentH * 0.25); // 25% drop before heading
-    const chapterHeader =
-      '<div style="padding-top:' + startDrop + 'px;text-align:' + template.headingAlign + ';">'
-      + (!options.hideChapterNumbers
-          ? '<span style="display:block;font-family:' + template.headingFont + ';'
-            + 'font-size:' + chapNumPx + 'px;font-weight:' + template.headingWeight + ';'
-            + 'color:' + template.accentColor + ';letter-spacing:0.18em;'
-            + 'text-transform:uppercase;margin-bottom:0.55em;">'
-            + (template.chapterNumberStyle === 'numeral' ? 'Chapter ' : '') + chNumDisplay + '</span>'
-          : '')
-      + (isMeaningful
-          ? '<div style="font-family:' + template.headingFont + ';font-size:' + headPx + 'px;'
-            + 'font-weight:' + template.headingWeight + ';color:' + template.headingColor + ';'
-            + 'text-transform:' + template.headingTransform + ';line-height:1.2;'
-            + 'margin-bottom:1.4em;">' + escapeHtml(chTitle) + '</div>'
-          : '<div style="margin-bottom:1.4em;"></div>')
-      + '</div>';
+    const startDrop   = Math.round(contentH * 0.25);
+    const headStyle   = (template as ReturnType<typeof getTemplate> & { chapterHeadingStyle?: string }).chapterHeadingStyle ?? 'classic';
+    const showNum     = !options.hideChapterNumbers && template.chapterNumberStyle !== 'none';
+    const numPrefix   = template.chapterNumberStyle === 'numeral' ? 'Chapter ' : '';
+    const numLabel    = showNum ? (numPrefix + chNumDisplay) : '';
+    const ruleColor   = template.accentColor + '88'; // 53% opacity rule
+    const ruleW       = Math.round(contentW * 0.55);
+
+    // ── Build heading block by style ─────────────────────────────────
+    let headingBlock = '';
+
+    if (headStyle === 'ruled') {
+      // Thin rules above and below the title block
+      headingBlock =
+        '<div style="text-align:' + template.headingAlign + ';padding-top:' + startDrop + 'px;">'
+        + '<div style="border-top:0.75px solid ' + ruleColor + ';margin-bottom:0.65em;width:' + ruleW + 'px;'
+        + (template.headingAlign === 'center' ? 'margin-left:auto;margin-right:auto;' : '') + '"></div>'
+        + (numLabel ? '<div style="font-family:' + template.headingFont + ';font-size:' + chapNumPx + 'px;'
+          + 'font-weight:' + template.headingWeight + ';color:' + template.accentColor + ';'
+          + 'letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.3em;">' + numLabel + '</div>' : '')
+        + (isMeaningful ? '<div style="font-family:' + template.headingFont + ';font-size:' + headPx + 'px;'
+          + 'font-weight:' + template.headingWeight + ';color:' + template.headingColor + ';'
+          + 'text-transform:' + template.headingTransform + ';line-height:1.2;margin-bottom:0.6em;">'
+          + escapeHtml(chTitle) + '</div>' : '')
+        + '<div style="border-bottom:0.75px solid ' + ruleColor + ';margin-top:0.3em;margin-bottom:1.4em;'
+        + 'width:' + ruleW + 'px;'
+        + (template.headingAlign === 'center' ? 'margin-left:auto;margin-right:auto;' : '') + '"></div>'
+        + '</div>';
+
+    } else if (headStyle === 'large-num') {
+      // Huge faded chapter number as visual anchor, title below
+      const bigNumPx = Math.round(headPx * 3.5);
+      headingBlock =
+        '<div style="text-align:' + template.headingAlign + ';padding-top:' + startDrop + 'px;">'
+        + (showNum ? '<div style="font-family:' + template.headingFont + ';font-size:' + bigNumPx + 'px;'
+          + 'font-weight:700;color:' + template.accentColor + ';opacity:0.13;line-height:0.9;'
+          + 'margin-bottom:-' + Math.round(bigNumPx * 0.18) + 'px;letter-spacing:-0.02em;">'
+          + chNumDisplay + '</div>' : '')
+        + (isMeaningful ? '<div style="font-family:' + template.headingFont + ';font-size:' + headPx + 'px;'
+          + 'font-weight:' + template.headingWeight + ';color:' + template.headingColor + ';'
+          + 'text-transform:' + template.headingTransform + ';line-height:1.2;'
+          + 'position:relative;margin-bottom:1.4em;">' + escapeHtml(chTitle) + '</div>' : '')
+        + (showNum && !isMeaningful ? '<div style="margin-bottom:1.4em;"></div>' : '')
+        + '</div>';
+
+    } else if (headStyle === 'badge') {
+      // Chapter number in a decorative framed box, then title
+      const badgePx = Math.round(chapNumPx * 1.3);
+      const badgeSz = Math.round(badgePx * 2.4);
+      headingBlock =
+        '<div style="text-align:' + template.headingAlign + ';padding-top:' + startDrop + 'px;">'
+        + (showNum ? '<div style="display:inline-block;width:' + badgeSz + 'px;height:' + badgeSz + 'px;'
+          + 'border:1.5px solid ' + template.accentColor + ';margin-bottom:0.75em;'
+          + 'display:flex;align-items:center;justify-content:center;'
+          + (template.headingAlign === 'center' ? 'margin-left:auto;margin-right:auto;' : '') + '">'
+          + '<span style="font-family:' + template.headingFont + ';font-size:' + badgePx + 'px;'
+          + 'font-weight:' + template.headingWeight + ';color:' + template.accentColor + ';'
+          + 'line-height:1;">' + chNumDisplay + '</span>'
+          + '</div>' : '')
+        + (isMeaningful ? '<div style="font-family:' + template.headingFont + ';font-size:' + headPx + 'px;'
+          + 'font-weight:' + template.headingWeight + ';color:' + template.headingColor + ';'
+          + 'text-transform:' + template.headingTransform + ';line-height:1.2;margin-bottom:1.4em;">'
+          + escapeHtml(chTitle) + '</div>' : '<div style="margin-bottom:1.4em;"></div>')
+        + '</div>';
+
+    } else if (headStyle === 'stacked') {
+      // Number label, thin rule underneath, then title
+      const ruleW2 = Math.round(contentW * 0.18);
+      headingBlock =
+        '<div style="text-align:' + template.headingAlign + ';padding-top:' + startDrop + 'px;">'
+        + (numLabel ? '<div style="font-family:' + template.headingFont + ';font-size:' + chapNumPx + 'px;'
+          + 'font-weight:' + template.headingWeight + ';color:' + template.accentColor + ';'
+          + 'letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.5em;">' + numLabel + '</div>' : '')
+        + '<div style="width:' + ruleW2 + 'px;height:1px;background:' + template.accentColor + ';opacity:0.5;'
+        + 'margin-bottom:0.65em;'
+        + (template.headingAlign === 'center' ? 'margin-left:auto;margin-right:auto;' : '') + '"></div>'
+        + (isMeaningful ? '<div style="font-family:' + template.headingFont + ';font-size:' + headPx + 'px;'
+          + 'font-weight:' + template.headingWeight + ';color:' + template.headingColor + ';'
+          + 'text-transform:' + template.headingTransform + ';line-height:1.2;margin-bottom:1.4em;">'
+          + escapeHtml(chTitle) + '</div>' : '<div style="margin-bottom:1.4em;"></div>')
+        + '</div>';
+
+    } else if (headStyle === 'minimal') {
+      // Tiny all-caps label, no decoration, maximum whitespace
+      headingBlock =
+        '<div style="text-align:' + template.headingAlign + ';padding-top:' + startDrop + 'px;">'
+        + (numLabel ? '<div style="font-family:' + template.headingFont + ';font-size:' + Math.round(chapNumPx * 0.85) + 'px;'
+          + 'font-weight:' + template.headingWeight + ';color:' + template.accentColor + ';'
+          + 'letter-spacing:0.22em;text-transform:uppercase;margin-bottom:0.7em;opacity:0.7;">' + numLabel + '</div>' : '')
+        + (isMeaningful ? '<div style="font-family:' + template.headingFont + ';font-size:' + Math.round(headPx * 0.88) + 'px;'
+          + 'font-weight:' + template.headingWeight + ';color:' + template.headingColor + ';'
+          + 'text-transform:' + template.headingTransform + ';line-height:1.2;margin-bottom:1.6em;">'
+          + escapeHtml(chTitle) + '</div>' : '<div style="margin-bottom:1.6em;"></div>')
+        + '</div>';
+
+    } else {
+      // classic (default): centered, number above title
+      headingBlock =
+        '<div style="padding-top:' + startDrop + 'px;text-align:' + template.headingAlign + ';">'
+        + (numLabel ? '<span style="display:block;font-family:' + template.headingFont + ';'
+          + 'font-size:' + chapNumPx + 'px;font-weight:' + template.headingWeight + ';'
+          + 'color:' + template.accentColor + ';letter-spacing:0.18em;'
+          + 'text-transform:uppercase;margin-bottom:0.55em;">' + numLabel + '</span>' : '')
+        + (isMeaningful
+            ? '<div style="font-family:' + template.headingFont + ';font-size:' + headPx + 'px;'
+              + 'font-weight:' + template.headingWeight + ';color:' + template.headingColor + ';'
+              + 'text-transform:' + template.headingTransform + ';line-height:1.2;'
+              + 'margin-bottom:1.4em;">' + escapeHtml(chTitle) + '</div>'
+            : '<div style="margin-bottom:1.4em;"></div>')
+        + '</div>';
+    }
+
+    const chapterHeader = headingBlock;
 
     // Estimated lines consumed by the header block
     const headerLines = Math.round(startDrop / (bodyPx * lineH))

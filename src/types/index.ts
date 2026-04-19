@@ -66,12 +66,20 @@ export interface BookPage {
 //  TEMPLATE TYPES
 // ─────────────────────────────────────────
 
-export type TemplateCategory = 'fiction' | 'nonfiction' | 'business' | 'poetry' | 'memoir';
+export type TemplateCategory = 'fiction' | 'nonfiction' | 'business' | 'poetry' | 'memoir' | 'ya' | 'horror' | 'mystery' | 'romance' | 'scifi';
 export type HeadingAlign = 'center' | 'left' | 'right';
 export type HeadingTransform = 'none' | 'uppercase' | 'capitalize';
 export type ChapterNumberStyle = 'numeral' | 'roman' | 'spelled' | 'none';
 export type ParagraphStyle = 'indent' | 'spaced';
-export type PageSize = 'trade' | 'digest' | 'a5' | 'mass';
+export type PageSize = 'trade' | 'digest' | 'a5' | 'mass' | '7x10';
+// Visual treatment of the chapter heading block in PDF and EPUB
+// classic   – centered text, number above title (default)
+// ruled     – thin horizontal rules above and below the heading
+// large-num – oversized faded chapter number as visual anchor
+// badge     – chapter number in a decorative framed box
+// stacked   – number + thin rule, then title underneath
+// minimal   – tiny all-caps label, no decoration, left-aligned
+export type ChapterHeadingStyle = 'classic' | 'ruled' | 'large-num' | 'badge' | 'stacked' | 'minimal';
 
 export interface Template {
   id: string;
@@ -119,6 +127,7 @@ export interface Template {
   // Premium features
   dropCap: boolean;                // drop cap on first letter of each chapter
   ornament: string;                // HTML template for section breaks ([ACCENT] placeholder)
+  chapterHeadingStyle: ChapterHeadingStyle; // visual treatment of chapter heading block
 }
 
 // ─────────────────────────────────────────

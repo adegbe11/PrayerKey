@@ -127,6 +127,30 @@ function buildEpubCSS(template: Template): string {
   margin-top: 4px;
 }` : '';
 
+  // Per-style chapter heading overrides
+  const hs = (template as Template & { chapterHeadingStyle?: string }).chapterHeadingStyle ?? 'classic';
+  const headingStyleCss =
+    hs === 'ruled' ? `
+.chapter-start { border-top: 0.75px solid ${template.accentColor}88; padding-top: 3em; }
+h2.chapter-title { border-bottom: 0.75px solid ${template.accentColor}88; padding-bottom: 0.5em; }
+` : hs === 'large-num' ? `
+.chapter-number { font-size: 4em; opacity: 0.13; line-height: 0.9; margin-bottom: -0.5em; }
+` : hs === 'badge' ? `
+.chapter-number {
+  display: inline-block;
+  border: 1.5px solid ${template.accentColor};
+  padding: 0.3em 0.6em;
+  font-size: 1em;
+  margin-bottom: 0.75em;
+}
+` : hs === 'stacked' ? `
+.chapter-number { font-size: 0.85em; letter-spacing: 0.2em; margin-bottom: 0.3em; }
+.chapter-number::after { content: ''; display: block; width: 2.5em; height: 1px; background: ${template.accentColor}; opacity: 0.5; margin-top: 0.5em; }
+` : hs === 'minimal' ? `
+.chapter-number { font-size: 0.75em; letter-spacing: 0.22em; opacity: 0.7; }
+h2.chapter-title { font-size: 1.3em; }
+` : ''; /* classic — no override needed */
+
   return `
 @charset "UTF-8";
 body {
@@ -216,6 +240,7 @@ h1 + p, h2 + p, h3 + p, .chapter-start + p {
   opacity: 0.7;
 }
 ${dropCapCss}
+${headingStyleCss}
 `;
 }
 
