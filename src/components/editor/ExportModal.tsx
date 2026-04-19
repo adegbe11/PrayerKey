@@ -316,7 +316,7 @@ export default function ExportModal({
                 width: 36,
                 height: 50,
                 background: template.paperColor,
-                border: '2px solid #FFE500',
+                border: '2px solid #C8FF00',
                 flexShrink: 0,
                 display: 'flex',
                 flexDirection: 'column',
@@ -324,7 +324,7 @@ export default function ExportModal({
                 justifyContent: 'center',
                 padding: 4,
                 overflow: 'hidden',
-                boxShadow: '3px 3px 0 #FFE500',
+                boxShadow: '3px 3px 0 #C8FF00',
               }}>
                 <div style={{
                   fontFamily: template.headingFont,
@@ -347,8 +347,8 @@ export default function ExportModal({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                   <span style={{
-                    background: '#FFE500',
-                    border: '1.5px solid #FFE500',
+                    background: '#C8FF00',
+                    border: '1.5px solid #C8FF00',
                     color: '#000',
                     fontSize: 8,
                     fontWeight: 900,
@@ -381,8 +381,8 @@ export default function ExportModal({
                 transition: 'all 0.1s',
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = '#FFE500';
-                (e.currentTarget as HTMLElement).style.borderColor = '#FFE500';
+                (e.currentTarget as HTMLElement).style.background = '#C8FF00';
+                (e.currentTarget as HTMLElement).style.borderColor = '#C8FF00';
                 (e.currentTarget as HTMLElement).style.color = '#000';
               }}
               onMouseLeave={(e) => {
@@ -406,7 +406,7 @@ export default function ExportModal({
             }}>
               <div style={{
                 background: '#000',
-                color: '#FFE500',
+                color: '#C8FF00',
                 fontSize: 8,
                 fontWeight: 900,
                 letterSpacing: '0.14em',
@@ -550,7 +550,7 @@ export default function ExportModal({
           <div style={{ borderBottom: '2px solid #000', padding: '14px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
               <div style={{
-                background: '#000', color: '#FFE500',
+                background: '#000', color: '#C8FF00',
                 fontSize: 8, fontWeight: 900, letterSpacing: '0.14em',
                 textTransform: 'uppercase', padding: '4px 10px',
               }}>02</div>
@@ -598,7 +598,7 @@ export default function ExportModal({
                 cursor: 'pointer',
                 padding: '10px 12px',
                 border: dropCaps ? '2px solid #000' : '2px solid #ddd',
-                background: dropCaps ? '#FFE500' : '#fafafa',
+                background: dropCaps ? '#C8FF00' : '#fafafa',
                 boxShadow: dropCaps ? '2px 2px 0 #000' : 'none',
                 transition: 'all 0.1s',
                 userSelect: 'none',
@@ -616,7 +616,7 @@ export default function ExportModal({
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}>
-                  {dropCaps && <div style={{ width: 6, height: 6, background: '#FFE500' }} />}
+                  {dropCaps && <div style={{ width: 6, height: 6, background: '#C8FF00' }} />}
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#000', lineHeight: 1.3 }}>
                   Drop Caps
@@ -631,7 +631,7 @@ export default function ExportModal({
                 cursor: 'pointer',
                 padding: '10px 12px',
                 border: hideChapterNumbers ? '2px solid #000' : '2px solid #ddd',
-                background: hideChapterNumbers ? '#FFE500' : '#fafafa',
+                background: hideChapterNumbers ? '#C8FF00' : '#fafafa',
                 boxShadow: hideChapterNumbers ? '2px 2px 0 #000' : 'none',
                 transition: 'all 0.1s',
                 userSelect: 'none',
@@ -650,7 +650,7 @@ export default function ExportModal({
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}>
-                  {hideChapterNumbers && <div style={{ width: 6, height: 6, background: '#FFE500' }} />}
+                  {hideChapterNumbers && <div style={{ width: 6, height: 6, background: '#C8FF00' }} />}
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#000', lineHeight: 1.3 }}>
                   Hide Chapter Numbers
@@ -663,7 +663,7 @@ export default function ExportModal({
           <div style={{ borderBottom: '2px solid #000', padding: '14px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
               <div style={{
-                background: '#000', color: '#FFE500',
+                background: '#000', color: '#C8FF00',
                 fontSize: 8, fontWeight: 900, letterSpacing: '0.14em',
                 textTransform: 'uppercase', padding: '4px 10px',
               }}>03</div>
@@ -685,19 +685,19 @@ export default function ExportModal({
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'all 0.1s',
-                  boxShadow: epubSelected ? '3px 3px 0 #FFE500' : 'none',
+                  boxShadow: epubSelected ? '3px 3px 0 #C8FF00' : 'none',
                   position: 'relative',
                   overflow: 'hidden',
                 }}
               >
                 <div style={{
                   width: 28, height: 28,
-                  background: epubSelected ? '#FFE500' : '#eee',
+                  background: epubSelected ? '#C8FF00' : '#eee',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   marginBottom: 10,
                   fontSize: 12, fontWeight: 900, color: '#000',
                 }}>E</div>
-                <div style={{ fontSize: 13, fontWeight: 900, color: epubSelected ? '#FFE500' : '#111', marginBottom: 4, letterSpacing: '-0.01em' }}>
+                <div style={{ fontSize: 13, fontWeight: 900, color: epubSelected ? '#C8FF00' : '#111', marginBottom: 4, letterSpacing: '-0.01em' }}>
                   EPUB
                 </div>
                 <div style={{ fontSize: 9, color: epubSelected ? 'rgba(255,255,255,0.55)' : '#999', lineHeight: 1.5, fontWeight: 500 }}>
@@ -707,7 +707,7 @@ export default function ExportModal({
                   <div style={{
                     position: 'absolute', top: 8, right: 8,
                     width: 18, height: 18,
-                    background: '#FFE500',
+                    background: '#C8FF00',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 10, fontWeight: 900, color: '#000',
                   }}>✓</div>
@@ -724,7 +724,7 @@ export default function ExportModal({
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'all 0.1s',
-                  boxShadow: pdfSelected ? '3px 3px 0 #FFE500' : 'none',
+                  boxShadow: pdfSelected ? '3px 3px 0 #C8FF00' : 'none',
                   position: 'relative',
                   overflow: 'hidden',
                 }}
@@ -736,7 +736,7 @@ export default function ExportModal({
                   marginBottom: 10,
                   fontSize: 12, fontWeight: 900, color: '#fff',
                 }}>P</div>
-                <div style={{ fontSize: 13, fontWeight: 900, color: pdfSelected ? '#FFE500' : '#111', marginBottom: 4, letterSpacing: '-0.01em' }}>
+                <div style={{ fontSize: 13, fontWeight: 900, color: pdfSelected ? '#C8FF00' : '#111', marginBottom: 4, letterSpacing: '-0.01em' }}>
                   Print PDF
                 </div>
                 <div style={{ fontSize: 9, color: pdfSelected ? 'rgba(255,255,255,0.55)' : '#999', lineHeight: 1.5, fontWeight: 500 }}>
@@ -746,7 +746,7 @@ export default function ExportModal({
                   <div style={{
                     position: 'absolute', top: 8, right: 8,
                     width: 18, height: 18,
-                    background: '#FFE500',
+                    background: '#C8FF00',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 10, fontWeight: 900, color: '#000',
                   }}>✓</div>
@@ -763,7 +763,7 @@ export default function ExportModal({
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'all 0.1s',
-                  boxShadow: wordSelected ? '3px 3px 0 #FFE500' : 'none',
+                  boxShadow: wordSelected ? '3px 3px 0 #C8FF00' : 'none',
                   position: 'relative',
                   overflow: 'hidden',
                 }}
@@ -775,7 +775,7 @@ export default function ExportModal({
                   marginBottom: 10,
                   fontSize: 12, fontWeight: 900, color: '#fff',
                 }}>W</div>
-                <div style={{ fontSize: 13, fontWeight: 900, color: wordSelected ? '#FFE500' : '#111', marginBottom: 4, letterSpacing: '-0.01em' }}>
+                <div style={{ fontSize: 13, fontWeight: 900, color: wordSelected ? '#C8FF00' : '#111', marginBottom: 4, letterSpacing: '-0.01em' }}>
                   Word
                 </div>
                 <div style={{ fontSize: 9, color: wordSelected ? 'rgba(255,255,255,0.55)' : '#999', lineHeight: 1.5, fontWeight: 500 }}>
@@ -785,7 +785,7 @@ export default function ExportModal({
                   <div style={{
                     position: 'absolute', top: 8, right: 8,
                     width: 18, height: 18,
-                    background: '#FFE500',
+                    background: '#C8FF00',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 10, fontWeight: 900, color: '#000',
                   }}>✓</div>
@@ -798,7 +798,7 @@ export default function ExportModal({
           <div style={{ borderBottom: '2px solid #000', padding: '14px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
               <div style={{
-                background: '#000', color: '#FFE500',
+                background: '#000', color: '#C8FF00',
                 fontSize: 8, fontWeight: 900, letterSpacing: '0.14em',
                 textTransform: 'uppercase', padding: '4px 10px',
               }}>04</div>
@@ -894,7 +894,7 @@ export default function ExportModal({
           <div style={{ padding: '20px 24px', background: '#000' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
               <div style={{
-                background: '#FFE500', color: '#000',
+                background: '#C8FF00', color: '#000',
                 fontSize: 8, fontWeight: 900, letterSpacing: '0.14em',
                 textTransform: 'uppercase', padding: '4px 10px',
               }}>05</div>
@@ -915,10 +915,10 @@ export default function ExportModal({
                   ? '#FF2D78'
                   : nothingSelected
                   ? '#555'
-                  : '#FFE500',
+                  : '#C8FF00',
                 border: '2px solid',
-                borderColor: exportState === 'done' ? '#00C853' : exportState === 'error' ? '#FF2D78' : nothingSelected ? '#555' : '#FFE500',
-                boxShadow: exportState === 'generating' || nothingSelected ? 'none' : '4px 4px 0 #FFE500',
+                borderColor: exportState === 'done' ? '#00C853' : exportState === 'error' ? '#FF2D78' : nothingSelected ? '#555' : '#C8FF00',
+                boxShadow: exportState === 'generating' || nothingSelected ? 'none' : '4px 4px 0 #C8FF00',
                 fontSize: 15,
                 fontWeight: 900,
                 color: exportState === 'done' || exportState === 'error' ? '#fff' : '#000',
@@ -934,12 +934,12 @@ export default function ExportModal({
               onMouseEnter={(e) => {
                 if (exportState !== 'generating' && !nothingSelected) {
                   (e.currentTarget as HTMLElement).style.transform = 'translate(-2px,-2px)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '6px 6px 0 #FFE500';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '6px 6px 0 #C8FF00';
                 }
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLElement).style.transform = '';
-                (e.currentTarget as HTMLElement).style.boxShadow = exportState === 'generating' || nothingSelected ? 'none' : '4px 4px 0 #FFE500';
+                (e.currentTarget as HTMLElement).style.boxShadow = exportState === 'generating' || nothingSelected ? 'none' : '4px 4px 0 #C8FF00';
               }}
             >
               {exportState === 'generating' ? (
@@ -951,7 +951,7 @@ export default function ExportModal({
               ) : (
                 <>
                   <span style={{
-                    background: '#000', color: '#FFE500',
+                    background: '#000', color: '#C8FF00',
                     fontSize: 10, fontWeight: 900,
                     padding: '3px 8px', letterSpacing: '0.06em',
                   }}>
@@ -970,7 +970,7 @@ export default function ExportModal({
                   textTransform: 'uppercase',
                   display: 'flex', alignItems: 'center', gap: 5,
                 }}>
-                  <span style={{ color: '#FFE500', fontSize: 8 }}>✦</span> {tag}
+                  <span style={{ color: '#C8FF00', fontSize: 8 }}>✦</span> {tag}
                 </span>
               ))}
             </div>

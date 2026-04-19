@@ -28,7 +28,7 @@ import type { BookData, BookPage, PreviewMode, TrimSize, Genre, CoverConfig, Rec
 
 const GENRE_COLOR_MAP: Record<string, string> = {
   religious: '#0A1628', romance: '#4A0E28', thriller: '#090909',
-  business: '#F8F7F4', memoir: '#F7F2EA', selfhelp: '#FFE500',
+  business: '#F8F7F4', memoir: '#F7F2EA', selfhelp: '#C8FF00',
   poetry: '#F0EEF8', scifi: '#0D1B3E', fiction: '#1A1828', academic: '#F2F2F0',
 };
 
@@ -520,7 +520,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
   return (
     <div
       style={{
-        background: '#F5F2EC',
+        background: '#FFFFFF',
         height: '100vh',
         overflow: 'hidden',
         display: 'flex',
@@ -531,7 +531,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
       <div
         style={{
           height: 52,
-          background: '#F0EDE7',
+          background: '#FAFAFA',
           borderBottom: '1px solid rgba(0,0,0,0.1)',
           flexShrink: 0,
           display: 'flex',
@@ -562,7 +562,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: '#FFE500',
+              background: '#C8FF00',
               border: '1.5px solid rgba(0,0,0,0.4)',
               fontSize: 11,
               fontWeight: 900,
@@ -591,9 +591,9 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
               fontWeight: 600,
               background: 'transparent',
               border: 'none',
-              borderBottom: '1.5px solid #FFE500',
+              borderBottom: '1.5px solid #C8FF00',
               outline: 'none',
-              color: '#1a1a1a',
+              color: '#0A0A0A',
               minWidth: 140,
               maxWidth: 260,
             }}
@@ -605,7 +605,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
             style={{
               fontSize: 13,
               fontWeight: 600,
-              color: '#1a1a1a',
+              color: '#0A0A0A',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
@@ -681,8 +681,8 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
             style={{
               display: 'flex', alignItems: 'center', gap: 4,
               border: '1px solid rgba(0,0,0,0.18)',
-              background: showAiMenu ? 'linear-gradient(135deg,#7C3AED,#EC4899)' : 'transparent',
-              color: showAiMenu ? '#fff' : '#333',
+              background: showAiMenu ? '#C8FF00' : 'transparent',
+              color: showAiMenu ? '#0A0A0A' : '#333',
               fontSize: 11,
               padding: '5px 10px',
               borderRadius: 3,
@@ -711,8 +711,8 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
                     top: 'calc(100% + 6px)',
                     right: 0,
                     zIndex: 50,
-                    background: 'rgba(20,18,32,0.94)',
-                    color: '#F0EEFE',
+                    background: 'rgba(10,10,10,0.97)',
+                    color: '#FFFFFF',
                     border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: 12,
                     boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
@@ -740,7 +740,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
                         padding: '8px 10px',
                         background: 'transparent',
                         border: 'none',
-                        color: 'var(--text-primary, #F0EEFE)',
+                        color: '#FFFFFF',
                         borderRadius: 8,
                         cursor: !bookData || aiBusy ? 'wait' : 'pointer',
                         textAlign: 'left',
@@ -763,13 +763,13 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
                       padding: '8px 10px',
                       background: 'transparent',
                       border: 'none',
-                      color: '#A78BFA',
+                      color: '#C8FF00',
                       borderRadius: 8,
                       cursor: 'pointer',
                       textAlign: 'left',
                       fontSize: 12,
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(124,58,237,0.15)'; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(200,255,0,0.1)'; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                   >
                     <Zap size={12} />
@@ -837,7 +837,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              background: '#FFE500',
+              background: '#C8FF00',
               border: '2px solid #000',
               boxShadow: '3px 3px 0 #000',
               padding: '6px 18px',
@@ -881,7 +881,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
             <div
               style={{
                 background: '#1a1a1a',
-                borderBottom: '2px solid #FFE500',
+                borderBottom: '2px solid #C8FF00',
                 padding: '9px 16px',
                 display: 'flex',
                 alignItems: 'center',
@@ -893,7 +893,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
               <div
                 style={{
                   display: 'flex', alignItems: 'center', gap: 7,
-                  background: '#FFE500', padding: '3px 10px',
+                  background: '#C8FF00', padding: '3px 10px',
                   fontWeight: 900, fontSize: 11, color: '#000',
                   letterSpacing: '0.06em', flexShrink: 0,
                 }}
@@ -928,7 +928,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
                 <button
                   onClick={() => { if (bookData) setShowExportModal(true); }}
                   style={{
-                    background: '#FFE500', border: '1px solid #FFE500',
+                    background: '#C8FF00', border: '1px solid #C8FF00',
                     color: '#000', fontSize: 11, fontWeight: 700,
                     padding: '4px 12px', cursor: 'pointer', borderRadius: 3,
                     display: 'flex', alignItems: 'center', gap: 5,
@@ -1000,7 +1000,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
               top: 52,
               bottom: 0,
               width: 380,
-              background: '#E8E5DE',
+              background: '#F2F2F2',
               borderLeft: '1px solid rgba(0,0,0,0.12)',
               zIndex: 30,
               display: 'flex',
@@ -1016,7 +1016,7 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
                 alignItems: 'center',
                 padding: '0 14px',
                 borderBottom: '1px solid rgba(0,0,0,0.08)',
-                background: '#E0DDD7',
+                background: '#EBEBEB',
                 gap: 6,
                 flexShrink: 0,
               }}
@@ -1173,8 +1173,8 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="fixed z-[62] bottom-5 right-5 max-w-md"
             style={{
-              background: 'rgba(15,13,27,0.92)',
-              color: '#F0EEFE',
+              background: 'rgba(10,10,10,0.96)',
+              color: '#FFFFFF',
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: '14px',
               boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
@@ -1187,11 +1187,11 @@ export default function EditorApp({ initialText = '', initialFilename = '', init
               <div
                 style={{
                   width: 28, height: 28, borderRadius: 8,
-                  background: 'linear-gradient(135deg,#7C3AED,#EC4899)',
+                  background: '#C8FF00',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 }}
               >
-                <Zap size={13} color="#fff" />
+                <Zap size={13} color="#0A0A0A" />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4 }}>
@@ -1225,9 +1225,9 @@ function BannerChip({ label, accent }: { label: string; accent?: boolean }) {
       style={{
         fontSize: 10,
         fontWeight: accent ? 700 : 500,
-        color: accent ? '#FFE500' : 'rgba(255,255,255,0.65)',
-        background: accent ? 'rgba(255,229,0,0.12)' : 'rgba(255,255,255,0.06)',
-        border: `1px solid ${accent ? 'rgba(255,229,0,0.3)' : 'rgba(255,255,255,0.1)'}`,
+        color: accent ? '#C8FF00' : 'rgba(255,255,255,0.65)',
+        background: accent ? 'rgba(200,255,0,0.12)' : 'rgba(255,255,255,0.06)',
+        border: `1px solid ${accent ? 'rgba(200,255,0,0.3)' : 'rgba(255,255,255,0.1)'}`,
         padding: '2px 7px',
         letterSpacing: accent ? '0.05em' : 0,
         textTransform: accent ? 'uppercase' : 'none',
@@ -1266,7 +1266,7 @@ function ProcessingState() {
             position: 'absolute',
             inset: 0,
             borderRadius: 2,
-            background: '#F5F0E8',
+            background: '#F5F5F5',
             boxShadow: '3px 3px 0 rgba(0,0,0,0.15)',
           }}
         />

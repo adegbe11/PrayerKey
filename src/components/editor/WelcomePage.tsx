@@ -6,20 +6,20 @@ import type { RecentBook, NewBookMeta, Genre } from '@/types';
 
 // ─── constants ───────────────────────────────────────────────────
 const GENRE_OPTIONS: { value: Genre; label: string; sub: string; bg: string; fg: string }[] = [
-  { value: 'fiction',   label: 'Fiction',          sub: 'Novel · Short Stories',  bg: '#1A1828', fg: '#fff' },
+  { value: 'fiction',   label: 'Fiction',          sub: 'Novel · Short Stories',  bg: '#0A0A0A', fg: '#fff' },
   { value: 'romance',   label: 'Romance',           sub: 'Contemporary · Historical', bg: '#4A1228', fg: '#fff' },
   { value: 'thriller',  label: 'Thriller / Mystery',sub: 'Crime · Suspense · Horror', bg: '#0A0A0A', fg: '#fff' },
   { value: 'fantasy',   label: 'Fantasy / Sci-Fi',  sub: 'Epic · Urban · Space Opera', bg: '#1A2840', fg: '#fff' },
-  { value: 'memoir',    label: 'Memoir',            sub: 'Personal · Biography',    bg: '#F5EFE6', fg: '#1a1a1a' },
-  { value: 'business',  label: 'Business',          sub: 'Leadership · Strategy',   bg: '#EEF2F8', fg: '#1a1a1a' },
-  { value: 'selfhelp',  label: 'Self-Help',         sub: 'Motivation · Wellness',   bg: '#FFF8E0', fg: '#1a1a1a' },
-  { value: 'academic',  label: 'Nonfiction',        sub: 'History · Science · Essay', bg: '#F0F0F0', fg: '#1a1a1a' },
+  { value: 'memoir',    label: 'Memoir',            sub: 'Personal · Biography',    bg: '#F5EFE6', fg: '#0A0A0A' },
+  { value: 'business',  label: 'Business',          sub: 'Leadership · Strategy',   bg: '#EEF2F8', fg: '#0A0A0A' },
+  { value: 'selfhelp',  label: 'Self-Help',         sub: 'Motivation · Wellness',   bg: '#FFF8E0', fg: '#0A0A0A' },
+  { value: 'academic',  label: 'Nonfiction',        sub: 'History · Science · Essay', bg: '#F0F0F0', fg: '#0A0A0A' },
 ];
 
 const GENRE_COVER_COLOR: Record<string, string> = {
-  fiction: '#1A1828', romance: '#4A0E28', thriller: '#090909',
+  fiction: '#0A0A0A', romance: '#4A0E28', thriller: '#090909',
   fantasy: '#0D1B3E', memoir: '#F7F2EA', business: '#F8F7F4',
-  selfhelp: '#FFE500', academic: '#F2F2F0',
+  selfhelp: '#C8FF00', academic: '#F2F2F0',
 };
 
 function formatRelativeTime(ts: number): string {
@@ -45,20 +45,20 @@ function loadRecentBooks(): RecentBook[] {
 function BooksaneIcon({ size = 72 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
-      <path d="M24 26 C18 22, 10 20, 4 22 C8 18, 16 16, 24 20 Z" fill="#1a1a1a" />
-      <path d="M24 26 C17 19, 8 15, 2 16 C6 12, 15 12, 24 18 Z" fill="#1a1a1a" opacity="0.6" />
-      <path d="M24 26 C19 16, 12 10, 5 10 C9 7, 17 9, 24 16 Z" fill="#1a1a1a" opacity="0.35" />
-      <path d="M24 26 C30 22, 38 20, 44 22 C40 18, 32 16, 24 20 Z" fill="#1a1a1a" />
-      <path d="M24 26 C31 19, 40 15, 46 16 C42 12, 33 12, 24 18 Z" fill="#1a1a1a" opacity="0.6" />
-      <path d="M24 26 C29 16, 36 10, 43 10 C39 7, 31 9, 24 16 Z" fill="#1a1a1a" opacity="0.35" />
-      <rect x="21" y="22" width="6" height="16" rx="1" fill="#1a1a1a" />
-      <ellipse cx="24" cy="19" rx="4.5" ry="4" fill="#1a1a1a" />
-      <circle cx="25.5" cy="18.5" r="1.2" fill="#FFE500" />
-      <path d="M24 21.5 L26 23 L22 23 Z" fill="#1a1a1a" />
-      <path d="M21 37 L18 43 M24 38 L24 44 M27 37 L30 43" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="21" y1="27" x2="27" y2="27" stroke="#FFE500" strokeWidth="0.8" />
-      <line x1="21" y1="30" x2="27" y2="30" stroke="#FFE500" strokeWidth="0.8" />
-      <line x1="21" y1="33" x2="27" y2="33" stroke="#FFE500" strokeWidth="0.8" />
+      <path d="M24 26 C18 22, 10 20, 4 22 C8 18, 16 16, 24 20 Z" fill="#0A0A0A" />
+      <path d="M24 26 C17 19, 8 15, 2 16 C6 12, 15 12, 24 18 Z" fill="#0A0A0A" opacity="0.6" />
+      <path d="M24 26 C19 16, 12 10, 5 10 C9 7, 17 9, 24 16 Z" fill="#0A0A0A" opacity="0.35" />
+      <path d="M24 26 C30 22, 38 20, 44 22 C40 18, 32 16, 24 20 Z" fill="#0A0A0A" />
+      <path d="M24 26 C31 19, 40 15, 46 16 C42 12, 33 12, 24 18 Z" fill="#0A0A0A" opacity="0.6" />
+      <path d="M24 26 C29 16, 36 10, 43 10 C39 7, 31 9, 24 16 Z" fill="#0A0A0A" opacity="0.35" />
+      <rect x="21" y="22" width="6" height="16" rx="1" fill="#0A0A0A" />
+      <ellipse cx="24" cy="19" rx="4.5" ry="4" fill="#0A0A0A" />
+      <circle cx="25.5" cy="18.5" r="1.2" fill="#C8FF00" />
+      <path d="M24 21.5 L26 23 L22 23 Z" fill="#0A0A0A" />
+      <path d="M21 37 L18 43 M24 38 L24 44 M27 37 L30 43" stroke="#0A0A0A" strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="21" y1="27" x2="27" y2="27" stroke="#C8FF00" strokeWidth="0.8" />
+      <line x1="21" y1="30" x2="27" y2="30" stroke="#C8FF00" strokeWidth="0.8" />
+      <line x1="21" y1="33" x2="27" y2="33" stroke="#C8FF00" strokeWidth="0.8" />
     </svg>
   );
 }
@@ -159,7 +159,7 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
   if (screen === 'new-book') {
     return (
       <div style={{
-        width: '100%', height: '100vh', background: '#EDEBE5',
+        width: '100%', height: '100vh', background: '#FFFFFF',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         <div style={{
@@ -168,10 +168,10 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
           boxShadow: '0 8px 40px rgba(0,0,0,0.14)', borderRadius: 8, overflow: 'hidden',
         }}>
           {/* Header */}
-          <div style={{ background: '#1a1a1a', padding: '20px 32px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ background: '#0A0A0A', padding: '20px 32px', display: 'flex', alignItems: 'center', gap: 12 }}>
             <BooksaneIcon size={28} />
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#FFE500', letterSpacing: '0.1em', textTransform: 'uppercase' }}>New Book</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#C8FF00', letterSpacing: '0.1em', textTransform: 'uppercase' }}>New Book</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 1 }}>
                 Step {nbStep} of 2 — {nbStep === 1 ? 'Book Details' : 'Choose Genre'}
               </div>
@@ -196,9 +196,9 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
                     style={{
                       width: '100%', fontSize: 22, fontWeight: 700,
                       fontFamily: "'Playfair Display', Georgia, serif",
-                      border: 'none', borderBottom: '2px solid #1a1a1a',
+                      border: 'none', borderBottom: '2px solid #0A0A0A',
                       outline: 'none', background: 'transparent',
-                      padding: '6px 0', color: '#1a1a1a', boxSizing: 'border-box',
+                      padding: '6px 0', color: '#0A0A0A', boxSizing: 'border-box',
                     }}
                   />
                 </div>
@@ -217,7 +217,7 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
                       width: '100%', fontSize: 16,
                       border: 'none', borderBottom: '1.5px solid rgba(0,0,0,0.2)',
                       outline: 'none', background: 'transparent',
-                      padding: '6px 0', color: '#1a1a1a', boxSizing: 'border-box',
+                      padding: '6px 0', color: '#0A0A0A', boxSizing: 'border-box',
                     }}
                   />
                 </div>
@@ -248,8 +248,8 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
                     onClick={() => setNbStep(2)}
                     disabled={!nbTitle.trim() || !nbAuthor.trim()}
                     style={{
-                      background: (!nbTitle.trim() || !nbAuthor.trim()) ? '#ddd' : '#1a1a1a',
-                      color: (!nbTitle.trim() || !nbAuthor.trim()) ? '#aaa' : '#FFE500',
+                      background: (!nbTitle.trim() || !nbAuthor.trim()) ? '#ddd' : '#0A0A0A',
+                      color: (!nbTitle.trim() || !nbAuthor.trim()) ? '#aaa' : '#C8FF00',
                       border: 'none', cursor: (!nbTitle.trim() || !nbAuthor.trim()) ? 'not-allowed' : 'pointer',
                       fontSize: 13, fontWeight: 700, padding: '10px 24px', borderRadius: 4,
                       display: 'flex', alignItems: 'center', gap: 8,
@@ -263,7 +263,7 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
             ) : (
               <>
                 <div style={{ fontSize: 13, color: '#888', marginBottom: 20 }}>
-                  What genre is <strong style={{ color: '#1a1a1a' }}>{nbTitle}</strong>? This sets the best default template and formatting.
+                  What genre is <strong style={{ color: '#0A0A0A' }}>{nbTitle}</strong>? This sets the best default template and formatting.
                 </div>
 
                 {/* Genre grid */}
@@ -274,9 +274,9 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
                       onClick={() => setNbGenre(g.value)}
                       style={{
                         background: g.bg,
-                        border: nbGenre === g.value ? '2.5px solid #FFE500' : '2px solid transparent',
+                        border: nbGenre === g.value ? '2.5px solid #C8FF00' : '2px solid rgba(0,0,0,0.08)',
                         borderRadius: 6, padding: '14px 16px', cursor: 'pointer', textAlign: 'left',
-                        boxShadow: nbGenre === g.value ? '0 0 0 2px #1a1a1a' : 'none',
+                        boxShadow: nbGenre === g.value ? '0 0 0 2px #0A0A0A' : 'none',
                         transition: 'box-shadow 0.15s, border-color 0.15s',
                       }}
                     >
@@ -293,12 +293,12 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
                   <button
                     onClick={handleStartWriting}
                     style={{
-                      background: '#FFE500', color: '#1a1a1a',
-                      border: '2px solid #1a1a1a', cursor: 'pointer',
+                      background: '#C8FF00', color: '#0A0A0A',
+                      border: '2px solid #0A0A0A', cursor: 'pointer',
                       fontSize: 13, fontWeight: 800, padding: '11px 28px', borderRadius: 4,
                       display: 'flex', alignItems: 'center', gap: 8,
                       letterSpacing: '0.05em', textTransform: 'uppercase',
-                      boxShadow: '3px 3px 0 #1a1a1a',
+                      boxShadow: '3px 3px 0 #0A0A0A',
                     }}
                   >
                     Start Writing <ArrowRight size={14} />
@@ -314,7 +314,7 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
 
   // ── Splash screen ──────────────────────────────────────────────
   return (
-    <div style={{ width: '100%', height: '100vh', background: '#EDEBE5', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100vh', background: '#F5F5F5', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <input ref={fileInputRef} type="file" accept=".txt,.docx" style={{ display: 'none' }} onChange={handleFileChange} />
 
       <div style={{
@@ -329,13 +329,13 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
       }}>
         {/* Left panel */}
         <div style={{
-          background: '#EDEBE5', display: 'flex', flexDirection: 'column',
+          background: '#FFFFFF', display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           padding: '48px 40px', flexShrink: 0, width: hasRecent ? 340 : '100%',
         }}>
           <BooksaneIcon size={90} />
           <div style={{ textAlign: 'center', marginTop: 16, marginBottom: 28 }}>
-            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '0.12em', color: '#1a1a1a' }}>BOOKSANE</div>
+            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '0.12em', color: '#0A0A0A' }}>BOOKSANE</div>
             <div style={{ fontSize: 12, color: '#888', marginTop: 6 }}>The world&apos;s fastest book formatter</div>
           </div>
 
@@ -346,15 +346,15 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
             onClick={handleImportClick}
             style={{
               width: '100%', maxWidth: 280,
-              background: '#1a1a1a', color: '#FFE500',
-              border: '2px solid #1a1a1a',
+              background: '#0A0A0A', color: '#C8FF00',
+              border: '2px solid #0A0A0A',
               borderRadius: 6, padding: '13px 20px',
               cursor: 'pointer', textAlign: 'left',
               marginBottom: 10,
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Upload size={16} strokeWidth={2} color="#FFE500" />
+              <Upload size={16} strokeWidth={2} color="#C8FF00" />
               <div>
                 <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.02em' }}>Fix My Book</div>
                 <div style={{ fontSize: 10, color: 'rgba(255,229,0,0.6)', marginTop: 2 }}>Import .txt or .docx · auto-arrange + best template</div>
@@ -406,7 +406,7 @@ export default function WelcomePage({ onNewBook, onImportText, onOpenRecent }: W
                 />
               ))}
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', borderTop: '1px solid rgba(0,0,0,0.08)', background: '#f7f6f3', flexShrink: 0 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', borderTop: '1px solid rgba(0,0,0,0.08)', background: '#F5F5F5', flexShrink: 0 }}>
               <SplashBtn label="Open Other…" onClick={handleImportClick} />
               <SplashBtn primary label="Open Selected" onClick={handleOpenSelected} disabled={!selectedId} />
             </div>
@@ -426,7 +426,7 @@ function SplashBtn({ label, onClick, primary, disabled }: { label: string; onCli
       onClick={onClick} disabled={disabled}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        background: primary ? (hov ? '#d4cf00' : '#FFE500') : (hov ? '#d4d0c9' : '#e0ddd7'),
+        background: primary ? (hov ? '#a8d400' : '#C8FF00') : (hov ? '#d4d0c9' : '#e0ddd7'),
         border: primary ? '1.5px solid rgba(0,0,0,0.3)' : '1px solid rgba(0,0,0,0.18)',
         color: disabled ? '#aaa' : '#222', fontSize: 12, fontWeight: primary ? 700 : 500,
         padding: '7px 16px', cursor: disabled ? 'not-allowed' : 'pointer', borderRadius: 4,
@@ -448,18 +448,18 @@ function TextLink({ icon, label, onClick }: { icon: React.ReactNode; label: stri
 
 function RecentRow({ book, isSelected, onClick, onDoubleClick }: { book: RecentBook; isSelected: boolean; onClick: () => void; onDoubleClick: () => void }) {
   const [hov, setHov] = useState(false);
-  const color = book.coverColor || GENRE_COVER_COLOR[book.genre] || '#1A1828';
+  const color = book.coverColor || GENRE_COVER_COLOR[book.genre] || '#0A0A0A';
   return (
     <div onClick={onClick} onDoubleClick={onDoubleClick}
       onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex', alignItems: 'center', gap: 12, padding: '9px 16px', cursor: 'pointer',
-        background: isSelected ? 'rgba(99,102,241,0.1)' : hov ? 'rgba(0,0,0,0.03)' : 'transparent',
-        borderLeft: isSelected ? '3px solid #6366f1' : '3px solid transparent', userSelect: 'none',
+        background: isSelected ? 'rgba(200,255,0,0.1)' : hov ? 'rgba(0,0,0,0.03)' : 'transparent',
+        borderLeft: isSelected ? '3px solid #C8FF00' : '3px solid transparent', userSelect: 'none',
       }}>
       <CoverThumb color={color} title={book.title} genre={book.genre} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{book.title}</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#0A0A0A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{book.title}</div>
         <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>{book.genre} · {book.wordCount.toLocaleString()} words</div>
         <div style={{ fontSize: 10, color: '#bbb', marginTop: 1 }}>{formatRelativeTime(book.lastModified)}</div>
       </div>

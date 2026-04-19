@@ -230,7 +230,7 @@ export default function Navigator({
   return (
     <>
       <div style={{
-        width: 220, flexShrink: 0, background: '#EDEBE5',
+        width: 220, flexShrink: 0, background: '#FFFFFF',
         borderRight: '1px solid rgba(0,0,0,0.1)',
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
       }}>
@@ -239,12 +239,12 @@ export default function Navigator({
           {(['contents', 'styles'] as NavMode[]).map((mode) => (
             <button key={mode} onClick={() => onNavModeChange(mode)} style={{
               flex: 1, height: 36,
-              background: navMode === mode ? '#EDEBE5' : '#E5E2DC',
+              background: navMode === mode ? '#FFFFFF' : '#F5F5F5',
               border: 'none',
-              borderBottom: navMode === mode ? '2.5px solid #1a1a1a' : '2.5px solid transparent',
+              borderBottom: navMode === mode ? '2.5px solid #C8FF00' : '2.5px solid transparent',
               cursor: 'pointer', fontSize: 11,
               fontWeight: navMode === mode ? 700 : 500,
-              color: navMode === mode ? '#1a1a1a' : '#777',
+              color: navMode === mode ? '#0A0A0A' : '#777',
               letterSpacing: '0.04em', textTransform: 'uppercase',
             }}>
               {mode === 'contents' ? 'Contents' : 'Styles'}
@@ -255,7 +255,7 @@ export default function Navigator({
         {navMode === 'contents' && (
           <>
             <div style={{ padding: '14px 16px 12px', borderBottom: '1px solid rgba(0,0,0,0.07)', flexShrink: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#1a1a1a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#0A0A0A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {bookData?.title || 'Untitled Book'}
               </div>
               {bookData?.author && (
@@ -328,9 +328,9 @@ export default function Navigator({
                     onMouseLeave={() => setHoveredId(null)}
                     style={{
                       display: 'flex', alignItems: 'center',
-                      background: isSelected ? '#1a1a1a' : isDragOver ? 'rgba(0,0,0,0.08)' : isHovered ? 'rgba(0,0,0,0.05)' : 'transparent',
-                      borderLeft: isSelected ? '3px solid #FFE500' : '3px solid transparent',
-                      borderTop: isDragOver ? '2px solid #FFE500' : '2px solid transparent',
+                      background: isSelected ? '#0A0A0A' : isDragOver ? 'rgba(0,0,0,0.08)' : isHovered ? 'rgba(0,0,0,0.05)' : 'transparent',
+                      borderLeft: isSelected ? '3px solid #C8FF00' : '3px solid transparent',
+                      borderTop: isDragOver ? '2px solid #C8FF00' : '2px solid transparent',
                       cursor: 'pointer',
                     }}
                   >
@@ -384,10 +384,10 @@ export default function Navigator({
                 onClick={handleOpenMenu}
                 style={{
                   width: '100%', padding: '7px 0',
-                  background: showMenu ? '#1a1a1a' : 'transparent',
-                  border: showMenu ? '1.5px solid #1a1a1a' : '1.5px dashed rgba(0,0,0,0.25)',
+                  background: showMenu ? '#0A0A0A' : 'transparent',
+                  border: showMenu ? '1.5px solid #0A0A0A' : '1.5px dashed rgba(0,0,0,0.25)',
                   borderRadius: 4, fontSize: 12, fontWeight: 600,
-                  color: showMenu ? '#FFE500' : '#666',
+                  color: showMenu ? '#C8FF00' : '#666',
                   cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                 }}
@@ -407,8 +407,8 @@ export default function Navigator({
                 <button key={cat} onClick={() => onStyleCategoryChange(cat)} style={{
                   width: '100%', display: 'block', textAlign: 'left', padding: '8px 16px',
                   fontSize: 13, border: 'none',
-                  borderLeft: isSelected ? '3px solid #FFE500' : '3px solid transparent',
-                  background: isSelected ? '#1a1a1a' : 'transparent',
+                  borderLeft: isSelected ? '3px solid #C8FF00' : '3px solid transparent',
+                  background: isSelected ? '#0A0A0A' : 'transparent',
                   color: isSelected ? '#fff' : '#333', cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.05)'; }}
@@ -434,9 +434,9 @@ export default function Navigator({
             left: menuPos.left,
             width: Math.max(menuPos.width, 220),
             background: '#fff',
-            border: '2px solid #1a1a1a',
+            border: '2px solid #0A0A0A',
             borderRadius: 6,
-            boxShadow: '4px 4px 0 #1a1a1a',
+            boxShadow: '4px 4px 0 #0A0A0A',
             zIndex: 9999,
             maxHeight: 400,
             overflowY: 'auto',
@@ -462,7 +462,7 @@ export default function Navigator({
                         setMenuPos(null);
                       }}
                       style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 14px', fontSize: 12, fontWeight: 500, color: '#222', background: 'transparent', border: 'none', borderBottom: '1px solid rgba(0,0,0,0.05)', cursor: 'pointer' }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#EDEBE5'; }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#F5F5F5'; }}
                       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                     >
                       {el.label}
