@@ -428,7 +428,54 @@ body {
   gap: 6px;
 }
 
-/* Section alternation colors */
+/* ─────────────────────────────────────────
+   TIPTAP EDITOR
+───────────────────────────────────────── */
+.tiptap-content {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  line-height: 1.85;
+  color: #1a1a1a;
+  outline: none;
+  min-height: 420px;
+  word-break: break-word;
+  caret-color: #000;
+}
+
+.tiptap-content p {
+  margin: 0 0 0.15em;
+}
+
+.tiptap-content strong { font-weight: 700; }
+.tiptap-content em    { font-style: italic; }
+.tiptap-content u     { text-decoration: underline; }
+
+/* Scene break paragraph */
+.tiptap-content p.section-break {
+  text-align: center;
+  color: #aaa;
+  letter-spacing: 0.35em;
+  margin: 1.2em 0;
+  user-select: none;
+}
+
+/* Placeholder */
+.tiptap-empty::before {
+  content: attr(data-placeholder);
+  color: #bbb;
+  font-style: italic;
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+/* Selection highlight */
+.tiptap-content ::selection {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* ─────────────────────────────────────────
+   Section alternation colors */
 .section-cream {
   background: #FFF8E1;
   color: #0A0910;

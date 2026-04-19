@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
 import { templates } from '@/lib/templates';
+import TiptapEditor from './TiptapEditor';
 import type { BookData, CoverConfig, Genre } from '@/types';
 import type { NavItem, StyleCategory } from './Navigator';
 import CoverPanel from './CoverPanel';
@@ -42,68 +42,6 @@ interface ChapterEditorProps {
   coverConfig?: CoverConfig;
   onCoverChange?: (config: CoverConfig) => void;
   detectedGenre?: Genre;
-}
-
-// ─────────────────────────────────────────
-//  HELPER: strip HTML tags
-// ─────────────────────────────────────────
-
-function stripHtml(html: string): string {
-  return html
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/p>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
-
-// ─────────────────────────────────────────
-//  TOOLBAR BUTTON
-// ─────────────────────────────────────────
-
-function ToolbarButton({
-  label,
-  title,
-  onClick,
-}: {
-  label: string;
-  title: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      style={{
-        width: 28,
-        height: 28,
-        border: '1px solid rgba(0,0,0,0.12)',
-        borderRadius: 3,
-        background: 'transparent',
-        cursor: 'pointer',
-        fontSize: 12,
-        fontWeight: 700,
-        color: '#333',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-        transition: 'background 0.1s',
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.06)';
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.background = 'transparent';
-      }}
-    >
-      {label}
-    </button>
-  );
 }
 
 // ─────────────────────────────────────────
@@ -491,7 +429,7 @@ function SimpleTextView({ text, placeholder, onUpdate }: { text: string; placeho
 }
 
 // ─────────────────────────────────────────
-//  CHAPTER CONTENT EDITOR
+//  CHAPTER CONTENT EDITOR  (Tiptap-powered)
 // ─────────────────────────────────────────
 
 function ChapterContentEditor({
@@ -503,146 +441,28 @@ function ChapterContentEditor({
   selectedItem: NavItem;
   onUpdateChapterContent: (chapterIdx: number, newContent: string) => void;
 }) {
-  const contentRef = useRef<HTMLDivElement>(null);
   const chapterIdx = selectedItem.chapterIdx;
-  const chapter = chapterIdx !== undefined ? bookData?.chapters[chapterIdx] : undefined;
-
-  // Update editor content when chapter changes
-  useEffect(() => {
-    if (!contentRef.current || !chapter) return;
-    const plain = stripHtml(chapter.content);
-    if (contentRef.current.innerText !== plain) {
-      contentRef.current.innerText = plain;
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chapter?.id]);
-
-  const handleBlur = useCallback(() => {
-    if (!contentRef.current || chapterIdx === undefined) return;
-    const rawText = contentRef.current.innerText || '';
-    // Wrap paragraphs in <p> tags
-    const html = rawText
-      .split(/\n\n+/)
-      .map((para) => `<p>${para.replace(/\n/g, '<br/>')}</p>`)
-      .join('');
-    onUpdateChapterContent(chapterIdx, html);
-  }, [chapterIdx, onUpdateChapterContent]);
-
-  const execCmd = (cmd: string, value?: string) => {
-    document.execCommand(cmd, false, value);
-    contentRef.current?.focus();
-  };
+  const chapter    = chapterIdx !== undefined ? bookData?.chapters[chapterIdx] : undefined;
 
   if (!chapter) {
     return (
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#aaa',
-          fontSize: 13,
-        }}
-      >
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#aaa', fontSize: 13 }}>
         Chapter not found.
       </div>
     );
   }
 
   return (
-    <>
-      {/* Chapter header + toolbar */}
-      <div
-        style={{
-          borderBottom: '1px solid rgba(0,0,0,0.07)',
-          padding: '16px 40px 0',
-          flexShrink: 0,
-        }}
-      >
-        <div
-          style={{
-            fontSize: 22,
-            fontFamily: 'Georgia, serif',
-            fontWeight: 700,
-            color: '#1a1a1a',
-            marginBottom: 12,
-          }}
-        >
-          {chapter.title || `Chapter ${chapter.number}`}
-        </div>
-
-        {/* Formatting toolbar */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            paddingBottom: 10,
-          }}
-        >
-          <ToolbarButton label="B" title="Bold" onClick={() => execCmd('bold')} />
-          <ToolbarButton label="I" title="Italic" onClick={() => execCmd('italic')} />
-          <ToolbarButton label="U" title="Underline" onClick={() => execCmd('underline')} />
-
-          {/* Divider */}
-          <div style={{ width: 1, height: 18, background: 'rgba(0,0,0,0.1)', margin: '0 4px' }} />
-
-          <button
-            onClick={() => execCmd('insertHTML', '<hr style="border:none;text-align:center;margin:1.5em auto;width:40%;border-top:1px solid #999;" />')}
-            style={{
-              height: 28,
-              padding: '0 10px',
-              border: '1px solid rgba(0,0,0,0.12)',
-              borderRadius: 3,
-              background: 'transparent',
-              cursor: 'pointer',
-              fontSize: 11,
-              fontWeight: 600,
-              color: '#555',
-              flexShrink: 0,
-              transition: 'background 0.1s',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = 'rgba(0,0,0,0.06)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = 'transparent';
-            }}
-          >
-            Scene Break
-          </button>
-
-          <div style={{ flex: 1 }} />
-        </div>
-      </div>
-
-      {/* Editable content area */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '28px 40px',
-        }}
-      >
-        <div
-          ref={contentRef}
-          contentEditable
-          suppressContentEditableWarning
-          onBlur={handleBlur}
-          style={{
-            fontFamily: 'Georgia, serif',
-            fontSize: 15,
-            lineHeight: 1.85,
-            color: '#1a1a1a',
-            outline: 'none',
-            whiteSpace: 'pre-wrap',
-            minHeight: 400,
-            wordBreak: 'break-word',
-          }}
-        />
-      </div>
-    </>
+    <TiptapEditor
+      key={chapter.id}          // remount only when chapter id changes
+      content={chapter.content}
+      chapterId={chapter.id}
+      chapterTitle={chapter.title}
+      chapterNumber={chapter.number}
+      onChange={(html) => {
+        if (chapterIdx !== undefined) onUpdateChapterContent(chapterIdx, html);
+      }}
+    />
   );
 }
 
