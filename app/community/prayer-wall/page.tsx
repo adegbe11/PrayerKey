@@ -74,11 +74,13 @@ export default async function PrayerWallPage() {
                       display:        "flex",
                       alignItems:     "center",
                       justifyContent: "center",
-                      fontSize:       "16px",
+                      fontSize:       "14px",
+                      fontWeight:     700,
+                      color:          "#0071E3",
                       flexShrink:     0,
                     }}
                   >
-                    🙏
+                    ✝
                   </div>
                   <div style={{ flex: 1 }}>
                     <p style={{ fontSize: "15px", fontWeight: 700, color: "var(--pk-t1)", margin: "0 0 3px" }}>{r.title}</p>
@@ -110,7 +112,7 @@ export default async function PrayerWallPage() {
 
             {active.length === 0 && (
               <div style={{ background: "#FFFFFF", borderRadius: "14px", padding: "36px", textAlign: "center", boxShadow: "var(--pk-shadow-sm)" }}>
-                <p style={{ fontSize: "24px", marginBottom: "10px" }}>🙏</p>
+                <p style={{ fontSize: "22px", marginBottom: "10px", color: "#0071E3" }}>✝</p>
                 <p style={{ fontSize: "15px", fontWeight: 600, color: "var(--pk-t1)", marginBottom: "6px" }}>The wall is clear</p>
                 <p style={{ fontSize: "13px", color: "var(--pk-t3)" }}>Be the first to share a prayer need.</p>
               </div>
@@ -138,7 +140,7 @@ export default async function PrayerWallPage() {
                       opacity:      0.75,
                     }}
                   >
-                    <span style={{ fontSize: "16px" }}>✅</span>
+                    <span style={{ fontSize: "14px", fontWeight: 700, color: "#34C759" }}>✓</span>
                     <div>
                       <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-t1)", margin: "0 0 2px" }}>{r.title}</p>
                       <p style={{ fontSize: "11px", color: "#34C759", fontWeight: 600, margin: 0 }}>Answered · {r.prayCount} prayed</p>

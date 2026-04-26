@@ -73,7 +73,7 @@ export default async function SermonsPage() {
 
       {sermons.length === 0 && (
         <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "48px", textAlign: "center", boxShadow: "var(--pk-shadow-sm)" }}>
-          <p style={{ fontSize: "32px", marginBottom: "12px" }}>📖</p>
+          <p style={{ fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--pk-t3)", marginBottom: "12px" }}>Sermons</p>
           <p style={{ fontSize: "16px", fontWeight: 600, color: "var(--pk-t1)", marginBottom: "6px" }}>No sermons yet</p>
           <p style={{ fontSize: "14px", color: "var(--pk-t3)", marginBottom: "20px" }}>
             Start a live service to automatically capture and archive sermons.
@@ -114,10 +114,13 @@ export default async function SermonsPage() {
                     alignItems:     "center",
                     justifyContent: "center",
                     flexShrink:     0,
-                    fontSize:       "18px",
+                    fontSize:       "14px",
+                    fontWeight:     800,
+                    color:          "#0071E3",
+                    letterSpacing:  "-0.02em",
                   }}
                 >
-                  📖
+                  ✦
                 </div>
 
                 {/* Details */}

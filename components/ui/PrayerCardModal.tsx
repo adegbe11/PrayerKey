@@ -130,8 +130,8 @@ export default function PrayerCardModal({ prayer, onClose }: Props) {
           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
             {[
               { label: busy === "png" ? "Saving…" : "⬇ Download PNG", action: downloadPNG, color: "#B07C1F" },
-              { label: busy === "pdf" ? "Opening…" : "🖨 Download PDF", action: printPDF,    color: "#5856D6" },
-              { label: "📋 Copy Text", action: copyText, color: "#34C759" },
+              { label: busy === "pdf" ? "Opening…" : "Download PDF", action: printPDF,    color: "#5856D6" },
+              { label: "Copy Text", action: copyText, color: "#34C759" },
               { label: "✕ Close",     action: onClose,   color: "rgba(255,255,255,0.3)" },
             ].map(btn => (
               <button
@@ -194,8 +194,8 @@ export default function PrayerCardModal({ prayer, onClose }: Props) {
             {/* Content */}
             <div style={{ position: "relative", zIndex: 1, textAlign: "center" }}>
 
-              {/* Praying hands */}
-              <div style={{ fontSize: "52px", lineHeight: 1, marginBottom: "6px" }}>🙏</div>
+              {/* Cross ornament */}
+              <div style={{ fontSize: "40px", lineHeight: 1, marginBottom: "6px", color: "#B07C1F" }}>✝</div>
 
               {/* Subtitle tag */}
               <p style={{

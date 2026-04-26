@@ -218,7 +218,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
           padding: "16px 20px", marginBottom: "32px",
         }}>
           <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 6px" }}>
-            📌 Quick Summary
+            Quick Summary
           </p>
           <p style={{ fontSize: "15px", color: "var(--pk-text)", margin: 0, lineHeight: 1.7 }}>
             {display} is a verse from the book of {book.name} in the {book.testament === "old" ? "Old" : "New"} Testament.

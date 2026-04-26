@@ -51,7 +51,6 @@ export default function AmenButton({ testimonyId, initialCount }: Props) {
         opacity:      loading ? 0.6 : 1,
       }}
     >
-      <span style={{ fontSize: "15px" }}>🙌</span>
       <span>{pressed ? "Amen!" : "Amen"}</span>
       {count > 0 && (
         <span

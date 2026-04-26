@@ -193,7 +193,7 @@ export default function PrayerSlugPage({ params }: { params: { slug: string } })
             fontSize: "11px", fontWeight: 700, color: "var(--pk-accent)",
             letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 6px",
           }}>
-            📌 Quick Answer
+            Quick Answer
           </p>
           <p style={{ fontSize: "15px", color: "var(--pk-text)", margin: "0 0 12px", lineHeight: 1.7 }}>
             {topic.metaDesc}
@@ -267,11 +267,11 @@ export default function PrayerSlugPage({ params }: { params: { slug: string } })
           marginBottom: "28px",
           boxShadow:    "var(--pk-shadow)",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "22px" }}>
-            <span style={{ fontSize: "22px" }}>🙏</span>
+          <div style={{ marginBottom: "22px" }}>
             <h2 style={{
               fontSize: "13px", fontWeight: 700, color: "var(--pk-accent)",
               margin: 0, letterSpacing: "0.08em", textTransform: "uppercase",
+              borderBottom: "1.5px solid var(--pk-accent-border)", paddingBottom: "10px",
             }}>
               {topic.title}
             </h2>
@@ -313,7 +313,7 @@ export default function PrayerSlugPage({ params }: { params: { slug: string } })
         {/* ── 5. Prayer Points ── */}
         <div style={{ marginBottom: "40px" }}>
           <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 6px" }}>
-            🎯 Specific Prayer Points for {topic.title}
+            Specific Prayer Points for {topic.title}
           </h2>
           <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: "0 0 18px", lineHeight: 1.6 }}>
             Use these focused declarations alongside the prayer above. Each point is rooted in scripture and designed to help you pray with precision.
@@ -351,7 +351,7 @@ export default function PrayerSlugPage({ params }: { params: { slug: string } })
           marginBottom: "40px",
         }}>
           <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 6px" }}>
-            📖 How to Pray for {topic.title}: A 5-Step Guide
+            How to Pray for {topic.title}: A 5-Step Guide
           </h2>
           <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: "0 0 20px", lineHeight: 1.6 }}>
             Based on our review of thousands of prayer journeys, these five steps consistently lead to the deepest connection with God in this area.
@@ -561,7 +561,7 @@ export default function PrayerSlugPage({ params }: { params: { slug: string } })
                     transition:     "border-color 150ms ease, background 150ms ease",
                   }}
                 >
-                  🙏 {r.title}
+                  {r.title} →
                 </Link>
               ))}
             </div>
@@ -580,7 +580,7 @@ export default function PrayerSlugPage({ params }: { params: { slug: string } })
             fontSize: "11px", fontWeight: 700, color: "var(--pk-text-3)",
             letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 14px",
           }}>
-            📝 How This Prayer Was Written
+            How This Prayer Was Written
           </p>
           <div style={{ display: "flex", gap: "16px", alignItems: "flex-start", flexWrap: "wrap" }}>
             <div style={{

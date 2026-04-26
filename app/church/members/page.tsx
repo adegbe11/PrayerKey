@@ -151,9 +151,8 @@ export default async function MembersPage() {
 
             {/* Prayer streak */}
             <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-              <span style={{ fontSize: "14px" }}>🔥</span>
               <p style={{ fontSize: "14px", fontWeight: 600, color: m.prayerStreak > 0 ? "#FF9F0A" : "var(--pk-t3)", margin: 0 }}>
-                {m.prayerStreak}
+                {m.prayerStreak > 0 ? `${m.prayerStreak}d` : "—"}
               </p>
             </div>
           </div>

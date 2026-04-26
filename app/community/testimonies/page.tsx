@@ -125,7 +125,7 @@ export default async function TestimoniesPage() {
                   {/* Amen count */}
                   {t.amenCount > 0 && (
                     <span style={{ fontSize: "12px", color: "var(--pk-gold)", fontWeight: 700 }}>
-                      🙌 {t.amenCount}
+                      {t.amenCount} Amen
                     </span>
                   )}
                 </div>

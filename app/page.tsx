@@ -239,7 +239,7 @@ export default function HomePage() {
                 (e.currentTarget as HTMLDivElement).style.boxShadow = "4px 4px 0 0 var(--pk-border)";
               }}
             >
-              🎙 Start Live Sermon
+              ◉ Start Live Sermon
             </div>
           </Link>
         </div>
@@ -610,7 +610,7 @@ function BibleFeatureSection() {
 
           {/* Search bar */}
           <div style={{ display: "flex", gap: "8px", padding: "10px 16px", background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)", borderRadius: "100px", alignItems: "center" }}>
-            <span style={{ fontSize: "14px" }}>🔍</span>
+            <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--pk-gold)" }}>◆</span>
             <span style={{ fontSize: "14px", color: "var(--pk-text-2)", flex: 1 }}>do not be afraid</span>
             <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--pk-gold)", background: "var(--pk-gold-dim)", padding: "4px 12px", borderRadius: "100px" }}>Search</span>
           </div>
@@ -739,10 +739,10 @@ function PrayerFeatureSection() {
           {/* Copy button */}
           <div style={{ display: "flex", gap: "8px" }}>
             <div style={{ padding: "8px 18px", borderRadius: "100px", background: "var(--pk-card)", border: "1px solid var(--pk-border)", fontSize: "12px", color: "var(--pk-text-2)", cursor: "pointer" }}>
-              📋 Copy Prayer
+              Copy Prayer
             </div>
             <div style={{ padding: "8px 18px", borderRadius: "100px", background: "var(--pk-card)", border: "1px solid var(--pk-border)", fontSize: "12px", color: "var(--pk-text-2)", cursor: "pointer" }}>
-              🔄 Regenerate
+              Regenerate
             </div>
           </div>
         </div>
@@ -878,7 +878,7 @@ function SermonFeatureSection() {
           {/* Transcript */}
           <div style={{ padding: "10px 14px", background: "var(--pk-card)", borderRadius: "10px" }}>
             <p style={{ fontSize: "12px", color: "var(--pk-text-3)", margin: 0, fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              🎤 &ldquo;...for God so loved the world that he gave his only begotten son...&rdquo;
+              &ldquo;...for God so loved the world that he gave his only begotten son...&rdquo;
             </p>
           </div>
 
@@ -915,7 +915,7 @@ function SermonFeatureSection() {
 
           {/* Projector button */}
           <div style={{ padding: "10px 16px", background: "var(--pk-card)", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontSize: "12px", color: "var(--pk-text-3)" }}>📺 Projector screen open on Display 2</span>
+            <span style={{ fontSize: "12px", color: "var(--pk-text-3)" }}>Projector — Display 2</span>
             <span style={{ fontSize: "11px", color: "#34C759", fontWeight: 600 }}>● Connected</span>
           </div>
 

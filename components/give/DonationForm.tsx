@@ -111,7 +111,7 @@ export default function DonationForm({ funds }: Props) {
           {fmtAmount} to <strong style={{ color: "var(--pk-t1)" }}>{receipt.fundName}</strong>
         </p>
         <p style={{ fontSize: "13px", color: "var(--pk-t3)", marginBottom: "28px" }}>
-          Your generosity makes a difference. 🙏
+          Your generosity makes a difference.
         </p>
         <button
           onClick={() => { setStatus("idle"); setReceipt(null); }}

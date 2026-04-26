@@ -314,7 +314,7 @@ export default function CollinsAseinPage() {
                 }}
               >
                 <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--pk-text-2)" }}>
-                  📝 {article.title}
+                  {article.title}
                 </span>
                 <span style={{ fontSize: "12px", color: "var(--pk-text-3)", flexShrink: 0 }}>
                   {article.date}

@@ -94,8 +94,7 @@ export default async function EventsPage() {
               flexShrink:   0,
             }}
           >
-            <span style={{ fontSize: "12px" }}>👥</span>
-            <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--pk-t2)", margin: 0 }}>{event.attendees}</p>
+            <p style={{ fontSize: "12px", fontWeight: 600, color: "var(--pk-t2)", margin: 0 }}>{event.attendees} attending</p>
           </div>
         )}
       </div>

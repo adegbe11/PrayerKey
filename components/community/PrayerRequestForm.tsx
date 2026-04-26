@@ -49,7 +49,7 @@ export default function PrayerRequestForm() {
   if (done) {
     return (
       <div style={{ background: "#FFFFFF", borderRadius: "16px", padding: "28px", textAlign: "center", boxShadow: "var(--pk-shadow-sm)" }}>
-        <p style={{ fontSize: "28px", marginBottom: "10px" }}>🙏</p>
+        <p style={{ fontSize: "18px", fontWeight: 700, color: "#0071E3", marginBottom: "10px", letterSpacing: "0.06em" }}>✝</p>
         <p style={{ fontSize: "15px", fontWeight: 700, color: "var(--pk-t1)", marginBottom: "5px" }}>Request submitted!</p>
         <p style={{ fontSize: "13px", color: "var(--pk-t3)", marginBottom: "18px" }}>Your church family will be praying for you.</p>
         <button

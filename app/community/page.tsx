@@ -105,7 +105,7 @@ export default async function CommunityPage() {
             marginBottom: "24px",
           }}
         >
-          <span style={{ fontSize: "16px" }}>⚠️</span>
+          <span style={{ fontSize: "14px", fontWeight: 800, color: "#FF9F0A" }}>!</span>
           <p style={{ fontSize: "14px", color: "#FF9F0A", fontWeight: 600, margin: 0 }}>
             {pendingTestimonies} testimon{pendingTestimonies === 1 ? "y" : "ies"} awaiting approval
           </p>
@@ -245,7 +245,7 @@ export default async function CommunityPage() {
               >
                 {a.pinned && (
                   <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.04em", margin: "0 0 5px" }}>
-                    📌 PINNED
+                    PINNED
                   </p>
                 )}
                 <p style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-t1)", margin: "0 0 5px" }}>{a.title}</p>

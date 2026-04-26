@@ -196,8 +196,8 @@ export default function BiblePage() {
       {/* Empty state */}
       {results.length === 0 && !loading && query && (
         <div style={{ textAlign: "center", padding: "48px 20px", color: "var(--pk-text-3)" }}>
-          <div style={{ fontSize: "32px", marginBottom: "12px" }}>🔍</div>
-          <p style={{ fontSize: "15px", margin: 0 }}>No results. Try different keywords or a direct reference like &ldquo;Romans 8:28&rdquo;.</p>
+          <p style={{ fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 8px", color: "var(--pk-text-3)" }}>No Results</p>
+          <p style={{ fontSize: "15px", margin: 0 }}>Try different keywords or a direct reference like &ldquo;Romans 8:28&rdquo;.</p>
         </div>
       )}
 

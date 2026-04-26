@@ -51,7 +51,6 @@ export default function PrayButton({ requestId, initialCount }: Props) {
         opacity:      loading ? 0.6 : 1,
       }}
     >
-      <span style={{ fontSize: "15px" }}>🙏</span>
       <span>{pressed ? "Praying!" : "Pray"}</span>
       {count > 0 && (
         <span
