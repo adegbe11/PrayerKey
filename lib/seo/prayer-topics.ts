@@ -3,6 +3,11 @@ import { BATCH2_PRAYER_TOPICS } from "./prayer-topics-batch2";
 import { BATCH3_PRAYER_TOPICS } from "./prayer-topics-batch3";
 import { BATCH4_PRAYER_TOPICS } from "./prayer-topics-batch4";
 import { BATCH5_PRAYER_TOPICS } from "./prayer-topics-batch5";
+import { BATCH6_PRAYER_TOPICS } from "./prayer-topics-batch6";
+import { BATCH7_PRAYER_TOPICS } from "./prayer-topics-batch7";
+import { BATCH8_PRAYER_TOPICS } from "./prayer-topics-batch8";
+import { BATCH9_PRAYER_TOPICS } from "./prayer-topics-batch9";
+import { BATCH10_PRAYER_TOPICS } from "./prayer-topics-batch10";
 
 export interface PrayerTopic {
   slug:         string;
@@ -280,6 +285,21 @@ export const PRAYER_TOPICS: PrayerTopic[] = [
 
   // ── Batch 5 — Scripture prayers, struggles, life stages, work ────
   ...BATCH5_PRAYER_TOPICS,
+
+  // ── Batch 6 — Prayer of the day/week/month/year, monthly, daily ──
+  ...BATCH6_PRAYER_TOPICS,
+
+  // ── Batch 7 — Milestone birthdays, Psalm prayers, Armor of God ───
+  ...BATCH7_PRAYER_TOPICS,
+
+  // ── Batch 8 — Financial, body part healing, weather, special ─────
+  ...BATCH8_PRAYER_TOPICS,
+
+  // ── Batch 9 — More countries, professions, school/exam specific ──
+  ...BATCH9_PRAYER_TOPICS,
+
+  // ── Batch 10 — Relationships, sins, modern struggles, life stages ─
+  ...BATCH10_PRAYER_TOPICS,
 ];
 
 // ── Fast lookup map ─────────────────────────────────────────────────
