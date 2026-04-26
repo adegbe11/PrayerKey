@@ -22,8 +22,8 @@ export async function GET(req: NextRequest) {
 
   try {
     const completion = await groq.chat.completions.create({
-      model:           "llama-3.3-70b-versatile",
-      max_tokens:      600,
+      model:           "llama-3.1-8b-instant",
+      max_tokens:      300,
       response_format: { type: "json_object" },
       messages: [
         {
