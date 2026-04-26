@@ -4,8 +4,8 @@
   "description": "Free AI prayer generator, live sermon verse detection, and Bible search.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#060608",
-  "theme_color": "#C49A2A",
+  "background_color": "#0F1428",
+  "theme_color": "#7A5010",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -36,7 +36,7 @@
       "purpose": "maskable"
     },
     {
-      "src": "/og-image.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

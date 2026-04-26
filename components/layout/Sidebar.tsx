@@ -59,17 +59,13 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="flex items-center gap-2 px-4 py-5">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <rect x="8.5" y="1" width="3" height="18" rx="1.5" fill="var(--pk-gold)" />
-          <rect x="1" y="7.5" width="18" height="3" rx="1.5" fill="var(--pk-gold)" />
-        </svg>
+        <img src="/prayerkey-logo.png" alt="PrayerKey" width={28} height={28} style={{ borderRadius: "6px", objectFit: "cover", display: "block" }} />
         <span
           style={{
             fontSize: "15px",
-            fontWeight: 600,
-            letterSpacing: "-0.003em",
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
             color: "var(--pk-t1)",
-            fontFamily: '"SF Pro Display", -apple-system, sans-serif',
           }}
         >
           Prayer<span style={{ color: "var(--pk-gold)" }}>Key</span>
