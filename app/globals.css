@@ -6,60 +6,60 @@
    THEME TOKENS — Light (Crimson + Apple White) / Dark
 ═══════════════════════════════════════════════════ */
 
-/* ── Light mode (DEFAULT) ── */
+/* ── Light mode (DEFAULT) — Parchment + Crimson ── */
 :root {
-  /* Backgrounds */
-  --pk-bg:          #FFFFFF;
-  --pk-surface:     #F8F6F3;          /* warm parchment */
-  --pk-surface-2:   #EDE9E3;
-  --pk-card:        rgba(0,0,0,0.025);
-  --pk-card-hover:  rgba(0,0,0,0.045);
+  /* ── Backgrounds: warm parchment / papyrus ── */
+  --pk-bg:          #EDE8D0;          /* main beige parchment */
+  --pk-surface:     #E4DDB8;          /* slightly deeper parchment for footer/panels */
+  --pk-surface-2:   #D8D0A0;          /* deep parchment for dividers */
+  --pk-card:        rgba(255,255,255,0.60); /* frosted white card floats on parchment */
+  --pk-card-hover:  rgba(255,255,255,0.82);
 
-  /* Borders */
-  --pk-border:      rgba(0,0,0,0.09);
-  --pk-border-2:    rgba(0,0,0,0.15);
+  /* ── Borders: warm ink-on-parchment ── */
+  --pk-border:      rgba(100,70,20,0.16);
+  --pk-border-2:    rgba(100,70,20,0.28);
 
-  /* Text */
-  --pk-text:        #1A1A1A;
-  --pk-text-2:      #555555;
-  --pk-text-3:      #999999;
+  /* ── Text: warm brown hierarchy ── */
+  --pk-text:        #1A1108;          /* near-black warm brown */
+  --pk-text-2:      #5A4530;          /* mid warm brown */
+  --pk-text-3:      #9A886A;          /* muted warm brown */
 
-  /* Crimson accent (primary in light mode) */
+  /* ── Crimson accent (primary) ── */
   --pk-accent:         #B22222;
   --pk-accent-dark:    #8B1A1A;
-  --pk-accent-dim:     rgba(178,34,34,0.07);
-  --pk-accent-border:  rgba(178,34,34,0.2);
+  --pk-accent-dim:     rgba(178,34,34,0.09);
+  --pk-accent-border:  rgba(178,34,34,0.24);
 
-  /* Purple CTA */
+  /* ── Purple CTA ── */
   --pk-purple:         #7B3FA0;
   --pk-purple-dim:     rgba(123,63,160,0.09);
   --pk-purple-border:  rgba(123,63,160,0.22);
 
-  /* Gold (secondary) */
-  --pk-gold:           #8B6514;
-  --pk-gold-dim:       rgba(139,101,20,0.07);
-  --pk-gold-border:    rgba(139,101,20,0.2);
+  /* ── Gold — scripture / Bible feature ── */
+  --pk-gold:           #7A5010;       /* deeper gold on parchment */
+  --pk-gold-dim:       rgba(122,80,16,0.10);
+  --pk-gold-border:    rgba(122,80,16,0.22);
 
-  /* Nav / UI */
-  --pk-nav-bg:         rgba(255,255,255,0.92);
-  --pk-nav-border:     rgba(0,0,0,0.08);
-  --pk-nav-text:       #1A1A1A;
-  --pk-nav-text-muted: rgba(0,0,0,0.42);
-  --pk-nav-active-bg:  rgba(178,34,34,0.07);
+  /* ── Nav ── */
+  --pk-nav-bg:         rgba(237,232,208,0.94);
+  --pk-nav-border:     rgba(100,70,20,0.14);
+  --pk-nav-text:       #1A1108;
+  --pk-nav-text-muted: rgba(26,17,8,0.45);
+  --pk-nav-active-bg:  rgba(178,34,34,0.09);
   --pk-nav-active-clr: #B22222;
 
-  /* Footer */
-  --pk-footer-border:  rgba(0,0,0,0.08);
-  --pk-footer-text:    rgba(0,0,0,0.28);
+  /* ── Footer ── */
+  --pk-footer-border:  rgba(100,70,20,0.14);
+  --pk-footer-text:    rgba(26,17,8,0.38);
   --pk-wordmark-fill:  #B22222;
 
-  /* Shadows */
-  --pk-shadow:         0 2px 24px rgba(0,0,0,0.07);
-  --pk-shadow-sm:      0 1px 8px rgba(0,0,0,0.05);
+  /* ── Shadows ── */
+  --pk-shadow:         0 2px 24px rgba(0,0,0,0.10);
+  --pk-shadow-sm:      0 1px 8px rgba(0,0,0,0.07);
 
-  /* Misc */
-  --pk-red:            #FF3B30;
-  --pk-scrollbar:      rgba(178,34,34,0.25);
+  /* ── Misc ── */
+  --pk-red:            #CC2200;
+  --pk-scrollbar:      rgba(178,34,34,0.30);
 }
 
 /* ── Dark mode ── */
@@ -242,9 +242,10 @@ body::before {
 }
 
 :root body::before {
+  /* Subtle warm radial glow on parchment — crimson from top-left, mauve from bottom-right */
   background:
-    radial-gradient(ellipse 60% 40% at 15% 0%,   rgba(178,34,34,0.04)  0%, transparent 70%),
-    radial-gradient(ellipse 40% 30% at 85% 100%,  rgba(123,63,160,0.03) 0%, transparent 70%);
+    radial-gradient(ellipse 55% 35% at 10% 0%,   rgba(178,34,34,0.07)  0%, transparent 70%),
+    radial-gradient(ellipse 40% 28% at 90% 100%,  rgba(122,80,16,0.06)  0%, transparent 70%);
 }
 [data-theme="dark"] body::before {
   background:
@@ -384,6 +385,40 @@ body::after {
 .text-lead  { font-size: clamp(16px, 1.6vw, 20px); line-height: 1.65; }
 .text-body  { font-size: clamp(14px, 1.2vw, 16px); line-height: 1.7; }
 .text-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ── Scripture typography — BibleGateway-inspired ── */
+.scripture-text {
+  font-family:   Georgia, "Times New Roman", "Palatino Linotype", serif;
+  font-size:     clamp(16px, 1.8vw, 22px);
+  font-style:    italic;
+  line-height:   1.85;
+  letter-spacing: 0.01em;
+  color:         var(--pk-text);
+}
+.scripture-ref {
+  font-family:   Georgia, serif;
+  font-size:     14px;
+  font-style:    normal;
+  font-weight:   700;
+  color:         var(--pk-accent);
+  letter-spacing: 0.02em;
+}
+.scripture-block {
+  border-left:  3px solid var(--pk-accent);
+  padding-left: clamp(16px, 3vw, 28px);
+  margin:       0;
+}
+/* Verse-number superscripts — BibleGateway style */
+.verse-num {
+  font-size:     0.6em;
+  font-style:    normal;
+  font-weight:   700;
+  color:         var(--pk-accent);
+  vertical-align: super;
+  margin-right:  4px;
+  letter-spacing: 0;
+  font-family:   -apple-system, sans-serif;
+}
 
 /* ═══════════════════════════════════════════════════
    NEO-BRUTALIST

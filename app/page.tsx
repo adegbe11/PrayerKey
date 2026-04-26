@@ -4,6 +4,48 @@ import { useEffect, useState } from "react";
 
 const ROTATING_WORDS = ["prayers", "sermons", "miracles", "blessings", "churches", "revivals"];
 
+/* ── Verse of the Day pool — cycles daily ─────────────────────────────── */
+const DAILY_VERSES = [
+  { ref: "John 3:16",          text: "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.", book: "John",        chapter: 3  },
+  { ref: "Psalm 23:1",         text: "The Lord is my shepherd, I lack nothing.",                                                                                            book: "Psalms",      chapter: 23 },
+  { ref: "Philippians 4:13",   text: "I can do all this through him who gives me strength.",                                                                                book: "Philippians", chapter: 4  },
+  { ref: "Romans 8:28",        text: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose.",          book: "Romans",      chapter: 8  },
+  { ref: "Isaiah 40:31",       text: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.", book: "Isaiah", chapter: 40 },
+  { ref: "Jeremiah 29:11",     text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", book: "Jeremiah", chapter: 29 },
+  { ref: "Proverbs 3:5–6",     text: "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.", book: "Proverbs", chapter: 3 },
+  { ref: "Matthew 6:33",       text: "But seek first his kingdom and his righteousness, and all these things will be given to you as well.",                                  book: "Matthew",     chapter: 6  },
+  { ref: "Psalm 46:1",         text: "God is our refuge and strength, an ever-present help in trouble.",                                                                     book: "Psalms",      chapter: 46 },
+  { ref: "Romans 12:2",        text: "Do not conform to the pattern of this world, but be transformed by the renewing of your mind. Then you will be able to test and approve what God's will is — his good, pleasing and perfect will.", book: "Romans", chapter: 12 },
+  { ref: "2 Timothy 1:7",      text: "For God has not given us a spirit of fear, but of power and of love and of a sound mind.",                                              book: "2 Timothy",   chapter: 1  },
+  { ref: "Hebrews 11:1",       text: "Now faith is confidence in what we hope for and assurance about what we do not see.",                                                   book: "Hebrews",     chapter: 11 },
+  { ref: "Galatians 5:22–23",  text: "But the fruit of the Spirit is love, joy, peace, forbearance, kindness, goodness, faithfulness, gentleness and self-control.",         book: "Galatians",   chapter: 5  },
+  { ref: "Ephesians 2:8–9",    text: "For it is by grace you have been saved, through faith — and this is not from yourselves, it is the gift of God — not by works, so that no one can boast.", book: "Ephesians", chapter: 2 },
+  { ref: "Matthew 11:28",      text: "Come to me, all you who are weary and burdened, and I will give you rest.",                                                             book: "Matthew",     chapter: 11 },
+  { ref: "Psalm 119:105",      text: "Your word is a lamp for my feet, a light on my path.",                                                                                  book: "Psalms",      chapter: 119},
+  { ref: "Joshua 1:9",         text: "Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", book: "Joshua", chapter: 1 },
+  { ref: "Psalm 37:4",         text: "Take delight in the Lord, and he will give you the desires of your heart.",                                                             book: "Psalms",      chapter: 37 },
+  { ref: "Isaiah 41:10",       text: "So do not fear, for I am with you; do not be dismayed, for I am your God. I will strengthen you and help you; I will uphold you with my righteous right hand.", book: "Isaiah", chapter: 41 },
+  { ref: "1 Corinthians 13:4", text: "Love is patient, love is kind. It does not envy, it does not boast, it is not proud.",                                                  book: "1 Corinthians", chapter: 13 },
+  { ref: "Psalm 91:1",         text: "Whoever dwells in the shelter of the Most High will rest in the shadow of the Almighty.",                                               book: "Psalms",      chapter: 91 },
+  { ref: "Romans 5:8",         text: "But God demonstrates his own love for us in this: While we were still sinners, Christ died for us.",                                    book: "Romans",      chapter: 5  },
+  { ref: "Lamentations 3:22–23", text: "Because of the Lord's great love we are not consumed, for his compassions never fail. They are new every morning; great is your faithfulness.", book: "Lamentations", chapter: 3 },
+  { ref: "Psalm 27:1",         text: "The Lord is my light and my salvation — whom shall I fear? The Lord is the stronghold of my life — of whom shall I be afraid?",         book: "Psalms",      chapter: 27 },
+  { ref: "John 14:6",          text: "Jesus answered, 'I am the way and the truth and the life. No one comes to the Father except through me.'",                              book: "John",        chapter: 14 },
+  { ref: "Nehemiah 8:10",      text: "Do not grieve, for the joy of the Lord is your strength.",                                                                              book: "Nehemiah",    chapter: 8  },
+  { ref: "Micah 6:8",          text: "He has shown you, O mortal, what is good. And what does the Lord require of you? To act justly and to love mercy and to walk humbly with your God.", book: "Micah", chapter: 6 },
+  { ref: "John 1:1",           text: "In the beginning was the Word, and the Word was with God, and the Word was God.",                                                       book: "John",        chapter: 1  },
+  { ref: "Revelation 21:4",    text: "He will wipe every tear from their eyes. There will be no more death or mourning or crying or pain, for the old order of things has passed away.", book: "Revelation", chapter: 21 },
+  { ref: "Mark 12:30",         text: "Love the Lord your God with all your heart and with all your soul and with all your mind and with all your strength.",                   book: "Mark",        chapter: 12 },
+  { ref: "Psalm 34:18",        text: "The Lord is close to the brokenhearted and saves those who are crushed in spirit.",                                                     book: "Psalms",      chapter: 34 },
+];
+
+function getDailyVerse() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now.getTime() - start.getTime()) / 86_400_000);
+  return DAILY_VERSES[dayOfYear % DAILY_VERSES.length];
+}
+
 const FEATURES = [
   {
     href:   "/pray",
@@ -40,6 +82,8 @@ const FEATURES = [
 export default function HomePage() {
   const [wordIndex, setWordIndex] = useState(0);
   const [visible,   setVisible]   = useState(true);
+
+  const todayVerse = getDailyVerse();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -231,6 +275,172 @@ export default function HomePage() {
           ))}
         </div>
 
+      </section>
+
+      {/* ══════════════════════════════════════════
+          VERSE OF THE DAY — BibleGateway-inspired
+      ══════════════════════════════════════════ */}
+      <section style={{ marginBottom: "72px" }}>
+
+        {/* Section header — ruled divider with label */}
+        <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "24px" }}>
+          <div style={{ height: "1px", flex: 1, background: "var(--pk-border)" }} />
+          <span style={{
+            fontSize:      "10px",
+            fontWeight:    700,
+            color:         "var(--pk-accent)",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+          }}>
+            ✞ Verse of the Day
+          </span>
+          <div style={{ height: "1px", flex: 1, background: "var(--pk-border)" }} />
+        </div>
+
+        {/* Verse card */}
+        <div style={{
+          background:   "var(--pk-card)",
+          border:       "1px solid var(--pk-border)",
+          borderRadius: "20px",
+          padding:      "clamp(24px,4vw,48px) clamp(24px,4vw,52px)",
+          position:     "relative",
+          overflow:     "hidden",
+          backdropFilter: "blur(12px)",
+        }}>
+
+          {/* Decorative cross watermark */}
+          <div aria-hidden style={{
+            position:   "absolute",
+            top:        "50%",
+            right:      "clamp(24px,4vw,52px)",
+            transform:  "translateY(-50%)",
+            fontSize:   "clamp(80px,10vw,140px)",
+            color:      "var(--pk-accent)",
+            opacity:    0.04,
+            fontWeight: 700,
+            lineHeight: 1,
+            userSelect: "none",
+            pointerEvents: "none",
+            fontFamily: "Georgia, serif",
+          }}>
+            ✝
+          </div>
+
+          {/* Translation badge */}
+          <div style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{
+              fontSize:      "9px",
+              fontWeight:    800,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color:         "var(--pk-accent)",
+              border:        "1.5px solid var(--pk-accent-border)",
+              background:    "var(--pk-accent-dim)",
+              padding:       "3px 10px",
+              borderRadius:  "3px",
+            }}>
+              NIV
+            </span>
+            <span style={{ fontSize: "11px", color: "var(--pk-text-3)", letterSpacing: "0.04em" }}>
+              New International Version
+            </span>
+          </div>
+
+          {/* Scripture blockquote — Georgia serif, left crimson border */}
+          <blockquote className="scripture-block" style={{
+            marginBottom: "18px",
+          }}>
+            <p className="scripture-text">
+              &ldquo;{todayVerse.text}&rdquo;
+            </p>
+          </blockquote>
+
+          {/* Reference */}
+          <p className="scripture-ref scripture-block" style={{ marginBottom: "28px" }}>
+            — {todayVerse.ref}
+          </p>
+
+          {/* Action row — BibleGateway-style */}
+          <div style={{
+            display:    "flex",
+            gap:        "20px",
+            alignItems: "center",
+            flexWrap:   "wrap",
+            paddingTop: "20px",
+            borderTop:  "1px solid var(--pk-border)",
+          }}>
+            <Link
+              href={`/bible?q=${encodeURIComponent(todayVerse.ref)}`}
+              style={{
+                display:       "inline-flex",
+                alignItems:    "center",
+                gap:           "5px",
+                fontSize:      "13px",
+                fontWeight:    700,
+                color:         "var(--pk-accent)",
+                textDecoration:"none",
+                letterSpacing: "0.01em",
+                padding:       "8px 16px",
+                border:        "1.5px solid var(--pk-accent-border)",
+                borderRadius:  "6px",
+                background:    "var(--pk-accent-dim)",
+                boxShadow:     "2px 2px 0 0 var(--pk-accent-border)",
+                transition:    "transform 140ms ease, box-shadow 140ms ease",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLAnchorElement).style.transform  = "translate(-1px,-1px)";
+                (e.currentTarget as HTMLAnchorElement).style.boxShadow = "3px 3px 0 0 var(--pk-accent-border)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLAnchorElement).style.transform  = "translate(0,0)";
+                (e.currentTarget as HTMLAnchorElement).style.boxShadow = "2px 2px 0 0 var(--pk-accent-border)";
+              }}
+            >
+              📖 Read {todayVerse.book} {todayVerse.chapter}
+            </Link>
+
+            <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
+
+            <Link
+              href={`/pray?topic=${encodeURIComponent("prayer based on " + todayVerse.ref)}`}
+              style={{
+                fontSize:      "13px",
+                fontWeight:    600,
+                color:         "var(--pk-text-2)",
+                textDecoration:"none",
+                letterSpacing: "0.01em",
+                display:       "inline-flex",
+                alignItems:    "center",
+                gap:           "5px",
+                transition:    "color 140ms ease",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-accent)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}
+            >
+              🙏 Pray this verse
+            </Link>
+
+            <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
+
+            <Link
+              href="/bible"
+              style={{
+                fontSize:      "13px",
+                fontWeight:    600,
+                color:         "var(--pk-text-2)",
+                textDecoration:"none",
+                display:       "inline-flex",
+                alignItems:    "center",
+                gap:           "5px",
+                transition:    "color 140ms ease",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-accent)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}
+            >
+              Search more verses →
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* ══════════════════════════════════════════
