@@ -15,13 +15,13 @@ export default function AboutPage() {
           display:      "inline-flex",
           alignItems:   "center",
           padding:      "4px 12px",
-          border:       "1.5px solid rgba(196,154,42,0.35)",
+          border:       "1.5px solid var(--pk-accent-border)",
           borderRadius: "4px",
           marginBottom: "24px",
-          background:   "rgba(196,154,42,0.06)",
-          boxShadow:    "3px 3px 0 0 rgba(196,154,42,0.15)",
+          background:   "var(--pk-accent-dim)",
+          boxShadow:    "3px 3px 0 0 var(--pk-accent-border)",
         }}>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "#C49A2A", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-accent)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
             About PrayerKey
           </span>
         </div>
@@ -29,7 +29,7 @@ export default function AboutPage() {
         <h1 style={{
           fontSize:      "clamp(32px, 5vw, 56px)",
           fontWeight:    800,
-          color:         "#fff",
+          color:         "var(--pk-text)",
           margin:        "0 0 20px",
           letterSpacing: "-0.03em",
           lineHeight:    1.08,
@@ -38,7 +38,7 @@ export default function AboutPage() {
         </h1>
         <p style={{
           fontSize:   "clamp(16px, 1.5vw, 19px)",
-          color:      "rgba(255,255,255,0.48)",
+          color:      "var(--pk-text-2)",
           lineHeight: 1.75,
           margin:     0,
           maxWidth:   "640px",
@@ -92,7 +92,7 @@ function Section({ title, tag, children, last = false }: { title: string; tag: s
       gridTemplateColumns: "auto 1fr",
       gap:           "clamp(20px, 4vw, 48px)",
       padding:       "clamp(32px, 5vw, 52px) 0",
-      borderBottom:  last ? "none" : "1px solid rgba(255,255,255,0.06)",
+      borderBottom:  last ? "none" : "1px solid var(--pk-border)",
     }}>
       {/* Tag column */}
       <div style={{ paddingTop: "4px" }}>
@@ -100,14 +100,14 @@ function Section({ title, tag, children, last = false }: { title: string; tag: s
           display:       "block",
           fontSize:      "10px",
           fontWeight:    700,
-          color:         "rgba(196,154,42,0.5)",
+          color:         "var(--pk-accent)",
           letterSpacing: "0.1em",
-          border:        "1px solid rgba(196,154,42,0.15)",
+          border:        "1px solid var(--pk-accent-border)",
           padding:       "4px 8px",
           borderRadius:  "3px",
           textAlign:     "center",
           whiteSpace:    "nowrap",
-          background:    "rgba(196,154,42,0.04)",
+          background:    "var(--pk-accent-dim)",
         }}>
           {tag}
         </span>
@@ -118,7 +118,7 @@ function Section({ title, tag, children, last = false }: { title: string; tag: s
         <h2 style={{
           fontSize:      "clamp(18px, 2.2vw, 24px)",
           fontWeight:    700,
-          color:         "#fff",
+          color:         "var(--pk-text)",
           margin:        "0 0 16px",
           letterSpacing: "-0.02em",
           lineHeight:    1.2,
@@ -127,7 +127,7 @@ function Section({ title, tag, children, last = false }: { title: string; tag: s
         </h2>
         <div style={{
           fontSize:    "clamp(14px, 1.3vw, 16px)",
-          color:       "rgba(255,255,255,0.52)",
+          color:       "var(--pk-text-2)",
           lineHeight:  1.85,
           whiteSpace:  "pre-wrap",
         }}>
