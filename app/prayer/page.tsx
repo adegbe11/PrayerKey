@@ -34,50 +34,50 @@ export const metadata: Metadata = {
 /*  DATA                                                       */
 /* ─────────────────────────────────────────────────────────── */
 
-/** Category metadata — icon, description */
-const CATEGORY_META: Record<string, { icon: string; desc: string }> = {
-  "Health":        { icon: "🩺", desc: "Healing, recovery, sickness & body"         },
-  "Mental Health": { icon: "🧠", desc: "Anxiety, depression, peace of mind"          },
-  "Daily Prayer":  { icon: "🌅", desc: "Morning, night, short & powerful prayers"    },
-  "Family":        { icon: "👨‍👩‍👧‍👦", desc: "Children, parents, home & unity"           },
-  "Finance":       { icon: "💰", desc: "Breakthrough, debt, provision & wealth"      },
-  "Protection":    { icon: "🛡️", desc: "Safety, travel, spiritual warfare & home"    },
-  "Faith":         { icon: "✝️", desc: "Salvation, trust, scripture & belief"        },
-  "Grief":         { icon: "🕊️", desc: "Loss, death, funeral & bereavement"         },
-  "Celebration":   { icon: "🎉", desc: "Birthday, graduation, new job & milestones"  },
-  "Education":     { icon: "📚", desc: "Exams, students, wisdom & learning"          },
-  "Salvation":     { icon: "🙏", desc: "Repentance, forgiveness & new life in Christ"},
-  "Purpose":       { icon: "🎯", desc: "Direction, calling, vision & destiny"        },
-  "Relationships": { icon: "❤️", desc: "Marriage, friendship, love & reconciliation" },
-  "Thanksgiving":  { icon: "🌻", desc: "Gratitude, praise & worship"                 },
-  "Ministry":      { icon: "⛪", desc: "Church, pastors, evangelism & mission"       },
-  "Nation":        { icon: "🌍", desc: "Government, leaders, peace & revival"        },
+/** Category metadata — description only, no emoji */
+const CATEGORY_META: Record<string, { desc: string }> = {
+  "Health":        { desc: "Healing, recovery, sickness & body"          },
+  "Mental Health": { desc: "Anxiety, depression, peace of mind"           },
+  "Daily Prayer":  { desc: "Morning, night, short & powerful prayers"     },
+  "Family":        { desc: "Children, parents, home & unity"              },
+  "Finance":       { desc: "Breakthrough, debt, provision & wealth"       },
+  "Protection":    { desc: "Safety, travel, spiritual warfare & home"     },
+  "Faith":         { desc: "Salvation, trust, scripture & belief"         },
+  "Grief":         { desc: "Loss, death, funeral & bereavement"           },
+  "Celebration":   { desc: "Birthday, graduation, new job & milestones"   },
+  "Education":     { desc: "Exams, students, wisdom & learning"           },
+  "Salvation":     { desc: "Repentance, forgiveness & new life in Christ" },
+  "Purpose":       { desc: "Direction, calling, vision & destiny"         },
+  "Relationships": { desc: "Marriage, friendship, love & reconciliation"  },
+  "Thanksgiving":  { desc: "Gratitude, praise & worship"                  },
+  "Ministry":      { desc: "Church, pastors, evangelism & mission"        },
+  "Nation":        { desc: "Government, leaders, peace & revival"         },
 };
 
 /** Time-of-day quick access */
 const BY_TIME = [
-  { label: "Morning Prayer",   slug: "morning",       icon: "🌅", desc: "Start your day with God" },
-  { label: "Night Prayer",     slug: "night",         icon: "🌙", desc: "Rest in His peace" },
-  { label: "Daily Prayer",     slug: "daily",         icon: "📅", desc: "Stay connected all day" },
-  { label: "Short Prayer",     slug: "short-prayer",  icon: "⚡", desc: "One-minute prayers" },
-  { label: "Powerful Prayer",  slug: "powerful-prayer",icon: "🔥", desc: "Bold, faith-filled prayer" },
-  { label: "Fasting Prayer",   slug: "fasting",       icon: "✋", desc: "Pray with fasting" },
+  { label: "Morning Prayer",  slug: "morning",        desc: "Start your day with God"   },
+  { label: "Night Prayer",    slug: "night",          desc: "Rest in His peace"          },
+  { label: "Daily Prayer",    slug: "daily",          desc: "Stay connected all day"     },
+  { label: "Short Prayer",    slug: "short-prayer",   desc: "One-minute prayers"         },
+  { label: "Powerful Prayer", slug: "powerful-prayer",desc: "Bold, faith-filled prayer"  },
+  { label: "Fasting Prayer",  slug: "fasting",        desc: "Pray with fasting"          },
 ];
 
-/** Emotion / mood quick access */
+/** Emotion / mood quick access — label only, no emoji */
 const BY_MOOD = [
-  { label: "Anxious",   slug: "anxiety",    emoji: "😰" },
-  { label: "Depressed", slug: "depression", emoji: "😔" },
-  { label: "Grieving",  slug: "grief",      emoji: "😢" },
-  { label: "Angry",     slug: "anger",      emoji: "😤" },
-  { label: "Lonely",    slug: "loneliness", emoji: "🥺" },
-  { label: "Afraid",    slug: "fear",       emoji: "😨" },
-  { label: "Hopeful",   slug: "hope",       emoji: "🌟" },
-  { label: "Grateful",  slug: "gratitude",  emoji: "🙌" },
-  { label: "Stressed",  slug: "stress",     emoji: "😩" },
-  { label: "Confused",  slug: "guidance",   emoji: "🤔" },
-  { label: "Joyful",    slug: "joy",        emoji: "😄" },
-  { label: "Sick",      slug: "healing",    emoji: "🤒" },
+  { label: "Anxious",   slug: "anxiety"    },
+  { label: "Depressed", slug: "depression" },
+  { label: "Grieving",  slug: "grief"      },
+  { label: "Angry",     slug: "anger"      },
+  { label: "Lonely",    slug: "loneliness" },
+  { label: "Afraid",    slug: "fear"       },
+  { label: "Hopeful",   slug: "hope"       },
+  { label: "Grateful",  slug: "gratitude"  },
+  { label: "Stressed",  slug: "stress"     },
+  { label: "Confused",  slug: "guidance"   },
+  { label: "Joyful",    slug: "joy"        },
+  { label: "Sick",      slug: "healing"    },
 ];
 
 /** Popular prayers — top searches */
@@ -251,12 +251,9 @@ export default function PrayerHubPage() {
                   background:   "var(--pk-card)",
                   transition:   "all 150ms",
                 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-                    <span style={{ fontSize: "24px" }}>{meta.icon}</span>
-                    <div>
-                      <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--pk-text)" }}>{cat}</div>
-                      <div style={{ fontSize: "11px", color: "var(--pk-text-3)" }}>{meta.desc}</div>
-                    </div>
+                  <div style={{ marginBottom: "12px" }}>
+                    <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--pk-text)", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "3px" }}>{cat}</div>
+                    {meta && <div style={{ fontSize: "11px", color: "var(--pk-text-3)" }}>{meta.desc}</div>}
                   </div>
 
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "14px" }}>
@@ -324,8 +321,8 @@ export default function PrayerHubPage() {
                   transition:   "all 150ms",
                 }}
               >
-                <div style={{ fontSize: "28px", marginBottom: "8px" }}>{t.icon}</div>
-                <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)", marginBottom: "4px" }}>{t.label}</div>
+                <div style={{ fontSize: "10px", fontWeight: 800, color: "var(--pk-accent)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>✦</div>
+                <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)", marginBottom: "4px", letterSpacing: "-0.01em" }}>{t.label}</div>
                 <div style={{ fontSize: "12px", color: "var(--pk-text-3)" }}>{t.desc}</div>
                 <div style={{ fontSize: "12px", color: "var(--pk-accent)", fontWeight: 600, marginTop: "10px" }}>
                   Pray now →
@@ -365,7 +362,6 @@ export default function PrayerHubPage() {
                   transition:    "all 150ms",
                 }}
               >
-                <span style={{ fontSize: "18px" }}>{m.emoji}</span>
                 {m.label}
               </Link>
             ))}
@@ -412,8 +408,8 @@ export default function PrayerHubPage() {
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)", marginBottom: "2px" }}>
-                    🙏 {p.title}
+                  <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)", marginBottom: "2px", letterSpacing: "-0.01em" }}>
+                    {p.title}
                   </div>
                   <div style={{ fontSize: "11px", color: "var(--pk-text-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                     {p.category}
@@ -441,12 +437,12 @@ export default function PrayerHubPage() {
               const prayers = grouped[cat] ?? [];
               return (
                 <div key={cat}>
-                  {/* Category header */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid var(--pk-border)" }}>
-                    <span style={{ fontSize: "20px" }}>{meta.icon}</span>
-                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "var(--pk-text)", margin: 0 }}>{cat}</h3>
-                    <span style={{ fontSize: "12px", color: "var(--pk-accent)", fontWeight: 600, marginLeft: "auto" }}>
-                      {prayers.length} prayers
+                  {/* Category header — pure typography */}
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid var(--pk-border)" }}>
+                    <h3 style={{ fontSize: "13px", fontWeight: 800, color: "var(--pk-text)", margin: 0, letterSpacing: "0.08em", textTransform: "uppercase" }}>{cat}</h3>
+                    {meta && <span style={{ fontSize: "12px", color: "var(--pk-text-3)", fontWeight: 500 }}>{meta.desc}</span>}
+                    <span style={{ fontSize: "11px", color: "var(--pk-accent)", fontWeight: 700, marginLeft: "auto", letterSpacing: "0.04em" }}>
+                      {prayers.length}
                     </span>
                   </div>
 
@@ -468,8 +464,7 @@ export default function PrayerHubPage() {
                           transition:    "all 120ms",
                         }}
                       >
-                        <span style={{ fontSize: "16px", flexShrink: 0 }}>🙏</span>
-                        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)" }}>
+                        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)", letterSpacing: "-0.01em" }}>
                           {p.title}
                         </span>
                       </Link>
@@ -491,7 +486,7 @@ export default function PrayerHubPage() {
           padding:      "clamp(32px,5vw,56px)",
           textAlign:    "center",
         }}>
-          <div style={{ fontSize: "40px", marginBottom: "16px" }}>🙏</div>
+          <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--pk-accent)", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: "16px" }}>✦ AI Prayer Generator</div>
           <h2 style={{ fontSize: "clamp(22px,3vw,32px)", fontWeight: 800, color: "var(--pk-text)", margin: "0 0 12px", letterSpacing: "-0.025em" }}>
             Don&apos;t see your situation?
           </h2>
@@ -530,7 +525,7 @@ export default function PrayerHubPage() {
                 fontWeight:   700,
               }}
             >
-              📖 Search the Bible
+              Search the Bible →
             </Link>
           </div>
         </div>

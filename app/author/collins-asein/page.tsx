@@ -110,7 +110,7 @@ export default function CollinsAseinPage() {
             border:       "3px solid var(--pk-gold-border)",
             boxShadow:    "0 0 40px var(--pk-purple-dim)",
           }}>
-            ✝️
+            ✝
           </div>
 
           {/* Bio */}
@@ -217,26 +217,35 @@ export default function CollinsAseinPage() {
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "12px" }}>
             {[
-              { icon: "🙏", label: "Christian Prayer & Intercession" },
-              { icon: "📖", label: "Bible Study & Scripture" },
-              { icon: "⛪", label: "Church Technology" },
-              { icon: "🤖", label: "AI Tools for Faith" },
-              { icon: "🎙️", label: "Sermon Preparation" },
-              { icon: "💡", label: "Devotional Writing" },
-              { icon: "🌍", label: "Global Christian Outreach" },
-              { icon: "✝️", label: "Apologetics & Theology" },
-            ].map((item) => (
-              <div key={item.label} style={{
+              "Christian Prayer & Intercession",
+              "Bible Study & Scripture",
+              "Church Technology",
+              "AI Tools for Faith",
+              "Sermon Preparation",
+              "Devotional Writing",
+              "Global Christian Outreach",
+              "Apologetics & Theology",
+            ].map((label, i) => (
+              <div key={label} style={{
                 display:      "flex",
                 alignItems:   "center",
-                gap:          "12px",
+                gap:          "14px",
                 padding:      "14px 18px",
                 borderRadius: "10px",
                 border:       "1.5px solid var(--pk-gold-border)",
                 background:   "var(--pk-gold-dim)",
               }}>
-                <span style={{ fontSize: "20px" }}>{item.icon}</span>
-                <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)" }}>{item.label}</span>
+                <span style={{
+                  fontSize:      "10px",
+                  fontWeight:    800,
+                  color:         "var(--pk-gold)",
+                  letterSpacing: "0.1em",
+                  flexShrink:    0,
+                  fontVariantNumeric: "tabular-nums",
+                }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)", letterSpacing: "-0.01em" }}>{label}</span>
               </div>
             ))}
           </div>
@@ -268,8 +277,8 @@ export default function CollinsAseinPage() {
                 <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "6px" }}>
                   {topic.category}
                 </div>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--pk-text-2)" }}>
-                  🙏 {topic.title}
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--pk-text-2)", letterSpacing: "-0.01em" }}>
+                  {topic.title} →
                 </div>
               </Link>
             ))}
@@ -360,7 +369,7 @@ export default function CollinsAseinPage() {
                 fontWeight:   700,
               }}
             >
-              📖 Search the Bible
+              Search the Bible →
             </Link>
           </div>
         </div>

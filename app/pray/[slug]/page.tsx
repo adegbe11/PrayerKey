@@ -119,11 +119,19 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
           borderRadius: "20px", padding: "clamp(24px,4vw,40px)", marginBottom: "32px",
           boxShadow: "4px 4px 0 0 var(--pk-gold-border)",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
-            <span style={{ fontSize: "22px" }}>🙏</span>
-            <h2 style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-gold)", margin: 0, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+          <div style={{ marginBottom: "24px" }}>
+            <span style={{
+              display:       "inline-block",
+              fontSize:      "10px",
+              fontWeight:    800,
+              color:         "var(--pk-gold)",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              borderBottom:  "1.5px solid var(--pk-gold-border)",
+              paddingBottom: "8px",
+            }}>
               {topic.title}
-            </h2>
+            </span>
           </div>
           <p style={{
             fontSize: "clamp(15px, 1.5vw, 17px)", color: "var(--pk-text)",
@@ -194,7 +202,7 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
                     fontSize: "13px", fontWeight: 600, transition: "all 150ms",
                   }}
                 >
-                  🙏 {r.title}
+                  {r.title} →
                 </Link>
               ))}
             </div>

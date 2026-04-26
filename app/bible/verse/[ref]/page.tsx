@@ -278,7 +278,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
                         href={`/bible/verse/${crRef}`}
                         style={{ fontSize: "13px", fontWeight: 700, color: "var(--pk-gold)", textDecoration: "none" }}
                       >
-                        📖 {cr.ref}
+                        {cr.ref} →
                       </Link>
                       <span style={{ fontSize: "11px", color: "var(--pk-text-3)", flexShrink: 0 }}>
                         related
@@ -311,7 +311,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
             border: "1.5px solid var(--pk-purple-border)",
             borderRadius: "16px", padding: "clamp(24px,4vw,36px)", textAlign: "center",
           }}>
-            <div style={{ fontSize: "32px", marginBottom: "12px" }}>🙏</div>
+            <div style={{ fontSize: "18px", marginBottom: "12px", color: "var(--pk-purple)", fontWeight: 700, letterSpacing: "0.1em" }}>✦</div>
             <h3 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 10px" }}>
               Generate a Prayer from {display}
             </h3>
@@ -351,7 +351,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
                     fontSize: "13px", fontWeight: 600,
                   }}
                 >
-                  🙏 {p.title}
+                  {p.title} →
                 </Link>
               ))}
             </div>
@@ -424,7 +424,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
             width: "44px", height: "44px", borderRadius: "50%", flexShrink: 0,
             background: "linear-gradient(135deg, var(--pk-purple) 0%, var(--pk-gold) 100%)",
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px",
-          }}>✝️</div>
+          }}>✝</div>
           <div>
             <p style={{ fontSize: "13px", color: "var(--pk-text-3)", margin: "0 0 2px" }}>
               Curated by

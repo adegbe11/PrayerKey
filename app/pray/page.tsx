@@ -331,7 +331,7 @@ export default function PrayPage() {
                 boxShadow:    "2px 2px 0 0 var(--pk-gold-border)",
               }}
             >
-              🎴 View &amp; Download Card
+              ✦ View Prayer Card
             </button>
 
             <button
@@ -352,7 +352,7 @@ export default function PrayPage() {
                 gap:          "6px",
               }}
             >
-              {copied ? "✓ Copied!" : "📋 Copy"}
+              {copied ? "✓ Copied" : "Copy text"}
             </button>
             <button
               onClick={() => { setPrayer(null); setInput(""); setMoods([]); }}

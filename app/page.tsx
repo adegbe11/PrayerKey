@@ -49,33 +49,30 @@ function getDailyVerse() {
 const FEATURES = [
   {
     href:   "/pray",
-    emoji:  "🙏",
+    mark:   "✦",
     title:  "Generate a Prayer",
-    desc:   "Tell us what's on your heart and we'll write a beautiful prayer just for you.",
-    color:  "#AF52DE",
-    bg:     "rgba(175,82,222,0.07)",
-    border: "rgba(175,82,222,0.18)",
-    glow:   "rgba(175,82,222,0.25)",
+    desc:   "Tell us what's on your heart and we'll write a full, scripture-grounded prayer for you in seconds.",
+    color:  "var(--pk-purple)",
+    bg:     "var(--pk-purple-dim)",
+    border: "var(--pk-purple-border)",
   },
   {
     href:   "/live",
-    emoji:  "🎙️",
+    mark:   "◉",
     title:  "Live Sermon",
-    desc:   "Start a service. Bible verses appear on the projector screen automatically.",
-    color:  "#FF3B30",
-    bg:     "rgba(255,59,48,0.07)",
-    border: "rgba(255,59,48,0.18)",
-    glow:   "rgba(255,59,48,0.25)",
+    desc:   "Start a service. Bible verses are detected in real time and appear on the projector screen as you preach.",
+    color:  "var(--pk-red)",
+    bg:     "rgba(204,34,0,0.06)",
+    border: "rgba(204,34,0,0.18)",
   },
   {
     href:   "/bible",
-    emoji:  "📖",
+    mark:   "◆",
     title:  "Search the Bible",
-    desc:   "Find any verse, topic, or keyword in seconds.",
-    color:  "#B07C1F",
-    bg:     "rgba(176,124,31,0.07)",
-    border: "rgba(176,124,31,0.18)",
-    glow:   "rgba(176,124,31,0.25)",
+    desc:   "Search all 66 books by verse, keyword, topic, or paraphrase — with cross-references included.",
+    color:  "var(--pk-gold)",
+    bg:     "var(--pk-gold-dim)",
+    border: "var(--pk-gold-border)",
   },
 ];
 
@@ -396,7 +393,7 @@ export default function HomePage() {
                 (e.currentTarget as HTMLAnchorElement).style.boxShadow = "2px 2px 0 0 var(--pk-accent-border)";
               }}
             >
-              📖 Read {todayVerse.book} {todayVerse.chapter}
+              Read {todayVerse.book} {todayVerse.chapter} →
             </Link>
 
             <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
@@ -417,7 +414,7 @@ export default function HomePage() {
               onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-accent)"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}
             >
-              🙏 Pray this verse
+              Pray this verse →
             </Link>
 
             <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
@@ -474,15 +471,32 @@ export default function HomePage() {
                   (e.currentTarget as HTMLDivElement).style.background = "var(--pk-card)";
                 }}
               >
-                {/* Feature number — brutalist */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
-                  <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-text-3)", letterSpacing: "0.12em", border: "1px solid var(--pk-border)", padding: "3px 8px", borderRadius: "3px" }}>
+                {/* Feature index + mark */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
+                  <span style={{
+                    fontSize:      "10px",
+                    fontWeight:    700,
+                    color:         "var(--pk-text-3)",
+                    letterSpacing: "0.14em",
+                    border:        "1px solid var(--pk-border)",
+                    padding:       "3px 9px",
+                    borderRadius:  "3px",
+                    fontVariantNumeric: "tabular-nums",
+                  }}>
                     0{i + 1}
                   </span>
-                  <span style={{ fontSize: "28px", lineHeight: 1 }}>{f.emoji}</span>
+                  <span style={{
+                    fontSize:   f.mark === "◉" ? "18px" : "16px",
+                    color:      f.color,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    animation:  f.mark === "◉" ? "pulse 2s ease infinite" : "none",
+                  }}>
+                    {f.mark}
+                  </span>
                 </div>
 
-                <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 10px", letterSpacing: "-0.02em", lineHeight: 1.25 }}>
+                <h2 style={{ fontSize: "19px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 12px", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
                   {f.title}
                 </h2>
                 <p style={{ fontSize: "14px", color: "var(--pk-text-2)", margin: "0 0 28px", lineHeight: 1.65 }}>
