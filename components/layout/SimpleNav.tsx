@@ -55,11 +55,11 @@ export default function SimpleNav() {
             flexShrink:     0,
           }}>
             <Image
-              src="/prayerkey-logo.png"
+              src="/prayerkey-icon.png"
               alt="PrayerKey"
               width={36}
               height={36}
-              style={{ borderRadius: "8px", display: "block", objectFit: "cover" }}
+              style={{ borderRadius: "8px", display: "block" }}
               priority
             />
             <span style={{

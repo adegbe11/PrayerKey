@@ -59,7 +59,7 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="flex items-center gap-2 px-4 py-5">
-        <img src="/prayerkey-logo.png" alt="PrayerKey" width={28} height={28} style={{ borderRadius: "6px", objectFit: "cover", display: "block" }} />
+        <img src="/prayerkey-icon.png" alt="PrayerKey" width={28} height={28} style={{ borderRadius: "6px", display: "block" }} />
         <span
           style={{
             fontSize: "15px",
