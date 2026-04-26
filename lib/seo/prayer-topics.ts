@@ -1,4 +1,5 @@
 import { EXTENDED_PRAYER_TOPICS } from "./prayer-topics-extended";
+import { BATCH2_PRAYER_TOPICS } from "./prayer-topics-batch2";
 
 export interface PrayerTopic {
   slug:         string;
@@ -264,6 +265,9 @@ export const PRAYER_TOPICS: PrayerTopic[] = [
 
   // ── Extended topics (300+ additional prayers) ──────────────────────
   ...EXTENDED_PRAYER_TOPICS,
+
+  // ── Batch 2 — Google keyword-targeted topics ─────────────────────
+  ...BATCH2_PRAYER_TOPICS,
 ];
 
 // ── Fast lookup map ─────────────────────────────────────────────────
