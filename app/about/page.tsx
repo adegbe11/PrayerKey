@@ -1,13 +1,56 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "About — PrayerKey",
-  description: "PrayerKey is a free AI-powered church companion built for every pastor and believer. Built by Collins Omoikhudu Asein.",
+const BASE_URL  = "https://www.prayerkey.com";
+const ABOUT_URL = `${BASE_URL}/about`;
+
+export const metadata: Metadata = {
+  title:       "About PrayerKey — Free AI Church Companion | Built by Collins Asein",
+  description: "PrayerKey is a free AI-powered church companion built for every pastor and believer. Live sermon verse detection, AI prayers, and Bible search — free forever. Built by Collins Omoikhudu Asein.",
+  alternates:  { canonical: ABOUT_URL },
+  openGraph: {
+    title:       "About PrayerKey — Free AI Church Companion",
+    description: "Free AI-powered church technology for every pastor and believer. Built by Collins Omoikhudu Asein.",
+    url:         ABOUT_URL,
+    type:        "website",
+    siteName:    "PrayerKey",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "About PrayerKey" }],
+  },
+};
+
+const organizationLd = {
+  "@context": "https://schema.org",
+  "@type":    "Organization",
+  name:       "PrayerKey",
+  url:        BASE_URL,
+  logo:       `${BASE_URL}/og-image.png`,
+  description: "Free AI-powered church companion: live sermon Bible-verse detection, AI prayer generator, and Bible search.",
+  founder: {
+    "@type": "Person",
+    name:    "Collins Omoikhudu Asein",
+  },
+  sameAs: [
+    "https://github.com/adegbe11/PrayerKey",
+  ],
+};
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type":    "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home",  item: BASE_URL },
+    { "@type": "ListItem", position: 2, name: "About", item: ABOUT_URL },
+  ],
 };
 
 export default function AboutPage() {
   return (
     <article style={{ maxWidth: "760px", margin: "0 auto", padding: "0 0 100px" }}>
+      <script type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }} />
+      <script type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+
 
       {/* ── Hero ── */}
       <div className="animate-fadeUp" style={{ marginBottom: "64px" }}>
