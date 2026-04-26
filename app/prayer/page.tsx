@@ -8,16 +8,16 @@ const BASE_URL = "https://www.prayerkey.com";
 /*  METADATA                                                   */
 /* ─────────────────────────────────────────────────────────── */
 export const metadata: Metadata = {
-  title: "Prayer for Every Situation | 116 Prayers — PrayerKey",
+  title: "Prayer for Every Situation | 544+ Prayers — PrayerKey",
   description:
-    "Find the perfect prayer for any situation in life. 116 scripture-based prayers across 16 categories — healing, anxiety, marriage, finances, protection, grief, and more.",
+    "Find the perfect prayer for any situation in life. 544+ scripture-based prayers across 16 categories — healing, anxiety, marriage, finances, protection, grief, and more.",
   keywords:
     "prayers for every situation, prayer for healing, prayer for anxiety, prayer for strength, prayer for marriage, prayer for finances, prayer for protection, daily prayers, christian prayers",
   authors: [{ name: "Collins Asein", url: `${BASE_URL}/author/collins-asein` }],
   alternates: { canonical: `${BASE_URL}/prayer` },
   openGraph: {
-    title:       "Prayer for Every Situation | 116 Prayers — PrayerKey",
-    description: "Find the perfect prayer for any situation in life. 116 scripture-based prayers across 16 categories.",
+    title:       "Prayer for Every Situation | 544+ Prayers — PrayerKey",
+    description: "Find the perfect prayer for any situation in life. 544+ scripture-based prayers across 16 categories.",
     url:         `${BASE_URL}/prayer`,
     siteName:    "PrayerKey",
     images:      [{ url: "/og-image.png", width: 1200, height: 630 }],
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card:        "summary_large_image",
-    title:       "Prayer for Every Situation | 116 Prayers — PrayerKey",
-    description: "116 scripture-based prayers across 16 categories — healing, anxiety, marriage, finances, and more.",
+    title:       "Prayer for Every Situation | 544+ Prayers — PrayerKey",
+    description: "544+ scripture-based prayers across 16 categories — healing, anxiety, marriage, finances, and more.",
   },
 };
 
@@ -34,24 +34,24 @@ export const metadata: Metadata = {
 /*  DATA                                                       */
 /* ─────────────────────────────────────────────────────────── */
 
-/** Category metadata — icon, description, color accent */
-const CATEGORY_META: Record<string, { icon: string; desc: string; color: string }> = {
-  "Health":        { icon: "🩺", desc: "Healing, recovery, sickness & body",         color: "#34C759" },
-  "Mental Health": { icon: "🧠", desc: "Anxiety, depression, peace of mind",          color: "#5E5CE6" },
-  "Daily Prayer":  { icon: "🌅", desc: "Morning, night, short & powerful prayers",    color: "#FF9F0A" },
-  "Family":        { icon: "👨‍👩‍👧‍👦", desc: "Children, parents, home & unity",           color: "#FF6B35" },
-  "Finance":       { icon: "💰", desc: "Breakthrough, debt, provision & wealth",      color: "#30D158" },
-  "Protection":    { icon: "🛡️", desc: "Safety, travel, spiritual warfare & home",    color: "#0A84FF" },
-  "Faith":         { icon: "✝️", desc: "Salvation, trust, scripture & belief",        color: "#BF5AF2" },
-  "Grief":         { icon: "🕊️", desc: "Loss, death, funeral & bereavement",         color: "#98989D" },
-  "Celebration":   { icon: "🎉", desc: "Birthday, graduation, new job & milestones",  color: "#FF375F" },
-  "Education":     { icon: "📚", desc: "Exams, students, wisdom & learning",          color: "#64D2FF" },
-  "Salvation":     { icon: "🙏", desc: "Repentance, forgiveness & new life in Christ",color: "#B07C1F" },
-  "Purpose":       { icon: "🎯", desc: "Direction, calling, vision & destiny",        color: "#FF9F0A" },
-  "Relationships": { icon: "❤️", desc: "Marriage, friendship, love & reconciliation", color: "#FF375F" },
-  "Thanksgiving":  { icon: "🌻", desc: "Gratitude, praise & worship",                 color: "#FFD60A" },
-  "Ministry":      { icon: "⛪", desc: "Church, pastors, evangelism & mission",       color: "#AF52DE" },
-  "Nation":        { icon: "🌍", desc: "Government, leaders, peace & revival",        color: "#32ADE6" },
+/** Category metadata — icon, description */
+const CATEGORY_META: Record<string, { icon: string; desc: string }> = {
+  "Health":        { icon: "🩺", desc: "Healing, recovery, sickness & body"         },
+  "Mental Health": { icon: "🧠", desc: "Anxiety, depression, peace of mind"          },
+  "Daily Prayer":  { icon: "🌅", desc: "Morning, night, short & powerful prayers"    },
+  "Family":        { icon: "👨‍👩‍👧‍👦", desc: "Children, parents, home & unity"           },
+  "Finance":       { icon: "💰", desc: "Breakthrough, debt, provision & wealth"      },
+  "Protection":    { icon: "🛡️", desc: "Safety, travel, spiritual warfare & home"    },
+  "Faith":         { icon: "✝️", desc: "Salvation, trust, scripture & belief"        },
+  "Grief":         { icon: "🕊️", desc: "Loss, death, funeral & bereavement"         },
+  "Celebration":   { icon: "🎉", desc: "Birthday, graduation, new job & milestones"  },
+  "Education":     { icon: "📚", desc: "Exams, students, wisdom & learning"          },
+  "Salvation":     { icon: "🙏", desc: "Repentance, forgiveness & new life in Christ"},
+  "Purpose":       { icon: "🎯", desc: "Direction, calling, vision & destiny"        },
+  "Relationships": { icon: "❤️", desc: "Marriage, friendship, love & reconciliation" },
+  "Thanksgiving":  { icon: "🌻", desc: "Gratitude, praise & worship"                 },
+  "Ministry":      { icon: "⛪", desc: "Church, pastors, evangelism & mission"       },
+  "Nation":        { icon: "🌍", desc: "Government, leaders, peace & revival"        },
 };
 
 /** Time-of-day quick access */
@@ -105,9 +105,6 @@ export default function PrayerHubPage() {
     .map(s => PRAYER_TOPICS.find(t => t.slug === s))
     .filter(Boolean) as PrayerTopic[];
 
-  const gold   = "#B07C1F";
-  const purple = "#AF52DE";
-
   /* JSON-LD */
   const jsonLd = {
     "@context": "https://schema.org",
@@ -117,7 +114,7 @@ export default function PrayerHubPage() {
         "@id":         `${BASE_URL}/prayer`,
         "url":         `${BASE_URL}/prayer`,
         "name":        "Prayer for Every Situation — PrayerKey",
-        "description": "116 scripture-based prayers across 16 categories for every situation in life.",
+        "description": `${PRAYER_TOPICS.length} scripture-based prayers across ${categories.length} categories for every situation in life.`,
         "author": {
           "@type": "Person",
           "name":  "Collins Asein",
@@ -159,11 +156,11 @@ export default function PrayerHubPage() {
             display:      "inline-block",
             padding:      "4px 14px",
             borderRadius: "4px",
-            border:       `1.5px solid rgba(176,124,31,0.35)`,
-            background:   "rgba(176,124,31,0.06)",
+            border:       "1.5px solid var(--pk-accent-border)",
+            background:   "var(--pk-accent-dim)",
             fontSize:     "10px",
             fontWeight:   700,
-            color:        gold,
+            color:        "var(--pk-accent)",
             letterSpacing:"0.12em",
             textTransform:"uppercase",
             marginBottom: "20px",
@@ -174,7 +171,7 @@ export default function PrayerHubPage() {
           <h1 style={{
             fontSize:      "clamp(36px, 6vw, 64px)",
             fontWeight:    800,
-            color:         "#fff",
+            color:         "var(--pk-text)",
             margin:        "0 0 16px",
             letterSpacing: "-0.035em",
             lineHeight:    1.05,
@@ -184,7 +181,7 @@ export default function PrayerHubPage() {
 
           <p style={{
             fontSize:     "clamp(15px, 1.5vw, 18px)",
-            color:        "rgba(255,255,255,0.45)",
+            color:        "var(--pk-text-2)",
             margin:       "0 0 28px",
             lineHeight:   1.7,
             maxWidth:     "560px",
@@ -203,8 +200,8 @@ export default function PrayerHubPage() {
               { n: "Free",                     label: "Always" },
             ].map(s => (
               <div key={s.label} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "clamp(22px,3vw,32px)", fontWeight: 800, color: "#fff", letterSpacing: "-0.03em" }}>{s.n}</div>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>{s.label}</div>
+                <div style={{ fontSize: "clamp(22px,3vw,32px)", fontWeight: 800, color: "var(--pk-text)", letterSpacing: "-0.03em" }}>{s.n}</div>
+                <div style={{ fontSize: "11px", color: "var(--pk-text-3)", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -218,12 +215,12 @@ export default function PrayerHubPage() {
               gap:          "8px",
               padding:      "14px 32px",
               borderRadius: "6px",
-              background:   purple,
+              background:   "var(--pk-accent)",
               color:        "#fff",
               textDecoration:"none",
               fontSize:     "15px",
               fontWeight:   800,
-              boxShadow:    `4px 4px 0 0 rgba(175,82,222,0.3)`,
+              boxShadow:    "4px 4px 0 0 var(--pk-accent-border)",
               letterSpacing:"-0.01em",
             }}
           >
@@ -236,10 +233,10 @@ export default function PrayerHubPage() {
         {/* ═══════════════════════════════════════════════════ */}
         <section style={{ marginBottom: "64px" }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "20px", flexWrap: "wrap", gap: "8px" }}>
-            <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: 0, letterSpacing: "-0.02em" }}>
               Browse by Category
             </h2>
-            <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>{categories.length} categories</span>
+            <span style={{ fontSize: "13px", color: "var(--pk-text-3)" }}>{categories.length} categories</span>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "14px" }}>
@@ -250,15 +247,15 @@ export default function PrayerHubPage() {
                 <div key={cat} style={{
                   padding:      "20px 22px",
                   borderRadius: "14px",
-                  border:       `1.5px solid rgba(255,255,255,0.07)`,
-                  background:   "rgba(255,255,255,0.025)",
+                  border:       "1.5px solid var(--pk-border)",
+                  background:   "var(--pk-card)",
                   transition:   "all 150ms",
                 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
                     <span style={{ fontSize: "24px" }}>{meta.icon}</span>
                     <div>
-                      <div style={{ fontSize: "15px", fontWeight: 700, color: "#fff" }}>{cat}</div>
-                      <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)" }}>{meta.desc}</div>
+                      <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--pk-text)" }}>{cat}</div>
+                      <div style={{ fontSize: "11px", color: "var(--pk-text-3)" }}>{meta.desc}</div>
                     </div>
                   </div>
 
@@ -269,12 +266,12 @@ export default function PrayerHubPage() {
                         href={`/prayer/${p.slug}`}
                         style={{
                           fontSize:     "12px",
-                          color:        "rgba(255,255,255,0.55)",
+                          color:        "var(--pk-text-2)",
                           textDecoration:"none",
                           padding:      "4px 10px",
                           borderRadius: "4px",
-                          background:   "rgba(255,255,255,0.04)",
-                          border:       "1px solid rgba(255,255,255,0.07)",
+                          background:   "var(--pk-surface-2)",
+                          border:       "1px solid var(--pk-border)",
                           transition:   "all 120ms",
                         }}
                       >
@@ -282,19 +279,19 @@ export default function PrayerHubPage() {
                       </Link>
                     ))}
                     {prayers.length > 5 && (
-                      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.25)", padding: "4px 6px" }}>
+                      <span style={{ fontSize: "12px", color: "var(--pk-text-3)", padding: "4px 6px" }}>
                         +{prayers.length - 5} more
                       </span>
                     )}
                   </div>
 
-                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontSize: "12px", color: `${meta.color}`, fontWeight: 600 }}>
+                  <div style={{ borderTop: "1px solid var(--pk-border)", paddingTop: "12px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: "12px", color: "var(--pk-accent)", fontWeight: 600 }}>
                       {prayers.length} prayers
                     </span>
                     <Link
                       href={`/prayer/${prayers[0]?.slug ?? ""}`}
-                      style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", textDecoration: "none", fontWeight: 600 }}
+                      style={{ fontSize: "12px", color: "var(--pk-text-3)", textDecoration: "none", fontWeight: 600 }}
                     >
                       Browse prayers →
                     </Link>
@@ -309,7 +306,7 @@ export default function PrayerHubPage() {
         {/* BROWSE BY TIME OF DAY                              */}
         {/* ═══════════════════════════════════════════════════ */}
         <section style={{ marginBottom: "64px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
             Browse by Time of Day
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "12px" }}>
@@ -321,16 +318,16 @@ export default function PrayerHubPage() {
                   display:      "block",
                   padding:      "18px 20px",
                   borderRadius: "12px",
-                  border:       "1.5px solid rgba(255,255,255,0.08)",
-                  background:   "rgba(255,255,255,0.025)",
+                  border:       "1.5px solid var(--pk-border)",
+                  background:   "var(--pk-card)",
                   textDecoration:"none",
                   transition:   "all 150ms",
                 }}
               >
                 <div style={{ fontSize: "28px", marginBottom: "8px" }}>{t.icon}</div>
-                <div style={{ fontSize: "14px", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>{t.label}</div>
-                <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)" }}>{t.desc}</div>
-                <div style={{ fontSize: "12px", color: gold, fontWeight: 600, marginTop: "10px" }}>
+                <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)", marginBottom: "4px" }}>{t.label}</div>
+                <div style={{ fontSize: "12px", color: "var(--pk-text-3)" }}>{t.desc}</div>
+                <div style={{ fontSize: "12px", color: "var(--pk-accent)", fontWeight: 600, marginTop: "10px" }}>
                   Pray now →
                 </div>
               </Link>
@@ -342,10 +339,10 @@ export default function PrayerHubPage() {
         {/* BROWSE BY HOW YOU FEEL                             */}
         {/* ═══════════════════════════════════════════════════ */}
         <section style={{ marginBottom: "64px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 8px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 8px", letterSpacing: "-0.02em" }}>
             Browse by How You Feel
           </h2>
-          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.35)", margin: "0 0 20px" }}>
+          <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: "0 0 20px" }}>
             Find a prayer that meets you exactly where you are.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
@@ -359,9 +356,9 @@ export default function PrayerHubPage() {
                   gap:           "8px",
                   padding:       "10px 18px",
                   borderRadius:  "50px",
-                  border:        "1.5px solid rgba(255,255,255,0.09)",
-                  background:    "rgba(255,255,255,0.03)",
-                  color:         "rgba(255,255,255,0.7)",
+                  border:        "1.5px solid var(--pk-border)",
+                  background:    "var(--pk-card)",
+                  color:         "var(--pk-text-2)",
                   textDecoration:"none",
                   fontSize:      "14px",
                   fontWeight:    600,
@@ -380,10 +377,10 @@ export default function PrayerHubPage() {
         {/* ═══════════════════════════════════════════════════ */}
         <section style={{ marginBottom: "64px" }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: "20px", flexWrap: "wrap", gap: "8px" }}>
-            <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: 0, letterSpacing: "-0.02em" }}>
               Popular Prayers Right Now
             </h2>
-            <Link href="/pray/topics" style={{ fontSize: "13px", color: gold, textDecoration: "none", fontWeight: 600 }}>
+            <Link href="/pray/topics" style={{ fontSize: "13px", color: "var(--pk-accent)", textDecoration: "none", fontWeight: 600 }}>
               Browse all {PRAYER_TOPICS.length} →
             </Link>
           </div>
@@ -398,8 +395,8 @@ export default function PrayerHubPage() {
                   gap:           "14px",
                   padding:       "16px 18px",
                   borderRadius:  "12px",
-                  border:        "1.5px solid rgba(255,255,255,0.07)",
-                  background:    "rgba(255,255,255,0.025)",
+                  border:        "1.5px solid var(--pk-border)",
+                  background:    "var(--pk-card)",
                   textDecoration:"none",
                   transition:    "all 150ms",
                 }}
@@ -407,7 +404,7 @@ export default function PrayerHubPage() {
                 <span style={{
                   fontSize:     "11px",
                   fontWeight:   800,
-                  color:        "rgba(255,255,255,0.2)",
+                  color:        "var(--pk-text-3)",
                   width:        "20px",
                   flexShrink:   0,
                   fontVariantNumeric: "tabular-nums",
@@ -415,10 +412,10 @@ export default function PrayerHubPage() {
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "#fff", marginBottom: "2px" }}>
+                  <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)", marginBottom: "2px" }}>
                     🙏 {p.title}
                   </div>
-                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  <div style={{ fontSize: "11px", color: "var(--pk-text-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                     {p.category}
                   </div>
                 </div>
@@ -431,10 +428,10 @@ export default function PrayerHubPage() {
         {/* ALL PRAYERS — FULL DIRECTORY BY CATEGORY           */}
         {/* ═══════════════════════════════════════════════════ */}
         <section style={{ marginBottom: "64px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 8px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 8px", letterSpacing: "-0.02em" }}>
             All {PRAYER_TOPICS.length} Prayers
           </h2>
-          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.35)", margin: "0 0 32px" }}>
+          <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: "0 0 32px" }}>
             Every prayer on PrayerKey, organized by life category.
           </p>
 
@@ -445,10 +442,10 @@ export default function PrayerHubPage() {
               return (
                 <div key={cat}>
                   {/* Category header */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px", paddingBottom: "10px", borderBottom: "1px solid var(--pk-border)" }}>
                     <span style={{ fontSize: "20px" }}>{meta.icon}</span>
-                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#fff", margin: 0 }}>{cat}</h3>
-                    <span style={{ fontSize: "12px", color: `${meta.color}`, fontWeight: 600, marginLeft: "auto" }}>
+                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "var(--pk-text)", margin: 0 }}>{cat}</h3>
+                    <span style={{ fontSize: "12px", color: "var(--pk-accent)", fontWeight: 600, marginLeft: "auto" }}>
                       {prayers.length} prayers
                     </span>
                   </div>
@@ -465,14 +462,14 @@ export default function PrayerHubPage() {
                           gap:           "10px",
                           padding:       "12px 14px",
                           borderRadius:  "8px",
-                          border:        "1px solid rgba(255,255,255,0.06)",
-                          background:    "rgba(255,255,255,0.018)",
+                          border:        "1px solid var(--pk-border)",
+                          background:    "var(--pk-card)",
                           textDecoration:"none",
                           transition:    "all 120ms",
                         }}
                       >
                         <span style={{ fontSize: "16px", flexShrink: 0 }}>🙏</span>
-                        <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.75)" }}>
+                        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)" }}>
                           {p.title}
                         </span>
                       </Link>
@@ -488,17 +485,17 @@ export default function PrayerHubPage() {
         {/* GENERATE CTA                                       */}
         {/* ═══════════════════════════════════════════════════ */}
         <div style={{
-          background:   `linear-gradient(135deg, rgba(175,82,222,0.12) 0%, rgba(176,124,31,0.08) 100%)`,
-          border:       `1.5px solid rgba(175,82,222,0.2)`,
+          background:   "var(--pk-accent-dim)",
+          border:       "1.5px solid var(--pk-accent-border)",
           borderRadius: "20px",
           padding:      "clamp(32px,5vw,56px)",
           textAlign:    "center",
         }}>
           <div style={{ fontSize: "40px", marginBottom: "16px" }}>🙏</div>
-          <h2 style={{ fontSize: "clamp(22px,3vw,32px)", fontWeight: 800, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.025em" }}>
+          <h2 style={{ fontSize: "clamp(22px,3vw,32px)", fontWeight: 800, color: "var(--pk-text)", margin: "0 0 12px", letterSpacing: "-0.025em" }}>
             Don&apos;t see your situation?
           </h2>
-          <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.45)", margin: "0 0 28px", lineHeight: 1.7, maxWidth: "480px", marginInline: "auto" }}>
+          <p style={{ fontSize: "16px", color: "var(--pk-text-2)", margin: "0 0 28px", lineHeight: 1.7, maxWidth: "480px", marginInline: "auto" }}>
             Our AI prayer generator writes a personalised prayer for <em>any</em> situation you&apos;re facing — in seconds, free, no account needed.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -508,12 +505,12 @@ export default function PrayerHubPage() {
                 display:      "inline-block",
                 padding:      "16px 36px",
                 borderRadius: "6px",
-                background:   purple,
+                background:   "var(--pk-accent)",
                 color:        "#fff",
                 textDecoration:"none",
                 fontSize:     "16px",
                 fontWeight:   800,
-                boxShadow:    `4px 4px 0 0 rgba(175,82,222,0.3)`,
+                boxShadow:    "4px 4px 0 0 var(--pk-accent-border)",
                 letterSpacing:"-0.01em",
               }}
             >
@@ -525,9 +522,9 @@ export default function PrayerHubPage() {
                 display:      "inline-block",
                 padding:      "16px 36px",
                 borderRadius: "6px",
-                border:       `1.5px solid rgba(176,124,31,0.4)`,
-                background:   "rgba(176,124,31,0.06)",
-                color:        gold,
+                border:       "1.5px solid var(--pk-gold-border)",
+                background:   "var(--pk-gold-dim)",
+                color:        "var(--pk-gold)",
                 textDecoration:"none",
                 fontSize:     "16px",
                 fontWeight:   700,
