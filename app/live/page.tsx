@@ -667,9 +667,6 @@ export default function LivePage() {
             <span style={{ fontSize:"10px", fontWeight:700, color:YELLOW, letterSpacing:"0.18em", textTransform:"uppercase" as const }}>Live Sermon AI · Ready</span>
           </div>
 
-          {/* Tiny secure-connection style label */}
-          <p style={{ fontSize:"11px", color:T2, margin:"0 0 8px", letterSpacing:"0.06em" }}>Sermon Intelligence</p>
-
           {/* Massive serif wordmark */}
           <h1 style={{ fontSize:"clamp(54px,9vw,96px)", fontWeight:700, color:T1, margin:0,
             fontFamily:SERIF, letterSpacing:"-0.04em", lineHeight:0.98 }}>
@@ -701,7 +698,7 @@ export default function LivePage() {
             </button>
           </div>
 
-          <p style={{ fontSize:"15px", color:T1, margin:"0 0 6px", fontWeight:500, letterSpacing:"-0.01em" }}>Tap to Initialize</p>
+          <p style={{ fontSize:"15px", color:T1, margin:"0 0 6px", fontWeight:500, letterSpacing:"-0.01em" }}>Tap to Live Sermon</p>
           <p style={{ fontSize:"11px", color:T3, margin:"0 0 32px", letterSpacing:"0.04em" }}>Listening · Detecting · Projecting</p>
 
           {micError && <div style={{ marginBottom:"20px", padding:"10px 16px", borderRadius:"10px", background:"rgba(255,69,58,0.10)", border:"1px solid rgba(255,69,58,0.30)", color:RED, fontSize:"12px" }}>{micError}</div>}
