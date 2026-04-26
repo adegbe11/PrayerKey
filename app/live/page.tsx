@@ -476,136 +476,227 @@ export default function LivePage() {
     return (
       <>
         <div style={{
-          minHeight:      "70vh",
-          display:        "flex",
-          flexDirection:  "column",
-          alignItems:     "center",
-          justifyContent: "center",
-          padding:        "40px 24px 80px",
-          textAlign:      "center",
+          display:   "flex",
+          gap:       "48px",
+          alignItems:"flex-start",
+          maxWidth:  "1000px",
+          margin:    "0 auto",
+          padding:   "48px 0 80px",
         }}>
-          {/* Logo mark */}
+
+          {/* ── LEFT: crimson sidebar panel ─────────────────────────────── */}
           <div style={{
-            width:        "64px",
-            height:       "64px",
-            borderRadius: "16px",
-            background:   `linear-gradient(135deg, ${T.goldDim} 0%, rgba(232,168,32,0.04) 100%)`,
-            border:       `1px solid rgba(232,168,32,0.25)`,
-            display:      "flex",
-            alignItems:   "center",
-            justifyContent:"center",
-            marginBottom: "28px",
-            boxShadow:    `0 0 40px rgba(232,168,32,0.08), 0 1px 0 rgba(255,255,255,0.06) inset`,
+            width:        "260px",
+            flexShrink:   0,
+            borderRadius: "12px",
+            overflow:     "hidden",
+            border:       "1px solid var(--pk-border)",
           }}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L13.6 8.7L20.5 10L13.6 11.3L12 18L10.4 11.3L3.5 10L10.4 8.7L12 2Z" fill={T.gold} />
-            </svg>
-          </div>
-
-          <Badge label="Live Sermon Control" color={T.red} />
-
-          <h1 style={{
-            fontSize:      "clamp(36px, 5vw, 58px)",
-            fontWeight:    800,
-            color:         T.t1,
-            margin:        "20px 0 16px",
-            letterSpacing: "-0.04em",
-            lineHeight:    1.04,
-          }}>
-            Ready to Go Live
-          </h1>
-
-          <p style={{
-            fontSize:    "clamp(15px, 1.3vw, 17px)",
-            color:       T.t3,
-            maxWidth:    "420px",
-            margin:      "0 0 40px",
-            lineHeight:  1.75,
-          }}>
-            Press start, begin preaching. Verses are detected automatically
-            and appear on your congregation&apos;s screen within seconds.
-          </p>
-
-          {micError && (
+            {/* Crimson header */}
             <div style={{
-              marginBottom: "24px",
-              padding:      "13px 18px",
-              borderRadius: "10px",
-              background:   T.redDim,
-              border:       `1px solid rgba(255,59,48,0.2)`,
-              color:        T.red,
-              fontSize:     "13px",
-              maxWidth:     "400px",
-              lineHeight:   1.5,
+              background:  "#8B1A1A",
+              padding:     "20px 20px 18px",
             }}>
-              {micError}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                <span style={{
+                  width: "7px", height: "7px", borderRadius: "50%",
+                  background: "#fff", opacity: 0.7,
+                  animation: "dotPulse 1.4s ease infinite", flexShrink: 0,
+                }} />
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  Live Sermon
+                </span>
+              </div>
+              <p style={{ fontSize: "18px", fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
+                Sermon Control
+              </p>
             </div>
-          )}
 
-          <button
-            onClick={startService}
-            style={{
-              display:       "inline-flex",
-              alignItems:    "center",
-              gap:           "12px",
-              padding:       "0 48px",
-              height:        "60px",
-              borderRadius:  "12px",
-              border:        "none",
-              background:    `linear-gradient(135deg, #FF4F44 0%, ${T.red} 100%)`,
-              color:         "#fff",
-              fontSize:      "16px",
-              fontWeight:    700,
-              cursor:        "pointer",
-              letterSpacing: "-0.01em",
-              boxShadow:     `0 0 0 1px rgba(255,59,48,0.4), 0 8px 32px rgba(255,59,48,0.28), 0 1px 0 rgba(255,255,255,0.15) inset`,
-              transition:    "transform 160ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 160ms ease",
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.025)";
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 0 1px rgba(255,59,48,0.5), 0 12px 40px rgba(255,59,48,0.38), 0 1px 0 rgba(255,255,255,0.15) inset`;
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 0 1px rgba(255,59,48,0.4), 0 8px 32px rgba(255,59,48,0.28), 0 1px 0 rgba(255,255,255,0.15) inset`;
-            }}
-          >
-            <span style={{
-              width: "10px", height: "10px", borderRadius: "50%",
-              background: "#fff", opacity: 0.9, flexShrink: 0,
-              animation: "dotPulse 1.4s ease infinite",
-            }} />
-            Start Service
-          </button>
-
-          <p style={{ marginTop: "16px", fontSize: "12px", color: T.t4, letterSpacing: "0.02em" }}>
-            Deepgram Nova-2 · Groq AI Detection · Requires microphone
-          </p>
-
-          {/* Feature grid */}
-          <div style={{
-            display:             "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap:                 "1px",
-            marginTop:           "60px",
-            width:               "100%",
-            maxWidth:            "680px",
-            background:          T.line,
-            borderRadius:        "14px",
-            overflow:            "hidden",
-            border:              `1px solid ${T.border}`,
-          }}>
+            {/* Feature list */}
             {[
-              { icon: "🎙", title: "Real-Time STT",        body: "Deepgram Nova-2 transcribes your sermon with sub-300ms latency." },
-              { icon: "✦",  title: "AI Verse Detection",   body: "Groq Llama detects direct quotes, references, and paraphrases." },
-              { icon: "📺", title: "Instant Projection",   body: "Verses appear on the congregation screen as you preach them." },
-            ].map(c => (
-              <div key={c.title} style={{ padding: "24px 20px", background: T.panel }}>
-                <div style={{ fontSize: "22px", marginBottom: "10px" }}>{c.icon}</div>
-                <div style={{ fontSize: "13px", fontWeight: 600, color: T.t1, marginBottom: "6px" }}>{c.title}</div>
-                <div style={{ fontSize: "12px", color: T.t3, lineHeight: 1.65 }}>{c.body}</div>
+              {
+                label: "Real-Time Transcription",
+                desc:  "Deepgram Nova-2 captures every word with sub-300ms latency.",
+                icon: (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="22"/>
+                  </svg>
+                ),
+              },
+              {
+                label: "AI Verse Detection",
+                desc:  "Groq Llama detects quotes, references, and paraphrases automatically.",
+                icon: (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                  </svg>
+                ),
+              },
+              {
+                label: "Instant Projection",
+                desc:  "Detected verses display on the congregation screen as you preach.",
+                icon: (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+                  </svg>
+                ),
+              },
+              {
+                label: "Bible Search",
+                desc:  "Search all 66 books and push any verse live manually.",
+                icon: (
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                  </svg>
+                ),
+              },
+            ].map((f, i, arr) => (
+              <div key={f.label} style={{
+                display:     "flex",
+                gap:         "12px",
+                padding:     "14px 18px",
+                background:  "var(--pk-surface)",
+                borderBottom: i < arr.length - 1 ? "1px solid var(--pk-border)" : "none",
+              }}>
+                <div style={{
+                  width: "28px", height: "28px", borderRadius: "7px",
+                  background: "rgba(139,26,26,0.08)", border: "1px solid rgba(139,26,26,0.15)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0, color: "#8B1A1A",
+                }}>
+                  {f.icon}
+                </div>
+                <div>
+                  <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--pk-text)", marginBottom: "3px" }}>{f.label}</div>
+                  <div style={{ fontSize: "11px", color: "var(--pk-text-3)", lineHeight: 1.6 }}>{f.desc}</div>
+                </div>
               </div>
             ))}
+          </div>
+
+          {/* ── RIGHT: main content ──────────────────────────────────────── */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+
+            {/* Label */}
+            <p style={{
+              fontSize:      "11px",
+              fontWeight:    700,
+              color:         "#8B1A1A",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              margin:        "0 0 16px",
+            }}>
+              Live Sermon Control
+            </p>
+
+            {/* Headline */}
+            <h1 style={{
+              fontSize:      "clamp(32px, 4vw, 48px)",
+              fontWeight:    800,
+              color:         "var(--pk-text)",
+              margin:        "0 0 16px",
+              letterSpacing: "-0.03em",
+              lineHeight:    1.1,
+            }}>
+              Ready to Go Live
+            </h1>
+
+            {/* Rule */}
+            <div style={{ height: "2px", background: "#8B1A1A", width: "48px", marginBottom: "20px" }} />
+
+            <p style={{
+              fontSize:   "15px",
+              color:      "var(--pk-text-2)",
+              margin:     "0 0 36px",
+              lineHeight: 1.8,
+              maxWidth:   "480px",
+            }}>
+              Press <strong style={{ color: "var(--pk-text)" }}>Start Service</strong> and begin preaching.
+              Bible verses are detected automatically and displayed on your
+              congregation&apos;s screen within seconds.
+            </p>
+
+            {micError && (
+              <div style={{
+                marginBottom: "24px",
+                padding:      "12px 16px",
+                borderRadius: "8px",
+                background:   "rgba(255,59,48,0.06)",
+                border:       "1px solid rgba(255,59,48,0.2)",
+                color:        "#C0392B",
+                fontSize:     "13px",
+                lineHeight:   1.6,
+              }}>
+                {micError}
+              </div>
+            )}
+
+            {/* Start button */}
+            <button
+              onClick={startService}
+              style={{
+                display:       "inline-flex",
+                alignItems:    "center",
+                gap:           "12px",
+                padding:       "0 40px",
+                height:        "52px",
+                borderRadius:  "8px",
+                border:        "none",
+                background:    "#8B1A1A",
+                color:         "#fff",
+                fontSize:      "15px",
+                fontWeight:    700,
+                cursor:        "pointer",
+                letterSpacing: "-0.01em",
+                transition:    "background 150ms ease, transform 150ms ease",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "#A01E1E"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "#8B1A1A"; }}
+            >
+              <span style={{
+                width: "8px", height: "8px", borderRadius: "50%",
+                background: "#fff", opacity: 0.9, flexShrink: 0,
+                animation: "dotPulse 1.4s ease infinite",
+              }} />
+              Start Service
+            </button>
+
+            <p style={{ marginTop: "14px", fontSize: "12px", color: "var(--pk-text-3)" }}>
+              Requires microphone · Deepgram Nova-2 · Groq AI
+            </p>
+
+            {/* Info card */}
+            <div style={{
+              marginTop:    "48px",
+              padding:      "20px 24px",
+              borderRadius: "10px",
+              border:       "1px solid var(--pk-border)",
+              background:   "var(--pk-surface)",
+            }}>
+              <p style={{
+                fontSize:   "11px",
+                fontWeight: 700,
+                color:      "var(--pk-text)",
+                margin:     "0 0 10px",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+              }}>
+                How It Works
+              </p>
+              <ol style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                {[
+                  "Open this page on the pastor's device and click Start Service.",
+                  "Open the Projector link on the screen your congregation sees.",
+                  "Preach normally — verses appear on the projector automatically.",
+                  "You can also search and push any verse manually at any time.",
+                ].map((step, i) => (
+                  <li key={i} style={{ fontSize: "13px", color: "var(--pk-text-2)", lineHeight: 1.65 }}>{step}</li>
+                ))}
+              </ol>
+            </div>
+
           </div>
         </div>
         <style>{CSS_ANIMATIONS}</style>
