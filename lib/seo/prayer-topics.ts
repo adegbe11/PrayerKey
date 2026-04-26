@@ -1,3 +1,5 @@
+import { EXTENDED_PRAYER_TOPICS } from "./prayer-topics-extended";
+
 export interface PrayerTopic {
   slug:         string;
   title:        string;
@@ -259,6 +261,9 @@ export const PRAYER_TOPICS: PrayerTopic[] = [
   { slug:"hurricane-disaster", title:"Prayer During Natural Disaster", metaDesc:"A prayer during hurricanes, earthquakes, floods, and natural disasters. Trust God to protect and provide amid chaos.", category:"Protection", keywords:["prayer for hurricane","prayer during flood","prayer during earthquake","prayer for natural disaster","prayer for storm"], samplePrayer:"Lord, the storm rages around us and we feel small. But You spoke peace to a storm on Galilee and it obeyed. Be our shelter in this disaster. Protect every life. Guide rescue teams. Provide for those who have lost everything. And in the aftermath, let the church rise to show Your love in tangible ways. In Jesus' name, Amen.", scripture:[{ref:"Nahum 1:7",text:"The Lord is good, a refuge in times of trouble."},{ref:"Psalm 46:1",text:"God is our refuge and strength, an ever-present help in trouble."}], related:["protection","healing","provision","comfort","nation"] },
 
   { slug:"prison", title:"Prayer for Those in Prison", metaDesc:"A prayer for those in prison — for rehabilitation, peace, hope, and God's redemptive work behind bars.", category:"Nation", keywords:["prayer for prisoners","prayer for those in prison","prayer for incarcerated","prayer for jail","prayer for inmates"], samplePrayer:"Lord, You visited those in prison — You still do. I lift up everyone behind bars today. Let Your presence fill those cells. Bring hope where despair has settled. Work rehabilitation, restoration, and purpose. Let second chances be given and received. And for those wrongly convicted, bring justice. In Jesus' name, Amen.", scripture:[{ref:"Matthew 25:36",text:"I was in prison and you came to visit me."},{ref:"Psalm 146:7",text:"The Lord sets prisoners free."}], related:["justice","hope","redemption","healing","salvation"] },
+
+  // ── Extended topics (300+ additional prayers) ──────────────────────
+  ...EXTENDED_PRAYER_TOPICS,
 ];
 
 // ── Fast lookup map ─────────────────────────────────────────────────
