@@ -1,8 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import dynamic from "next/dynamic";
 import "./globals.css";
 import SimpleNav from "@/components/layout/SimpleNav";
-import Cursor from "@/components/ui/Cursor";
 import Link from "next/link";
+
+// Defer cursor — it runs a rAF loop; loading it after hydration keeps the
+// main thread free during LCP and avoids an unnecessary server-side pass.
+const Cursor = dynamic(() => import("@/components/ui/Cursor"), { ssr: false });
 
 const BASE_URL = "https://prayerkey.com";
 
@@ -42,6 +46,17 @@ export const metadata: Metadata = {
     other: [{ rel: "mask-icon", url: "/og-image.png" }],
   },
   manifest: "/site.webmanifest",
+};
+
+// Explicit viewport — controls mobile scaling and disables auto-zoom on inputs.
+// Kept separate from metadata (Next.js 14 requirement).
+export const viewport: Viewport = {
+  width:        "device-width",
+  initialScale: 1,
+  themeColor:   [
+    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
+    { media: "(prefers-color-scheme: dark)",  color: "#060608" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

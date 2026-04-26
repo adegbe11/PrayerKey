@@ -117,6 +117,15 @@ html {
   scroll-behavior: smooth;
   /* prevent flash — theme applied before paint via inline script */
 }
+/* Respect user's motion preference — suppresses scroll snap + animations */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration:   0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration:  0.01ms !important;
+  }
+}
 
 body {
   background:              var(--pk-bg);
@@ -162,6 +171,7 @@ a, button, [role="button"] { cursor: none; }
   transform: translate(-50%, -50%);
   transition: width 200ms ease, height 200ms ease, background 200ms ease;
   mix-blend-mode: difference;
+  will-change: left, top;
 }
 #pk-cursor-ring {
   position: fixed;
@@ -172,6 +182,7 @@ a, button, [role="button"] { cursor: none; }
   z-index: 9998;
   transform: translate(-50%, -50%);
   transition: transform 80ms linear, width 300ms ease, height 300ms ease, border-color 300ms ease;
+  will-change: left, top;
 }
 body:has(a:hover) #pk-cursor,
 body:has(button:hover) #pk-cursor { width: 18px; height: 18px; }
@@ -357,6 +368,8 @@ body::after {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: shimmer 3s linear infinite;
+  /* GPU-composite the background-position animation */
+  will-change: background-position;
 }
 [data-theme="dark"] .shimmer-accent {
   background: linear-gradient(90deg, var(--pk-gold) 0%, #F5D78E 40%, var(--pk-gold) 60%, #D4A43A 100%);
@@ -386,6 +399,28 @@ body::after {
   border-radius: 4px;
 }
 .magnetic { transition: transform 300ms cubic-bezier(0.22,1,0.36,1); will-change: transform; }
+
+/* ═══════════════════════════════════════════════════
+   CORE WEB VITALS — PERFORMANCE UTILITIES
+═══════════════════════════════════════════════════ */
+
+/* content-visibility: auto defers paint+layout of off-screen sections.
+   contain-intrinsic-size gives the browser a size hint so scroll position
+   stays stable when sections are skipped. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px; /* approximate section height */
+}
+
+/* Ensure animated elements that use transform/opacity get their own
+   compositor layer — prevents layout thrashing during page animations. */
+.animate-fadeUp,
+.animate-fadeIn,
+.animate-scaleIn,
+.animate-slideLeft,
+.animate-slideRight {
+  will-change: opacity, transform;
+}
 
 /* ═══════════════════════════════════════════════════
    LAYOUT UTILITIES

@@ -80,8 +80,8 @@ export default function HomePage() {
           <span style={{ fontSize: "12px", color: "var(--pk-accent)", fontWeight: 600, letterSpacing: "0.05em", textTransform: "uppercase" }}>AI-Powered Church Companion</span>
         </div>
 
-        {/* Main title — massive, bold */}
-        <h1 className="animate-fadeUp delay-100" style={{
+        {/* Main title — massive, bold — NO animation on LCP element */}
+        <h1 style={{
           fontSize:      "clamp(52px, 9vw, 108px)",
           fontWeight:    800,
           lineHeight:    0.95,
@@ -120,7 +120,8 @@ export default function HomePage() {
           </span>
         </div>
 
-        <h1 className="animate-fadeUp delay-300" style={{
+        {/* "are born." — NOT a second h1; use div styled identically */}
+        <div aria-hidden className="animate-fadeUp delay-300" style={{
           fontSize:      "clamp(52px, 9vw, 108px)",
           fontWeight:    800,
           lineHeight:    0.95,
@@ -129,7 +130,7 @@ export default function HomePage() {
           color:         "var(--pk-text)",
         }}>
           are born.
-        </h1>
+        </div>
 
         {/* Subtitle */}
         <p className="animate-fadeUp delay-400" style={{
@@ -300,17 +301,11 @@ export default function HomePage() {
       </section>
 
 
-      {/* ── Feature Section 1: Live Sermon ── */}
-      <SermonFeatureSection />
-
-      {/* ── Feature Section 2: Prayer ── */}
-      <PrayerFeatureSection />
-
-      {/* ── Feature Section 3: Bible Search ── */}
-      <BibleFeatureSection />
-
-      {/* ── FAQ ── */}
-      <FAQ />
+      {/* Below-fold sections — cv-auto defers their paint until they scroll into view */}
+      <div className="cv-auto"><SermonFeatureSection /></div>
+      <div className="cv-auto"><PrayerFeatureSection /></div>
+      <div className="cv-auto"><BibleFeatureSection /></div>
+      <div className="cv-auto"><FAQ /></div>
 
     </div>
   );
