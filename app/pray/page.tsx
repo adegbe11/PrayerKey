@@ -216,102 +216,188 @@ export default function PrayPage() {
       {prayer && (
         <div style={{ marginTop: "32px", animation: "prayerIn 480ms cubic-bezier(0.22,1,0.36,1)" }}>
 
-          {/* Title bar */}
+          {/* ── Receipt Header ── */}
           <div style={{
             display:        "flex",
             alignItems:     "center",
             justifyContent: "space-between",
-            padding:        "14px 20px",
-            background:     "var(--pk-purple-dim)",
-            border:         "1.5px solid var(--pk-purple-border)",
-            borderRadius:   "12px 12px 0 0",
-            borderBottom:   "none",
+            padding:        "14px 24px",
+            background:     "var(--pk-gold-dim)",
+            border:         "1.5px solid var(--pk-gold-border)",
+            borderRadius:   "16px 16px 0 0",
           }}>
-            <h2 style={{ fontSize: "15px", fontWeight: 700, color: "var(--pk-purple)", margin: 0, letterSpacing: "-0.01em" }}>
-              {prayer.title}
-            </h2>
-            <span style={{ fontSize: "11px", color: "var(--pk-text-3)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              ✦ Generated
+            <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--pk-gold)", letterSpacing: "0.06em" }}>
+              ✦ PrayerKey
+            </span>
+            <span style={{ fontSize: "11px", color: "var(--pk-text-3)", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+              {new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+              {" · "}
+              {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
             </span>
           </div>
 
-          {/* Prayer body */}
+          {/* ── Receipt Title ── */}
           <div style={{
-            background:   "var(--pk-purple-dim)",
-            border:       "1.5px solid var(--pk-purple-border)",
+            padding:      "20px 24px 16px",
+            background:   "var(--pk-card)",
+            border:       "1.5px solid var(--pk-gold-border)",
             borderTop:    "none",
-            borderRadius: "0 0 0 0",
-            padding:      "clamp(20px,4vw,32px)",
+            textAlign:    "center",
           }}>
+            <h2 style={{ fontSize: "22px", fontWeight: 800, color: "var(--pk-text)", margin: "0 0 4px", letterSpacing: "-0.02em" }}>
+              Prayer Receipt
+            </h2>
+            <p style={{ fontSize: "12px", color: "var(--pk-text-3)", margin: 0, letterSpacing: "0.02em" }}>
+              Generated from PrayerKey on{" "}
+              {new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}
+            </p>
+          </div>
+
+          {/* ── Receipt Meta Rows ── */}
+          <div style={{ background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)", borderTop: "none" }}>
+            {[
+              { label: "Topic",  value: prayer.title,           accent: false },
+              { label: "Type",   value: "Scripture-Based Prayer", accent: false },
+              { label: "Status", value: "Prayer Generated  ✓",  accent: true  },
+            ].map(({ label, value, accent }, i, arr) => (
+              <div key={label} style={{
+                display:       "flex",
+                gap:           "16px",
+                padding:       "13px 24px",
+                borderBottom:  i < arr.length - 1 ? "1px solid var(--pk-gold-border)" : "none",
+                alignItems:    "center",
+              }}>
+                <span style={{
+                  fontSize:     "12px",
+                  fontWeight:   700,
+                  color:        "var(--pk-gold)",
+                  minWidth:     "72px",
+                  letterSpacing:"0.04em",
+                  textTransform:"uppercase",
+                  flexShrink:   0,
+                }}>
+                  {label}
+                </span>
+                <span style={{
+                  fontSize:   "14px",
+                  color:      accent ? "#34C759" : "var(--pk-text)",
+                  fontWeight: accent ? 700 : 500,
+                }}>
+                  {value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Divider ── */}
+          <div style={{ background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)", borderTop: "none", padding: "0 24px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px", padding: "18px 0" }}>
+              <div style={{ flex: 1, height: "1px", background: "var(--pk-gold-border)" }} />
+              <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--pk-gold)", letterSpacing: "0.16em", textTransform: "uppercase", flexShrink: 0 }}>
+                Your Prayer
+              </span>
+              <div style={{ flex: 1, height: "1px", background: "var(--pk-gold-border)" }} />
+            </div>
+          </div>
+
+          {/* ── Prayer Title + Body ── */}
+          <div style={{
+            background: "var(--pk-card)",
+            border:     "1.5px solid var(--pk-gold-border)",
+            borderTop:  "none",
+            padding:    "0 clamp(24px,5vw,48px) clamp(28px,5vw,40px)",
+          }}>
+            <h3 style={{
+              fontSize:      "clamp(17px, 2vw, 21px)",
+              fontWeight:    800,
+              color:         "var(--pk-text)",
+              margin:        "0 0 20px",
+              textAlign:     "center",
+              letterSpacing: "-0.02em",
+              lineHeight:    1.2,
+            }}>
+              {prayer.title}
+            </h3>
             <p style={{
-              fontSize:    "clamp(15px, 1.4vw, 17px)",
-              color:       "var(--pk-text)",
-              lineHeight:  1.85,
-              whiteSpace:  "pre-wrap",
-              margin:      0,
-              fontStyle:   "italic",
+              fontSize:   "clamp(15px, 1.4vw, 17px)",
+              color:      "var(--pk-text)",
+              lineHeight: 1.95,
+              whiteSpace: "pre-wrap",
+              margin:     0,
+              fontStyle:  "italic",
             }}>
               {prayer.prayer}
             </p>
           </div>
 
-          {/* Encouragement */}
+          {/* ── Encouragement ── */}
           <div style={{
-            padding:      "18px 24px",
-            background:   "var(--pk-gold-dim)",
-            border:       "1.5px solid var(--pk-gold-border)",
-            borderTop:    "none",
-            borderRadius: "0",
-            borderLeft:   "4px solid var(--pk-gold)",
+            padding:    "16px 24px",
+            background: "var(--pk-gold-dim)",
+            border:     "1.5px solid var(--pk-gold-border)",
+            borderTop:  "none",
+            borderLeft: "4px solid var(--pk-gold)",
           }}>
-            <p style={{ fontSize: "14px", color: "var(--pk-text-2)", margin: 0, lineHeight: 1.7 }}>
+            <p style={{ fontSize: "13px", color: "var(--pk-text-2)", margin: 0, lineHeight: 1.75, fontStyle: "italic" }}>
               {prayer.encouragement}
             </p>
           </div>
 
-          {/* Verses */}
+          {/* ── Scripture Rows ── */}
           {prayer.verses?.length > 0 && (
-            <div style={{
-              padding:      "clamp(16px,3vw,24px)",
-              background:   "var(--pk-card)",
-              border:       "1.5px solid var(--pk-border)",
-              borderTop:    "none",
-              borderRadius: "0",
-            }}>
-              <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 12px" }}>
-                Scripture
-              </p>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {prayer.verses.map((v) => (
-                  <div key={v.ref} style={{
-                    padding:    "12px 16px",
-                    background: "var(--pk-gold-dim)",
-                    border:     "1px solid var(--pk-gold-border)",
-                    borderRadius:"8px",
-                    display:    "flex",
-                    gap:        "12px",
-                    alignItems: "flex-start",
-                  }}>
-                    <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--pk-gold)", flexShrink: 0, minWidth: "80px" }}>{v.ref}</span>
-                    <span style={{ fontSize: "13px", color: "var(--pk-text-2)", lineHeight: 1.6 }}>{v.text}</span>
-                  </div>
-                ))}
+            <div style={{ background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)", borderTop: "none" }}>
+
+              {/* Scripture label row */}
+              <div style={{ padding: "11px 24px", borderBottom: "1px solid var(--pk-gold-border)", background: "var(--pk-gold-dim)" }}>
+                <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--pk-gold)", letterSpacing: "0.14em", textTransform: "uppercase" }}>
+                  Scripture
+                </span>
               </div>
+
+              {/* Verse rows */}
+              {prayer.verses.map((v, i) => (
+                <div key={v.ref} style={{
+                  display:       "flex",
+                  gap:           "0",
+                  borderBottom:  i < prayer.verses.length - 1 ? "1px solid var(--pk-gold-border)" : "none",
+                  alignItems:    "stretch",
+                }}>
+                  {/* Ref column */}
+                  <div style={{
+                    padding:     "14px 16px 14px 24px",
+                    minWidth:    "110px",
+                    flexShrink:  0,
+                    borderRight: "1px solid var(--pk-gold-border)",
+                    display:     "flex",
+                    alignItems:  "center",
+                  }}>
+                    <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--pk-gold)", lineHeight: 1.3 }}>
+                      {v.ref}
+                    </span>
+                  </div>
+                  {/* Text column */}
+                  <div style={{ padding: "14px 24px 14px 16px", flex: 1 }}>
+                    <span style={{ fontSize: "13px", color: "var(--pk-text-2)", lineHeight: 1.7, fontStyle: "italic" }}>
+                      {v.text}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
-          {/* Action bar */}
+          {/* ── Action Footer ── */}
           <div style={{
             display:      "flex",
             gap:          "10px",
-            padding:      "16px 20px",
+            padding:      "14px 20px",
             background:   "var(--pk-card)",
-            border:       "1.5px solid var(--pk-border)",
-            borderTop:    "none",
+            border:       "1.5px solid var(--pk-gold-border)",
+            borderTop:    "1px solid var(--pk-gold-border)",
             borderRadius: "0 0 16px 16px",
             flexWrap:     "wrap",
+            alignItems:   "center",
           }}>
-            {/* View Card button */}
             <button
               onClick={() => setShowCard(true)}
               style={{
@@ -331,9 +417,8 @@ export default function PrayPage() {
                 boxShadow:    "2px 2px 0 0 var(--pk-gold-border)",
               }}
             >
-              ✦ View Prayer Card
+              ✦ Download Card
             </button>
-
             <button
               onClick={copy}
               style={{
@@ -341,18 +426,15 @@ export default function PrayPage() {
                 minHeight:    "44px",
                 borderRadius: "6px",
                 border:       "1.5px solid var(--pk-border)",
-                background:   copied ? "rgba(52,199,89,0.1)" : "var(--pk-card)",
+                background:   copied ? "rgba(52,199,89,0.08)" : "transparent",
                 color:        copied ? "#34C759" : "var(--pk-text-2)",
                 fontSize:     "13px",
                 fontWeight:   600,
                 cursor:       "pointer",
                 transition:   "all 180ms ease",
-                display:      "flex",
-                alignItems:   "center",
-                gap:          "6px",
               }}
             >
-              {copied ? "✓ Copied" : "Copy text"}
+              {copied ? "✓ Copied" : "Copy Text"}
             </button>
             <button
               onClick={() => { setPrayer(null); setInput(""); setMoods([]); }}
@@ -366,6 +448,7 @@ export default function PrayPage() {
                 fontSize:     "13px",
                 cursor:       "pointer",
                 transition:   "all 180ms ease",
+                marginLeft:   "auto",
               }}
             >
               New Prayer
