@@ -132,6 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 { href: "/author/collins-asein",     label: "Author" },
                 { href: "/prayer",                   label: "All Prayers" },
                 { href: "/bible",                    label: "Bible" },
+                { href: "/docs",                     label: "Docs" },
                 { href: "/terms",                    label: "Terms" },
                 { href: "/privacy",                  label: "Privacy" },
               ].map((l) => (
