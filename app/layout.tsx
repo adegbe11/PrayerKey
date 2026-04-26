@@ -30,20 +30,18 @@ export const metadata: Metadata = {
     images:      ["/og-image.png"],
   },
   icons: {
+    shortcut: "/prayerkey-icon.png",
     icon: [
-      { url: "/icon-48.png",  sizes: "48x48",   type: "image/png" },
-      { url: "/icon-72.png",  sizes: "72x72",   type: "image/png" },
-      { url: "/icon-96.png",  sizes: "96x96",   type: "image/png" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/prayerkey-icon.png", sizes: "any",     type: "image/png" },
+      { url: "/icon-32.png",        sizes: "32x32",   type: "image/png" },
+      { url: "/icon-96.png",        sizes: "96x96",   type: "image/png" },
+      { url: "/icon-192.png",       sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png",       sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/icon-120.png", sizes: "120x120", type: "image/png" },
-      { url: "/icon-152.png", sizes: "152x152", type: "image/png" },
-      { url: "/icon-167.png", sizes: "167x167", type: "image/png" },
-      { url: "/icon-180.png", sizes: "180x180", type: "image/png" },
-      { url: "/apple-touch-icon.png" },
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
-    other: [{ rel: "mask-icon", url: "/og-image.png" }],
+    other: [{ rel: "mask-icon", url: "/prayerkey-icon.png" }],
   },
   manifest: "/site.webmanifest",
 };
