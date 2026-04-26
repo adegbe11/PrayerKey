@@ -5,12 +5,14 @@ import { getAllVerseRefs, BIBLE_BOOKS } from "@/lib/seo/bible-books";
 /**
  * PrayerKey Programmatic SEO Sitemap
  * ------------------------------------
- * Total pages: ~35,000+
- *   - Static pages      :     9
- *   - Author page       :     1
- *   - Prayer topics     :   116
- *   - Bible verse pages : 31,102  (ISR — generated on first request)
- *   - Bible book hubs   :    66
+ * Total pages: ~35,400+
+ *   - Static pages        :     9
+ *   - Author page         :     1
+ *   - /prayer hub         :     1
+ *   - /prayer/[slug]      :   116
+ *   - /pray/[slug]        :   116
+ *   - Bible verse pages   : 31,102  (ISR — generated on first request)
+ *   - Bible book hubs     :    66
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://www.prayerkey.com";
@@ -30,7 +32,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/author/collins-asein`,    lastModified: now, changeFrequency: "monthly", priority: 0.85 },
   ];
 
-  /* ── Prayer topic hub pages ── */
+  /* ── /prayer hub ── */
+  const prayerHub: MetadataRoute.Sitemap = [
+    { url: `${base}/prayer`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.95 },
+  ];
+
+  /* ── /prayer/[slug] — pSEO prayer pages ── */
+  const prayerSlugPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
+    url:             `${base}/prayer/${slug}`,
+    lastModified:    now,
+    changeFrequency: "monthly" as const,
+    priority:        0.85,
+  }));
+
+  /* ── /pray/[slug] — original prayer pages ── */
   const topicPages: MetadataRoute.Sitemap = ALL_SLUGS.map((slug) => ({
     url:             `${base}/pray/${slug}`,
     lastModified:    now,
@@ -60,6 +75,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticPages,
+    ...prayerHub,
+    ...prayerSlugPages,
     ...topicPages,
     ...bookPages,
     ...versePages,
