@@ -24,8 +24,8 @@ const ORANGE  = "#FF9F0A";
 const BORDER  = "rgba(255,255,255,0.07)";
 const HILITE  = "inset 0 1px 0 rgba(255,255,255,0.06)";
 const T1      = "#FFFFFF";
-const T2      = "rgba(255,255,255,0.62)";
-const T3      = "rgba(255,255,255,0.34)";
+const T2      = "rgba(255,255,255,0.74)";
+const T3      = "rgba(255,255,255,0.48)";
 
 // Cards: glassy navy with top highlight
 const card: React.CSSProperties = {
@@ -605,7 +605,7 @@ export default function LivePage() {
         <div style={{ width:"210px", flexShrink:0, display:"flex", flexDirection:"column" as const,
           ...card, borderRadius:"16px" }}>
           <div style={{ padding:"12px 14px", borderBottom:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
-            <span style={{ fontSize:"9px", fontWeight:700, color:T2, letterSpacing:"0.12em", textTransform:"uppercase" as const }}>Transcript</span>
+            <span style={{ fontSize:"10px", fontWeight:700, color:"rgba(255,255,255,0.88)", letterSpacing:"0.14em", textTransform:"uppercase" as const }}>Transcript</span>
             {listening && (
               <div style={{ display:"flex", alignItems:"center", gap:"5px", padding:"2px 8px",
                 background:`${GREEN}15`, border:`1px solid ${GREEN}30`, borderRadius:"100px" }}>
@@ -614,40 +614,33 @@ export default function LivePage() {
               </div>
             )}
           </div>
-          <div ref={logRef} style={{ flex:1, overflowY:"auto" as const, padding:"10px", display:"flex", flexDirection:"column" as const, gap:"4px" }}>
+          <div ref={logRef} style={{ flex:1, overflowY:"auto" as const, padding:"8px 10px", display:"flex", flexDirection:"column" as const, gap:"1px" }}>
             {transcriptLog.map((entry, i) => {
               const isRecent = i >= transcriptLog.length - 2;
               return (
-                <div key={i} style={{ padding:"7px 10px", borderRadius:"10px",
-                  background: entry.detected ? `${GOLD}0E` : isRecent ? "rgba(255,255,255,0.04)" : "transparent",
-                  border: entry.detected ? `1px solid ${GOLD}30` : `1px solid ${isRecent ? "rgba(255,255,255,0.06)" : "transparent"}`,
+                <div key={i} style={{ padding: entry.detected ? "5px 8px" : "2px 4px", borderRadius:"8px",
+                  background: entry.detected ? `${GOLD}0E` : "transparent",
+                  border: entry.detected ? `1px solid ${GOLD}30` : "1px solid transparent",
                   transition:"all 200ms" }}>
                   {entry.detected && (
-                    <div style={{ display:"flex", alignItems:"center", gap:"5px", marginBottom:"3px" }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:"5px", marginBottom:"2px" }}>
                       <span style={{ width:"4px", height:"4px", borderRadius:"50%", background:GOLD, boxShadow:`0 0 4px ${GOLD}` }} />
                       <span style={{ fontSize:"7px", fontWeight:800, color:GOLD, letterSpacing:"0.12em" }}>VERSE FOUND</span>
                     </div>
                   )}
-                  <span style={{ fontSize:"11px", color: entry.detected ? "#FFE0A0" : isRecent ? T1 : T2, lineHeight:1.5, display:"block" }}>{entry.text}</span>
+                  <span style={{ fontSize:"11px", color: entry.detected ? "#FFE0A0" : isRecent ? T1 : T2, lineHeight:1.45, display:"block" }}>{entry.text}</span>
                 </div>
               );
             })}
             {transcript && (
-              <div style={{ padding:"7px 10px", borderRadius:"10px",
-                background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.10)" }}>
-                <span style={{ fontSize:"11px", color:T1, lineHeight:1.5, display:"block", fontStyle:"italic" }}>{transcript}</span>
+              <div style={{ padding:"3px 4px" }}>
+                <span style={{ fontSize:"11px", color:T1, lineHeight:1.45, display:"block", fontStyle:"italic" }}>{transcript}</span>
               </div>
             )}
             {!transcriptLog.length && !transcript && (
-              <div style={{ textAlign:"center", opacity:0.30, marginTop:"32px", padding:"0 10px" }}>
-                <div style={{ width:"40px", height:"40px", borderRadius:"50%",
-                  border:"1px dashed rgba(255,255,255,0.15)",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  margin:"0 auto 10px" }}>
-                  <span style={{ fontSize:"16px", color:T3 }}>◎</span>
-                </div>
+              <div style={{ textAlign:"center", opacity:0.30, marginTop:"24px", padding:"0 10px" }}>
                 <p style={{ fontSize:"10px", color:T3, margin:0, letterSpacing:"0.06em",
-                  fontFamily:SERIF, fontStyle:"italic" }}>Awaiting signal</p>
+                  fontFamily:SERIF, fontStyle:"italic" }}>Awaiting signal…</p>
               </div>
             )}
           </div>
@@ -671,7 +664,7 @@ export default function LivePage() {
         <div style={{ flex:1, display:"flex", flexDirection:"column" as const, gap:"10px",
           ...card, borderRadius:"16px", padding:"12px" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
-            <span style={{ fontSize:"9px", fontWeight:700, color:T2, letterSpacing:"0.12em", textTransform:"uppercase" as const }}>Program · Preview</span>
+            <span style={{ fontSize:"10px", fontWeight:700, color:"rgba(255,255,255,0.88)", letterSpacing:"0.14em", textTransform:"uppercase" as const }}>Program · Preview</span>
             {previewVerse && (
               <button onClick={() => { setGoLive(true); setLiveVerse(previewVerse); }} style={{
                 display:"flex", alignItems:"center", gap:"6px", padding:"5px 14px", borderRadius:"100px",
@@ -692,7 +685,7 @@ export default function LivePage() {
           ...(goLive && liveVerse ? { boxShadow: `0 8px 28px rgba(0,0,0,0.40), 0 0 0 1px ${BLUE}25, ${HILITE}` } : {}) }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
             <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-              <span style={{ fontSize:"9px", fontWeight:700, color:T2, letterSpacing:"0.12em", textTransform:"uppercase" as const }}>Live · Display</span>
+              <span style={{ fontSize:"10px", fontWeight:700, color:"rgba(255,255,255,0.88)", letterSpacing:"0.14em", textTransform:"uppercase" as const }}>Live · Display</span>
               {goLive && liveVerse && (
                 <div style={{ display:"inline-flex", alignItems:"center", gap:"5px", padding:"3px 9px",
                   background:`${GREEN}15`, border:`1px solid ${GREEN}40`, borderRadius:"100px" }}>
@@ -723,7 +716,7 @@ export default function LivePage() {
           ...card, borderRadius:"16px" }}>
           <div style={{ padding:"12px 14px", borderBottom:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
             <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-              <span style={{ fontSize:"9px", fontWeight:700, color:T2, letterSpacing:"0.12em", textTransform:"uppercase" as const }}>Queue</span>
+              <span style={{ fontSize:"10px", fontWeight:700, color:"rgba(255,255,255,0.88)", letterSpacing:"0.14em", textTransform:"uppercase" as const }}>Queue</span>
               {queue.length > 0 && (
                 <span style={{ fontSize:"9px", fontWeight:800, color:"#0B1726", background:YELLOW,
                   padding:"2px 8px", borderRadius:"100px", boxShadow:`0 0 10px ${YELLOW}40` }}>
@@ -737,18 +730,11 @@ export default function LivePage() {
           </div>
           <div style={{ flex:1, overflowY:"auto" as const, padding:"10px" }}>
             {queue.length === 0 ? (
-              <div style={{ display:"flex", flexDirection:"column" as const, alignItems:"center", justifyContent:"center",
-                height:"100%", gap:"10px", opacity:0.30, padding:"20px 10px", textAlign:"center" }}>
-                <div style={{ width:"44px", height:"44px", borderRadius:"50%",
-                  border:"1px dashed rgba(255,255,255,0.18)",
-                  display:"flex", alignItems:"center", justifyContent:"center" }}>
-                  <span style={{ fontSize:"18px", color:T3 }}>⏵</span>
-                </div>
-                <p style={{ fontSize:"10px", color:T3, margin:"0 0 4px", letterSpacing:"0.06em",
-                  fontFamily:SERIF, fontStyle:"italic" }}>Queue empty</p>
-                <p style={{ fontSize:"9px", color:T3, margin:0, lineHeight:1.5 }}>
-                  Press <kbd style={{ fontFamily:"'SF Mono',monospace", color:T1, fontSize:"8px", padding:"1px 6px",
-                    background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.14)", borderRadius:"4px" }}>Q</kbd> to add
+              <div style={{ padding:"10px 4px", textAlign:"center" }}>
+                <p style={{ fontSize:"10px", color:T3, margin:0, lineHeight:1.6 }}>
+                  <span style={{ fontFamily:SERIF, fontStyle:"italic", marginRight:"8px" }}>Queue empty.</span>
+                  Press <kbd style={{ fontFamily:"'SF Mono',monospace", color:T2, fontSize:"8px", padding:"1px 5px",
+                    background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:"4px" }}>Q</kbd> to add
                 </p>
               </div>
             ) : queue.map(item => (
@@ -847,14 +833,8 @@ export default function LivePage() {
                     </div>
                   );
                 }) : !chapterTitle && (
-                  <div style={{ textAlign:"center", padding:"36px 20px", opacity:0.30 }}>
-                    <div style={{ width:"48px", height:"48px", borderRadius:"50%",
-                      border:"1px dashed rgba(255,255,255,0.16)",
-                      display:"flex", alignItems:"center", justifyContent:"center",
-                      margin:"0 auto 14px" }}>
-                      <span style={{ fontSize:"20px", color:T3 }}>⌘</span>
-                    </div>
-                    <p style={{ fontSize:"11px", color:T3, margin:0, fontFamily:SERIF, fontStyle:"italic" }}>Enter book + chapter</p>
+                  <div style={{ textAlign:"center", padding:"14px 20px", opacity:0.55 }}>
+                    <p style={{ fontSize:"11px", color:T3, margin:0, fontFamily:SERIF, fontStyle:"italic" }}>Enter book + chapter…</p>
                   </div>
                 )}
               </>
@@ -875,14 +855,8 @@ export default function LivePage() {
                     <p style={{ fontSize:"11px", color:T2, margin:0, lineHeight:1.55, fontStyle:"italic", fontFamily:SERIF }}>{v.verseText.slice(0,140)}{v.verseText.length>140?"…":""}</p>
                   </div>
                 )) : (
-                  <div style={{ textAlign:"center", padding:"36px 20px", opacity:0.30 }}>
-                    <div style={{ width:"48px", height:"48px", borderRadius:"50%",
-                      border:"1px dashed rgba(255,255,255,0.16)",
-                      display:"flex", alignItems:"center", justifyContent:"center",
-                      margin:"0 auto 14px" }}>
-                      <span style={{ fontSize:"18px", color:T3 }}>◎</span>
-                    </div>
-                    <p style={{ fontSize:"11px", color:T3, margin:0, fontFamily:SERIF, fontStyle:"italic" }}>Search by topic or phrase</p>
+                  <div style={{ textAlign:"center", padding:"14px 20px", opacity:0.55 }}>
+                    <p style={{ fontSize:"11px", color:T3, margin:0, fontFamily:SERIF, fontStyle:"italic" }}>Search by topic or phrase…</p>
                   </div>
                 )}
               </>
@@ -895,7 +869,7 @@ export default function LivePage() {
           ...card, borderRadius:"16px" }}>
           <div style={{ padding:"12px 14px", borderBottom:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
             <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-              <span style={{ fontSize:"9px", fontWeight:700, color:T2, letterSpacing:"0.12em", textTransform:"uppercase" as const }}>Detections</span>
+              <span style={{ fontSize:"10px", fontWeight:700, color:"rgba(255,255,255,0.88)", letterSpacing:"0.14em", textTransform:"uppercase" as const }}>Detections</span>
               {detections.length > 0 && (
                 <span style={{ fontSize:"9px", fontWeight:800, color:"#0B1726", background:YELLOW, padding:"2px 8px", borderRadius:"100px", boxShadow:`0 0 10px ${YELLOW}40` }}>{detections.length}</span>
               )}
@@ -904,38 +878,29 @@ export default function LivePage() {
           </div>
           <div style={{ flex:1, overflowY:"auto" as const, padding:"10px" }}>
             {detections.length === 0 ? (
-              <div style={{ display:"flex", flexDirection:"column" as const, alignItems:"center", justifyContent:"center",
-                height:"100%", gap:"12px", opacity:0.30, padding:"20px 10px", textAlign:"center" }}>
-                <div style={{ width:"48px", height:"48px", borderRadius:"50%",
-                  border:"1px dashed rgba(255,255,255,0.16)",
-                  display:"flex", alignItems:"center", justifyContent:"center" }}>
-                  <span style={{ fontSize:"20px", color:T3 }}>◇</span>
-                </div>
-                <p style={{ fontSize:"11px", color:T3, margin:0, fontFamily:SERIF, fontStyle:"italic" }}>Awaiting verses</p>
-                <p style={{ fontSize:"10px", color:T3, margin:0, lineHeight:1.5 }}>AI is listening for scripture</p>
+              <div style={{ padding:"14px 12px", textAlign:"center", opacity:0.55 }}>
+                <p style={{ fontSize:"11px", color:T3, margin:0, fontFamily:SERIF, fontStyle:"italic" }}>Awaiting verses…</p>
               </div>
             ) : detections.map((v, i) => {
               const confColor = v.confidence >= 0.9 ? GREEN : v.confidence >= 0.7 ? YELLOW : ORANGE;
               return (
-                <div key={i} style={{ padding:"11px 12px", marginBottom:"7px",
+                <div key={i} style={{ padding:"8px 10px", marginBottom:"5px",
                   background:"rgba(255,255,255,0.03)", border:`1px solid ${BORDER}`,
-                  borderRadius:"12px", boxShadow:HILITE,
+                  borderRadius:"10px", boxShadow:HILITE,
                   animation: i === 0 ? "slideInRight 320ms cubic-bezier(0.22,1,0.36,1)" : "none" }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:"7px", marginBottom:"6px" }}>
-                    <div style={{ width:"6px", height:"6px", borderRadius:"50%", background:confColor, flexShrink:0, boxShadow:`0 0 5px ${confColor}` }} />
-                    <span style={{ fontSize:"12px", fontWeight:700, color:GOLD, flex:1 }}>{v.verseRef}</span>
+                  <div style={{ display:"flex", alignItems:"center", gap:"7px", marginBottom:"4px" }}>
+                    <div style={{ width:"5px", height:"5px", borderRadius:"50%", background:confColor, flexShrink:0, boxShadow:`0 0 4px ${confColor}` }} />
+                    <span style={{ fontSize:"11px", fontWeight:700, color:GOLD, flex:1 }}>{v.verseRef}</span>
+                    <button onClick={() => presentVerse(v)} style={{ padding:"3px 9px", borderRadius:"100px",
+                      background:`linear-gradient(135deg, ${BLUE}, ${BLUE_HI})`, border:`1px solid ${BLUE}80`, color:"#FFFFFF", fontSize:"8px",
+                      fontWeight:700, cursor:"pointer", letterSpacing:"0.04em", boxShadow:`0 2px 6px ${BLUE}40, ${HILITE}` }}>▶ Present</button>
+                    <button onClick={() => addToQueue(v)} style={{ padding:"3px 8px", borderRadius:"100px",
+                      background:"rgba(255,255,255,0.04)", border:`1px solid ${BORDER}`, color:T2, fontSize:"8px", cursor:"pointer", boxShadow:HILITE }}>+Q</button>
                   </div>
-                  <p style={{ fontSize:"11px", color:T2, margin:"0 0 9px", lineHeight:1.5, fontStyle:"italic", fontFamily:SERIF,
-                    overflow:"hidden", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical" as const }}>
+                  <p style={{ fontSize:"10.5px", color:T2, margin:0, lineHeight:1.45, fontStyle:"italic", fontFamily:SERIF,
+                    overflow:"hidden", whiteSpace:"nowrap" as const, textOverflow:"ellipsis" }}>
                     {v.verseText}
                   </p>
-                  <div style={{ display:"flex", gap:"6px" }}>
-                    <button onClick={() => presentVerse(v)} style={{ flex:1, padding:"6px 10px", borderRadius:"100px",
-                      background:`linear-gradient(135deg, ${BLUE}, ${BLUE_HI})`, border:`1px solid ${BLUE}80`, color:"#FFFFFF", fontSize:"9px",
-                      fontWeight:700, cursor:"pointer", letterSpacing:"0.04em", boxShadow:`0 2px 10px ${BLUE}40, ${HILITE}` }}>▶ Present</button>
-                    <button onClick={() => addToQueue(v)} style={{ flex:1, padding:"6px 10px", borderRadius:"100px",
-                      background:"rgba(255,255,255,0.04)", border:`1px solid ${BORDER}`, color:T2, fontSize:"9px", cursor:"pointer", boxShadow:HILITE }}>+ Queue</button>
-                  </div>
                 </div>
               );
             })}
