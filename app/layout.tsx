@@ -15,14 +15,7 @@ export const metadata: Metadata = {
     description: "Instantly generate prayers with scripture, detect Bible verses during live sermons, and search all 66 books of the Bible. Free. No account needed.",
     url:         BASE_URL,
     siteName:    "PrayerKey",
-    images: [
-      {
-        url:    "/og-image.png",
-        width:  1200,
-        height: 630,
-        alt:    "PrayerKey — AI-powered church companion",
-      },
-    ],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "PrayerKey — AI-powered church companion" }],
     locale: "en_US",
     type:   "website",
   },
@@ -46,28 +39,42 @@ export const metadata: Metadata = {
       { url: "/icon-180.png", sizes: "180x180", type: "image/png" },
       { url: "/apple-touch-icon.png" },
     ],
-    other: [
-      { rel: "mask-icon", url: "/og-image.png" },
-    ],
+    other: [{ rel: "mask-icon", url: "/og-image.png" }],
   },
   manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
+      <head>
+        {/* ── Anti-flash theme script — runs before any paint ── */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('pk-theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body>
         <Cursor />
         <SimpleNav />
 
-        <main style={{ maxWidth: "1440px", margin: "0 auto", padding: "clamp(32px,5vw,64px) clamp(20px,4vw,80px) 100px" }}>
+        <main style={{
+          maxWidth: "1440px",
+          margin:   "0 auto",
+          padding:  "clamp(32px,5vw,64px) clamp(20px,4vw,80px) 100px",
+        }}>
           {children}
         </main>
 
-        <footer style={{ borderTop: "1px solid rgba(255,255,255,0.08)", overflow: "hidden" }}>
-
+        <footer style={{
+          borderTop:  "1px solid var(--pk-footer-border)",
+          overflow:   "hidden",
+          background: "var(--pk-surface)",
+          transition: "background 250ms ease, border-color 250ms ease",
+        }}>
           {/* Massive wordmark */}
-          <div style={{ padding: "0 0 0", lineHeight: 0, userSelect: "none" }}>
+          <div style={{ padding: "0", lineHeight: 0, userSelect: "none" }}>
             <svg
               width="100%"
               viewBox="0 0 1000 175"
@@ -83,8 +90,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   fontFamily:    "-apple-system,'SF Pro Display','Helvetica Neue',sans-serif",
                   fontWeight:    900,
                   fontSize:      "175px",
-                  fill:          "#C49A2A",
+                  fill:          "var(--pk-wordmark-fill)",
                   letterSpacing: "-4px",
+                  opacity:       0.18,
                 }}
               >
                 PRAYERKEY
@@ -92,9 +100,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </svg>
           </div>
 
-          {/* Bottom links row */}
+          {/* Footer nav */}
           <div style={{
-            borderTop:      "1px solid rgba(255,255,255,0.06)",
+            borderTop:      "1px solid var(--pk-footer-border)",
             padding:        "18px clamp(20px,4vw,48px)",
             display:        "flex",
             flexWrap:       "wrap",
@@ -102,18 +110,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             justifyContent: "space-between",
             gap:            "12px",
           }}>
-            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.18)", letterSpacing: "0.02em" }}>
+            <span style={{ fontSize: "12px", color: "var(--pk-footer-text)", letterSpacing: "0.02em" }}>
               {new Date().getFullYear()} © PrayerKey
             </span>
-            <div style={{ display: "flex", gap: "28px" }}>
+            <div style={{ display: "flex", gap: "28px", flexWrap: "wrap" }}>
               {[
-                { href: "/about",   label: "About"          },
-                { href: "/terms",   label: "Terms"          },
-                { href: "/privacy", label: "Privacy Policy" },
+                { href: "/about",                    label: "About" },
+                { href: "/author/collins-asein",     label: "Author" },
+                { href: "/prayer",                   label: "All Prayers" },
+                { href: "/bible",                    label: "Bible" },
+                { href: "/terms",                    label: "Terms" },
+                { href: "/privacy",                  label: "Privacy" },
               ].map((l) => (
                 <Link key={l.href} href={l.href} style={{
                   fontSize:       "12px",
-                  color:          "rgba(255,255,255,0.28)",
+                  color:          "var(--pk-footer-text)",
                   textDecoration: "none",
                   letterSpacing:  "0.02em",
                   transition:     "color 150ms ease",
@@ -123,7 +134,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ))}
             </div>
           </div>
-
         </footer>
       </body>
     </html>

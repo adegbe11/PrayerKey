@@ -3,21 +3,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import DarkModeToggle from "@/components/ui/DarkModeToggle";
 
 const LINKS = [
-  { href: "/pray",  label: "Pray"        },
-  { href: "/live",  label: "Live Sermon" },
-  { href: "/bible", label: "Bible"       },
-  { href: "/about", label: "About"       },
+  { href: "/pray",   label: "Pray"        },
+  { href: "/prayer", label: "All Prayers" },
+  { href: "/bible",  label: "Bible"       },
+  { href: "/live",   label: "Live Sermon" },
+  { href: "/about",  label: "About"       },
 ];
 
 export default function SimpleNav() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
 
-  // Close menu on route change
   useEffect(() => { setOpen(false); }, [path]);
-  // Prevent body scroll when menu open
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -29,10 +29,11 @@ export default function SimpleNav() {
         position:       "sticky",
         top:            0,
         zIndex:         1000,
-        borderBottom:   "1px solid rgba(255,255,255,0.07)",
-        background:     "rgba(6,6,8,0.85)",
+        borderBottom:   "1px solid var(--pk-nav-border)",
+        background:     "var(--pk-nav-bg)",
         backdropFilter: "blur(24px) saturate(200%)",
         WebkitBackdropFilter: "blur(24px) saturate(200%)",
+        transition:     "background 250ms ease, border-color 250ms ease",
       }}>
         <div style={{
           maxWidth:   "1440px",
@@ -45,20 +46,28 @@ export default function SimpleNav() {
         }}>
 
           {/* Logo */}
-          <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "10px", marginRight: "28px", flexShrink: 0 }}>
+          <Link href="/" style={{
+            textDecoration: "none",
+            display:        "flex",
+            alignItems:     "center",
+            gap:            "10px",
+            marginRight:    "20px",
+            flexShrink:     0,
+          }}>
             <Image
               src="/og-image.png"
               alt="PrayerKey"
-              width={36}
-              height={36}
-              style={{ borderRadius: "6px", display: "block" }}
+              width={34}
+              height={34}
+              style={{ borderRadius: "8px", display: "block" }}
               priority
             />
             <span style={{
               fontSize:      "15px",
               fontWeight:    700,
-              color:         "#fff",
+              color:         "var(--pk-nav-text)",
               letterSpacing: "-0.03em",
+              transition:    "color 250ms ease",
             }}>
               PrayerKey
             </span>
@@ -67,20 +76,20 @@ export default function SimpleNav() {
           {/* Desktop nav links */}
           <nav className="desktop-only" style={{ display: "flex", alignItems: "center", gap: "2px", flex: 1 }}>
             {LINKS.map((l) => {
-              const active = path.startsWith(l.href);
+              const active = path === l.href || (l.href !== "/" && path.startsWith(l.href));
               return (
                 <Link key={l.href} href={l.href} style={{
                   textDecoration: "none",
-                  padding:        "8px 16px",
+                  padding:        "8px 14px",
                   minHeight:      "44px",
                   display:        "flex",
                   alignItems:     "center",
                   fontSize:       "13px",
                   fontWeight:     active ? 600 : 400,
-                  color:          active ? "#C49A2A" : "rgba(255,255,255,0.42)",
-                  borderRadius:   "6px",
-                  background:     active ? "rgba(196,154,42,0.08)" : "transparent",
-                  border:         active ? "1px solid rgba(196,154,42,0.2)" : "1px solid transparent",
+                  color:          active ? "var(--pk-nav-active-clr)" : "var(--pk-nav-text-muted)",
+                  borderRadius:   "8px",
+                  background:     active ? "var(--pk-nav-active-bg)" : "transparent",
+                  border:         active ? "1px solid var(--pk-accent-border)" : "1px solid transparent",
                   transition:     "all 180ms ease",
                   letterSpacing:  "-0.01em",
                 }}>
@@ -90,88 +99,90 @@ export default function SimpleNav() {
             })}
           </nav>
 
-          {/* Desktop Go Live CTA */}
-          <Link href="/live" className="desktop-only" style={{ textDecoration: "none", flexShrink: 0 }}>
-            <div style={{
-              display:      "flex",
-              alignItems:   "center",
-              gap:          "7px",
-              padding:      "10px 20px",
-              minHeight:    "44px",
-              background:   "#FF3B30",
-              border:       "2px solid #FF3B30",
-              boxShadow:    "3px 3px 0 0 rgba(255,59,48,0.4)",
-              borderRadius: "6px",
-              transition:   "transform 150ms ease, box-shadow 150ms ease",
-              cursor:       "none",
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLDivElement).style.transform = "translate(-2px,-2px)";
-              (e.currentTarget as HTMLDivElement).style.boxShadow = "5px 5px 0 0 rgba(255,59,48,0.4)";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLDivElement).style.transform = "translate(0,0)";
-              (e.currentTarget as HTMLDivElement).style.boxShadow = "3px 3px 0 0 rgba(255,59,48,0.4)";
-            }}
-            >
-              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff", display: "inline-block", animation: "liveDot 1.5s ease infinite" }} />
-              <span style={{ fontSize: "12px", fontWeight: 700, color: "#fff", letterSpacing: "0.04em", textTransform: "uppercase" }}>
-                Go Live
-              </span>
-            </div>
-          </Link>
+          {/* Desktop right side */}
+          <div className="desktop-only" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {/* Dark mode toggle */}
+            <DarkModeToggle />
 
-          {/* Spacer on mobile */}
+            {/* Go Live CTA */}
+            <Link href="/live" style={{ textDecoration: "none", flexShrink: 0 }}>
+              <div style={{
+                display:      "flex",
+                alignItems:   "center",
+                gap:          "7px",
+                padding:      "10px 18px",
+                minHeight:    "44px",
+                background:   "#B22222",
+                border:       "2px solid #B22222",
+                boxShadow:    "3px 3px 0 0 rgba(178,34,34,0.3)",
+                borderRadius: "8px",
+                transition:   "transform 150ms ease, box-shadow 150ms ease",
+                cursor:       "none",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLDivElement).style.transform  = "translate(-2px,-2px)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "5px 5px 0 0 rgba(178,34,34,0.4)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLDivElement).style.transform  = "translate(0,0)";
+                (e.currentTarget as HTMLDivElement).style.boxShadow = "3px 3px 0 0 rgba(178,34,34,0.3)";
+              }}
+              >
+                <span style={{
+                  width: "6px", height: "6px", borderRadius: "50%",
+                  background: "#fff", display: "inline-block",
+                  animation: "liveDot 1.5s ease infinite",
+                }} />
+                <span style={{
+                  fontSize: "12px", fontWeight: 700, color: "#fff",
+                  letterSpacing: "0.04em", textTransform: "uppercase",
+                }}>
+                  Go Live
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          {/* Mobile: spacer + toggle + hamburger */}
           <div style={{ flex: 1 }} className="mobile-only" />
-
-          {/* Hamburger button (mobile only) */}
+          <DarkModeToggle />
           <button
             className="mobile-only touch-target"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => setOpen(o => !o)}
             style={{
-              background:  "transparent",
-              border:      "1px solid rgba(255,255,255,0.12)",
-              borderRadius: "6px",
-              width:       "44px",
-              height:      "44px",
-              display:     "flex",
-              flexDirection: "column",
-              alignItems:  "center",
+              background:     "transparent",
+              border:         "1px solid var(--pk-border)",
+              borderRadius:   "8px",
+              width:          "44px",
+              height:         "44px",
+              display:        "flex",
+              flexDirection:  "column",
+              alignItems:     "center",
               justifyContent: "center",
-              gap:         "5px",
-              cursor:      "pointer",
-              padding:     "0",
-              flexShrink:  0,
+              gap:            "5px",
+              cursor:         "pointer",
+              padding:        "0",
+              flexShrink:     0,
+              transition:     "border-color 200ms ease",
             }}
           >
-            <span style={{
-              display:    "block",
-              width:      "18px",
-              height:     "2px",
-              background: "#fff",
-              borderRadius: "2px",
-              transition: "transform 250ms ease, opacity 250ms ease",
-              transform:  open ? "translateY(7px) rotate(45deg)" : "none",
-            }} />
-            <span style={{
-              display:    "block",
-              width:      "18px",
-              height:     "2px",
-              background: "#fff",
-              borderRadius: "2px",
-              transition: "opacity 250ms ease",
-              opacity:    open ? 0 : 1,
-            }} />
-            <span style={{
-              display:    "block",
-              width:      "18px",
-              height:     "2px",
-              background: "#fff",
-              borderRadius: "2px",
-              transition: "transform 250ms ease, opacity 250ms ease",
-              transform:  open ? "translateY(-7px) rotate(-45deg)" : "none",
-            }} />
+            {[
+              { t: open ? "translateY(7px) rotate(45deg)"  : "none",  o: 1 },
+              { t: "none",                                              o: open ? 0 : 1 },
+              { t: open ? "translateY(-7px) rotate(-45deg)" : "none", o: 1 },
+            ].map((s, i) => (
+              <span key={i} style={{
+                display:      "block",
+                width:        "18px",
+                height:       "2px",
+                background:   "var(--pk-text)",
+                borderRadius: "2px",
+                transition:   "transform 250ms ease, opacity 250ms ease, background 250ms ease",
+                transform:    s.t,
+                opacity:      s.o,
+              }} />
+            ))}
           </button>
 
         </div>
@@ -179,23 +190,23 @@ export default function SimpleNav() {
 
       {/* Mobile full-screen overlay menu */}
       <div style={{
-        position:   "fixed",
-        inset:      0,
-        zIndex:     999,
-        background: "rgba(6,6,8,0.97)",
+        position:       "fixed",
+        inset:          0,
+        zIndex:         999,
+        background:     "var(--pk-bg)",
         backdropFilter: "blur(24px)",
-        display:    "flex",
-        flexDirection: "column",
+        display:        "flex",
+        flexDirection:  "column",
         justifyContent: "center",
-        alignItems: "center",
-        gap:        "8px",
-        opacity:    open ? 1 : 0,
-        pointerEvents: open ? "auto" : "none",
-        transition: "opacity 280ms ease",
-        paddingTop: "64px",
+        alignItems:     "center",
+        gap:            "4px",
+        opacity:        open ? 1 : 0,
+        pointerEvents:  open ? "auto" : "none",
+        transition:     "opacity 280ms ease",
+        paddingTop:     "64px",
       }}>
         {LINKS.map((l, i) => {
-          const active = path.startsWith(l.href);
+          const active = path === l.href || (l.href !== "/" && path.startsWith(l.href));
           return (
             <Link
               key={l.href}
@@ -213,8 +224,8 @@ export default function SimpleNav() {
                 fontSize:       "clamp(22px, 5vw, 28px)",
                 fontWeight:     700,
                 letterSpacing:  "-0.02em",
-                color:          active ? "#C49A2A" : "rgba(255,255,255,0.72)",
-                borderBottom:   "1px solid rgba(255,255,255,0.06)",
+                color:          active ? "var(--pk-accent)" : "var(--pk-text-2)",
+                borderBottom:   "1px solid var(--pk-border)",
                 transform:      open ? "translateY(0)" : "translateY(20px)",
                 opacity:        open ? 1 : 0,
                 transition:     `transform 300ms cubic-bezier(0.22,1,0.36,1) ${i * 60}ms, opacity 300ms ease ${i * 60}ms`,
@@ -235,16 +246,20 @@ export default function SimpleNav() {
             alignItems:     "center",
             gap:            "10px",
             padding:        "16px 40px",
-            background:     "#FF3B30",
-            border:         "2px solid #FF3B30",
-            boxShadow:      "4px 4px 0 0 rgba(255,59,48,0.4)",
-            borderRadius:   "8px",
+            background:     "#B22222",
+            border:         "2px solid #B22222",
+            boxShadow:      "4px 4px 0 0 rgba(178,34,34,0.35)",
+            borderRadius:   "10px",
             transform:      open ? "translateY(0)" : "translateY(20px)",
             opacity:        open ? 1 : 0,
             transition:     `transform 300ms cubic-bezier(0.22,1,0.36,1) ${LINKS.length * 60}ms, opacity 300ms ease ${LINKS.length * 60}ms`,
           }}
         >
-          <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#fff", display: "inline-block", animation: "liveDot 1.5s ease infinite" }} />
+          <span style={{
+            width: "8px", height: "8px", borderRadius: "50%",
+            background: "#fff", display: "inline-block",
+            animation: "liveDot 1.5s ease infinite",
+          }} />
           <span style={{ fontSize: "16px", fontWeight: 700, color: "#fff", letterSpacing: "0.06em", textTransform: "uppercase" }}>
             Go Live Now
           </span>
@@ -255,14 +270,6 @@ export default function SimpleNav() {
         @keyframes liveDot {
           0%,100% { opacity:1; transform:scale(1); }
           50%     { opacity:0.4; transform:scale(0.7); }
-        }
-        @media (max-width: 768px) {
-          .desktop-only { display: none !important; }
-          .mobile-only  { display: flex !important; }
-        }
-        @media (min-width: 769px) {
-          .mobile-only  { display: none !important; }
-          .desktop-only { display: flex !important; }
         }
       `}</style>
     </>
