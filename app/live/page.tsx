@@ -157,6 +157,7 @@ export default function LivePage() {
   const [goLive,        setGoLive]        = useState(false);
   const [detections,    setDetections]    = useState<DetectedVerse[]>([]);
   const [queue,         setQueue]         = useState<QueueItem[]>([]);
+  const [sidebarTab,    setSidebarTab]    = useState<"detections" | "queue">("detections");
   const [autoMode,      setAutoMode]      = useState(false);
   const [searchMode,    setSearchMode]    = useState<SearchMode>("book");
   const [searchQuery,   setSearchQuery]   = useState("");
@@ -597,9 +598,13 @@ export default function LivePage() {
         </div>
       </div>
 
+      {/* ── MAIN AREA — left column (top+bottom) + right Detections sidebar ── */}
+      <div style={{ flex:1, display:"flex", overflow:"hidden", position:"relative" as const, zIndex:1, gap:"10px", padding:"10px" }}>
+      <div style={{ flex:1, display:"flex", flexDirection:"column" as const, gap:"10px", overflow:"hidden", minWidth:0 }}>
+
       {/* ── TOP ROW ── */}
       <div style={{ height:"52%", flexShrink:0, display:"flex", overflow:"hidden",
-        borderBottom:`1px solid ${BORDER}`, position:"relative" as const, zIndex:1, gap:"10px", padding:"10px" }}>
+        position:"relative" as const, zIndex:1, gap:"10px" }}>
 
         {/* Col 1 — Transcript */}
         <div style={{ width:"210px", flexShrink:0, display:"flex", flexDirection:"column" as const,
@@ -711,58 +716,10 @@ export default function LivePage() {
           <VerseScreen verse={liveVerse} empty="No verse on air" isLive={goLive && !!liveVerse} />
         </div>
 
-        {/* Col 4 — Queue */}
-        <div style={{ width:"220px", flexShrink:0, display:"flex", flexDirection:"column" as const,
-          ...card, borderRadius:"16px" }}>
-          <div style={{ padding:"12px 14px", borderBottom:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-              <span style={{ fontSize:"10px", fontWeight:700, color:"rgba(255,255,255,0.88)", letterSpacing:"0.14em", textTransform:"uppercase" as const }}>Queue</span>
-              {queue.length > 0 && (
-                <span style={{ fontSize:"9px", fontWeight:800, color:"#0B1726", background:YELLOW,
-                  padding:"2px 8px", borderRadius:"100px", boxShadow:`0 0 10px ${YELLOW}40` }}>
-                  {queue.length}
-                </span>
-              )}
-            </div>
-            {queue.length > 0 && (
-              <button onClick={() => setQueue([])} style={{ fontSize:"8px", color:T3, background:"none", border:"none", cursor:"pointer", letterSpacing:"0.04em" }}>Clear</button>
-            )}
-          </div>
-          <div style={{ flex:1, overflowY:"auto" as const, padding:"10px" }}>
-            {queue.length === 0 ? (
-              <div style={{ padding:"10px 4px", textAlign:"center" }}>
-                <p style={{ fontSize:"10px", color:T3, margin:0, lineHeight:1.6 }}>
-                  <span style={{ fontFamily:SERIF, fontStyle:"italic", marginRight:"8px" }}>Queue empty.</span>
-                  Press <kbd style={{ fontFamily:"'SF Mono',monospace", color:T2, fontSize:"8px", padding:"1px 5px",
-                    background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:"4px" }}>Q</kbd> to add
-                </p>
-              </div>
-            ) : queue.map(item => (
-              <div key={item.queueId} style={{ padding:"10px 12px", marginBottom:"6px",
-                background:"rgba(255,255,255,0.04)", border:`1px solid ${BORDER}`,
-                borderRadius:"12px",
-                display:"flex", alignItems:"center", gap:"8px", boxShadow:HILITE }}>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize:"11px", fontWeight:700, color:GOLD, whiteSpace:"nowrap" as const,
-                    overflow:"hidden", textOverflow:"ellipsis" }}>{item.verseRef}</div>
-                  <div style={{ fontSize:"8px", color:T3, marginTop:"2px", letterSpacing:"0.06em", textTransform:"uppercase" as const }}>{item.source === "ai" ? "AI" : "Manual"}</div>
-                </div>
-                <button onClick={() => playFromQueue(item)} style={{ width:"26px", height:"26px", borderRadius:"50%",
-                  background:`linear-gradient(135deg, ${BLUE}, ${BLUE_HI})`,
-                  border:`1px solid ${BLUE}80`, color:"#FFFFFF", fontSize:"9px",
-                  cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
-                  flexShrink:0, boxShadow:`0 3px 10px ${BLUE}50, ${HILITE}` }}>▶</button>
-                <button onClick={() => removeFromQueue(item.queueId)} style={{ width:"22px", height:"22px", borderRadius:"50%",
-                  background:"transparent", border:`1px solid ${BORDER}`, color:T3, fontSize:"10px",
-                  cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* ── BOTTOM ROW ── */}
-      <div style={{ flex:1, display:"flex", overflow:"hidden", position:"relative" as const, zIndex:1, gap:"10px", padding:"0 10px 10px" }}>
+      <div style={{ flex:1, display:"flex", overflow:"hidden", position:"relative" as const, zIndex:1, gap:"10px" }}>
 
         {/* Bible Browser */}
         <div style={{ flex:1, display:"flex", flexDirection:"column" as const, overflow:"hidden",
@@ -864,20 +821,50 @@ export default function LivePage() {
           </div>
         </div>
 
-        {/* Detections */}
-        <div style={{ width:"280px", flexShrink:0, display:"flex", flexDirection:"column" as const,
-          ...card, borderRadius:"16px" }}>
-          <div style={{ padding:"12px 14px", borderBottom:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-              <span style={{ fontSize:"10px", fontWeight:700, color:"rgba(255,255,255,0.88)", letterSpacing:"0.14em", textTransform:"uppercase" as const }}>Detections</span>
-              {detections.length > 0 && (
-                <span style={{ fontSize:"9px", fontWeight:800, color:"#0B1726", background:YELLOW, padding:"2px 8px", borderRadius:"100px", boxShadow:`0 0 10px ${YELLOW}40` }}>{detections.length}</span>
-              )}
-            </div>
-            {detections.length > 0 && <button onClick={() => setDetections([])} style={{ fontSize:"8px", color:T3, background:"none", border:"none", cursor:"pointer", letterSpacing:"0.04em" }}>Clear</button>}
+      </div>
+
+      </div>{/* end left column */}
+
+      {/* ── DETECTIONS / QUEUE — tall right sidebar with tab toggle ── */}
+      <div style={{ width:"300px", flexShrink:0, display:"flex", flexDirection:"column" as const,
+        ...card, borderRadius:"16px" }}>
+        <div style={{ padding:"10px 12px", borderBottom:`1px solid ${BORDER}`, display:"flex", alignItems:"center", justifyContent:"space-between", gap:"8px", flexShrink:0 }}>
+          {/* Segmented tab pill */}
+          <div style={{ display:"flex", padding:"3px", background:"rgba(255,255,255,0.04)", border:`1px solid ${BORDER}`, borderRadius:"100px", boxShadow:HILITE }}>
+            {(["detections","queue"] as const).map(tab => {
+              const active = sidebarTab === tab;
+              const count  = tab === "detections" ? detections.length : queue.length;
+              const label  = tab === "detections" ? "Detections" : "Queue";
+              return (
+                <button key={tab} onClick={() => setSidebarTab(tab)} style={{
+                  display:"flex", alignItems:"center", gap:"6px", padding:"4px 11px", borderRadius:"100px",
+                  background: active ? "rgba(255,255,255,0.10)" : "transparent",
+                  border: active ? "1px solid rgba(255,255,255,0.14)" : "1px solid transparent",
+                  color: active ? T1 : T3, fontSize:"10px", fontWeight:700, cursor:"pointer",
+                  letterSpacing:"0.06em", textTransform:"uppercase" as const,
+                  boxShadow: active ? HILITE : "none", transition:"all 180ms" }}>
+                  {label}
+                  {count > 0 && (
+                    <span style={{ fontSize:"9px", fontWeight:800, color:"#0B1726", background:YELLOW,
+                      padding:"1px 6px", borderRadius:"100px", letterSpacing:0,
+                      boxShadow: active ? `0 0 8px ${YELLOW}40` : "none" }}>{count}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
-          <div style={{ flex:1, overflowY:"auto" as const, padding:"10px" }}>
-            {detections.length === 0 ? (
+          {sidebarTab === "detections" && detections.length > 0 && (
+            <button onClick={() => setDetections([])} style={{ fontSize:"8px", color:T3, background:"none", border:"none", cursor:"pointer", letterSpacing:"0.04em" }}>Clear</button>
+          )}
+          {sidebarTab === "queue" && queue.length > 0 && (
+            <button onClick={() => setQueue([])} style={{ fontSize:"8px", color:T3, background:"none", border:"none", cursor:"pointer", letterSpacing:"0.04em" }}>Clear</button>
+          )}
+        </div>
+
+        {/* Body */}
+        <div style={{ flex:1, overflowY:"auto" as const, padding:"10px" }}>
+          {sidebarTab === "detections" ? (
+            detections.length === 0 ? (
               <div style={{ padding:"14px 12px", textAlign:"center", opacity:0.55 }}>
                 <p style={{ fontSize:"11px", color:T3, margin:0, fontFamily:SERIF, fontStyle:"italic" }}>Awaiting verses…</p>
               </div>
@@ -898,15 +885,45 @@ export default function LivePage() {
                       background:"rgba(255,255,255,0.04)", border:`1px solid ${BORDER}`, color:T2, fontSize:"8px", cursor:"pointer", boxShadow:HILITE }}>+Q</button>
                   </div>
                   <p style={{ fontSize:"10.5px", color:T2, margin:0, lineHeight:1.45, fontStyle:"italic", fontFamily:SERIF,
-                    overflow:"hidden", whiteSpace:"nowrap" as const, textOverflow:"ellipsis" }}>
+                    overflow:"hidden", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical" as const }}>
                     {v.verseText}
                   </p>
                 </div>
               );
-            })}
-          </div>
+            })
+          ) : (
+            queue.length === 0 ? (
+              <div style={{ padding:"14px 12px", textAlign:"center", opacity:0.55 }}>
+                <p style={{ fontSize:"11px", color:T3, margin:0, lineHeight:1.6 }}>
+                  <span style={{ fontFamily:SERIF, fontStyle:"italic" }}>Queue empty.</span><br/>
+                  Press <kbd style={{ fontFamily:"'SF Mono',monospace", color:T2, fontSize:"8px", padding:"1px 5px",
+                    background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:"4px" }}>Q</kbd> on a staged verse to add
+                </p>
+              </div>
+            ) : queue.map((item, i) => (
+              <div key={item.queueId} style={{ padding:"8px 10px", marginBottom:"5px",
+                background:"rgba(255,255,255,0.03)", border:`1px solid ${BORDER}`,
+                borderRadius:"10px", display:"flex", alignItems:"center", gap:"8px", boxShadow:HILITE }}>
+                <span style={{ fontSize:"9px", color:T3, fontFamily:"'SF Mono',monospace", width:"14px", flexShrink:0 }}>{i+1}</span>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:"11px", fontWeight:700, color:GOLD, whiteSpace:"nowrap" as const,
+                    overflow:"hidden", textOverflow:"ellipsis" }}>{item.verseRef}</div>
+                  <div style={{ fontSize:"10px", color:T2, marginTop:"2px", whiteSpace:"nowrap" as const,
+                    overflow:"hidden", textOverflow:"ellipsis", fontStyle:"italic", fontFamily:SERIF }}>{item.verseText}</div>
+                </div>
+                <button onClick={() => playFromQueue(item)} style={{ padding:"3px 9px", borderRadius:"100px",
+                  background:`linear-gradient(135deg, ${BLUE}, ${BLUE_HI})`, border:`1px solid ${BLUE}80`, color:"#FFFFFF", fontSize:"8px",
+                  fontWeight:700, cursor:"pointer", letterSpacing:"0.04em", boxShadow:`0 2px 6px ${BLUE}40, ${HILITE}`, flexShrink:0 }}>▶</button>
+                <button onClick={() => removeFromQueue(item.queueId)} style={{ width:"20px", height:"20px", borderRadius:"50%",
+                  background:"transparent", border:`1px solid ${BORDER}`, color:T3, fontSize:"10px",
+                  cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>✕</button>
+              </div>
+            ))
+          )}
         </div>
       </div>
+
+      </div>{/* end main area flex-row */}
 
       {/* ── SHORTCUT STRIP ── */}
       <div style={{ height:"32px", flexShrink:0, display:"flex", alignItems:"center", padding:"0 20px", gap:"22px",
