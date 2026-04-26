@@ -40,20 +40,38 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
 
   // JSON-LD structured data
   const jsonLd = {
-    "@context":  "https://schema.org",
-    "@type":     "Article",
-    "headline":  topic.title,
+    "@context":    "https://schema.org",
+    "@type":       "Article",
+    "headline":    topic.title,
     "description": topic.metaDesc,
-    "url":       `https://www.prayerkey.com/pray/${topic.slug}`,
+    "url":         `https://www.prayerkey.com/pray/${topic.slug}`,
+    "dateModified": new Date().toISOString(),
+    "author": {
+      "@type": "Person",
+      "name":  "Collins Asein",
+      "url":   "https://www.prayerkey.com/author/collins-asein",
+      "jobTitle": "Christian Author & Faith Technologist",
+    },
     "publisher": {
       "@type": "Organization",
       "name":  "PrayerKey",
+      "url":   "https://www.prayerkey.com",
       "logo":  { "@type": "ImageObject", "url": "https://www.prayerkey.com/og-image.png" },
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id":   `https://www.prayerkey.com/pray/${topic.slug}`,
     },
+    "breadcrumb": {
+      "@type":           "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home",   "item": "https://www.prayerkey.com" },
+        { "@type": "ListItem", "position": 2, "name": "Pray",   "item": "https://www.prayerkey.com/pray" },
+        { "@type": "ListItem", "position": 3, "name": topic.title, "item": `https://www.prayerkey.com/pray/${topic.slug}` },
+      ],
+    },
+    "keywords": topic.keywords.join(", "),
+    "about": { "@type": "Thing", "name": topic.title },
   };
 
   return (
