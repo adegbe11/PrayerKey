@@ -50,13 +50,13 @@ export default function BiblePage() {
           alignItems:   "center",
           gap:          "8px",
           padding:      "4px 12px",
-          border:       "1.5px solid rgba(176,124,31,0.35)",
+          border:       "1.5px solid var(--pk-gold-border)",
           borderRadius: "4px",
           marginBottom: "20px",
-          background:   "rgba(176,124,31,0.06)",
-          boxShadow:    "3px 3px 0 0 rgba(176,124,31,0.15)",
+          background:   "var(--pk-gold-dim)",
+          boxShadow:    "3px 3px 0 0 var(--pk-gold-border)",
         }}>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "#B07C1F", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
             Bible Search
           </span>
         </div>
@@ -64,7 +64,7 @@ export default function BiblePage() {
         <h1 style={{
           fontSize:      "clamp(32px, 6vw, 56px)",
           fontWeight:    800,
-          color:         "#fff",
+          color:         "var(--pk-text)",
           margin:        "0 0 14px",
           letterSpacing: "-0.03em",
           lineHeight:    1.05,
@@ -73,7 +73,7 @@ export default function BiblePage() {
         </h1>
         <p style={{
           fontSize:    "clamp(15px, 1.4vw, 17px)",
-          color:       "rgba(255,255,255,0.42)",
+          color:       "var(--pk-text-2)",
           margin:      0,
           lineHeight:  1.65,
           maxWidth:    "420px",
@@ -88,11 +88,11 @@ export default function BiblePage() {
         display:      "flex",
         gap:          "8px",
         marginBottom: "28px",
-        background:   "rgba(255,255,255,0.025)",
-        border:       "1.5px solid rgba(255,255,255,0.09)",
+        background:   "var(--pk-card)",
+        border:       "1.5px solid var(--pk-border)",
         borderRadius: "8px",
         padding:      "8px",
-        boxShadow:    "4px 4px 0 0 rgba(255,255,255,0.03)",
+        boxShadow:    "var(--pk-shadow-sm)",
       }}>
         <input
           value={query}
@@ -105,7 +105,7 @@ export default function BiblePage() {
             minHeight:  "48px",
             background: "transparent",
             border:     "none",
-            color:      "#fff",
+            color:      "var(--pk-text)",
             fontSize:   "clamp(14px, 1.4vw, 16px)",
             outline:    "none",
             fontFamily: "inherit",
@@ -119,29 +119,29 @@ export default function BiblePage() {
             minHeight:    "48px",
             borderRadius: "4px",
             border:       "1.5px solid",
-            borderColor:  loading || !query.trim() ? "rgba(176,124,31,0.25)" : "#B07C1F",
-            background:   loading || !query.trim() ? "rgba(176,124,31,0.1)" : "#B07C1F",
-            color:        loading || !query.trim() ? "rgba(255,255,255,0.3)" : "#fff",
+            borderColor:  loading || !query.trim() ? "var(--pk-gold-border)" : "var(--pk-gold)",
+            background:   loading || !query.trim() ? "var(--pk-gold-dim)" : "var(--pk-gold)",
+            color:        loading || !query.trim() ? "var(--pk-text-3)" : "#fff",
             fontSize:     "14px",
             fontWeight:   800,
             cursor:       loading || !query.trim() ? "not-allowed" : "pointer",
             letterSpacing:"-0.01em",
-            boxShadow:    loading || !query.trim() ? "none" : "3px 3px 0 0 rgba(176,124,31,0.3)",
+            boxShadow:    loading || !query.trim() ? "none" : "3px 3px 0 0 var(--pk-gold-border)",
             transition:   "all 150ms ease",
             flexShrink:   0,
           }}
           onMouseEnter={e => {
             if (loading || !query.trim()) return;
             (e.currentTarget as HTMLButtonElement).style.transform = "translate(-1px,-1px)";
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = "5px 5px 0 0 rgba(176,124,31,0.3)";
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = "5px 5px 0 0 var(--pk-gold-border)";
           }}
           onMouseLeave={e => {
             (e.currentTarget as HTMLButtonElement).style.transform = "translate(0,0)";
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = loading || !query.trim() ? "none" : "3px 3px 0 0 rgba(176,124,31,0.3)";
+            (e.currentTarget as HTMLButtonElement).style.boxShadow = loading || !query.trim() ? "none" : "3px 3px 0 0 var(--pk-gold-border)";
           }}
         >
           {loading ? (
-            <span style={{ width: "14px", height: "14px", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
+            <span style={{ width: "14px", height: "14px", border: "2px solid var(--pk-gold-border)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
           ) : "Search →"}
         </button>
       </div>
@@ -149,7 +149,7 @@ export default function BiblePage() {
       {/* ── Results ── */}
       {results.length > 0 && (
         <div className="animate-fadeUp" style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
-          <p style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 8px" }}>
+          <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--pk-text-3)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 8px" }}>
             {results.length} Result{results.length !== 1 ? "s" : ""}
           </p>
           {results.map((r) => {
@@ -163,30 +163,30 @@ export default function BiblePage() {
                   padding:      "18px 20px",
                   minHeight:    "44px",
                   borderRadius: "8px",
-                  border:       `1.5px solid ${isSelected ? "rgba(176,124,31,0.4)" : "rgba(255,255,255,0.07)"}`,
-                  background:   isSelected ? "rgba(176,124,31,0.1)" : "rgba(255,255,255,0.025)",
+                  border:       `1.5px solid ${isSelected ? "var(--pk-gold-border)" : "var(--pk-border)"}`,
+                  background:   isSelected ? "var(--pk-gold-dim)" : "var(--pk-card)",
                   cursor:       "pointer",
                   transition:   "all 150ms ease",
-                  boxShadow:    isSelected ? "3px 3px 0 0 rgba(176,124,31,0.15)" : "none",
+                  boxShadow:    isSelected ? "3px 3px 0 0 var(--pk-gold-border)" : "none",
                 }}
                 onMouseEnter={e => {
                   if (isSelected) return;
-                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.04)";
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.12)";
+                  (e.currentTarget as HTMLButtonElement).style.background = "var(--pk-card-hover)";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--pk-border-2)";
                 }}
                 onMouseLeave={e => {
                   if (isSelected) return;
-                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.025)";
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.07)";
+                  (e.currentTarget as HTMLButtonElement).style.background = "var(--pk-card)";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--pk-border)";
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 700, color: "#B07C1F", letterSpacing: "-0.01em" }}>{r.ref}</span>
-                  <span style={{ fontSize: "10px", fontWeight: 700, color: isSelected ? "#B07C1F" : "rgba(255,255,255,0.22)", letterSpacing: "0.08em", textTransform: "uppercase", background: isSelected ? "rgba(176,124,31,0.12)" : "rgba(255,255,255,0.04)", padding: "2px 8px", borderRadius: "3px" }}>
+                  <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "-0.01em" }}>{r.ref}</span>
+                  <span style={{ fontSize: "10px", fontWeight: 700, color: isSelected ? "var(--pk-gold)" : "var(--pk-text-3)", letterSpacing: "0.08em", textTransform: "uppercase", background: isSelected ? "var(--pk-gold-dim)" : "var(--pk-card)", padding: "2px 8px", borderRadius: "3px" }}>
                     {r.match === "direct" ? "Exact" : "Related"}
                   </span>
                 </div>
-                <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.75)", lineHeight: 1.65, margin: 0 }}>{r.text}</p>
+                <p style={{ fontSize: "14px", color: "var(--pk-text-2)", lineHeight: 1.65, margin: 0 }}>{r.text}</p>
               </button>
             );
           })}
@@ -195,7 +195,7 @@ export default function BiblePage() {
 
       {/* Empty state */}
       {results.length === 0 && !loading && query && (
-        <div style={{ textAlign: "center", padding: "48px 20px", color: "rgba(255,255,255,0.25)" }}>
+        <div style={{ textAlign: "center", padding: "48px 20px", color: "var(--pk-text-3)" }}>
           <div style={{ fontSize: "32px", marginBottom: "12px" }}>🔍</div>
           <p style={{ fontSize: "15px", margin: 0 }}>No results. Try different keywords or a direct reference like &ldquo;Romans 8:28&rdquo;.</p>
         </div>
@@ -212,9 +212,9 @@ export default function BiblePage() {
                 padding:      "8px 16px",
                 minHeight:    "36px",
                 borderRadius: "4px",
-                border:       "1px solid rgba(176,124,31,0.2)",
-                background:   "rgba(176,124,31,0.05)",
-                color:        "#B07C1F",
+                border:       "1px solid var(--pk-gold-border)",
+                background:   "var(--pk-gold-dim)",
+                color:        "var(--pk-gold)",
                 fontSize:     "13px",
                 fontWeight:   500,
                 cursor:       "pointer",
@@ -231,17 +231,17 @@ export default function BiblePage() {
       {selected && (
         <div className="animate-fadeUp" style={{
           marginTop:    "8px",
-          background:   "rgba(176,124,31,0.05)",
-          border:       "1.5px solid rgba(176,124,31,0.18)",
+          background:   "var(--pk-gold-dim)",
+          border:       "1.5px solid var(--pk-gold-border)",
           borderRadius: "12px",
           overflow:     "hidden",
-          boxShadow:    "4px 4px 0 0 rgba(176,124,31,0.1)",
+          boxShadow:    "4px 4px 0 0 var(--pk-gold-border)",
         }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(176,124,31,0.12)", background: "rgba(176,124,31,0.07)", display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "10px", fontWeight: 700, color: "#B07C1F", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--pk-gold-border)", background: "var(--pk-gold-dim)", display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
               Related Verses
             </span>
-            <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>
+            <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)" }}>
               for {selected.ref}
             </span>
           </div>
@@ -249,8 +249,8 @@ export default function BiblePage() {
           <div style={{ padding: "16px 20px" }}>
             {crLoading && (
               <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 0" }}>
-                <span style={{ width: "14px", height: "14px", border: "2px solid rgba(176,124,31,0.3)", borderTopColor: "#B07C1F", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
-                <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.3)" }}>Loading related scriptures...</span>
+                <span style={{ width: "14px", height: "14px", border: "2px solid var(--pk-gold-border)", borderTopColor: "var(--pk-gold)", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
+                <span style={{ fontSize: "13px", color: "var(--pk-text-3)" }}>Loading related scriptures...</span>
               </div>
             )}
             {crossRefs.length > 0 && (
@@ -258,13 +258,13 @@ export default function BiblePage() {
                 {crossRefs.map((c) => (
                   <div key={c.ref} style={{
                     padding:      "14px 16px",
-                    background:   "rgba(255,255,255,0.03)",
-                    border:       "1px solid rgba(255,255,255,0.07)",
+                    background:   "var(--pk-card)",
+                    border:       "1px solid var(--pk-border)",
                     borderRadius: "8px",
                   }}>
-                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#B07C1F", marginBottom: "6px" }}>{c.ref}</div>
-                    <div style={{ fontSize: "14px", color: "rgba(255,255,255,0.75)", lineHeight: 1.65, marginBottom: "8px" }}>{c.text}</div>
-                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.28)", fontStyle: "italic", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "6px" }}>{c.reason}</div>
+                    <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--pk-gold)", marginBottom: "6px" }}>{c.ref}</div>
+                    <div style={{ fontSize: "14px", color: "var(--pk-text-2)", lineHeight: 1.65, marginBottom: "8px" }}>{c.text}</div>
+                    <div style={{ fontSize: "12px", color: "var(--pk-text-3)", fontStyle: "italic", borderTop: "1px solid var(--pk-border)", paddingTop: "6px" }}>{c.reason}</div>
                   </div>
                 ))}
               </div>
@@ -275,7 +275,7 @@ export default function BiblePage() {
 
       <style>{`
         input:focus { outline: none; }
-        input::placeholder { color: rgba(255,255,255,0.2); }
+        input::placeholder { color: var(--pk-text-3); }
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
     </div>

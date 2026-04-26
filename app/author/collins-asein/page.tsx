@@ -50,9 +50,7 @@ export default function CollinsAseinPage() {
           "name":  "PrayerKey",
           "url":   BASE_URL,
         },
-        "sameAs": [
-          BASE_URL,
-        ],
+        "sameAs": [BASE_URL],
       },
       {
         "@type":        "ProfilePage",
@@ -82,12 +80,12 @@ export default function CollinsAseinPage() {
       <div style={{ maxWidth: "860px", margin: "0 auto", padding: "0 24px 100px" }}>
 
         {/* ── Breadcrumb ── */}
-        <nav style={{ marginBottom: "40px", fontSize: "13px", color: "rgba(255,255,255,0.35)", display: "flex", gap: "6px", alignItems: "center" }}>
-          <Link href="/" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>Home</Link>
+        <nav style={{ marginBottom: "40px", fontSize: "13px", color: "var(--pk-text-3)", display: "flex", gap: "6px", alignItems: "center" }}>
+          <Link href="/" style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Home</Link>
           <span>/</span>
-          <span style={{ color: "rgba(255,255,255,0.35)" }}>Author</span>
+          <span style={{ color: "var(--pk-text-3)" }}>Author</span>
           <span>/</span>
-          <span style={{ color: "var(--pk-gold, #B07C1F)" }}>Collins Asein</span>
+          <span style={{ color: "var(--pk-gold)" }}>Collins Asein</span>
         </nav>
 
         {/* ── Hero ── */}
@@ -103,14 +101,14 @@ export default function CollinsAseinPage() {
             width:        "clamp(80px, 12vw, 120px)",
             height:       "clamp(80px, 12vw, 120px)",
             borderRadius: "50%",
-            background:   "linear-gradient(135deg, #AF52DE 0%, #B07C1F 100%)",
+            background:   "linear-gradient(135deg, var(--pk-purple) 0%, var(--pk-gold) 100%)",
             display:      "flex",
             alignItems:   "center",
             justifyContent: "center",
             fontSize:     "clamp(32px, 5vw, 52px)",
             flexShrink:   0,
-            border:       "3px solid rgba(176,124,31,0.3)",
-            boxShadow:    "0 0 40px rgba(175,82,222,0.2)",
+            border:       "3px solid var(--pk-gold-border)",
+            boxShadow:    "0 0 40px var(--pk-purple-dim)",
           }}>
             ✝️
           </div>
@@ -122,11 +120,11 @@ export default function CollinsAseinPage() {
               display:      "inline-block",
               padding:      "4px 12px",
               borderRadius: "4px",
-              border:       "1.5px solid rgba(176,124,31,0.35)",
-              background:   "rgba(176,124,31,0.06)",
+              border:       "1.5px solid var(--pk-gold-border)",
+              background:   "var(--pk-gold-dim)",
               fontSize:     "10px",
               fontWeight:   700,
-              color:        "var(--pk-gold, #B07C1F)",
+              color:        "var(--pk-gold)",
               letterSpacing:"0.1em",
               textTransform:"uppercase",
               marginBottom: "14px",
@@ -137,7 +135,7 @@ export default function CollinsAseinPage() {
             <h1 style={{
               fontSize:      "clamp(28px, 5vw, 48px)",
               fontWeight:    800,
-              color:         "#fff",
+              color:         "var(--pk-text)",
               margin:        "0 0 12px",
               letterSpacing: "-0.03em",
               lineHeight:    1.1,
@@ -147,12 +145,12 @@ export default function CollinsAseinPage() {
 
             <p style={{
               fontSize:   "clamp(15px, 1.5vw, 17px)",
-              color:      "rgba(255,255,255,0.55)",
+              color:      "var(--pk-text-2)",
               lineHeight: 1.75,
               margin:     "0 0 20px",
             }}>
               Collins Asein is a Christian author, faith technologist, and the founder of{" "}
-              <Link href="/" style={{ color: "var(--pk-gold, #B07C1F)", textDecoration: "none", fontWeight: 700 }}>
+              <Link href="/" style={{ color: "var(--pk-gold)", textDecoration: "none", fontWeight: 700 }}>
                 PrayerKey
               </Link>{" "}
               — an AI-powered prayer and Bible platform serving believers worldwide. His work sits at the
@@ -163,16 +161,16 @@ export default function CollinsAseinPage() {
             {/* Stats */}
             <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
               {[
-                { label: "Prayer Topics",    value: "120+" },
+                { label: "Prayer Topics",    value: `${PRAYER_TOPICS.length}+` },
                 { label: "Bible Verses",     value: "31,102" },
-                { label: "Prayers Generated","value": "Thousands" },
+                { label: "Prayers Generated", value: "Thousands" },
                 { label: "Faith",            value: "Christian" },
               ].map((stat) => (
                 <div key={stat.label}>
-                  <div style={{ fontSize: "22px", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
+                  <div style={{ fontSize: "22px", fontWeight: 800, color: "var(--pk-text)", letterSpacing: "-0.02em" }}>
                     {stat.value}
                   </div>
-                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                  <div style={{ fontSize: "11px", color: "var(--pk-text-3)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
                     {stat.label}
                   </div>
                 </div>
@@ -183,16 +181,16 @@ export default function CollinsAseinPage() {
 
         {/* ── About ── */}
         <section style={{ marginBottom: "60px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
             About Collins
           </h2>
           <div style={{
-            background:   "rgba(255,255,255,0.025)",
-            border:       "1.5px solid rgba(255,255,255,0.07)",
+            background:   "var(--pk-card)",
+            border:       "1.5px solid var(--pk-border)",
             borderRadius: "16px",
             padding:      "clamp(24px,4vw,40px)",
           }}>
-            <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.7)", lineHeight: 1.85, margin: "0 0 16px" }}>
+            <p style={{ fontSize: "16px", color: "var(--pk-text-2)", lineHeight: 1.85, margin: "0 0 16px" }}>
               Collins Asein built PrayerKey from a deeply personal conviction: that prayer is the most
               powerful force available to a believer, and that technology should make it more accessible —
               not less meaningful. As a Christian who has seen prayer transform lives, families, and
@@ -200,21 +198,21 @@ export default function CollinsAseinPage() {
               whether they&apos;re a new believer who doesn&apos;t know how to pray, or a pastor preparing a
               sermon at midnight.
             </p>
-            <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.7)", lineHeight: 1.85, margin: "0 0 16px" }}>
+            <p style={{ fontSize: "16px", color: "var(--pk-text-2)", lineHeight: 1.85, margin: "0 0 16px" }}>
               PrayerKey was born from that vision: a platform where AI serves the Spirit, where every
               generated prayer is grounded in Scripture, and where technology bows to theology. Collins
               writes extensively on faith, prayer, and the intersection of Christianity with the modern world.
             </p>
-            <p style={{ fontSize: "16px", color: "rgba(255,255,255,0.7)", lineHeight: 1.85, margin: 0 }}>
-              His belief is simple: <em style={{ color: "#fff", fontStyle: "italic" }}>"The Gospel doesn&apos;t need technology to be powerful. But technology,
-              when surrendered to God, can carry the Gospel further than we ever imagined."</em>
+            <p style={{ fontSize: "16px", color: "var(--pk-text-2)", lineHeight: 1.85, margin: 0 }}>
+              His belief is simple: <em style={{ color: "var(--pk-text)", fontStyle: "italic" }}>&ldquo;The Gospel doesn&apos;t need technology to be powerful. But technology,
+              when surrendered to God, can carry the Gospel further than we ever imagined.&rdquo;</em>
             </p>
           </div>
         </section>
 
         {/* ── Expertise ── */}
         <section style={{ marginBottom: "60px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
             Areas of Expertise
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "12px" }}>
@@ -234,11 +232,11 @@ export default function CollinsAseinPage() {
                 gap:          "12px",
                 padding:      "14px 18px",
                 borderRadius: "10px",
-                border:       "1.5px solid rgba(176,124,31,0.2)",
-                background:   "rgba(176,124,31,0.04)",
+                border:       "1.5px solid var(--pk-gold-border)",
+                background:   "var(--pk-gold-dim)",
               }}>
                 <span style={{ fontSize: "20px" }}>{item.icon}</span>
-                <span style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.75)" }}>{item.label}</span>
+                <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)" }}>{item.label}</span>
               </div>
             ))}
           </div>
@@ -246,10 +244,10 @@ export default function CollinsAseinPage() {
 
         {/* ── Prayers by Collins ── */}
         <section style={{ marginBottom: "60px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
             Prayers Written by Collins Asein
           </h2>
-          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.4)", margin: "0 0 20px" }}>
+          <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: "0 0 20px" }}>
             Every prayer on PrayerKey is rooted in Scripture and written with pastoral care.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "10px" }}>
@@ -261,31 +259,31 @@ export default function CollinsAseinPage() {
                   display:      "block",
                   padding:      "16px 18px",
                   borderRadius: "10px",
-                  border:       "1.5px solid rgba(255,255,255,0.07)",
-                  background:   "rgba(255,255,255,0.025)",
+                  border:       "1.5px solid var(--pk-border)",
+                  background:   "var(--pk-card)",
                   textDecoration:"none",
                   transition:   "all 150ms",
                 }}
               >
-                <div style={{ fontSize: "11px", fontWeight: 700, color: "rgba(176,124,31,0.7)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "6px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "6px" }}>
                   {topic.category}
                 </div>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>
+                <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--pk-text-2)" }}>
                   🙏 {topic.title}
                 </div>
               </Link>
             ))}
           </div>
           <div style={{ marginTop: "16px", textAlign: "center" }}>
-            <Link href="/pray/topics" style={{ color: "var(--pk-gold, #B07C1F)", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>
-              View all 120+ prayers →
+            <Link href="/pray/topics" style={{ color: "var(--pk-gold)", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>
+              View all {PRAYER_TOPICS.length}+ prayers →
             </Link>
           </div>
         </section>
 
         {/* ── Articles ── */}
         <section style={{ marginBottom: "60px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "#fff", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
             Featured Writing
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -299,17 +297,17 @@ export default function CollinsAseinPage() {
                   alignItems:     "center",
                   padding:        "18px 24px",
                   borderRadius:   "12px",
-                  border:         "1.5px solid rgba(255,255,255,0.07)",
-                  background:     "rgba(255,255,255,0.02)",
+                  border:         "1.5px solid var(--pk-border)",
+                  background:     "var(--pk-card)",
                   textDecoration: "none",
                   gap:            "16px",
                   transition:     "all 150ms",
                 }}
               >
-                <span style={{ fontSize: "15px", fontWeight: 600, color: "rgba(255,255,255,0.8)" }}>
+                <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--pk-text-2)" }}>
                   📝 {article.title}
                 </span>
-                <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)", flexShrink: 0 }}>
+                <span style={{ fontSize: "12px", color: "var(--pk-text-3)", flexShrink: 0 }}>
                   {article.date}
                 </span>
               </Link>
@@ -319,16 +317,16 @@ export default function CollinsAseinPage() {
 
         {/* ── CTA ── */}
         <div style={{
-          background:   "linear-gradient(135deg, rgba(175,82,222,0.1) 0%, rgba(176,124,31,0.08) 100%)",
-          border:       "1.5px solid rgba(175,82,222,0.2)",
+          background:   "var(--pk-accent-dim)",
+          border:       "1.5px solid var(--pk-accent-border)",
           borderRadius: "20px",
           padding:      "clamp(28px,5vw,48px)",
           textAlign:    "center",
         }}>
-          <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#fff", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "24px", fontWeight: 800, color: "var(--pk-text)", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
             Experience PrayerKey
           </h2>
-          <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.45)", margin: "0 0 24px", lineHeight: 1.7 }}>
+          <p style={{ fontSize: "15px", color: "var(--pk-text-2)", margin: "0 0 24px", lineHeight: 1.7 }}>
             Generate a scripture-based prayer for any situation — free, instant, no account needed.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
@@ -338,12 +336,12 @@ export default function CollinsAseinPage() {
                 display:      "inline-block",
                 padding:      "14px 32px",
                 borderRadius: "6px",
-                background:   "#AF52DE",
+                background:   "var(--pk-accent)",
                 color:        "#fff",
                 textDecoration:"none",
                 fontSize:     "15px",
                 fontWeight:   800,
-                boxShadow:    "4px 4px 0 0 rgba(175,82,222,0.3)",
+                boxShadow:    "4px 4px 0 0 var(--pk-accent-border)",
               }}
             >
               ✦ Generate a Prayer
@@ -354,9 +352,9 @@ export default function CollinsAseinPage() {
                 display:      "inline-block",
                 padding:      "14px 32px",
                 borderRadius: "6px",
-                border:       "1.5px solid rgba(176,124,31,0.4)",
-                background:   "rgba(176,124,31,0.06)",
-                color:        "var(--pk-gold, #B07C1F)",
+                border:       "1.5px solid var(--pk-gold-border)",
+                background:   "var(--pk-gold-dim)",
+                color:        "var(--pk-gold)",
                 textDecoration:"none",
                 fontSize:     "15px",
                 fontWeight:   700,

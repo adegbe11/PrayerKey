@@ -53,19 +53,19 @@ export default function PrayPage() {
 
       {/* ── Page header ── */}
       <div className="animate-fadeUp" style={{ textAlign: "center", marginBottom: "48px" }}>
-        {/* Brutalist label */}
+        {/* Label */}
         <div style={{
           display:      "inline-flex",
           alignItems:   "center",
           gap:          "8px",
           padding:      "4px 12px",
-          border:       "1.5px solid rgba(175,82,222,0.35)",
+          border:       "1.5px solid var(--pk-purple-border)",
           borderRadius: "4px",
           marginBottom: "20px",
-          background:   "rgba(175,82,222,0.06)",
-          boxShadow:    "3px 3px 0 0 rgba(175,82,222,0.15)",
+          background:   "var(--pk-purple-dim)",
+          boxShadow:    "3px 3px 0 0 var(--pk-purple-border)",
         }}>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "#AF52DE", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-purple)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
             AI Prayer Generator
           </span>
         </div>
@@ -73,7 +73,7 @@ export default function PrayPage() {
         <h1 style={{
           fontSize:      "clamp(32px, 6vw, 56px)",
           fontWeight:    800,
-          color:         "#fff",
+          color:         "var(--pk-text)",
           margin:        "0 0 14px",
           letterSpacing: "-0.03em",
           lineHeight:    1.05,
@@ -82,7 +82,7 @@ export default function PrayPage() {
         </h1>
         <p style={{
           fontSize:    "clamp(15px, 1.4vw, 17px)",
-          color:       "rgba(255,255,255,0.42)",
+          color:       "var(--pk-text-2)",
           margin:      0,
           lineHeight:  1.65,
           maxWidth:    "420px",
@@ -94,12 +94,12 @@ export default function PrayPage() {
 
       {/* ── Input card ── */}
       <div className="animate-fadeUp delay-100" style={{
-        background:   "rgba(255,255,255,0.025)",
-        border:       "1.5px solid rgba(255,255,255,0.09)",
+        background:   "var(--pk-card)",
+        border:       "1.5px solid var(--pk-border)",
         borderRadius: "20px",
         padding:      "clamp(20px,4vw,32px)",
         marginBottom: "16px",
-        boxShadow:    "4px 4px 0 0 rgba(255,255,255,0.03)",
+        boxShadow:    "var(--pk-shadow-sm)",
       }}>
 
         {/* Textarea */}
@@ -114,7 +114,7 @@ export default function PrayPage() {
             border:       "none",
             padding:      "0",
             fontSize:     "clamp(15px, 1.4vw, 17px)",
-            color:        "#fff",
+            color:        "var(--pk-text)",
             resize:       "none",
             outline:      "none",
             boxSizing:    "border-box",
@@ -123,7 +123,7 @@ export default function PrayPage() {
           }}
         />
 
-        <div style={{ height: "1px", background: "rgba(255,255,255,0.07)", margin: "16px 0" }} />
+        <div style={{ height: "1px", background: "var(--pk-border)", margin: "16px 0" }} />
 
         {/* Mood chips */}
         <div>
@@ -132,7 +132,7 @@ export default function PrayPage() {
             fontWeight:   700,
             letterSpacing:"0.08em",
             textTransform:"uppercase",
-            color:        "rgba(255,255,255,0.28)",
+            color:        "var(--pk-text-3)",
             marginBottom: "10px",
           }}>
             How are you feeling? (optional)
@@ -148,14 +148,14 @@ export default function PrayPage() {
                     padding:      "8px 16px",
                     minHeight:    "36px",
                     borderRadius: "4px",
-                    border:       active ? "1.5px solid #AF52DE" : "1.5px solid rgba(255,255,255,0.1)",
-                    background:   active ? "rgba(175,82,222,0.14)" : "rgba(255,255,255,0.03)",
-                    color:        active ? "#AF52DE" : "rgba(255,255,255,0.45)",
+                    border:       active ? "1.5px solid var(--pk-purple)" : "1.5px solid var(--pk-border)",
+                    background:   active ? "var(--pk-purple-dim)" : "var(--pk-card)",
+                    color:        active ? "var(--pk-purple)" : "var(--pk-text-3)",
                     fontSize:     "12px",
                     fontWeight:   active ? 700 : 500,
                     cursor:       "pointer",
                     transition:   "all 150ms ease",
-                    boxShadow:    active ? "2px 2px 0 0 rgba(175,82,222,0.25)" : "none",
+                    boxShadow:    active ? "2px 2px 0 0 var(--pk-purple-border)" : "none",
                     letterSpacing:"-0.01em",
                   }}
                 >
@@ -177,29 +177,29 @@ export default function PrayPage() {
           minHeight:    "56px",
           borderRadius: "6px",
           border:       "2px solid",
-          borderColor:  loading || !input.trim() ? "rgba(175,82,222,0.3)" : "#AF52DE",
-          background:   loading || !input.trim() ? "rgba(175,82,222,0.15)" : "#AF52DE",
-          color:        loading || !input.trim() ? "rgba(255,255,255,0.4)" : "#fff",
+          borderColor:  loading || !input.trim() ? "var(--pk-purple-border)" : "var(--pk-purple)",
+          background:   loading || !input.trim() ? "var(--pk-purple-dim)" : "var(--pk-purple)",
+          color:        loading || !input.trim() ? "var(--pk-text-3)" : "#fff",
           fontSize:     "16px",
           fontWeight:   800,
           cursor:       loading || !input.trim() ? "not-allowed" : "pointer",
           transition:   "all 200ms ease",
           letterSpacing:"-0.01em",
-          boxShadow:    loading || !input.trim() ? "none" : "4px 4px 0 0 rgba(175,82,222,0.3)",
+          boxShadow:    loading || !input.trim() ? "none" : "4px 4px 0 0 var(--pk-purple-border)",
         }}
         onMouseEnter={e => {
           if (loading || !input.trim()) return;
           (e.currentTarget as HTMLButtonElement).style.transform = "translate(-2px,-2px)";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "6px 6px 0 0 rgba(175,82,222,0.3)";
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = "6px 6px 0 0 var(--pk-purple-border)";
         }}
         onMouseLeave={e => {
           (e.currentTarget as HTMLButtonElement).style.transform = "translate(0,0)";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = loading || !input.trim() ? "none" : "4px 4px 0 0 rgba(175,82,222,0.3)";
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = loading || !input.trim() ? "none" : "4px 4px 0 0 var(--pk-purple-border)";
         }}
       >
         {loading ? (
           <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
-            <span style={{ width: "16px", height: "16px", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
+            <span style={{ width: "16px", height: "16px", border: "2px solid var(--pk-purple-border)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
             Writing your prayer...
           </span>
         ) : "✦ Generate Prayer"}
@@ -207,7 +207,7 @@ export default function PrayPage() {
 
       {/* ── Error ── */}
       {error && (
-        <div style={{ marginTop: "16px", padding: "14px 18px", borderRadius: "8px", background: "rgba(255,59,48,0.08)", border: "1.5px solid rgba(255,59,48,0.25)", color: "#FF3B30", fontSize: "14px", boxShadow: "3px 3px 0 0 rgba(255,59,48,0.15)" }}>
+        <div style={{ marginTop: "16px", padding: "14px 18px", borderRadius: "8px", background: "rgba(255,59,48,0.08)", border: "1.5px solid rgba(255,59,48,0.25)", color: "var(--pk-red)", fontSize: "14px", boxShadow: "3px 3px 0 0 rgba(255,59,48,0.15)" }}>
           {error}
         </div>
       )}
@@ -222,30 +222,30 @@ export default function PrayPage() {
             alignItems:     "center",
             justifyContent: "space-between",
             padding:        "14px 20px",
-            background:     "rgba(175,82,222,0.1)",
-            border:         "1.5px solid rgba(175,82,222,0.25)",
+            background:     "var(--pk-purple-dim)",
+            border:         "1.5px solid var(--pk-purple-border)",
             borderRadius:   "12px 12px 0 0",
             borderBottom:   "none",
           }}>
-            <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#AF52DE", margin: 0, letterSpacing: "-0.01em" }}>
+            <h2 style={{ fontSize: "15px", fontWeight: 700, color: "var(--pk-purple)", margin: 0, letterSpacing: "-0.01em" }}>
               {prayer.title}
             </h2>
-            <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.28)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+            <span style={{ fontSize: "11px", color: "var(--pk-text-3)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               ✦ Generated
             </span>
           </div>
 
           {/* Prayer body */}
           <div style={{
-            background:   "rgba(175,82,222,0.04)",
-            border:       "1.5px solid rgba(175,82,222,0.18)",
+            background:   "var(--pk-purple-dim)",
+            border:       "1.5px solid var(--pk-purple-border)",
             borderTop:    "none",
             borderRadius: "0 0 0 0",
             padding:      "clamp(20px,4vw,32px)",
           }}>
             <p style={{
               fontSize:    "clamp(15px, 1.4vw, 17px)",
-              color:       "rgba(255,255,255,0.88)",
+              color:       "var(--pk-text)",
               lineHeight:  1.85,
               whiteSpace:  "pre-wrap",
               margin:      0,
@@ -258,13 +258,13 @@ export default function PrayPage() {
           {/* Encouragement */}
           <div style={{
             padding:      "18px 24px",
-            background:   "rgba(176,124,31,0.07)",
-            border:       "1.5px solid rgba(176,124,31,0.2)",
+            background:   "var(--pk-gold-dim)",
+            border:       "1.5px solid var(--pk-gold-border)",
             borderTop:    "none",
             borderRadius: "0",
-            borderLeft:   "4px solid #B07C1F",
+            borderLeft:   "4px solid var(--pk-gold)",
           }}>
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", margin: 0, lineHeight: 1.7 }}>
+            <p style={{ fontSize: "14px", color: "var(--pk-text-2)", margin: 0, lineHeight: 1.7 }}>
               {prayer.encouragement}
             </p>
           </div>
@@ -273,27 +273,27 @@ export default function PrayPage() {
           {prayer.verses?.length > 0 && (
             <div style={{
               padding:      "clamp(16px,3vw,24px)",
-              background:   "rgba(255,255,255,0.025)",
-              border:       "1.5px solid rgba(255,255,255,0.08)",
+              background:   "var(--pk-card)",
+              border:       "1.5px solid var(--pk-border)",
               borderTop:    "none",
               borderRadius: "0",
             }}>
-              <p style={{ fontSize: "10px", fontWeight: 700, color: "#B07C1F", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 12px" }}>
+              <p style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 12px" }}>
                 Scripture
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {prayer.verses.map((v) => (
                   <div key={v.ref} style={{
                     padding:    "12px 16px",
-                    background: "rgba(176,124,31,0.06)",
-                    border:     "1px solid rgba(176,124,31,0.15)",
+                    background: "var(--pk-gold-dim)",
+                    border:     "1px solid var(--pk-gold-border)",
                     borderRadius:"8px",
                     display:    "flex",
                     gap:        "12px",
                     alignItems: "flex-start",
                   }}>
-                    <span style={{ fontSize: "12px", fontWeight: 700, color: "#B07C1F", flexShrink: 0, minWidth: "80px" }}>{v.ref}</span>
-                    <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>{v.text}</span>
+                    <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--pk-gold)", flexShrink: 0, minWidth: "80px" }}>{v.ref}</span>
+                    <span style={{ fontSize: "13px", color: "var(--pk-text-2)", lineHeight: 1.6 }}>{v.text}</span>
                   </div>
                 ))}
               </div>
@@ -305,10 +305,11 @@ export default function PrayPage() {
             display:      "flex",
             gap:          "10px",
             padding:      "16px 20px",
-            background:   "rgba(255,255,255,0.02)",
-            border:       "1.5px solid rgba(255,255,255,0.07)",
+            background:   "var(--pk-card)",
+            border:       "1.5px solid var(--pk-border)",
             borderTop:    "none",
             borderRadius: "0 0 16px 16px",
+            flexWrap:     "wrap",
           }}>
             {/* View Card button */}
             <button
@@ -317,9 +318,9 @@ export default function PrayPage() {
                 padding:      "10px 20px",
                 minHeight:    "44px",
                 borderRadius: "6px",
-                border:       "1.5px solid #B07C1F",
-                background:   "rgba(176,124,31,0.1)",
-                color:        "#C49A2A",
+                border:       "1.5px solid var(--pk-gold-border)",
+                background:   "var(--pk-gold-dim)",
+                color:        "var(--pk-gold)",
                 fontSize:     "13px",
                 fontWeight:   700,
                 cursor:       "pointer",
@@ -327,10 +328,10 @@ export default function PrayPage() {
                 display:      "flex",
                 alignItems:   "center",
                 gap:          "6px",
-                boxShadow:    "2px 2px 0 0 rgba(176,124,31,0.2)",
+                boxShadow:    "2px 2px 0 0 var(--pk-gold-border)",
               }}
             >
-              🎴 View & Download Card
+              🎴 View &amp; Download Card
             </button>
 
             <button
@@ -339,9 +340,9 @@ export default function PrayPage() {
                 padding:      "10px 20px",
                 minHeight:    "44px",
                 borderRadius: "6px",
-                border:       "1.5px solid rgba(255,255,255,0.12)",
-                background:   copied ? "rgba(52,199,89,0.1)" : "rgba(255,255,255,0.04)",
-                color:        copied ? "#34C759" : "rgba(255,255,255,0.65)",
+                border:       "1.5px solid var(--pk-border)",
+                background:   copied ? "rgba(52,199,89,0.1)" : "var(--pk-card)",
+                color:        copied ? "#34C759" : "var(--pk-text-2)",
                 fontSize:     "13px",
                 fontWeight:   600,
                 cursor:       "pointer",
@@ -359,9 +360,9 @@ export default function PrayPage() {
                 padding:      "10px 20px",
                 minHeight:    "44px",
                 borderRadius: "6px",
-                border:       "1.5px solid rgba(255,255,255,0.08)",
+                border:       "1.5px solid var(--pk-border)",
                 background:   "transparent",
-                color:        "rgba(255,255,255,0.35)",
+                color:        "var(--pk-text-3)",
                 fontSize:     "13px",
                 cursor:       "pointer",
                 transition:   "all 180ms ease",
@@ -379,8 +380,8 @@ export default function PrayPage() {
       )}
 
       <style>{`
-        textarea:focus { border-color: rgba(175,82,222,0.5) !important; }
-        textarea::placeholder { color: rgba(255,255,255,0.2); }
+        textarea:focus { border-color: var(--pk-purple-border) !important; }
+        textarea::placeholder { color: var(--pk-text-3); }
         @keyframes spin    { to { transform: rotate(360deg); } }
         @keyframes prayerIn {
           from { opacity: 0; transform: translateY(20px); }
