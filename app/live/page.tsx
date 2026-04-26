@@ -10,43 +10,25 @@ import type {
 } from "@/types/sermon";
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   DESIGN SYSTEM
+   ACCENT TOKENS  (used for verse colours, idle / ended screens)
 ───────────────────────────────────────────────────────────────────────────── */
 const T = {
-  /* Backgrounds */
-  bg:      "#04040A",
-  panel:   "#08080F",
-  raised:  "#0D0D18",
-  hover:   "#12121E",
-  input:   "#0A0A15",
-
-  /* Borders */
-  line:    "rgba(255,255,255,0.055)",
-  border:  "rgba(255,255,255,0.085)",
-  borderHi:"rgba(255,255,255,0.15)",
-
-  /* Brand */
-  gold:    "#E8A820",
-  goldDim: "rgba(232,168,32,0.12)",
-  goldGlow:"rgba(232,168,32,0.06)",
-
-  /* Status */
-  red:     "#FF3B30",
-  redDim:  "rgba(255,59,48,0.12)",
-  green:   "#34C759",
-  greenDim:"rgba(52,199,89,0.12)",
-  blue:    "#0A84FF",
-  orange:  "#FF9F0A",
-
-  /* Text */
-  t1:      "#FFFFFF",
-  t2:      "rgba(255,255,255,0.62)",
-  t3:      "rgba(255,255,255,0.35)",
-  t4:      "rgba(255,255,255,0.18)",
-  t5:      "rgba(255,255,255,0.08)",
+  gold:    "#C8920A",
+  red:     "#B22222",
+  green:   "#1B7A3C",
+  orange:  "#E07000",
 };
 
 const F = { mono: "'SF Mono','Fira Code','Consolas',monospace" };
+
+/* Dashboard light tokens */
+const BD   = "#E8E8E8";   // border / divider
+const TXT1 = "#111111";
+const TXT2 = "#444444";
+const TXT3 = "#888888";
+const TXT4 = "#BBBBBB";
+const GRN  = "#1B7A3C";
+const SCR  = "#060A14";   // dark screen background for verse display
 
 /* ─────────────────────────────────────────────────────────────────────────────
    HELPERS
@@ -54,230 +36,36 @@ const F = { mono: "'SF Mono','Fira Code','Consolas',monospace" };
 type SvcState = "idle" | "live" | "ended";
 interface SearchResult { ref: string; text: string; match: string }
 
-function confColor(c: number) {
-  if (c >= 0.9) return T.green;
-  if (c >= 0.75) return T.gold;
-  return T.orange;
-}
 function fmtDur(s: number) {
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60).toString().padStart(2, "0");
+  const h  = Math.floor(s / 3600);
+  const m  = Math.floor((s % 3600) / 60).toString().padStart(2, "0");
   const sc = (s % 60).toString().padStart(2, "0");
   return h ? `${h}:${m}:${sc}` : `${m}:${sc}`;
 }
-function relTime(iso: string) {
-  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (s < 5) return "just now";
-  if (s < 60) return `${s}s ago`;
-  return `${Math.floor(s / 60)}m ago`;
-}
 
 const TRANSLATIONS = ["NIV","KJV","ESV","NLT","NKJV","NASB","CSB","AMP","NRSV"];
-const QUICK_REFS   = ["John 3:16","Psalm 23:1","Romans 8:28","Philippians 4:13",
-                      "Isaiah 40:31","Jeremiah 29:11","Proverbs 3:5","Matthew 6:33"];
+const QUICK_REFS   = [
+  "John 3:16","Psalm 23:1","Romans 8:28","Philippians 4:13",
+  "Isaiah 40:31","Jeremiah 29:11","Proverbs 3:5","Matthew 6:33",
+];
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   SUB-COMPONENTS
+   TINY BADGE
 ───────────────────────────────────────────────────────────────────────────── */
-
-/** Tiny pill badge */
 function Badge({ label, color, pulse = false }: { label: string; color: string; pulse?: boolean }) {
   return (
     <span style={{
-      display:      "inline-flex",
-      alignItems:   "center",
-      gap:          "5px",
-      padding:      "3px 8px",
-      borderRadius: "100px",
-      border:       `1px solid ${color}40`,
-      background:   `${color}14`,
-      fontSize:     "9px",
-      fontWeight:   700,
-      color,
-      letterSpacing:"0.09em",
-      textTransform:"uppercase",
+      display: "inline-flex", alignItems: "center", gap: "5px",
+      padding: "2px 7px", borderRadius: "100px",
+      border: `1px solid ${color}40`, background: `${color}14`,
+      fontSize: "9px", fontWeight: 700, color, letterSpacing: "0.09em", textTransform: "uppercase",
     }}>
       <span style={{
-        width:        "5px",
-        height:       "5px",
-        borderRadius: "50%",
-        background:   color,
-        flexShrink:   0,
-        animation:    pulse ? "dotPulse 1.4s ease infinite" : "none",
+        width: "5px", height: "5px", borderRadius: "50%", background: color, flexShrink: 0,
+        animation: pulse ? "dotPulse 1.4s ease infinite" : "none",
       }} />
       {label}
     </span>
-  );
-}
-
-/** Panel with header chrome */
-function Panel({
-  id, title, badge, extra, children, style = {},
-}: {
-  id?: string;
-  title: string;
-  badge?: React.ReactNode;
-  extra?: React.ReactNode;
-  children: React.ReactNode;
-  style?: React.CSSProperties;
-}) {
-  return (
-    <section
-      id={id}
-      style={{
-        display:        "flex",
-        flexDirection:  "column",
-        background:     T.panel,
-        borderRight:    `1px solid ${T.line}`,
-        overflow:       "hidden",
-        position:       "relative",
-        ...style,
-      }}
-    >
-      {/* Panel chrome bar */}
-      <header style={{
-        display:        "flex",
-        alignItems:     "center",
-        gap:            "8px",
-        height:         "34px",
-        padding:        "0 14px",
-        borderBottom:   `1px solid ${T.line}`,
-        flexShrink:     0,
-        background:     `linear-gradient(180deg, ${T.raised} 0%, ${T.panel} 100%)`,
-      }}>
-        <span style={{
-          fontSize:     "9.5px",
-          fontWeight:   600,
-          color:        T.t3,
-          letterSpacing:"0.11em",
-          textTransform:"uppercase",
-          userSelect:   "none",
-        }}>
-          {title}
-        </span>
-        {badge && <div style={{ marginLeft: "2px" }}>{badge}</div>}
-        {extra && <div style={{ marginLeft: "auto" }}>{extra}</div>}
-      </header>
-
-      <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-        {children}
-      </div>
-    </section>
-  );
-}
-
-/** Confidence arc / ring */
-function ConfRing({ value, size = 32 }: { value: number; size?: number }) {
-  const r       = (size - 4) / 2;
-  const circ    = 2 * Math.PI * r;
-  const filled  = circ * value;
-  const color   = confColor(value);
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={T.t5} strokeWidth="2" />
-      <circle
-        cx={size/2} cy={size/2} r={r} fill="none"
-        stroke={color} strokeWidth="2.5"
-        strokeDasharray={`${filled} ${circ - filled}`}
-        strokeLinecap="round"
-        transform={`rotate(-90 ${size/2} ${size/2})`}
-        style={{ transition: "stroke-dasharray 600ms ease" }}
-      />
-      <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle"
-        style={{ fontSize: "8px", fontFamily: F.mono, fill: color, fontWeight: 700 }}>
-        {Math.round(value * 100)}
-      </text>
-    </svg>
-  );
-}
-
-/** Audio waveform bars */
-function Waveform({ active }: { active: boolean }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: "2px", height: "22px" }}>
-      {Array.from({ length: 20 }).map((_, i) => (
-        <div key={i} style={{
-          width:        "2.5px",
-          background:   active ? T.red : T.t5,
-          borderRadius: "2px",
-          minHeight:    "3px",
-          animation:    active
-            ? `wv ${(0.5 + (i % 7) * 0.12).toFixed(2)}s ease-in-out infinite alternate`
-            : "none",
-          animationDelay: `${(i * 0.04).toFixed(2)}s`,
-          transition:   "background 400ms ease",
-        }} />
-      ))}
-    </div>
-  );
-}
-
-/** Queue verse card */
-function QueueCard({
-  verse, isActive, onClick, onPushLive,
-}: {
-  verse: VerseDetectedPayload; isActive: boolean; onClick: () => void; onPushLive: () => void;
-}) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        display:      "flex",
-        alignItems:   "flex-start",
-        gap:          "10px",
-        padding:      "10px 12px",
-        background:   isActive ? T.goldDim : "transparent",
-        borderLeft:   `2px solid ${isActive ? T.gold : confColor(verse.confidence)}40`,
-        cursor:       "pointer",
-        transition:   "background 140ms ease",
-      }}
-      onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLDivElement).style.background = T.raised; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = isActive ? T.goldDim : "transparent"; }}
-    >
-      <ConfRing value={verse.confidence} size={30} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "6px", marginBottom: "3px" }}>
-          <span style={{ fontSize: "11.5px", fontWeight: 700, color: T.gold, whiteSpace: "nowrap" }}>{verse.verseRef}</span>
-          <span style={{ fontSize: "9px", color: T.t4, fontFamily: F.mono }}>{relTime(verse.detectedAt)}</span>
-        </div>
-        <p style={{
-          fontSize:   "10.5px",
-          color:      T.t2,
-          lineHeight: 1.5,
-          margin:     0,
-          fontStyle:  "italic",
-          display:    "-webkit-box",
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: "vertical",
-          overflow:   "hidden",
-        }}>
-          {verse.verseText}
-        </p>
-      </div>
-      <button
-        onClick={e => { e.stopPropagation(); onPushLive(); }}
-        title="Push to live"
-        style={{
-          flexShrink:   0,
-          width:        "26px",
-          height:       "26px",
-          borderRadius: "5px",
-          border:       `1px solid ${T.green}50`,
-          background:   T.greenDim,
-          color:        T.green,
-          fontSize:     "11px",
-          cursor:       "pointer",
-          display:      "flex",
-          alignItems:   "center",
-          justifyContent: "center",
-          transition:   "all 120ms ease",
-        }}
-        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = `rgba(52,199,89,0.25)`; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = T.greenDim; }}
-      >
-        ▶
-      </button>
-    </div>
   );
 }
 
@@ -285,7 +73,8 @@ function QueueCard({
    MAIN PAGE
 ───────────────────────────────────────────────────────────────────────────── */
 export default function LivePage() {
-  /* ── State ────────────────────────────────────────────────────────────────── */
+
+  /* ── State ── */
   const [svcState,    setSvcState]    = useState<SvcState>("idle");
   const [serviceId,   setServiceId]   = useState("");
   const [connected,   setConnected]   = useState(false);
@@ -302,11 +91,11 @@ export default function LivePage() {
   const [transcript, setTranscript] = useState("");
   const [stats,      setStats]      = useState<ServiceStatsPayload>({ versesDetected: 0, powerMoments: 0, duration: 0, attendees: 0 });
 
-  const [searchQ,    setSearchQ]    = useState("");
-  const [searching,  setSearching]  = useState(false);
-  const [results,    setResults]    = useState<SearchResult[]>([]);
+  const [searchQ,   setSearchQ]   = useState("");
+  const [searching, setSearching] = useState(false);
+  const [results,   setResults]   = useState<SearchResult[]>([]);
 
-  /* ── Refs ─────────────────────────────────────────────────────────────────── */
+  /* ── Refs ── */
   const socketRef    = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const streamRef    = useRef<MediaStream | null>(null);
   const ctxRef       = useRef<AudioContext | null>(null);
@@ -315,7 +104,7 @@ export default function LivePage() {
 
   useEffect(() => { serviceIdRef.current = serviceId; }, [serviceId]);
 
-  /* ── Verse received ───────────────────────────────────────────────────────── */
+  /* ── Verse received ── */
   const onVerseReceived = useCallback((v: VerseDetectedPayload) => {
     setQueue(prev => [v, ...prev.filter(x => x.verseRef !== v.verseRef)].slice(0, 40));
     setAutoMode(auto => {
@@ -331,36 +120,25 @@ export default function LivePage() {
     });
   }, []);
 
-  /* ── Start service ────────────────────────────────────────────────────────── */
+  /* ── Start service ── */
   function startService() {
     setMicError("");
-
-    // ── IMMEDIATELY show the dashboard — nothing blocks this ─────────────────
     const title = `Service — ${new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}`;
     const sid   = `svc-${Date.now()}`;
     setServiceId(sid);
     setServiceTitle(title);
     serviceIdRef.current = sid;
-    setSvcState("live");   // ← dashboard opens RIGHT NOW
+    setSvcState("live");
 
-    // ── Everything else runs async in the background ──────────────────────────
     void (async () => {
-      // 1. Create service record (updates title if API responds)
       try {
-        const res  = await fetch("/api/service/start", {
-          method:  "POST",
-          headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify({ title }),
-        });
+        const res  = await fetch("/api/service/start", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title }) });
         const data = await res.json() as { serviceId: string; title: string };
         setServiceId(data.serviceId);
         setServiceTitle(data.title ?? title);
         serviceIdRef.current = data.serviceId;
-      } catch {
-        // keep local sid — service already showing, no disruption
-      }
+      } catch { /* keep local sid */ }
 
-      // 2. Connect socket
       try {
         const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
           process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:3001",
@@ -374,37 +152,29 @@ export default function LivePage() {
         socket.on("verse:suggested",   p => { if (p.confidence >= 0.70) onVerseReceived(p); });
         socket.on("transcript:update", ({ text, isFinal }) => { if (isFinal) setTranscript(text); });
         socket.on("service:stats",     setStats);
-      } catch (socketErr) {
-        console.error("[live] Socket connection failed:", socketErr);
-      }
+      } catch (e) { console.error("[live] socket:", e); }
 
-      // 3. Microphone + audio pipeline
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         streamRef.current = stream;
-
         const ctx = new AudioContext({ sampleRate: 16000 });
         ctxRef.current = ctx;
         await ctx.audioWorklet.addModule("/audio-processor.js");
         const src     = ctx.createMediaStreamSource(stream);
         const worklet = new AudioWorkletNode(ctx, "audio-chunk-processor");
-        worklet.port.onmessage = (e: MessageEvent<ArrayBuffer>) => {
-          socketRef.current?.emit("audio:chunk", e.data);
-        };
+        worklet.port.onmessage = (e: MessageEvent<ArrayBuffer>) => { socketRef.current?.emit("audio:chunk", e.data); };
         src.connect(worklet);
         worklet.connect(ctx.destination);
       } catch (micErr) {
         const m = micErr instanceof Error ? micErr.message : "";
         if (m.toLowerCase().includes("denied") || m.toLowerCase().includes("permission")) {
           setMicError("Microphone access denied — click the camera/mic icon in the address bar to allow it.");
-        } else {
-          console.error("[live] Audio pipeline failed:", micErr);
         }
       }
     })();
   }
 
-  /* ── Push verse to projector ──────────────────────────────────────────────── */
+  /* ── Push to projector ── */
   function pushToLive(verse?: VerseDetectedPayload) {
     const v = verse ?? previewVerse;
     if (!v) return;
@@ -418,7 +188,7 @@ export default function LivePage() {
     socketRef.current?.emit("service:translation", t, serviceIdRef.current);
   }
 
-  /* ── Bible search ─────────────────────────────────────────────────────────── */
+  /* ── Bible search ── */
   const runSearch = useCallback(async (q: string) => {
     if (!q.trim()) { setResults([]); return; }
     setSearching(true);
@@ -435,15 +205,12 @@ export default function LivePage() {
   }, [searchQ, runSearch]);
 
   function stageResult(r: SearchResult) {
-    const v: VerseDetectedPayload = {
-      verseRef: r.ref, verseText: r.text, translation,
-      confidence: 1.0, detectionMs: 0, snippetUsed: "", detectedAt: new Date().toISOString(),
-    };
+    const v: VerseDetectedPayload = { verseRef: r.ref, verseText: r.text, translation, confidence: 1.0, detectionMs: 0, snippetUsed: "", detectedAt: new Date().toISOString() };
     setPreviewVerse(v);
     setQueue(prev => [v, ...prev.filter(x => x.verseRef !== v.verseRef)].slice(0, 40));
   }
 
-  /* ── End service ──────────────────────────────────────────────────────────── */
+  /* ── End service ── */
   function endService() {
     socketRef.current?.emit("service:leave", serviceIdRef.current);
     socketRef.current?.disconnect();
@@ -453,14 +220,14 @@ export default function LivePage() {
     setSvcState("ended");
   }
 
-  /* ── Cleanup ──────────────────────────────────────────────────────────────── */
+  /* ── Cleanup ── */
   useEffect(() => () => {
     socketRef.current?.disconnect();
     streamRef.current?.getTracks().forEach(t => t.stop());
     ctxRef.current?.close();
   }, []);
 
-  /* ── Keyboard shortcut: ⌘K / Ctrl+K → focus search ──────────────────────── */
+  /* ── ⌘K shortcut ── */
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); searchRef.current?.focus(); }
@@ -470,102 +237,34 @@ export default function LivePage() {
   }, []);
 
   /* ═══════════════════════════════════════════════════════════════════════════
-     IDLE  ─ Pre-service start screen
+     IDLE
   ═══════════════════════════════════════════════════════════════════════════ */
   if (svcState === "idle") {
     return (
       <>
-        <div style={{
-          display:   "flex",
-          gap:       "48px",
-          alignItems:"flex-start",
-          maxWidth:  "1000px",
-          margin:    "0 auto",
-          padding:   "48px 0 80px",
-        }}>
+        <div style={{ display: "flex", gap: "48px", alignItems: "flex-start", maxWidth: "1000px", margin: "0 auto", padding: "48px 0 80px" }}>
 
-          {/* ── LEFT: crimson sidebar panel ─────────────────────────────── */}
-          <div style={{
-            width:        "260px",
-            flexShrink:   0,
-            borderRadius: "12px",
-            overflow:     "hidden",
-            border:       "1px solid var(--pk-border)",
-          }}>
-            {/* Crimson header */}
-            <div style={{
-              background:  "#8B1A1A",
-              padding:     "20px 20px 18px",
-            }}>
+          {/* Left sidebar */}
+          <div style={{ width: "260px", flexShrink: 0, borderRadius: "12px", overflow: "hidden", border: "1px solid var(--pk-border)" }}>
+            <div style={{ background: "#8B1A1A", padding: "20px 20px 18px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                <span style={{
-                  width: "7px", height: "7px", borderRadius: "50%",
-                  background: "#fff", opacity: 0.7,
-                  animation: "dotPulse 1.4s ease infinite", flexShrink: 0,
-                }} />
-                <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                  Live Sermon
-                </span>
+                <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#fff", opacity: 0.7, animation: "dotPulse 1.4s ease infinite", flexShrink: 0 }} />
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.7)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Live Sermon</span>
               </div>
-              <p style={{ fontSize: "18px", fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
-                Sermon Control
-              </p>
+              <p style={{ fontSize: "18px", fontWeight: 700, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>Sermon Control</p>
             </div>
-
-            {/* Feature list */}
             {[
-              {
-                label: "Real-Time Transcription",
-                desc:  "Deepgram Nova-2 captures every word with sub-300ms latency.",
-                icon: (
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                    <line x1="12" y1="19" x2="12" y2="22"/>
-                  </svg>
-                ),
-              },
-              {
-                label: "AI Verse Detection",
-                desc:  "Groq Llama detects quotes, references, and paraphrases automatically.",
-                icon: (
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                  </svg>
-                ),
-              },
-              {
-                label: "Instant Projection",
-                desc:  "Detected verses display on the congregation screen as you preach.",
-                icon: (
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
-                  </svg>
-                ),
-              },
-              {
-                label: "Bible Search",
-                desc:  "Search all 66 books and push any verse live manually.",
-                icon: (
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                  </svg>
-                ),
-              },
+              { label: "Real-Time Transcription", desc: "Deepgram Nova-2 captures every word with sub-300ms latency.",
+                icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg> },
+              { label: "AI Verse Detection", desc: "Groq Llama detects quotes, references, and paraphrases automatically.",
+                icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> },
+              { label: "Instant Projection", desc: "Detected verses display on the congregation screen as you preach.",
+                icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> },
+              { label: "Bible Search", desc: "Search all 66 books and push any verse live manually.",
+                icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> },
             ].map((f, i, arr) => (
-              <div key={f.label} style={{
-                display:     "flex",
-                gap:         "12px",
-                padding:     "14px 18px",
-                background:  "var(--pk-surface)",
-                borderBottom: i < arr.length - 1 ? "1px solid var(--pk-border)" : "none",
-              }}>
-                <div style={{
-                  width: "28px", height: "28px", borderRadius: "7px",
-                  background: "rgba(139,26,26,0.08)", border: "1px solid rgba(139,26,26,0.15)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  flexShrink: 0, color: "#8B1A1A",
-                }}>
+              <div key={f.label} style={{ display: "flex", gap: "12px", padding: "14px 18px", background: "var(--pk-surface)", borderBottom: i < arr.length - 1 ? "1px solid var(--pk-border)" : "none" }}>
+                <div style={{ width: "28px", height: "28px", borderRadius: "7px", background: "rgba(139,26,26,0.08)", border: "1px solid rgba(139,26,26,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "#8B1A1A" }}>
                   {f.icon}
                 </div>
                 <div>
@@ -576,115 +275,41 @@ export default function LivePage() {
             ))}
           </div>
 
-          {/* ── RIGHT: main content ──────────────────────────────────────── */}
+          {/* Right content */}
           <div style={{ flex: 1, minWidth: 0 }}>
-
-            {/* Label */}
-            <p style={{
-              fontSize:      "11px",
-              fontWeight:    700,
-              color:         "#8B1A1A",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              margin:        "0 0 16px",
-            }}>
+            <p style={{ fontSize: "11px", fontWeight: 700, color: "#8B1A1A", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 16px" }}>
               Live Sermon Control
             </p>
-
-            {/* Headline */}
-            <h1 style={{
-              fontSize:      "clamp(32px, 4vw, 48px)",
-              fontWeight:    800,
-              color:         "var(--pk-text)",
-              margin:        "0 0 16px",
-              letterSpacing: "-0.03em",
-              lineHeight:    1.1,
-            }}>
+            <h1 style={{ fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 800, color: "var(--pk-text)", margin: "0 0 16px", letterSpacing: "-0.03em", lineHeight: 1.1 }}>
               Ready to Go Live
             </h1>
-
-            {/* Rule */}
             <div style={{ height: "2px", background: "#8B1A1A", width: "48px", marginBottom: "20px" }} />
-
-            <p style={{
-              fontSize:   "15px",
-              color:      "var(--pk-text-2)",
-              margin:     "0 0 36px",
-              lineHeight: 1.8,
-              maxWidth:   "480px",
-            }}>
+            <p style={{ fontSize: "15px", color: "var(--pk-text-2)", margin: "0 0 36px", lineHeight: 1.8, maxWidth: "480px" }}>
               Press <strong style={{ color: "var(--pk-text)" }}>Start Service</strong> and begin preaching.
-              Bible verses are detected automatically and displayed on your
-              congregation&apos;s screen within seconds.
+              Bible verses are detected automatically and displayed on your congregation&apos;s screen within seconds.
             </p>
 
             {micError && (
-              <div style={{
-                marginBottom: "24px",
-                padding:      "12px 16px",
-                borderRadius: "8px",
-                background:   "rgba(255,59,48,0.06)",
-                border:       "1px solid rgba(255,59,48,0.2)",
-                color:        "#C0392B",
-                fontSize:     "13px",
-                lineHeight:   1.6,
-              }}>
+              <div style={{ marginBottom: "24px", padding: "12px 16px", borderRadius: "8px", background: "rgba(178,34,34,0.06)", border: "1px solid rgba(178,34,34,0.2)", color: "#B22222", fontSize: "13px", lineHeight: 1.6 }}>
                 {micError}
               </div>
             )}
 
-            {/* Start button */}
             <button
               onClick={startService}
-              style={{
-                display:       "inline-flex",
-                alignItems:    "center",
-                gap:           "12px",
-                padding:       "0 40px",
-                height:        "52px",
-                borderRadius:  "8px",
-                border:        "none",
-                background:    "#8B1A1A",
-                color:         "#fff",
-                fontSize:      "15px",
-                fontWeight:    700,
-                cursor:        "pointer",
-                letterSpacing: "-0.01em",
-                transition:    "background 150ms ease, transform 150ms ease",
-              }}
+              style={{ display: "inline-flex", alignItems: "center", gap: "12px", padding: "0 40px", height: "52px", borderRadius: "8px", border: "none", background: "#8B1A1A", color: "#fff", fontSize: "15px", fontWeight: 700, cursor: "pointer", transition: "background 150ms ease" }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "#A01E1E"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "#8B1A1A"; }}
             >
-              <span style={{
-                width: "8px", height: "8px", borderRadius: "50%",
-                background: "#fff", opacity: 0.9, flexShrink: 0,
-                animation: "dotPulse 1.4s ease infinite",
-              }} />
+              <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#fff", opacity: 0.9, flexShrink: 0, animation: "dotPulse 1.4s ease infinite" }} />
               Start Service
             </button>
-
             <p style={{ marginTop: "14px", fontSize: "12px", color: "var(--pk-text-3)" }}>
               Requires microphone · Deepgram Nova-2 · Groq AI
             </p>
 
-            {/* Info card */}
-            <div style={{
-              marginTop:    "48px",
-              padding:      "20px 24px",
-              borderRadius: "10px",
-              border:       "1px solid var(--pk-border)",
-              background:   "var(--pk-surface)",
-            }}>
-              <p style={{
-                fontSize:   "11px",
-                fontWeight: 700,
-                color:      "var(--pk-text)",
-                margin:     "0 0 10px",
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-              }}>
-                How It Works
-              </p>
+            <div style={{ marginTop: "48px", padding: "20px 24px", borderRadius: "10px", border: "1px solid var(--pk-border)", background: "var(--pk-surface)" }}>
+              <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 10px", letterSpacing: "0.06em", textTransform: "uppercase" }}>How It Works</p>
               <ol style={{ margin: 0, paddingLeft: "18px", display: "flex", flexDirection: "column", gap: "8px" }}>
                 {[
                   "Open this page on the pastor's device and click Start Service.",
@@ -696,7 +321,6 @@ export default function LivePage() {
                 ))}
               </ol>
             </div>
-
           </div>
         </div>
         <style>{CSS_ANIMATIONS}</style>
@@ -705,50 +329,33 @@ export default function LivePage() {
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
-     ENDED  ─ Post-service summary
+     ENDED
   ═══════════════════════════════════════════════════════════════════════════ */
   if (svcState === "ended") {
     return (
       <>
-        <div style={{ maxWidth: "520px", margin: "0 auto", textAlign: "center", padding: "60px 20px 80px" }}>
-          <div style={{
-            width: "72px", height: "72px", borderRadius: "18px",
-            background: T.greenDim, border: `1px solid rgba(52,199,89,0.25)`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            margin: "0 auto 28px",
-            boxShadow: "0 0 40px rgba(52,199,89,0.1)",
-            fontSize: "28px",
-          }}>
+        <div style={{ maxWidth: "480px", margin: "0 auto", textAlign: "center", padding: "60px 20px 80px" }}>
+          <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "rgba(27,122,60,0.08)", border: "1px solid rgba(27,122,60,0.2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 28px", fontSize: "26px", color: GRN }}>
             ✓
           </div>
-          <h2 style={{ fontSize: "clamp(26px,4vw,38px)", fontWeight: 700, color: T.t1, marginBottom: "12px", letterSpacing: "-0.03em" }}>
+          <h2 style={{ fontSize: "clamp(26px,4vw,36px)", fontWeight: 700, color: "var(--pk-text)", marginBottom: "12px", letterSpacing: "-0.03em" }}>
             Service Complete
           </h2>
-          <div style={{ display: "flex", justifyContent: "center", gap: "24px", marginBottom: "36px" }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: "32px", marginBottom: "36px" }}>
             {[
-              { label: "Verses Detected",  val: stats.versesDetected, color: T.gold  },
-              { label: "Power Moments",    val: stats.powerMoments,   color: T.green },
-              { label: "Duration",         val: fmtDur(stats.duration), color: T.t2  },
+              { label: "Verses Detected", val: stats.versesDetected, color: T.gold },
+              { label: "Power Moments",   val: stats.powerMoments,   color: GRN   },
+              { label: "Duration",        val: fmtDur(stats.duration), color: TXT3 },
             ].map(s => (
               <div key={s.label} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "28px", fontWeight: 800, color: s.color, letterSpacing: "-0.03em", fontFamily: F.mono }}>{s.val}</div>
-                <div style={{ fontSize: "11px", color: T.t4, marginTop: "2px", letterSpacing: "0.04em" }}>{s.label}</div>
+                <div style={{ fontSize: "11px", color: TXT4, marginTop: "2px", letterSpacing: "0.04em" }}>{s.label}</div>
               </div>
             ))}
           </div>
           <button
-            onClick={() => {
-              setQueue([]); setPreviewVerse(null); setLiveVerse(null);
-              setTranscript(""); setStats({ versesDetected: 0, powerMoments: 0, duration: 0, attendees: 0 });
-              setSvcState("idle");
-            }}
-            style={{
-              padding: "0 40px", height: "52px", borderRadius: "10px",
-              border: "none", background: T.red, color: "#fff",
-              fontSize: "15px", fontWeight: 700, cursor: "pointer",
-              boxShadow: "0 4px 20px rgba(255,59,48,0.3)",
-              transition: "transform 150ms ease",
-            }}
+            onClick={() => { setQueue([]); setPreviewVerse(null); setLiveVerse(null); setTranscript(""); setStats({ versesDetected: 0, powerMoments: 0, duration: 0, attendees: 0 }); setSvcState("idle"); }}
+            style={{ padding: "0 40px", height: "50px", borderRadius: "8px", border: "none", background: "#8B1A1A", color: "#fff", fontSize: "15px", fontWeight: 700, cursor: "pointer" }}
           >
             Start New Service
           </button>
@@ -759,829 +366,288 @@ export default function LivePage() {
   }
 
   /* ═══════════════════════════════════════════════════════════════════════════
-     LIVE  ─ Broadcast control dashboard
+     LIVE  ─ openbeam-style light dashboard
   ═══════════════════════════════════════════════════════════════════════════ */
   return (
     <div style={{
-      position:      "fixed",
-      top:           "64px",
-      left:          0,
-      right:         0,
-      bottom:        0,
-      background:    T.bg,
-      display:       "flex",
-      flexDirection: "column",
-      overflow:      "hidden",
-      fontFamily:    "-apple-system,'SF Pro Display','Helvetica Neue',sans-serif",
+      position: "fixed", top: "64px", left: 0, right: 0, bottom: 0,
+      zIndex: 500,
+      background: "#FFFFFF",
+      display: "flex", flexDirection: "column", overflow: "hidden",
+      fontFamily: "-apple-system,'SF Pro Display','Helvetica Neue',sans-serif",
     }}>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          TOP STATUS BAR
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div style={{
-        display:      "flex",
-        alignItems:   "center",
-        gap:          "10px",
-        height:       "46px",
-        padding:      "0 16px",
-        background:   `linear-gradient(180deg, ${T.raised} 0%, ${T.panel} 100%)`,
-        borderBottom: `1px solid ${T.line}`,
-        flexShrink:   0,
-      }}>
-        {/* Live badge */}
-        <Badge label="Live" color={T.red} pulse />
-
-        {/* Divider */}
-        <div style={{ width: "1px", height: "18px", background: T.line }} />
-
-        {/* Service title */}
-        <span style={{ fontSize: "12px", fontWeight: 500, color: T.t2, letterSpacing: "-0.01em" }}>
-          {serviceTitle}
-        </span>
-
-        {/* Divider */}
-        <div style={{ width: "1px", height: "18px", background: T.line }} />
-
-        {/* Socket status */}
-        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <span style={{
-            width:        "6px",
-            height:       "6px",
-            borderRadius: "50%",
-            background:   connected ? T.green : T.orange,
-            display:      "inline-block",
-            boxShadow:    connected ? `0 0 6px ${T.green}` : "none",
-            transition:   "background 300ms ease",
-          }} />
-          <span style={{ fontSize: "11px", color: connected ? T.green : T.orange, fontWeight: 500 }}>
-            {connected ? "Connected" : "Reconnecting…"}
-          </span>
-        </div>
-
-        {/* Divider */}
-        <div style={{ width: "1px", height: "18px", background: T.line }} />
-
-        {/* Stats row */}
-        <div style={{ display: "flex", gap: "16px" }}>
-          {[
-            { label: "Detected", val: stats.versesDetected, color: T.gold  },
-            { label: "Power",    val: stats.powerMoments,   color: T.green },
-            { label: "Duration", val: fmtDur(stats.duration), color: T.t3  },
-          ].map(s => (
-            <div key={s.label} style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
-              <span style={{ fontSize: "14px", fontWeight: 700, color: s.color, fontFamily: F.mono }}>{s.val}</span>
-              <span style={{ fontSize: "9px", color: T.t4, letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</span>
-            </div>
+      {/* ── TOP BAR ── */}
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", height: "42px", padding: "0 16px", background: "#FFFFFF", borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+        {/* Mic */}
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={connected ? GRN : TXT4} strokeWidth="2" strokeLinecap="round">
+          <path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+        {/* Signal bars */}
+        <div style={{ display: "flex", alignItems: "flex-end", gap: "2px", height: "14px" }}>
+          {[6,10,14].map((h,i) => (
+            <div key={i} style={{ width: "3px", height: `${h}px`, borderRadius: "1px", background: connected ? GRN : TXT4, opacity: connected ? 1 : 0.35 }} />
           ))}
         </div>
-
+        {connected
+          ? <Badge label="Live" color={T.red} pulse />
+          : <span style={{ fontSize: "10px", color: TXT4, fontWeight: 600, letterSpacing: "0.08em" }}>OFF AIR</span>
+        }
+        <div style={{ width: "1px", height: "18px", background: BD }} />
+        <span style={{ fontSize: "12px", color: TXT3, fontWeight: 500 }}>{serviceTitle}</span>
+        <div style={{ width: "1px", height: "18px", background: BD }} />
+        {[
+          { label: "Detected", val: stats.versesDetected, color: T.gold },
+          { label: "Duration", val: fmtDur(stats.duration), color: TXT3 },
+        ].map(s => (
+          <div key={s.label} style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
+            <span style={{ fontSize: "13px", fontWeight: 700, color: s.color, fontFamily: F.mono }}>{s.val}</span>
+            <span style={{ fontSize: "9px", color: TXT4, letterSpacing: "0.06em", textTransform: "uppercase" }}>{s.label}</span>
+          </div>
+        ))}
         <div style={{ flex: 1 }} />
-
-        {/* AUTO toggle */}
-        <button
-          onClick={() => setAutoMode(a => !a)}
-          style={{
-            display:      "flex",
-            alignItems:   "center",
-            gap:          "6px",
-            padding:      "0 12px",
-            height:       "28px",
-            borderRadius: "7px",
-            border:       `1px solid ${autoMode ? `${T.green}50` : T.border}`,
-            background:   autoMode ? T.greenDim : "transparent",
-            color:        autoMode ? T.green : T.t3,
-            fontSize:     "10.5px",
-            fontWeight:   600,
-            cursor:       "pointer",
-            letterSpacing:"0.06em",
-            textTransform:"uppercase",
-            transition:   "all 160ms ease",
-          }}
-        >
-          <span style={{
-            width: "7px", height: "7px", borderRadius: "50%",
-            background: autoMode ? T.green : T.t4,
-            animation:  autoMode ? "dotPulse 1.6s ease infinite" : "none",
-            flexShrink: 0,
-            transition: "background 160ms ease",
-          }} />
+        <button onClick={() => setAutoMode(a => !a)} style={{ display: "flex", alignItems: "center", gap: "5px", padding: "0 10px", height: "26px", borderRadius: "6px", border: `1px solid ${autoMode ? "rgba(27,122,60,0.4)" : BD}`, background: autoMode ? "rgba(27,122,60,0.07)" : "transparent", color: autoMode ? GRN : TXT3, fontSize: "10px", fontWeight: 600, cursor: "pointer", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: autoMode ? GRN : TXT4, animation: autoMode ? "dotPulse 1.6s ease infinite" : "none" }} />
           Auto {autoMode ? "On" : "Off"}
         </button>
-
-        {/* Translation select */}
-        <select
-          value={translation}
-          onChange={e => changeTranslation(e.target.value)}
-          style={{
-            height:      "28px",
-            padding:     "0 8px",
-            background:  T.raised,
-            border:      `1px solid ${T.border}`,
-            borderRadius:"7px",
-            color:       T.t2,
-            fontSize:    "11px",
-            fontWeight:  500,
-            cursor:      "pointer",
-            outline:     "none",
-          }}
-        >
+        <select value={translation} onChange={e => changeTranslation(e.target.value)} style={{ height: "26px", padding: "0 8px", border: `1px solid ${BD}`, borderRadius: "6px", color: TXT1, fontSize: "11px", background: "#fff", cursor: "pointer", outline: "none" }}>
           {TRANSLATIONS.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
-
-        {/* Projector */}
-        <a
-          href={`/live/projector?serviceId=${serviceId}`}
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            display:      "flex",
-            alignItems:   "center",
-            gap:          "6px",
-            padding:      "0 12px",
-            height:       "28px",
-            borderRadius: "7px",
-            border:       `1px solid ${T.border}`,
-            background:   "transparent",
-            color:        T.t2,
-            fontSize:     "11px",
-            fontWeight:   500,
-            textDecoration:"none",
-            transition:   "all 150ms ease",
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = T.borderHi; (e.currentTarget as HTMLAnchorElement).style.color = T.t1; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.borderColor = T.border; (e.currentTarget as HTMLAnchorElement).style.color = T.t2; }}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" />
-            <path d="M8 21h8M12 17v4" />
-          </svg>
+        <a href={`/live/projector?serviceId=${serviceId}`} target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: "5px", padding: "0 10px", height: "26px", borderRadius: "6px", border: `1px solid ${BD}`, color: TXT2, fontSize: "11px", fontWeight: 500, textDecoration: "none" }}>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
           Projector
         </a>
-
-        {/* End service */}
-        <button
-          onClick={endService}
-          style={{
-            display:      "flex",
-            alignItems:   "center",
-            gap:          "6px",
-            padding:      "0 14px",
-            height:       "28px",
-            borderRadius: "7px",
-            border:       `1px solid rgba(255,59,48,0.3)`,
-            background:   T.redDim,
-            color:        T.red,
-            fontSize:     "10.5px",
-            fontWeight:   600,
-            cursor:       "pointer",
-            letterSpacing:"0.04em",
-            textTransform:"uppercase",
-            transition:   "all 150ms ease",
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = `rgba(255,59,48,0.2)`; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = T.redDim; }}
-        >
-          <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor">
-            <rect width="8" height="8" rx="1" />
-          </svg>
+        <button onClick={endService} style={{ display: "flex", alignItems: "center", gap: "5px", padding: "0 12px", height: "26px", borderRadius: "6px", border: "1px solid rgba(178,34,34,0.3)", background: "rgba(178,34,34,0.06)", color: "#B22222", fontSize: "10px", fontWeight: 600, cursor: "pointer", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+          <svg width="7" height="7" viewBox="0 0 8 8" fill="currentColor"><rect width="8" height="8" rx="1"/></svg>
           End Service
         </button>
       </div>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          PANEL GRID  (all panels separated by 1px gap = T.line background)
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div style={{
-        flex:       1,
-        display:    "flex",
-        flexDirection:"column",
-        background: T.line,
-        gap:        "1px",
-        overflow:   "hidden",
-      }}>
+      {/* ── PANELS ── */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
-        {/* ── TOP ROW ─────────────────────────────────────────────────────── */}
-        <div style={{ display: "flex", flex: 1, gap: "1px", overflow: "hidden" }}>
+        {/* TOP ROW */}
+        <div style={{ display: "flex", flex: 1, overflow: "hidden", borderBottom: `1px solid ${BD}` }}>
 
-          {/* ── 1. LIVE TRANSCRIPT ──────────────────────────────────────── */}
-          <Panel
-            title="Transcript"
-            style={{ width: "196px", flexShrink: 0 }}
-            badge={connected
-              ? <Badge label="Live" color={T.red} pulse />
-              : <Badge label="Offline" color={T.orange} />
-            }
-          >
-            <div style={{ flex: 1, overflowY: "auto", padding: "14px" }}>
-              {/* Audio waveform */}
-              <div style={{ marginBottom: "14px" }}>
-                <Waveform active={connected} />
-              </div>
-
-              {/* Transcript text */}
-              <div style={{
-                minHeight:    "80px",
-                padding:      "12px",
-                background:   T.raised,
-                borderRadius: "8px",
-                border:       `1px solid ${T.line}`,
-                marginBottom: "14px",
-              }}>
-                {transcript ? (
-                  <p style={{ fontSize: "11.5px", color: T.t2, lineHeight: 1.7, margin: 0, fontStyle: "italic" }}>
-                    {transcript}
-                  </p>
-                ) : (
-                  <p style={{ fontSize: "11px", color: T.t4, lineHeight: 1.6, margin: 0 }}>
-                    Start preaching — transcript appears here as you speak…
-                  </p>
-                )}
-              </div>
-
-              {/* Stats */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {[
-                  { label: "Detected",       val: stats.versesDetected, color: T.gold  },
-                  { label: "Power Moments",  val: stats.powerMoments,   color: T.green },
-                  { label: "Duration",       val: fmtDur(stats.duration),color: T.t2   },
-                  { label: "Connected",      val: stats.attendees,      color: T.blue  },
-                ].map(s => (
-                  <div key={s.label} style={{
-                    display:        "flex",
-                    alignItems:     "center",
-                    justifyContent: "space-between",
-                    padding:        "6px 0",
-                    borderBottom:   `1px solid ${T.line}`,
-                  }}>
-                    <span style={{ fontSize: "10px", color: T.t4, letterSpacing: "0.04em" }}>{s.label}</span>
-                    <span style={{ fontSize: "13px", fontWeight: 700, color: s.color, fontFamily: F.mono }}>{s.val}</span>
-                  </div>
-                ))}
-              </div>
+          {/* 1 — LIVE TRANSCRIPT */}
+          <div style={{ width: "220px", flexShrink: 0, borderRight: `1px solid ${BD}`, display: "flex", flexDirection: "column" }}>
+            <div style={{ height: "34px", padding: "0 14px", display: "flex", alignItems: "center", gap: "8px", borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={TXT3} strokeWidth="2.5" strokeLinecap="round"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              <span style={{ fontSize: "9.5px", fontWeight: 600, color: TXT3, letterSpacing: "0.1em", textTransform: "uppercase" }}>Live Transcript</span>
+              {connected && <Badge label="Live" color={T.red} pulse />}
             </div>
-          </Panel>
-
-          {/* ── 2. PROGRAM PREVIEW ──────────────────────────────────────── */}
-          <Panel
-            title="Program Preview"
-            style={{ flex: 1 }}
-            badge={<span style={{ fontSize: "9px", color: T.t4 }}>Staged — review before going live</span>}
-          >
-            <div style={{ flex: 1, padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-              {previewVerse ? (
-                <>
-                  {/* Verse display */}
-                  <div style={{
-                    flex:           1,
-                    padding:        "20px 24px",
-                    background:     `linear-gradient(135deg, ${T.goldGlow} 0%, ${T.raised} 100%)`,
-                    border:         `1px solid rgba(232,168,32,0.18)`,
-                    borderRadius:   "10px",
-                    display:        "flex",
-                    flexDirection:  "column",
-                    justifyContent: "center",
-                    alignItems:     "center",
-                    textAlign:      "center",
-                    gap:            "14px",
-                    position:       "relative",
-                    overflow:       "hidden",
-                  }}>
-                    {/* Top accent line */}
-                    <div style={{ position: "absolute", top: 0, left: "20%", right: "20%", height: "1px", background: `linear-gradient(90deg, transparent, ${T.gold}60, transparent)` }} />
-
-                    {/* Translation + confidence */}
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <span style={{ fontSize: "10px", color: T.t4, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                        {previewVerse.translation}
-                      </span>
-                      <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: T.t5, display: "inline-block" }} />
-                      <ConfRing value={previewVerse.confidence} size={28} />
-                    </div>
-
-                    {/* Verse text */}
-                    <p style={{
-                      fontSize:      "clamp(13px, 1.5vw, 17px)",
-                      fontStyle:     "italic",
-                      color:         T.t1,
-                      lineHeight:    1.75,
-                      margin:        0,
-                      letterSpacing: "0.005em",
-                    }}>
-                      &ldquo;{previewVerse.verseText}&rdquo;
-                    </p>
-
-                    {/* Reference */}
-                    <span style={{
-                      fontSize:      "15px",
-                      fontWeight:    700,
-                      color:         T.gold,
-                      letterSpacing: "-0.01em",
-                    }}>
-                      {previewVerse.verseRef}
-                    </span>
-                  </div>
-
-                  {/* Push button */}
-                  <button
-                    onClick={() => pushToLive()}
-                    style={{
-                      display:       "flex",
-                      alignItems:    "center",
-                      justifyContent:"center",
-                      gap:           "8px",
-                      height:        "46px",
-                      borderRadius:  "9px",
-                      border:        "none",
-                      background:    `linear-gradient(135deg, #3adb6e 0%, ${T.green} 100%)`,
-                      color:         "#fff",
-                      fontSize:      "13px",
-                      fontWeight:    700,
-                      cursor:        "pointer",
-                      letterSpacing: "0.02em",
-                      boxShadow:     `0 0 0 1px rgba(52,199,89,0.3), 0 6px 20px rgba(52,199,89,0.2)`,
-                      transition:    "transform 150ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 150ms ease",
-                    }}
-                    onMouseEnter={e => {
-                      (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.02)";
-                      (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 0 1px rgba(52,199,89,0.4), 0 8px 28px rgba(52,199,89,0.3)`;
-                    }}
-                    onMouseLeave={e => {
-                      (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
-                      (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 0 1px rgba(52,199,89,0.3), 0 6px 20px rgba(52,199,89,0.2)`;
-                    }}
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                      <polygon points="5,3 19,12 5,21" />
-                    </svg>
-                    Push to Live Display
-                  </button>
-                </>
+            <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px" }}>
+              {transcript ? (
+                <p style={{ fontSize: "13px", color: TXT1, lineHeight: 1.8, margin: 0 }}>{transcript}</p>
               ) : (
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "10px" }}>
-                  <div style={{
-                    width:        "48px",
-                    height:       "48px",
-                    borderRadius: "12px",
-                    background:   T.raised,
-                    border:       `1px solid ${T.line}`,
-                    display:      "flex",
-                    alignItems:   "center",
-                    justifyContent:"center",
-                    opacity:      0.4,
-                  }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.t3} strokeWidth="1.5" strokeLinecap="round">
-                      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                    </svg>
-                  </div>
-                  <p style={{ fontSize: "12px", color: T.t4, textAlign: "center", lineHeight: 1.65, margin: 0 }}>
-                    No verse staged.<br />
-                    <span style={{ color: T.t3 }}>Auto-detected or searched verses appear here.</span>
-                  </p>
-                </div>
+                <p style={{ fontSize: "12px", color: TXT4, lineHeight: 1.65, margin: 0 }}>
+                  {connected ? "Start preaching — transcript appears here…" : "Click Start Service to begin"}
+                </p>
               )}
             </div>
-          </Panel>
+            <div style={{ padding: "10px 14px", borderTop: `1px solid ${BD}`, flexShrink: 0 }}>
+              <button onClick={endService} style={{ background: "none", border: "none", color: "#B22222", fontSize: "12px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", padding: 0 }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Stop transcribing
+              </button>
+            </div>
+          </div>
 
-          {/* ── 3. LIVE DISPLAY ─────────────────────────────────────────── */}
-          <Panel
-            title="Live Display"
-            style={{ flex: 1 }}
-            badge={
-              goLive
-                ? <Badge label="On Air" color={T.red} pulse />
-                : <span style={{ fontSize: "9px", color: T.t4 }}>Off Air — nothing showing</span>
-            }
-          >
-            <div style={{ flex: 1, padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-              {/* Monitor frame */}
-              <div style={{
-                flex:       1,
-                position:   "relative",
-                borderRadius:"10px",
-                overflow:   "hidden",
-                background: "#020208",
-                border:     `1px solid ${goLive ? `rgba(255,59,48,0.3)` : T.line}`,
-                boxShadow:  goLive ? `0 0 0 1px rgba(255,59,48,0.15), inset 0 0 60px rgba(232,168,32,0.04)` : `inset 0 0 30px rgba(0,0,0,0.4)`,
-                transition: "all 400ms ease",
-              }}>
-                {/* Scan-line texture */}
-                <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.012) 2px, rgba(255,255,255,0.012) 4px)", pointerEvents: "none", zIndex: 2 }} />
-
-                {/* Cross watermark */}
-                <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.035, pointerEvents: "none" }}>
-                  <svg width="130" height="130" viewBox="0 0 100 100">
-                    <rect x="44" y="8"  width="12" height="84" rx="5" fill={T.gold} />
-                    <rect x="14" y="30" width="72" height="12" rx="5" fill={T.gold} />
-                  </svg>
-                </div>
-
-                {/* Radial glow */}
-                {goLive && liveVerse && (
-                  <div style={{
-                    position: "absolute", inset: 0,
-                    background: `radial-gradient(ellipse 80% 60% at 50% 50%, rgba(232,168,32,0.06) 0%, transparent 70%)`,
-                    pointerEvents: "none",
-                  }} />
-                )}
-
-                {/* Verse content */}
-                <div style={{
-                  position:  "absolute",
-                  inset:     0,
-                  display:   "flex",
-                  flexDirection:"column",
-                  alignItems:"center",
-                  justifyContent:"center",
-                  padding:   "20px 24px",
-                  textAlign: "center",
-                  gap:       "10px",
-                  zIndex:    1,
-                }}>
-                  {liveVerse && goLive ? (
-                    <div style={{ animation: "fadeSlideUp 350ms cubic-bezier(0.22,1,0.36,1)" }}>
-                      <p style={{
-                        fontSize:  "clamp(10px, 1.1vw, 14px)",
-                        fontStyle: "italic",
-                        color:     "rgba(255,255,255,0.9)",
-                        lineHeight:1.7,
-                        margin:    "0 0 10px",
-                      }}>
-                        &ldquo;{liveVerse.verseText}&rdquo;
-                      </p>
-                      <span style={{ fontSize: "12px", fontWeight: 700, color: T.gold }}>{liveVerse.verseRef}</span>
-                      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.25)", marginLeft: "8px" }}>{liveVerse.translation}</span>
-                    </div>
-                  ) : (
-                    <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.12)", margin: 0, userSelect: "none" }}>
-                      Projector is dark
+          {/* 2 — PROGRAM PREVIEW */}
+          <div style={{ flex: 1, borderRight: `1px solid ${BD}`, display: "flex", flexDirection: "column" }}>
+            <div style={{ height: "34px", padding: "0 14px", display: "flex", alignItems: "center", gap: "8px", borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+              <span style={{ fontSize: "9.5px", fontWeight: 600, color: TXT3, letterSpacing: "0.1em", textTransform: "uppercase" }}>Program Preview</span>
+              <span style={{ marginLeft: "auto", fontSize: "9px", color: TXT4 }}>Staged — review before going live</span>
+            </div>
+            <div style={{ flex: 1, padding: "12px", display: "flex", flexDirection: "column", gap: "10px", overflow: "hidden" }}>
+              <div style={{ flex: 1, background: SCR, borderRadius: "6px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 24px", textAlign: "center", gap: "12px" }}>
+                {previewVerse ? (
+                  <>
+                    <span style={{ fontSize: "10.5px", fontWeight: 700, color: T.gold, letterSpacing: "0.07em", textTransform: "uppercase" }}>
+                      {previewVerse.verseRef} ({previewVerse.translation})
+                    </span>
+                    <p style={{ fontSize: "clamp(12px,1.2vw,15px)", fontStyle: "italic", color: "rgba(255,255,255,0.92)", lineHeight: 1.8, margin: 0 }}>
+                      &ldquo;{previewVerse.verseText}&rdquo;
                     </p>
-                  )}
-                </div>
-
-                {/* ON AIR badge */}
-                {goLive && (
-                  <div style={{
-                    position:     "absolute",
-                    top:          "8px",
-                    right:        "8px",
-                    zIndex:       3,
-                  }}>
-                    <Badge label="On Air" color={T.red} pulse />
-                  </div>
+                  </>
+                ) : (
+                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.15)", margin: 0, userSelect: "none" }}>No verse staged</p>
                 )}
               </div>
+              <button onClick={() => pushToLive()} disabled={!previewVerse} style={{ height: "38px", borderRadius: "6px", border: "none", background: previewVerse ? GRN : "#E8E8E8", color: previewVerse ? "#fff" : TXT4, fontSize: "12px", fontWeight: 700, cursor: previewVerse ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px", flexShrink: 0 }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                Push to Live Display
+              </button>
+            </div>
+          </div>
 
-              {/* Controls */}
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button
-                  onClick={() => pushToLive()}
-                  disabled={!previewVerse}
-                  style={{
-                    flex:          1,
-                    height:        "38px",
-                    borderRadius:  "8px",
-                    border:        `1px solid ${previewVerse ? `${T.green}50` : T.line}`,
-                    background:    previewVerse ? T.greenDim : "transparent",
-                    color:         previewVerse ? T.green : T.t4,
-                    fontSize:      "11px",
-                    fontWeight:    700,
-                    cursor:        previewVerse ? "pointer" : "default",
-                    letterSpacing: "0.05em",
-                    textTransform: "uppercase",
-                    display:       "flex",
-                    alignItems:    "center",
-                    justifyContent:"center",
-                    gap:           "6px",
-                    transition:    "all 150ms ease",
-                  }}
-                  onMouseEnter={e => { if (previewVerse) (e.currentTarget as HTMLButtonElement).style.background = `rgba(52,199,89,0.2)`; }}
-                  onMouseLeave={e => { if (previewVerse) (e.currentTarget as HTMLButtonElement).style.background = T.greenDim; }}
-                >
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="5,3 19,12 5,21" />
-                  </svg>
+          {/* 3 — LIVE DISPLAY */}
+          <div style={{ flex: 1, borderRight: `1px solid ${BD}`, display: "flex", flexDirection: "column" }}>
+            <div style={{ height: "34px", padding: "0 14px", display: "flex", alignItems: "center", gap: "8px", borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+              <span style={{ fontSize: "9.5px", fontWeight: 600, color: TXT3, letterSpacing: "0.1em", textTransform: "uppercase" }}>Live Display</span>
+              {goLive
+                ? <Badge label="Live" color={GRN} pulse />
+                : <span style={{ fontSize: "9px", color: TXT4, marginLeft: "auto" }}>Off Air</span>
+              }
+            </div>
+            <div style={{ flex: 1, padding: "12px", display: "flex", flexDirection: "column", gap: "10px", overflow: "hidden" }}>
+              <div style={{ flex: 1, background: SCR, borderRadius: "6px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px 24px", textAlign: "center", gap: "12px", border: goLive ? "1px solid rgba(27,122,60,0.3)" : "1px solid transparent", transition: "border-color 400ms ease" }}>
+                {liveVerse && goLive ? (
+                  <div style={{ animation: "fadeSlideUp 350ms cubic-bezier(0.22,1,0.36,1)" }}>
+                    <span style={{ fontSize: "10.5px", fontWeight: 700, color: T.gold, letterSpacing: "0.07em", textTransform: "uppercase", display: "block", marginBottom: "10px" }}>
+                      {liveVerse.verseRef} ({liveVerse.translation})
+                    </span>
+                    <p style={{ fontSize: "clamp(12px,1.2vw,15px)", fontStyle: "italic", color: "rgba(255,255,255,0.92)", lineHeight: 1.8, margin: 0 }}>
+                      &ldquo;{liveVerse.verseText}&rdquo;
+                    </p>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.12)", margin: 0, userSelect: "none" }}>Projector is dark</p>
+                )}
+              </div>
+              <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+                <button onClick={() => pushToLive()} disabled={!previewVerse} style={{ flex: 1, height: "36px", borderRadius: "6px", border: `1px solid ${previewVerse ? GRN : BD}`, background: "transparent", color: previewVerse ? GRN : TXT4, fontSize: "11px", fontWeight: 700, cursor: previewVerse ? "pointer" : "default" }}>
                   Go Live
                 </button>
-                <button
-                  onClick={() => setGoLive(false)}
-                  style={{
-                    width:         "80px",
-                    height:        "38px",
-                    borderRadius:  "8px",
-                    border:        `1px solid ${T.border}`,
-                    background:    "transparent",
-                    color:         T.t3,
-                    fontSize:      "11px",
-                    fontWeight:    500,
-                    cursor:        "pointer",
-                    letterSpacing: "0.03em",
-                    transition:    "all 150ms ease",
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.borderHi; (e.currentTarget as HTMLButtonElement).style.color = T.t1; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = T.border; (e.currentTarget as HTMLButtonElement).style.color = T.t3; }}
-                >
+                <button onClick={() => setGoLive(false)} style={{ width: "70px", height: "36px", borderRadius: "6px", border: `1px solid ${BD}`, background: "transparent", color: TXT3, fontSize: "11px", cursor: "pointer" }}>
                   Clear
                 </button>
               </div>
             </div>
-          </Panel>
+          </div>
 
-          {/* ── 4. VERSE QUEUE ──────────────────────────────────────────── */}
-          <Panel
-            title="Verse Queue"
-            style={{ width: "230px", flexShrink: 0, borderRight: "none" }}
-            badge={
-              queue.length > 0
-                ? <span style={{ fontSize: "9px", color: T.gold, fontFamily: F.mono, fontWeight: 700 }}>{queue.length}</span>
-                : undefined
-            }
-            extra={
-              <button
-                onClick={() => setAutoMode(a => !a)}
-                style={{
-                  fontSize:      "9px",
-                  fontWeight:    600,
-                  color:         autoMode ? T.green : T.t4,
-                  background:    "none",
-                  border:        "none",
-                  cursor:        "pointer",
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                  display:       "flex",
-                  alignItems:    "center",
-                  gap:           "4px",
-                }}
-              >
-                <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: autoMode ? T.green : T.t5, display: "inline-block" }} />
-                Auto {autoMode ? "On" : "Off"}
-              </button>
-            }
-          >
+          {/* 4 — QUEUE */}
+          <div style={{ width: "220px", flexShrink: 0, display: "flex", flexDirection: "column" }}>
+            <div style={{ height: "34px", padding: "0 14px", display: "flex", alignItems: "center", gap: "8px", borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+              <span style={{ fontSize: "9.5px", fontWeight: 600, color: TXT3, letterSpacing: "0.1em", textTransform: "uppercase" }}>Queue</span>
+              <span style={{ marginLeft: "auto", fontSize: "11px", color: TXT3, fontFamily: F.mono }}>{queue.length}</span>
+              {queue.length > 0 && <button onClick={() => setQueue([])} style={{ background: "none", border: "none", fontSize: "10px", color: TXT4, cursor: "pointer", padding: "0 2px" }}>Clear all</button>}
+            </div>
             <div style={{ flex: 1, overflowY: "auto" }}>
               {queue.length === 0 ? (
-                <div style={{ padding: "24px 16px", textAlign: "center" }}>
-                  <div style={{ fontSize: "26px", opacity: 0.15, marginBottom: "8px" }}>🎙</div>
-                  <p style={{ fontSize: "11px", color: T.t4, lineHeight: 1.65, margin: 0 }}>
-                    Verses detected while you preach will appear here.
+                <p style={{ padding: "20px 14px", fontSize: "11.5px", color: TXT4, lineHeight: 1.7, margin: 0, textAlign: "center" }}>
+                  Verses will appear here when detected or queued
+                </p>
+              ) : queue.map((v, i) => (
+                <div key={v.verseRef + i} onClick={() => setPreviewVerse(v)}
+                  style={{ padding: "10px 14px", borderBottom: "1px solid #F4F4F4", cursor: "pointer", borderLeft: previewVerse?.verseRef === v.verseRef ? `2px solid ${GRN}` : "2px solid transparent", background: previewVerse?.verseRef === v.verseRef ? "rgba(27,122,60,0.04)" : "transparent" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "#F8F8F8"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = previewVerse?.verseRef === v.verseRef ? "rgba(27,122,60,0.04)" : "transparent"; }}
+                >
+                  <div style={{ fontSize: "11.5px", fontWeight: 700, color: T.gold, marginBottom: "3px" }}>{v.verseRef}</div>
+                  <p style={{ fontSize: "10.5px", color: TXT2, lineHeight: 1.55, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                    {v.verseText}
                   </p>
                 </div>
-              ) : (
-                <div style={{ borderTop: `1px solid ${T.line}` }}>
-                  {queue.map((v, i) => (
-                    <div key={v.verseRef + i} style={{ borderBottom: `1px solid ${T.line}` }}>
-                      <QueueCard
-                        verse={v}
-                        isActive={previewVerse?.verseRef === v.verseRef}
-                        onClick={() => setPreviewVerse(v)}
-                        onPushLive={() => {
-                          setPreviewVerse(v);
-                          pushToLive(v);
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+              ))}
             </div>
-          </Panel>
+          </div>
         </div>
 
-        {/* ── BOTTOM ROW ──────────────────────────────────────────────────── */}
-        <div style={{ display: "flex", height: "240px", gap: "1px", overflow: "hidden", flexShrink: 0 }}>
+        {/* BOTTOM ROW */}
+        <div style={{ height: "280px", display: "flex", overflow: "hidden", flexShrink: 0 }}>
 
-          {/* ── 5. BIBLE SEARCH ─────────────────────────────────────────── */}
-          <Panel
-            title="Bible Search"
-            style={{ flex: 1 }}
-            extra={
-              <span style={{ fontSize: "9px", color: T.t4, fontFamily: F.mono }}>
-                ⌘K
-              </span>
-            }
-          >
-            <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
-              {/* Input */}
-              <div style={{ padding: "10px 14px", borderBottom: `1px solid ${T.line}`, flexShrink: 0 }}>
-                <div style={{ position: "relative" }}>
-                  <div style={{ position: "absolute", left: "11px", top: "50%", transform: "translateY(-50%)", color: T.t4, pointerEvents: "none", display: "flex" }}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                      <circle cx="11" cy="11" r="8" />
-                      <path d="m21 21-4.35-4.35" />
-                    </svg>
+          {/* 5 — BIBLE SEARCH */}
+          <div style={{ flex: 1, borderRight: `1px solid ${BD}`, display: "flex", flexDirection: "column" }}>
+            <div style={{ height: "46px", padding: "0 14px", display: "flex", alignItems: "center", gap: "8px", borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+              <button style={{ height: "28px", padding: "0 10px", borderRadius: "6px", border: `1px solid ${GRN}`, background: "rgba(27,122,60,0.08)", color: GRN, fontSize: "11px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: "5px", flexShrink: 0 }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                Book search
+              </button>
+              <div style={{ width: "1px", height: "20px", background: BD, flexShrink: 0 }} />
+              <div style={{ flex: 1, position: "relative" }}>
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={searchQ}
+                  onChange={e => setSearchQ(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") runSearch(searchQ); }}
+                  placeholder="Type: J → John 3:16"
+                  style={{ width: "100%", height: "36px", padding: "0 12px", border: "none", outline: "none", fontSize: "13px", color: TXT1, background: "transparent" }}
+                />
+                {searching && (
+                  <div style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)" }}>
+                    <div style={{ width: "12px", height: "12px", borderRadius: "50%", border: `2px solid rgba(27,122,60,0.3)`, borderTopColor: GRN, animation: "spin 0.7s linear infinite" }} />
                   </div>
-                  <input
-                    ref={searchRef}
-                    type="text"
-                    value={searchQ}
-                    onChange={e => setSearchQ(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter") runSearch(searchQ); }}
-                    placeholder='Search verses — "John 3:16", "faith", "do not fear"…'
-                    style={{
-                      width:        "100%",
-                      height:       "36px",
-                      padding:      "0 12px 0 32px",
-                      background:   T.input,
-                      border:       `1px solid ${T.border}`,
-                      borderRadius: "8px",
-                      color:        T.t1,
-                      fontSize:     "12px",
-                      outline:      "none",
-                      boxSizing:    "border-box",
-                      transition:   "border-color 150ms ease, box-shadow 150ms ease",
-                    }}
-                    onFocus={e => {
-                      (e.target as HTMLInputElement).style.borderColor = `${T.gold}80`;
-                      (e.target as HTMLInputElement).style.boxShadow = `0 0 0 3px ${T.goldGlow}`;
-                    }}
-                    onBlur={e => {
-                      (e.target as HTMLInputElement).style.borderColor = T.border;
-                      (e.target as HTMLInputElement).style.boxShadow = "none";
-                    }}
-                  />
-                  {searching && (
-                    <div style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)" }}>
-                      <div style={{ width: "12px", height: "12px", borderRadius: "50%", border: `2px solid ${T.gold}40`, borderTopColor: T.gold, animation: "spin 0.7s linear infinite" }} />
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
-
-              {/* Results / Quick refs */}
-              <div style={{ flex: 1, overflowY: "auto", padding: "8px 14px" }}>
-                {results.length > 0 ? (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                    {results.map((r, i) => (
-                      <div
-                        key={r.ref + i}
-                        onClick={() => stageResult(r)}
-                        style={{
-                          display:      "flex",
-                          alignItems:   "flex-start",
-                          gap:          "12px",
-                          padding:      "9px 11px",
-                          borderRadius: "7px",
-                          border:       `1px solid transparent`,
-                          cursor:       "pointer",
-                          transition:   "all 120ms ease",
-                        }}
-                        onMouseEnter={e => {
-                          (e.currentTarget as HTMLDivElement).style.background = T.raised;
-                          (e.currentTarget as HTMLDivElement).style.borderColor = T.border;
-                        }}
-                        onMouseLeave={e => {
-                          (e.currentTarget as HTMLDivElement).style.background = "transparent";
-                          (e.currentTarget as HTMLDivElement).style.borderColor = "transparent";
-                        }}
+              <select value={translation} onChange={e => changeTranslation(e.target.value)} style={{ height: "28px", padding: "0 8px", border: `1px solid ${BD}`, borderRadius: "6px", color: TXT1, fontSize: "11px", background: "#fff", cursor: "pointer", outline: "none", flexShrink: 0 }}>
+                {TRANSLATIONS.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div style={{ flex: 1, overflowY: "auto" }}>
+              {results.length > 0 ? results.map((r, i) => (
+                <div key={r.ref + i} onClick={() => stageResult(r)}
+                  style={{ display: "flex", alignItems: "flex-start", gap: "12px", padding: "8px 14px", borderBottom: "1px solid #F4F4F4", cursor: "pointer" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "#F8F8F8"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "transparent"; }}
+                >
+                  <span style={{ fontSize: "11.5px", fontWeight: 700, color: T.gold, minWidth: "80px", flexShrink: 0, paddingTop: "1px" }}>{r.ref}</span>
+                  <p style={{ flex: 1, fontSize: "12px", color: TXT2, lineHeight: 1.55, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{r.text}</p>
+                  <button
+                    onClick={e => { e.stopPropagation(); stageResult(r); pushToLive({ verseRef: r.ref, verseText: r.text, translation, confidence: 1, detectionMs: 0, snippetUsed: "", detectedAt: new Date().toISOString() }); }}
+                    style={{ flexShrink: 0, padding: "3px 8px", borderRadius: "4px", border: `1px solid ${GRN}`, background: "rgba(27,122,60,0.08)", color: GRN, fontSize: "9px", fontWeight: 700, cursor: "pointer" }}
+                  >
+                    LIVE
+                  </button>
+                </div>
+              )) : !searchQ ? (
+                <div style={{ padding: "10px 14px" }}>
+                  <p style={{ fontSize: "10px", color: TXT4, marginBottom: "8px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Quick Access</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {QUICK_REFS.map(q => (
+                      <button key={q} onClick={() => { setSearchQ(q); runSearch(q); }}
+                        style={{ padding: "4px 10px", borderRadius: "5px", border: `1px solid ${BD}`, background: "#F8F8F8", color: TXT2, fontSize: "11px", cursor: "pointer" }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = GRN; (e.currentTarget as HTMLButtonElement).style.color = GRN; }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = BD; (e.currentTarget as HTMLButtonElement).style.color = TXT2; }}
                       >
-                        <div style={{ flexShrink: 0 }}>
-                          <div style={{ fontSize: "11.5px", fontWeight: 700, color: T.gold }}>{r.ref}</div>
-                          <div style={{
-                            fontSize:     "8.5px",
-                            color:        T.t4,
-                            textTransform:"uppercase",
-                            letterSpacing:"0.06em",
-                            marginTop:    "2px",
-                          }}>
-                            {r.match}
-                          </div>
-                        </div>
-                        <p style={{
-                          fontSize:   "11px",
-                          color:      T.t2,
-                          lineHeight: 1.55,
-                          margin:     0,
-                          display:    "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient:"vertical",
-                          overflow:   "hidden",
-                          paddingTop: "1px",
-                        }}>
-                          {r.text}
-                        </p>
-                        <div style={{ flexShrink: 0, marginLeft: "auto" }}>
-                          <button
-                            onClick={e => { e.stopPropagation(); stageResult(r); pushToLive({ verseRef: r.ref, verseText: r.text, translation, confidence: 1, detectionMs: 0, snippetUsed: "", detectedAt: new Date().toISOString() }); }}
-                            style={{
-                              padding:      "3px 8px",
-                              borderRadius: "4px",
-                              border:       `1px solid ${T.green}50`,
-                              background:   T.greenDim,
-                              color:        T.green,
-                              fontSize:     "9px",
-                              fontWeight:   700,
-                              cursor:       "pointer",
-                              letterSpacing:"0.06em",
-                            }}
-                          >
-                            LIVE
-                          </button>
-                        </div>
-                      </div>
+                        {q}
+                      </button>
                     ))}
                   </div>
-                ) : searchQ && !searching ? (
-                  <p style={{ fontSize: "11px", color: T.t4, padding: "12px 0", margin: 0 }}>
-                    No results for &ldquo;{searchQ}&rdquo;
-                  </p>
-                ) : !searchQ ? (
-                  <div>
-                    <p style={{ fontSize: "10px", color: T.t4, marginBottom: "8px", letterSpacing: "0.04em", textTransform: "uppercase" }}>Quick Access</p>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                      {QUICK_REFS.map(q => (
-                        <button
-                          key={q}
-                          onClick={() => { setSearchQ(q); runSearch(q); }}
-                          style={{
-                            padding:      "5px 10px",
-                            borderRadius: "6px",
-                            border:       `1px solid ${T.border}`,
-                            background:   T.raised,
-                            color:        T.t3,
-                            fontSize:     "11px",
-                            cursor:       "pointer",
-                            transition:   "all 130ms ease",
-                            fontWeight:   500,
-                          }}
-                          onMouseEnter={e => {
-                            (e.currentTarget as HTMLButtonElement).style.borderColor = `${T.gold}60`;
-                            (e.currentTarget as HTMLButtonElement).style.color = T.gold;
-                            (e.currentTarget as HTMLButtonElement).style.background = T.goldDim;
-                          }}
-                          onMouseLeave={e => {
-                            (e.currentTarget as HTMLButtonElement).style.borderColor = T.border;
-                            (e.currentTarget as HTMLButtonElement).style.color = T.t3;
-                            (e.currentTarget as HTMLButtonElement).style.background = T.raised;
-                          }}
-                        >
-                          {q}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
+                </div>
+              ) : searchQ && !searching ? (
+                <p style={{ padding: "12px 14px", fontSize: "12px", color: TXT4, margin: 0 }}>No results for &ldquo;{searchQ}&rdquo;</p>
+              ) : null}
             </div>
-          </Panel>
+          </div>
 
-          {/* ── 6. RECENT DETECTIONS ────────────────────────────────────── */}
-          <Panel
-            title="Detections"
-            style={{ width: "290px", flexShrink: 0, borderRight: "none" }}
-            badge={queue.length > 0 ? <span style={{ fontSize: "9px", color: T.t4, fontFamily: F.mono }}>{queue.length} this session</span> : undefined}
-          >
+          {/* 6 — RECENT DETECTIONS */}
+          <div style={{ width: "320px", flexShrink: 0, display: "flex", flexDirection: "column" }}>
+            <div style={{ height: "46px", padding: "0 14px", display: "flex", alignItems: "center", gap: "8px", borderBottom: `1px solid ${BD}`, flexShrink: 0 }}>
+              <span style={{ fontSize: "9.5px", fontWeight: 600, color: TXT3, letterSpacing: "0.1em", textTransform: "uppercase" }}>Recent Detections</span>
+              {queue.length > 0 && <button onClick={() => setQueue([])} style={{ marginLeft: "auto", background: "none", border: "none", fontSize: "10px", color: TXT4, cursor: "pointer" }}>Clear all</button>}
+            </div>
             <div style={{ flex: 1, overflowY: "auto" }}>
               {queue.length === 0 ? (
-                <div style={{ padding: "24px 16px", textAlign: "center" }}>
-                  <div style={{ fontSize: "22px", opacity: 0.2, marginBottom: "8px" }}>👂</div>
-                  <p style={{ fontSize: "11px", color: T.t4, lineHeight: 1.65, margin: 0 }}>
-                    Listening for verses…<br />
-                    Start preaching and they&apos;ll appear here automatically.
-                  </p>
+                <p style={{ padding: "24px 16px", fontSize: "12px", color: TXT4, lineHeight: 1.7, margin: 0, textAlign: "center" }}>
+                  Verse detections will appear here during transcription
+                </p>
+              ) : queue.map((v, i) => (
+                <div key={v.verseRef + i} style={{ padding: "12px 14px", borderBottom: "1px solid #F4F4F4", animation: i === 0 ? "fadeSlideUp 350ms cubic-bezier(0.22,1,0.36,1)" : "none" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
+                    <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: GRN, flexShrink: 0 }} />
+                    <span style={{ fontSize: "8.5px", fontWeight: 700, color: GRN, letterSpacing: "0.08em", textTransform: "uppercase", border: "1px solid rgba(27,122,60,0.3)", padding: "1px 5px", borderRadius: "3px" }}>
+                      {v.snippetUsed ? "Direct" : "AI"}
+                    </span>
+                    <span style={{ fontSize: "13px", fontWeight: 700, color: TXT1 }}>{v.verseRef}</span>
+                  </div>
+                  <p style={{ fontSize: "12px", color: TXT2, lineHeight: 1.65, margin: "0 0 8px" }}>{v.verseText}</p>
+                  <div style={{ display: "flex", gap: "7px" }}>
+                    <button onClick={() => { setPreviewVerse(v); pushToLive(v); }} style={{ height: "28px", padding: "0 12px", borderRadius: "5px", border: "none", background: GRN, color: "#fff", fontSize: "11px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                      Present
+                    </button>
+                    <button onClick={() => setPreviewVerse(v)} style={{ height: "28px", padding: "0 12px", borderRadius: "5px", border: `1px solid ${BD}`, background: "transparent", color: TXT2, fontSize: "11px", cursor: "pointer" }}>
+                      + Queue
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <div style={{ borderTop: `1px solid ${T.line}` }}>
-                  {queue.map((v, i) => (
-                    <div
-                      key={v.verseRef + i}
-                      onClick={() => setPreviewVerse(v)}
-                      style={{
-                        padding:     "9px 14px",
-                        borderBottom:`1px solid ${T.line}`,
-                        cursor:      "pointer",
-                        animation:   i === 0 ? "fadeSlideUp 350ms cubic-bezier(0.22,1,0.36,1)" : "none",
-                        background:  i === 0 ? `rgba(232,168,32,0.04)` : "transparent",
-                        transition:  "background 130ms ease",
-                      }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = T.hover; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = i === 0 ? `rgba(232,168,32,0.04)` : "transparent"; }}
-                    >
-                      {/* Row 1 */}
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                        {i === 0 && (
-                          <span style={{ fontSize: "8px", fontWeight: 700, color: T.gold, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                            NEW
-                          </span>
-                        )}
-                        <span style={{ fontSize: "12px", fontWeight: 700, color: T.gold }}>{v.verseRef}</span>
-                        <span style={{ fontSize: "9.5px", color: T.t4 }}>{v.translation}</span>
-                        <span style={{ marginLeft: "auto", fontSize: "9px", color: confColor(v.confidence), fontWeight: 600, fontFamily: F.mono }}>
-                          {Math.round(v.confidence * 100)}%
-                        </span>
-                      </div>
-                      {/* Row 2: snippet */}
-                      {v.snippetUsed && (
-                        <p style={{ fontSize: "10px", color: T.t4, margin: "0 0 3px", fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          &ldquo;{v.snippetUsed}&rdquo;
-                        </p>
-                      )}
-                      {/* Row 3: time */}
-                      <span style={{ fontSize: "9px", color: T.t5, fontFamily: F.mono }}>{relTime(v.detectedAt)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              ))}
             </div>
-          </Panel>
+          </div>
         </div>
       </div>
 
@@ -1591,17 +657,17 @@ export default function LivePage() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   GLOBAL ANIMATIONS & SCROLLBAR
+   ANIMATIONS & SCROLLBAR
 ───────────────────────────────────────────────────────────────────────────── */
 const CSS_ANIMATIONS = `
   @keyframes dotPulse    { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.35;transform:scale(0.65)} }
-  @keyframes fadeSlideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes wv          { from{height:3px} to{height:20px} }
+  @keyframes fadeSlideUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes wv          { from{height:3px} to{height:18px} }
   @keyframes spin        { to{transform:translateY(-50%) rotate(360deg)} }
   *, *::before, *::after { box-sizing: border-box; }
-  ::-webkit-scrollbar             { width: 3px; height: 3px; }
+  ::-webkit-scrollbar             { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track       { background: transparent; }
-  ::-webkit-scrollbar-thumb       { background: rgba(255,255,255,0.08); border-radius: 2px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
-  select option { background: #0D0D18; }
+  ::-webkit-scrollbar-thumb       { background: #DEDEDE; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #CCCCCC; }
+  select option { background: #FFFFFF; color: #111111; }
 `;
