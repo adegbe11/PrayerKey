@@ -84,10 +84,10 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
       <div style={{ maxWidth: "780px", margin: "0 auto", padding: "0 24px 100px" }}>
 
         {/* ── Breadcrumb ── */}
-        <nav style={{ marginBottom: "32px", fontSize: "13px", color: "rgba(255,255,255,0.35)", display: "flex", gap: "6px", alignItems: "center" }}>
-          <Link href="/" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>Home</Link>
+        <nav style={{ marginBottom: "32px", fontSize: "13px", color: "var(--pk-text-3)", display: "flex", gap: "6px", alignItems: "center" }}>
+          <Link href="/" style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Home</Link>
           <span>/</span>
-          <Link href="/pray" style={{ color: "rgba(255,255,255,0.35)", textDecoration: "none" }}>Pray</Link>
+          <Link href="/pray" style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Pray</Link>
           <span>/</span>
           <span style={{ color: "var(--pk-gold)" }}>{topic.title}</span>
         </nav>
@@ -96,7 +96,7 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
         <div style={{ marginBottom: "40px" }}>
           <div style={{
             display: "inline-block", padding: "4px 12px", borderRadius: "4px",
-            border: "1.5px solid rgba(176,124,31,0.35)", background: "rgba(176,124,31,0.06)",
+            border: "1.5px solid var(--pk-gold-border)", background: "var(--pk-gold-dim)",
             fontSize: "10px", fontWeight: 700, color: "var(--pk-gold)",
             letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "16px",
           }}>
@@ -104,20 +104,20 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
           </div>
           <h1 style={{
             fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 800,
-            color: "#fff", margin: "0 0 16px", letterSpacing: "-0.03em", lineHeight: 1.1,
+            color: "var(--pk-text)", margin: "0 0 16px", letterSpacing: "-0.03em", lineHeight: 1.1,
           }}>
             {topic.title}
           </h1>
-          <p style={{ fontSize: "17px", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, margin: 0 }}>
+          <p style={{ fontSize: "17px", color: "var(--pk-text-2)", lineHeight: 1.7, margin: 0 }}>
             {topic.metaDesc}
           </p>
         </div>
 
         {/* ── Sample Prayer Card ── */}
         <div style={{
-          background: "rgba(255,255,255,0.03)", border: "1.5px solid rgba(176,124,31,0.2)",
+          background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)",
           borderRadius: "20px", padding: "clamp(24px,4vw,40px)", marginBottom: "32px",
-          boxShadow: "4px 4px 0 0 rgba(176,124,31,0.08)",
+          boxShadow: "4px 4px 0 0 var(--pk-gold-border)",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "24px" }}>
             <span style={{ fontSize: "22px" }}>🙏</span>
@@ -126,7 +126,7 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
             </h2>
           </div>
           <p style={{
-            fontSize: "clamp(15px, 1.5vw, 17px)", color: "rgba(255,255,255,0.85)",
+            fontSize: "clamp(15px, 1.5vw, 17px)", color: "var(--pk-text)",
             lineHeight: 1.95, fontStyle: "italic", margin: "0 0 24px", whiteSpace: "pre-wrap",
           }}>
             {topic.samplePrayer}
@@ -136,13 +136,13 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
           {topic.scripture.map((v) => (
             <div key={v.ref} style={{
               display: "flex", gap: "12px", padding: "12px 16px", marginBottom: "8px",
-              background: "rgba(176,124,31,0.06)", borderLeft: "3px solid var(--pk-gold)",
+              background: "var(--pk-gold-dim)", borderLeft: "3px solid var(--pk-gold)",
               borderRadius: "0 8px 8px 0",
             }}>
               <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--pk-gold)", minWidth: "110px", flexShrink: 0 }}>
                 {v.ref}
               </span>
-              <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", lineHeight: 1.7, fontStyle: "italic" }}>
+              <span style={{ fontSize: "13px", color: "var(--pk-text-2)", lineHeight: 1.7, fontStyle: "italic" }}>
                 {v.text}
               </span>
             </div>
@@ -151,23 +151,23 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
 
         {/* ── AI Generate CTA ── */}
         <div style={{
-          background: "linear-gradient(135deg, rgba(175,82,222,0.12) 0%, rgba(176,124,31,0.08) 100%)",
-          border: "1.5px solid rgba(175,82,222,0.25)", borderRadius: "16px",
+          background: "var(--pk-purple-dim)",
+          border: "1.5px solid var(--pk-purple-border)", borderRadius: "16px",
           padding: "clamp(20px,3vw,32px)", marginBottom: "48px", textAlign: "center",
         }}>
-          <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#fff", margin: "0 0 10px" }}>
+          <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 10px" }}>
             Want a personalised {topic.title.toLowerCase()}?
           </h2>
-          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.45)", margin: "0 0 20px" }}>
+          <p style={{ fontSize: "14px", color: "var(--pk-text-2)", margin: "0 0 20px" }}>
             Our AI will write a prayer tailored to your exact situation in seconds — free.
           </p>
           <Link
             href={`/pray?topic=${encodeURIComponent(topic.title)}`}
             style={{
               display: "inline-block", padding: "14px 32px", borderRadius: "6px",
-              background: "#AF52DE", color: "#fff", textDecoration: "none",
+              background: "var(--pk-purple)", color: "#fff", textDecoration: "none",
               fontSize: "15px", fontWeight: 800, letterSpacing: "-0.01em",
-              boxShadow: "4px 4px 0 0 rgba(175,82,222,0.3)",
+              boxShadow: "4px 4px 0 0 var(--pk-purple-border)",
               transition: "all 200ms ease",
             }}
           >
@@ -178,7 +178,7 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
         {/* ── Related Prayers ── */}
         {related.length > 0 && (
           <div>
-            <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#fff", margin: "0 0 16px" }}>
+            <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px" }}>
               Related Prayers
             </h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "10px" }}>
@@ -188,9 +188,9 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
                   href={`/pray/${r.slug}`}
                   style={{
                     display: "block", padding: "14px 18px", borderRadius: "10px",
-                    border: "1.5px solid rgba(255,255,255,0.07)",
-                    background: "rgba(255,255,255,0.025)",
-                    color: "rgba(255,255,255,0.7)", textDecoration: "none",
+                    border: "1.5px solid var(--pk-border)",
+                    background: "var(--pk-card)",
+                    color: "var(--pk-text-2)", textDecoration: "none",
                     fontSize: "13px", fontWeight: 600, transition: "all 150ms",
                   }}
                 >
