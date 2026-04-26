@@ -15,13 +15,13 @@ export default function TermsPage() {
           display:      "inline-flex",
           alignItems:   "center",
           padding:      "4px 12px",
-          border:       "1.5px solid rgba(255,255,255,0.12)",
+          border:       "1.5px solid var(--pk-border-2)",
           borderRadius: "4px",
           marginBottom: "24px",
-          background:   "rgba(255,255,255,0.04)",
-          boxShadow:    "3px 3px 0 0 rgba(255,255,255,0.05)",
+          background:   "var(--pk-card)",
+          boxShadow:    "3px 3px 0 0 var(--pk-border)",
         }}>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-text-3)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
             Legal
           </span>
         </div>
@@ -29,14 +29,14 @@ export default function TermsPage() {
         <h1 style={{
           fontSize:      "clamp(32px, 5vw, 56px)",
           fontWeight:    800,
-          color:         "#fff",
+          color:         "var(--pk-text)",
           margin:        "0 0 16px",
           letterSpacing: "-0.03em",
           lineHeight:    1.05,
         }}>
           Terms of Service
         </h1>
-        <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.25)", margin: 0, letterSpacing: "0.02em" }}>
+        <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: 0, letterSpacing: "0.02em" }}>
           Last updated: April 2026
         </p>
       </div>
@@ -105,12 +105,12 @@ function LegalSection({ title, children, last = false }: { title: string; childr
   return (
     <div style={{
       padding:      "clamp(28px, 4vw, 44px) 0",
-      borderBottom: last ? "none" : "1px solid rgba(255,255,255,0.06)",
+      borderBottom: last ? "none" : "1px solid var(--pk-border)",
     }}>
       <h2 style={{
         fontSize:      "clamp(17px, 2vw, 21px)",
         fontWeight:    700,
-        color:         "#fff",
+        color:         "var(--pk-text)",
         margin:        "0 0 14px",
         letterSpacing: "-0.02em",
         lineHeight:    1.25,
@@ -119,7 +119,7 @@ function LegalSection({ title, children, last = false }: { title: string; childr
       </h2>
       <div style={{
         fontSize:   "clamp(14px, 1.3vw, 16px)",
-        color:      "rgba(255,255,255,0.5)",
+        color:      "var(--pk-text-2)",
         lineHeight: 1.85,
         whiteSpace: "pre-wrap",
       }}>
