@@ -18,6 +18,11 @@ export interface PrayerTopic {
   samplePrayer: string;
   scripture:    { ref: string; text: string }[];
   related:      string[];
+  // April 2026 E-E-A-T enrichment fields (optional — smart fallbacks generated in template)
+  prayerPoints?: string[];                        // 5-7 specific prayer bullets
+  faqs?:         { q: string; a: string }[];      // 4-5 topic-specific Q&As
+  context?:      string;                          // Why people pray this (60-80 words)
+  howToPray?:    string[];                        // 5-step guide unique to topic
 }
 
 export const PRAYER_TOPICS: PrayerTopic[] = [
