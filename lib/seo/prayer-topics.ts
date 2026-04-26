@@ -1,5 +1,8 @@
 import { EXTENDED_PRAYER_TOPICS } from "./prayer-topics-extended";
 import { BATCH2_PRAYER_TOPICS } from "./prayer-topics-batch2";
+import { BATCH3_PRAYER_TOPICS } from "./prayer-topics-batch3";
+import { BATCH4_PRAYER_TOPICS } from "./prayer-topics-batch4";
+import { BATCH5_PRAYER_TOPICS } from "./prayer-topics-batch5";
 
 export interface PrayerTopic {
   slug:         string;
@@ -268,6 +271,15 @@ export const PRAYER_TOPICS: PrayerTopic[] = [
 
   // ── Batch 2 — Google keyword-targeted topics ─────────────────────
   ...BATCH2_PRAYER_TOPICS,
+
+  // ── Batch 3 — Days of week, family, health, spiritual ────────────
+  ...BATCH3_PRAYER_TOPICS,
+
+  // ── Batch 4 — Holidays, countries, professions, occasions ────────
+  ...BATCH4_PRAYER_TOPICS,
+
+  // ── Batch 5 — Scripture prayers, struggles, life stages, work ────
+  ...BATCH5_PRAYER_TOPICS,
 ];
 
 // ── Fast lookup map ─────────────────────────────────────────────────
