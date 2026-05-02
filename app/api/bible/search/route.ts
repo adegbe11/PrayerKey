@@ -2,12 +2,9 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const groq = new OpenAI({
-  apiKey:  process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 /**
  * GET /api/bible/search?q=<query>&translation=<NIV|KJV|...>
@@ -21,14 +18,9 @@ export async function GET(req: NextRequest) {
   if (!q) return NextResponse.json({ results: [] });
 
   try {
-    const completion = await groq.chat.completions.create({
-      model:           "llama-3.1-8b-instant",
-      max_tokens:      300,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role:    "system",
-          content: `You are a Bible verse search engine. Given a query — which may be:
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      systemInstruction: `You are a Bible verse search engine. Given a query — which may be:
 - A precise reference like "John 3:16" or "Ps 23"
 - A partial reference like "john 3" (return all verses in that chapter, up to 5)
 - A keyword or topic like "do not fear", "faith", "healing"
@@ -49,15 +41,13 @@ Return ONLY valid JSON — no markdown, no prose:
 
 "match" values: "direct" for exact references, "semantic" for topic/keyword matches.
 Return an empty results array if nothing relevant found.`,
-        },
-        {
-          role:    "user",
-          content: `Query: "${q}"\nTranslation: ${translation}`,
-        },
-      ],
     });
 
-    const raw    = completion.choices[0].message.content ?? '{"results":[]}';
+    const result = await model.generateContent(
+      `Query: "${q}"\nTranslation: ${translation}`,
+    );
+
+    const raw    = result.response.text().replace(/```json\n?|\n?```/g, "").trim();
     const parsed = JSON.parse(raw) as {
       results: { ref: string; text: string; match: string }[];
     };

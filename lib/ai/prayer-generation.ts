@@ -1,9 +1,6 @@
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const groq = new OpenAI({
-  apiKey:  process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export interface GeneratedPrayer {
   prayer:        string;
@@ -51,19 +48,15 @@ export async function generatePrayer(
     ? `Current emotional state / mood: ${moods.join(", ")}\n\n`
     : "";
 
-  const completion = await groq.chat.completions.create({
-    model:           "llama-3.3-70b-versatile",
-    max_tokens:      1024,
-    response_format: { type: "json_object" },
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      {
-        role:    "user",
-        content: `${moodContext}Prayer request / what's on my heart:\n"${userInput.slice(0, 800)}"`,
-      },
-    ],
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    systemInstruction: SYSTEM_PROMPT,
   });
 
-  const raw = completion.choices[0].message.content ?? "{}";
+  const result = await model.generateContent(
+    `${moodContext}Prayer request / what's on my heart:\n"${userInput.slice(0, 800)}"`,
+  );
+
+  const raw = result.response.text().replace(/```json\n?|\n?```/g, "").trim();
   return JSON.parse(raw) as GeneratedPrayer;
 }

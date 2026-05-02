@@ -1,7 +1,7 @@
-import Groq from "groq-sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { VerseDetectionResult } from "@/types/sermon";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 const SYSTEM_PROMPT = `You are a Bible verse detection AI embedded in a live church sermon system.
 
@@ -37,21 +37,17 @@ export async function detectVerseFromText(
   const start = Date.now();
 
   try {
-    const completion = await groq.chat.completions.create({
-      model:           "llama-3.3-70b-versatile",
-      max_tokens:      256,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role:    "user",
-          content: `Translation preference: ${translation}\n\nTranscript snippet:\n"${transcript.slice(0, 600)}"`,
-        },
-      ],
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      systemInstruction: SYSTEM_PROMPT,
     });
 
+    const result = await model.generateContent(
+      `Translation preference: ${translation}\n\nTranscript snippet:\n"${transcript.slice(0, 600)}"`,
+    );
+
     const detectionMs = Date.now() - start;
-    const raw = completion.choices[0].message.content ?? "{}";
+    const raw = result.response.text().replace(/```json\n?|\n?```/g, "").trim();
 
     const parsed = JSON.parse(raw) as {
       detected:    boolean;
@@ -71,7 +67,7 @@ export async function detectVerseFromText(
 
     return { ...parsed, detectionMs };
   } catch (err) {
-    console.error("[verse-detection] Groq error:", err);
+    console.error("[verse-detection] Gemini error:", err);
     return {
       detected: false, verseRef: "", verseText: "",
       translation, confidence: 0, snippetUsed: "",
