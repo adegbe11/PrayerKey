@@ -119,6 +119,16 @@ function getDailyPrayer() {
   return DAILY_PRAYERS[day % DAILY_PRAYERS.length];
 }
 
+/* ── Social media download formats ─────────────────────────────────────── */
+const FORMATS = [
+  { id: "instagram", label: "Instagram", sub: "1:1 Post",       width: 1080, height: 1080 },
+  { id: "story",     label: "Story",     sub: "9:16 · TikTok",  width: 1080, height: 1920 },
+  { id: "facebook",  label: "Facebook",  sub: "1.91:1 Post",    width: 1200, height: 630  },
+  { id: "twitter",   label: "Twitter / X", sub: "16:9 Post",    width: 1200, height: 675  },
+  { id: "pinterest", label: "Pinterest", sub: "2:3 Pin",         width: 1000, height: 1500 },
+] as const;
+type FormatId = typeof FORMATS[number]["id"];
+
 const FEATURES = [
   {
     href:   "/pray",
@@ -150,31 +160,143 @@ const FEATURES = [
 ];
 
 export default function HomePage() {
-  const [wordIndex,      setWordIndex]      = useState(0);
-  const [visible,        setVisible]        = useState(true);
-  const [downloading,    setDownloading]    = useState(false);
+  const [wordIndex,    setWordIndex]    = useState(0);
+  const [visible,      setVisible]      = useState(true);
+  const [downloading,  setDownloading]  = useState(false);
+  const [activeFormat, setActiveFormat] = useState<FormatId>("instagram");
+  // prayerCardRef kept for legacy (unused — canvas path now)
   const prayerCardRef = useRef<HTMLDivElement>(null);
 
   const todayVerse  = getDailyVerse();
   const todayPrayer = getDailyPrayer();
+  const fmt         = FORMATS.find(f => f.id === activeFormat)!;
 
-  async function downloadPrayerCard() {
-    if (!prayerCardRef.current || downloading) return;
+  async function downloadPrayerCard(formatId: FormatId = activeFormat) {
+    if (downloading) return;
     setDownloading(true);
     try {
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(prayerCardRef.current, {
-        scale:           2,
-        useCORS:         true,
-        backgroundColor: "#ffffff",
-        logging:         false,
+      const f     = FORMATS.find(f => f.id === formatId)!;
+      const p     = todayPrayer;
+      const today = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+      const W = f.width, H = f.height;
+      const canvas = document.createElement("canvas");
+      canvas.width  = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d")!;
+
+      const PAD = Math.round(W * 0.082);
+      const CW  = W - PAD * 2;
+      const S   = W / 1080;
+      const hr  = H / W;
+      // for landscape formats shrink text so it fits the short height
+      const TS  = hr < 0.72 ? S * (hr / 0.72) : S;
+
+      /* wrap text helper — returns line array */
+      function lines(text: string, maxW: number): string[] {
+        const words = text.split(" "); const arr: string[] = []; let cur = "";
+        for (const w of words) {
+          const test = cur ? `${cur} ${w}` : w;
+          if (ctx.measureText(test).width > maxW && cur) { arr.push(cur); cur = w; }
+          else cur = test;
+        }
+        if (cur) arr.push(cur);
+        return arr;
+      }
+
+      /* rounded rect helper */
+      function rr(x: number, y: number, w: number, h: number, r: number) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y,     x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x,     y + h, r);
+        ctx.arcTo(x,     y + h, x,     y,     r);
+        ctx.arcTo(x,     y,     x + w, y,     r);
+        ctx.closePath();
+      }
+
+      // ── Background gradient ──────────────────────────────────────
+      const bg = ctx.createLinearGradient(0, 0, W * 0.4, H);
+      bg.addColorStop(0,   "#0D1F38");
+      bg.addColorStop(0.6, "#0B1726");
+      bg.addColorStop(1,   "#080F1C");
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+      // Dot grid texture
+      ctx.fillStyle = "rgba(255,255,255,0.016)";
+      const gs = Math.round(28 * S);
+      for (let gx = PAD; gx < W - PAD / 2; gx += gs)
+        for (let gy = PAD; gy < H - PAD / 2; gy += gs) {
+          ctx.beginPath(); ctx.arc(gx, gy, 1.5 * S, 0, Math.PI * 2); ctx.fill();
+        }
+
+      // Top-right cross watermark
+      const cxOff = W - PAD * 0.6, cyOff = PAD * 0.8;
+      ctx.strokeStyle = "rgba(212,168,83,0.07)";
+      ctx.lineWidth = Math.round(18 * S);
+      ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(cxOff, cyOff - 60 * S); ctx.lineTo(cxOff, cyOff + 60 * S); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cxOff - 40 * S, cyOff - 16 * S); ctx.lineTo(cxOff + 40 * S, cyOff - 16 * S); ctx.stroke();
+
+      // ── Gold top accent line ─────────────────────────────────────
+      ctx.strokeStyle = "#D4A853"; ctx.lineWidth = Math.round(3 * S); ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(PAD, Math.round(PAD * 0.6)); ctx.lineTo(PAD + Math.round(CW * 0.13), Math.round(PAD * 0.6)); ctx.stroke();
+
+      // ── Label ────────────────────────────────────────────────────
+      ctx.font = `700 ${Math.round(11 * S)}px system-ui, sans-serif`;
+      ctx.fillStyle = "#D4A853";
+      ctx.fillText("PRAYER OF THE DAY", PAD, Math.round(PAD * 1.12));
+
+      // ── Verse reference ──────────────────────────────────────────
+      let curY = Math.round(PAD * 1.75);
+      const refFS = Math.round(54 * TS);
+      ctx.font = `700 ${refFS}px Georgia, serif`;
+      ctx.fillStyle = "#D4A853";
+      lines(p.ref, CW).forEach(l => {
+        ctx.fillText(l, PAD, curY + refFS * 0.85); curY += Math.round(refFS * 1.18);
       });
-      const link    = document.createElement("a");
-      link.download = `prayerkey-prayer-${new Date().toISOString().slice(0, 10)}.png`;
-      link.href     = canvas.toDataURL("image/png");
+      curY += Math.round(14 * S);
+
+      // ── Cyan verse highlight block ───────────────────────────────
+      const vFS = Math.round(18 * TS), vLH = Math.round(vFS * 1.65);
+      const vPX = Math.round(14 * S),  vPY = Math.round(10 * S);
+      ctx.font = `700 ${vFS}px system-ui, sans-serif`;
+      const vLines = lines(`"${p.verse}"`, CW - vPX * 2);
+      const blockH = vLines.length * vLH + vPY * 2;
+      ctx.fillStyle = "#00D4D4";
+      rr(PAD, curY, CW, blockH, Math.round(10 * S)); ctx.fill();
+      ctx.fillStyle = "#000000";
+      vLines.forEach((l, i) => ctx.fillText(l, PAD + vPX, curY + vPY + vLH * i + vFS * 0.82));
+      curY += blockH + Math.round(22 * S);
+
+      // ── Gold divider ─────────────────────────────────────────────
+      ctx.strokeStyle = "rgba(212,168,83,0.32)"; ctx.lineWidth = Math.round(1 * S);
+      ctx.beginPath(); ctx.moveTo(PAD, curY); ctx.lineTo(PAD + CW, curY); ctx.stroke();
+      curY += Math.round(20 * S);
+
+      // ── Prayer text ──────────────────────────────────────────────
+      const pFS = Math.round(17 * TS), pLH = Math.round(pFS * 1.7);
+      ctx.font = `italic ${pFS}px Georgia, serif`;
+      ctx.fillStyle = "#E4DCC8";
+      lines(p.prayer, CW).forEach((l, i) => ctx.fillText(l, PAD, curY + pLH * i + pFS * 0.85));
+      curY += lines(p.prayer, CW).length * pLH + Math.round(12 * S);
+
+      // ── Bottom branding ──────────────────────────────────────────
+      const botY = H - Math.round(PAD * 0.72);
+      ctx.strokeStyle = "rgba(212,168,83,0.22)"; ctx.lineWidth = Math.round(1 * S);
+      ctx.beginPath(); ctx.moveTo(PAD, botY - Math.round(18 * S)); ctx.lineTo(PAD + CW, botY - Math.round(18 * S)); ctx.stroke();
+      ctx.font = `800 ${Math.round(12 * S)}px system-ui, sans-serif`;
+      ctx.fillStyle = "#D4A853"; ctx.fillText("PRAYERKEY.COM", PAD, botY);
+      ctx.font = `${Math.round(11 * S)}px system-ui, sans-serif`;
+      ctx.fillStyle = "rgba(255,255,255,0.38)";
+      ctx.fillText(today, PAD + CW - ctx.measureText(today).width, botY);
+
+      // ── Export ───────────────────────────────────────────────────
+      const link = document.createElement("a");
+      link.download = `prayerkey-${formatId}-${new Date().toISOString().slice(0, 10)}.png`;
+      link.href = canvas.toDataURL("image/png");
       link.click();
-    } catch (e) {
-      console.error("Download failed", e);
+    } catch (err) {
+      console.error("Card download error", err);
     } finally {
       setDownloading(false);
     }
@@ -539,206 +661,203 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════
-          PRAYER OF THE DAY — Downloadable card
+          PRAYER OF THE DAY — Social media cards
       ══════════════════════════════════════════ */}
       <section style={{ marginBottom: "72px" }}>
 
         {/* Section header */}
-        <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "24px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "28px" }}>
           <div style={{ height: "1px", flex: 1, background: "var(--pk-border)" }} />
-          <span style={{
-            fontSize:      "10px",
-            fontWeight:    700,
-            color:         "var(--pk-accent)",
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-          }}>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-accent)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
             ✦ Prayer of the Day
           </span>
           <div style={{ height: "1px", flex: 1, background: "var(--pk-border)" }} />
         </div>
 
-        {/* Outer wrapper — download button sits outside the card */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: "16px" }}>
+        {/* Format selector pills */}
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "20px" }}>
+          {FORMATS.map(f => (
+            <button key={f.id} onClick={() => setActiveFormat(f.id)}
+              style={{
+                display:       "inline-flex",
+                flexDirection: "column",
+                alignItems:    "center",
+                gap:           "2px",
+                padding:       "8px 16px",
+                borderRadius:  "10px",
+                border:        activeFormat === f.id ? "1.5px solid #00D4D4" : "1.5px solid var(--pk-border)",
+                background:    activeFormat === f.id ? "rgba(0,212,212,0.08)" : "var(--pk-surface)",
+                cursor:        "pointer",
+                transition:    "all 150ms ease",
+              }}>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: activeFormat === f.id ? "#00B4B4" : "var(--pk-text-2)", letterSpacing: "0.01em" }}>
+                {f.label}
+              </span>
+              <span style={{ fontSize: "10px", color: activeFormat === f.id ? "#00B4B4" : "var(--pk-text-3)", letterSpacing: "0.04em" }}>
+                {f.sub}
+              </span>
+            </button>
+          ))}
+        </div>
 
-          {/* ── The card that gets captured ── */}
-          <div ref={prayerCardRef} style={{
-            background:   "#ffffff",
-            border:       "1.5px solid #e5e5e5",
+        {/* Preview card — dark navy, beautiful, correct aspect ratio */}
+        <div style={{
+          display:        "flex",
+          justifyContent: fmt.width >= fmt.height ? "stretch" : "center",
+          marginBottom:   "20px",
+        }}>
+          <div style={{
+            width:        fmt.width >= fmt.height ? "100%" : "min(340px, 100%)",
+            aspectRatio:  `${fmt.width} / ${fmt.height}`,
+            background:   "linear-gradient(150deg, #0D1F38 0%, #0B1726 60%, #080F1C 100%)",
             borderRadius: "20px",
-            padding:      "clamp(32px,5vw,56px) clamp(28px,5vw,60px) clamp(28px,4vw,48px)",
+            padding:      "clamp(20px,5%,52px)",
             position:     "relative",
             overflow:     "hidden",
+            boxShadow:    "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,168,83,0.18)",
+            display:      "flex",
+            flexDirection:"column",
+            justifyContent: "space-between",
           }}>
 
-            {/* Subtle grid watermark */}
+            {/* Dot grid texture */}
             <div aria-hidden style={{
-              position:       "absolute",
-              inset:          0,
-              backgroundImage: "radial-gradient(circle, #00000008 1px, transparent 1px)",
-              backgroundSize:  "24px 24px",
-              pointerEvents:  "none",
+              position:        "absolute", inset: 0, pointerEvents: "none",
+              backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.016) 1px, transparent 1px)",
+              backgroundSize:  "28px 28px",
             }} />
 
-            {/* Reference — big bold serif */}
-            <p style={{
-              fontFamily:    "Georgia, 'Times New Roman', serif",
-              fontSize:      "clamp(28px, 5vw, 48px)",
-              fontWeight:    700,
-              color:         "#111111",
-              margin:        "0 0 24px",
-              lineHeight:    1.1,
-              letterSpacing: "-0.02em",
-              position:      "relative",
-            }}>
-              {todayPrayer.ref}
-            </p>
+            {/* Cross watermark top-right */}
+            <div aria-hidden style={{
+              position: "absolute", top: "6%", right: "6%",
+              fontSize: "clamp(60px,12%,120px)", color: "rgba(212,168,83,0.06)",
+              fontWeight: 700, lineHeight: 1, userSelect: "none", pointerEvents: "none",
+              fontFamily: "Georgia, serif",
+            }}>✝</div>
 
-            {/* Verse — cyan highlight block exactly like the screenshot */}
-            <p style={{
-              fontFamily:      "system-ui, -apple-system, sans-serif",
-              fontSize:        "clamp(15px, 2.2vw, 19px)",
-              fontWeight:      700,
-              color:           "#000000",
-              background:      "#00D4D4",
-              display:         "inline",
-              boxDecorationBreak: "clone",
-              WebkitBoxDecorationBreak: "clone",
-              padding:         "2px 6px",
-              lineHeight:      1.7,
-              margin:          "0 0 28px",
-              position:        "relative",
-            } as React.CSSProperties}>
-              {todayPrayer.verse}
-            </p>
+            {/* TOP: label + reference */}
+            <div style={{ position: "relative" }}>
+              {/* Gold accent line */}
+              <div style={{ width: "13%", height: "2px", background: "#D4A853", borderRadius: "2px", marginBottom: "10px" }} />
 
-            {/* Divider */}
-            <div style={{ height: "1px", background: "#e5e5e5", margin: "28px 0 24px", position: "relative" }} />
+              <p style={{ fontSize: "clamp(8px,1vw,11px)", fontWeight: 700, color: "#D4A853", letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 12px", fontFamily: "system-ui,sans-serif" }}>
+                PRAYER OF THE DAY
+              </p>
 
-            {/* Prayer text */}
-            <p style={{
-              fontFamily:  "Georgia, 'Times New Roman', serif",
-              fontSize:    "clamp(15px, 2vw, 17px)",
-              color:       "#333333",
-              lineHeight:  1.85,
-              margin:      "0 0 28px",
-              fontStyle:   "italic",
-              position:    "relative",
-            }}>
-              {todayPrayer.prayer}
-            </p>
+              <p style={{
+                fontFamily:    "Georgia, 'Times New Roman', serif",
+                fontSize:      "clamp(22px, 4.5vw, 48px)",
+                fontWeight:    700,
+                color:         "#D4A853",
+                margin:        "0 0 16px",
+                lineHeight:    1.1,
+                letterSpacing: "-0.02em",
+              }}>
+                {todayPrayer.ref}
+              </p>
 
-            {/* Branding footer */}
+              {/* Cyan verse highlight */}
+              <p style={{
+                fontFamily:               "system-ui, -apple-system, sans-serif",
+                fontSize:                 "clamp(11px, 1.8vw, 17px)",
+                fontWeight:               700,
+                color:                    "#000000",
+                background:               "#00D4D4",
+                display:                  "inline",
+                boxDecorationBreak:       "clone",
+                WebkitBoxDecorationBreak: "clone",
+                padding:                  "2px 6px",
+                lineHeight:               1.75,
+                margin:                   "0 0 16px",
+              } as React.CSSProperties}>
+                &ldquo;{todayPrayer.verse}&rdquo;
+              </p>
+            </div>
+
+            {/* MIDDLE: prayer text */}
+            <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "16px 0" }}>
+              <div style={{ height: "1px", background: "rgba(212,168,83,0.28)", marginBottom: "16px" }} />
+              <p style={{
+                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontSize:   "clamp(10px, 1.5vw, 16px)",
+                color:      "#E4DCC8",
+                lineHeight: 1.8,
+                fontStyle:  "italic",
+                margin:     0,
+                WebkitLineClamp: fmt.height < fmt.width ? 3 : 8,
+                overflow:   "hidden",
+                display:    "-webkit-box",
+                WebkitBoxOrient: "vertical",
+              } as React.CSSProperties}>
+                {todayPrayer.prayer}
+              </p>
+            </div>
+
+            {/* BOTTOM: branding */}
             <div style={{
               display:        "flex",
               alignItems:     "center",
               justifyContent: "space-between",
-              borderTop:      "1px solid #e5e5e5",
-              paddingTop:     "16px",
+              borderTop:      "1px solid rgba(212,168,83,0.2)",
+              paddingTop:     "12px",
               position:       "relative",
             }}>
-              <span style={{
-                fontFamily:    "system-ui, -apple-system, sans-serif",
-                fontSize:      "11px",
-                fontWeight:    800,
-                color:         "#999999",
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-              }}>
-                prayerkey.com
+              <span style={{ fontSize: "clamp(8px,1vw,11px)", fontWeight: 800, color: "#D4A853", letterSpacing: "0.16em", textTransform: "uppercase", fontFamily: "system-ui,sans-serif" }}>
+                PRAYERKEY.COM
               </span>
-              <span style={{
-                fontFamily:    "system-ui, -apple-system, sans-serif",
-                fontSize:      "11px",
-                color:         "#bbbbbb",
-                letterSpacing: "0.06em",
-              }}>
+              <span style={{ fontSize: "clamp(8px,1vw,10px)", color: "rgba(255,255,255,0.35)", fontFamily: "system-ui,sans-serif" }}>
                 {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
               </span>
             </div>
           </div>
+        </div>
 
-          {/* Action row */}
-          <div style={{
-            display:    "flex",
-            gap:        "12px",
-            alignItems: "center",
-            flexWrap:   "wrap",
-          }}>
-            {/* Download button */}
-            <button
-              onClick={downloadPrayerCard}
-              disabled={downloading}
-              style={{
-                display:       "inline-flex",
-                alignItems:    "center",
-                gap:           "7px",
-                padding:       "10px 20px",
-                fontSize:      "13px",
-                fontWeight:    700,
-                color:         "#ffffff",
-                background:    downloading ? "#999" : "#00B4B4",
-                border:        "1.5px solid transparent",
-                borderRadius:  "8px",
-                cursor:        downloading ? "not-allowed" : "pointer",
-                boxShadow:     "3px 3px 0 0 rgba(0,180,180,0.35)",
-                letterSpacing: "0.01em",
-                transition:    "transform 140ms ease, box-shadow 140ms ease",
-              }}
-              onMouseEnter={e => {
-                if (!downloading) {
-                  (e.currentTarget as HTMLButtonElement).style.transform  = "translate(-1px,-1px)";
-                  (e.currentTarget as HTMLButtonElement).style.boxShadow = "4px 4px 0 0 rgba(0,180,180,0.45)";
-                }
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.transform  = "translate(0,0)";
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = "3px 3px 0 0 rgba(0,180,180,0.35)";
-              }}
-            >
-              {downloading ? "⏳ Saving…" : "⬇ Download Card"}
-            </button>
+        {/* Action row */}
+        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
 
-            <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
+          {/* Download button */}
+          <button
+            onClick={() => downloadPrayerCard(activeFormat)}
+            disabled={downloading}
+            style={{
+              display:       "inline-flex",
+              alignItems:    "center",
+              gap:           "7px",
+              padding:       "11px 22px",
+              fontSize:      "13px",
+              fontWeight:    700,
+              color:         "#000000",
+              background:    downloading ? "rgba(0,180,180,0.5)" : "#00D4D4",
+              border:        "1.5px solid transparent",
+              borderRadius:  "8px",
+              cursor:        downloading ? "not-allowed" : "pointer",
+              boxShadow:     "3px 3px 0 0 rgba(0,180,180,0.4)",
+              letterSpacing: "0.01em",
+              transition:    "transform 140ms ease, box-shadow 140ms ease",
+            }}
+            onMouseEnter={e => { if (!downloading) { (e.currentTarget as HTMLButtonElement).style.transform = "translate(-1px,-1px)"; (e.currentTarget as HTMLButtonElement).style.boxShadow = "4px 4px 0 0 rgba(0,180,180,0.5)"; } }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = "translate(0,0)"; (e.currentTarget as HTMLButtonElement).style.boxShadow = "3px 3px 0 0 rgba(0,180,180,0.4)"; }}
+          >
+            {downloading ? "⏳ Saving…" : `⬇ Download for ${fmt.label}`}
+          </button>
 
-            <Link
-              href={`/pray?topic=${encodeURIComponent("prayer based on " + todayPrayer.ref)}`}
-              style={{
-                fontSize:      "13px",
-                fontWeight:    600,
-                color:         "var(--pk-text-2)",
-                textDecoration:"none",
-                display:       "inline-flex",
-                alignItems:    "center",
-                gap:           "5px",
-                transition:    "color 140ms ease",
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-accent)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}
-            >
-              Deepen this prayer →
-            </Link>
+          <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
 
-            <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
+          <Link href={`/pray?topic=${encodeURIComponent("prayer based on " + todayPrayer.ref)}`}
+            style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)", textDecoration: "none", transition: "color 140ms ease" }}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-accent)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}>
+            Deepen this prayer →
+          </Link>
 
-            <Link
-              href={`/bible?q=${encodeURIComponent(todayPrayer.ref)}`}
-              style={{
-                fontSize:      "13px",
-                fontWeight:    600,
-                color:         "var(--pk-text-2)",
-                textDecoration:"none",
-                display:       "inline-flex",
-                alignItems:    "center",
-                gap:           "5px",
-                transition:    "color 140ms ease",
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-accent)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}
-            >
-              Read the verse →
-            </Link>
-          </div>
+          <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
+
+          <Link href={`/bible?q=${encodeURIComponent(todayPrayer.ref)}`}
+            style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)", textDecoration: "none", transition: "color 140ms ease" }}
+            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-accent)"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}>
+            Read the verse →
+          </Link>
         </div>
       </section>
 
