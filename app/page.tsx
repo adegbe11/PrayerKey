@@ -346,13 +346,15 @@ export default function HomePage() {
         ctx.fillText(l, CX, curY + pFS * 0.85 + pLH * i);
       });
 
-      // ── WATERMARK — bottom centre, prominent ────────────────────
-      const wmFS = Math.round(15 * S);
-      const wmY  = H - Math.round(PAD * 0.52);
-      ctx.strokeStyle = "rgba(155,112,64,0.25)"; ctx.lineWidth = Math.round(1.5 * S);
-      ctx.beginPath(); ctx.moveTo(PAD, wmY - Math.round(20 * S)); ctx.lineTo(W - PAD, wmY - Math.round(20 * S)); ctx.stroke();
+      // ── WATERMARK — sits just below prayer text ──────────────────
+      const wmFS  = Math.round(15 * S);
+      const wmGap = Math.round(30 * S);
+      const wmLineY = curY + lines(shortPrayer, CW, `italic 400 ${Math.round((hr < 0.72 ? 15 : hr > 1.4 ? 20 : 18) * TS)}px Georgia, serif`).length * Math.round((hr < 0.72 ? 15 : hr > 1.4 ? 20 : 18) * TS * 1.85) + wmGap;
+      const wmY   = wmLineY + Math.round(20 * S);
+      ctx.strokeStyle = "rgba(155,112,64,0.28)"; ctx.lineWidth = Math.round(1.5 * S);
+      ctx.beginPath(); ctx.moveTo(CX - Math.round(90 * S), wmLineY); ctx.lineTo(CX + Math.round(90 * S), wmLineY); ctx.stroke();
       ctx.font = `800 ${wmFS}px system-ui, sans-serif`;
-      ctx.fillStyle = "#9B7040"; ctx.letterSpacing = `${Math.round(3 * S)}px`;
+      ctx.fillStyle = "#9B7040";
       ctx.fillText("PRAYERKEY.COM", CX, wmY);
 
       ctx.textAlign = "left";
@@ -863,17 +865,15 @@ export default function HomePage() {
                   {shortPrayer}
                 </p>
 
-                {/* Watermark — bottom, prominent, centred */}
+                {/* Watermark — flows in the flex column, right below short prayer */}
                 <div style={{
-                  position:   "absolute",
-                  bottom:     isPortrait ? "12px" : "clamp(8px,1.4%,18px)",
-                  left: 0, right: 0,
-                  display:    "flex",
+                  display:       "flex",
                   flexDirection: "column",
-                  alignItems: "center",
-                  gap:        "4px",
+                  alignItems:    "center",
+                  gap:           "5px",
+                  marginTop:     isPortrait ? "14px" : "clamp(10px,1.8%,22px)",
                 }}>
-                  <div style={{ width: "80%", height: "1px", background: "rgba(155,112,64,0.2)" }} />
+                  <div style={{ width: isPortrait ? "100px" : "clamp(70px,12vw,130px)", height: "1px", background: "rgba(155,112,64,0.28)" }} />
                   <span style={{
                     fontSize:      wmFS,
                     fontWeight:    800,
