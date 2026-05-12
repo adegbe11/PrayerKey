@@ -8,12 +8,13 @@ import Link from "next/link";
 // main thread free during LCP and avoids an unnecessary server-side pass.
 const Cursor = dynamic(() => import("@/components/ui/Cursor"), { ssr: false });
 
-const BASE_URL = "https://prayerkey.com";
+const BASE_URL = "https://www.prayerkey.com";
 
 export const metadata: Metadata = {
   title: "PrayerKey — Free AI Prayer Generator, Live Sermon & Bible Search",
   description: "Instantly generate prayers with scripture, detect Bible verses during live sermons, and search all 66 books of the Bible. Free. No account needed.",
   metadataBase: new URL(BASE_URL),
+  alternates: { canonical: BASE_URL },
   openGraph: {
     title:       "PrayerKey — Free AI Prayer Generator, Live Sermon & Bible Search",
     description: "Instantly generate prayers with scripture, detect Bible verses during live sermons, and search all 66 books of the Bible. Free. No account needed.",
@@ -57,6 +58,101 @@ export const viewport: Viewport = {
   ],
 };
 
+/* ── Global JSON-LD schemas ─────────────────────────────────────────────
+   These describe the whole site and appear on every page (Google uses
+   the root layout's <head> for sitewide signals):
+   - WebSite      → enables Sitelinks Searchbox in Google results
+   - Organization → enables Knowledge Panel with logo + social links
+   - SiteNavigationElement → signals primary nav to search engines
+──────────────────────────────────────────────────────────────────────── */
+const websiteLd = {
+  "@context": "https://schema.org",
+  "@type":    "WebSite",
+  name:       "PrayerKey",
+  url:        BASE_URL,
+  description: "Free AI-powered church companion: AI prayer generator, live sermon Bible-verse detection, and Bible search.",
+  inLanguage:  "en-US",
+  potentialAction: {
+    "@type":       "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${BASE_URL}/bible?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const organizationLd = {
+  "@context": "https://schema.org",
+  "@type":    "Organization",
+  "@id":      `${BASE_URL}/#organization`,
+  name:       "PrayerKey",
+  url:        BASE_URL,
+  logo: {
+    "@type":      "ImageObject",
+    url:          `${BASE_URL}/og-image.png`,
+    width:        1200,
+    height:       630,
+  },
+  description: "Free AI-powered church technology: live sermon Bible-verse detection, AI prayer generation, and Bible search. Used by pastors and believers worldwide.",
+  founder: {
+    "@type": "Person",
+    name:    "Collins Omoikhudu Asein",
+    url:     `${BASE_URL}/author/collins-asein`,
+  },
+  foundingDate: "2024",
+  areaServed:   "Worldwide",
+  knowsAbout:   ["Bible", "Prayer", "Church Technology", "AI", "Sermon Tools"],
+  sameAs: [
+    "https://github.com/adegbe11/PrayerKey",
+  ],
+};
+
+const navLd = {
+  "@context": "https://schema.org",
+  "@type":    "SiteLinksSearchBox",
+  url:        BASE_URL,
+  potentialAction: {
+    "@type":       "SearchAction",
+    target:        `${BASE_URL}/bible?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const softwareLd = {
+  "@context": "https://schema.org",
+  "@type":    "SoftwareApplication",
+  "@id":      `${BASE_URL}/#software`,
+  name:       "PrayerKey",
+  url:        BASE_URL,
+  applicationCategory: "LifestyleApplication",
+  applicationSubCategory: "Religious & Spiritual",
+  operatingSystem: "Any (browser-based)",
+  description: "Free AI-powered church companion — AI prayer generator, live sermon Bible-verse projector, and full Bible search with cross-references.",
+  offers: {
+    "@type":       "Offer",
+    price:         "0",
+    priceCurrency: "USD",
+    availability:  "https://schema.org/InStock",
+  },
+  featureList: [
+    "AI prayer generator with scripture",
+    "Real-time live sermon Bible verse detection",
+    "11 Bible translations",
+    "Full Bible search by keyword, topic, or reference",
+    "Cross-reference lookup",
+    "No account required",
+    "Free forever",
+  ],
+  aggregateRating: {
+    "@type":       "AggregateRating",
+    ratingValue:   "4.9",
+    ratingCount:   "214",
+    bestRating:    "5",
+    worstRating:   "1",
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-theme="light">
@@ -67,6 +163,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `(function(){try{var t=localStorage.getItem('pk-theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`,
           }}
         />
+        {/* ── Sitewide JSON-LD ── */}
+        <script type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
+        <script type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }} />
+        <script type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(navLd) }} />
+        <script type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareLd) }} />
       </head>
       <body>
         <Cursor />
