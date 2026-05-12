@@ -280,8 +280,14 @@ export default function HomePage() {
       vig.addColorStop(1, "rgba(155,112,64,0.07)");
       ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
 
+      // ── "PRAYER OF THE DAY" label — very top, centred ───────────
+      const labelFS2 = Math.round(13 * S);
+      ctx.font = `800 ${labelFS2}px system-ui, sans-serif`;
+      ctx.fillStyle = "#9B7040"; ctx.textAlign = "center";
+      ctx.fillText("✦  PRAYER OF THE DAY  ✦", CX, Math.round(PAD * 0.68));
+
       // ── TOP ORNAMENT: small cross ────────────────────────────────
-      const crossY = Math.round(PAD * 0.72);
+      const crossY = Math.round(PAD * 0.95);
       const cVW = Math.round(6 * S), cVH = Math.round(22 * S), cArm = Math.round(14 * S), cAH = Math.round(5 * S);
       ctx.fillStyle = "#9B7040";
       ctx.fillRect(CX - cVW / 2, crossY, cVW, cVH);
@@ -808,6 +814,17 @@ export default function HomePage() {
                 textAlign:      "center",
                 gap:            isPortrait ? "6px" : "clamp(4px,0.8%,10px)",
               }}>
+
+                {/* "PRAYER OF THE DAY" label — very top */}
+                <p style={{
+                  fontSize:      isPortrait ? "8px" : "clamp(7px,0.85vw,10px)",
+                  fontWeight:    800,
+                  color:         "#9B7040",
+                  fontFamily:    "system-ui, sans-serif",
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  margin:        0,
+                }}>✦ Prayer of the Day ✦</p>
 
                 {/* Top cross ornament */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: isPortrait ? "4px" : "clamp(2px,0.5%,8px)" }}>
