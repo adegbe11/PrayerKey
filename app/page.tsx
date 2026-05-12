@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ROTATING_WORDS = ["prayers", "sermons", "miracles", "blessings", "churches", "revivals"];
 
@@ -46,6 +46,79 @@ function getDailyVerse() {
   return DAILY_VERSES[dayOfYear % DAILY_VERSES.length];
 }
 
+/* ── Prayer of the Day pool ────────────────────────────────────────────── */
+const DAILY_PRAYERS: { ref: string; verse: string; prayer: string }[] = [
+  { ref: "John 3:16",        verse: "For God so loved the world…",
+    prayer: "Lord, thank You for a love so deep that You gave Your only Son for me. Let that love anchor me today. When fear comes, remind me I am fully known and fully loved. Amen." },
+  { ref: "Psalm 23:1",       verse: "The Lord is my shepherd, I lack nothing.",
+    prayer: "Father, You are my Shepherd and I am safe in Your care. Provide for every need I bring before You today — physically, spiritually, emotionally. Lead me beside still waters. Amen." },
+  { ref: "Philippians 4:13", verse: "I can do all this through him who gives me strength.",
+    prayer: "Lord, I face challenges today that feel too big for me. But I trust that through You I have strength for every moment. Fill me afresh with Your power and peace. Amen." },
+  { ref: "Romans 8:28",      verse: "In all things God works for the good of those who love him.",
+    prayer: "Father, I surrender what I cannot understand. I trust that even this situation is in Your hands and working toward something good. Give me faith to rest in that truth. Amen." },
+  { ref: "Isaiah 40:31",     verse: "Those who hope in the Lord will renew their strength.",
+    prayer: "Lord, I am weary but I put my hope in You. Renew my strength like the eagle's. Let me rise above exhaustion into the purpose You have placed on my life. Amen." },
+  { ref: "Jeremiah 29:11",   verse: "I know the plans I have for you, declares the Lord.",
+    prayer: "Father, when uncertainty clouds my path, remind me that You hold a plan full of hope for my future. I release my anxieties and trust Your perfect design for my life. Amen." },
+  { ref: "Proverbs 3:5",     verse: "Trust in the Lord with all your heart.",
+    prayer: "God, I choose today to lean not on my own limited understanding but to trust You completely. Direct my steps. Make my path straight as I submit every decision to You. Amen." },
+  { ref: "Matthew 6:33",     verse: "Seek first his kingdom and his righteousness.",
+    prayer: "Lord, let the first pursuit of my heart today be Your kingdom. Align my priorities. Strip away every distraction and make me wholly focused on what matters to You. Amen." },
+  { ref: "Psalm 46:1",       verse: "God is our refuge and strength, an ever-present help in trouble.",
+    prayer: "Father, You are my refuge. In every storm and every uncertainty, I run to You. Be my strength today. Let me feel Your presence as a shield around me. Amen." },
+  { ref: "Romans 12:2",      verse: "Be transformed by the renewing of your mind.",
+    prayer: "Lord, renew my mind today. Let Your Word reshape the way I think and see the world. Transform me from the inside out until my thoughts reflect Your truth. Amen." },
+  { ref: "2 Timothy 1:7",    verse: "God has not given us a spirit of fear.",
+    prayer: "Father, I reject every spirit of fear today. You have given me power, love, and a sound mind. I walk in boldness and confidence because of who You are in me. Amen." },
+  { ref: "Hebrews 11:1",     verse: "Faith is confidence in what we hope for.",
+    prayer: "Lord, increase my faith today. Let me see the unseen with eyes of faith. I believe in Your promises even when circumstances tell a different story. Amen." },
+  { ref: "Matthew 11:28",    verse: "Come to me, all you who are weary and burdened.",
+    prayer: "Jesus, I come to You right now with every burden I am carrying. I lay them all at Your feet. Take my weariness and replace it with Your rest and Your peace. Amen." },
+  { ref: "Psalm 119:105",    verse: "Your word is a lamp for my feet, a light on my path.",
+    prayer: "Father, illuminate my path today with Your Word. In every decision I face, let Scripture be my guide. Give me wisdom and clarity to walk in Your light. Amen." },
+  { ref: "Joshua 1:9",       verse: "Be strong and courageous. Do not be afraid.",
+    prayer: "Lord, I choose courage today. Not because I have the strength, but because You are with me wherever I go. I will not be shaken. You go before me. Amen." },
+  { ref: "Psalm 37:4",       verse: "Take delight in the Lord, and he will give you the desires of your heart.",
+    prayer: "Father, my greatest delight is You. As I seek Your face above all else today, align the desires of my heart with Yours. Let every longing be filled by You. Amen." },
+  { ref: "Isaiah 41:10",     verse: "Do not fear, for I am with you.",
+    prayer: "God, You are with me — that is enough. I will not fear what today holds. Strengthen me with Your right hand. I am never alone in any trial I face. Amen." },
+  { ref: "Psalm 34:18",      verse: "The Lord is close to the brokenhearted.",
+    prayer: "Father, draw near to every broken heart reading this today. You do not stand at a distance from our pain. Come close, Lord. Heal what only You can heal. Amen." },
+  { ref: "Romans 5:8",       verse: "While we were still sinners, Christ died for us.",
+    prayer: "Lord, I am overwhelmed by a love that pursued me at my worst. Let the reality of the cross shape everything about how I live today. I am loved beyond measure. Amen." },
+  { ref: "John 14:6",        verse: "I am the way and the truth and the life.",
+    prayer: "Jesus, You alone are the way when I am lost, the truth when I am confused, and the life when I feel empty. Guide my every step today. I follow You. Amen." },
+  { ref: "Psalm 27:1",       verse: "The Lord is my light and my salvation — whom shall I fear?",
+    prayer: "Lord, You are my light in every dark season. You are my salvation when I feel overwhelmed. Because of You, I have nothing to fear today or any day. Amen." },
+  { ref: "Lamentations 3:22–23", verse: "His mercies are new every morning.",
+    prayer: "Father, thank You that this morning carries fresh mercy. Yesterday's failures do not define today. I receive Your new mercies now and step into this day with hope. Amen." },
+  { ref: "Nehemiah 8:10",    verse: "The joy of the Lord is your strength.",
+    prayer: "Lord, fill me with Your joy today — not a happiness that depends on circumstances, but a deep, settled joy that flows from knowing You. Let that joy be my strength. Amen." },
+  { ref: "Psalm 91:1",       verse: "Whoever dwells in the shelter of the Most High will rest in the shadow of the Almighty.",
+    prayer: "Father, I dwell in Your shelter today. Hide me under the shadow of Your wings. No weapon formed against me shall prosper. I am safe in You. Amen." },
+  { ref: "Mark 12:30",       verse: "Love the Lord your God with all your heart.",
+    prayer: "Lord, I give You my whole heart today — not just a portion of it. All of me. Shape my love for You so that it overflows into love for the people around me. Amen." },
+  { ref: "1 Corinthians 13:4", verse: "Love is patient, love is kind.",
+    prayer: "Father, grow in me the kind of love described in Your Word. Patient, kind, selfless love. Let me love the people in my life the way You have loved me. Amen." },
+  { ref: "Revelation 21:4",  verse: "He will wipe every tear from their eyes.",
+    prayer: "Lord, for everyone in pain today — remind them that this is not the end of the story. You are making all things new. Comfort every heart that is hurting right now. Amen." },
+  { ref: "Galatians 5:22",   verse: "The fruit of the Spirit is love, joy, peace…",
+    prayer: "Holy Spirit, produce Your fruit in my life today. Love where I am selfish. Joy where I am anxious. Peace where I am troubled. Let me reflect You to the world. Amen." },
+  { ref: "Ephesians 2:8",    verse: "For it is by grace you have been saved, through faith.",
+    prayer: "Father, I did nothing to earn Your love and I never could. It is all grace. Let that truth humble me and fill me with gratitude that shapes everything I do today. Amen." },
+  { ref: "Micah 6:8",        verse: "Act justly and to love mercy and to walk humbly with your God.",
+    prayer: "Lord, make me a person of justice, mercy, and humility today. Where I encounter injustice, give me courage. Where I could show mercy, give me generosity. Amen." },
+  { ref: "John 1:1",         verse: "In the beginning was the Word, and the Word was God.",
+    prayer: "Father, Your Word has always been and always will be. Ground me in Scripture today. Let Your eternal truth anchor my heart against every wave of uncertainty. Amen." },
+];
+
+function getDailyPrayer() {
+  const now   = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const day   = Math.floor((now.getTime() - start.getTime()) / 86_400_000);
+  return DAILY_PRAYERS[day % DAILY_PRAYERS.length];
+}
+
 const FEATURES = [
   {
     href:   "/pray",
@@ -77,10 +150,35 @@ const FEATURES = [
 ];
 
 export default function HomePage() {
-  const [wordIndex, setWordIndex] = useState(0);
-  const [visible,   setVisible]   = useState(true);
+  const [wordIndex,      setWordIndex]      = useState(0);
+  const [visible,        setVisible]        = useState(true);
+  const [downloading,    setDownloading]    = useState(false);
+  const prayerCardRef = useRef<HTMLDivElement>(null);
 
-  const todayVerse = getDailyVerse();
+  const todayVerse  = getDailyVerse();
+  const todayPrayer = getDailyPrayer();
+
+  async function downloadPrayerCard() {
+    if (!prayerCardRef.current || downloading) return;
+    setDownloading(true);
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(prayerCardRef.current, {
+        scale:           2,
+        useCORS:         true,
+        backgroundColor: "#ffffff",
+        logging:         false,
+      });
+      const link    = document.createElement("a");
+      link.download = `prayerkey-prayer-${new Date().toISOString().slice(0, 10)}.png`;
+      link.href     = canvas.toDataURL("image/png");
+      link.click();
+    } catch (e) {
+      console.error("Download failed", e);
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -435,6 +533,210 @@ export default function HomePage() {
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}
             >
               Search more verses →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+          PRAYER OF THE DAY — Downloadable card
+      ══════════════════════════════════════════ */}
+      <section style={{ marginBottom: "72px" }}>
+
+        {/* Section header */}
+        <div style={{ display: "flex", alignItems: "center", gap: "14px", marginBottom: "24px" }}>
+          <div style={{ height: "1px", flex: 1, background: "var(--pk-border)" }} />
+          <span style={{
+            fontSize:      "10px",
+            fontWeight:    700,
+            color:         "var(--pk-accent)",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+          }}>
+            ✦ Prayer of the Day
+          </span>
+          <div style={{ height: "1px", flex: 1, background: "var(--pk-border)" }} />
+        </div>
+
+        {/* Outer wrapper — download button sits outside the card */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "stretch", gap: "16px" }}>
+
+          {/* ── The card that gets captured ── */}
+          <div ref={prayerCardRef} style={{
+            background:   "#ffffff",
+            border:       "1.5px solid #e5e5e5",
+            borderRadius: "20px",
+            padding:      "clamp(32px,5vw,56px) clamp(28px,5vw,60px) clamp(28px,4vw,48px)",
+            position:     "relative",
+            overflow:     "hidden",
+          }}>
+
+            {/* Subtle grid watermark */}
+            <div aria-hidden style={{
+              position:       "absolute",
+              inset:          0,
+              backgroundImage: "radial-gradient(circle, #00000008 1px, transparent 1px)",
+              backgroundSize:  "24px 24px",
+              pointerEvents:  "none",
+            }} />
+
+            {/* Reference — big bold serif */}
+            <p style={{
+              fontFamily:    "Georgia, 'Times New Roman', serif",
+              fontSize:      "clamp(28px, 5vw, 48px)",
+              fontWeight:    700,
+              color:         "#111111",
+              margin:        "0 0 24px",
+              lineHeight:    1.1,
+              letterSpacing: "-0.02em",
+              position:      "relative",
+            }}>
+              {todayPrayer.ref}
+            </p>
+
+            {/* Verse — cyan highlight block exactly like the screenshot */}
+            <p style={{
+              fontFamily:      "system-ui, -apple-system, sans-serif",
+              fontSize:        "clamp(15px, 2.2vw, 19px)",
+              fontWeight:      700,
+              color:           "#000000",
+              background:      "#00D4D4",
+              display:         "inline",
+              boxDecorationBreak: "clone",
+              WebkitBoxDecorationBreak: "clone",
+              padding:         "2px 6px",
+              lineHeight:      1.7,
+              margin:          "0 0 28px",
+              position:        "relative",
+            } as React.CSSProperties}>
+              {todayPrayer.verse}
+            </p>
+
+            {/* Divider */}
+            <div style={{ height: "1px", background: "#e5e5e5", margin: "28px 0 24px", position: "relative" }} />
+
+            {/* Prayer text */}
+            <p style={{
+              fontFamily:  "Georgia, 'Times New Roman', serif",
+              fontSize:    "clamp(15px, 2vw, 17px)",
+              color:       "#333333",
+              lineHeight:  1.85,
+              margin:      "0 0 28px",
+              fontStyle:   "italic",
+              position:    "relative",
+            }}>
+              {todayPrayer.prayer}
+            </p>
+
+            {/* Branding footer */}
+            <div style={{
+              display:        "flex",
+              alignItems:     "center",
+              justifyContent: "space-between",
+              borderTop:      "1px solid #e5e5e5",
+              paddingTop:     "16px",
+              position:       "relative",
+            }}>
+              <span style={{
+                fontFamily:    "system-ui, -apple-system, sans-serif",
+                fontSize:      "11px",
+                fontWeight:    800,
+                color:         "#999999",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+              }}>
+                prayerkey.com
+              </span>
+              <span style={{
+                fontFamily:    "system-ui, -apple-system, sans-serif",
+                fontSize:      "11px",
+                color:         "#bbbbbb",
+                letterSpacing: "0.06em",
+              }}>
+                {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+              </span>
+            </div>
+          </div>
+
+          {/* Action row */}
+          <div style={{
+            display:    "flex",
+            gap:        "12px",
+            alignItems: "center",
+            flexWrap:   "wrap",
+          }}>
+            {/* Download button */}
+            <button
+              onClick={downloadPrayerCard}
+              disabled={downloading}
+              style={{
+                display:       "inline-flex",
+                alignItems:    "center",
+                gap:           "7px",
+                padding:       "10px 20px",
+                fontSize:      "13px",
+                fontWeight:    700,
+                color:         "#ffffff",
+                background:    downloading ? "#999" : "#00B4B4",
+                border:        "1.5px solid transparent",
+                borderRadius:  "8px",
+                cursor:        downloading ? "not-allowed" : "pointer",
+                boxShadow:     "3px 3px 0 0 rgba(0,180,180,0.35)",
+                letterSpacing: "0.01em",
+                transition:    "transform 140ms ease, box-shadow 140ms ease",
+              }}
+              onMouseEnter={e => {
+                if (!downloading) {
+                  (e.currentTarget as HTMLButtonElement).style.transform  = "translate(-1px,-1px)";
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = "4px 4px 0 0 rgba(0,180,180,0.45)";
+                }
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.transform  = "translate(0,0)";
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = "3px 3px 0 0 rgba(0,180,180,0.35)";
+              }}
+            >
+              {downloading ? "⏳ Saving…" : "⬇ Download Card"}
+            </button>
+
+            <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
+
+            <Link
+              href={`/pray?topic=${encodeURIComponent("prayer based on " + todayPrayer.ref)}`}
+              style={{
+                fontSize:      "13px",
+                fontWeight:    600,
+                color:         "var(--pk-text-2)",
+                textDecoration:"none",
+                display:       "inline-flex",
+                alignItems:    "center",
+                gap:           "5px",
+                transition:    "color 140ms ease",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-accent)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}
+            >
+              Deepen this prayer →
+            </Link>
+
+            <span style={{ color: "var(--pk-border-2)", userSelect: "none" }}>|</span>
+
+            <Link
+              href={`/bible?q=${encodeURIComponent(todayPrayer.ref)}`}
+              style={{
+                fontSize:      "13px",
+                fontWeight:    600,
+                color:         "var(--pk-text-2)",
+                textDecoration:"none",
+                display:       "inline-flex",
+                alignItems:    "center",
+                gap:           "5px",
+                transition:    "color 140ms ease",
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-accent)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = "var(--pk-text-2)"; }}
+            >
+              Read the verse →
             </Link>
           </div>
         </div>
