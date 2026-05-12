@@ -277,8 +277,17 @@ export default function HomePage() {
       const pFS = Math.round(17 * TS), pLH = Math.round(pFS * 1.7);
       ctx.font = `italic ${pFS}px Georgia, serif`;
       ctx.fillStyle = "#E4DCC8";
-      lines(p.prayer, CW).forEach((l, i) => ctx.fillText(l, PAD, curY + pLH * i + pFS * 0.85));
-      curY += lines(p.prayer, CW).length * pLH + Math.round(12 * S);
+      const prayerLineArr = lines(p.prayer, CW);
+      const prayerBlockH  = prayerLineArr.length * pLH;
+
+      // For portrait formats: vertically center the prayer text in the remaining space
+      const botSectionH = Math.round(PAD * 0.72) + Math.round(18 * S) + Math.round(24 * S);
+      const remaining   = H - curY - botSectionH - prayerBlockH;
+      const prayerOffset = hr > 1.1 ? Math.max(Math.round(remaining * 0.3), Math.round(20 * S)) : Math.round(12 * S);
+      curY += prayerOffset;
+
+      prayerLineArr.forEach((l, i) => ctx.fillText(l, PAD, curY + pLH * i + pFS * 0.85));
+      curY += prayerBlockH + Math.round(16 * S);
 
       // ── Bottom branding ──────────────────────────────────────────
       const botY = H - Math.round(PAD * 0.72);
@@ -701,116 +710,106 @@ export default function HomePage() {
         </div>
 
         {/* Preview card — dark navy, beautiful, correct aspect ratio */}
-        <div style={{
-          display:        "flex",
-          justifyContent: fmt.width >= fmt.height ? "stretch" : "center",
-          marginBottom:   "20px",
-        }}>
-          <div style={{
-            width:        fmt.width >= fmt.height ? "100%" : "min(340px, 100%)",
-            aspectRatio:  `${fmt.width} / ${fmt.height}`,
-            background:   "linear-gradient(150deg, #0D1F38 0%, #0B1726 60%, #080F1C 100%)",
-            borderRadius: "20px",
-            padding:      "clamp(20px,5%,52px)",
-            position:     "relative",
-            overflow:     "hidden",
-            boxShadow:    "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,168,83,0.18)",
-            display:      "flex",
-            flexDirection:"column",
-            justifyContent: "space-between",
-          }}>
-
-            {/* Dot grid texture */}
-            <div aria-hidden style={{
-              position:        "absolute", inset: 0, pointerEvents: "none",
-              backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.016) 1px, transparent 1px)",
-              backgroundSize:  "28px 28px",
-            }} />
-
-            {/* Cross watermark top-right */}
-            <div aria-hidden style={{
-              position: "absolute", top: "6%", right: "6%",
-              fontSize: "clamp(60px,12%,120px)", color: "rgba(212,168,83,0.06)",
-              fontWeight: 700, lineHeight: 1, userSelect: "none", pointerEvents: "none",
-              fontFamily: "Georgia, serif",
-            }}>✝</div>
-
-            {/* TOP: label + reference */}
-            <div style={{ position: "relative" }}>
-              {/* Gold accent line */}
-              <div style={{ width: "13%", height: "2px", background: "#D4A853", borderRadius: "2px", marginBottom: "10px" }} />
-
-              <p style={{ fontSize: "clamp(8px,1vw,11px)", fontWeight: 700, color: "#D4A853", letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 12px", fontFamily: "system-ui,sans-serif" }}>
-                PRAYER OF THE DAY
-              </p>
-
-              <p style={{
-                fontFamily:    "Georgia, 'Times New Roman', serif",
-                fontSize:      "clamp(22px, 4.5vw, 48px)",
-                fontWeight:    700,
-                color:         "#D4A853",
-                margin:        "0 0 16px",
-                lineHeight:    1.1,
-                letterSpacing: "-0.02em",
-              }}>
-                {todayPrayer.ref}
-              </p>
-
-              {/* Cyan verse highlight */}
-              <p style={{
-                fontFamily:               "system-ui, -apple-system, sans-serif",
-                fontSize:                 "clamp(11px, 1.8vw, 17px)",
-                fontWeight:               700,
-                color:                    "#000000",
-                background:               "#00D4D4",
-                display:                  "inline",
-                boxDecorationBreak:       "clone",
-                WebkitBoxDecorationBreak: "clone",
-                padding:                  "2px 6px",
-                lineHeight:               1.75,
-                margin:                   "0 0 16px",
-              } as React.CSSProperties}>
-                &ldquo;{todayPrayer.verse}&rdquo;
-              </p>
-            </div>
-
-            {/* MIDDLE: prayer text */}
-            <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "16px 0" }}>
-              <div style={{ height: "1px", background: "rgba(212,168,83,0.28)", marginBottom: "16px" }} />
-              <p style={{
-                fontFamily: "Georgia, 'Times New Roman', serif",
-                fontSize:   "clamp(10px, 1.5vw, 16px)",
-                color:      "#E4DCC8",
-                lineHeight: 1.8,
-                fontStyle:  "italic",
-                margin:     0,
-                WebkitLineClamp: fmt.height < fmt.width ? 3 : 8,
-                overflow:   "hidden",
-                display:    "-webkit-box",
-                WebkitBoxOrient: "vertical",
-              } as React.CSSProperties}>
-                {todayPrayer.prayer}
-              </p>
-            </div>
-
-            {/* BOTTOM: branding */}
+        {(() => {
+          const isPortrait  = fmt.height > fmt.width;
+          const isLandscape = fmt.width > fmt.height * 1.2;
+          // Font sizes derived from the card's display width, not viewport
+          const refFS   = isPortrait ? "28px" : isLandscape ? "clamp(24px,3.2vw,44px)" : "clamp(26px,4vw,44px)";
+          const verseFS = isPortrait ? "13px" : isLandscape ? "clamp(12px,1.4vw,16px)" : "clamp(13px,1.8vw,17px)";
+          const prayerFS= isPortrait ? "13px" : isLandscape ? "clamp(11px,1.3vw,15px)" : "clamp(13px,1.5vw,16px)";
+          const labelFS = isPortrait ? "9px"  : "clamp(8px,0.9vw,11px)";
+          const pad     = isPortrait ? "28px" : isLandscape ? "clamp(16px,3%,40px)" : "clamp(20px,4%,44px)";
+          return (
             <div style={{
               display:        "flex",
-              alignItems:     "center",
-              justifyContent: "space-between",
-              borderTop:      "1px solid rgba(212,168,83,0.2)",
-              paddingTop:     "12px",
-              position:       "relative",
+              justifyContent: isPortrait ? "center" : "stretch",
+              marginBottom:   "20px",
             }}>
-              <span style={{ fontSize: "clamp(8px,1vw,11px)", fontWeight: 800, color: "#D4A853", letterSpacing: "0.16em", textTransform: "uppercase", fontFamily: "system-ui,sans-serif" }}>
-                PRAYERKEY.COM
-              </span>
-              <span style={{ fontSize: "clamp(8px,1vw,10px)", color: "rgba(255,255,255,0.35)", fontFamily: "system-ui,sans-serif" }}>
-                {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-              </span>
+              <div style={{
+                width:         isPortrait ? "min(360px, 100%)" : "100%",
+                aspectRatio:   `${fmt.width} / ${fmt.height}`,
+                background:    "linear-gradient(150deg, #0D1F38 0%, #0B1726 55%, #080F1C 100%)",
+                borderRadius:  "20px",
+                padding:       pad,
+                position:      "relative",
+                overflow:      "hidden",
+                boxShadow:     "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,168,83,0.18)",
+                display:       "flex",
+                flexDirection: "column",
+              }}>
+
+                {/* Dot grid */}
+                <div aria-hidden style={{
+                  position: "absolute", inset: 0, pointerEvents: "none",
+                  backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.016) 1px, transparent 1px)",
+                  backgroundSize: "28px 28px",
+                }} />
+
+                {/* Large cross watermark — centred for portrait, top-right for others */}
+                <div aria-hidden style={{
+                  position:   "absolute",
+                  top:        isPortrait ? "50%" : "6%",
+                  right:      isPortrait ? "50%" : "6%",
+                  transform:  isPortrait ? "translate(50%,-50%)" : "none",
+                  fontSize:   isPortrait ? "min(180px,45%)" : "clamp(60px,12%,120px)",
+                  color:      "rgba(212,168,83,0.055)",
+                  fontWeight: 700, lineHeight: 1,
+                  userSelect: "none", pointerEvents: "none",
+                  fontFamily: "Georgia, serif",
+                }}>✝</div>
+
+                {/* ── TOP: label + reference + verse ── */}
+                <div style={{ position: "relative", zIndex: 1 }}>
+                  <div style={{ width: "13%", height: "2px", background: "#D4A853", borderRadius: "2px", marginBottom: "8px" }} />
+                  <p style={{ fontSize: labelFS, fontWeight: 700, color: "#D4A853", letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 10px", fontFamily: "system-ui,sans-serif" }}>
+                    PRAYER OF THE DAY
+                  </p>
+                  <p style={{ fontFamily: "Georgia, serif", fontSize: refFS, fontWeight: 700, color: "#D4A853", margin: "0 0 14px", lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+                    {todayPrayer.ref}
+                  </p>
+                  <p style={{
+                    fontFamily: "system-ui, sans-serif", fontSize: verseFS, fontWeight: 700,
+                    color: "#000", background: "#00D4D4", display: "inline",
+                    boxDecorationBreak: "clone", WebkitBoxDecorationBreak: "clone",
+                    padding: "2px 6px", lineHeight: 1.75,
+                  } as React.CSSProperties}>
+                    &ldquo;{todayPrayer.verse}&rdquo;
+                  </p>
+                </div>
+
+                {/* ── MIDDLE: prayer text — grows to fill available space ── */}
+                <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", paddingTop: "16px" }}>
+                  <div style={{ height: "1px", background: "rgba(212,168,83,0.28)", marginBottom: "14px" }} />
+                  <p style={{
+                    fontFamily: "Georgia, serif", fontSize: prayerFS,
+                    color: "#E4DCC8", lineHeight: 1.85, fontStyle: "italic", margin: 0,
+                    ...(isLandscape ? {
+                      WebkitLineClamp: 3, overflow: "hidden",
+                      display: "-webkit-box", WebkitBoxOrient: "vertical",
+                    } : {}),
+                  } as React.CSSProperties}>
+                    {todayPrayer.prayer}
+                  </p>
+                </div>
+
+                {/* ── BOTTOM: branding ── */}
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  borderTop: "1px solid rgba(212,168,83,0.2)", paddingTop: "10px",
+                  marginTop: isPortrait ? "20px" : "12px",
+                  position: "relative", zIndex: 1,
+                }}>
+                  <span style={{ fontSize: labelFS, fontWeight: 800, color: "#D4A853", letterSpacing: "0.16em", textTransform: "uppercase", fontFamily: "system-ui,sans-serif" }}>
+                    PRAYERKEY.COM
+                  </span>
+                  <span style={{ fontSize: labelFS, color: "rgba(255,255,255,0.35)", fontFamily: "system-ui,sans-serif" }}>
+                    {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          );
+        })()}
 
         {/* Action row */}
         <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
