@@ -238,20 +238,21 @@ export default function HomePage() {
     try {
       const f     = FORMATS.find(f => f.id === formatId)!;
       const p     = todayPrayer;
-      const today = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
       const W = f.width, H = f.height;
       const canvas = document.createElement("canvas");
-      canvas.width  = W;
-      canvas.height = H;
+      canvas.width  = W; canvas.height = H;
       const ctx = canvas.getContext("2d")!;
 
-      const S   = W / 1080;
-      const hr  = H / W;
-      const TS  = hr < 0.72 ? S * (hr / 0.72) : S;
-      const PAD = Math.round(W * 0.08);
+      const S  = W / 1080;
+      const hr = H / W;
+      const TS = hr < 0.72 ? S * (hr / 0.72) : S;
+      const PAD = Math.round(W * 0.10);
+      const CW  = W - PAD * 2;
+      const CX  = W / 2;
 
-      /* wrap text helper */
-      function lines(text: string, maxW: number): string[] {
+      /* centered wrap helper */
+      function lines(text: string, maxW: number, font: string): string[] {
+        ctx.font = font;
         const words = text.split(" "); const arr: string[] = []; let cur = "";
         for (const w of words) {
           const test = cur ? `${cur} ${w}` : w;
@@ -262,188 +263,99 @@ export default function HomePage() {
         return arr;
       }
 
-      // Parse ref → book name + chapter:verse  e.g. "John 3:16" → ["John", "3:16"]
+      // Parse ref: "John 3:16" → book="JOHN", cv="3:16"
       const refMatch = p.ref.match(/^(.*?)\s+(\d+[:\d]*)$/);
       const bookName = (refMatch ? refMatch[1] : p.ref).toUpperCase();
       const chVerse  = refMatch ? refMatch[2] : "";
+      // Short prayer = first sentence only
+      const shortPrayer = p.prayer.replace(/\n/g, " ").split(/(?<=[.!?])\s+/)[0];
 
-      const isLandscape = W > H * 1.2;
-      const hasSideIcon = !isLandscape; // two-column only for square & portrait
-
-      // Content column dimensions
-      const leftW    = hasSideIcon ? Math.round(W * 0.56) : W - PAD * 2;
-      const leftX    = PAD;
-      const contentX = leftX + Math.round(28 * S);
-      const contentW = leftW - Math.round(28 * S) - (hasSideIcon ? Math.round(20 * S) : 0);
-
-      // ── BACKGROUND: warm cream ──────────────────────────────────
+      // ── BACKGROUND ──────────────────────────────────────────────
       ctx.fillStyle = "#F5EFE8";
       ctx.fillRect(0, 0, W, H);
 
-      // ── THREE DOTS top-left ─────────────────────────────────────
-      const dotY   = Math.round(PAD * 0.75);
-      const dotR   = Math.round(4 * S);
-      const dotGap = Math.round(13 * S);
-      for (let i = 0; i < 3; i++) {
-        ctx.beginPath();
-        ctx.arc(leftX + dotR + i * (dotR * 2 + dotGap), dotY, dotR, 0, Math.PI * 2);
-        ctx.fillStyle = "#1a1a1a"; ctx.fill();
-      }
+      // Subtle warm vignette
+      const vig = ctx.createRadialGradient(CX, H * 0.5, H * 0.2, CX, H * 0.5, H * 0.75);
+      vig.addColorStop(0, "rgba(0,0,0,0)");
+      vig.addColorStop(1, "rgba(155,112,64,0.07)");
+      ctx.fillStyle = vig; ctx.fillRect(0, 0, W, H);
 
-      // ── VERTICAL DECORATIVE LINE with circles ───────────────────
-      const lineX  = leftX + dotR;
-      const lineY1 = dotY + Math.round(18 * S);
-      const lineY2 = hasSideIcon ? Math.round(H * 0.55) : Math.round(H * 0.72);
-      const circR  = Math.round(5.5 * S);
-      ctx.strokeStyle = "#1a1a1a"; ctx.lineWidth = Math.round(2.5 * S);
-      ctx.beginPath();
-      ctx.moveTo(lineX, lineY1 + circR * 2);
-      ctx.lineTo(lineX, lineY2 - circR * 2);
-      ctx.stroke();
-      ctx.fillStyle = "#1a1a1a";
-      ctx.beginPath(); ctx.arc(lineX, lineY1 + circR, circR, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(lineX, lineY2 - circR, circR, 0, Math.PI * 2); ctx.fill();
-
-      let curY = lineY1 + Math.round(14 * S);
-
-      // ── BOOK NAME — huge black bold ─────────────────────────────
-      const bookFS = Math.round((isLandscape ? 68 : hr > 1.4 ? 110 : 92) * TS);
-      ctx.font = `900 ${bookFS}px system-ui, -apple-system, Arial, sans-serif`;
-      ctx.fillStyle = "#1a1a1a";
-      lines(bookName, contentW).forEach(l => {
-        ctx.fillText(l, contentX, curY + bookFS * 0.8);
-        curY += Math.round(bookFS * 0.98);
-      });
-      curY += Math.round(4 * S);
-
-      // ── CHAPTER:VERSE — large warm golden brown ─────────────────
-      const cvFS = Math.round((isLandscape ? 58 : hr > 1.4 ? 95 : 78) * TS);
-      ctx.font = `900 ${cvFS}px system-ui, -apple-system, Arial, sans-serif`;
+      // ── TOP ORNAMENT: small cross ────────────────────────────────
+      const crossY = Math.round(PAD * 0.72);
+      const cVW = Math.round(6 * S), cVH = Math.round(22 * S), cArm = Math.round(14 * S), cAH = Math.round(5 * S);
       ctx.fillStyle = "#9B7040";
-      ctx.fillText(chVerse, contentX, curY + cvFS * 0.8);
-      curY += Math.round(cvFS * 0.95) + Math.round(14 * S);
+      ctx.fillRect(CX - cVW / 2, crossY, cVW, cVH);
+      ctx.fillRect(CX - cArm, crossY + Math.round(7 * S), cArm * 2, cAH);
 
-      // ── SHORT DASH separator ────────────────────────────────────
-      ctx.strokeStyle = "#1a1a1a"; ctx.lineWidth = Math.round(3.5 * S);
-      ctx.beginPath();
-      ctx.moveTo(contentX, curY);
-      ctx.lineTo(contentX + Math.round(46 * S), curY);
-      ctx.stroke();
-      curY += Math.round(20 * S);
+      // ── Thin line under cross ────────────────────────────────────
+      const lineY = crossY + cVH + Math.round(14 * S);
+      ctx.strokeStyle = "rgba(155,112,64,0.35)"; ctx.lineWidth = Math.round(1.5 * S);
+      ctx.beginPath(); ctx.moveTo(CX - Math.round(60 * S), lineY); ctx.lineTo(CX + Math.round(60 * S), lineY); ctx.stroke();
 
-      // ── VERSE TEXT — regular weight, dark gray ──────────────────
-      const vFS = Math.round((isLandscape ? 17 : hr > 1.4 ? 22 : 20) * TS);
-      const vLH = Math.round(vFS * 1.75);
-      ctx.font = `400 ${vFS}px Georgia, serif`;
-      ctx.fillStyle = "#2a2a2a";
-      lines(p.verse, contentW).forEach((l, i) => {
-        ctx.fillText(l, contentX, curY + vFS * 0.85 + vLH * i);
-      });
-      curY += lines(p.verse, contentW).length * vLH + Math.round(22 * S);
+      let curY = lineY + Math.round(28 * S);
 
-      // ── PRAYER TITLE label ──────────────────────────────────────
-      const lFS = Math.round(11 * TS);
-      ctx.font = `700 ${lFS}px system-ui, sans-serif`;
-      ctx.fillStyle = "#9B7040";
-      ctx.fillText("— " + p.title.toUpperCase(), contentX, curY + lFS * 0.85);
-      curY += Math.round(lFS * 1.5) + Math.round(8 * S);
-
-      // ── FIRST PARAGRAPH of prayer ───────────────────────────────
-      const pFS = Math.round((isLandscape ? 14 : hr > 1.4 ? 20 : 17) * TS);
-      const pLH = Math.round(pFS * 1.8);
-      ctx.font = `400 ${pFS}px Georgia, serif`;
-      ctx.fillStyle = "#3a3a3a";
-      const firstPara = p.prayer.split("\n\n")[0].replace(/\n/g, " ");
-      lines(firstPara, contentW).forEach((l, i) => {
-        ctx.fillText(l, contentX, curY + pFS * 0.85 + pLH * i);
+      // ── BOOK NAME — huge black bold, centred ────────────────────
+      const bookFS = Math.round((hr < 0.72 ? 76 : hr > 1.4 ? 118 : 100) * TS);
+      const bookFont = `900 ${bookFS}px system-ui, -apple-system, Arial, sans-serif`;
+      ctx.fillStyle = "#1a1a1a"; ctx.textAlign = "center";
+      lines(bookName, CW, bookFont).forEach(l => {
+        ctx.font = bookFont;
+        ctx.fillText(l, CX, curY + bookFS * 0.8);
+        curY += Math.round(bookFS * 0.95);
       });
 
-      // ── BOTTOM BRANDING ─────────────────────────────────────────
-      const botY = H - Math.round(PAD * 0.55);
-      ctx.strokeStyle = "rgba(0,0,0,0.1)"; ctx.lineWidth = Math.round(1.5 * S);
-      ctx.beginPath(); ctx.moveTo(leftX, botY - Math.round(18 * S)); ctx.lineTo(leftX + leftW - PAD, botY - Math.round(18 * S)); ctx.stroke();
-      ctx.font = `800 ${Math.round(12 * S)}px system-ui, sans-serif`;
-      ctx.fillStyle = "#9B7040";
-      ctx.fillText("PRAYERKEY.COM", contentX, botY);
-      ctx.font = `400 ${Math.round(11 * S)}px system-ui, sans-serif`;
-      ctx.fillStyle = "#888888";
-      const tw = ctx.measureText(today).width;
-      ctx.fillText(today, hasSideIcon ? (leftX + leftW - PAD - tw) : (PAD + (W - PAD * 2) - tw), botY);
+      // ── CHAPTER:VERSE — large golden, centred ───────────────────
+      const cvFS = Math.round((hr < 0.72 ? 62 : hr > 1.4 ? 98 : 82) * TS);
+      const cvFont = `900 ${cvFS}px system-ui, -apple-system, Arial, sans-serif`;
+      ctx.font = cvFont; ctx.fillStyle = "#9B7040";
+      ctx.fillText(chVerse, CX, curY + cvFS * 0.82);
+      curY += Math.round(cvFS * 0.95) + Math.round(18 * S);
 
-      // ── RIGHT SIDE: decorative Bible circle ─────────────────────
-      if (hasSideIcon) {
-        const RX = Math.round(W * 0.775);
-        const RY = Math.round(H * 0.36);
-        const outerR = Math.round(162 * S);
-        const innerR = Math.round(135 * S);
+      // ── ORNAMENTAL DIVIDER ───────────────────────────────────────
+      ctx.strokeStyle = "rgba(155,112,64,0.5)"; ctx.lineWidth = Math.round(1.5 * S);
+      ctx.beginPath(); ctx.moveTo(CX - Math.round(80 * S), curY); ctx.lineTo(CX - Math.round(16 * S), curY); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(CX + Math.round(16 * S), curY); ctx.lineTo(CX + Math.round(80 * S), curY); ctx.stroke();
+      ctx.beginPath(); ctx.arc(CX, curY, Math.round(5 * S), 0, Math.PI * 2);
+      ctx.fillStyle = "#9B7040"; ctx.fill();
+      curY += Math.round(26 * S);
 
-        // Outer ring
-        ctx.strokeStyle = "#C4A068"; ctx.lineWidth = Math.round(1.8 * S);
-        ctx.beginPath(); ctx.arc(RX, RY, outerR, 0, Math.PI * 2); ctx.stroke();
-        // Inner filled circle
-        ctx.fillStyle = "#EDE3D6";
-        ctx.beginPath(); ctx.arc(RX, RY, innerR, 0, Math.PI * 2); ctx.fill();
-        // Accent dots on ring
-        ([[-0.35, outerR + Math.round(8 * S)], [Math.PI * 0.82, outerR + Math.round(8 * S)]] as [number, number][]).forEach(([ang, r]) => {
-          ctx.beginPath(); ctx.arc(RX + Math.cos(ang) * r, RY + Math.sin(ang) * r, Math.round(7 * S), 0, Math.PI * 2);
-          ctx.fillStyle = "#C4A068"; ctx.fill();
-        });
+      // ── VERSE TEXT — medium weight, centred ─────────────────────
+      const vFS = Math.round((hr < 0.72 ? 17 : hr > 1.4 ? 24 : 21) * TS);
+      const vLH = Math.round(vFS * 1.8);
+      const vFont = `400 ${vFS}px Georgia, serif`;
+      const verseText = `“${p.verse}”`;
+      ctx.font = vFont; ctx.fillStyle = "#2a2a2a";
+      lines(verseText, CW, vFont).forEach((l, i) => {
+        ctx.font = vFont;
+        ctx.fillText(l, CX, curY + vFS * 0.85 + vLH * i);
+      });
+      curY += lines(verseText, CW, vFont).length * vLH + Math.round(28 * S);
 
-        // Open Bible icon
-        const bW = Math.round(70 * S), bH = Math.round(52 * S);
-        const bX = RX - bW / 2, bY = RY - bH / 2 + Math.round(10 * S);
-        ctx.fillStyle = "#1a1a1a";
-        // Left page
-        ctx.beginPath();
-        ctx.moveTo(bX + Math.round(4 * S), bY + Math.round(5 * S));
-        ctx.lineTo(bX + bW / 2 - Math.round(3 * S), bY);
-        ctx.lineTo(bX + bW / 2 - Math.round(3 * S), bY + bH);
-        ctx.lineTo(bX + Math.round(2 * S), bY + bH - Math.round(4 * S));
-        ctx.closePath(); ctx.fill();
-        // Right page
-        ctx.beginPath();
-        ctx.moveTo(bX + bW - Math.round(4 * S), bY + Math.round(5 * S));
-        ctx.lineTo(bX + bW / 2 + Math.round(3 * S), bY);
-        ctx.lineTo(bX + bW / 2 + Math.round(3 * S), bY + bH);
-        ctx.lineTo(bX + bW - Math.round(2 * S), bY + bH - Math.round(4 * S));
-        ctx.closePath(); ctx.fill();
-        // Spine
-        ctx.fillStyle = "#EDE3D6";
-        ctx.fillRect(RX - Math.round(4 * S), bY - Math.round(2 * S), Math.round(8 * S), bH + Math.round(4 * S));
-        // Page lines
-        ctx.strokeStyle = "#1a1a1a"; ctx.lineWidth = Math.round(1.5 * S);
-        for (let li = 1; li <= 3; li++) {
-          ctx.beginPath();
-          ctx.moveTo(bX + Math.round(li * 6 * S), bY + bH + Math.round(li * 2 * S));
-          ctx.lineTo(bX + bW - Math.round(li * 6 * S), bY + bH + Math.round(li * 2 * S));
-          ctx.stroke();
-        }
-        // Cross above Bible
-        const cX = RX, cY = bY - Math.round(32 * S);
-        const cBarW = Math.round(9 * S), cVH = Math.round(30 * S), cArm = Math.round(18 * S);
-        ctx.fillStyle = "#1a1a1a";
-        ctx.fillRect(cX - cBarW / 2, cY, cBarW, cVH);
-        ctx.fillRect(cX - cArm, cY + Math.round(9 * S), cArm * 2, cBarW);
-        // "THE BIBLE" text
-        const tbFS = Math.round(12 * S);
-        ctx.font = `700 ${tbFS}px system-ui, sans-serif`;
-        ctx.fillStyle = "#1a1a1a";
-        ctx.textAlign = "center";
-        ctx.fillText("THE  BIBLE", RX, RY + innerR - Math.round(20 * S));
-        ctx.textAlign = "left";
-      }
+      // ── SECOND DIVIDER ───────────────────────────────────────────
+      ctx.strokeStyle = "rgba(155,112,64,0.3)"; ctx.lineWidth = Math.round(1.5 * S);
+      ctx.beginPath(); ctx.moveTo(CX - Math.round(50 * S), curY); ctx.lineTo(CX + Math.round(50 * S), curY); ctx.stroke();
+      curY += Math.round(24 * S);
 
-      // ── BOTTOM-LEFT BROWN QUARTER CIRCLE ────────────────────────
-      const bcR = Math.round(Math.min(W, H) * 0.135);
-      ctx.fillStyle = "#9B7040";
-      ctx.beginPath();
-      ctx.arc(0, H, bcR, -Math.PI / 2, 0);
-      ctx.lineTo(0, H);
-      ctx.closePath(); ctx.fill();
-      // Heart
-      ctx.font = `${Math.round(22 * S)}px sans-serif`;
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText("♡", Math.round(13 * S), H - Math.round(12 * S));
+      // ── SHORT PRAYER — italic, centred ──────────────────────────
+      const pFS = Math.round((hr < 0.72 ? 15 : hr > 1.4 ? 20 : 18) * TS);
+      const pLH = Math.round(pFS * 1.85);
+      const pFont = `italic 400 ${pFS}px Georgia, serif`;
+      ctx.font = pFont; ctx.fillStyle = "#5a4020";
+      lines(shortPrayer, CW, pFont).forEach((l, i) => {
+        ctx.font = pFont;
+        ctx.fillText(l, CX, curY + pFS * 0.85 + pLH * i);
+      });
+
+      // ── WATERMARK — bottom centre, prominent ────────────────────
+      const wmFS = Math.round(15 * S);
+      const wmY  = H - Math.round(PAD * 0.52);
+      ctx.strokeStyle = "rgba(155,112,64,0.25)"; ctx.lineWidth = Math.round(1.5 * S);
+      ctx.beginPath(); ctx.moveTo(PAD, wmY - Math.round(20 * S)); ctx.lineTo(W - PAD, wmY - Math.round(20 * S)); ctx.stroke();
+      ctx.font = `800 ${wmFS}px system-ui, sans-serif`;
+      ctx.fillStyle = "#9B7040"; ctx.letterSpacing = `${Math.round(3 * S)}px`;
+      ctx.fillText("PRAYERKEY.COM", CX, wmY);
+
+      ctx.textAlign = "left";
 
       // ── EXPORT ──────────────────────────────────────────────────
       const link = document.createElement("a");
@@ -855,23 +767,22 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Preview card — cream two-column design (matches downloaded image) */}
+        {/* Preview card — centred: Bible verse · short prayer · watermark */}
         {(() => {
           const isPortrait  = fmt.height > fmt.width;
           const isLandscape = fmt.width > fmt.height * 1.2;
-          const hasSideIcon = !isLandscape;
 
-          // Parse ref: "John 3:16" → "JOHN" + "3:16"
           const refMatch = todayPrayer.ref.match(/^(.*?)\s+(\d+[:\d]*)$/);
           const bookName = (refMatch ? refMatch[1] : todayPrayer.ref).toUpperCase();
           const chVerse  = refMatch ? refMatch[2] : "";
+          const shortPrayer = todayPrayer.prayer.replace(/\n/g, " ").split(/(?<=[.!?])\s+/)[0];
 
-          const labelFS  = isPortrait ? "9px"  : "clamp(8px,0.8vw,10px)";
-          const bookFS   = isPortrait ? "clamp(32px,8vw,56px)"  : isLandscape ? "clamp(24px,4vw,48px)" : "clamp(28px,5vw,52px)";
-          const cvFS     = isPortrait ? "clamp(28px,7vw,48px)"  : isLandscape ? "clamp(20px,3.4vw,40px)" : "clamp(24px,4.4vw,44px)";
-          const verseFS  = isPortrait ? "11px" : isLandscape ? "clamp(10px,1.2vw,14px)" : "clamp(11px,1.4vw,15px)";
-          const prayerFS = isPortrait ? "10px" : isLandscape ? "clamp(9px,1vw,12px)"    : "clamp(10px,1.2vw,13px)";
-          const pad      = isPortrait ? "22px 20px" : isLandscape ? "clamp(12px,2%,28px) clamp(16px,3%,36px)" : "clamp(16px,3%,32px) clamp(18px,3.5%,36px)";
+          const bookFS  = isPortrait ? "clamp(34px,9vw,58px)"  : isLandscape ? "clamp(26px,4.5vw,52px)" : "clamp(30px,5.5vw,54px)";
+          const cvFS    = isPortrait ? "clamp(28px,7.5vw,48px)" : isLandscape ? "clamp(22px,3.8vw,44px)" : "clamp(25px,4.8vw,46px)";
+          const verseFS = isPortrait ? "11px" : isLandscape ? "clamp(10px,1.3vw,15px)" : "clamp(11px,1.5vw,16px)";
+          const prayFS  = isPortrait ? "10px" : isLandscape ? "clamp(9px,1.1vw,13px)"  : "clamp(10px,1.3vw,14px)";
+          const wmFS    = isPortrait ? "9px"  : "clamp(8px,0.9vw,11px)";
+          const pad     = isPortrait ? "20px" : isLandscape ? "clamp(14px,2.5%,32px) clamp(20px,4%,40px)" : "clamp(18px,3%,36px)";
 
           return (
             <div style={{
@@ -880,197 +791,97 @@ export default function HomePage() {
               marginBottom:   "20px",
             }}>
               <div ref={prayerCardRef} style={{
-                width:         isPortrait ? "min(320px, 100%)" : "100%",
-                aspectRatio:   `${fmt.width} / ${fmt.height}`,
-                background:    "#F5EFE8",
-                borderRadius:  "16px",
-                padding:       pad,
-                position:      "relative",
-                overflow:      "hidden",
-                boxShadow:     "0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(155,112,64,0.15)",
-                display:       "flex",
-                flexDirection: "column",
+                width:          isPortrait ? "min(320px, 100%)" : "100%",
+                aspectRatio:    `${fmt.width} / ${fmt.height}`,
+                background:     "#F5EFE8",
+                borderRadius:   "16px",
+                padding:        pad,
+                position:       "relative",
+                overflow:       "hidden",
+                boxShadow:      "0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(155,112,64,0.15)",
+                display:        "flex",
+                flexDirection:  "column",
+                alignItems:     "center",
+                justifyContent: "center",
+                textAlign:      "center",
+                gap:            isPortrait ? "6px" : "clamp(4px,0.8%,10px)",
               }}>
 
-                {/* Bottom-left brown quarter circle */}
-                <div aria-hidden style={{
-                  position:     "absolute",
-                  bottom:       0, left: 0,
-                  width:        isPortrait ? "min(100px,28%)" : "clamp(60px,12%,110px)",
-                  aspectRatio:  "1",
-                  background:   "#9B7040",
-                  borderRadius: "0 100% 0 0",
-                  zIndex:       0,
-                }} />
-                {/* Heart over brown circle */}
-                <div aria-hidden style={{
-                  position:   "absolute",
-                  bottom:     isPortrait ? "10px" : "clamp(6px,1.2%,14px)",
-                  left:       isPortrait ? "10px" : "clamp(6px,1.2%,14px)",
-                  fontSize:   isPortrait ? "14px" : "clamp(10px,1.6%,18px)",
-                  color:      "#ffffff",
-                  lineHeight: 1, zIndex: 1,
-                }}>♡</div>
-
-                {/* Main layout: left column + optional right icon */}
-                <div style={{
-                  position:      "relative", zIndex: 1, flex: 1,
-                  display:       "flex",
-                  flexDirection: "row",
-                  gap:           hasSideIcon ? "0" : "0",
-                }}>
-
-                  {/* LEFT COLUMN */}
-                  <div style={{
-                    width:         hasSideIcon ? "57%" : "100%",
-                    display:       "flex",
-                    flexDirection: "column",
-                    position:      "relative",
-                  }}>
-                    {/* Three dots */}
-                    <div style={{ display: "flex", gap: "5px", alignItems: "center", marginBottom: "6px" }}>
-                      {[0,1,2].map(i => (
-                        <div key={i} style={{ width: isPortrait ? "5px" : "clamp(4px,0.6vw,7px)", aspectRatio: "1", borderRadius: "50%", background: "#1a1a1a" }} />
-                      ))}
-                    </div>
-
-                    {/* Vertical line + content row */}
-                    <div style={{ display: "flex", flex: 1, gap: isPortrait ? "10px" : "clamp(8px,1.2vw,14px)" }}>
-
-                      {/* Decorative vertical line */}
-                      <div style={{
-                        display:        "flex",
-                        flexDirection:  "column",
-                        alignItems:     "center",
-                        paddingTop:     "2px",
-                        flexShrink:     0,
-                        width:          isPortrait ? "10px" : "clamp(8px,1vw,12px)",
-                      }}>
-                        <div style={{ width: isPortrait ? "7px" : "clamp(6px,0.8vw,9px)", aspectRatio: "1", borderRadius: "50%", background: "#1a1a1a" }} />
-                        <div style={{ width: "2px", flex: 1, background: "#1a1a1a", margin: "3px 0" }} />
-                        <div style={{ width: isPortrait ? "7px" : "clamp(6px,0.8vw,9px)", aspectRatio: "1", borderRadius: "50%", background: "#1a1a1a" }} />
-                      </div>
-
-                      {/* Text content */}
-                      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-
-                        <div>
-                          {/* Book name — HUGE black */}
-                          <p style={{
-                            fontSize: bookFS, fontWeight: 900, color: "#1a1a1a",
-                            fontFamily: "system-ui, -apple-system, sans-serif",
-                            margin: "0", lineHeight: 0.95, letterSpacing: "-0.02em",
-                          }}>{bookName}</p>
-
-                          {/* Chapter:verse — large golden brown */}
-                          <p style={{
-                            fontSize: cvFS, fontWeight: 900, color: "#9B7040",
-                            fontFamily: "system-ui, -apple-system, sans-serif",
-                            margin: "0 0 8px", lineHeight: 1.0, letterSpacing: "-0.01em",
-                          }}>{chVerse}</p>
-
-                          {/* Dash separator */}
-                          <div style={{ width: isPortrait ? "32px" : "clamp(24px,3.5vw,44px)", height: "2.5px", background: "#1a1a1a", marginBottom: "10px", borderRadius: "2px" }} />
-
-                          {/* Verse text */}
-                          <p style={{
-                            fontFamily: "Georgia, serif", fontSize: verseFS,
-                            fontWeight: 400, color: "#2a2a2a",
-                            margin: "0 0 8px", lineHeight: 1.7,
-                          }}>
-                            {todayPrayer.verse}
-                          </p>
-
-                          {/* Prayer label */}
-                          <p style={{
-                            fontSize: labelFS, fontWeight: 700, color: "#9B7040",
-                            fontFamily: "system-ui,sans-serif",
-                            letterSpacing: "0.04em", textTransform: "uppercase",
-                            margin: "0 0 6px",
-                          }}>— {todayPrayer.title}</p>
-
-                          {/* First prayer paragraph */}
-                          <p style={{
-                            fontFamily: "Georgia, serif", fontSize: prayerFS,
-                            fontWeight: 400, color: "#3a3a3a",
-                            margin: 0, lineHeight: 1.75,
-                          }}>
-                            {todayPrayer.prayer.split("\n\n")[0].replace(/\n/g, " ")}
-                          </p>
-                        </div>
-
-                        {/* Branding */}
-                        <div style={{
-                          display: "flex", justifyContent: "space-between", alignItems: "center",
-                          borderTop: "1px solid rgba(155,112,64,0.25)", paddingTop: "7px",
-                          marginTop: "10px",
-                        }}>
-                          <span style={{ fontSize: labelFS, fontWeight: 800, color: "#9B7040", fontFamily: "system-ui,sans-serif", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                            PRAYERKEY.COM
-                          </span>
-                          <span style={{ fontSize: labelFS, color: "#888", fontFamily: "system-ui,sans-serif" }}>
-                            {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                {/* Top cross ornament */}
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: isPortrait ? "4px" : "clamp(2px,0.5%,8px)" }}>
+                  <div style={{ position: "relative", width: isPortrait ? "12px" : "clamp(9px,1.2vw,15px)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <div style={{ width: "40%", height: isPortrait ? "18px" : "clamp(13px,2vw,20px)", background: "#9B7040", borderRadius: "1px" }} />
+                    <div style={{ position: "absolute", top: "28%", left: 0, right: 0, height: "28%", background: "#9B7040", borderRadius: "1px" }} />
                   </div>
+                  {/* Short line below cross */}
+                  <div style={{ width: isPortrait ? "60px" : "clamp(44px,6vw,80px)", height: "1px", background: "rgba(155,112,64,0.4)", marginTop: isPortrait ? "8px" : "clamp(6px,1%,12px)" }} />
+                </div>
 
-                  {/* RIGHT COLUMN: Bible circle icon */}
-                  {hasSideIcon && (
-                    <div style={{
-                      width:          "43%",
-                      display:        "flex",
-                      alignItems:     "flex-start",
-                      justifyContent: "center",
-                      paddingTop:     isPortrait ? "16px" : "clamp(10px,2%,24px)",
-                    }}>
-                      <div style={{
-                        position:    "relative",
-                        width:        isPortrait ? "min(130px,80%)" : "clamp(90px,16vw,160px)",
-                        aspectRatio: "1",
-                      }}>
-                        {/* Outer ring */}
-                        <div style={{
-                          position:     "absolute", inset: 0,
-                          borderRadius: "50%",
-                          border:       "1.5px solid #C4A068",
-                        }} />
-                        {/* Accent dots on ring */}
-                        <div style={{ position: "absolute", top: "6%", right: "2%",  width: isPortrait ? "8px" : "clamp(6px,1vw,10px)", aspectRatio: "1", borderRadius: "50%", background: "#C4A068" }} />
-                        <div style={{ position: "absolute", bottom: "8%", left: "3%", width: isPortrait ? "8px" : "clamp(6px,1vw,10px)", aspectRatio: "1", borderRadius: "50%", background: "#C4A068" }} />
-                        {/* Inner circle */}
-                        <div style={{
-                          position:     "absolute", inset: "6%",
-                          borderRadius: "50%",
-                          background:   "#EDE3D6",
-                          display:      "flex",
-                          flexDirection:"column",
-                          alignItems:   "center",
-                          justifyContent:"center",
-                          gap:          "3px",
-                        }}>
-                          {/* Cross */}
-                          <div style={{ position: "relative", width: isPortrait ? "14px" : "clamp(10px,1.8vw,18px)", marginBottom: "2px" }}>
-                            <div style={{ width: "40%", height: isPortrait ? "20px" : "clamp(14px,2.5vw,22px)", background: "#1a1a1a", margin: "0 auto", borderRadius: "1px" }} />
-                            <div style={{ position: "absolute", top: "30%", left: 0, right: 0, height: "30%", background: "#1a1a1a", borderRadius: "1px" }} />
-                          </div>
-                          {/* Bible pages */}
-                          <div style={{ display: "flex", gap: "1px", alignItems: "flex-end" }}>
-                            <div style={{ width: isPortrait ? "22px" : "clamp(16px,2.8vw,26px)", height: isPortrait ? "18px" : "clamp(13px,2.3vw,22px)", background: "#1a1a1a", borderRadius: "1px 0 0 2px", clipPath: "polygon(8% 8%, 100% 0%, 100% 100%, 0% 92%)" }} />
-                            <div style={{ width: isPortrait ? "22px" : "clamp(16px,2.8vw,26px)", height: isPortrait ? "18px" : "clamp(13px,2.3vw,22px)", background: "#1a1a1a", borderRadius: "0 1px 2px 0", clipPath: "polygon(0% 0%, 92% 8%, 100% 92%, 0% 100%)" }} />
-                          </div>
-                          <p style={{
-                            fontSize:      isPortrait ? "7px" : "clamp(6px,0.8vw,9px)",
-                            fontWeight:    700, color: "#1a1a1a",
-                            fontFamily:    "system-ui,sans-serif",
-                            letterSpacing: "0.12em",
-                            margin:        "3px 0 0",
-                          }}>THE BIBLE</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                {/* Book name — HUGE black */}
+                <p style={{
+                  fontSize: bookFS, fontWeight: 900, color: "#1a1a1a",
+                  fontFamily: "system-ui, -apple-system, sans-serif",
+                  lineHeight: 0.92, letterSpacing: "-0.02em",
+                  margin: 0,
+                }}>{bookName}</p>
+
+                {/* Chapter:verse — large golden */}
+                <p style={{
+                  fontSize: cvFS, fontWeight: 900, color: "#9B7040",
+                  fontFamily: "system-ui, -apple-system, sans-serif",
+                  lineHeight: 1.0, letterSpacing: "-0.01em",
+                  margin: 0,
+                }}>{chVerse}</p>
+
+                {/* Ornamental divider — line · dot · line */}
+                <div style={{ display: "flex", alignItems: "center", gap: isPortrait ? "8px" : "clamp(6px,1vw,12px)", width: "100%", justifyContent: "center", margin: isPortrait ? "4px 0" : "clamp(3px,0.6%,8px) 0" }}>
+                  <div style={{ flex: 1, maxWidth: isPortrait ? "60px" : "clamp(44px,8vw,90px)", height: "1px", background: "rgba(155,112,64,0.45)" }} />
+                  <div style={{ width: isPortrait ? "6px" : "clamp(5px,0.7vw,8px)", aspectRatio: "1", borderRadius: "50%", background: "#9B7040" }} />
+                  <div style={{ flex: 1, maxWidth: isPortrait ? "60px" : "clamp(44px,8vw,90px)", height: "1px", background: "rgba(155,112,64,0.45)" }} />
+                </div>
+
+                {/* Bible verse text */}
+                <p style={{
+                  fontFamily: "Georgia, serif", fontSize: verseFS,
+                  fontWeight: 400, color: "#2a2a2a",
+                  lineHeight: 1.75, margin: 0,
+                  maxWidth: "88%",
+                }}>
+                  &ldquo;{todayPrayer.verse}&rdquo;
+                </p>
+
+                {/* Second divider */}
+                <div style={{ width: isPortrait ? "44px" : "clamp(32px,5vw,60px)", height: "1px", background: "rgba(155,112,64,0.3)", margin: isPortrait ? "2px 0" : "clamp(2px,0.4%,6px) 0" }} />
+
+                {/* Short prayer */}
+                <p style={{
+                  fontFamily: "Georgia, serif", fontSize: prayFS,
+                  fontStyle: "italic", fontWeight: 400, color: "#5a4020",
+                  lineHeight: 1.8, margin: 0,
+                  maxWidth: "90%",
+                }}>
+                  {shortPrayer}
+                </p>
+
+                {/* Watermark — bottom, prominent, centred */}
+                <div style={{
+                  position:   "absolute",
+                  bottom:     isPortrait ? "12px" : "clamp(8px,1.4%,18px)",
+                  left: 0, right: 0,
+                  display:    "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap:        "4px",
+                }}>
+                  <div style={{ width: "80%", height: "1px", background: "rgba(155,112,64,0.2)" }} />
+                  <span style={{
+                    fontSize:      wmFS,
+                    fontWeight:    800,
+                    color:         "#9B7040",
+                    fontFamily:    "system-ui,sans-serif",
+                    letterSpacing: "0.18em",
+                    textTransform: "uppercase",
+                  }}>PRAYERKEY.COM</span>
                 </div>
               </div>
             </div>
