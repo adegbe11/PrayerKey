@@ -275,105 +275,90 @@ export default function HomePage() {
         ctx.closePath();
       }
 
-      // ── Background gradient ──────────────────────────────────────
-      const bg = ctx.createLinearGradient(0, 0, W * 0.4, H);
-      bg.addColorStop(0,   "#0D1F38");
-      bg.addColorStop(0.6, "#0B1726");
-      bg.addColorStop(1,   "#080F1C");
-      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-
-      // Dot grid texture
-      ctx.fillStyle = "rgba(255,255,255,0.016)";
-      const gs = Math.round(28 * S);
-      for (let gx = PAD; gx < W - PAD / 2; gx += gs)
-        for (let gy = PAD; gy < H - PAD / 2; gy += gs) {
-          ctx.beginPath(); ctx.arc(gx, gy, 1.5 * S, 0, Math.PI * 2); ctx.fill();
-        }
-
-      // Top-right cross watermark
-      const cxOff = W - PAD * 0.6, cyOff = PAD * 0.8;
-      ctx.strokeStyle = "rgba(212,168,83,0.07)";
-      ctx.lineWidth = Math.round(18 * S);
-      ctx.lineCap = "round";
-      ctx.beginPath(); ctx.moveTo(cxOff, cyOff - 60 * S); ctx.lineTo(cxOff, cyOff + 60 * S); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cxOff - 40 * S, cyOff - 16 * S); ctx.lineTo(cxOff + 40 * S, cyOff - 16 * S); ctx.stroke();
-
-      // ── Gold top accent line ─────────────────────────────────────
-      ctx.strokeStyle = "#D4A853"; ctx.lineWidth = Math.round(3 * S); ctx.lineCap = "round";
-      ctx.beginPath(); ctx.moveTo(PAD, Math.round(PAD * 0.6)); ctx.lineTo(PAD + Math.round(CW * 0.13), Math.round(PAD * 0.6)); ctx.stroke();
-
-      // ── Label ────────────────────────────────────────────────────
-      ctx.font = `700 ${Math.round(11 * S)}px system-ui, sans-serif`;
-      ctx.fillStyle = "#D4A853";
-      ctx.fillText("PRAYER OF THE DAY", PAD, Math.round(PAD * 1.12));
-
-      // ── Title ────────────────────────────────────────────────────
-      let curY = Math.round(PAD * 1.6);
-      const titleFS = Math.round(38 * TS);
-      ctx.font = `700 ${titleFS}px Georgia, serif`;
+      // ── WHITE background ─────────────────────────────────────────
       ctx.fillStyle = "#ffffff";
-      lines(p.title, CW).forEach(l => {
-        ctx.fillText(l, PAD, curY + titleFS * 0.85); curY += Math.round(titleFS * 1.15);
-      });
-      curY += Math.round(6 * S);
+      ctx.fillRect(0, 0, W, H);
 
-      // ── Verse reference (smaller, italic, gold) ──────────────────
-      const refFS = Math.round(22 * TS);
-      ctx.font = `italic ${refFS}px Georgia, serif`;
-      ctx.fillStyle = "#D4A853";
-      ctx.globalAlpha = 0.85;
-      ctx.fillText(`— ${p.ref}`, PAD, curY + refFS * 0.85);
-      ctx.globalAlpha = 1;
-      curY += Math.round(refFS * 1.3) + Math.round(14 * S);
+      // Subtle warm tint at top
+      const topTint = ctx.createLinearGradient(0, 0, 0, H * 0.25);
+      topTint.addColorStop(0, "rgba(0,180,180,0.06)");
+      topTint.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = topTint; ctx.fillRect(0, 0, W, H);
 
-      // ── Cyan verse highlight block ───────────────────────────────
-      const vFS = Math.round(18 * TS), vLH = Math.round(vFS * 1.65);
-      const vPX = Math.round(14 * S),  vPY = Math.round(10 * S);
-      ctx.font = `700 ${vFS}px system-ui, sans-serif`;
-      const vLines = lines(`"${p.verse}"`, CW - vPX * 2);
-      const blockH = vLines.length * vLH + vPY * 2;
+      // ── Cyan top bar ─────────────────────────────────────────────
       ctx.fillStyle = "#00D4D4";
-      rr(PAD, curY, CW, blockH, Math.round(10 * S)); ctx.fill();
-      ctx.fillStyle = "#000000";
-      vLines.forEach((l, i) => ctx.fillText(l, PAD + vPX, curY + vPY + vLH * i + vFS * 0.82));
-      curY += blockH + Math.round(22 * S);
+      ctx.fillRect(0, 0, W, Math.round(10 * S));
 
-      // ── Gold divider ─────────────────────────────────────────────
-      ctx.strokeStyle = "rgba(212,168,83,0.32)"; ctx.lineWidth = Math.round(1 * S);
-      ctx.beginPath(); ctx.moveTo(PAD, curY); ctx.lineTo(PAD + CW, curY); ctx.stroke();
-      curY += Math.round(20 * S);
+      // ── "PRAYER OF THE DAY" label ─────────────────────────────────
+      ctx.font = `800 ${Math.round(13 * S)}px system-ui, sans-serif`;
+      ctx.fillStyle = "#00A0A0";
+      ctx.fillText("✦ PRAYER OF THE DAY", PAD, Math.round(PAD * 1.05));
 
-      // ── Prayer text (supports \n\n paragraph breaks) ─────────────
-      const pFS = Math.round(17 * TS), pLH = Math.round(pFS * 1.72);
-      const paraGap = Math.round(pFS * 1.1); // extra gap between paragraphs
-      ctx.font = `italic ${pFS}px Georgia, serif`;
-      ctx.fillStyle = "#E4DCC8";
+      // ── Title ─────────────────────────────────────────────────────
+      let curY = Math.round(PAD * 1.55);
+      const titleFS = Math.round(44 * TS);
+      ctx.font = `900 ${titleFS}px Georgia, serif`;
+      ctx.fillStyle = "#111111";
+      lines(p.title, CW).forEach(l => {
+        ctx.fillText(l, PAD, curY + titleFS * 0.82); curY += Math.round(titleFS * 1.12);
+      });
+      curY += Math.round(8 * S);
 
-      // Split into paragraphs then wrap each
-      const paragraphs = p.prayer.split("\n\n");
-      const allParagraphLines: string[][] = paragraphs.map(para => lines(para.replace(/\n/g, " "), CW));
-      const prayerBlockH = allParagraphLines.reduce((t, pl) => t + pl.length * pLH, 0) + (allParagraphLines.length - 1) * paraGap;
-
-      // For portrait: vertically distribute the prayer text in remaining space
-      const botSectionH  = Math.round(PAD * 0.72) + Math.round(18 * S) + Math.round(24 * S);
-      const remaining    = H - curY - botSectionH - prayerBlockH;
-      const prayerOffset = hr > 1.1 ? Math.max(Math.round(remaining * 0.28), Math.round(20 * S)) : Math.round(10 * S);
-      curY += prayerOffset;
-
-      allParagraphLines.forEach(paraLines => {
-        paraLines.forEach((l, i) => ctx.fillText(l, PAD, curY + pLH * i + pFS * 0.85));
-        curY += paraLines.length * pLH + paraGap;
+      // ── Bible reference — very bold, large ───────────────────────
+      const refFS = Math.round(52 * TS);
+      ctx.font = `900 ${refFS}px Georgia, serif`;
+      ctx.fillStyle = "#111111";
+      lines(p.ref.toUpperCase(), CW).forEach(l => {
+        ctx.fillText(l, PAD, curY + refFS * 0.82); curY += Math.round(refFS * 1.1);
       });
       curY += Math.round(10 * S);
 
-      // ── Bottom branding ──────────────────────────────────────────
-      const botY = H - Math.round(PAD * 0.72);
-      ctx.strokeStyle = "rgba(212,168,83,0.22)"; ctx.lineWidth = Math.round(1 * S);
-      ctx.beginPath(); ctx.moveTo(PAD, botY - Math.round(18 * S)); ctx.lineTo(PAD + CW, botY - Math.round(18 * S)); ctx.stroke();
-      ctx.font = `800 ${Math.round(12 * S)}px system-ui, sans-serif`;
-      ctx.fillStyle = "#D4A853"; ctx.fillText("PRAYERKEY.COM", PAD, botY);
-      ctx.font = `${Math.round(11 * S)}px system-ui, sans-serif`;
-      ctx.fillStyle = "rgba(255,255,255,0.38)";
+      // ── Cyan verse highlight block ────────────────────────────────
+      const vFS = Math.round(20 * TS), vLH = Math.round(vFS * 1.65);
+      const vPX = Math.round(16 * S),  vPY = Math.round(12 * S);
+      ctx.font = `800 ${vFS}px system-ui, sans-serif`;
+      const vLines = lines(`"${p.verse}"`, CW - vPX * 2);
+      const blockH = vLines.length * vLH + vPY * 2;
+      ctx.fillStyle = "#00D4D4";
+      rr(PAD, curY, CW, blockH, Math.round(8 * S)); ctx.fill();
+      ctx.fillStyle = "#000000";
+      vLines.forEach((l, i) => ctx.fillText(l, PAD + vPX, curY + vPY + vLH * i + vFS * 0.82));
+      curY += blockH + Math.round(20 * S);
+
+      // ── Thin black divider ────────────────────────────────────────
+      ctx.strokeStyle = "rgba(0,0,0,0.12)"; ctx.lineWidth = Math.round(1.5 * S);
+      ctx.beginPath(); ctx.moveTo(PAD, curY); ctx.lineTo(PAD + CW, curY); ctx.stroke();
+      curY += Math.round(18 * S);
+
+      // ── Prayer text — BOLD black, paragraphs ─────────────────────
+      const pFS  = Math.round(18 * TS), pLH = Math.round(pFS * 1.72);
+      const pgap = Math.round(pFS * 1.0);
+      ctx.font      = `700 ${pFS}px Georgia, serif`;
+      ctx.fillStyle = "#1a1a1a";
+
+      const paragraphs       = p.prayer.split("\n\n");
+      const allParaLines: string[][] = paragraphs.map(para => lines(para.replace(/\n/g, " "), CW));
+      const prayerBlockH     = allParaLines.reduce((t, pl) => t + pl.length * pLH, 0) + (allParaLines.length - 1) * pgap;
+
+      const botSectionH  = Math.round(PAD * 0.85) + Math.round(22 * S);
+      const remaining    = H - curY - botSectionH - prayerBlockH;
+      const prayerOffset = hr > 1.1 ? Math.max(Math.round(remaining * 0.25), Math.round(16 * S)) : Math.round(8 * S);
+      curY += prayerOffset;
+
+      allParaLines.forEach(paraLines => {
+        paraLines.forEach((l, i) => ctx.fillText(l, PAD, curY + pLH * i + pFS * 0.85));
+        curY += paraLines.length * pLH + pgap;
+      });
+
+      // ── Bottom branding ───────────────────────────────────────────
+      const botY = H - Math.round(PAD * 0.6);
+      ctx.strokeStyle = "rgba(0,0,0,0.1)"; ctx.lineWidth = Math.round(1.5 * S);
+      ctx.beginPath(); ctx.moveTo(PAD, botY - Math.round(20 * S)); ctx.lineTo(PAD + CW, botY - Math.round(20 * S)); ctx.stroke();
+      ctx.font = `900 ${Math.round(13 * S)}px system-ui, sans-serif`;
+      ctx.fillStyle = "#00A0A0";
+      ctx.fillText("PRAYERKEY.COM", PAD, botY);
+      ctx.font = `600 ${Math.round(12 * S)}px system-ui, sans-serif`;
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
       ctx.fillText(today, PAD + CW - ctx.measureText(today).width, botY);
 
       // ── Export ───────────────────────────────────────────────────
@@ -786,85 +771,110 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Preview card — dark navy, beautiful, correct aspect ratio */}
+        {/* Preview card — WHITE bold design (matches downloaded image exactly) */}
         {(() => {
           const isPortrait  = fmt.height > fmt.width;
           const isLandscape = fmt.width > fmt.height * 1.2;
-          // Font sizes derived from the card's display width, not viewport
-          const refFS   = isPortrait ? "28px" : isLandscape ? "clamp(24px,3.2vw,44px)" : "clamp(26px,4vw,44px)";
-          const verseFS = isPortrait ? "13px" : isLandscape ? "clamp(12px,1.4vw,16px)" : "clamp(13px,1.8vw,17px)";
-          const prayerFS= isPortrait ? "13px" : isLandscape ? "clamp(11px,1.3vw,15px)" : "clamp(13px,1.5vw,16px)";
           const labelFS = isPortrait ? "9px"  : "clamp(8px,0.9vw,11px)";
-          const pad     = isPortrait ? "28px" : isLandscape ? "clamp(16px,3%,40px)" : "clamp(20px,4%,44px)";
+          const titleFS = isPortrait ? "18px" : isLandscape ? "clamp(16px,2vw,28px)"   : "clamp(18px,2.5vw,30px)";
+          const refFS   = isPortrait ? "26px" : isLandscape ? "clamp(20px,2.8vw,38px)" : "clamp(22px,3.5vw,40px)";
+          const verseFS = isPortrait ? "12px" : isLandscape ? "clamp(11px,1.3vw,15px)" : "clamp(12px,1.6vw,16px)";
+          const prayerFS= isPortrait ? "12px" : isLandscape ? "clamp(10px,1.2vw,14px)" : "clamp(12px,1.4vw,15px)";
+          const pad     = isPortrait ? "24px 28px" : isLandscape ? "clamp(14px,2.5%,32px) clamp(16px,3%,40px)" : "clamp(18px,3.5%,40px) clamp(20px,4%,44px)";
           return (
             <div style={{
               display:        "flex",
               justifyContent: isPortrait ? "center" : "stretch",
               marginBottom:   "20px",
             }}>
-              <div style={{
-                width:         isPortrait ? "min(360px, 100%)" : "100%",
+              <div ref={prayerCardRef} style={{
+                width:         isPortrait ? "min(340px, 100%)" : "100%",
                 aspectRatio:   `${fmt.width} / ${fmt.height}`,
-                background:    "linear-gradient(150deg, #0D1F38 0%, #0B1726 55%, #080F1C 100%)",
-                borderRadius:  "20px",
+                background:    "#ffffff",
+                borderRadius:  "16px",
                 padding:       pad,
                 position:      "relative",
                 overflow:      "hidden",
-                boxShadow:     "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(212,168,83,0.18)",
+                boxShadow:     "0 8px 40px rgba(0,0,0,0.14), 0 0 0 1px rgba(0,212,212,0.18)",
                 display:       "flex",
                 flexDirection: "column",
               }}>
 
-                {/* Dot grid */}
+                {/* Cyan top bar */}
                 <div aria-hidden style={{
-                  position: "absolute", inset: 0, pointerEvents: "none",
-                  backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.016) 1px, transparent 1px)",
-                  backgroundSize: "28px 28px",
+                  position: "absolute", top: 0, left: 0, right: 0,
+                  height: isPortrait ? "6px" : "clamp(4px,0.7%,8px)",
+                  background: "#00D4D4",
+                  borderRadius: "16px 16px 0 0",
                 }} />
 
-                {/* Large cross watermark — centred for portrait, top-right for others */}
+                {/* Subtle cross watermark */}
                 <div aria-hidden style={{
                   position:   "absolute",
-                  top:        isPortrait ? "50%" : "6%",
+                  top:        isPortrait ? "50%" : "50%",
                   right:      isPortrait ? "50%" : "6%",
-                  transform:  isPortrait ? "translate(50%,-50%)" : "none",
-                  fontSize:   isPortrait ? "min(180px,45%)" : "clamp(60px,12%,120px)",
-                  color:      "rgba(212,168,83,0.055)",
-                  fontWeight: 700, lineHeight: 1,
+                  transform:  isPortrait ? "translate(50%,-50%)" : "translate(0,-50%)",
+                  fontSize:   isPortrait ? "min(200px,52%)" : "clamp(70px,14%,130px)",
+                  color:      "rgba(0,212,212,0.06)",
+                  fontWeight: 900, lineHeight: 1,
                   userSelect: "none", pointerEvents: "none",
                   fontFamily: "Georgia, serif",
                 }}>✝</div>
 
-                {/* ── TOP: label + reference + verse ── */}
-                <div style={{ position: "relative", zIndex: 1 }}>
-                  <div style={{ width: "13%", height: "2px", background: "#D4A853", borderRadius: "2px", marginBottom: "8px" }} />
-                  <p style={{ fontSize: labelFS, fontWeight: 700, color: "#D4A853", letterSpacing: "0.18em", textTransform: "uppercase", margin: "0 0 8px", fontFamily: "system-ui,sans-serif" }}>
+                {/* ── TOP: label + title + bold ref ── */}
+                <div style={{ position: "relative", zIndex: 1, paddingTop: isPortrait ? "10px" : "6px" }}>
+                  <p style={{
+                    fontSize: labelFS, fontWeight: 800, color: "#00A0A0",
+                    letterSpacing: "0.18em", textTransform: "uppercase",
+                    margin: "0 0 6px", fontFamily: "system-ui,sans-serif",
+                  }}>
                     PRAYER OF THE DAY
                   </p>
-                  <p style={{ fontFamily: "Georgia, serif", fontSize: isPortrait ? "20px" : "clamp(16px,2.2vw,26px)", fontWeight: 700, color: "#ffffff", margin: "0 0 6px", lineHeight: 1.2, letterSpacing: "-0.01em" }}>
+                  <p style={{
+                    fontFamily: "Georgia, serif", fontSize: titleFS,
+                    fontWeight: 700, color: "#111111",
+                    margin: "0 0 8px", lineHeight: 1.2, letterSpacing: "-0.01em",
+                  }}>
                     {todayPrayer.title}
                   </p>
-                  <p style={{ fontFamily: "Georgia, serif", fontSize: refFS, fontWeight: 400, color: "#D4A853", margin: "0 0 14px", lineHeight: 1.1, letterSpacing: "0em", opacity: 0.85 }}>
-                    — {todayPrayer.ref}
-                  </p>
+                  {/* VERY BOLD reference — biggest, most prominent element */}
                   <p style={{
-                    fontFamily: "system-ui, sans-serif", fontSize: verseFS, fontWeight: 700,
-                    color: "#000", background: "#00D4D4", display: "inline",
-                    boxDecorationBreak: "clone", WebkitBoxDecorationBreak: "clone",
-                    padding: "2px 6px", lineHeight: 1.75,
-                  } as React.CSSProperties}>
-                    &ldquo;{todayPrayer.verse}&rdquo;
+                    fontFamily: "Georgia, serif", fontSize: refFS,
+                    fontWeight: 900, color: "#111111",
+                    margin: "0 0 12px", lineHeight: 1.1, letterSpacing: "-0.02em",
+                    textTransform: "uppercase",
+                  }}>
+                    {todayPrayer.ref}
                   </p>
+
+                  {/* Cyan verse highlight block */}
+                  <div style={{
+                    background: "#00D4D4",
+                    borderRadius: "6px",
+                    padding: isPortrait ? "8px 12px" : "clamp(6px,1%,10px) clamp(8px,1.5%,14px)",
+                    marginBottom: "12px",
+                  }}>
+                    <p style={{
+                      fontFamily: "Georgia, serif", fontSize: verseFS,
+                      fontWeight: 700, color: "#000000",
+                      margin: 0, lineHeight: 1.65,
+                    }}>
+                      &ldquo;{todayPrayer.verse}&rdquo;
+                    </p>
+                  </div>
                 </div>
 
-                {/* ── MIDDLE: prayer text — grows to fill available space ── */}
-                <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", paddingTop: "16px" }}>
-                  <div style={{ height: "1px", background: "rgba(212,168,83,0.28)", marginBottom: "14px" }} />
+                {/* ── MIDDLE: prayer text ── */}
+                <div style={{
+                  position: "relative", zIndex: 1, flex: 1,
+                  display: "flex", flexDirection: "column", justifyContent: "center",
+                  borderTop: "1.5px solid #e8e8e8", paddingTop: "10px",
+                }}>
                   {todayPrayer.prayer.split("\n\n").map((para, i) => (
                     <p key={i} style={{
                       fontFamily: "Georgia, serif", fontSize: prayerFS,
-                      color: "#E4DCC8", lineHeight: 1.85, fontStyle: "italic",
-                      margin: i === 0 ? 0 : "8px 0 0",
+                      fontWeight: 700, color: "#1a1a1a",
+                      lineHeight: 1.8, margin: i === 0 ? 0 : "6px 0 0",
                       ...(isLandscape && i > 0 ? { display: "none" } : {}),
                     }}>
                       {para.replace(/\n/g, " ")}
@@ -875,14 +885,18 @@ export default function HomePage() {
                 {/* ── BOTTOM: branding ── */}
                 <div style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
-                  borderTop: "1px solid rgba(212,168,83,0.2)", paddingTop: "10px",
-                  marginTop: isPortrait ? "20px" : "12px",
+                  borderTop: "1.5px solid #e8e8e8", paddingTop: "8px",
+                  marginTop: isPortrait ? "14px" : "10px",
                   position: "relative", zIndex: 1,
                 }}>
-                  <span style={{ fontSize: labelFS, fontWeight: 800, color: "#D4A853", letterSpacing: "0.16em", textTransform: "uppercase", fontFamily: "system-ui,sans-serif" }}>
+                  <span style={{
+                    fontSize: labelFS, fontWeight: 900, color: "#00A0A0",
+                    letterSpacing: "0.16em", textTransform: "uppercase",
+                    fontFamily: "system-ui,sans-serif",
+                  }}>
                     PRAYERKEY.COM
                   </span>
-                  <span style={{ fontSize: labelFS, color: "rgba(255,255,255,0.35)", fontFamily: "system-ui,sans-serif" }}>
+                  <span style={{ fontSize: labelFS, color: "#999999", fontFamily: "system-ui,sans-serif" }}>
                     {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                   </span>
                 </div>
