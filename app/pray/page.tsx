@@ -111,7 +111,7 @@ export default function PrayPage() {
             background:   "transparent",
             border:       "none",
             padding:      "0",
-            fontSize:     "clamp(15px, 1.4vw, 17px)",
+            fontSize:     "clamp(16px, 1.4vw, 17px)",
             color:        "var(--pk-text)",
             resize:       "none",
             outline:      "none",

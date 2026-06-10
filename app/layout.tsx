@@ -52,9 +52,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width:        "device-width",
   initialScale: 1,
+  viewportFit:  "cover", // iOS: paint behind the notch / Dynamic Island
   themeColor:   [
-    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
-    { media: "(prefers-color-scheme: dark)",  color: "#060608" },
+    { media: "(prefers-color-scheme: light)", color: "#F2EBDC" },
+    { media: "(prefers-color-scheme: dark)",  color: "#0D1B15" },
   ],
 };
 

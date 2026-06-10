@@ -6,106 +6,106 @@
    THEME TOKENS — Light (Crimson + Apple White) / Dark
 ═══════════════════════════════════════════════════ */
 
-/* ── Light mode (DEFAULT) — Parchment + Crimson ── */
+/* ── Light mode (DEFAULT) — Sanctuary: Ivory + Pine + Brass ── */
 :root {
-  /* ── Backgrounds: warm parchment / papyrus ── */
-  --pk-bg:          #EDE8D0;          /* main beige parchment */
-  --pk-surface:     #E4DDB8;          /* slightly deeper parchment for footer/panels */
-  --pk-surface-2:   #D8D0A0;          /* deep parchment for dividers */
-  --pk-card:        rgba(255,255,255,0.60); /* frosted white card floats on parchment */
-  --pk-card-hover:  rgba(255,255,255,0.82);
+  /* ── Backgrounds: warm ivory ── */
+  --pk-bg:          #F2EBDC;          /* ivory — main page background */
+  --pk-surface:     #EAE1CC;          /* deeper ivory for footer/panels */
+  --pk-surface-2:   #DFD4B8;          /* deepest ivory for dividers */
+  --pk-card:        rgba(255,255,255,0.55); /* frosted white card floats on ivory */
+  --pk-card-hover:  rgba(255,255,255,0.80);
 
-  /* ── Borders: warm ink-on-parchment ── */
-  --pk-border:      rgba(100,70,20,0.16);
-  --pk-border-2:    rgba(100,70,20,0.28);
+  /* ── Borders: pine ink on ivory ── */
+  --pk-border:      rgba(17,36,28,0.14);
+  --pk-border-2:    rgba(17,36,28,0.26);
 
-  /* ── Text: warm brown hierarchy ── */
-  --pk-text:        #1A1108;          /* near-black warm brown */
-  --pk-text-2:      #5A4530;          /* mid warm brown */
-  --pk-text-3:      #9A886A;          /* muted warm brown */
+  /* ── Text: deep pine hierarchy ── */
+  --pk-text:        #11241C;          /* deep pine */
+  --pk-text-2:      #3E5247;          /* mid pine */
+  --pk-text-3:      #7C8779;          /* muted pine-gray */
 
-  /* ── Crimson accent (primary) ── */
-  --pk-accent:         #B22222;
-  --pk-accent-dark:    #8B1A1A;
-  --pk-accent-dim:     rgba(178,34,34,0.09);
-  --pk-accent-border:  rgba(178,34,34,0.24);
+  /* ── Brass accent (primary, deepened for AA contrast on ivory) ── */
+  --pk-accent:         #8F6B1E;
+  --pk-accent-dark:    #6F5316;
+  --pk-accent-dim:     rgba(201,162,75,0.14);
+  --pk-accent-border:  rgba(143,107,30,0.30);
 
-  /* ── Purple CTA ── */
-  --pk-purple:         #7B3FA0;
-  --pk-purple-dim:     rgba(123,63,160,0.09);
-  --pk-purple-border:  rgba(123,63,160,0.22);
+  /* ── Sage CTA (replaces purple) ── */
+  --pk-purple:         #4E7D66;
+  --pk-purple-dim:     rgba(111,162,135,0.13);
+  --pk-purple-border:  rgba(78,125,102,0.28);
 
-  /* ── Gold — scripture / Bible feature ── */
-  --pk-gold:           #7A5010;       /* deeper gold on parchment */
-  --pk-gold-dim:       rgba(122,80,16,0.10);
-  --pk-gold-border:    rgba(122,80,16,0.22);
+  /* ── Brass gold — scripture / Bible feature ── */
+  --pk-gold:           #8A6420;
+  --pk-gold-dim:       rgba(201,162,75,0.13);
+  --pk-gold-border:    rgba(138,100,32,0.26);
 
   /* ── Nav ── */
-  --pk-nav-bg:         rgba(237,232,208,0.94);
-  --pk-nav-border:     rgba(100,70,20,0.14);
-  --pk-nav-text:       #1A1108;
-  --pk-nav-text-muted: rgba(26,17,8,0.45);
-  --pk-nav-active-bg:  rgba(178,34,34,0.09);
-  --pk-nav-active-clr: #B22222;
+  --pk-nav-bg:         rgba(242,235,220,0.94);
+  --pk-nav-border:     rgba(17,36,28,0.12);
+  --pk-nav-text:       #11241C;
+  --pk-nav-text-muted: rgba(17,36,28,0.45);
+  --pk-nav-active-bg:  rgba(201,162,75,0.14);
+  --pk-nav-active-clr: #8F6B1E;
 
   /* ── Footer ── */
-  --pk-footer-border:  rgba(100,70,20,0.14);
-  --pk-footer-text:    rgba(26,17,8,0.38);
-  --pk-wordmark-fill:  #B22222;
+  --pk-footer-border:  rgba(17,36,28,0.12);
+  --pk-footer-text:    rgba(17,36,28,0.40);
+  --pk-wordmark-fill:  #C9A24B;
 
-  /* ── Shadows ── */
-  --pk-shadow:         0 2px 24px rgba(0,0,0,0.10);
-  --pk-shadow-sm:      0 1px 8px rgba(0,0,0,0.07);
+  /* ── Shadows: soft warm ── */
+  --pk-shadow:         0 2px 24px rgba(17,36,28,0.10);
+  --pk-shadow-sm:      0 1px 8px rgba(17,36,28,0.07);
 
   /* ── Misc ── */
-  --pk-red:            #CC2200;
-  --pk-scrollbar:      rgba(178,34,34,0.30);
+  --pk-red:            #A03A2A;        /* muted oxblood for live/alerts */
+  --pk-scrollbar:      rgba(143,107,30,0.32);
 }
 
-/* ── Dark mode ── */
+/* ── Dark mode — Sanctuary: Pine + Ivory + Brass ── */
 [data-theme="dark"] {
-  --pk-bg:          #060608;
-  --pk-surface:     #0c0c12;
-  --pk-surface-2:   #111118;
-  --pk-card:        rgba(255,255,255,0.03);
-  --pk-card-hover:  rgba(255,255,255,0.055);
+  --pk-bg:          #0D1B15;          /* deepest pine */
+  --pk-surface:     #11241C;          /* pine */
+  --pk-surface-2:   #1B342A;          /* panel pine */
+  --pk-card:        rgba(242,235,220,0.045);
+  --pk-card-hover:  rgba(242,235,220,0.08);
 
-  --pk-border:      rgba(255,255,255,0.07);
-  --pk-border-2:    rgba(255,255,255,0.14);
+  --pk-border:      rgba(242,235,220,0.12);
+  --pk-border-2:    rgba(242,235,220,0.20);
 
-  --pk-text:        #FFFFFF;
-  --pk-text-2:      rgba(255,255,255,0.55);
-  --pk-text-3:      rgba(255,255,255,0.32);
+  --pk-text:        #F2EBDC;          /* ivory */
+  --pk-text-2:      rgba(242,235,220,0.64);
+  --pk-text-3:      rgba(242,235,220,0.40);
 
-  --pk-accent:         #C49A2A;
-  --pk-accent-dark:    #9A7018;
-  --pk-accent-dim:     rgba(196,154,42,0.08);
-  --pk-accent-border:  rgba(196,154,42,0.22);
+  --pk-accent:         #C9A24B;       /* brass */
+  --pk-accent-dark:    #A98430;
+  --pk-accent-dim:     rgba(201,162,75,0.10);
+  --pk-accent-border:  rgba(201,162,75,0.28);
 
-  --pk-purple:         #AF52DE;
-  --pk-purple-dim:     rgba(175,82,222,0.12);
-  --pk-purple-border:  rgba(175,82,222,0.22);
+  --pk-purple:         #6FA287;       /* sage */
+  --pk-purple-dim:     rgba(111,162,135,0.12);
+  --pk-purple-border:  rgba(111,162,135,0.26);
 
-  --pk-gold:           #C49A2A;
-  --pk-gold-dim:       rgba(196,154,42,0.08);
-  --pk-gold-border:    rgba(196,154,42,0.22);
+  --pk-gold:           #C9A24B;
+  --pk-gold-dim:       rgba(201,162,75,0.10);
+  --pk-gold-border:    rgba(201,162,75,0.26);
 
-  --pk-nav-bg:         rgba(6,6,8,0.88);
-  --pk-nav-border:     rgba(255,255,255,0.07);
-  --pk-nav-text:       #FFFFFF;
-  --pk-nav-text-muted: rgba(255,255,255,0.42);
-  --pk-nav-active-bg:  rgba(196,154,42,0.08);
-  --pk-nav-active-clr: #C49A2A;
+  --pk-nav-bg:         rgba(13,27,21,0.90);
+  --pk-nav-border:     rgba(242,235,220,0.10);
+  --pk-nav-text:       #F2EBDC;
+  --pk-nav-text-muted: rgba(242,235,220,0.44);
+  --pk-nav-active-bg:  rgba(201,162,75,0.10);
+  --pk-nav-active-clr: #C9A24B;
 
-  --pk-footer-border:  rgba(255,255,255,0.07);
-  --pk-footer-text:    rgba(255,255,255,0.18);
-  --pk-wordmark-fill:  #C49A2A;
+  --pk-footer-border:  rgba(242,235,220,0.10);
+  --pk-footer-text:    rgba(242,235,220,0.22);
+  --pk-wordmark-fill:  #C9A24B;
 
-  --pk-shadow:         4px 4px 0 0 rgba(196,154,42,0.08);
-  --pk-shadow-sm:      2px 2px 0 0 rgba(196,154,42,0.06);
+  --pk-shadow:         4px 4px 0 0 rgba(201,162,75,0.10);
+  --pk-shadow-sm:      2px 2px 0 0 rgba(201,162,75,0.07);
 
-  --pk-red:            #FF3B30;
-  --pk-scrollbar:      rgba(196,154,42,0.25);
+  --pk-red:            #E0604A;
+  --pk-scrollbar:      rgba(201,162,75,0.25);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -116,6 +116,29 @@
 html {
   scroll-behavior: smooth;
   /* prevent flash — theme applied before paint via inline script */
+  /* iOS: stop Safari auto-inflating text in landscape */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ── iOS polish ─────────────────────────────────────
+   - no gray flash on tap
+   - momentum scrolling
+   - inputs ≥16px so Safari never auto-zooms the page
+   - safe-area padding for notch / Dynamic Island ── */
+* { -webkit-tap-highlight-color: transparent; }
+
+input, textarea, select { font-size: 16px; }
+
+body {
+  -webkit-overflow-scrolling: touch;
+  padding-left:  env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+@supports (-webkit-touch-callout: none) {
+  /* iOS only: keep the footer clear of the home indicator */
+  footer { padding-bottom: env(safe-area-inset-bottom); }
 }
 /* Respect user's motion preference — suppresses scroll snap + animations */
 @media (prefers-reduced-motion: reduce) {

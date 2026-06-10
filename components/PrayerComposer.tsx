@@ -102,7 +102,7 @@ export default function PrayerComposer({ seedTopic, compact }: Props) {
           style={{
             width: "100%", background: "transparent", border: "none", outline: "none",
             resize: "vertical", color: C.ivory, fontFamily: "inherit",
-            fontSize: "15px", lineHeight: 1.6, minHeight: compact ? "56px" : "76px",
+            fontSize: "16px", lineHeight: 1.6, minHeight: compact ? "56px" : "76px",
           }}
         />
 
