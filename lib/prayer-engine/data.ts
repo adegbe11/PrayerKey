@@ -1,5 +1,5 @@
 /**
- * PrayerKey client-side prayer composition engine — data.
+ * PrayerKey client-side prayer composition engine, data.
  * No AI API, no server: keyword-scored categories stitched into a full prayer.
  * Scripture: KJV (public domain).
  */
@@ -27,7 +27,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     ],
     verses: [
       { ref: "Jeremiah 30:17", text: "For I will restore health unto thee, and I will heal thee of thy wounds, saith the LORD." },
-      { ref: "Psalm 103:2–3", text: "Bless the LORD, O my soul... who healeth all thy diseases." },
+      { ref: "Psalm 103:2-3", text: "Bless the LORD, O my soul... who healeth all thy diseases." },
       { ref: "Isaiah 53:5", text: "...and with his stripes we are healed." },
     ],
   },
@@ -37,7 +37,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     fragments: [
       "You are my Provider, and You own the cattle on a thousand hills. I bring my financial situation before You. Open doors of provision that no man can shut, send help from expected and unexpected places, and let lack give way to sufficiency.",
       "Lord, You know every bill, every need, and every obligation weighing on me. Supply all my needs according to Your riches in glory. Give me wisdom to manage what You provide, and lift the burden of financial pressure from my shoulders.",
-      "Father, command Your blessing on the work of my hands. Break every cycle of lack, settle every debt that towers over me, and establish me in a place of overflow — so that I may also become a blessing to others.",
+      "Father, command Your blessing on the work of my hands. Break every cycle of lack, settle every debt that towers over me, and establish me in a place of overflow, so that I may also become a blessing to others.",
     ],
     verses: [
       { ref: "Philippians 4:19", text: "But my God shall supply all your need according to his riches in glory by Christ Jesus." },
@@ -54,7 +54,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     ],
     verses: [
       { ref: "Proverbs 18:16", text: "A man's gift maketh room for him, and bringeth him before great men." },
-      { ref: "Psalm 75:6–7", text: "For promotion cometh neither from the east, nor from the west... God is the judge: he putteth down one, and setteth up another." },
+      { ref: "Psalm 75:6-7", text: "For promotion cometh neither from the east, nor from the west... God is the judge: he putteth down one, and setteth up another." },
     ],
   },
   exams: {
@@ -166,11 +166,11 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     label: "Peace of Mind",
     keywords: ["anxious","anxiety","worry","worried","fear","afraid","scared","stress","stressed","overwhelmed","panic","peace","restless","nervous","cant sleep","can't sleep","insomnia","sleepless"],
     fragments: [
-      "Lord, my mind has been heavy and my thoughts have not let me rest. I cast every anxiety on You, because You care for me. Quiet the storm inside me, replace fear with faith, and let Your peace — the kind that passes understanding — guard my heart and mind.",
+      "Lord, my mind has been heavy and my thoughts have not let me rest. I cast every anxiety on You, because You care for me. Quiet the storm inside me, replace fear with faith, and let Your peace, the kind that passes understanding, guard my heart and mind.",
       "Father, You have not given me a spirit of fear, but of power, love, and a sound mind. Take these worries I cannot carry. Tonight and every night, grant me deep, restful sleep, and let me wake with strength and a settled heart.",
     ],
     verses: [
-      { ref: "Philippians 4:6–7", text: "Be careful for nothing... and the peace of God, which passeth all understanding, shall keep your hearts and minds." },
+      { ref: "Philippians 4:6-7", text: "Be careful for nothing... and the peace of God, which passeth all understanding, shall keep your hearts and minds." },
       { ref: "Psalm 4:8", text: "I will both lay me down in peace, and sleep: for thou, LORD, only makest me dwell in safety." },
     ],
   },
@@ -178,7 +178,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     label: "Comfort & Grief",
     keywords: ["grief","grieving","loss","lost","died","death","funeral","mourning","passed away","bereaved","late"],
     fragments: [
-      "Lord, You are close to the broken-hearted. I bring my grief to You honestly — the ache, the questions, the empty space. Hold me through this valley, comfort everyone who mourns with me, and in time, gently turn this mourning into a quiet strength.",
+      "Lord, You are close to the broken-hearted. I bring my grief to You honestly, the ache, the questions, the empty space. Hold me through this valley, comfort everyone who mourns with me, and in time, gently turn this mourning into a quiet strength.",
       "Father of all comfort, wrap Your arms around this season of loss. Carry the memories tenderly, heal the heart that is torn, and remind us of the hope we have in You that death cannot take away.",
     ],
     verses: [
@@ -194,7 +194,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
       "Father, You know the end from the beginning. Order my steps in this decision. Where my own wisdom ends, let Yours begin, and let me look back on this moment and see Your hand all over it.",
     ],
     verses: [
-      { ref: "Proverbs 3:5–6", text: "Trust in the LORD with all thine heart... and he shall direct thy paths." },
+      { ref: "Proverbs 3:5-6", text: "Trust in the LORD with all thine heart... and he shall direct thy paths." },
       { ref: "Psalm 32:8", text: "I will instruct thee and teach thee in the way which thou shalt go..." },
     ],
   },
@@ -214,7 +214,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     label: "Forgiveness & Repentance",
     keywords: ["forgive","forgiveness","sin","sinned","repent","repentance","guilt","guilty","ashamed","mercy","wrong","mistake"],
     fragments: [
-      "Lord, I come honestly before You — I have fallen short, and I am sorry. Wash me clean by Your mercy, silence the voice of guilt and shame, and help me walk in a new direction from today. Thank You that Your mercy is new every morning.",
+      "Lord, I come honestly before You, I have fallen short, and I am sorry. Wash me clean by Your mercy, silence the voice of guilt and shame, and help me walk in a new direction from today. Thank You that Your mercy is new every morning.",
       "Father, You are faithful and just to forgive. I confess what weighs on my conscience and I receive Your cleansing. Restore the joy of my salvation and give me grace not to return to what You have delivered me from.",
     ],
     verses: [
@@ -226,7 +226,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     label: "Freedom & Deliverance",
     keywords: ["addiction","addicted","habit","pornography","alcohol","drinking","drugs","smoking","gambling","betting","deliver","deliverance","bondage","free me","freedom"],
     fragments: [
-      "Lord, there is a chain in my life I have not been able to break on my own. I bring it into Your light today. Whom the Son sets free is free indeed — so set me free. Break the grip of this habit, renew my mind, and put people and structures around me that keep me walking in freedom.",
+      "Lord, there is a chain in my life I have not been able to break on my own. I bring it into Your light today. Whom the Son sets free is free indeed, so set me free. Break the grip of this habit, renew my mind, and put people and structures around me that keep me walking in freedom.",
       "Father, give me a hatred for what has held me and a hunger for what heals me. Strengthen me in the moment of temptation, and let every relapse pattern be broken permanently by Your power.",
     ],
     verses: [
@@ -250,7 +250,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     label: "Joy & Strength",
     keywords: ["sad","sadness","depressed","depression","hopeless","despair","crying","tears","broken","heartbroken","tired of life","give up","discouraged","down"],
     fragments: [
-      "Lord, my heart is heavy and my strength feels small. I bring You my honest tears. You are the lifter of my head — lift it now. Renew my hope, send light into this dark season, and let joy return to me, even gradually, like the morning.",
+      "Lord, my heart is heavy and my strength feels small. I bring You my honest tears. You are the lifter of my head, lift it now. Renew my hope, send light into this dark season, and let joy return to me, even gradually, like the morning.",
       "Father, weeping may endure for a night, but joy comes in the morning. Hold me through this night season. Surround me with people who care, give me the courage to reach out for help, and restore to me the will to keep going.",
     ],
     verses: [
@@ -262,7 +262,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     label: "Thanksgiving",
     keywords: ["thank","thanks","thanksgiving","grateful","gratitude","testimony","praise","celebrate","answered"],
     fragments: [
-      "Lord, before I ask for anything else — thank You. Thank You for life, for mercy I did not earn, and for prayers You have already answered. Let my heart stay grateful in every season, and let this testimony encourage someone else to trust You.",
+      "Lord, before I ask for anything else, thank You. Thank You for life, for mercy I did not earn, and for prayers You have already answered. Let my heart stay grateful in every season, and let this testimony encourage someone else to trust You.",
     ],
     verses: [
       { ref: "Psalm 107:1", text: "O give thanks unto the LORD, for he is good: for his mercy endureth for ever." },
@@ -282,7 +282,7 @@ export const CATEGORIES: Record<string, PrayerCategory> = {
     label: "Salvation of Loved Ones",
     keywords: ["salvation","saved","unbeliever","backslide","backslidden","come to christ","know god","prodigal","church again"],
     fragments: [
-      "Lord, I stand in the gap for the one whose salvation I long for. Open their eyes to see You, soften every hardness in their heart, and arrange divine encounters they cannot explain away. Bring them home — and let me have the joy of seeing it.",
+      "Lord, I stand in the gap for the one whose salvation I long for. Open their eyes to see You, soften every hardness in their heart, and arrange divine encounters they cannot explain away. Bring them home, and let me have the joy of seeing it.",
     ],
     verses: [
       { ref: "Acts 16:31", text: "Believe on the Lord Jesus Christ, and thou shalt be saved, and thy house." },
@@ -326,23 +326,23 @@ export const GENERAL: PrayerCategory = {
 export const OPENINGS = [
   "Heavenly Father, I come before Your throne of grace with confidence, because You invited me to come.",
   "Lord God, thank You for another opportunity to call on Your name. You are faithful, and You hear me.",
-  "Father, I quiet my heart in Your presence. Before I speak, You already know — yet You ask me to ask.",
+  "Father, I quiet my heart in Your presence. Before I speak, You already know, yet You ask me to ask.",
   "Almighty God, I lift my eyes to You, the One from whom my help comes.",
   "Gracious Father, thank You that I never need an appointment to reach You. I come just as I am.",
 ];
 
 export const PERSONAL = [
   "Today I bring this before You: {x}.",
-  "You see what is on my heart — {x} — and You see everything around it that I did not write down.",
+  "You see what is on my heart, {x}, and You see everything around it that I did not write down.",
   "I lay this matter at Your feet: {x}. You know it fully, even better than I can express it.",
   "This is my prayer point today: {x}. I refuse to carry it alone any longer.",
 ];
 
 export const TRANSITIONS = [
-  "And Lord, I also pray —",
-  "Beyond this, Father —",
-  "I bring one more thing before You —",
-  "And concerning the other matter on my heart —",
+  "And Lord, I also pray:",
+  "Beyond this, Father:",
+  "I bring one more thing before You:",
+  "And concerning the other matter on my heart:",
 ];
 
 export const CLOSINGS = [
