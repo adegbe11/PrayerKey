@@ -156,7 +156,9 @@ const softwareLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="light">
+    // suppressHydrationWarning: the anti-flash script swaps data-theme
+    // from localStorage before React hydrates — expected, not a bug
+    <html lang="en" data-theme="light" suppressHydrationWarning>
       <head>
         {/* ── Anti-flash theme script — runs before any paint ── */}
         <script
