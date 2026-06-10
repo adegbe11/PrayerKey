@@ -496,30 +496,37 @@ export default function LivePage() {
         const sd = await sr.json(); const top = (sd.results ?? [])[0]; if (!top) continue;
         const v: DetectedVerse = { verseRef: top.ref, verseText: top.text, translation, confidence: 1.0, detectedAt: new Date().toISOString(), source: "ai" };
         setDetections(prev => [v, ...prev.filter(p => p.verseRef !== v.verseRef)].slice(0, 12));
-        setPreviewVerse(prev => prev ?? v);
+        // spoken reference = certain — auto-project it in auto mode
+        setAutoMode(auto => {
+          if (auto) { setPreviewVerse(v); setLiveVerse(v); setGoLive(true); }
+          else { setPreviewVerse(prev => prev ?? v); }
+          return auto;
+        });
       } catch { /* continue */ }
     }
     try {
+      // Quoted-scripture detection: confidence-gated so normal preaching
+      // ("God wants to bless your family") never flashes a wrong verse.
       const semanticQuery = recentChunk.slice(-350).trim();
       if (semanticQuery.length < 15) return;
-      const sr = await fetch(`/api/bible/search?q=${encodeURIComponent(semanticQuery)}&translation=${translation}`);
-      const sd = await sr.json();
-      const results: { ref: string; text: string }[] = sd.results ?? [];
-      if (!results.length) return;
-      const newVerses: DetectedVerse[] = results
-        .slice(0, 3)
-        .filter(r => !explicitRefs.some(ref => ref.toLowerCase().startsWith(r.ref.split(":")[0].toLowerCase())))
-        .map(r => ({
-          verseRef: r.ref, verseText: r.text, translation,
-          confidence: 0.88, detectedAt: new Date().toISOString(), source: "ai" as const,
-        }));
-      if (!newVerses.length) return;
-      setDetections(prev =>
-        [...newVerses, ...prev.filter(p => !newVerses.some(n => n.verseRef === p.verseRef))].slice(0, 12)
-      );
+      const dr = await fetch("/api/detect-verses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript: semanticQuery }),
+      });
+      const det = await dr.json() as { detected: boolean; ref: string; text: string; confidence: number };
+      if (!det.detected || det.confidence < 0.65) return;
+      if (explicitRefs.some(ref => ref.toLowerCase().startsWith(det.ref.split(":")[0].toLowerCase()))) return;
+
+      const v: DetectedVerse = {
+        verseRef: det.ref, verseText: det.text, translation,
+        confidence: det.confidence, detectedAt: new Date().toISOString(), source: "ai" as const,
+      };
+      setDetections(prev => [v, ...prev.filter(p => p.verseRef !== v.verseRef)].slice(0, 12));
       setAutoMode(auto => {
-        if (auto) { setPreviewVerse(newVerses[0]); setLiveVerse(newVerses[0]); setGoLive(true); }
-        else { setPreviewVerse(prev => prev ?? newVerses[0]); }
+        // auto-project only high-confidence quotes; lower ones wait in preview
+        if (auto && det.confidence >= 0.8) { setPreviewVerse(v); setLiveVerse(v); setGoLive(true); }
+        else { setPreviewVerse(prev => prev ?? v); }
         return auto;
       });
     } catch { /* offline */ }

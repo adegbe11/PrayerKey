@@ -174,21 +174,62 @@ export function getCrossRefs(slug: string, chapter: number, verse: number, limit
   return scored.slice(0, limit).map((s) => s.hit);
 }
 
-/* ── Live sermon: detect a quoted verse inside a transcript chunk ─── */
-export function detectVerseInTranscript(transcript: string): VerseHit | null {
-  // spoken references: "john chapter 3 verse 16", "john 3 16", "john 3:16"
+/* ── Live sermon: detect a verse inside a preaching transcript ──────
+   Two detection paths, both confidence-scored so ordinary preaching
+   never flashes random verses on the projector:
+   1. Spoken reference  → "John chapter 3 verse 16" (confidence 1.0)
+   2. Quoted scripture  → consecutive word-sequences shared with a
+      verse; rejected below a strict bigram threshold.            */
+
+export interface DetectionResult {
+  detected: boolean;
+  ref: string;
+  text: string;
+  confidence: number; // 0–1
+}
+
+const NO_DETECTION: DetectionResult = { detected: false, ref: "", text: "", confidence: 0 };
+
+export function detectVerseInTranscript(transcript: string): DetectionResult {
+  // 1. spoken references: "john chapter 3 verse 16", "john 3 16", "john 3:16"
   const spoken = transcript.toLowerCase()
     .replace(/\bchapter\b/g, " ")
-    .replace(/\bverse\b/g, ":");
-  const refMatch = spoken.match(/((?:[123]|first|second|third)?\s*[a-z]+)\s+(\d{1,3})\s*[:\s]\s*(\d{1,3})/);
+    .replace(/\bverses?\b/g, ":");
+  const refMatch = spoken.match(/((?:[123]|first|second|third)?\s*[a-z]{3,})\s+(\d{1,3})\s*[:\s]\s*(\d{1,3})/);
   if (refMatch) {
     const book = findBook(refMatch[1]);
     if (book) {
       const text = getVerseText(book.slug, parseInt(refMatch[2], 10), parseInt(refMatch[3], 10));
-      if (text) return { ref: `${book.name} ${refMatch[2]}:${refMatch[3]}`, text, match: "direct" };
+      if (text) return { detected: true, ref: `${book.name} ${refMatch[2]}:${refMatch[3]}`, text, confidence: 1.0 };
     }
   }
-  // quoted text: fall back to phrase search over the last words
-  const hits = searchBible(transcript.split(/\s+/).slice(-25).join(" "), 1);
-  return hits[0] ?? null;
+
+  // 2. quoted scripture: score by consecutive word-pairs shared with a verse
+  const words = transcript.toLowerCase().replace(/[^a-z\s]/g, " ").replace(/\s+/g, " ")
+    .trim().split(" ").slice(-30);
+  if (words.length < 5) return NO_DETECTION;
+  const bigrams = words.slice(0, -1).map((w, i) => `${w} ${words[i + 1]}`).filter((b) => b.length > 6);
+  if (bigrams.length < 4) return NO_DETECTION;
+  const sigCount = new Set(words.filter((w) => w.length > 2 && !STOP.has(w))).size;
+
+  let best: { score: number; ref: string; text: string } | null = null;
+  for (const book of BIBLE_BOOKS) {
+    const chapters = TEXT_BY_SLUG.get(book.slug)!;
+    for (let c = 0; c < chapters.length; c++) {
+      const verses = chapters[c];
+      for (let v = 0; v < verses.length; v++) {
+        const lower = verses[v].toLowerCase();
+        let hits = 0;
+        for (const bg of bigrams) if (lower.includes(bg)) hits++;
+        if (hits >= 3 && (!best || hits > best.score)) {
+          best = { score: hits, ref: `${book.name} ${c + 1}:${v + 1}`, text: verses[v] };
+        }
+      }
+    }
+  }
+
+  // strict gate: ≥3 shared word-pairs AND real content words present
+  if (!best || sigCount < 3) return NO_DETECTION;
+  const confidence = best.score >= 6 ? 0.95 : best.score >= 4 ? 0.8 : 0.65;
+  return { detected: true, ref: best.ref, text: best.text, confidence };
 }
