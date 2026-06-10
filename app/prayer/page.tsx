@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PrayerComposer from "@/components/PrayerComposer";
 import { PRAYER_TOPICS, PrayerTopic } from "@/lib/seo/prayer-topics";
 
 const BASE_URL = "https://www.prayerkey.com";
@@ -227,6 +228,11 @@ export default function PrayerHubPage() {
             ✦ Generate My Personal Prayer
           </Link>
         </div>
+
+        {/* ═══════════════════════════════════════════════════ */}
+        {/* PRAYER TOOL — above the fold, before all content    */}
+        {/* ═══════════════════════════════════════════════════ */}
+        <PrayerComposer />
 
         {/* ═══════════════════════════════════════════════════ */}
         {/* BROWSE BY CATEGORY                                 */}

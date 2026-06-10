@@ -307,6 +307,14 @@ export const PRAYER_TOPICS: PrayerTopic[] = [
   ...BATCH10_PRAYER_TOPICS,
 ];
 
+// ── Merge hand-written enrichment (custom FAQs / context / how-to) ──
+// Top-traffic topics get unique content instead of template fallbacks.
+import { TOPIC_ENRICHMENT } from "./prayer-topic-enrichment";
+for (const topic of PRAYER_TOPICS) {
+  const extra = TOPIC_ENRICHMENT[topic.slug];
+  if (extra) Object.assign(topic, extra);
+}
+
 // ── Fast lookup map ─────────────────────────────────────────────────
 export const TOPIC_MAP = new Map<string, PrayerTopic>(
   PRAYER_TOPICS.map((t) => [t.slug, t])

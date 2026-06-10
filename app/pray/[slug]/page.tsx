@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import PrayerComposer from "@/components/PrayerComposer";
 import { PRAYER_TOPICS, TOPIC_MAP, ALL_SLUGS } from "@/lib/seo/prayer-topics";
 
 /* ── Static generation ─────────────────────────────────────────────── */
@@ -91,6 +92,9 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
           <span>/</span>
           <span style={{ color: "var(--pk-gold)" }}>{topic.title}</span>
         </nav>
+
+        {/* ── Prayer tool — above the fold on every prayer page ── */}
+        <PrayerComposer seedTopic={topic.title} compact />
 
         {/* ── Header ── */}
         <div style={{ marginBottom: "40px" }}>

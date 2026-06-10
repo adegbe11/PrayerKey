@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { parseRef, refToDisplay, getRelatedPrayers, BOOK_MAP } from "@/lib/seo/bible-books";
+import { getBookContent } from "@/lib/seo/bible-book-content";
 import { TOPIC_MAP } from "@/lib/seo/prayer-topics";
 
 const BASE_URL = "https://www.prayerkey.com";
@@ -74,7 +75,8 @@ export default async function BibleVersePage({ params }: { params: { ref: string
   if (!parsed) notFound();
 
   const { book, chapter, verse } = parsed;
-  const display  = `${book.name} ${chapter}:${verse}`;
+  const display     = `${book.name} ${chapter}:${verse}`;
+  const bookContent = getBookContent(book.slug);
 
   // Fetch verse + cross-refs in parallel
   const [verseData, crossRefs] = await Promise.all([
@@ -133,7 +135,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
         "itemListElement": [
           { "@type": "ListItem", "position": 1, "name": "Home",         "item": BASE_URL },
           { "@type": "ListItem", "position": 2, "name": "Bible",        "item": `${BASE_URL}/bible` },
-          { "@type": "ListItem", "position": 3, "name": book.name,      "item": `${BASE_URL}/bible` },
+          { "@type": "ListItem", "position": 3, "name": book.name,      "item": `${BASE_URL}/bible/${book.slug}` },
           { "@type": "ListItem", "position": 4, "name": display,        "item": `${BASE_URL}/bible/verse/${params.ref}` },
         ],
       },
@@ -172,6 +174,8 @@ export default async function BibleVersePage({ params }: { params: { ref: string
           <Link href="/"       style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Home</Link>
           <span>/</span>
           <Link href="/bible"  style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Bible</Link>
+          <span>/</span>
+          <Link href={`/bible/${book.slug}`} style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>{book.name}</Link>
           <span>/</span>
           <span style={{ color: "var(--pk-gold)" }}>{display}</span>
         </nav>
@@ -257,6 +261,39 @@ export default async function BibleVersePage({ params }: { params: { ref: string
             )}
           </div>
         </section>
+
+        {/* ── About the Book — static unique context (no API) ── */}
+        {bookContent && (
+          <section style={{ marginBottom: "40px" }}>
+            <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px" }}>
+              {display} in Context — About the Book of {book.name}
+            </h2>
+            <div style={{
+              padding: "20px 24px", borderRadius: "14px",
+              border: "1.5px solid var(--pk-border)", background: "var(--pk-card)",
+            }}>
+              <p style={{ fontSize: "15px", color: "var(--pk-text-2)", lineHeight: 1.8, margin: "0 0 14px" }}>
+                {bookContent.overview}
+              </p>
+              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "14px" }}>
+                {bookContent.themes.map((t) => (
+                  <span key={t} style={{
+                    padding: "4px 12px", borderRadius: "999px",
+                    border: "1px solid var(--pk-gold-border)", background: "var(--pk-gold-dim)",
+                    fontSize: "11px", fontWeight: 600, color: "var(--pk-gold)",
+                  }}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+              <Link href={`/bible/${book.slug}`} style={{
+                fontSize: "13px", fontWeight: 700, color: "var(--pk-gold)", textDecoration: "none",
+              }}>
+                Explore the full Book of {book.name} — all {book.chapters} chapter{book.chapters > 1 ? "s" : ""} →
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* ── Cross References ── */}
         {crossRefs.length > 0 && (

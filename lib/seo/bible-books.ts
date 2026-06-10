@@ -1,4 +1,5 @@
 /** Complete Bible book data for programmatic SEO verse pages */
+import { getRelatedPrayersForBook } from "./bible-book-content";
 
 export interface BibleBook {
   slug: string;       // url-safe: "genesis", "john", "1-corinthians"
@@ -128,17 +129,9 @@ export function refToDisplay(ref: string): string {
   return `${parsed.book.name} ${parsed.chapter}:${parsed.verse}`;
 }
 
-/** Related prayer slugs for a given book + topic guess */
+/** Related prayer slugs for a given book — complete coverage for all 66 books
+ *  (data lives in bible-book-content.ts alongside each book's hub content) */
 export function getRelatedPrayers(bookName: string): string[] {
-  const map: Record<string, string[]> = {
-    Psalms:       ["morning", "night", "anxiety", "depression", "praise", "daily"],
-    Proverbs:     ["wisdom", "work", "guidance", "marriage"],
-    John:         ["salvation", "faith", "healing", "eternal-life"],
-    Romans:       ["salvation", "faith", "purpose", "strength"],
-    Philippians:  ["anxiety", "peace", "joy", "gratitude"],
-    Isaiah:       ["healing", "strength", "hope", "comfort"],
-    Matthew:      ["prayer-for-today", "morning", "faith", "guidance"],
-    Revelation:   ["hope", "comfort", "protection"],
-  };
-  return map[bookName] ?? ["morning", "healing", "strength", "peace"];
+  const book = BOOK_MAP_BY_NAME.get(bookName.toLowerCase());
+  return getRelatedPrayersForBook(book?.slug ?? bookName.toLowerCase().replace(/\s+/g, "-"));
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { composePrayer } from "@/lib/prayer-engine/compose";
 
 const PrayerCardModal = dynamic(() => import("@/components/ui/PrayerCardModal"), { ssr: false });
 
@@ -19,26 +20,23 @@ export default function PrayPage() {
     setMoods((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
   }
 
-  async function generate() {
+  function generate() {
     if (!input.trim()) return;
     setLoading(true);
     setError("");
     setPrayer(null);
-    try {
-      const res  = await fetch("/api/prayer/generate", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ userInput: input, moods }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Something went wrong");
-      setPrayer(data);
-      setShowCard(true);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
+    // Compose entirely on-device — no API, no server, nothing leaves the page.
+    // Moods are folded into the input so the keyword engine can score them.
+    const moodText = moods.length ? ` I am feeling ${moods.join(" and ").toLowerCase()}.` : "";
+    const result   = composePrayer(input + moodText);
+    setPrayer({
+      title:         `A Prayer for ${result.topics.join(" & ")}`,
+      prayer:        result.prayer + "\n\nAmen.",
+      encouragement: "Composed on your device from scripture-based prayer patterns. Pray it aloud and make it your own.",
+      verses:        result.verses,
+    });
+    setShowCard(true);
+    setLoading(false);
   }
 
   async function copy() {

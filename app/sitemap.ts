@@ -54,12 +54,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority:        0.8,
   }));
 
-  /* ── Bible book hub pages ── */
+  /* ── Bible book hub pages — 66 real /bible/[book] pages ── */
   const bookPages: MetadataRoute.Sitemap = BIBLE_BOOKS.map((book) => ({
-    url:             `${base}/bible`,
+    url:             `${base}/bible/${book.slug}`,
     lastModified:    now,
     changeFrequency: "monthly" as const,
-    priority:        0.75,
+    priority:        0.8,
   }));
 
   /* ── Bible verse pages — 31,102 individual verse pages ──

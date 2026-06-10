@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import PrayerComposer from "@/components/PrayerComposer";
 import { PRAYER_TOPICS, TOPIC_MAP, ALL_SLUGS, type PrayerTopic } from "@/lib/seo/prayer-topics";
 
 const BASE_URL   = "https://www.prayerkey.com";
@@ -179,6 +180,9 @@ export default function PrayerSlugPage({ params }: { params: { slug: string } })
           <span>/</span>
           <span style={{ color: "var(--pk-accent)" }}>{topic.title}</span>
         </nav>
+
+        {/* ── Prayer tool — above the fold on every prayer page ── */}
+        <PrayerComposer seedTopic={topic.title} compact />
 
         {/* ── 2. Atomic Answer Box ── */}
         <div style={{
