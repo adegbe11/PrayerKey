@@ -10,28 +10,10 @@ import { TOPIC_MAP } from "@/lib/seo/prayer-topics";
 
 const BASE_URL = "https://www.prayerkey.com";
 
-/* ── Types ─────────────────────────────────────────────────────── */
+/* ── Static KJV engine — no API, no fetch, instant ─────────────── */
+import { getVerseText, getCrossRefs } from "@/lib/bible/kjv";
+
 interface VerseResult { ref: string; text: string; match: string }
-interface CrossRef    { ref: string; text: string; reason: string }
-
-/* ── Internal fetch helpers ─────────────────────────────────────── */
-async function fetchVerse(display: string): Promise<VerseResult | null> {
-  try {
-    const url = `${BASE_URL}/api/bible/search?q=${encodeURIComponent(display)}&translation=NIV`;
-    const res  = await fetch(url, { next: { revalidate: 86400 } });
-    const data = await res.json() as { results: VerseResult[] };
-    return data.results?.[0] ?? null;
-  } catch { return null; }
-}
-
-async function fetchCrossRefs(display: string): Promise<CrossRef[]> {
-  try {
-    const url = `${BASE_URL}/api/bible/cross-refs?ref=${encodeURIComponent(display)}&translation=NIV`;
-    const res  = await fetch(url, { next: { revalidate: 86400 } });
-    const data = await res.json() as { refs: CrossRef[] };
-    return data.refs ?? [];
-  } catch { return []; }
-}
 
 /* ── Metadata ───────────────────────────────────────────────────── */
 export async function generateMetadata(
@@ -41,7 +23,7 @@ export async function generateMetadata(
   if (!parsed) return {};
 
   const display = `${parsed.book.name} ${parsed.chapter}:${parsed.verse}`;
-  const desc    = `${display} NIV — meaning, commentary, cross-references, and a prayer based on this Bible verse. Explore Scripture with PrayerKey.`;
+  const desc    = `${display} KJV — meaning, commentary, cross-references, and a prayer based on this Bible verse. Explore Scripture with PrayerKey.`;
 
   return {
     title:       `${display} — Meaning, Commentary & Prayer | PrayerKey`,
@@ -78,11 +60,12 @@ export default async function BibleVersePage({ params }: { params: { ref: string
   const display     = `${book.name} ${chapter}:${verse}`;
   const bookContent = getBookContent(book.slug);
 
-  // Fetch verse + cross-refs in parallel
-  const [verseData, crossRefs] = await Promise.all([
-    fetchVerse(display),
-    fetchCrossRefs(display),
-  ]);
+  // Static KJV lookups — synchronous, no network
+  const verseText = getVerseText(book.slug, chapter, verse);
+  const verseData: VerseResult | null = verseText
+    ? { ref: display, text: verseText, match: "direct" }
+    : null;
+  const crossRefs = getCrossRefs(book.slug, chapter, verse, 5);
 
   // Related prayers
   const relatedSlugs  = getRelatedPrayers(book.name);
@@ -226,7 +209,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
           </p>
           <p style={{ fontSize: "15px", color: "var(--pk-text)", margin: 0, lineHeight: 1.7 }}>
             {display} is a verse from the book of {book.name} in the {book.testament === "old" ? "Old" : "New"} Testament.
-            {verseData ? ` The NIV reads: "${verseData.text.slice(0, 120)}${verseData.text.length > 120 ? "..." : ""}"` : ""}
+            {verseData ? ` The KJV reads: "${verseData.text.slice(0, 120)}${verseData.text.length > 120 ? "..." : ""}"` : ""}
             {" "}Below you will find the full verse text, cross-references, meaning, and a prayer based on this scripture.
           </p>
         </div>
@@ -234,7 +217,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
         {/* ── Verse Card ── */}
         <section style={{ marginBottom: "40px" }}>
           <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px" }}>
-            {display} — NIV
+            {display} — KJV
           </h2>
           <div style={{
             background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)",
@@ -251,7 +234,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
                   &ldquo;{verseData.text}&rdquo;
                 </p>
                 <p style={{ fontSize: "13px", color: "var(--pk-gold)", fontWeight: 700, margin: 0 }}>
-                  — {display} (NIV)
+                  — {display} (KJV)
                 </p>
               </>
             ) : (

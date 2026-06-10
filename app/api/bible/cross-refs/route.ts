@@ -2,52 +2,30 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+import { getCrossRefs, parseQueryRef } from "@/lib/bible/kjv";
+import { BIBLE_BOOKS } from "@/lib/seo/bible-books";
 
 /**
- * GET /api/bible/cross-refs?ref=<verseRef>&translation=<NIV|KJV|...>
- * Returns 4–6 cross-referenced verses for the given verse — thematically
- * or textually related, as Rhema's 340k cross-reference database does.
+ * GET /api/bible/cross-refs?ref=<verseRef>
+ * Cross-references computed from the bundled KJV by shared key themes.
+ * No AI API — free, instant, deterministic.
  */
 export async function GET(req: NextRequest) {
-  const ref         = req.nextUrl.searchParams.get("ref")?.trim() ?? "";
-  const translation = req.nextUrl.searchParams.get("translation") ?? "NIV";
-
+  const ref = req.nextUrl.searchParams.get("ref")?.trim() ?? "";
   if (!ref) return NextResponse.json({ refs: [] });
 
   try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
-      systemInstruction: `You are a Bible cross-reference system with access to a comprehensive cross-reference database (similar to OpenBible.info's 340,000 cross-references).
+    // Resolve "John 3:16" → book + chapter + verse via the shared parser
+    const hits = parseQueryRef(ref);
+    if (!hits?.length) return NextResponse.json({ refs: [] });
 
-Given a Bible verse reference, return 4–6 verses that are thematically, verbally, or doctrinally linked to it. Prioritise strong, well-known cross-references over obscure ones.
+    const m = hits[0].ref.match(/^(.*)\s+(\d+):(\d+)$/);
+    if (!m) return NextResponse.json({ refs: [] });
+    const book = BIBLE_BOOKS.find((b) => b.name === m[1]);
+    if (!book) return NextResponse.json({ refs: [] });
 
-Return ONLY valid JSON — no markdown, no prose:
-{
-  "refs": [
-    {
-      "ref":    "Romans 8:28",
-      "text":   "And we know that in all things God works for the good of those who love him...",
-      "reason": "Shares theme of God's sovereignty and purpose"
-    }
-  ]
-}
-
-Always use the ${translation} translation for verse text.`,
-    });
-
-    const result = await model.generateContent(
-      `Verse: ${ref}\nTranslation: ${translation}`,
-    );
-
-    const raw    = result.response.text().replace(/```json\n?|\n?```/g, "").trim();
-    const parsed = JSON.parse(raw) as {
-      refs: { ref: string; text: string; reason: string }[];
-    };
-
-    return NextResponse.json({ refs: parsed.refs ?? [] });
+    const refs = getCrossRefs(book.slug, parseInt(m[2], 10), parseInt(m[3], 10), 5);
+    return NextResponse.json({ refs });
   } catch (err) {
     console.error("[bible/cross-refs] Error:", err);
     return NextResponse.json({ refs: [] }, { status: 500 });
