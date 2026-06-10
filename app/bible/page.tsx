@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
+import { BIBLE_BOOKS } from "@/lib/seo/bible-books";
 
 type Result   = { ref: string; text: string; match: string };
 type CrossRef = { ref: string; text: string; reason: string };
@@ -272,6 +274,39 @@ export default function BiblePage() {
           </div>
         </div>
       )}
+
+      {/* ── Browse all 66 books — crawl path to book hub pages ── */}
+      <section style={{ marginTop: "64px" }}>
+        <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 6px", letterSpacing: "-0.02em", textAlign: "center" }}>
+          Browse All 66 Books of the Bible
+        </h2>
+        <p style={{ fontSize: "13px", color: "var(--pk-text-3)", margin: "0 0 24px", textAlign: "center" }}>
+          Summaries, key themes, famous verses, and every chapter — book by book.
+        </p>
+
+        {(["old", "new"] as const).map((testament) => (
+          <div key={testament} style={{ marginBottom: "28px" }}>
+            <h3 style={{
+              fontSize: "11px", fontWeight: 800, color: "var(--pk-gold)",
+              letterSpacing: "0.14em", textTransform: "uppercase", margin: "0 0 12px",
+            }}>
+              {testament === "old" ? "Old Testament — 39 Books" : "New Testament — 27 Books"}
+            </h3>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {BIBLE_BOOKS.filter((b) => b.testament === testament).map((b) => (
+                <Link key={b.slug} href={`/bible/${b.slug}`} style={{
+                  padding: "7px 14px", borderRadius: "999px",
+                  border: "1px solid var(--pk-border)", background: "var(--pk-card)",
+                  fontSize: "12px", fontWeight: 600, color: "var(--pk-text-2)",
+                  textDecoration: "none", transition: "all 130ms ease",
+                }}>
+                  {b.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
 
       <style>{`
         input:focus { outline: none; }

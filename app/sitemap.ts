@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { ALL_SLUGS } from "@/lib/seo/prayer-topics";
 import { getAllVerseRefs, BIBLE_BOOKS } from "@/lib/seo/bible-books";
+import { GUIDE_SLUGS } from "@/lib/seo/guides";
 
 /**
  * PrayerKey Programmatic SEO Sitemap
@@ -54,6 +55,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority:        0.8,
   }));
 
+  /* ── Pillar guides — head-term content layer ── */
+  const guidePages: MetadataRoute.Sitemap = [
+    { url: `${base}/guides`, lastModified: now, changeFrequency: "weekly" as const, priority: 0.9 },
+    ...GUIDE_SLUGS.map((slug) => ({
+      url:             `${base}/guides/${slug}`,
+      lastModified:    now,
+      changeFrequency: "monthly" as const,
+      priority:        0.88,
+    })),
+  ];
+
   /* ── Bible book hub pages — 66 real /bible/[book] pages ── */
   const bookPages: MetadataRoute.Sitemap = BIBLE_BOOKS.map((book) => ({
     url:             `${base}/bible/${book.slug}`,
@@ -79,6 +91,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...prayerHub,
     ...prayerSlugPages,
     ...topicPages,
+    ...guidePages,
     ...bookPages,
     ...versePages,
   ];
