@@ -76,20 +76,13 @@ export default function PrayerComposer({ seedTopic, compact }: Props) {
         borderRadius: "14px",
         padding:      compact ? "18px" : "22px",
       }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "12px", flexWrap: "wrap" }}>
+        <div style={{ marginBottom: "12px" }}>
           <p style={{
             fontSize: "11px", fontWeight: 800, color: C.brass,
             letterSpacing: "0.14em", textTransform: "uppercase", margin: 0,
           }}>
             ✦ Type your prayer points. Receive a prayer.
           </p>
-          <span style={{
-            fontSize: "10px", fontWeight: 600, color: C.sage,
-            border: `1px solid ${C.line}`, borderRadius: "999px", padding: "3px 10px",
-            letterSpacing: "0.08em", textTransform: "uppercase",
-          }}>
-            Instant · Private · No account
-          </span>
         </div>
 
         <textarea
@@ -107,13 +100,10 @@ export default function PrayerComposer({ seedTopic, compact }: Props) {
         />
 
         <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
+          display: "flex", alignItems: "center", justifyContent: "flex-end",
           gap: "12px", marginTop: "8px", borderTop: `1px solid ${C.line}`,
           paddingTop: "12px", flexWrap: "wrap",
         }}>
-          <span style={{ fontSize: "12px", color: C.ivoryDim }}>
-            Composed on your device. Nothing you type leaves this page.
-          </span>
           <button
             onClick={() => generate()}
             style={{
