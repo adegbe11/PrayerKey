@@ -22,7 +22,19 @@ data class SermonVerse(val reference: String, val text: String, val detectedAt: 
 data class SermonSession(val id: Long, val title: String, val startedAt: Long, val endedAt: Long?, val verses: List<SermonVerse>)
 data class JournalPrayer(val id: Long, val title: String, val request: String, val prayer: String, val scriptureRef: String?, val createdAt: Long)
 
-class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 5) {
+data class JournalEntry(
+    val id: Long,
+    val entryDay: Long,          // epoch day — one calendar day per group
+    val mood: String,            // emoji key, e.g. "🙏"
+    val body: String,            // what's on your heart
+    val gratitude: String,       // one thing you're grateful for
+    val verseRef: String?,       // optionally attached word
+    val verseText: String?,
+    val createdAt: Long,
+    val updatedAt: Long,
+)
+
+class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 6) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""CREATE TABLE saved_words (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,6 +57,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         if (oldVersion < 3) createMemoryTable(db)
         if (oldVersion < 4) createSermonTables(db)
         if (oldVersion < 5) createPrayerJournal(db)
+        if (oldVersion < 6) createJournalEntries(db)
     }
 
     private fun createStateTable(db: SQLiteDatabase) {
@@ -62,6 +75,71 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
 
     private fun createPrayerJournal(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE IF NOT EXISTS prayer_journal (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, request TEXT NOT NULL, prayer TEXT NOT NULL, scripture_ref TEXT, created_at INTEGER NOT NULL)")
+    }
+
+    private fun createJournalEntries(db: SQLiteDatabase) {
+        db.execSQL("""CREATE TABLE IF NOT EXISTS journal_entries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            entry_day INTEGER NOT NULL,
+            mood TEXT NOT NULL,
+            body TEXT NOT NULL,
+            gratitude TEXT NOT NULL DEFAULT '',
+            verse_ref TEXT,
+            verse_text TEXT,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL
+        )""")
+        db.execSQL("CREATE INDEX IF NOT EXISTS journal_day ON journal_entries(entry_day)")
+    }
+
+    fun addJournalEntry(mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?): Long {
+        val now = System.currentTimeMillis()
+        return writableDatabase.insert("journal_entries", null, ContentValues().apply {
+            put("entry_day", java.time.LocalDate.now().toEpochDay())
+            put("mood", mood); put("body", body.trim()); put("gratitude", gratitude.trim())
+            put("verse_ref", verseRef); put("verse_text", verseText)
+            put("created_at", now); put("updated_at", now)
+        })
+    }
+
+    fun updateJournalEntry(id: Long, mood: String, body: String, gratitude: String) {
+        writableDatabase.update("journal_entries", ContentValues().apply {
+            put("mood", mood); put("body", body.trim()); put("gratitude", gratitude.trim())
+            put("updated_at", System.currentTimeMillis())
+        }, "id = ?", arrayOf(id.toString()))
+    }
+
+    fun deleteJournalEntry(id: Long) {
+        writableDatabase.delete("journal_entries", "id = ?", arrayOf(id.toString()))
+    }
+
+    fun journalEntries(): List<JournalEntry> = readableDatabase.query(
+        "journal_entries", null, null, null, null, null, "created_at DESC"
+    ).use { cursor ->
+        buildList { while (cursor.moveToNext()) add(JournalEntry(
+            cursor.getLong(cursor.getColumnIndexOrThrow("id")),
+            cursor.getLong(cursor.getColumnIndexOrThrow("entry_day")),
+            cursor.getString(cursor.getColumnIndexOrThrow("mood")),
+            cursor.getString(cursor.getColumnIndexOrThrow("body")),
+            cursor.getString(cursor.getColumnIndexOrThrow("gratitude")),
+            cursor.getColumnIndexOrThrow("verse_ref").let { if (cursor.isNull(it)) null else cursor.getString(it) },
+            cursor.getColumnIndexOrThrow("verse_text").let { if (cursor.isNull(it)) null else cursor.getString(it) },
+            cursor.getLong(cursor.getColumnIndexOrThrow("created_at")),
+            cursor.getLong(cursor.getColumnIndexOrThrow("updated_at")),
+        )) }
+    }
+
+    /** Consecutive days (ending today or yesterday) with at least one entry. */
+    fun journalStreak(): Int {
+        val days = journalEntries().map { it.entryDay }.toSortedSet().reversed()
+        if (days.isEmpty()) return 0
+        val today = java.time.LocalDate.now().toEpochDay()
+        var cursor = when (days.first()) { today, today - 1 -> days.first(); else -> return 0 }
+        var count = 0
+        for (day in days) {
+            if (day == cursor) { count++; cursor-- } else if (day < cursor) break
+        }
+        return count
     }
 
     fun savePrayer(title: String, request: String, prayer: String, scriptureRef: String?) {

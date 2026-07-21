@@ -37,7 +37,7 @@ import com.prayerkey.manna.ui.home.HomeScreen
 import com.prayerkey.manna.ui.screens.BibleScreen
 import com.prayerkey.manna.ui.screens.PrayerScreen
 import com.prayerkey.manna.ui.screens.ProfileScreen
-import com.prayerkey.manna.ui.screens.SavedScreen
+import com.prayerkey.manna.ui.screens.JournalScreen
 import com.prayerkey.manna.ui.screens.ChurchScreen
 import com.prayerkey.manna.ui.theme.Canvas
 import com.prayerkey.manna.ui.theme.Electric
@@ -54,6 +54,8 @@ fun MannaApp() {
     val preferences by viewModel.preferences.collectAsState()
     val sermons by viewModel.sermons.collectAsState()
     val journal by viewModel.journal.collectAsState()
+    val entries by viewModel.entries.collectAsState()
+    val journalStreak by viewModel.journalStreak.collectAsState()
     val context = LocalContext.current
     val destinations = remember {
         listOf(
@@ -61,7 +63,7 @@ fun MannaApp() {
             Destination("Bible", Icons.Outlined.Book),
             Destination("AI Pray", Icons.Outlined.AutoAwesome),
             Destination("Church", Icons.Outlined.Church),
-            Destination("Saved", Icons.Outlined.BookmarkBorder),
+            Destination("Journal", Icons.Outlined.BookmarkBorder),
         )
     }
     var selected by remember { mutableIntStateOf(0) }
@@ -116,7 +118,16 @@ fun MannaApp() {
                         onEndSession = viewModel::endSermon,
                         onSave = viewModel::save,
                     )
-                    4 -> SavedScreen(saved, viewModel::markAnswered)
+                    4 -> JournalScreen(
+                        entries = entries,
+                        journalStreak = journalStreak,
+                        words = saved,
+                        todayCard = DailyVerses[verseIndex % DailyVerses.size],
+                        onAdd = viewModel::addEntry,
+                        onUpdate = viewModel::updateEntry,
+                        onDelete = viewModel::deleteEntry,
+                        onAnswered = viewModel::markAnswered,
+                    )
                     else -> Unit
                 }
             }

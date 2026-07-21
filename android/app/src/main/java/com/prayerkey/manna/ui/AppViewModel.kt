@@ -8,6 +8,7 @@ import com.prayerkey.manna.data.MemoryVerse
 import com.prayerkey.manna.data.UserPrefs
 import com.prayerkey.manna.data.SermonSession
 import com.prayerkey.manna.data.JournalPrayer
+import com.prayerkey.manna.data.JournalEntry
 import com.prayerkey.manna.data.GeneratedPrayer
 import com.prayerkey.manna.model.VerseCard
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val sermons = _sermons.asStateFlow()
     private val _journal = MutableStateFlow(store.prayerJournal())
     val journal = _journal.asStateFlow()
+    private val _entries = MutableStateFlow(store.journalEntries())
+    val entries = _entries.asStateFlow()
+    private val _journalStreak = MutableStateFlow(store.journalStreak())
+    val journalStreak = _journalStreak.asStateFlow()
 
     fun save(card: VerseCard) { store.save(card); _saved.value = store.all() }
     fun markAnswered(id: Long, testimony: String) { store.markAnswered(id, testimony); _saved.value = store.all() }
@@ -37,6 +42,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun startSermon(): Long = store.startSermon()
     fun addSermonVerse(sessionId: Long, reference: String, text: String) { store.addSermonVerse(sessionId, reference, text); _sermons.value = store.sermons() }
     fun endSermon(sessionId: Long) { store.endSermon(sessionId); _sermons.value = store.sermons() }
+    private fun refreshEntries() {
+        _entries.value = store.journalEntries()
+        _journalStreak.value = store.journalStreak()
+    }
+    fun addEntry(mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?) {
+        store.addJournalEntry(mood, body, gratitude, verseRef, verseText); refreshEntries()
+    }
+    fun updateEntry(id: Long, mood: String, body: String, gratitude: String) {
+        store.updateJournalEntry(id, mood, body, gratitude); refreshEntries()
+    }
+    fun deleteEntry(id: Long) { store.deleteJournalEntry(id); refreshEntries() }
+
     fun savePrayer(request: String, prayer: GeneratedPrayer) {
         store.savePrayer(prayer.title, request, prayer.prayer, prayer.verses.firstOrNull()?.first)
         store.save(VerseCard(prayer.verses.firstOrNull()?.first ?: prayer.title, "PRAYER", prayer.prayer, ""))
