@@ -29,7 +29,9 @@ data class PrayerTopic(
 data class RemoteVerse(val reference: String, val text: String, val translation: String)
 
 object PrayerKeyApi {
-    private const val BASE_URL = "https://prayerkey.com"
+    // www is canonical — the bare domain 301s, and HttpURLConnection
+    // drops POST bodies on cross-host redirects (broke prayer/generate).
+    private const val BASE_URL = "https://www.prayerkey.com"
 
     suspend fun generatePrayer(request: String, moods: List<String>): GeneratedPrayer = withContext(Dispatchers.IO) {
         val body = JSONObject().put("userInput", request).put("moods", JSONArray(moods))
