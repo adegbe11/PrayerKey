@@ -79,6 +79,27 @@ object PrayerKeyApi {
         } }
     }
 
+    /**
+     * Public-domain translations served straight from bible-api.com —
+     * no key, no cost, always available. Used for WEB/ASV/BBE/DARBY/YLT.
+     * Reference lookups only; keyword search happens on the offline KJV
+     * first, then the found references are re-fetched in this version.
+     */
+    suspend fun freeVerse(reference: String, apiId: String): RemoteVerse? = withContext(Dispatchers.IO) {
+        runCatching {
+            val encoded = URLEncoder.encode(reference, Charsets.UTF_8.name()).replace("+", "%20")
+            val connection = (URL("https://bible-api.com/$encoded?translation=$apiId").openConnection() as HttpURLConnection).apply {
+                connectTimeout = 12_000; readTimeout = 20_000
+                setRequestProperty("Accept", "application/json")
+            }
+            val text = connection.inputStream.bufferedReader().use { it.readText() }
+            val json = JSONObject(text)
+            val verseText = json.optString("text").trim().replace(Regex("\\s+"), " ")
+            if (verseText.isBlank()) null
+            else RemoteVerse(json.optString("reference", reference), verseText, json.optString("translation_id", apiId).uppercase())
+        }.getOrNull()
+    }
+
     private fun request(path: String, method: String, body: JSONObject? = null): JSONObject {
         val connection = (URL(BASE_URL + path).openConnection() as HttpURLConnection).apply {
             requestMethod = method; connectTimeout = 15_000; readTimeout = 30_000

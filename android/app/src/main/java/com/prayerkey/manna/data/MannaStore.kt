@@ -17,7 +17,7 @@ data class SavedWord(
 )
 
 data class MemoryVerse(val reference: String, val verse: String, val stage: Int)
-data class UserPrefs(val name: String = "Collins", val reminderHour: Int = 7, val reminderMinute: Int = 0, val reminderEnabled: Boolean = false, val reduceMotion: Boolean = false)
+data class UserPrefs(val name: String = "Collins", val reminderHour: Int = 7, val reminderMinute: Int = 0, val reminderEnabled: Boolean = false, val reduceMotion: Boolean = false, val translation: String = "KJV")
 data class SermonVerse(val reference: String, val text: String, val detectedAt: Long)
 data class SermonSession(val id: Long, val title: String, val startedAt: Long, val endedAt: Long?, val verses: List<SermonVerse>)
 data class JournalPrayer(val id: Long, val title: String, val request: String, val prayer: String, val scriptureRef: String?, val createdAt: Long)
@@ -225,12 +225,13 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         reminderMinute = state("reminder_minute")?.toIntOrNull() ?: 0,
         reminderEnabled = state("reminder_enabled") == "true",
         reduceMotion = state("reduce_motion") == "true",
+        translation = state("translation") ?: "KJV",
     )
 
     fun savePreferences(prefs: UserPrefs) {
         putState("name", prefs.name); putState("reminder_hour", prefs.reminderHour.toString())
         putState("reminder_minute", prefs.reminderMinute.toString()); putState("reminder_enabled", prefs.reminderEnabled.toString())
-        putState("reduce_motion", prefs.reduceMotion.toString())
+        putState("reduce_motion", prefs.reduceMotion.toString()); putState("translation", prefs.translation)
     }
 
     fun streak(): Int = state("streak")?.toIntOrNull() ?: 0

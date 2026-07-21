@@ -47,6 +47,13 @@ import com.prayerkey.manna.reminder.ReminderReceiver
 import com.prayerkey.manna.data.SermonSession
 import com.prayerkey.manna.data.JournalPrayer
 import com.prayerkey.manna.data.RemoteVerse
+import com.prayerkey.manna.data.BibleVersion
+import com.prayerkey.manna.data.BIBLE_VERSIONS
+import com.prayerkey.manna.data.VersionSource
+import com.prayerkey.manna.data.versionOf
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import android.app.TimePickerDialog
 import android.os.Build
 
@@ -54,95 +61,144 @@ import android.os.Build
 @Composable
 fun BibleScreen(
     memory: List<MemoryVerse>,
+    translation: String,
+    onTranslation: (String) -> Unit,
     onSave: (VerseCard) -> Unit,
     onMemorize: (VerseCard) -> Unit,
     onAdvanceMemory: (String) -> Unit,
 ) {
     var query by remember { mutableStateOf("") }
-    var results by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
-    var remoteResults by remember { mutableStateOf<List<RemoteVerse>>(emptyList()) }
+    var shown by remember { mutableStateOf<List<RemoteVerse>>(emptyList()) }
     var loading by remember { mutableStateOf(false) }
-    var translation by remember { mutableStateOf("KJV") }
-    var translationMenu by remember { mutableStateOf(false) }
+    var pickerOpen by remember { mutableStateOf(false) }
     var showMemory by remember { mutableStateOf(false) }
-    var selectedVerse by remember { mutableStateOf<BibleVerse?>(null) }
+    var selectedVerse by remember { mutableStateOf<RemoteVerse?>(null) }
     var related by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
     var chapterVerses by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
     var chapterTitle by remember { mutableStateOf("") }
     val context = LocalContext.current.applicationContext
     val bible = remember(context) { OfflineBible(context) }
     val scope = rememberCoroutineScope()
+    val version = versionOf(translation)
+
     fun runSearch(value: String) {
         scope.launch {
             loading = true
-            if (translation == "KJV") {
-                results = bible.search(value.ifBlank { "peace" }); remoteResults = emptyList()
-            } else {
-                remoteResults = runCatching { PrayerKeyApi.searchBible(value.ifBlank { "peace" }, translation) }.getOrElse { emptyList() }
-                results = emptyList()
+            val term = value.ifBlank { "peace" }
+            val kjv = bible.search(term, 10)
+            shown = when (version.source) {
+                VersionSource.OFFLINE -> kjv.map { RemoteVerse(it.reference, it.text, "KJV") }
+                VersionSource.FREE -> coroutineScope {
+                    kjv.take(8).map { hit ->
+                        async {
+                            PrayerKeyApi.freeVerse(hit.reference, version.apiId)
+                                ?: RemoteVerse(hit.reference, hit.text, "KJV")
+                        }
+                    }.awaitAll()
+                }
+                VersionSource.PREMIUM -> runCatching { PrayerKeyApi.searchBible(term, version.id) }
+                    .getOrElse { emptyList() }
+                    .ifEmpty { kjv.map { RemoteVerse(it.reference, it.text, "KJV") } }
             }
             loading = false
         }
     }
-    LaunchedEffect(Unit) { runSearch("peace") }
+    LaunchedEffect(translation) { runSearch(query) }
     LaunchedEffect(selectedVerse) {
-        related = selectedVerse?.let { bible.related(it) }.orEmpty()
+        related = selectedVerse?.let { sel ->
+            bible.search(sel.reference, 1).firstOrNull()?.let { bible.related(it) }
+        }.orEmpty()
     }
-    ScreenFrame("Bible", "Search Scripture by reference, word, or what you are feeling.") {
+
+    ScreenFrame("Bible", "Every version. Search by reference, word, or feeling.") {
+
+        /* ── Version selector — premium row card ── */
+        Surface(
+            onClick = { pickerOpen = true },
+            shape = RoundedCornerShape(22.dp), color = Night,
+            modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
+        ) {
+            Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(version.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                        Spacer(Modifier.width(8.dp))
+                        SourcePill(version.source)
+                    }
+                    Text(version.name, color = Color.White.copy(.62f), fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                }
+                Text("Change", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Gold)
+            }
+        }
+
         OutlinedTextField(
-            value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth(),
+            value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
             placeholder = { Text("Try “I can't sleep” or Psalm 23") },
             leadingIcon = { Icon(Icons.Outlined.Search, null) }, singleLine = true,
             shape = RoundedCornerShape(18.dp), colors = fieldColors(),
             trailingIcon = { IconButton(onClick = { runSearch(query) }) { Icon(Icons.Outlined.ArrowForward, "Search") } },
         )
-        Box(Modifier.padding(top = 10.dp)) {
-            AssistChip(onClick = { translationMenu = true }, label = { Text("$translation ${if (translation == "KJV") "· Offline" else "· Online"}") }, leadingIcon = { Icon(Icons.Outlined.Translate, null) })
-            DropdownMenu(translationMenu, onDismissRequest = { translationMenu = false }) {
-                listOf("KJV","NIV","ESV","NKJV","NLT","NASB","AMP","CSB","MSG","CEV","GNT").forEach { item ->
-                    DropdownMenuItem(text = { Text(item) }, onClick = {
-                        translation = item; translationMenu = false; runSearch(query)
-                    })
-                }
-            }
-        }
-        Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
+        Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf("Fear", "Healing", "Peace").forEach { word ->
                 SuggestionChip(onClick = { query = word; runSearch(word) }, label = { Text(word) })
             }
             SuggestionChip(onClick = { showMemory = !showMemory }, label = { Text("Memorize ${memory.size}") }, icon = { Icon(Icons.Outlined.School, null) })
         }
-        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Gold, trackColor = Hairline)
         if (showMemory) {
             MemoryTrainer(memory.firstOrNull(), onAdvanceMemory)
-        } else if (translation == "KJV") LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(results, key = { it.reference }) { card ->
+        } else LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 24.dp)) {
+            items(shown, key = { "${it.translation}-${it.reference}" }) { card ->
                 Surface(
                     modifier = Modifier.clickable { selectedVerse = card },
-                    shape = RoundedCornerShape(20.dp), color = Color.White,
+                    shape = RoundedCornerShape(24.dp), color = Color.White,
                     border = androidx.compose.foundation.BorderStroke(1.dp, Hairline),
                 ) {
-                    Column(Modifier.padding(18.dp)) {
+                    Column(Modifier.padding(20.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(card.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                            IconButton(onClick = { onMemorize(VerseCard(card.reference, "KJV", card.text, "")) }) { Icon(Icons.Outlined.School, "Memorize") }
-                            IconButton(onClick = { onSave(VerseCard(card.reference, "KJV", card.text, "")) }) { Icon(Icons.Outlined.BookmarkBorder, "Save") }
+                            Text(card.reference, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.weight(1f))
+                            VersionPill(card.translation)
                         }
-                        Text(card.text, fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 28.sp)
-                        Text("KJV", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 10.dp))
+                        Text(card.text, fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 29.sp, modifier = Modifier.padding(top = 10.dp))
+                        Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.End) {
+                            IconButton(onClick = { onMemorize(VerseCard(card.reference, card.translation, card.text, "")) }) { Icon(Icons.Outlined.School, "Memorize", tint = Muted) }
+                            IconButton(onClick = { onSave(VerseCard(card.reference, card.translation, card.text, "")) }) { Icon(Icons.Outlined.BookmarkBorder, "Save", tint = Muted) }
+                        }
                     }
                 }
             }
-        } else LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            items(remoteResults, key = { "${it.translation}-${it.reference}" }) { card ->
-                Surface(shape = RoundedCornerShape(20.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
-                    Column(Modifier.padding(18.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(card.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                            IconButton(onClick = { onSave(VerseCard(card.reference, card.translation, card.text, "")) }) { Icon(Icons.Outlined.BookmarkBorder, "Save") }
+        }
+    }
+
+    /* ── Version picker — premium bottom sheet ── */
+    if (pickerOpen) {
+        ModalBottomSheet(onDismissRequest = { pickerOpen = false }, containerColor = Canvas) {
+            Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 40.dp)) {
+                Text("Choose your Bible", fontFamily = FontFamily.Serif, fontSize = 28.sp)
+                Text("14 versions. All free, forever.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 3.dp, bottom = 16.dp))
+                LazyColumn(Modifier.heightIn(max = 560.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
+                    items(BIBLE_VERSIONS, key = { it.id }) { item ->
+                        val active = item.id == translation
+                        Surface(
+                            onClick = { onTranslation(item.id); pickerOpen = false },
+                            shape = RoundedCornerShape(20.dp),
+                            color = if (active) Night else Color.White,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, if (active) Night else Hairline),
+                        ) {
+                            Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Column(Modifier.weight(1f)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(item.id, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = if (active) Gold else Ink)
+                                        Spacer(Modifier.width(8.dp))
+                                        SourcePill(item.source)
+                                    }
+                                    Text("${item.name} — ${item.tagline}", color = if (active) Color.White.copy(.7f) else Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                                }
+                                if (active) Text("✓", color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
-                        Text(card.text, fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 28.sp)
-                        Text("${card.translation} · Online", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 10.dp))
                     }
                 }
             }
@@ -151,14 +207,19 @@ fun BibleScreen(
     selectedVerse?.let { verse ->
         ModalBottomSheet(onDismissRequest = { selectedVerse = null }, containerColor = Canvas) {
             VerseDetail(
-                verse = verse, related = related,
-                onSave = { onSave(VerseCard(verse.reference, "KJV", verse.text, "")) },
-                onMemorize = { onMemorize(VerseCard(verse.reference, "KJV", verse.text, "")) },
-                onRelated = { selectedVerse = it },
+                reference = verse.reference, text = verse.text, versionId = verse.translation,
+                versionName = versionOf(verse.translation).name,
+                related = related,
+                onSave = { onSave(VerseCard(verse.reference, verse.translation, verse.text, "")) },
+                onMemorize = { onMemorize(VerseCard(verse.reference, verse.translation, verse.text, "")) },
+                onRelated = { selectedVerse = RemoteVerse(it.reference, it.text, "KJV") },
                 onReadChapter = {
-                    selectedVerse = null
-                    chapterTitle = "${verse.book} ${verse.chapter}"
-                    scope.launch { chapterVerses = bible.chapter(verse.book, verse.chapter) }
+                    val source = runCatching { kotlinx.coroutines.runBlocking { bible.search(verse.reference, 1).firstOrNull() } }.getOrNull()
+                    if (source != null) {
+                        selectedVerse = null
+                        chapterTitle = "${source.book} ${source.chapter}"
+                        scope.launch { chapterVerses = bible.chapter(source.book, source.chapter) }
+                    }
                 },
             )
         }
@@ -170,7 +231,7 @@ fun BibleScreen(
                 Text("King James Version · available offline", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp, bottom = 18.dp))
                 LazyColumn(Modifier.heightIn(max = 620.dp)) {
                     items(chapterVerses, key = { it.reference }) { item ->
-                        Row(Modifier.fillMaxWidth().clickable { chapterTitle = ""; selectedVerse = item }.padding(vertical = 8.dp)) {
+                        Row(Modifier.fillMaxWidth().clickable { chapterTitle = ""; selectedVerse = RemoteVerse(item.reference, item.text, "KJV") }.padding(vertical = 8.dp)) {
                             Text(item.verse.toString(), color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.width(34.dp))
                             Text(item.text, fontFamily = FontFamily.Serif, fontSize = 19.sp, lineHeight = 27.sp)
                         }
@@ -182,8 +243,32 @@ fun BibleScreen(
 }
 
 @Composable
+private fun SourcePill(source: VersionSource) {
+    val (label, bg, fg) = when (source) {
+        VersionSource.OFFLINE -> Triple("Offline", Gold.copy(alpha = .18f), Gold)
+        VersionSource.FREE -> Triple("Free online", Color(0xFF1E5A38).copy(alpha = .16f), Color(0xFF2E7D4F))
+        VersionSource.PREMIUM -> Triple("Premium", Electric.copy(alpha = .13f), Electric)
+    }
+    Surface(shape = RoundedCornerShape(99.dp), color = bg) {
+        Text(label, color = fg, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = .4.sp,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
+    }
+}
+
+@Composable
+private fun VersionPill(id: String) {
+    Surface(shape = RoundedCornerShape(99.dp), color = Gold.copy(alpha = .15f)) {
+        Text(id, color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = .6.sp,
+            modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp))
+    }
+}
+
+@Composable
 private fun VerseDetail(
-    verse: BibleVerse,
+    reference: String,
+    text: String,
+    versionId: String,
+    versionName: String,
     related: List<BibleVerse>,
     onSave: () -> Unit,
     onMemorize: () -> Unit,
@@ -191,9 +276,9 @@ private fun VerseDetail(
     onReadChapter: () -> Unit,
 ) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 36.dp)) {
-        Text(verse.reference, fontFamily = FontFamily.Serif, fontSize = 30.sp)
-        Text("King James Version", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 3.dp))
-        Text(verse.text, fontFamily = FontFamily.Serif, fontSize = 28.sp, lineHeight = 38.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 34.dp))
+        Text(reference, fontFamily = FontFamily.Serif, fontSize = 30.sp)
+        Text("$versionName ($versionId)", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 3.dp))
+        Text(text, fontFamily = FontFamily.Serif, fontSize = 28.sp, lineHeight = 38.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 34.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             Button(onClick = onSave, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" Save") }
             OutlinedButton(onClick = onMemorize, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.School, null); Text(" Memorize") }
@@ -446,7 +531,20 @@ fun ProfileScreen(savedCount: Int, streak: Int, prefs: UserPrefs, onBack: () -> 
             if (enabled && Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) notifications.launch(Manifest.permission.POST_NOTIFICATIONS)
             else { val next = prefs.copy(reminderEnabled = enabled); onUpdate(next); ReminderReceiver.schedule(context, next.reminderHour, next.reminderMinute, enabled) }
         }) }
-        SettingRow("Bible translation", "KJV") { Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted) }
+        var versionMenu by remember { mutableStateOf(false) }
+        Box {
+            SettingRow("Bible translation", "${prefs.translation} · ${versionOf(prefs.translation).name}", onClick = { versionMenu = true }) {
+                Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted)
+            }
+            DropdownMenu(versionMenu, onDismissRequest = { versionMenu = false }) {
+                BIBLE_VERSIONS.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text("${item.id} — ${item.name}") },
+                        onClick = { onUpdate(prefs.copy(translation = item.id)); versionMenu = false },
+                    )
+                }
+            }
+        }
         SettingRow("Reduce motion", if (prefs.reduceMotion) "On" else "Off") {
             Switch(prefs.reduceMotion, onCheckedChange = { onUpdate(prefs.copy(reduceMotion = it)) })
         }

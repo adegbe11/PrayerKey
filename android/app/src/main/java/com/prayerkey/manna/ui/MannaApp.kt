@@ -109,7 +109,14 @@ fun MannaApp() {
                         },
                         onProfile = { showProfile = true },
                     )
-                    1 -> BibleScreen(memory, viewModel::save, viewModel::memorize, viewModel::advanceMemory)
+                    1 -> BibleScreen(
+                        memory = memory,
+                        translation = preferences.translation,
+                        onTranslation = { viewModel.updatePreferences(preferences.copy(translation = it)) },
+                        onSave = viewModel::save,
+                        onMemorize = viewModel::memorize,
+                        onAdvanceMemory = viewModel::advanceMemory,
+                    )
                     2 -> PrayerScreen(journal, viewModel::savePrayer)
                     3 -> ChurchScreen(
                         sermons = sermons,
