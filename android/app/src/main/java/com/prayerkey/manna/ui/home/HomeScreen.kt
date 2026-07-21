@@ -154,9 +154,11 @@ private fun Header(name: String, streak: Int, onProfile: () -> Unit) {
 
 @Composable
 private fun VerseDeckCard(card: VerseCard, revealed: Boolean, progress: Float, dragY: Float, reduceMotion: Boolean, modifier: Modifier) {
-    val shape = RoundedCornerShape(28.dp)
-    val rotation = if (reduceMotion) 0f else 48f - (228f * progress)
-    val front = if (reduceMotion) revealed else progress > .52f || revealed
+    val shape = RoundedCornerShape(24.dp)
+    // Resting card stands perfectly straight and flat, Tinder-style.
+    // The 3D tumble only happens DURING the pull (0° -> -180° flip).
+    val rotation = if (reduceMotion) 0f else -(180f * progress)
+    val front = if (reduceMotion) revealed else progress > .5f || revealed
     Box(
         // Tinder-sized: the card owns the whole stage — full width, all
         // available height between the header and the bottom controls.
@@ -165,7 +167,7 @@ private fun VerseDeckCard(card: VerseCard, revealed: Boolean, progress: Float, d
             .graphicsLayer {
                 rotationX = rotation
                 cameraDistance = 18f * density
-                scaleX = .94f + (.06f * progress); scaleY = .94f + (.06f * progress)
+                scaleX = 1f; scaleY = 1f
                 shadowElevation = 22f; this.shape = shape; clip = true
             }
             .background(if (front) Ivory else Night, shape)
@@ -202,7 +204,7 @@ private fun CardFront(card: VerseCard) {
             Spacer(Modifier.height(40.dp))
             Text(card.verse, color = Ink, fontFamily = FontFamily.Serif, fontSize = 31.sp, lineHeight = 40.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height(20.dp))
-            Text("${card.reference}   |   ${card.translation}", color = Muted, fontSize = 12.sp)
+            Text("${card.reference}   |   ${card.translation}", color = Ink, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.weight(1f))
             Text("Pulled by ${card.receivedBy} people today", color = Color.White, fontSize = 11.sp)
         }
