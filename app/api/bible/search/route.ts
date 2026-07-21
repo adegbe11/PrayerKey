@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { searchBible } from "@/lib/bible/kjv";
+import { semanticVerseSearch } from "@/lib/ai/bible-embeddings";
 
 /**
  * GET /api/bible/search?q=<query>
@@ -12,9 +13,23 @@ import { searchBible } from "@/lib/bible/kjv";
  */
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
+  const translation = (req.nextUrl.searchParams.get("translation")?.trim() || "KJV").toUpperCase();
   if (!q) return NextResponse.json({ results: [] });
 
   try {
+    if (translation !== "KJV") {
+      try {
+        const matches = await semanticVerseSearch(q, 10, translation);
+        if (matches.length) {
+          return NextResponse.json({
+            results: matches.map((match) => ({ ref: match.verseRef, text: match.verseText, translation: match.translation })),
+          });
+        }
+      } catch (semErr) {
+        // Embeddings service unavailable (no key / network) — fall through to KJV
+        console.error("[bible/search] semantic fallback to KJV:", semErr);
+      }
+    }
     const results = searchBible(q, 5);
     return NextResponse.json({ results });
   } catch (err) {
