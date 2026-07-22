@@ -110,48 +110,37 @@ fun BibleScreen(
         }.orEmpty()
     }
 
-    ScreenFrame("Bible", "Every version. Search by reference, word, or feeling.") {
+    /* Tinder rule: the CARD owns the screen. One slim header row +
+       search — everything else lives on or under the card. */
+    Column(Modifier.fillMaxSize().background(Canvas).padding(horizontal = 14.dp).padding(top = 14.dp)) {
 
-        /* ── Version selector — premium row card ── */
-        Surface(
-            onClick = { pickerOpen = true },
-            shape = RoundedCornerShape(22.dp), color = Night,
-            modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
-        ) {
-            Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(version.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                        Spacer(Modifier.width(8.dp))
-                        SourcePill(version.source)
-                    }
-                    Text(version.name, color = Color.White.copy(.62f), fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text("Bible", fontFamily = FontFamily.Serif, fontSize = 26.sp)
+            Spacer(Modifier.weight(1f))
+            IconButton(onClick = { showMemory = !showMemory }) {
+                Icon(Icons.Outlined.School, "Memorize", tint = if (showMemory) Gold else Muted)
+            }
+            Surface(onClick = { pickerOpen = true }, shape = RoundedCornerShape(99.dp), color = Night) {
+                Row(Modifier.padding(start = 14.dp, end = 8.dp, top = 7.dp, bottom = 7.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(version.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Icon(Icons.Outlined.KeyboardArrowDown, "Change version", tint = Gold)
                 }
-                Text("Change", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Gold)
             }
         }
 
         OutlinedTextField(
-            value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-            placeholder = { Text("Try “I can't sleep” or Psalm 23") },
+            value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            placeholder = { Text("Try “I can't sleep” or Psalm 23", fontSize = 14.sp) },
             leadingIcon = { Icon(Icons.Outlined.Search, null) }, singleLine = true,
-            shape = RoundedCornerShape(18.dp), colors = fieldColors(),
+            shape = RoundedCornerShape(16.dp), colors = fieldColors(),
             trailingIcon = { IconButton(onClick = { runSearch(query) }) { Icon(Icons.Outlined.ArrowForward, "Search") } },
         )
 
-        Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("Fear", "Healing", "Peace").forEach { word ->
-                SuggestionChip(onClick = { query = word; runSearch(word) }, label = { Text(word) })
-            }
-            SuggestionChip(onClick = { showMemory = !showMemory }, label = { Text("Memorize ${memory.size}") }, icon = { Icon(Icons.Outlined.School, null) })
-        }
-        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Gold, trackColor = Hairline)
+        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 6.dp), color = Gold, trackColor = Hairline)
         if (showMemory) {
+            Spacer(Modifier.height(10.dp))
             MemoryTrainer(memory.firstOrNull(), onAdvanceMemory)
-        } else Box(Modifier.weight(1f).fillMaxWidth().padding(bottom = 10.dp)) {
-            // Scripture is dealt, never scrolled — pull down for the next
-            // verse, push up to save. The MANNA rule, applied to the Bible.
+        } else Box(Modifier.weight(1f).fillMaxWidth().padding(top = 10.dp, bottom = 6.dp)) {
             com.prayerkey.manna.ui.components.VersePullDeck(
                 verses = shown,
                 onSave = { onSave(VerseCard(it.reference, it.translation, it.text, "")) },
