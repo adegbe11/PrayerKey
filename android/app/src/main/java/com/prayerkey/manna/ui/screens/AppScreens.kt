@@ -130,7 +130,7 @@ fun BibleScreen(
 
         OutlinedTextField(
             value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            placeholder = { Text("Try “I can't sleep” or Psalm 23", fontSize = 14.sp) },
+            placeholder = { Text("Search", fontSize = 14.sp, color = Muted) },
             leadingIcon = { Icon(Icons.Outlined.Search, null) }, singleLine = true,
             shape = RoundedCornerShape(16.dp), colors = fieldColors(),
             trailingIcon = { IconButton(onClick = { runSearch(query) }) { Icon(Icons.Outlined.ArrowForward, "Search") } },
