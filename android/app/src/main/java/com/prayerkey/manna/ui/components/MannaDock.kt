@@ -61,9 +61,9 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
     ) {
         Surface(
             shape = RoundedCornerShape(36.dp),
-            color = Color.White.copy(alpha = .94f),
+            color = Color.White.copy(alpha = .96f),
             border = BorderStroke(0.5.dp, Color(0xFFE8E8ED)),
-            shadowElevation = 18.dp,
+            shadowElevation = 26.dp,
         ) {
             Row(
                 Modifier.padding(horizontal = 10.dp, vertical = 9.dp),
@@ -82,7 +82,10 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                     Row(
                         Modifier
                             .clip(RoundedCornerShape(28.dp))
-                            .background(if (active) Night else Color.Transparent)
+                            .background(
+                                if (active) com.prayerkey.manna.ui.theme.NightGloss
+                                else androidx.compose.ui.graphics.SolidColor(Color.Transparent),
+                            )
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,

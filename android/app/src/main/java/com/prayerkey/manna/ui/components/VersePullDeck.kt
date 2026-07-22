@@ -6,6 +6,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -224,10 +225,20 @@ private fun VerseFace(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(26.dp),
-        color = if (still) Night else Ivory,
+        color = Color.Transparent,
         border = BorderStroke(1.dp, if (still) Color(0xFF343A58) else Hairline),
-        shadowElevation = if (dimmed) 0.dp else 14.dp,
+        shadowElevation = if (dimmed) 0.dp else 24.dp,
     ) {
+        Box(
+            Modifier.fillMaxSize().background(
+                if (still) com.prayerkey.manna.ui.theme.NightGloss
+                else com.prayerkey.manna.ui.theme.IvoryGloss,
+            ),
+        ) {
+        Box(Modifier.fillMaxSize().background(
+            if (still) com.prayerkey.manna.ui.theme.TopSheen
+            else com.prayerkey.manna.ui.theme.TopSheenLight,
+        ))
         Column(
             Modifier.fillMaxSize().padding(horizontal = 26.dp, vertical = 22.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -267,6 +278,7 @@ private fun VerseFace(
                 }
             }
             if (still) Text("Breathe this one. Then keep pulling.", color = Color.White.copy(.6f), fontSize = 12.sp)
+        }
         }
     }
 }

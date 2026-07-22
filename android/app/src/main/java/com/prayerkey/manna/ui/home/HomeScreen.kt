@@ -121,8 +121,8 @@ fun HomeScreen(
         }
         AnimatedVisibility(state == CardState.Revealed) {
             Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ActionButton("Pray this", Electric, Color.White, Modifier.weight(1f)) { onPray(activeCard) }
-                ActionButton("Save", AppleGray, Ink, Modifier.weight(1f)) { onSave(activeCard); onReceiveNext() }
+                ActionButton("Pray this", ElectricGloss, Color.White, Modifier.weight(1f)) { onPray(activeCard) }
+                ActionButton("Save", Brush.verticalGradient(listOf(Color.White, Color(0xFFEFEFF3))), Ink, Modifier.weight(1f)) { onSave(activeCard); onReceiveNext() }
             }
         }
         AnimatedVisibility(state == CardState.Revealed) {
@@ -170,7 +170,7 @@ private fun VerseDeckCard(card: VerseCard, revealed: Boolean, progress: Float, d
                 rotationX = rotation
                 cameraDistance = 18f * density
                 scaleX = 1f; scaleY = 1f
-                shadowElevation = 22f; this.shape = shape; clip = true
+                shadowElevation = 34f; this.shape = shape; clip = true
             }
             .background(if (front) Ivory else Night, shape)
             .border(1.dp, if (front) Color(0xFFE8D7B5) else Color(0xFF343A58), shape),
@@ -184,6 +184,7 @@ private fun VerseDeckCard(card: VerseCard, revealed: Boolean, progress: Float, d
 @Composable
 private fun CardBack() {
     Box(Modifier.fillMaxSize().background(Brush.radialGradient(listOf(Color(0xFF2A304D), Night))), contentAlignment = Alignment.Center) {
+        Box(Modifier.fillMaxSize().background(TopSheen))
         Canvas(Modifier.fillMaxSize().padding(16.dp)) {
             drawRoundRect(Gold.copy(alpha = .65f), cornerRadius = CornerRadius(68f), style = Stroke(1.2f))
             drawCircle(Gold.copy(alpha = .11f), radius = size.minDimension * .29f)
@@ -248,17 +249,25 @@ private fun PullPrompt(revealed: Boolean) {
 }
 
 @Composable
-private fun ActionButton(label: String, color: Color, content: Color, modifier: Modifier, onClick: () -> Unit) {
-    Button(onClick, modifier.height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = color, contentColor = content), shape = RoundedCornerShape(15.dp)) {
-        Text(label, fontWeight = FontWeight.SemiBold)
+private fun ActionButton(label: String, brush: Brush, content: Color, modifier: Modifier, onClick: () -> Unit) {
+    // glossy gradient pill with a real shadow — no flat Material button
+    Box(
+        modifier.height(50.dp)
+            .shadow(10.dp, RoundedCornerShape(15.dp), spotColor = Night.copy(alpha = .28f))
+            .clip(RoundedCornerShape(15.dp)).background(brush)
+            .border(0.5.dp, Color.White.copy(alpha = .35f), RoundedCornerShape(15.dp))
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(label, color = content, fontWeight = FontWeight.SemiBold)
     }
 }
 
 @Composable
 private fun AskBar(onAsk: () -> Unit) {
-    Row(Modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(17.dp)).background(AppleGray).clickable(onClick = onAsk).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().height(52.dp).shadow(12.dp, RoundedCornerShape(17.dp), spotColor = Night.copy(alpha = .22f)).clip(RoundedCornerShape(17.dp)).background(Color.White).border(0.5.dp, Hairline, RoundedCornerShape(17.dp)).clickable(onClick = onAsk).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Text("Ask PrayerKey anything…", color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))
-        Box(Modifier.size(40.dp).clip(CircleShape).background(Electric), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(40.dp).clip(CircleShape).background(ElectricGloss), contentAlignment = Alignment.Center) {
             Icon(Icons.Outlined.AutoAwesome, "Ask PrayerKey", tint = Color.White, modifier = Modifier.size(20.dp))
         }
     }

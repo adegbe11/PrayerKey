@@ -14,6 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -122,7 +124,7 @@ fun BibleScreen(
             IconButton(onClick = { showMemory = !showMemory }) {
                 Icon(Icons.Outlined.School, "Memorize", tint = if (showMemory) Gold else Muted)
             }
-            Surface(onClick = { pickerOpen = true }, shape = RoundedCornerShape(99.dp), color = Night) {
+            Surface(onClick = { pickerOpen = true }, shape = RoundedCornerShape(99.dp), color = Color.Transparent, modifier = Modifier.background(NightGloss, RoundedCornerShape(99.dp))) {
                 Row(Modifier.padding(start = 14.dp, end = 8.dp, top = 7.dp, bottom = 7.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(version.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     Icon(Icons.Outlined.KeyboardArrowDown, "Change version", tint = Gold)
@@ -328,8 +330,9 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
         var potdOpen by remember { mutableStateOf(false) }
         if (!deckMode) Surface(
             onClick = { potdOpen = true },
-            shape = RoundedCornerShape(22.dp), color = Night,
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            shape = RoundedCornerShape(22.dp), color = Color.Transparent,
+            shadowElevation = 12.dp,
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp).background(NightGloss, RoundedCornerShape(22.dp)),
         ) {
             Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -436,18 +439,31 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                 }
             }
             error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 10.dp)) }
-            Button(
-                onClick = {
-                    scope.launch {
-                        loading = true; error = null
-                        runCatching { PrayerKeyApi.generatePrayer(request, moods.toList()) }
-                            .onSuccess { generated = it }
-                            .onFailure { error = it.message ?: "Prayer could not be generated" }
-                        loading = false
-                    }
-                }, enabled = request.isNotBlank() && !loading,
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp).height(56.dp), shape = RoundedCornerShape(17.dp),
-            ) { if (loading) CircularProgressIndicator(Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp) else Icon(Icons.Outlined.AutoAwesome, null); Spacer(Modifier.width(8.dp)); Text(if (loading) "Preparing your prayer…" else "Generate Prayer", fontWeight = FontWeight.SemiBold) }
+            val canGenerate = request.isNotBlank() && !loading
+            Box(
+                Modifier.fillMaxWidth().padding(top = 12.dp).height(56.dp)
+                    .shadow(if (canGenerate) 14.dp else 0.dp, RoundedCornerShape(17.dp), spotColor = Electric.copy(alpha = .45f))
+                    .clip(RoundedCornerShape(17.dp))
+                    .background(if (canGenerate) ElectricGloss else androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0xFFD9D9DE), Color(0xFFCFCFD6))))
+                    .border(0.5.dp, Color.White.copy(alpha = .35f), RoundedCornerShape(17.dp))
+                    .clickable(enabled = canGenerate) {
+                        scope.launch {
+                            loading = true; error = null
+                            runCatching { PrayerKeyApi.generatePrayer(request, moods.toList()) }
+                                .onSuccess { generated = it }
+                                .onFailure { error = it.message ?: "Prayer could not be generated" }
+                            loading = false
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (loading) CircularProgressIndicator(Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                    else Icon(Icons.Outlined.AutoAwesome, null, tint = Color.White, modifier = Modifier.size(19.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(if (loading) "Preparing your prayer…" else "Generate Prayer", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                }
+            }
             if (journal.isNotEmpty()) {
                 Text("Prayer journal", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 24.dp, bottom = 8.dp))
                 journal.take(2).forEach { entry ->
