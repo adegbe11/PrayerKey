@@ -13,6 +13,7 @@ import com.prayerkey.manna.data.GeneratedPrayer
 import com.prayerkey.manna.model.VerseCard
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val store = MannaStore(application)
@@ -32,6 +33,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val entries = _entries.asStateFlow()
     private val _journalStreak = MutableStateFlow(store.journalStreak())
     val journalStreak = _journalStreak.asStateFlow()
+    // 544 prayer decks — fetched once, cached for the whole session so
+    // the Prayers tab opens instantly every time
+    private val _topics = MutableStateFlow<List<com.prayerkey.manna.data.PrayerTopic>>(emptyList())
+    val topics = _topics.asStateFlow()
+    private var topicsRequested = false
+    fun loadTopics() {
+        if (topicsRequested) return
+        topicsRequested = true
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            runCatching { com.prayerkey.manna.data.PrayerKeyApi.prayerTopics() }
+                .onSuccess { _topics.value = it }
+                .onFailure { topicsRequested = false }
+        }
+    }
 
     fun save(card: VerseCard) { store.save(card); _saved.value = store.all() }
     fun markAnswered(id: Long, testimony: String) { store.markAnswered(id, testimony); _saved.value = store.all() }

@@ -56,6 +56,7 @@ fun MannaApp() {
     val journal by viewModel.journal.collectAsState()
     val entries by viewModel.entries.collectAsState()
     val journalStreak by viewModel.journalStreak.collectAsState()
+    val topics by viewModel.topics.collectAsState()
     val context = LocalContext.current
     val destinations = remember {
         listOf(
@@ -83,8 +84,9 @@ fun MannaApp() {
         Box(Modifier.fillMaxSize().padding(padding)) {
             if (showProfile) {
                 ProfileScreen(saved.size, streak, preferences, onBack = { showProfile = false }, onUpdate = viewModel::updatePreferences)
-            } else AnimatedContent(targetState = selected, label = "destination") { page ->
-                when (page) {
+            } else {
+                // instant tab switch — no transition animation, zero delay
+                when (selected) {
                     0 -> HomeScreen(
                         card = DailyVerses[verseIndex % DailyVerses.size],
                         name = preferences.name,
@@ -98,6 +100,7 @@ fun MannaApp() {
                             CardShareRenderer.share(context, verse)
                         },
                         onProfile = { showProfile = true },
+                        onAsk = { selected = 2 },
                     )
                     1 -> BibleScreen(
                         memory = memory,
@@ -107,7 +110,7 @@ fun MannaApp() {
                         onMemorize = viewModel::memorize,
                         onAdvanceMemory = viewModel::advanceMemory,
                     )
-                    2 -> PrayerScreen(journal, viewModel::savePrayer)
+                    2 -> PrayerScreen(journal, topics, viewModel::loadTopics, viewModel::savePrayer)
                     3 -> ChurchScreen(
                         sermons = sermons,
                         onStartSession = viewModel::startSermon,

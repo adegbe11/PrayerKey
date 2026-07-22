@@ -159,12 +159,10 @@ fun VersePullDeck(
             onSave = null, onMemorize = null, onOpen = null,
         )
 
-        /* ── front card: rides the thumb 1:1, rotates with the drag ── */
+        /* ── front card: rides the thumb 1:1 — STRAIGHT down, no tilt ── */
         Box(
             Modifier.fillMaxSize().graphicsLayer {
                 translationY = offsetY.value
-                rotationZ = progress * 4.5f
-                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(.5f, 1.2f)
             },
         ) {
             VerseFace(

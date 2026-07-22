@@ -52,6 +52,7 @@ fun HomeScreen(
     onPray: (VerseCard) -> Unit,
     onShare: (VerseCard) -> Unit,
     onProfile: () -> Unit,
+    onAsk: () -> Unit,
 ) {
     var state by remember { mutableStateOf(CardState.Waiting) }
     var dragY by remember { mutableFloatStateOf(0f) }
@@ -130,13 +131,14 @@ fun HomeScreen(
             }
         }
         PullPrompt(state == CardState.Revealed)
-        AskBar()
+        AskBar(onAsk)
         Spacer(Modifier.height(10.dp))
     }
 }
 
 @Composable
 private fun Header(name: String, streak: Int, onProfile: () -> Unit) {
+    // bell opens Profile (where reminders live) — no dead buttons
     Row(Modifier.fillMaxWidth().padding(top = 22.dp, bottom = 22.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text("Good morning,", color = Muted, fontSize = 14.sp)
@@ -145,7 +147,7 @@ private fun Header(name: String, streak: Int, onProfile: () -> Unit) {
         Surface(color = AppleGray, shape = RoundedCornerShape(22.dp)) {
             Text("🔥  $streak", Modifier.padding(horizontal = 12.dp, vertical = 8.dp), fontWeight = FontWeight.Bold)
         }
-        IconButton(onClick = {}) { Icon(Icons.Outlined.NotificationsNone, "Notifications", tint = Ink) }
+        IconButton(onClick = onProfile) { Icon(Icons.Outlined.NotificationsNone, "Reminders", tint = Ink) }
         Box(Modifier.size(38.dp).clip(CircleShape).background(Night).clickable(onClick = onProfile), contentAlignment = Alignment.Center) {
             Text("CA", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         }
@@ -253,8 +255,8 @@ private fun ActionButton(label: String, color: Color, content: Color, modifier: 
 }
 
 @Composable
-private fun AskBar() {
-    Row(Modifier.fillMaxWidth().height(52.dp).background(AppleGray, RoundedCornerShape(17.dp)).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+private fun AskBar(onAsk: () -> Unit) {
+    Row(Modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(17.dp)).background(AppleGray).clickable(onClick = onAsk).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Text("Ask PrayerKey anything…", color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))
         Box(Modifier.size(40.dp).clip(CircleShape).background(Electric), contentAlignment = Alignment.Center) {
             Icon(Icons.Outlined.AutoAwesome, "Ask PrayerKey", tint = Color.White, modifier = Modifier.size(20.dp))
