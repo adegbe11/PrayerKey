@@ -121,7 +121,7 @@ fun HomeScreen(
         AnimatedVisibility(state == CardState.Revealed) {
             Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 ActionButton("Pray this", Electric, Color.White, Modifier.weight(1f)) { onPray(activeCard) }
-                ActionButton("Save", Color(0xFFF0F0F2), Ink, Modifier.weight(1f)) { onSave(activeCard); onReceiveNext() }
+                ActionButton("Save", AppleGray, Ink, Modifier.weight(1f)) { onSave(activeCard); onReceiveNext() }
             }
         }
         AnimatedVisibility(state == CardState.Revealed) {
@@ -142,7 +142,7 @@ private fun Header(name: String, streak: Int, onProfile: () -> Unit) {
             Text("Good morning,", color = Muted, fontSize = 14.sp)
             Text("$name 👋", color = Ink, fontFamily = FontFamily.Serif, fontSize = 31.sp, lineHeight = 35.sp)
         }
-        Surface(color = Color.White, shape = RoundedCornerShape(22.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
+        Surface(color = AppleGray, shape = RoundedCornerShape(22.dp)) {
             Text("🔥  $streak", Modifier.padding(horizontal = 12.dp, vertical = 8.dp), fontWeight = FontWeight.Bold)
         }
         IconButton(onClick = {}) { Icon(Icons.Outlined.NotificationsNone, "Notifications", tint = Ink) }
@@ -233,7 +233,7 @@ private fun MountainScene(modifier: Modifier) {
 @Composable
 private fun DeckShadow() {
     Box(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 8.dp).offset(y = 12.dp).graphicsLayer { rotationZ = 2.2f }
-        .shadow(16.dp, RoundedCornerShape(28.dp)).background(Color(0xFFF2EEE5), RoundedCornerShape(28.dp)))
+        .shadow(16.dp, RoundedCornerShape(28.dp)).background(AppleGray, RoundedCornerShape(28.dp)))
 }
 
 @Composable
@@ -254,7 +254,7 @@ private fun ActionButton(label: String, color: Color, content: Color, modifier: 
 
 @Composable
 private fun AskBar() {
-    Row(Modifier.fillMaxWidth().height(52.dp).background(Color.White, RoundedCornerShape(17.dp)).border(1.dp, Hairline, RoundedCornerShape(17.dp)).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().height(52.dp).background(AppleGray, RoundedCornerShape(17.dp)).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Text("Ask PrayerKey anything…", color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))
         Box(Modifier.size(40.dp).clip(CircleShape).background(Electric), contentAlignment = Alignment.Center) {
             Icon(Icons.Outlined.AutoAwesome, "Ask PrayerKey", tint = Color.White, modifier = Modifier.size(20.dp))

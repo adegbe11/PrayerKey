@@ -655,6 +655,6 @@ private fun ScreenFrame(title: String, subtitle: String, content: @Composable Co
 
 @Composable
 private fun fieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedBorderColor = Electric, unfocusedBorderColor = Hairline,
-    focusedContainerColor = Color.White, unfocusedContainerColor = Color.White,
+    focusedBorderColor = Electric, unfocusedBorderColor = Color.Transparent,
+    focusedContainerColor = AppleGray, unfocusedContainerColor = AppleGray,
 )

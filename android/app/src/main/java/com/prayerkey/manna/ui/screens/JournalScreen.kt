@@ -155,8 +155,8 @@ private fun JournalTimeline(
             singleLine = true, shape = RoundedCornerShape(14.dp),
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Electric, unfocusedBorderColor = Hairline,
-                focusedContainerColor = Color.White, unfocusedContainerColor = Color.White,
+                focusedBorderColor = Electric, unfocusedBorderColor = Color.Transparent,
+                focusedContainerColor = AppleGray, unfocusedContainerColor = AppleGray,
             ),
         )
 
@@ -211,7 +211,8 @@ private fun dayLabel(day: Long, today: Long): String = when (day) {
 
 @Composable
 private fun StatPill(value: String, label: String, modifier: Modifier) {
-    Surface(modifier, shape = RoundedCornerShape(16.dp), color = Color.White, border = BorderStroke(1.dp, Hairline)) {
+    // Apple style: soft gray fill on pure white, no border
+    Surface(modifier, shape = RoundedCornerShape(16.dp), color = AppleGray) {
         Column(Modifier.padding(vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(value, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             Text(label, color = Muted, fontSize = 10.sp)
