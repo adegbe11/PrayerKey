@@ -149,26 +149,15 @@ fun BibleScreen(
         if (loading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Gold, trackColor = Hairline)
         if (showMemory) {
             MemoryTrainer(memory.firstOrNull(), onAdvanceMemory)
-        } else LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 48.dp)) {
-            items(shown, key = { "${it.translation}-${it.reference}" }) { card ->
-                Surface(
-                    modifier = Modifier.clickable { selectedVerse = card },
-                    shape = RoundedCornerShape(24.dp), color = Color.White,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Hairline),
-                ) {
-                    Column(Modifier.padding(20.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(card.reference, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.weight(1f))
-                            VersionPill(card.translation)
-                        }
-                        Text(card.text, fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 29.sp, modifier = Modifier.padding(top = 10.dp))
-                        Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.End) {
-                            IconButton(onClick = { onMemorize(VerseCard(card.reference, card.translation, card.text, "")) }) { Icon(Icons.Outlined.School, "Memorize", tint = Muted) }
-                            IconButton(onClick = { onSave(VerseCard(card.reference, card.translation, card.text, "")) }) { Icon(Icons.Outlined.BookmarkBorder, "Save", tint = Muted) }
-                        }
-                    }
-                }
-            }
+        } else Box(Modifier.weight(1f).fillMaxWidth().padding(bottom = 10.dp)) {
+            // Scripture is dealt, never scrolled — pull down for the next
+            // verse, push up to save. The MANNA rule, applied to the Bible.
+            com.prayerkey.manna.ui.components.VersePullDeck(
+                verses = shown,
+                onSave = { onSave(VerseCard(it.reference, it.translation, it.text, "")) },
+                onMemorize = { onMemorize(VerseCard(it.reference, it.translation, it.text, "")) },
+                onOpen = { selectedVerse = it },
+            )
         }
     }
 
