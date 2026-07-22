@@ -149,7 +149,7 @@ fun BibleScreen(
         if (loading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Gold, trackColor = Hairline)
         if (showMemory) {
             MemoryTrainer(memory.firstOrNull(), onAdvanceMemory)
-        } else LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 24.dp)) {
+        } else LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 48.dp)) {
             items(shown, key = { "${it.translation}-${it.reference}" }) { card ->
                 Surface(
                     modifier = Modifier.clickable { selectedVerse = card },
@@ -356,7 +356,7 @@ fun PrayerScreen(journal: List<JournalPrayer>, onSavePrayer: (String, GeneratedP
             )
             if (topicsLoading) LinearProgressIndicator(Modifier.fillMaxWidth())
             val filtered = topics.filter { topicQuery.isBlank() || it.title.contains(topicQuery, true) || it.category.contains(topicQuery, true) }
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 48.dp)) {
                 items(filtered, key = { it.slug }) { topic ->
                     Surface(
                         modifier = Modifier.fillMaxWidth().clickable { selectedTopic = topic },
@@ -463,7 +463,7 @@ fun SavedScreen(words: List<SavedWord>, onAnswered: (Long, String) -> Unit) {
             FilterChip(answeredTab, { answeredTab = true }, label = { Text("Answered ${words.count { it.answeredAt != null }}") })
         }
         val shown = words.filter { (it.answeredAt != null) == answeredTab }
-        if (shown.isEmpty()) EmptySaved(answeredTab) else LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (shown.isEmpty()) EmptySaved(answeredTab) else LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 48.dp)) {
             items(shown, key = { it.id }) { word -> SavedCard(word, !answeredTab) { selected = word } }
         }
     }

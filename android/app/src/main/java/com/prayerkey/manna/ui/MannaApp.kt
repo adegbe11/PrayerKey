@@ -73,21 +73,11 @@ fun MannaApp() {
     Scaffold(
         containerColor = Canvas,
         bottomBar = {
-            NavigationBar(containerColor = Color.White, tonalElevation = 0.dp) {
-                destinations.forEachIndexed { index, destination ->
-                    NavigationBarItem(
-                        selected = selected == index,
-                        onClick = { selected = index },
-                        icon = { Icon(destination.icon, contentDescription = destination.label) },
-                        label = { Text(destination.label) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = Electric, selectedTextColor = Electric,
-                            indicatorColor = Color.Transparent,
-                            unselectedIconColor = Muted, unselectedTextColor = Muted,
-                        ),
-                    )
-                }
-            }
+            com.prayerkey.manna.ui.components.MannaDock(
+                items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon) },
+                selected = selected,
+                onSelect = { selected = it },
+            )
         },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
