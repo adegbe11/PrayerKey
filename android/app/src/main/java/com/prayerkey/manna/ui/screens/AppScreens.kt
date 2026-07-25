@@ -116,41 +116,66 @@ fun BibleScreen(
         }.orEmpty()
     }
 
-    /* Tinder rule: the CARD owns the screen. One slim header row +
-       search — everything else lives on or under the card. */
-    Column(Modifier.fillMaxSize().background(Canvas).padding(horizontal = 14.dp).padding(top = 14.dp)) {
+    /* TINDER ANATOMY: the card IS the screen — full-bleed, edge to edge.
+       Search + version chips FLOAT on top of it; five action buttons
+       float at the bottom. Nothing stacks above the card. */
+    val shareContext = LocalContext.current
+    var searchOpen by remember { mutableStateOf(false) }
 
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Bible", fontFamily = FontFamily.Serif, fontSize = 26.sp)
-            Spacer(Modifier.weight(1f))
-            IconButton(onClick = { showMemory = !showMemory }) {
-                Icon(Icons.Outlined.School, "Memorize", tint = if (showMemory) Gold else Muted)
-            }
-            Surface(onClick = { pickerOpen = true }, shape = RoundedCornerShape(99.dp), color = Color.Transparent, modifier = Modifier.background(NightGloss, RoundedCornerShape(99.dp))) {
-                Row(Modifier.padding(start = 14.dp, end = 8.dp, top = 7.dp, bottom = 7.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(version.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                    Icon(Icons.Outlined.KeyboardArrowDown, "Change version", tint = Gold)
-                }
-            }
-        }
-
-        OutlinedTextField(
-            value = query, onValueChange = { query = it }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            placeholder = { Text("Search", fontSize = 14.sp, color = Muted) },
-            leadingIcon = { Icon(Icons.Outlined.Search, null) }, singleLine = true,
-            shape = RoundedCornerShape(16.dp), colors = fieldColors(),
-            trailingIcon = { IconButton(onClick = { runSearch(query) }) { Icon(Icons.Outlined.ArrowForward, "Search") } },
-        )
-
-        if (loading) LinearProgressIndicator(Modifier.fillMaxWidth().padding(top = 6.dp), color = Gold, trackColor = Hairline)
+    Box(Modifier.fillMaxSize().background(Canvas)) {
         if (showMemory) {
-            Spacer(Modifier.height(10.dp))
-            MemoryTrainer(memory.firstOrNull(), onAdvanceMemory)
-        } else Box(Modifier.weight(1f).fillMaxWidth().padding(top = 10.dp, bottom = 6.dp)) {
+            Column(Modifier.fillMaxSize().padding(horizontal = 14.dp).padding(top = 60.dp)) {
+                Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("Memorize", fontFamily = FontFamily.Serif, fontSize = 24.sp, modifier = Modifier.weight(1f))
+                    FloatChip(onClick = { showMemory = false }) {
+                        Icon(Icons.Outlined.Close, "Back to verses", tint = Ink, modifier = Modifier.size(19.dp))
+                    }
+                }
+                MemoryTrainer(memory.firstOrNull(), onAdvanceMemory)
+            }
+        } else {
             com.prayerkey.manna.ui.components.VersePullDeck(
                 verses = shown,
+                topOverlay = {
+                    Row(
+                        Modifier.fillMaxWidth().padding(horizontal = 14.dp).padding(top = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        FloatChip(onClick = { searchOpen = !searchOpen }) {
+                            Icon(Icons.Outlined.Search, "Search", tint = Ink, modifier = Modifier.size(19.dp))
+                        }
+                        Spacer(Modifier.weight(1f))
+                        FloatChip(onClick = { showMemory = true }) {
+                            Icon(Icons.Outlined.School, "Memorize", tint = Ink, modifier = Modifier.size(19.dp))
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Surface(
+                            onClick = { pickerOpen = true }, shape = RoundedCornerShape(99.dp),
+                            color = Color.Transparent, shadowElevation = 8.dp,
+                            modifier = Modifier.background(NightGloss, RoundedCornerShape(99.dp)),
+                        ) {
+                            Row(Modifier.padding(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text(version.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                                Icon(Icons.Outlined.KeyboardArrowDown, "Change version", tint = Gold, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    }
+                    if (searchOpen) OutlinedTextField(
+                        value = query, onValueChange = { query = it },
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp).padding(top = 8.dp),
+                        placeholder = { Text("Search", fontSize = 14.sp, color = Muted) },
+                        singleLine = true, shape = RoundedCornerShape(16.dp), colors = fieldColors(),
+                        trailingIcon = {
+                            IconButton(onClick = { runSearch(query); searchOpen = false }) {
+                                Icon(Icons.Outlined.ArrowForward, "Search")
+                            }
+                        },
+                    )
+                    if (loading) LinearProgressIndicator(Modifier.fillMaxWidth().padding(horizontal = 14.dp), color = Gold, trackColor = Hairline)
+                },
                 onSave = { onSave(VerseCard(it.reference, it.translation, it.text, "")) },
                 onMemorize = { onMemorize(VerseCard(it.reference, it.translation, it.text, "")) },
+                onShare = { com.prayerkey.manna.share.CardShareRenderer.share(shareContext, VerseCard(it.reference, it.translation, it.text, "")) },
                 onOpen = { selectedVerse = it },
             )
         }
@@ -224,6 +249,19 @@ fun BibleScreen(
             }
         }
     }
+}
+
+/** Floating white circular chip that sits on top of the card. */
+@Composable
+private fun FloatChip(onClick: () -> Unit, content: @Composable () -> Unit) {
+    Box(
+        Modifier.size(42.dp)
+            .shadow(8.dp, CircleShape, spotColor = Night.copy(alpha = .3f))
+            .clip(CircleShape).background(Color.White)
+            .border(0.5.dp, Hairline, CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) { content() }
 }
 
 @Composable
