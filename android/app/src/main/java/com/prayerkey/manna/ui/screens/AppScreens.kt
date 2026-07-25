@@ -1,6 +1,8 @@
 package com.prayerkey.manna.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -331,8 +333,11 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
         if (!deckMode) Surface(
             onClick = { potdOpen = true },
             shape = RoundedCornerShape(22.dp), color = Color.Transparent,
-            shadowElevation = 12.dp,
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp).background(NightGloss, RoundedCornerShape(22.dp)),
+            // shadow on the OUTER modifier only — layering it with the
+            // gradient background painted a doubled inner edge
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
+                .shadow(12.dp, RoundedCornerShape(22.dp), spotColor = Night.copy(alpha = .35f))
+                .background(NightGloss, RoundedCornerShape(22.dp)),
         ) {
             Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -403,7 +408,12 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                 }
             }
         } else if (generated == null) {
-            /* site's AI Prayer Generator design, in Manna's white theme */
+            /* site's AI Prayer Generator design, in Manna's white theme.
+               Scrollable + dock clearance so the CTA is never clipped. */
+            Column(
+                Modifier.weight(1f).verticalScroll(rememberScrollState())
+                    .padding(bottom = 104.dp),
+            ) {
             Spacer(Modifier.height(16.dp))
             Text(
                 "Tell me what to\npray about.",
@@ -472,7 +482,9 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     }
                 }
             }
-        } else {
+            }
+        } else Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(bottom = 104.dp)) {
+            // generated prayers are long — must scroll and clear the dock
             Surface(Modifier.fillMaxWidth().padding(top = 18.dp), shape = RoundedCornerShape(24.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
                 Column(Modifier.padding(22.dp)) {
                     Text(generated!!.title, fontFamily = FontFamily.Serif, fontSize = 25.sp)
