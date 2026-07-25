@@ -17,21 +17,26 @@ import kotlinx.coroutines.launch
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val store = MannaStore(application)
-    private val _saved = MutableStateFlow(store.all())
+
+    /** The app must NEVER die on a cold start because of a storage
+     *  problem — every read falls back to an empty default. */
+    private fun <T> safe(default: T, read: () -> T): T = runCatching(read).getOrDefault(default)
+
+    private val _saved = MutableStateFlow(safe(emptyList()) { store.all() })
     val saved = _saved.asStateFlow()
-    private val _streak = MutableStateFlow(store.streak())
+    private val _streak = MutableStateFlow(safe(0) { store.streak() })
     val streak = _streak.asStateFlow()
-    private val _memory = MutableStateFlow(store.memoryVerses())
+    private val _memory = MutableStateFlow(safe(emptyList()) { store.memoryVerses() })
     val memory = _memory.asStateFlow()
-    private val _preferences = MutableStateFlow(store.preferences())
+    private val _preferences = MutableStateFlow(safe(UserPrefs()) { store.preferences() })
     val preferences = _preferences.asStateFlow()
-    private val _sermons = MutableStateFlow(store.sermons())
+    private val _sermons = MutableStateFlow(safe(emptyList()) { store.sermons() })
     val sermons = _sermons.asStateFlow()
-    private val _journal = MutableStateFlow(store.prayerJournal())
+    private val _journal = MutableStateFlow(safe(emptyList()) { store.prayerJournal() })
     val journal = _journal.asStateFlow()
-    private val _entries = MutableStateFlow(store.journalEntries())
+    private val _entries = MutableStateFlow(safe(emptyList()) { store.journalEntries() })
     val entries = _entries.asStateFlow()
-    private val _journalStreak = MutableStateFlow(store.journalStreak())
+    private val _journalStreak = MutableStateFlow(safe(0) { store.journalStreak() })
     val journalStreak = _journalStreak.asStateFlow()
     // 544 prayer decks — fetched once, cached for the whole session so
     // the Prayers tab opens instantly every time

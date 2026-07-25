@@ -60,6 +60,14 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         if (oldVersion < 6) createJournalEntries(db)
     }
 
+    /** A phone with a newer/foreign schema must never crash the app —
+     *  rebuild the database instead of throwing (default behaviour). */
+    override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        listOf("saved_words", "app_state", "memory_verses", "sermon_sessions", "sermon_verses", "prayer_journal", "journal_entries")
+            .forEach { table -> runCatching { db.execSQL("DROP TABLE IF EXISTS $table") } }
+        onCreate(db)
+    }
+
     private fun createStateTable(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE IF NOT EXISTS app_state (state_key TEXT PRIMARY KEY, state_value TEXT NOT NULL)")
     }
