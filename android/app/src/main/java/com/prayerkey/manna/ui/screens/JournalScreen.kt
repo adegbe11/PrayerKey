@@ -18,6 +18,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -71,11 +79,16 @@ fun JournalScreen(
                 }
             }
 
-            Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(tab == JournalTab.Journal, { tab = JournalTab.Journal }, label = { Text("Journal ${entries.size}") })
-                FilterChip(tab == JournalTab.Saved, { tab = JournalTab.Saved }, label = { Text("Saved ${words.count { it.answeredAt == null }}") })
-                FilterChip(tab == JournalTab.Answered, { tab = JournalTab.Answered }, label = { Text("Answered ${words.count { it.answeredAt != null }}") })
-            }
+            // Filters only earn their space once there is something to sort.
+            // On a blank journal they were three pills all reading "0".
+            val hasAnything = entries.isNotEmpty() || words.isNotEmpty()
+            if (hasAnything) {
+                Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(tab == JournalTab.Journal, { tab = JournalTab.Journal }, label = { Text("Journal ${entries.size}") })
+                    FilterChip(tab == JournalTab.Saved, { tab = JournalTab.Saved }, label = { Text("Saved ${words.count { it.answeredAt == null }}") })
+                    FilterChip(tab == JournalTab.Answered, { tab = JournalTab.Answered }, label = { Text("Answered ${words.count { it.answeredAt != null }}") })
+                }
+            } else Spacer(Modifier.height(10.dp))
 
             when (tab) {
                 JournalTab.Journal -> JournalTimeline(
@@ -153,10 +166,37 @@ private fun JournalTimeline(
     val grouped = remember(shown) { shown.groupBy { it.entryDay }.toSortedMap(compareByDescending { it }) }
 
     Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            StatPill("🔥 $streak", "day streak", Modifier.weight(1f))
-            StatPill("${entries.size}", "entries", Modifier.weight(1f))
-            StatPill("${entries.count { it.gratitude.isNotBlank() }}", "gratitudes", Modifier.weight(1f))
+        /* An empty journal should be an invitation, not a dashboard. No
+           stats, no filters, no search until there is something to count,
+           sort or find — just the line that makes someone want to write. */
+        if (entries.isEmpty()) {
+            Column(
+                Modifier.fillMaxWidth().padding(top = 64.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                JournalMark()
+                Text(
+                    "Your story starts here",
+                    fontWeight = FontWeight.SemiBold, fontSize = 17.sp,
+                    modifier = Modifier.padding(top = 22.dp),
+                )
+                Text(
+                    "Write what's on your heart today. In a year,\nyou'll be holding proof of how God moved.",
+                    color = Muted, fontSize = 13.5.sp, lineHeight = 21.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 10.dp),
+                )
+            }
+            return
+        }
+
+        // one quiet line instead of three grey blocks
+        Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("🔥 $streak", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            StatDot()
+            Text("${entries.size} ${if (entries.size == 1) "entry" else "entries"}", color = Muted, fontSize = 12.sp)
+            val gratitudes = entries.count { it.gratitude.isNotBlank() }
+            if (gratitudes > 0) { StatDot(); Text("$gratitudes grateful", color = Muted, fontSize = 12.sp) }
         }
 
         OutlinedTextField(
@@ -170,19 +210,6 @@ private fun JournalTimeline(
                 focusedContainerColor = AppleGray, unfocusedContainerColor = AppleGray,
             ),
         )
-
-        if (entries.isEmpty()) {
-            Column(Modifier.fillMaxWidth().padding(top = 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("📖", fontSize = 44.sp)
-                Text("Your story starts here", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 14.dp))
-                Text(
-                    "Write what's on your heart today. In a year,\nyou'll be holding proof of how God moved.",
-                    color = Muted, fontSize = 13.sp, lineHeight = 19.sp,
-                    modifier = Modifier.padding(top = 6.dp),
-                )
-            }
-            return
-        }
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -221,13 +248,46 @@ private fun dayLabel(day: Long, today: Long): String = when (day) {
 }
 
 @Composable
-private fun StatPill(value: String, label: String, modifier: Modifier) {
-    // Apple style: soft gray fill on pure white, no border
-    Surface(modifier, shape = RoundedCornerShape(16.dp), color = AppleGray) {
-        Column(Modifier.padding(vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(value, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text(label, color = Muted, fontSize = 10.sp)
+private fun StatDot() = Text("·", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 7.dp))
+
+/**
+ * Line-art open journal with a gold ribbon — drawn, not an emoji, so the
+ * empty state matches the stroke weight of the dock icons instead of
+ * dropping a system glyph into a custom design.
+ */
+@Composable
+private fun JournalMark() {
+    androidx.compose.foundation.Canvas(Modifier.size(66.dp)) {
+        val w = size.width
+        val h = size.height
+        val stroke = Stroke(width = w * .035f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+        val top = h * .22f
+        val bottom = h * .80f
+        val spine = w / 2f
+
+        // the two leaves, curving away from a shared spine
+        val leaves = Path().apply {
+            moveTo(spine, top + h * .045f)
+            cubicTo(spine - w * .13f, top - h * .04f, w * .16f, top, w * .07f, top + h * .03f)
+            lineTo(w * .07f, bottom - h * .03f)
+            cubicTo(w * .18f, bottom - h * .06f, spine - w * .12f, bottom - h * .015f, spine, bottom)
+            cubicTo(spine + w * .12f, bottom - h * .015f, w * .82f, bottom - h * .06f, w * .93f, bottom - h * .03f)
+            lineTo(w * .93f, top + h * .03f)
+            cubicTo(w * .84f, top, spine + w * .13f, top - h * .04f, spine, top + h * .045f)
+            close()
         }
+        drawPath(leaves, Ink.copy(alpha = .82f), style = stroke)
+        // the spine itself
+        drawLine(Ink.copy(alpha = .82f), Offset(spine, top + h * .045f), Offset(spine, bottom), strokeWidth = w * .03f, cap = StrokeCap.Round)
+
+        // ruled lines, shorter as they fall away — suggests writing
+        listOf(.36f to .30f, .48f to .26f, .60f to .20f).forEach { (y, len) ->
+            drawLine(Muted.copy(alpha = .5f), Offset(w * .18f, h * y), Offset(w * (.18f + len), h * y), strokeWidth = w * .022f, cap = StrokeCap.Round)
+            drawLine(Muted.copy(alpha = .5f), Offset(w * .53f, h * y), Offset(w * (.53f + len), h * y), strokeWidth = w * .022f, cap = StrokeCap.Round)
+        }
+
+        // gold ribbon marker, the one warm note
+        drawLine(Gold, Offset(spine, bottom - h * .02f), Offset(spine, h * .95f), strokeWidth = w * .045f, cap = StrokeCap.Round)
     }
 }
 
