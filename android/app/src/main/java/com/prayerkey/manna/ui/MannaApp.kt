@@ -64,7 +64,7 @@ fun MannaApp() {
         listOf(
             Destination("Home", Icons.Outlined.Home),
             Destination("Bible", Icons.Outlined.Book),
-            Destination("AI Pray", Icons.Outlined.AutoAwesome),
+            Destination("Pray", Icons.Outlined.AutoAwesome),
             Destination("Church", Icons.Outlined.Church),
             Destination("Journal", Icons.Outlined.BookmarkBorder),
         )
