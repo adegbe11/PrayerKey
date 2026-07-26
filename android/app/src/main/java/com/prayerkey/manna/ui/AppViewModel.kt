@@ -131,6 +131,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun addEntry(mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?) = io {
         store.addJournalEntry(mood, body, gratitude, verseRef, verseText); refreshEntries()
     }
+
+    /** The richer write flow: carries the entry's origin and prayer flag. */
+    fun addWrite(r: com.prayerkey.manna.ui.journal.WriteResult) = io {
+        store.addJournalEntry(r.mood, r.body, r.gratitude, r.verseRef, r.verseText, r.source, r.isPrayer)
+        refreshEntries()
+    }
+
+    fun updateWrite(id: Long, r: com.prayerkey.manna.ui.journal.WriteResult) = io {
+        store.updateJournalEntry(id, r.mood, r.body, r.gratitude, r.isPrayer); refreshEntries()
+    }
+
+    fun answerEntry(id: Long, testimony: String) = io {
+        store.answerJournalEntry(id, testimony); refreshEntries()
+    }
     fun updateEntry(id: Long, mood: String, body: String, gratitude: String) = io {
         store.updateJournalEntry(id, mood, body, gratitude); refreshEntries()
     }

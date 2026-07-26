@@ -106,7 +106,7 @@ fun ChurchScreen(
         arranged = SermonArranger.arrange(transcript, refs)
     }
 
-    Box(Modifier.fillMaxSize().background(Canvas)) {
+    Box(Modifier.fillMaxSize().background(dayWash())) {
         when (stage) {
             Stage.Ready -> ReadyView(notes, onOpen = { openNote = it }, onStart = { begin() })
             Stage.Listening -> ListeningView(
@@ -191,7 +191,7 @@ private fun ReadyView(notes: List<SermonNote>, onOpen: (SermonNote) -> Unit, onS
                 Surface(
                     onClick = { onOpen(note) },
                     modifier = Modifier.fillMaxWidth().padding(bottom = 9.dp),
-                    color = Ivory, shape = RoundedCornerShape(18.dp),
+                    color = Ivory, shape = R.card,
                     border = BorderStroke(1.dp, Hairline),
                 ) {
                     Column(Modifier.padding(16.dp)) {
@@ -255,7 +255,7 @@ private fun ListeningView(
         caught.reversed().forEach { hit ->
             Surface(
                 Modifier.fillMaxWidth().padding(bottom = 9.dp),
-                color = Color.White, shape = RoundedCornerShape(16.dp),
+                color = Color.White, shape = R.card,
                 border = BorderStroke(1.dp, Hairline), shadowElevation = 2.dp,
             ) {
                 Row(Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -267,8 +267,8 @@ private fun ListeningView(
 
         Box(
             Modifier.fillMaxWidth().padding(top = 22.dp).height(56.dp)
-                .shadow(12.dp, RoundedCornerShape(16.dp), spotColor = Night.copy(alpha = .35f))
-                .clip(RoundedCornerShape(16.dp)).background(NightGloss).clickable(onClick = onEnd),
+                .shadow(14.dp, R.control, spotColor = SoftShadow)
+                .clip(R.control).background(NightGloss).clickable(onClick = onEnd),
             contentAlignment = Alignment.Center,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -348,7 +348,7 @@ private fun NoteView(
 
         if (note.takeaway.isNotBlank()) {
             SectionLabel("CARRY THIS INTO YOUR WEEK")
-            Surface(shape = RoundedCornerShape(18.dp), color = Night, modifier = Modifier.fillMaxWidth()) {
+            Surface(shape = R.card, color = Night, modifier = Modifier.fillMaxWidth()) {
                 Text(
                     note.takeaway, color = Ivory, fontFamily = FontFamily.Serif,
                     fontSize = 19.sp, lineHeight = 27.sp, modifier = Modifier.padding(21.dp),
@@ -368,14 +368,14 @@ private fun NoteView(
         if (!empty) Row(Modifier.fillMaxWidth().padding(top = 26.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(
                 Modifier.weight(1f).height(52.dp)
-                    .shadow(10.dp, RoundedCornerShape(14.dp), spotColor = Electric.copy(alpha = .4f))
-                    .clip(RoundedCornerShape(14.dp)).background(ElectricGloss).clickable(onClick = onSave),
+                    .shadow(12.dp, R.control, spotColor = Electric.copy(alpha = .4f))
+                    .clip(R.control).background(ElectricGloss).clickable(onClick = onSave),
                 contentAlignment = Alignment.Center,
             ) { Text("Save to journal", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp) }
             Box(
                 Modifier.weight(1f).height(52.dp)
-                    .clip(RoundedCornerShape(14.dp)).background(Color.White)
-                    .border(1.dp, Hairline, RoundedCornerShape(14.dp)).clickable(onClick = onShare),
+                    .clip(R.control).background(Color.White)
+                    .border(1.dp, Hairline, R.control).clickable(onClick = onShare),
                 contentAlignment = Alignment.Center,
             ) { Text("Share", fontWeight = FontWeight.SemiBold, fontSize = 14.sp) }
         }

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,10 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.ui.theme.Gold
@@ -51,11 +47,9 @@ data class DockItem(val label: String, val icon: ImageVector)
  * The Manna Dock — a floating glass capsule rather than a flat tab bar, so
  * the full-bleed card on Home and Bible still shows through underneath.
  *
- * Every destination carries its label. Labels used to appear only on the
- * active tab, which left four unlabelled glyphs — and neither the sparkle
- * (AI Pray) nor the church is guessable. Home carries no wayfinding at all
- * now, so the dock is the only signpost in the app and has to be legible
- * at a glance.
+ * Icon-only, Wallet-style: the active destination is the only labelled
+ * thing on screen, and it is labelled by shape rather than text — a night
+ * pill with a gold glyph. Names remain available to screen readers.
  */
 @Composable
 fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
@@ -86,17 +80,13 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                         if (active) Gold else Muted,
                         spring(stiffness = Spring.StiffnessMediumLow), label = "dock-tint",
                     )
-                    val labelColor by animateColorAsState(
-                        if (active) Color.White else Muted,
-                        spring(stiffness = Spring.StiffnessMediumLow), label = "dock-label",
-                    )
 
                     /* Equal weight per tab: five stacked icon+label cells that
                        always occupy the same width, so nothing shifts sideways
                        when the selection moves. */
                     Column(
                         Modifier.weight(1f)
-                            .clip(RoundedCornerShape(22.dp))
+                            .clip(RoundedCornerShape(24.dp))
                             .background(if (active) NightGloss else SolidColor(Color.Transparent))
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
@@ -107,28 +97,15 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                                     onSelect(index)
                                 }
                             }
-                            .padding(vertical = 8.dp),
+                            .padding(vertical = 15.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
+                        // Icon only. contentDescription keeps the name available
+                        // to TalkBack even though it is no longer drawn.
                         Icon(
-                            item.icon, contentDescription = null,
+                            item.icon, contentDescription = item.label,
                             tint = tint,
-                            modifier = Modifier.size(22.dp).scale(iconScale),
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            item.label,
-                            color = labelColor,
-                            fontSize = 9.5.sp,
-                            lineHeight = 11.sp,
-                            letterSpacing = .2.sp,
-                            maxLines = 1,
-                            textAlign = TextAlign.Center,
-                            fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium,
-                            // no font padding, so the label hugs the icon evenly
-                            style = TextStyle(
-                                platformStyle = PlatformTextStyle(includeFontPadding = false),
-                            ),
+                            modifier = Modifier.size(25.dp).scale(iconScale),
                         )
                     }
                 }

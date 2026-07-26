@@ -399,10 +399,10 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
            which read exactly like two views colliding. A single scroll has
            no interior edge to clip against. */
         Column(
-            Modifier.fillMaxSize().background(Canvas)
+            Modifier.fillMaxSize().background(dayWash())
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 22.dp)
-                .padding(top = 24.dp, bottom = 130.dp),
+                .padding(top = 24.dp, bottom = Space.dock),
         ) {
             Text(if (generated == null) "Pray for me" else "Your prayer", fontFamily = FontFamily.Serif, fontSize = 32.sp)
             Text(
@@ -414,12 +414,12 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
             /* ── Prayer of the Day — same daily prayer as prayerkey.com ── */
             Surface(
                 onClick = { potdOpen = true },
-                shape = RoundedCornerShape(22.dp), color = Color.Transparent,
+                shape = R.card, color = Color.Transparent,
                 // shadow on the OUTER modifier only — layering it with the
                 // gradient background painted a doubled inner edge
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 16.dp)
-                    .shadow(12.dp, RoundedCornerShape(22.dp), spotColor = Night.copy(alpha = .35f))
-                    .background(NightGloss, RoundedCornerShape(22.dp)),
+                modifier = Modifier.fillMaxWidth().padding(top = Space.block, bottom = Space.block)
+                    .shadow(14.dp, R.card, spotColor = SoftShadow)
+                    .background(NightGloss, R.card),
             ) {
                 Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
@@ -433,19 +433,21 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
             }
 
             if (generated == null) {
-                Spacer(Modifier.height(14.dp))
+                Spacer(Modifier.height(Space.loose))
                 Text(
                     "Tell me what to\npray about.",
                     fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
-                    fontSize = 34.sp, lineHeight = 40.sp, textAlign = TextAlign.Center,
+                    fontSize = 34.sp, lineHeight = 42.sp, textAlign = TextAlign.Center,
+                    color = InkSoft,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                Spacer(Modifier.height(Space.loose))
 
                 /* A warm, roomy field instead of a support-ticket box, and one
                    quiet invitation instead of clinical examples. */
                 OutlinedTextField(
                     request, { request = it },
-                    modifier = Modifier.fillMaxWidth().padding(top = 22.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
                             "Pour your heart out here…",
@@ -453,9 +455,11 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                             fontFamily = FontFamily.Serif,
                         )
                     },
-                    textStyle = androidx.compose.ui.text.TextStyle(fontSize = 16.sp, lineHeight = 25.sp),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        fontSize = 16.sp, lineHeight = 26.sp, color = InkSoft,
+                    ),
                     minLines = 6,
-                    shape = RoundedCornerShape(20.dp),
+                    shape = R.card,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Gold.copy(alpha = .55f),
                         unfocusedBorderColor = Color.Transparent,
@@ -473,21 +477,36 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                             "HOW ARE YOU FEELING? (OPTIONAL)",
                             color = Muted, fontSize = 10.sp, letterSpacing = 1.4.sp,
                             fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(top = 20.dp, bottom = 10.dp),
+                            modifier = Modifier.padding(top = Space.block, bottom = 10.dp),
                         )
-                        // one fluid row rather than a grid of eight boxes
-                        Row(
-                            Modifier.fillMaxWidth()
-                                .horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            listOf("Grateful", "Anxious", "Sad", "Hopeful", "Confused", "Joyful", "Sick", "Tired").forEach { item ->
-                                FilterChip(
-                                    selected = item in moods,
-                                    onClick = { if (item in moods) moods.remove(item) else moods.add(item) },
-                                    label = { Text(item, fontSize = 12.sp) },
-                                )
+                        // one fluid row, with a fade telling you it keeps going
+                        Box {
+                            Row(
+                                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                listOf("Grateful", "Anxious", "Sad", "Hopeful", "Confused", "Joyful", "Sick", "Tired").forEach { item ->
+                                    val on = item in moods
+                                    Surface(
+                                        onClick = { if (on) moods.remove(item) else moods.add(item) },
+                                        shape = R.pill,
+                                        color = if (on) ChipFillSelected else ChipFill,
+                                    ) {
+                                        Text(
+                                            item,
+                                            color = if (on) Electric else InkSoft,
+                                            fontSize = 13.sp,
+                                            fontWeight = if (on) FontWeight.SemiBold else FontWeight.Medium,
+                                            modifier = Modifier.padding(horizontal = 17.dp, vertical = 11.dp),
+                                        )
+                                    }
+                                }
+                                Spacer(Modifier.width(26.dp))
                             }
+                            Box(
+                                Modifier.align(Alignment.CenterEnd).width(34.dp).height(46.dp)
+                                    .background(edgeFade()),
+                            )
                         }
                     }
                 }
@@ -496,11 +515,11 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
 
                 val canGenerate = request.isNotBlank() && !loading
                 Box(
-                    Modifier.fillMaxWidth().padding(top = 22.dp).height(56.dp)
-                        .shadow(if (canGenerate) 14.dp else 0.dp, RoundedCornerShape(17.dp), spotColor = Electric.copy(alpha = .45f))
-                        .clip(RoundedCornerShape(17.dp))
+                    Modifier.fillMaxWidth().padding(top = Space.loose).height(58.dp)
+                        .shadow(if (canGenerate) 16.dp else 0.dp, R.control, spotColor = Electric.copy(alpha = .45f))
+                        .clip(R.control)
                         .background(if (canGenerate) ElectricGloss else androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0xFFD9D9DE), Color(0xFFCFCFD6))))
-                        .border(0.5.dp, Color.White.copy(alpha = .35f), RoundedCornerShape(17.dp))
+                        .border(0.5.dp, Color.White.copy(alpha = .35f), R.control)
                         .clickable(enabled = canGenerate) {
                             scope.launch {
                                 loading = true; error = null
@@ -529,7 +548,7 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     }
                 }
             } else {
-                Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
+                Surface(Modifier.fillMaxWidth(), shape = R.card, color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
                     Column(Modifier.padding(22.dp)) {
                         Text(generated!!.title, fontFamily = FontFamily.Serif, fontSize = 25.sp)
                         Text("Prayed over your words", color = Electric, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp, bottom = 20.dp))

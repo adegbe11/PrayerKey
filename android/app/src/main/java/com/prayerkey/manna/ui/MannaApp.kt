@@ -132,6 +132,11 @@ fun MannaApp() {
                         onDelete = viewModel::deleteEntry,
                         onAnswered = viewModel::markAnswered,
                         onProfile = { showProfile = true },
+                        sermonNotes = sermonNotes,
+                        prayers = journal,
+                        onAdd2 = viewModel::addWrite,
+                        onUpdate2 = viewModel::updateWrite,
+                        onAnswerEntry = viewModel::answerEntry,
                     )
                     else -> Unit
                 }

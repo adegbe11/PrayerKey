@@ -40,6 +40,12 @@ data class JournalEntry(
     val verseText: String?,
     val createdAt: Long,
     val updatedAt: Long,
+    /** How this entry began: "write", "sermon", "prayer" or "verse". Drives
+     *  the origin icon on the card so a page traces back to its moment. */
+    val source: String = "write",
+    val isPrayer: Boolean = false,
+    val answeredAt: Long? = null,
+    val testimony: String? = null,
 )
 
 data class SermonNote(
@@ -54,7 +60,7 @@ data class SermonNote(
     val createdAt: Long,
 )
 
-class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 8) {
+class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 9) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""CREATE TABLE saved_words (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,6 +91,17 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         // v7 repairs installs created at v6, whose onCreate skipped this table
         if (oldVersion < 7) createJournalEntries(db)
         if (oldVersion < 8) createSermonNotes(db)
+        if (oldVersion < 9) {
+            // added per column, and tolerated individually: a table created
+            // fresh at v9 already has them, and ALTER on an existing column
+            // throws rather than no-opping
+            listOf(
+                "ALTER TABLE journal_entries ADD COLUMN source TEXT NOT NULL DEFAULT 'write'",
+                "ALTER TABLE journal_entries ADD COLUMN is_prayer INTEGER NOT NULL DEFAULT 0",
+                "ALTER TABLE journal_entries ADD COLUMN answered_at INTEGER",
+                "ALTER TABLE journal_entries ADD COLUMN testimony TEXT",
+            ).forEach { sql -> runCatching { db.execSQL(sql) } }
+        }
     }
 
     /** A phone with a newer/foreign schema must never crash the app —
@@ -122,7 +139,11 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
             verse_ref TEXT,
             verse_text TEXT,
             created_at INTEGER NOT NULL,
-            updated_at INTEGER NOT NULL
+            updated_at INTEGER NOT NULL,
+            source TEXT NOT NULL DEFAULT 'write',
+            is_prayer INTEGER NOT NULL DEFAULT 0,
+            answered_at INTEGER,
+            testimony TEXT
         )""")
         db.execSQL("CREATE INDEX IF NOT EXISTS journal_day ON journal_entries(entry_day)")
     }
@@ -181,20 +202,34 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         writableDatabase.delete("sermon_notes", "id = ?", arrayOf(id.toString()))
     }
 
-    fun addJournalEntry(mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?): Long {
+    fun addJournalEntry(
+        mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?,
+        source: String = "write", isPrayer: Boolean = false,
+    ): Long {
         val now = System.currentTimeMillis()
         return writableDatabase.insert("journal_entries", null, ContentValues().apply {
             put("entry_day", java.time.LocalDate.now().toEpochDay())
             put("mood", mood); put("body", body.trim()); put("gratitude", gratitude.trim())
             put("verse_ref", verseRef); put("verse_text", verseText)
             put("created_at", now); put("updated_at", now)
+            put("source", source); put("is_prayer", if (isPrayer) 1 else 0)
         })
     }
 
-    fun updateJournalEntry(id: Long, mood: String, body: String, gratitude: String) {
+    /** A prayer entry that God answered — the proof pile. */
+    fun answerJournalEntry(id: Long, testimony: String) {
+        writableDatabase.update("journal_entries", ContentValues().apply {
+            put("answered_at", System.currentTimeMillis())
+            put("testimony", testimony.trim())
+            put("updated_at", System.currentTimeMillis())
+        }, "id = ?", arrayOf(id.toString()))
+    }
+
+    fun updateJournalEntry(id: Long, mood: String, body: String, gratitude: String, isPrayer: Boolean? = null) {
         writableDatabase.update("journal_entries", ContentValues().apply {
             put("mood", mood); put("body", body.trim()); put("gratitude", gratitude.trim())
             put("updated_at", System.currentTimeMillis())
+            isPrayer?.let { put("is_prayer", if (it) 1 else 0) }
         }, "id = ?", arrayOf(id.toString()))
     }
 
@@ -215,6 +250,10 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
             cursor.getColumnIndexOrThrow("verse_text").let { if (cursor.isNull(it)) null else cursor.getString(it) },
             cursor.getLong(cursor.getColumnIndexOrThrow("created_at")),
             cursor.getLong(cursor.getColumnIndexOrThrow("updated_at")),
+            cursor.getColumnIndex("source").let { if (it < 0 || cursor.isNull(it)) "write" else cursor.getString(it) },
+            cursor.getColumnIndex("is_prayer").let { it >= 0 && cursor.getInt(it) == 1 },
+            cursor.getColumnIndex("answered_at").let { if (it < 0 || cursor.isNull(it)) null else cursor.getLong(it) },
+            cursor.getColumnIndex("testimony").let { if (it < 0 || cursor.isNull(it)) null else cursor.getString(it) },
         )) }
     }
 

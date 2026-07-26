@@ -77,7 +77,7 @@ fun HomeScreen(
 
     /* FULL-BLEED, same anatomy as Bible: the card owns the screen and
        every control floats on top of it. */
-    Box(Modifier.fillMaxSize().background(Canvas)) {
+    Box(Modifier.fillMaxSize().background(dayWash())) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             DeckShadow()
             VerseDeckCard(
@@ -139,7 +139,7 @@ fun HomeScreen(
 
 @Composable
 private fun VerseDeckCard(card: VerseCard, revealed: Boolean, progress: Float, dragY: Float, reduceMotion: Boolean, modifier: Modifier) {
-    val shape = RoundedCornerShape(24.dp)
+    val shape = R.card
     // Resting card stands perfectly straight and flat, Tinder-style.
     // The 3D tumble only happens DURING the pull (0° -> -180° flip).
     val rotation = if (reduceMotion) 0f else -(180f * progress)
@@ -228,9 +228,9 @@ private fun ActionButton(label: String, brush: Brush, content: Color, modifier: 
     // glossy gradient pill with a real shadow — no flat Material button
     Box(
         modifier.height(50.dp)
-            .shadow(10.dp, RoundedCornerShape(15.dp), spotColor = Night.copy(alpha = .28f))
-            .clip(RoundedCornerShape(15.dp)).background(brush)
-            .border(0.5.dp, Color.White.copy(alpha = .35f), RoundedCornerShape(15.dp))
+            .shadow(12.dp, R.control, spotColor = SoftShadow)
+            .clip(R.control).background(brush)
+            .border(0.5.dp, Color.White.copy(alpha = .35f), R.control)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {

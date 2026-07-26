@@ -17,7 +17,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -58,14 +65,25 @@ fun JournalScreen(
     onDelete: (Long) -> Unit,
     onAnswered: (Long, String) -> Unit,
     onProfile: () -> Unit,
+    sermonNotes: List<com.prayerkey.manna.data.SermonNote>,
+    prayers: List<com.prayerkey.manna.data.JournalPrayer>,
+    onAdd2: (com.prayerkey.manna.ui.journal.WriteResult) -> Unit,
+    onUpdate2: (Long, com.prayerkey.manna.ui.journal.WriteResult) -> Unit,
+    onAnswerEntry: (Long, String) -> Unit,
 ) {
     var tab by remember { mutableStateOf(JournalTab.Journal) }
     var composing by remember { mutableStateOf(false) }
     var editing by remember { mutableStateOf<JournalEntry?>(null) }
     var answering by remember { mutableStateOf<SavedWord?>(null) }
     var query by remember { mutableStateOf("") }
+    // Write is two steps now: pick a prompt, then write. `picking` is the
+    // suggestion sheet; `writing` holds the chosen prompt (null = blank page).
+    var picking by remember { mutableStateOf(false) }
+    var writing by remember { mutableStateOf(false) }
+    var chosen by remember { mutableStateOf<com.prayerkey.manna.ui.journal.JournalSuggestions.Prompt?>(null) }
+    var answeringEntry by remember { mutableStateOf<JournalEntry?>(null) }
 
-    Box(Modifier.fillMaxSize().background(Canvas)) {
+    Box(Modifier.fillMaxSize().background(dayWash())) {
         Column(Modifier.fillMaxSize().padding(horizontal = 22.dp).padding(top = 24.dp)) {
             // Home is bare now, so Settings lives here — the one screen
             // that is already about the user rather than today's word.
@@ -86,7 +104,11 @@ fun JournalScreen(
                 Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilterChip(tab == JournalTab.Journal, { tab = JournalTab.Journal }, label = { Text("Journal ${entries.size}") })
                     FilterChip(tab == JournalTab.Saved, { tab = JournalTab.Saved }, label = { Text("Saved ${words.count { it.answeredAt == null }}") })
-                    FilterChip(tab == JournalTab.Answered, { tab = JournalTab.Answered }, label = { Text("Answered ${words.count { it.answeredAt != null }}") })
+                    FilterChip(
+                        tab == JournalTab.Answered, { tab = JournalTab.Answered },
+                        // answered prayers live in BOTH places now
+                        label = { Text("Answered ${words.count { it.answeredAt != null } + entries.count { it.answeredAt != null }}") },
+                    )
                 }
             } else Spacer(Modifier.height(10.dp))
 
@@ -94,42 +116,97 @@ fun JournalScreen(
                 JournalTab.Journal -> JournalTimeline(
                     entries = entries, streak = journalStreak, query = query,
                     onQuery = { query = it }, onEdit = { editing = it },
+                    onAnswer = { answeringEntry = it },
                 )
                 JournalTab.Saved -> WordList(words.filter { it.answeredAt == null }, canAnswer = true) { answering = it }
-                JournalTab.Answered -> WordList(words.filter { it.answeredAt != null }, canAnswer = false) {}
+                JournalTab.Answered -> AnsweredList(
+                    entries = entries.filter { it.answeredAt != null },
+                    words = words.filter { it.answeredAt != null },
+                    onEdit = { editing = it },
+                )
             }
         }
 
         if (tab == JournalTab.Journal) {
-            ExtendedFloatingActionButton(
-                onClick = { composing = true },
-                containerColor = Electric, contentColor = Color.White,
-                modifier = Modifier.align(Alignment.BottomEnd).padding(22.dp),
+            // gentle pull toward the one action, only while there is nothing else
+            val transition = rememberInfiniteTransition(label = "fab")
+            val pulse by transition.animateFloat(
+                initialValue = 1f,
+                targetValue = if (entries.isEmpty()) 1.06f else 1f,
+                animationSpec = infiniteRepeatable(tween(1100), RepeatMode.Reverse),
+                label = "fab-pulse",
+            )
+            // circular, soft-shadowed — Wallet's action button, not a Material pill
+            Box(
+                Modifier.align(Alignment.BottomEnd).padding(24.dp).scale(pulse)
+                    .size(62.dp)
+                    .shadow(18.dp, CircleShape, spotColor = Electric.copy(alpha = .5f))
+                    .clip(CircleShape).background(ElectricGloss)
+                    .clickable { picking = true },
+                contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Outlined.Create, null); Spacer(Modifier.width(8.dp)); Text("Write", fontWeight = FontWeight.SemiBold)
+                Icon(Icons.Outlined.Create, "Write an entry", tint = Color.White, modifier = Modifier.size(25.dp))
             }
         }
     }
 
-    if (composing) EntryComposer(
-        title = "Today's entry",
-        initialMood = MOODS.first().first, initialBody = "", initialGratitude = "",
-        todayCard = todayCard, showAttach = true,
-        onDismiss = { composing = false },
-        onSubmit = { mood, body, gratitude, attach ->
-            onAdd(mood, body, gratitude, if (attach) todayCard.reference else null, if (attach) todayCard.verse else null)
-            composing = false
-        },
+    if (picking) {
+        val prompts = remember(sermonNotes, prayers, words) {
+            com.prayerkey.manna.ui.journal.JournalSuggestions.build(
+                sermons = sermonNotes, prayers = prayers, savedWords = words,
+                nowMillis = System.currentTimeMillis(),
+            )
+        }
+        com.prayerkey.manna.ui.journal.SuggestionSheet(
+            prompts = prompts,
+            onPick = { prompt -> chosen = prompt; picking = false; writing = true },
+            onDismiss = { picking = false },
+        )
+    }
+
+    if (writing) com.prayerkey.manna.ui.journal.WriteSheet(
+        prompt = chosen,
+        todayCard = todayCard,
+        onDismiss = { writing = false; chosen = null },
+        onSubmit = { result -> onAdd2(result); writing = false; chosen = null },
     )
 
     editing?.let { entry ->
-        EntryComposer(
-            title = "Edit entry",
-            initialMood = entry.mood, initialBody = entry.body, initialGratitude = entry.gratitude,
-            todayCard = todayCard, showAttach = false,
+        com.prayerkey.manna.ui.journal.WriteSheet(
+            prompt = null,
+            todayCard = todayCard,
+            initialMood = entry.mood,
+            initialBody = entry.body,
+            initialGratitude = entry.gratitude,
+            initialIsPrayer = entry.isPrayer,
+            editing = true,
             onDismiss = { editing = null },
-            onSubmit = { mood, body, gratitude, _ -> onUpdate(entry.id, mood, body, gratitude); editing = null },
+            onSubmit = { result -> onUpdate2(entry.id, result); editing = null },
             onDelete = { onDelete(entry.id); editing = null },
+        )
+    }
+
+    answeringEntry?.let { entry ->
+        var testimony by remember(entry.id) { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { answeringEntry = null },
+            title = { Text("What did God do?") },
+            text = {
+                Column {
+                    Text(entry.body, color = Muted, fontSize = 13.sp, maxLines = 3)
+                    OutlinedTextField(
+                        testimony, { testimony = it },
+                        placeholder = { Text("Write one line of testimony…") },
+                        minLines = 3, modifier = Modifier.padding(top = 10.dp),
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (testimony.isNotBlank()) { onAnswerEntry(entry.id, testimony); answeringEntry = null }
+                }) { Text("Mark answered") }
+            },
+            dismissButton = { TextButton(onClick = { answeringEntry = null }) { Text("Cancel") } },
         )
     }
 
@@ -152,6 +229,7 @@ private fun JournalTimeline(
     query: String,
     onQuery: (String) -> Unit,
     onEdit: (JournalEntry) -> Unit,
+    onAnswer: (JournalEntry) -> Unit,
 ) {
     val today = LocalDate.now().toEpochDay()
     val memory = remember(entries) {
@@ -203,8 +281,8 @@ private fun JournalTimeline(
             query, onQuery,
             placeholder = { Text("Search your journal…", fontSize = 13.sp) },
             leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Muted) },
-            singleLine = true, shape = RoundedCornerShape(14.dp),
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            singleLine = true, shape = R.control,
+            modifier = Modifier.fillMaxWidth().padding(top = Space.block),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Electric, unfocusedBorderColor = Color.Transparent,
                 focusedContainerColor = AppleGray, unfocusedContainerColor = AppleGray,
@@ -213,7 +291,7 @@ private fun JournalTimeline(
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(top = 14.dp, bottom = 96.dp),
+            contentPadding = PaddingValues(top = Space.block, bottom = Space.dock),
         ) {
             memory?.let { m ->
                 item(key = "memory") {
@@ -235,7 +313,9 @@ private fun JournalTimeline(
                         modifier = Modifier.padding(top = 6.dp),
                     )
                 }
-                items(dayEntries, key = { it.id }) { entry -> EntryCard(entry) { onEdit(entry) } }
+                items(dayEntries, key = { it.id }) { entry ->
+                    EntryCard(entry, onAnswer = { onAnswer(entry) }) { onEdit(entry) }
+                }
             }
         }
     }
@@ -292,17 +372,23 @@ private fun JournalMark() {
 }
 
 @Composable
-private fun EntryCard(entry: JournalEntry, onClick: () -> Unit) {
+private fun EntryCard(entry: JournalEntry, onAnswer: () -> Unit, onClick: () -> Unit) {
+    val answered = entry.answeredAt != null
     Surface(
-        shape = RoundedCornerShape(20.dp), color = Ivory,
+        shape = R.card, color = if (answered) Color(0xFFFFFBF0) else Ivory,
         border = BorderStroke(1.dp, Hairline),
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).clickable(onClick = onClick),
+        modifier = Modifier.fillMaxWidth().clip(R.card).clickable(onClick = onClick),
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(entry.mood, fontSize = 20.sp)
                 Spacer(Modifier.width(8.dp))
                 Text(MOODS.firstOrNull { it.first == entry.mood }?.second ?: "", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                // where this page came from, so a moment traces back to itself
+                originGlyph(entry.source)?.let { glyph ->
+                    Spacer(Modifier.width(7.dp))
+                    Text(glyph, color = Muted, fontSize = 11.sp)
+                }
                 Spacer(Modifier.weight(1f))
                 Text(
                     DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(entry.createdAt)),
@@ -318,8 +404,45 @@ private fun EntryCard(entry: JournalEntry, onClick: () -> Unit) {
                     Text("📜 $ref", color = Gold, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp))
                 }
             }
+
+            /* The lifecycle: a prayer waits, then carries a gold seal and the
+               testimony forever. This is the proof pile no feed can copy. */
+            if (answered) {
+                Surface(
+                    shape = RoundedCornerShape(12.dp), color = Gold.copy(alpha = .14f),
+                    border = BorderStroke(1.dp, Gold.copy(alpha = .45f)),
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text("✦ GOD ANSWERED", color = Gold, fontSize = 9.5.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold)
+                        entry.testimony?.let {
+                            Text(it, fontFamily = FontFamily.Serif, fontSize = 13.5.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 5.dp))
+                        }
+                    }
+                }
+            } else if (entry.isPrayer) {
+                Surface(
+                    onClick = onAnswer,
+                    shape = RoundedCornerShape(12.dp), color = Color.White,
+                    border = BorderStroke(1.dp, Hairline),
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                ) {
+                    Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text("Still praying", color = Muted, fontSize = 11.5.sp, modifier = Modifier.weight(1f))
+                        Text("Mark answered", color = Electric, fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
         }
     }
+}
+
+/** Small glyph telling the reader how an entry began. */
+private fun originGlyph(source: String): String? = when (source) {
+    "sermon" -> "· from Sunday"
+    "prayer" -> "· from a prayer"
+    "verse" -> "· from a word"
+    else -> null
 }
 
 @Composable
@@ -392,6 +515,39 @@ private fun EntryComposer(
             }
         },
     )
+}
+
+/** Everything God answered, whichever screen it was asked on. */
+@Composable
+private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, onEdit: (JournalEntry) -> Unit) {
+    if (entries.isEmpty() && words.isEmpty()) {
+        Column(Modifier.fillMaxWidth().padding(top = 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Nothing marked answered yet", fontWeight = FontWeight.SemiBold)
+            Text(
+                "Mark a prayer answered and it stays here as proof.",
+                color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 6.dp),
+            )
+        }
+        return
+    }
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(top = 14.dp, bottom = 130.dp),
+    ) {
+        items(entries, key = { "entry-${it.id}" }) { entry ->
+            EntryCard(entry, onAnswer = {}) { onEdit(entry) }
+        }
+        items(words, key = { "word-${it.id}" }) { word ->
+            Surface(shape = RoundedCornerShape(22.dp), color = Color(0xFFF1F8F3), border = BorderStroke(1.dp, Hairline)) {
+                Column(Modifier.fillMaxWidth().padding(18.dp)) {
+                    Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
+                    Text(word.verse, fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
+                    word.testimony?.let { Text("“$it”", color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
+                }
+            }
+        }
+    }
 }
 
 @Composable
