@@ -43,17 +43,12 @@ private enum class CardState { Waiting, Revealed }
 @Composable
 fun HomeScreen(
     card: VerseCard,
-    name: String,
     reduceMotion: Boolean,
-    streak: Int,
     onReceived: () -> Unit,
     onReceiveNext: () -> Unit,
     onSave: (VerseCard) -> Unit,
     onPray: (VerseCard) -> Unit,
     onShare: (VerseCard) -> Unit,
-    onProfile: () -> Unit,
-    onAsk: () -> Unit,
-    onChurch: () -> Unit,
 ) {
     var state by remember { mutableStateOf(CardState.Waiting) }
     var dragY by remember { mutableFloatStateOf(0f) }
@@ -120,55 +115,9 @@ fun HomeScreen(
             )
         }
 
-        /* The card is full-bleed, so the overlay sits on whichever face is
-           showing. Dark card back means the text must go light, or the
-           greeting disappears into it. */
-        val onDark = state != CardState.Revealed && progress < .5f
-        val headline = if (onDark) Ivory else Ink
-        val secondary = if (onDark) Ivory.copy(alpha = .68f) else Muted
-
-        /* ── TOP OVERLAY: greeting, date, streak, At-church chip ── */
-        Column(Modifier.align(Alignment.TopCenter).fillMaxWidth().padding(horizontal = 14.dp).padding(top = 14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(greeting(hour), color = secondary, fontSize = 13.sp)
-                    Text(
-                        name.ifBlank { "friend" },
-                        color = headline, fontFamily = FontFamily.Serif,
-                        fontSize = 26.sp, lineHeight = 30.sp,
-                    )
-                }
-                Surface(color = Color.White, shape = RoundedCornerShape(22.dp), shadowElevation = 6.dp) {
-                    Text("🔥  $streak", Modifier.padding(horizontal = 12.dp, vertical = 8.dp), fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                }
-                Spacer(Modifier.width(8.dp))
-                Box(
-                    Modifier.size(38.dp).shadow(8.dp, CircleShape, spotColor = Night.copy(alpha = .3f))
-                        .clip(CircleShape).background(NightGloss).clickable(onClick = onProfile),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        name.trim().take(1).uppercase().ifBlank { "?" },
-                        color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
-
-            /* At church chip — the growth trojan horse, one tap from the ritual */
-            Surface(
-                onClick = onChurch, shape = RoundedCornerShape(99.dp),
-                color = Color.White, shadowElevation = 6.dp,
-                modifier = Modifier.padding(top = 12.dp),
-            ) {
-                Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text("◉", color = Gold, fontSize = 12.sp)
-                    Spacer(Modifier.width(7.dp))
-                    Text("At church", fontSize = 12.sp, fontWeight = FontWeight.Medium)
-                }
-            }
-        }
-
-        /* ── BOTTOM OVERLAY: actions, prompt, Ask bar — all float ── */
+        /* Nothing floats over the waiting card. The disc is the whole screen
+           and the gesture is the whole instruction. Actions only appear once
+           a word has actually been pulled. */
         Column(
             Modifier.align(Alignment.BottomCenter).fillMaxWidth()
                 .padding(horizontal = 14.dp).padding(bottom = 92.dp),
@@ -184,22 +133,8 @@ fun HomeScreen(
                     }
                 }
             }
-            PullPrompt(state == CardState.Revealed, headline, secondary)
-            AskBar(onAsk)
         }
     }
-}
-
-private fun greeting(hour: Int): String = when (hour) {
-    in 5..11 -> "Good morning,"
-    in 12..16 -> "Good afternoon,"
-    in 17..21 -> "Good evening,"
-    else -> "Peace to you tonight,"
-}
-
-private fun todayLabel(): String {
-    val today = java.time.LocalDate.now()
-    return today.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, MMMM d")).uppercase()
 }
 
 @Composable
@@ -250,7 +185,7 @@ private fun CardFront(card: VerseCard) {
     Box(Modifier.fillMaxSize()) {
         MountainScene(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(170.dp))
         // top/bottom padding clears the floating overlays
-        Column(Modifier.fillMaxSize().padding(horizontal = 30.dp).padding(top = 168.dp, bottom = 210.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.fillMaxSize().padding(horizontal = 30.dp).padding(top = 96.dp, bottom = 150.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Outlined.WbSunny, null, tint = Gold, modifier = Modifier.size(24.dp))
             Spacer(Modifier.height(24.dp))
             Text(card.verse, color = Ink, fontFamily = FontFamily.Serif, fontSize = 31.sp, lineHeight = 40.sp, textAlign = TextAlign.Center)
@@ -289,17 +224,6 @@ private fun DeckShadow() {
 }
 
 @Composable
-private fun PullPrompt(revealed: Boolean, headline: Color, secondary: Color) {
-    Column(Modifier.fillMaxWidth().padding(bottom = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(if (revealed) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown, null, tint = Gold)
-        Text(
-            if (revealed) "Push up to save" else "Pull down to receive",
-            color = headline, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
-        )
-    }
-}
-
-@Composable
 private fun ActionButton(label: String, brush: Brush, content: Color, modifier: Modifier, onClick: () -> Unit) {
     // glossy gradient pill with a real shadow — no flat Material button
     Box(
@@ -311,15 +235,5 @@ private fun ActionButton(label: String, brush: Brush, content: Color, modifier: 
         contentAlignment = Alignment.Center,
     ) {
         Text(label, color = content, fontWeight = FontWeight.SemiBold)
-    }
-}
-
-@Composable
-private fun AskBar(onAsk: () -> Unit) {
-    Row(Modifier.fillMaxWidth().height(52.dp).shadow(12.dp, RoundedCornerShape(17.dp), spotColor = Night.copy(alpha = .22f)).clip(RoundedCornerShape(17.dp)).background(Color.White).border(0.5.dp, Hairline, RoundedCornerShape(17.dp)).clickable(onClick = onAsk).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("Ask anything", color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))
-        Box(Modifier.size(40.dp).clip(CircleShape).background(ElectricGloss), contentAlignment = Alignment.Center) {
-            Icon(Icons.Outlined.AutoAwesome, "Ask PrayerKey", tint = Color.White, modifier = Modifier.size(20.dp))
-        }
     }
 }

@@ -99,9 +99,7 @@ fun MannaApp() {
                 when (selected) {
                     0 -> HomeScreen(
                         card = DailyVerses[verseIndex % DailyVerses.size],
-                        name = preferences.name,
                         reduceMotion = preferences.reduceMotion,
-                        streak = streak,
                         onReceived = viewModel::recordDailyPull,
                         onReceiveNext = { verseIndex++ },
                         onSave = viewModel::save,
@@ -109,9 +107,6 @@ fun MannaApp() {
                         onShare = { verse ->
                             CardShareRenderer.share(context, verse)
                         },
-                        onProfile = { showProfile = true },
-                        onAsk = { selected = 2 },
-                        onChurch = { selected = 3 },
                     )
                     1 -> BibleScreen(
                         memory = memory,
@@ -136,6 +131,7 @@ fun MannaApp() {
                         onUpdate = viewModel::updateEntry,
                         onDelete = viewModel::deleteEntry,
                         onAnswered = viewModel::markAnswered,
+                        onProfile = { showProfile = true },
                     )
                     else -> Unit
                 }

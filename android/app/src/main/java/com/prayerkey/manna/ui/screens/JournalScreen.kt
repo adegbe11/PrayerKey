@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -48,6 +49,7 @@ fun JournalScreen(
     onUpdate: (Long, String, String, String) -> Unit,
     onDelete: (Long) -> Unit,
     onAnswered: (Long, String) -> Unit,
+    onProfile: () -> Unit,
 ) {
     var tab by remember { mutableStateOf(JournalTab.Journal) }
     var composing by remember { mutableStateOf(false) }
@@ -57,8 +59,17 @@ fun JournalScreen(
 
     Box(Modifier.fillMaxSize().background(Canvas)) {
         Column(Modifier.fillMaxSize().padding(horizontal = 22.dp).padding(top = 24.dp)) {
-            Text("Journal", fontFamily = FontFamily.Serif, fontSize = 32.sp)
-            Text("Your walk with God, written down.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
+            // Home is bare now, so Settings lives here — the one screen
+            // that is already about the user rather than today's word.
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Journal", fontFamily = FontFamily.Serif, fontSize = 32.sp)
+                    Text("Your walk with God, written down.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
+                }
+                androidx.compose.material3.IconButton(onClick = onProfile) {
+                    Icon(Icons.Outlined.Settings, "Settings", tint = Muted)
+                }
+            }
 
             Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(tab == JournalTab.Journal, { tab = JournalTab.Journal }, label = { Text("Journal ${entries.size}") })
