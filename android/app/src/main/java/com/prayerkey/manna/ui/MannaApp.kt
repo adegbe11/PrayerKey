@@ -57,6 +57,8 @@ fun MannaApp() {
     val entries by viewModel.entries.collectAsState()
     val journalStreak by viewModel.journalStreak.collectAsState()
     val topics by viewModel.topics.collectAsState()
+    val hydrated by viewModel.hydrated.collectAsState()
+    val sermonNotes by viewModel.sermonNotes.collectAsState()
     val context = LocalContext.current
     val destinations = remember {
         listOf(
@@ -74,7 +76,8 @@ fun MannaApp() {
     Scaffold(
         containerColor = Canvas,
         bottomBar = {
-            com.prayerkey.manna.ui.components.MannaDock(
+            // no dock during onboarding — the first screen stays undistracted
+            if (hydrated && preferences.onboarded) com.prayerkey.manna.ui.components.MannaDock(
                 items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon) },
                 selected = selected,
                 onSelect = { selected = it },
@@ -82,7 +85,14 @@ fun MannaApp() {
         },
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
-            if (showProfile) {
+            if (!hydrated) {
+                // one frame of brand, never a flash of the wrong screen
+                Box(Modifier.fillMaxSize().background(Canvas))
+            } else if (!preferences.onboarded) {
+                com.prayerkey.manna.ui.screens.OnboardingScreen { chosenName ->
+                    viewModel.updatePreferences(preferences.copy(name = chosenName, onboarded = true))
+                }
+            } else if (showProfile) {
                 ProfileScreen(saved.size, streak, preferences, onBack = { showProfile = false }, onUpdate = viewModel::updatePreferences)
             } else {
                 // instant tab switch — no transition animation, zero delay
@@ -101,6 +111,7 @@ fun MannaApp() {
                         },
                         onProfile = { showProfile = true },
                         onAsk = { selected = 2 },
+                        onChurch = { selected = 3 },
                     )
                     1 -> BibleScreen(
                         memory = memory,
@@ -112,11 +123,9 @@ fun MannaApp() {
                     )
                     2 -> PrayerScreen(journal, topics, viewModel::loadTopics, viewModel::savePrayer)
                     3 -> ChurchScreen(
-                        sermons = sermons,
-                        onStartSession = viewModel::startSermon,
-                        onVerseDetected = viewModel::addSermonVerse,
-                        onEndSession = viewModel::endSermon,
-                        onSave = viewModel::save,
+                        notes = sermonNotes,
+                        onSaveNote = viewModel::saveSermonNote,
+                        onDeleteNote = viewModel::deleteSermonNote,
                     )
                     4 -> JournalScreen(
                         entries = entries,

@@ -2,6 +2,7 @@ package com.prayerkey.manna.ui.church
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,54 +10,127 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 
+/**
+ * Listens for the length of a service and keeps the whole transcript.
+ *
+ * Two things it must get right:
+ *  - ACCUMULATE. onResults hands back one utterance at a time; each
+ *    finished chunk is appended, never assigned over. Without this there is
+ *    no sermon, only the last few seconds of it.
+ *  - PREFER OFFLINE. EXTRA_PREFER_OFFLINE keeps the audio on the phone,
+ *    which is what the app promises the user and what makes it free.
+ */
 class SermonRecognizer(
     context: Context,
-    private val onWords: (String) -> Unit,
+    /** Every finished chunk, as it lands. */
+    private val onChunk: (String) -> Unit,
+    /** The in-flight utterance, for the live caption only. */
+    private val onPartial: (String) -> Unit,
     private val onStatus: (String) -> Unit,
 ) : RecognitionListener {
+
+    private val app: Context = context.applicationContext
     private val handler = Handler(Looper.getMainLooper())
-    private val recognizer = SpeechRecognizer.createSpeechRecognizer(context).also { it.setRecognitionListener(this) }
+    private val recognizer = SpeechRecognizer.createSpeechRecognizer(app).also { it.setRecognitionListener(this) }
+
     private val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
         putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
-        putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
+        putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+        putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, app.packageName)
+        // keep the audio on the device — free, private, works with no signal
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+        }
+        // don't cut the mic the moment he pauses for breath
+        putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 4000L)
+        putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 4000L)
+        putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 8000L)
     }
-    private var continuous = false
+
+    private var running = false
+    /** Guards against two startListening calls racing after an error. */
+    private var pendingRestart = false
+    private var offlineFailures = 0
+
+    val available: Boolean get() = SpeechRecognizer.isRecognitionAvailable(app)
 
     fun start() {
-        if (!SpeechRecognizer.isRecognitionAvailable(recognizerContext)) {
-            onStatus("Speech recognition is unavailable on this device")
-            return
-        }
-        continuous = true; onStatus("Listening…"); recognizer.startListening(intent)
+        if (!available) { onStatus("Speech recognition is unavailable on this device"); return }
+        running = true
+        onStatus("Listening")
+        safeStart()
     }
 
-    fun stop() { continuous = false; handler.removeCallbacksAndMessages(null); recognizer.stopListening(); onStatus("Ready") }
-    fun destroy() { continuous = false; handler.removeCallbacksAndMessages(null); recognizer.destroy() }
+    fun stop() {
+        running = false
+        pendingRestart = false
+        handler.removeCallbacksAndMessages(null)
+        runCatching { recognizer.stopListening() }
+        onStatus("Ready")
+    }
 
-    private fun restart() {
-        if (continuous) handler.postDelayed({ if (continuous) recognizer.startListening(intent) }, 350)
+    fun destroy() {
+        running = false
+        pendingRestart = false
+        handler.removeCallbacksAndMessages(null)
+        runCatching { recognizer.destroy() }
+    }
+
+    private fun safeStart() {
+        pendingRestart = false
+        runCatching { recognizer.startListening(intent) }
+            .onFailure { handler.postDelayed({ if (running) safeStart() }, 600) }
+    }
+
+    /** Restart fast — every millisecond here is a word of the sermon lost. */
+    private fun restart(delayMs: Long = 120) {
+        if (!running || pendingRestart) return
+        pendingRestart = true
+        handler.postDelayed({ if (running) safeStart() }, delayMs)
     }
 
     override fun onResults(results: Bundle) {
-        results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.let(onWords)
+        results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+            ?.firstOrNull()?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.let(onChunk)
         restart()
     }
+
     override fun onPartialResults(partialResults: Bundle) {
-        partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.let(onWords)
+        partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+            ?.firstOrNull()?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.let(onPartial)
     }
+
     override fun onError(error: Int) {
-        if (error == SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS) {
-            continuous = false; onStatus("Microphone permission is required")
-        } else restart()
+        when (error) {
+            SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> {
+                running = false; onStatus("Microphone permission is required")
+            }
+            // no offline model on this device — fall back to the online one
+            // once, rather than silently capturing nothing all service
+            SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE,
+            SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED -> {
+                if (offlineFailures++ == 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false)
+                    onStatus("Listening")
+                }
+                restart(400)
+            }
+            // silence and no-match are normal in a service — just go again
+            SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> restart(80)
+            SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> restart(700)
+            else -> restart(400)
+        }
     }
-    override fun onReadyForSpeech(params: Bundle?) { onStatus("Listening…") }
+
+    override fun onReadyForSpeech(params: Bundle?) { if (running) onStatus("Listening") }
     override fun onBeginningOfSpeech() = Unit
     override fun onRmsChanged(rmsdB: Float) = Unit
     override fun onBufferReceived(buffer: ByteArray?) = Unit
     override fun onEndOfSpeech() = Unit
     override fun onEvent(eventType: Int, params: Bundle?) = Unit
-
-    private val recognizerContext: Context = context.applicationContext
 }

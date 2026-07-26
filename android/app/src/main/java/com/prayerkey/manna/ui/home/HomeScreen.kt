@@ -53,6 +53,7 @@ fun HomeScreen(
     onShare: (VerseCard) -> Unit,
     onProfile: () -> Unit,
     onAsk: () -> Unit,
+    onChurch: () -> Unit,
 ) {
     var state by remember { mutableStateOf(CardState.Waiting) }
     var dragY by remember { mutableFloatStateOf(0f) }
@@ -79,11 +80,10 @@ fun HomeScreen(
 
     LaunchedEffect(card.reference) { state = CardState.Waiting; dragY = 0f }
 
-    Column(Modifier.fillMaxSize().background(Canvas).padding(horizontal = 14.dp)) {
-        Header(name, streak, onProfile)
-        Text("TODAY'S WORD", color = Muted, fontSize = 11.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(start = 8.dp))
-        Spacer(Modifier.height(10.dp))
-        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+    /* FULL-BLEED, same anatomy as Bible: the card owns the screen and
+       every control floats on top of it. */
+    Box(Modifier.fillMaxSize().background(Canvas)) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             DeckShadow()
             VerseDeckCard(
                 card = activeCard,
@@ -119,39 +119,88 @@ fun HomeScreen(
                 },
             )
         }
-        AnimatedVisibility(state == CardState.Revealed) {
-            Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                ActionButton("Pray this", ElectricGloss, Color.White, Modifier.weight(1f)) { onPray(activeCard) }
-                ActionButton("Save", Brush.verticalGradient(listOf(Color.White, Color(0xFFEFEFF3))), Ink, Modifier.weight(1f)) { onSave(activeCard); onReceiveNext() }
+
+        /* The card is full-bleed, so the overlay sits on whichever face is
+           showing. Dark card back means the text must go light, or the
+           greeting disappears into it. */
+        val onDark = state != CardState.Revealed && progress < .5f
+        val headline = if (onDark) Ivory else Ink
+        val secondary = if (onDark) Ivory.copy(alpha = .68f) else Muted
+
+        /* ── TOP OVERLAY: greeting, date, streak, At-church chip ── */
+        Column(Modifier.align(Alignment.TopCenter).fillMaxWidth().padding(horizontal = 14.dp).padding(top = 14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(greeting(hour), color = secondary, fontSize = 13.sp)
+                    Text(
+                        name.ifBlank { "friend" },
+                        color = headline, fontFamily = FontFamily.Serif,
+                        fontSize = 26.sp, lineHeight = 30.sp,
+                    )
+                    Text(todayLabel(), color = if (onDark) Gold else Muted, fontSize = 11.sp, letterSpacing = .4.sp)
+                }
+                Surface(color = Color.White, shape = RoundedCornerShape(22.dp), shadowElevation = 6.dp) {
+                    Text("🔥  $streak", Modifier.padding(horizontal = 12.dp, vertical = 8.dp), fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
+                Spacer(Modifier.width(8.dp))
+                Box(
+                    Modifier.size(38.dp).shadow(8.dp, CircleShape, spotColor = Night.copy(alpha = .3f))
+                        .clip(CircleShape).background(NightGloss).clickable(onClick = onProfile),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        name.trim().take(1).uppercase().ifBlank { "?" },
+                        color = Gold, fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+
+            /* At church chip — the growth trojan horse, one tap from the ritual */
+            Surface(
+                onClick = onChurch, shape = RoundedCornerShape(99.dp),
+                color = Color.White, shadowElevation = 6.dp,
+                modifier = Modifier.padding(top = 12.dp),
+            ) {
+                Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("◉", color = Gold, fontSize = 12.sp)
+                    Spacer(Modifier.width(7.dp))
+                    Text("At church? Catch the verses", fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                }
             }
         }
-        AnimatedVisibility(state == CardState.Revealed) {
-            TextButton(onClick = { onShare(activeCard) }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Outlined.Share, null, modifier = Modifier.size(17.dp)); Spacer(Modifier.width(7.dp)); Text("Share this word")
+
+        /* ── BOTTOM OVERLAY: actions, prompt, Ask bar — all float ── */
+        Column(
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+                .padding(horizontal = 14.dp).padding(bottom = 92.dp),
+        ) {
+            AnimatedVisibility(state == CardState.Revealed) {
+                Column {
+                    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        ActionButton("Pray this", ElectricGloss, Color.White, Modifier.weight(1f)) { onPray(activeCard) }
+                        ActionButton("Save", Brush.verticalGradient(listOf(Color.White, Color(0xFFEFEFF3))), Ink, Modifier.weight(1f)) { onSave(activeCard); onReceiveNext() }
+                    }
+                    TextButton(onClick = { onShare(activeCard) }, modifier = Modifier.fillMaxWidth()) {
+                        Icon(Icons.Outlined.Share, null, modifier = Modifier.size(17.dp)); Spacer(Modifier.width(7.dp)); Text("Share this word")
+                    }
+                }
             }
+            PullPrompt(state == CardState.Revealed, headline, secondary)
+            AskBar(onAsk)
         }
-        PullPrompt(state == CardState.Revealed)
-        AskBar(onAsk)
-        Spacer(Modifier.height(10.dp))
     }
 }
 
-@Composable
-private fun Header(name: String, streak: Int, onProfile: () -> Unit) {
-    // bell opens Profile (where reminders live) — no dead buttons
-    Row(Modifier.fillMaxWidth().padding(top = 22.dp, bottom = 22.dp), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {
-            Text("Good morning,", color = Muted, fontSize = 14.sp)
-            Text("$name 👋", color = Ink, fontFamily = FontFamily.Serif, fontSize = 31.sp, lineHeight = 35.sp)
-        }
-        Surface(color = AppleGray, shape = RoundedCornerShape(22.dp)) {
-            Text("🔥  $streak", Modifier.padding(horizontal = 12.dp, vertical = 8.dp), fontWeight = FontWeight.Bold)
-        }
-        IconButton(onClick = onProfile) { Icon(Icons.Outlined.NotificationsNone, "Reminders", tint = Ink) }
-        Box(Modifier.size(38.dp).clip(CircleShape).background(Night).clickable(onClick = onProfile), contentAlignment = Alignment.Center) {
-            Text("CA", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        }
-    }
+private fun greeting(hour: Int): String = when (hour) {
+    in 5..11 -> "Good morning,"
+    in 12..16 -> "Good afternoon,"
+    in 17..21 -> "Good evening,"
+    else -> "Peace to you tonight,"
+}
+
+private fun todayLabel(): String {
+    val today = java.time.LocalDate.now()
+    return today.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, MMMM d")).uppercase()
 }
 
 @Composable
@@ -202,14 +251,16 @@ private fun CardBack() {
 private fun CardFront(card: VerseCard) {
     Box(Modifier.fillMaxSize()) {
         MountainScene(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(170.dp))
-        Column(Modifier.fillMaxSize().padding(horizontal = 30.dp, vertical = 34.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        // top/bottom padding clears the floating overlays
+        Column(Modifier.fillMaxSize().padding(horizontal = 30.dp).padding(top = 168.dp, bottom = 210.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Outlined.WbSunny, null, tint = Gold, modifier = Modifier.size(24.dp))
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(24.dp))
             Text(card.verse, color = Ink, fontFamily = FontFamily.Serif, fontSize = 31.sp, lineHeight = 40.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height(20.dp))
             Text("${card.reference}   |   ${card.translation}", color = Ink, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.weight(1f))
-            Text("Pulled by ${card.receivedBy} people today", color = Color.White, fontSize = 11.sp)
+            // sits on ivory, not on the mountain — needs a dark ink, not white
+            Text("Pulled by ${card.receivedBy} people today", color = Muted, fontSize = 11.sp)
         }
     }
 }
@@ -240,11 +291,14 @@ private fun DeckShadow() {
 }
 
 @Composable
-private fun PullPrompt(revealed: Boolean) {
+private fun PullPrompt(revealed: Boolean, headline: Color, secondary: Color) {
     Column(Modifier.fillMaxWidth().padding(bottom = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(if (revealed) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown, null, tint = Gold)
-        Text(if (revealed) "Push up to save" else "Pull down to receive", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
-        Text(if (revealed) "Keep this word close" else "God's Word for you today", color = Muted, fontSize = 11.sp)
+        Text(
+            if (revealed) "Push up to save" else "Pull down to receive",
+            color = headline, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
+        )
+        Text(if (revealed) "Keep this word close" else "God's Word for you today", color = secondary, fontSize = 11.sp)
     }
 }
 

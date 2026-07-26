@@ -17,7 +17,15 @@ data class SavedWord(
 )
 
 data class MemoryVerse(val reference: String, val verse: String, val stage: Int)
-data class UserPrefs(val name: String = "Collins", val reminderHour: Int = 7, val reminderMinute: Int = 0, val reminderEnabled: Boolean = false, val reduceMotion: Boolean = false, val translation: String = "KJV")
+data class UserPrefs(
+    val name: String = "",
+    val reminderHour: Int = 7,
+    val reminderMinute: Int = 0,
+    val reminderEnabled: Boolean = false,
+    val reduceMotion: Boolean = false,
+    val translation: String = "KJV",
+    val onboarded: Boolean = false,
+)
 data class SermonVerse(val reference: String, val text: String, val detectedAt: Long)
 data class SermonSession(val id: Long, val title: String, val startedAt: Long, val endedAt: Long?, val verses: List<SermonVerse>)
 data class JournalPrayer(val id: Long, val title: String, val request: String, val prayer: String, val scriptureRef: String?, val createdAt: Long)
@@ -34,7 +42,19 @@ data class JournalEntry(
     val updatedAt: Long,
 )
 
-class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 6) {
+data class SermonNote(
+    val id: Long,
+    val title: String,
+    val scriptures: List<String>,
+    val points: List<String>,
+    val quotes: List<String>,
+    val takeaway: String,
+    val transcript: String,
+    val minutes: Int,
+    val createdAt: Long,
+)
+
+class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 8) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""CREATE TABLE saved_words (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,6 +70,11 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         createMemoryTable(db)
         createSermonTables(db)
         createPrayerJournal(db)
+        // onCreate must build EVERY table. Leaving this out meant a fresh
+        // install landed at the current schema version with no journal
+        // table, and onUpgrade never ran to add it.
+        createJournalEntries(db)
+        createSermonNotes(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -57,13 +82,15 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         if (oldVersion < 3) createMemoryTable(db)
         if (oldVersion < 4) createSermonTables(db)
         if (oldVersion < 5) createPrayerJournal(db)
-        if (oldVersion < 6) createJournalEntries(db)
+        // v7 repairs installs created at v6, whose onCreate skipped this table
+        if (oldVersion < 7) createJournalEntries(db)
+        if (oldVersion < 8) createSermonNotes(db)
     }
 
     /** A phone with a newer/foreign schema must never crash the app —
      *  rebuild the database instead of throwing (default behaviour). */
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        listOf("saved_words", "app_state", "memory_verses", "sermon_sessions", "sermon_verses", "prayer_journal", "journal_entries")
+        listOf("saved_words", "app_state", "memory_verses", "sermon_sessions", "sermon_verses", "prayer_journal", "journal_entries", "sermon_notes")
             .forEach { table -> runCatching { db.execSQL("DROP TABLE IF EXISTS $table") } }
         onCreate(db)
     }
@@ -98,6 +125,60 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
             updated_at INTEGER NOT NULL
         )""")
         db.execSQL("CREATE INDEX IF NOT EXISTS journal_day ON journal_entries(entry_day)")
+    }
+
+    private fun createSermonNotes(db: SQLiteDatabase) {
+        db.execSQL("""CREATE TABLE IF NOT EXISTS sermon_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            scriptures TEXT NOT NULL,
+            points TEXT NOT NULL,
+            quotes TEXT NOT NULL,
+            takeaway TEXT NOT NULL,
+            transcript TEXT NOT NULL,
+            minutes INTEGER NOT NULL,
+            created_at INTEGER NOT NULL
+        )""")
+    }
+
+    /** Lists are stored newline-joined — no JSON dependency needed. */
+    private fun join(items: List<String>) = items.joinToString("\n")
+    private fun split(raw: String) = raw.split("\n").filter { it.isNotBlank() }
+
+    fun saveSermonNote(
+        title: String, scriptures: List<String>, points: List<String>,
+        quotes: List<String>, takeaway: String, transcript: String, minutes: Int,
+    ): Long = writableDatabase.insert("sermon_notes", null, ContentValues().apply {
+        put("title", title)
+        put("scriptures", join(scriptures))
+        put("points", join(points))
+        put("quotes", join(quotes))
+        put("takeaway", takeaway)
+        put("transcript", transcript)
+        put("minutes", minutes)
+        put("created_at", System.currentTimeMillis())
+    })
+
+    fun sermonNotes(): List<SermonNote> = readableDatabase.query(
+        "sermon_notes", null, null, null, null, null, "created_at DESC"
+    ).use { c ->
+        buildList {
+            while (c.moveToNext()) add(SermonNote(
+                c.getLong(c.getColumnIndexOrThrow("id")),
+                c.getString(c.getColumnIndexOrThrow("title")),
+                split(c.getString(c.getColumnIndexOrThrow("scriptures"))),
+                split(c.getString(c.getColumnIndexOrThrow("points"))),
+                split(c.getString(c.getColumnIndexOrThrow("quotes"))),
+                c.getString(c.getColumnIndexOrThrow("takeaway")),
+                c.getString(c.getColumnIndexOrThrow("transcript")),
+                c.getInt(c.getColumnIndexOrThrow("minutes")),
+                c.getLong(c.getColumnIndexOrThrow("created_at")),
+            ))
+        }
+    }
+
+    fun deleteSermonNote(id: Long) {
+        writableDatabase.delete("sermon_notes", "id = ?", arrayOf(id.toString()))
     }
 
     fun addJournalEntry(mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?): Long {
@@ -228,18 +309,20 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     }
 
     fun preferences(): UserPrefs = UserPrefs(
-        name = state("name") ?: "Collins",
+        name = state("name") ?: "",
         reminderHour = state("reminder_hour")?.toIntOrNull() ?: 7,
         reminderMinute = state("reminder_minute")?.toIntOrNull() ?: 0,
         reminderEnabled = state("reminder_enabled") == "true",
         reduceMotion = state("reduce_motion") == "true",
         translation = state("translation") ?: "KJV",
+        onboarded = state("onboarded") == "true",
     )
 
     fun savePreferences(prefs: UserPrefs) {
         putState("name", prefs.name); putState("reminder_hour", prefs.reminderHour.toString())
         putState("reminder_minute", prefs.reminderMinute.toString()); putState("reminder_enabled", prefs.reminderEnabled.toString())
         putState("reduce_motion", prefs.reduceMotion.toString()); putState("translation", prefs.translation)
+        putState("onboarded", prefs.onboarded.toString())
     }
 
     fun streak(): Int = state("streak")?.toIntOrNull() ?: 0

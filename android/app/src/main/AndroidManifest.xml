@@ -5,6 +5,15 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Church mode listens for a whole service with the screen off -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
     <application android:allowBackup="true" android:icon="@drawable/ic_manna" android:roundIcon="@drawable/ic_manna" android:label="MANNA" android:supportsRtl="true" android:theme="@style/Theme.Manna">
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -14,6 +23,10 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/share_paths" />
         </provider>
         <receiver android:name=".reminder.ReminderReceiver" android:exported="false" />
+        <service
+            android:name=".ui.church.SermonService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
         <activity android:name=".MainActivity" android:exported="true" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
