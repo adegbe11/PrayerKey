@@ -137,7 +137,6 @@ fun HomeScreen(
                         color = headline, fontFamily = FontFamily.Serif,
                         fontSize = 26.sp, lineHeight = 30.sp,
                     )
-                    Text(todayLabel(), color = if (onDark) Gold else Muted, fontSize = 11.sp, letterSpacing = .4.sp)
                 }
                 Surface(color = Color.White, shape = RoundedCornerShape(22.dp), shadowElevation = 6.dp) {
                     Text("🔥  $streak", Modifier.padding(horizontal = 12.dp, vertical = 8.dp), fontWeight = FontWeight.Bold, fontSize = 13.sp)
@@ -164,7 +163,7 @@ fun HomeScreen(
                 Row(Modifier.padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("◉", color = Gold, fontSize = 12.sp)
                     Spacer(Modifier.width(7.dp))
-                    Text("At church? Catch the verses", fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                    Text("At church", fontSize = 12.sp, fontWeight = FontWeight.Medium)
                 }
             }
         }
@@ -242,7 +241,6 @@ private fun CardBack() {
             Text("⚿", color = Gold, fontSize = 42.sp)
             Spacer(Modifier.height(14.dp))
             Text("MANNA", color = Color.White, fontSize = 13.sp, letterSpacing = 4.sp, fontWeight = FontWeight.Medium)
-            Text("FRESH EVERY MORNING", color = Gold, fontSize = 9.sp, letterSpacing = 1.8.sp, modifier = Modifier.padding(top = 8.dp))
         }
     }
 }
@@ -298,7 +296,6 @@ private fun PullPrompt(revealed: Boolean, headline: Color, secondary: Color) {
             if (revealed) "Push up to save" else "Pull down to receive",
             color = headline, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
         )
-        Text(if (revealed) "Keep this word close" else "God's Word for you today", color = secondary, fontSize = 11.sp)
     }
 }
 
@@ -320,7 +317,7 @@ private fun ActionButton(label: String, brush: Brush, content: Color, modifier: 
 @Composable
 private fun AskBar(onAsk: () -> Unit) {
     Row(Modifier.fillMaxWidth().height(52.dp).shadow(12.dp, RoundedCornerShape(17.dp), spotColor = Night.copy(alpha = .22f)).clip(RoundedCornerShape(17.dp)).background(Color.White).border(0.5.dp, Hairline, RoundedCornerShape(17.dp)).clickable(onClick = onAsk).padding(start = 16.dp, end = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("Ask PrayerKey anything…", color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))
+        Text("Ask anything", color = Muted, fontSize = 13.sp, modifier = Modifier.weight(1f))
         Box(Modifier.size(40.dp).clip(CircleShape).background(ElectricGloss), contentAlignment = Alignment.Center) {
             Icon(Icons.Outlined.AutoAwesome, "Ask PrayerKey", tint = Color.White, modifier = Modifier.size(20.dp))
         }
