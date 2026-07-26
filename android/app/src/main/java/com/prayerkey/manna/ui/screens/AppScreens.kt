@@ -2,6 +2,7 @@ package com.prayerkey.manna.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -355,72 +356,16 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
     var deckMode by remember { mutableStateOf(false) }
     var selectedTopic by remember { mutableStateOf<PrayerTopic?>(null) }
     var topicQuery by remember { mutableStateOf("") }
+    var potdOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val potd = remember { com.prayerkey.manna.model.todaysPrayer() }
     // decks come from the app-wide cache — instant after first load
     LaunchedEffect(Unit) { onLoadTopics() }
     val topicsLoading = deckMode && topics.isEmpty()
-    ScreenFrame(if (deckMode) "Prayer decks" else "Pray for me", if (deckMode) "544 prayers for every season of life." else "Bring what is on your heart. PrayerKey will pray with you.") {
-        Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(!deckMode, { deckMode = false }, label = { Text("Pray for me") }, leadingIcon = { Icon(Icons.Outlined.AutoAwesome, null) })
-            FilterChip(deckMode, { deckMode = true }, label = { Text("Prayer decks") }, leadingIcon = { Icon(Icons.Outlined.Style, null) })
-        }
 
-        /* ── Prayer of the Day — same daily prayer as prayerkey.com ── */
-        val potd = remember { com.prayerkey.manna.model.todaysPrayer() }
-        var potdOpen by remember { mutableStateOf(false) }
-        if (!deckMode) Surface(
-            onClick = { potdOpen = true },
-            shape = RoundedCornerShape(22.dp), color = Color.Transparent,
-            // shadow on the OUTER modifier only — layering it with the
-            // gradient background painted a doubled inner edge
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp)
-                .shadow(12.dp, RoundedCornerShape(22.dp), spotColor = Night.copy(alpha = .35f))
-                .background(NightGloss, RoundedCornerShape(22.dp)),
-        ) {
-            Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text("✦ PRAYER OF THE DAY", color = Gold, fontSize = 10.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
-                    Text(potd.title, color = Color.White, fontFamily = FontFamily.Serif, fontSize = 19.sp, modifier = Modifier.padding(top = 4.dp))
-                    Text(potd.ref, color = Color.White.copy(.6f), fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
-                }
-                Text("Read", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Gold)
-            }
-        }
-        if (potdOpen) {
-            val shareContext = LocalContext.current
-            ModalBottomSheet(onDismissRequest = { potdOpen = false }, containerColor = Canvas) {
-                LazyColumn(Modifier.fillMaxWidth().padding(horizontal = 24.dp), contentPadding = PaddingValues(bottom = 44.dp)) {
-                    item {
-                        Text("✦ PRAYER OF THE DAY ✦", color = Gold, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
-                        Text(potd.title, fontFamily = FontFamily.Serif, fontSize = 28.sp, modifier = Modifier.padding(top = 6.dp))
-                        Text(potd.ref, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.padding(top = 3.dp))
-                        Surface(shape = RoundedCornerShape(14.dp), color = Ivory, modifier = Modifier.fillMaxWidth().padding(top = 14.dp)) {
-                            Text("“${potd.verse}”", fontFamily = FontFamily.Serif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(16.dp))
-                        }
-                        potd.prayer.split("\n\n").forEach { para ->
-                            Text(para, fontSize = 15.sp, lineHeight = 24.sp, color = Ink, modifier = Modifier.padding(top = 14.dp))
-                        }
-                        Text("SHARE AS A CARD", color = Muted, fontSize = 11.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 26.dp, bottom = 10.dp))
-                    }
-                    items(com.prayerkey.manna.share.CardFormat.entries.toList(), key = { it.name }) { format ->
-                        Surface(
-                            onClick = { com.prayerkey.manna.share.PrayerCardRenderer.share(shareContext, potd, format) },
-                            shape = RoundedCornerShape(16.dp), color = Color.White,
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Hairline),
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                        ) {
-                            Row(Modifier.padding(horizontal = 18.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Outlined.Share, null, tint = Gold, modifier = Modifier.size(18.dp))
-                                Text(format.label, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
-                                Text("${format.w}×${format.h}", color = Muted, fontSize = 11.sp)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (deckMode) {
+    if (deckMode) {
+        ScreenFrame("Prayer decks", "544 prayers for every season of life.") {
+            ModeChips(deckMode) { deckMode = it }
             OutlinedTextField(
                 topicQuery, { topicQuery = it }, modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
                 placeholder = { Text("Healing, family, work, grief…") }, leadingIcon = { Icon(Icons.Outlined.Search, null) },
@@ -428,7 +373,7 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
             )
             if (topicsLoading) LinearProgressIndicator(Modifier.fillMaxWidth())
             val filtered = topics.filter { topicQuery.isBlank() || it.title.contains(topicQuery, true) || it.category.contains(topicQuery, true) }
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 48.dp)) {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 130.dp)) {
                 items(filtered, key = { it.slug }) { topic ->
                     Surface(
                         modifier = Modifier.fillMaxWidth().clickable { selectedTopic = topic },
@@ -445,99 +390,196 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     }
                 }
             }
-        } else if (generated == null) {
-            /* site's AI Prayer Generator design, in Manna's white theme.
-               Scrollable + dock clearance so the CTA is never clipped. */
-            Column(
-                Modifier.weight(1f).verticalScroll(rememberScrollState())
-                    .padding(bottom = 104.dp),
+        }
+    } else {
+        /* ONE scroll for the whole screen.
+           Previously the header, mode chips and Prayer of the Day sat in a
+           fixed Column above a nested scrolling region. Scrolling slid the
+           headline under that hard viewport edge and clipped it mid-glyph,
+           which read exactly like two views colliding. A single scroll has
+           no interior edge to clip against. */
+        Column(
+            Modifier.fillMaxSize().background(Canvas)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 22.dp)
+                .padding(top = 24.dp, bottom = 130.dp),
+        ) {
+            Text(if (generated == null) "Pray for me" else "Your prayer", fontFamily = FontFamily.Serif, fontSize = 32.sp)
+            Text(
+                "Bring what is on your heart. PrayerKey will pray with you.",
+                color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp),
+            )
+            ModeChips(deckMode) { deckMode = it }
+
+            /* ── Prayer of the Day — same daily prayer as prayerkey.com ── */
+            Surface(
+                onClick = { potdOpen = true },
+                shape = RoundedCornerShape(22.dp), color = Color.Transparent,
+                // shadow on the OUTER modifier only — layering it with the
+                // gradient background painted a doubled inner edge
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 16.dp)
+                    .shadow(12.dp, RoundedCornerShape(22.dp), spotColor = Night.copy(alpha = .35f))
+                    .background(NightGloss, RoundedCornerShape(22.dp)),
             ) {
-            Spacer(Modifier.height(16.dp))
-            Text(
-                "Tell me what to\npray about.",
-                fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
-                fontSize = 34.sp, lineHeight = 40.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Text(
-                "Type anything: a worry, a thank you, a situation.\nA full prayer written for you in seconds.",
-                color = Muted, fontSize = 13.sp, lineHeight = 19.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-            )
-            OutlinedTextField(
-                request, { request = it }, modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
-                placeholder = { Text("e.g. I'm worried about my job. Please pray for my family. I'm thankful for healing...", fontSize = 14.sp, lineHeight = 20.sp) },
-                minLines = 4,
-                shape = RoundedCornerShape(18.dp), colors = fieldColors(),
-            )
-            Text("HOW ARE YOU FEELING? (OPTIONAL)", color = Muted, fontSize = 10.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
-            listOf(
-                listOf("Grateful", "Anxious", "Sad", "Hopeful"),
-                listOf("Confused", "Joyful", "Sick", "Tired"),
-            ).forEach { rowMoods ->
-                Row(Modifier.fillMaxWidth().padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    rowMoods.forEach { item ->
-                        FilterChip(
-                            selected = item in moods,
-                            onClick = { if (item in moods) moods.remove(item) else moods.add(item) },
-                            label = { Text(item, fontSize = 12.sp) },
-                            modifier = Modifier.weight(1f),
+                Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("✦ PRAYER OF THE DAY", color = Gold, fontSize = 10.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
+                        Text(potd.title, color = Color.White, fontFamily = FontFamily.Serif, fontSize = 19.sp, modifier = Modifier.padding(top = 4.dp))
+                        Text(potd.ref, color = Color.White.copy(.6f), fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                    }
+                    Text("Read", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Gold)
+                }
+            }
+
+            if (generated == null) {
+                Spacer(Modifier.height(14.dp))
+                Text(
+                    "Tell me what to\npray about.",
+                    fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
+                    fontSize = 34.sp, lineHeight = 40.sp, textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                /* A warm, roomy field instead of a support-ticket box, and one
+                   quiet invitation instead of clinical examples. */
+                OutlinedTextField(
+                    request, { request = it },
+                    modifier = Modifier.fillMaxWidth().padding(top = 22.dp),
+                    placeholder = {
+                        Text(
+                            "Pour your heart out here…",
+                            fontSize = 16.sp, color = Muted,
+                            fontFamily = FontFamily.Serif,
                         )
-                    }
-                }
-            }
-            error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 10.dp)) }
-            val canGenerate = request.isNotBlank() && !loading
-            Box(
-                Modifier.fillMaxWidth().padding(top = 12.dp).height(56.dp)
-                    .shadow(if (canGenerate) 14.dp else 0.dp, RoundedCornerShape(17.dp), spotColor = Electric.copy(alpha = .45f))
-                    .clip(RoundedCornerShape(17.dp))
-                    .background(if (canGenerate) ElectricGloss else androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0xFFD9D9DE), Color(0xFFCFCFD6))))
-                    .border(0.5.dp, Color.White.copy(alpha = .35f), RoundedCornerShape(17.dp))
-                    .clickable(enabled = canGenerate) {
-                        scope.launch {
-                            loading = true; error = null
-                            runCatching { PrayerKeyApi.generatePrayer(request, moods.toList()) }
-                                .onSuccess { generated = it }
-                                .onFailure { error = it.message ?: "Prayer could not be generated" }
-                            loading = false
-                        }
                     },
-                contentAlignment = Alignment.Center,
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (loading) CircularProgressIndicator(Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
-                    else Icon(Icons.Outlined.AutoAwesome, null, tint = Color.White, modifier = Modifier.size(19.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(if (loading) "Preparing your prayer…" else "Generate Prayer", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-                }
-            }
-            if (journal.isNotEmpty()) {
-                Text("Prayer journal", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 24.dp, bottom = 8.dp))
-                journal.take(2).forEach { entry ->
-                    Surface(Modifier.fillMaxWidth().padding(bottom = 7.dp), color = Ivory, shape = RoundedCornerShape(15.dp)) {
-                        Column(Modifier.padding(13.dp)) { Text(entry.title, fontFamily = FontFamily.Serif, fontSize = 17.sp); Text(entry.scriptureRef.orEmpty(), color = Gold, fontSize = 11.sp) }
+                    textStyle = androidx.compose.ui.text.TextStyle(fontSize = 16.sp, lineHeight = 25.sp),
+                    minLines = 6,
+                    shape = RoundedCornerShape(20.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Gold.copy(alpha = .55f),
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedContainerColor = Ivory,
+                        unfocusedContainerColor = Ivory,
+                    ),
+                )
+
+                /* Moods stay out of the way until there is something to
+                   colour. Asking someone to tick "Sick" before they have
+                   said a word is a form; offering it after is a nuance. */
+                androidx.compose.animation.AnimatedVisibility(request.isNotBlank()) {
+                    Column {
+                        Text(
+                            "HOW ARE YOU FEELING? (OPTIONAL)",
+                            color = Muted, fontSize = 10.sp, letterSpacing = 1.4.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = 20.dp, bottom = 10.dp),
+                        )
+                        // one fluid row rather than a grid of eight boxes
+                        Row(
+                            Modifier.fillMaxWidth()
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            listOf("Grateful", "Anxious", "Sad", "Hopeful", "Confused", "Joyful", "Sick", "Tired").forEach { item ->
+                                FilterChip(
+                                    selected = item in moods,
+                                    onClick = { if (item in moods) moods.remove(item) else moods.add(item) },
+                                    label = { Text(item, fontSize = 12.sp) },
+                                )
+                            }
+                        }
                     }
                 }
-            }
-            }
-        } else Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(bottom = 104.dp)) {
-            // generated prayers are long — must scroll and clear the dock
-            Surface(Modifier.fillMaxWidth().padding(top = 18.dp), shape = RoundedCornerShape(24.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
-                Column(Modifier.padding(22.dp)) {
-                    Text(generated!!.title, fontFamily = FontFamily.Serif, fontSize = 25.sp)
-                    Text("Generated for you", color = Electric, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp, bottom = 20.dp))
-                    Text(generated!!.prayer, lineHeight = 24.sp)
-                    generated!!.verses.firstOrNull()?.let { Text(it.first, color = Gold, modifier = Modifier.padding(top = 20.dp)) }
-                    if (generated!!.encouragement.isNotBlank()) Text(generated!!.encouragement, color = Muted, modifier = Modifier.padding(top = 14.dp))
-                    Row(Modifier.fillMaxWidth().padding(top = 22.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(onClick = { generated?.let { onSavePrayer(request, it) } }, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" Journal") }
-                        Button(onClick = { generated = null }, modifier = Modifier.weight(1f)) { Text("Pray again") }
+
+                error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 10.dp)) }
+
+                val canGenerate = request.isNotBlank() && !loading
+                Box(
+                    Modifier.fillMaxWidth().padding(top = 22.dp).height(56.dp)
+                        .shadow(if (canGenerate) 14.dp else 0.dp, RoundedCornerShape(17.dp), spotColor = Electric.copy(alpha = .45f))
+                        .clip(RoundedCornerShape(17.dp))
+                        .background(if (canGenerate) ElectricGloss else androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0xFFD9D9DE), Color(0xFFCFCFD6))))
+                        .border(0.5.dp, Color.White.copy(alpha = .35f), RoundedCornerShape(17.dp))
+                        .clickable(enabled = canGenerate) {
+                            scope.launch {
+                                loading = true; error = null
+                                runCatching { PrayerKeyApi.generatePrayer(request, moods.toList()) }
+                                    .onSuccess { generated = it }
+                                    .onFailure { error = it.message ?: "Prayer could not be generated" }
+                                loading = false
+                            }
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (loading) CircularProgressIndicator(Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                        else Icon(Icons.Outlined.AutoAwesome, null, tint = Color.White, modifier = Modifier.size(19.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(if (loading) "Preparing your prayer…" else "Pray with me", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    }
+                }
+
+                if (journal.isNotEmpty()) {
+                    Text("Prayer journal", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 26.dp, bottom = 8.dp))
+                    journal.take(2).forEach { entry ->
+                        Surface(Modifier.fillMaxWidth().padding(bottom = 7.dp), color = Ivory, shape = RoundedCornerShape(15.dp)) {
+                            Column(Modifier.padding(13.dp)) { Text(entry.title, fontFamily = FontFamily.Serif, fontSize = 17.sp); Text(entry.scriptureRef.orEmpty(), color = Gold, fontSize = 11.sp) }
+                        }
+                    }
+                }
+            } else {
+                Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
+                    Column(Modifier.padding(22.dp)) {
+                        Text(generated!!.title, fontFamily = FontFamily.Serif, fontSize = 25.sp)
+                        Text("Prayed over your words", color = Electric, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp, bottom = 20.dp))
+                        Text(generated!!.prayer, lineHeight = 24.sp)
+                        generated!!.verses.firstOrNull()?.let { Text(it.first, color = Gold, modifier = Modifier.padding(top = 20.dp)) }
+                        if (generated!!.encouragement.isNotBlank()) Text(generated!!.encouragement, color = Muted, modifier = Modifier.padding(top = 14.dp))
+                        Row(Modifier.fillMaxWidth().padding(top = 22.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(onClick = { generated?.let { onSavePrayer(request, it) } }, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" Journal") }
+                            Button(onClick = { generated = null }, modifier = Modifier.weight(1f)) { Text("Pray again") }
+                        }
                     }
                 }
             }
         }
     }
+
+    if (potdOpen) {
+        val shareContext = LocalContext.current
+        ModalBottomSheet(onDismissRequest = { potdOpen = false }, containerColor = Canvas) {
+            LazyColumn(Modifier.fillMaxWidth().padding(horizontal = 24.dp), contentPadding = PaddingValues(bottom = 44.dp)) {
+                item {
+                    Text("✦ PRAYER OF THE DAY ✦", color = Gold, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
+                    Text(potd.title, fontFamily = FontFamily.Serif, fontSize = 28.sp, modifier = Modifier.padding(top = 6.dp))
+                    Text(potd.ref, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.padding(top = 3.dp))
+                    Surface(shape = RoundedCornerShape(14.dp), color = Ivory, modifier = Modifier.fillMaxWidth().padding(top = 14.dp)) {
+                        Text("“${potd.verse}”", fontFamily = FontFamily.Serif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(16.dp))
+                    }
+                    potd.prayer.split("\n\n").forEach { para ->
+                        Text(para, fontSize = 15.sp, lineHeight = 24.sp, color = Ink, modifier = Modifier.padding(top = 14.dp))
+                    }
+                    Text("SHARE AS A CARD", color = Muted, fontSize = 11.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 26.dp, bottom = 10.dp))
+                }
+                items(com.prayerkey.manna.share.CardFormat.entries.toList(), key = { it.name }) { format ->
+                    Surface(
+                        onClick = { com.prayerkey.manna.share.PrayerCardRenderer.share(shareContext, potd, format) },
+                        shape = RoundedCornerShape(16.dp), color = Color.White,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Hairline),
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    ) {
+                        Row(Modifier.padding(horizontal = 18.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Outlined.Share, null, tint = Gold, modifier = Modifier.size(18.dp))
+                            Text(format.label, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
+                            Text("${format.w}×${format.h}", color = Muted, fontSize = 11.sp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     selectedTopic?.let { topic ->
         ModalBottomSheet(onDismissRequest = { selectedTopic = null }, containerColor = Canvas) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 36.dp)) {
@@ -556,6 +598,14 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                 Button(onClick = { selectedTopic = null }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp)) { Text("Amen") }
             }
         }
+    }
+}
+
+@Composable
+private fun ModeChips(deckMode: Boolean, onMode: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FilterChip(!deckMode, { onMode(false) }, label = { Text("Pray for me") }, leadingIcon = { Icon(Icons.Outlined.AutoAwesome, null) })
+        FilterChip(deckMode, { onMode(true) }, label = { Text("Prayer decks") }, leadingIcon = { Icon(Icons.Outlined.Style, null) })
     }
 }
 
