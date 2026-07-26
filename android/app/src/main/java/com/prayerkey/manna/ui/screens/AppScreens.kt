@@ -364,30 +364,119 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
     val topicsLoading = deckMode && topics.isEmpty()
 
     if (deckMode) {
-        ScreenFrame("Prayer decks", "544 prayers for every season of life.") {
-            ModeChips(deckMode) { deckMode = it }
-            OutlinedTextField(
-                topicQuery, { topicQuery = it }, modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                placeholder = { Text("Healing, family, work, grief…") }, leadingIcon = { Icon(Icons.Outlined.Search, null) },
-                singleLine = true, shape = RoundedCornerShape(18.dp), colors = fieldColors(),
-            )
-            if (topicsLoading) LinearProgressIndicator(Modifier.fillMaxWidth())
-            val filtered = topics.filter { topicQuery.isBlank() || it.title.contains(topicQuery, true) || it.category.contains(topicQuery, true) }
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp), contentPadding = PaddingValues(bottom = 130.dp)) {
-                items(filtered, key = { it.slug }) { topic ->
+        /* Prayer decks shuffle like Manna: the card is the screen, pull down
+           for the next prayer, push up to keep it. 544 rows in a list was a
+           directory; this is a deck you can actually browse with a thumb. */
+        val filtered = remember(topics, topicQuery) {
+            topics.filter {
+                topicQuery.isBlank() ||
+                    it.title.contains(topicQuery, true) ||
+                    it.category.contains(topicQuery, true)
+            }
+        }
+        Box(Modifier.fillMaxSize().background(dayWash())) {
+            if (topicsLoading) {
+                Column(
+                    Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator(color = Electric, strokeWidth = 3.dp, modifier = Modifier.size(42.dp))
+                    Text("Shuffling 544 prayers…", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 18.dp))
+                }
+            } else if (filtered.isEmpty()) {
+                Column(
+                    Modifier.fillMaxSize().padding(horizontal = 40.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text("No prayer for that yet", fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "Try healing, family, work, fear or money.",
+                        color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 6.dp),
+                    )
                     Surface(
-                        modifier = Modifier.fillMaxWidth().clickable { selectedTopic = topic },
-                        color = deckColor(topic.category), shape = RoundedCornerShape(20.dp),
+                        onClick = { topicQuery = "" }, shape = R.pill, color = ChipFill,
+                        modifier = Modifier.padding(top = 18.dp),
                     ) {
-                        Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Box(Modifier.size(45.dp).background(Color.White.copy(.72f), CircleShape), contentAlignment = Alignment.Center) { Icon(Icons.Outlined.FavoriteBorder, null, tint = Gold) }
-                            Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
-                                Text(topic.title, fontFamily = FontFamily.Serif, fontSize = 20.sp)
-                                Text(topic.category, color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp))
-                            }
-                            Icon(Icons.Outlined.KeyboardArrowRight, null)
-                        }
+                        Text(
+                            "Clear search", color = Electric, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
+                        )
                     }
+                }
+            } else {
+                com.prayerkey.manna.ui.components.PullDeck(
+                    items = filtered,
+                    pullStamp = "NEXT ✦",
+                    keepStamp = "KEPT ♥",
+                    onKeep = { topic ->
+                        // keeping a prayer files it, with its first verse attached
+                        onSavePrayer(
+                            topic.title,
+                            GeneratedPrayer(
+                                id = topic.slug,
+                                title = topic.title,
+                                prayer = topic.prayer,
+                                encouragement = "",
+                                verses = topic.scripture,
+                            ),
+                        )
+                    },
+                    actions = { topic, controls ->
+                        listOf(
+                            com.prayerkey.manna.ui.components.DeckAction(
+                                Icons.Outlined.Close, "Next prayer", Color(0xFFE0526B), 58.dp,
+                            ) { controls.next() },
+                            com.prayerkey.manna.ui.components.DeckAction(
+                                Icons.Outlined.AutoAwesome, "Pray it", Gold, 50.dp,
+                            ) { selectedTopic = topic },
+                            com.prayerkey.manna.ui.components.DeckAction(
+                                Icons.Outlined.BookmarkBorder, "Keep", Color(0xFF2E9E63), 58.dp,
+                            ) { controls.keep() },
+                            com.prayerkey.manna.ui.components.DeckAction(
+                                Icons.Outlined.Share, "Share", Color(0xFF3C7BE0), 50.dp,
+                            ) { selectedTopic = topic },
+                        )
+                    },
+                    topOverlay = { position ->
+                        Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(top = 16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Surface(
+                                    onClick = { deckMode = false }, shape = R.pill,
+                                    color = Color.White, shadowElevation = 6.dp,
+                                ) {
+                                    Text(
+                                        "‹  Pray for me", fontSize = 12.sp, fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
+                                    )
+                                }
+                                Spacer(Modifier.weight(1f))
+                                Surface(shape = R.pill, color = Color.White, shadowElevation = 6.dp) {
+                                    Text(
+                                        "${position + 1} of ${filtered.size}",
+                                        color = Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier.padding(horizontal = 13.dp, vertical = 9.dp),
+                                    )
+                                }
+                            }
+                            OutlinedTextField(
+                                topicQuery, { topicQuery = it },
+                                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+                                placeholder = { Text("Healing, family, work, grief…", fontSize = 13.sp) },
+                                leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Muted) },
+                                singleLine = true, shape = R.control,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Gold.copy(alpha = .5f),
+                                    unfocusedBorderColor = Color.Transparent,
+                                    focusedContainerColor = Color.White,
+                                    unfocusedContainerColor = Color.White.copy(alpha = .92f),
+                                ),
+                            )
+                        }
+                    },
+                ) { topic, front, mod ->
+                    PrayerDeckFace(topic, front, onOpen = { selectedTopic = topic }, modifier = mod)
                 }
             }
         }
