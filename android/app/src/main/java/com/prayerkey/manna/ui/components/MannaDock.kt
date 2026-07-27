@@ -97,15 +97,31 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                                     onSelect(index)
                                 }
                             }
-                            .padding(vertical = 15.dp),
+                            .padding(top = 10.dp, bottom = 9.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        // Icon only. contentDescription keeps the name available
-                        // to TalkBack even though it is no longer drawn.
                         Icon(
-                            item.icon, contentDescription = item.label,
+                            item.icon, contentDescription = null,
                             tint = tint,
-                            modifier = Modifier.size(25.dp).scale(iconScale),
+                            modifier = Modifier.size(23.dp).scale(iconScale),
+                        )
+                        /* Every tab is named, always. A sparkle and a church
+                           glyph are not guessable, and Home carries no other
+                           wayfinding — the dock is the only signpost in the
+                           app, which is the wrong place to be subtle. */
+                        Text(
+                            item.label,
+                            color = if (active) Color.White else Muted,
+                            fontSize = 10.sp,
+                            fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium,
+                            letterSpacing = .1.sp,
+                            maxLines = 1,
+                            modifier = Modifier.padding(top = 5.dp),
+                            // kill Android's font padding so the label sits
+                            // optically centred under the icon
+                            style = androidx.compose.ui.text.TextStyle(
+                                platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false),
+                            ),
                         )
                     }
                 }
