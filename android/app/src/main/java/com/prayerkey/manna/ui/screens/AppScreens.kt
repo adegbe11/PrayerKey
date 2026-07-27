@@ -442,23 +442,9 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     topOverlay = { position ->
                         Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(top = 16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Surface(
-                                    onClick = { deckMode = false }, shape = R.pill,
-                                    color = Color.White, shadowElevation = 6.dp,
-                                ) {
-                                    Text(
-                                        "‹  Pray for me", fontSize = 12.sp, fontWeight = FontWeight.Medium,
-                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
-                                    )
-                                }
+                                com.prayerkey.manna.ui.components.PkGlassPill("‹  Pray for me", onClick = { deckMode = false })
                                 Spacer(Modifier.weight(1f))
-                                Surface(shape = R.pill, color = Color.White, shadowElevation = 6.dp) {
-                                    Text(
-                                        "${position + 1} of ${filtered.size}",
-                                        color = Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
-                                        modifier = Modifier.padding(horizontal = 13.dp, vertical = 9.dp),
-                                    )
-                                }
+                                com.prayerkey.manna.ui.components.PkGlassPill("${position + 1} of ${filtered.size}")
                             }
                             OutlinedTextField(
                                 topicQuery, { topicQuery = it },
@@ -507,8 +493,12 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                 // shadow on the OUTER modifier only — layering it with the
                 // gradient background painted a doubled inner edge
                 modifier = Modifier.fillMaxWidth().padding(top = Space.block, bottom = Space.block)
-                    .shadow(14.dp, R.card, spotColor = SoftShadow)
-                    .background(NightGloss, R.card),
+                    .shadow(24.dp, R.card, spotColor = Night.copy(alpha = .32f), ambientColor = Night.copy(alpha = .12f))
+                    .shadow(3.dp, R.card, spotColor = Night.copy(alpha = .3f), ambientColor = Color.Transparent)
+                    .clip(R.card)
+                    .background(NightFill)
+                    .bloom(Gold, .09f)
+                    .goldEdge(R.card),
             ) {
                 Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
@@ -603,42 +593,32 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 10.dp)) }
 
                 val canGenerate = request.isNotBlank() && !loading
-                Box(
-                    Modifier.fillMaxWidth().padding(top = Space.loose).height(58.dp)
-                        .shadow(if (canGenerate) 16.dp else 0.dp, R.control, spotColor = Electric.copy(alpha = .45f))
-                        .clip(R.control)
-                        .background(if (canGenerate) ElectricGloss else androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0xFFD9D9DE), Color(0xFFCFCFD6))))
-                        .border(0.5.dp, Color.White.copy(alpha = .35f), R.control)
-                        .clickable(enabled = canGenerate) {
-                            scope.launch {
-                                loading = true; error = null
-                                runCatching { PrayerKeyApi.generatePrayer(request, moods.toList()) }
-                                    .onSuccess { generated = it }
-                                    .onFailure { error = it.message ?: "Prayer could not be generated" }
-                                loading = false
-                            }
-                        },
-                    contentAlignment = Alignment.Center,
+                com.prayerkey.manna.ui.components.PkButton(
+                    label = if (loading) "Preparing your prayer…" else "Pray with me",
+                    enabled = canGenerate,
+                    icon = Icons.Outlined.AutoAwesome,
+                    modifier = Modifier.fillMaxWidth().padding(top = Space.loose),
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (loading) CircularProgressIndicator(Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
-                        else Icon(Icons.Outlined.AutoAwesome, null, tint = Color.White, modifier = Modifier.size(19.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(if (loading) "Preparing your prayer…" else "Pray with me", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    scope.launch {
+                        loading = true; error = null
+                        runCatching { PrayerKeyApi.generatePrayer(request, moods.toList()) }
+                            .onSuccess { generated = it }
+                            .onFailure { error = it.message ?: "Prayer could not be generated" }
+                        loading = false
                     }
                 }
 
                 if (journal.isNotEmpty()) {
                     Text("Prayer journal", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 26.dp, bottom = 8.dp))
                     journal.take(2).forEach { entry ->
-                        Surface(Modifier.fillMaxWidth().padding(bottom = 7.dp), color = Ivory, shape = RoundedCornerShape(15.dp)) {
-                            Column(Modifier.padding(13.dp)) { Text(entry.title, fontFamily = FontFamily.Serif, fontSize = 17.sp); Text(entry.scriptureRef.orEmpty(), color = Gold, fontSize = 11.sp) }
+                        Box(Modifier.fillMaxWidth().padding(bottom = 8.dp).premiumCard(fill = PaperFill, lift = false)) {
+                            Column(Modifier.padding(15.dp)) { Text(entry.title, fontFamily = FontFamily.Serif, fontSize = 17.sp); Text(entry.scriptureRef.orEmpty(), color = Gold, fontSize = 11.sp) }
                         }
                     }
                 }
             } else {
-                Surface(Modifier.fillMaxWidth(), shape = R.card, color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
-                    Column(Modifier.padding(22.dp)) {
+                Box(Modifier.fillMaxWidth().premiumCard(fill = PaperFill)) {
+                    Column(Modifier.padding(24.dp)) {
                         Text(generated!!.title, fontFamily = FontFamily.Serif, fontSize = 25.sp)
                         Text("Prayed over your words", color = Electric, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp, bottom = 20.dp))
                         Text(generated!!.prayer, lineHeight = 24.sp)
@@ -711,9 +691,9 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
 
 @Composable
 private fun ModeChips(deckMode: Boolean, onMode: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FilterChip(!deckMode, { onMode(false) }, label = { Text("Pray for me") }, leadingIcon = { Icon(Icons.Outlined.AutoAwesome, null) })
-        FilterChip(deckMode, { onMode(true) }, label = { Text("Prayer decks") }, leadingIcon = { Icon(Icons.Outlined.Style, null) })
+    Row(Modifier.fillMaxWidth().padding(top = Space.block), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        com.prayerkey.manna.ui.components.PkChip("Pray for me", !deckMode, Icons.Outlined.AutoAwesome) { onMode(false) }
+        com.prayerkey.manna.ui.components.PkChip("Prayer decks", deckMode, Icons.Outlined.Style) { onMode(true) }
     }
 }
 

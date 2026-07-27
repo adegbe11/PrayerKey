@@ -188,11 +188,10 @@ private fun ReadyView(notes: List<SermonNote>, onOpen: (SermonNote) -> Unit, onS
         if (notes.isNotEmpty()) {
             Text("Your Sundays", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 40.dp, bottom = 10.dp))
             notes.take(6).forEach { note ->
-                Surface(
-                    onClick = { onOpen(note) },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 9.dp),
-                    color = Ivory, shape = R.card,
-                    border = BorderStroke(1.dp, Hairline),
+                Box(
+                    Modifier.fillMaxWidth().padding(bottom = 10.dp)
+                        .premiumCard(fill = PaperFill)
+                        .clickable { onOpen(note) },
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         Text(note.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -253,11 +252,7 @@ private fun ListeningView(
             modifier = Modifier.padding(bottom = 12.dp),
         )
         caught.reversed().forEach { hit ->
-            Surface(
-                Modifier.fillMaxWidth().padding(bottom = 9.dp),
-                color = Color.White, shape = R.card,
-                border = BorderStroke(1.dp, Hairline), shadowElevation = 2.dp,
-            ) {
+            Box(Modifier.fillMaxWidth().padding(bottom = 10.dp).premiumCard(lift = false)) {
                 Row(Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(hit.reference, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, modifier = Modifier.weight(1f))
                     Text(clockLabel(hit.atMillis), color = Muted, fontSize = 11.sp)
@@ -348,7 +343,7 @@ private fun NoteView(
 
         if (note.takeaway.isNotBlank()) {
             SectionLabel("CARRY THIS INTO YOUR WEEK")
-            Surface(shape = R.card, color = Night, modifier = Modifier.fillMaxWidth()) {
+            Box(Modifier.fillMaxWidth().premiumCard(fill = NightFill).goldEdge()) {
                 Text(
                     note.takeaway, color = Ivory, fontFamily = FontFamily.Serif,
                     fontSize = 19.sp, lineHeight = 27.sp, modifier = Modifier.padding(21.dp),

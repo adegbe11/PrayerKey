@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prayerkey.manna.ui.components.PkChip
 import com.prayerkey.manna.data.JournalEntry
 import com.prayerkey.manna.data.SavedWord
 import com.prayerkey.manna.model.VerseCard
@@ -101,14 +102,14 @@ fun JournalScreen(
             // On a blank journal they were three pills all reading "0".
             val hasAnything = entries.isNotEmpty() || words.isNotEmpty()
             if (hasAnything) {
-                Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChip(tab == JournalTab.Journal, { tab = JournalTab.Journal }, label = { Text("Journal ${entries.size}") })
-                    FilterChip(tab == JournalTab.Saved, { tab = JournalTab.Saved }, label = { Text("Saved ${words.count { it.answeredAt == null }}") })
-                    FilterChip(
-                        tab == JournalTab.Answered, { tab = JournalTab.Answered },
-                        // answered prayers live in BOTH places now
-                        label = { Text("Answered ${words.count { it.answeredAt != null } + entries.count { it.answeredAt != null }}") },
-                    )
+                Row(Modifier.fillMaxWidth().padding(vertical = Space.block), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PkChip("Journal ${entries.size}", tab == JournalTab.Journal) { tab = JournalTab.Journal }
+                    PkChip("Saved ${words.count { it.answeredAt == null }}", tab == JournalTab.Saved) { tab = JournalTab.Saved }
+                    // answered prayers live in BOTH places now
+                    PkChip(
+                        "Answered ${words.count { it.answeredAt != null } + entries.count { it.answeredAt != null }}",
+                        tab == JournalTab.Answered,
+                    ) { tab = JournalTab.Answered }
                 }
             } else Spacer(Modifier.height(10.dp))
 
@@ -296,8 +297,8 @@ private fun JournalTimeline(
             memory?.let { m ->
                 item(key = "memory") {
                     val ago = if (m.entryDay == today - 365) "One year ago today" else "One month ago today"
-                    Surface(shape = RoundedCornerShape(18.dp), color = Night) {
-                        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+                    Box(Modifier.fillMaxWidth().premiumCard(fill = NightFill).goldEdge()) {
+                        Column(Modifier.fillMaxWidth().padding(18.dp)) {
                             Text("ON THIS DAY", color = Gold, fontSize = 10.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
                             Text(ago, color = Color.White, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 6.dp))
                             Text(m.body, color = Color(0xFFD8D5CC), fontSize = 13.sp, lineHeight = 19.sp, maxLines = 3, modifier = Modifier.padding(top = 6.dp))
@@ -374,10 +375,10 @@ private fun JournalMark() {
 @Composable
 private fun EntryCard(entry: JournalEntry, onAnswer: () -> Unit, onClick: () -> Unit) {
     val answered = entry.answeredAt != null
-    Surface(
-        shape = R.card, color = if (answered) Color(0xFFFFFBF0) else Ivory,
-        border = BorderStroke(1.dp, Hairline),
-        modifier = Modifier.fillMaxWidth().clip(R.card).clickable(onClick = onClick),
+    Box(
+        Modifier.fillMaxWidth()
+            .premiumCard(fill = if (answered) GoldFill else PaperFill)
+            .clickable(onClick = onClick),
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

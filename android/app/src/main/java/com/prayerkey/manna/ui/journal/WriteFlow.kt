@@ -48,6 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.model.VerseCard
 import com.prayerkey.manna.ui.church.ReferenceDetector
+import com.prayerkey.manna.ui.theme.premiumCard
+import com.prayerkey.manna.ui.theme.PaperFill
+import com.prayerkey.manna.ui.theme.topHighlight
 import com.prayerkey.manna.ui.theme.R
 import com.prayerkey.manna.ui.theme.InkSoft
 import com.prayerkey.manna.ui.theme.Electric
@@ -99,12 +102,10 @@ fun SuggestionSheet(
             )
 
             prompts.forEach { prompt ->
-                Surface(
-                    onClick = { onPick(prompt) },
-                    shape = R.card,
-                    color = Color(0xFFFBF9F3),
-                    border = BorderStroke(1.dp, Hairline),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                Box(
+                    Modifier.fillMaxWidth().padding(bottom = 10.dp)
+                        .premiumCard(fill = PaperFill, lift = false)
+                        .clickable { onPick(prompt) },
                 ) {
                     Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
@@ -319,7 +320,11 @@ fun WriteSheet(
                 val ready = body.isNotBlank()
                 Box(
                     Modifier.height(48.dp).clip(R.control)
-                        .background(if (ready) Electric else Color(0xFFD9D9DE))
+                        .background(
+                            if (ready) androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0xFF4E70FF), Electric))
+                            else androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color(0xFFDCDCE2), Color(0xFFD1D1D8))),
+                        )
+                        .topHighlight(R.control, strength = if (ready) .4f else .2f)
                         .clickable(enabled = ready) {
                             onSubmit(
                                 WriteResult(

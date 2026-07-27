@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
@@ -24,6 +25,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.PrayerTopic
+import com.prayerkey.manna.ui.theme.premiumCard
+import com.prayerkey.manna.ui.theme.PaperFill
+import com.prayerkey.manna.ui.theme.bloom
 import com.prayerkey.manna.ui.theme.Gold
 import com.prayerkey.manna.ui.theme.Hairline
 import com.prayerkey.manna.ui.theme.InkSoft
@@ -48,15 +52,15 @@ fun PrayerDeckFace(
     onOpen: () -> Unit,
     modifier: Modifier,
 ) {
-    Surface(
-        modifier = if (front) modifier.clickable(onClick = onOpen) else modifier,
-        shape = R.card,
-        color = if (front) Color.Transparent else Ivory,
-        border = BorderStroke(1.dp, Hairline),
-        shadowElevation = if (front) 24.dp else 0.dp,
+    Box(
+        if (front) {
+            modifier.premiumCard(fill = PaperFill).bloom(Gold, .07f).clickable(onClick = onOpen)
+        } else {
+            // PERF: the waiting card paints flat — no second full-screen gradient
+            modifier.clip(R.card).background(Ivory)
+        },
     ) {
-        // PERF: only the front card paints gloss, sheen and scrim
-        Box(Modifier.fillMaxSize().let { if (front) it.background(IvoryGloss) else it }) {
+        Box(Modifier.fillMaxSize()) {
             if (front) {
                 Box(Modifier.fillMaxSize().background(TopSheenLight))
                 Box(
