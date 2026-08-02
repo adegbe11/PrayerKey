@@ -25,6 +25,7 @@ data class UserPrefs(
     val reduceMotion: Boolean = false,
     val translation: String = "KJV",
     val onboarded: Boolean = false,
+    val sermonLanguage: String = "en-US",
 )
 data class SermonVerse(val reference: String, val text: String, val detectedAt: Long)
 data class SermonSession(val id: Long, val title: String, val startedAt: Long, val endedAt: Long?, val verses: List<SermonVerse>)

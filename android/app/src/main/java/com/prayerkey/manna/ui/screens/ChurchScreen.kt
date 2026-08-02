@@ -23,6 +23,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.heightIn
+import com.prayerkey.manna.ui.church.SERMON_LANGUAGES
+import com.prayerkey.manna.ui.church.sermonLanguageLabel
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Stop
 import androidx.compose.material3.CircularProgressIndicator
@@ -59,6 +66,8 @@ private enum class Stage { Ready, Listening, Arranging, Note }
 @Composable
 fun ChurchScreen(
     notes: List<SermonNote>,
+    language: String,
+    onLanguage: (String) -> Unit,
     onSaveNote: (SermonArranger.Note, Int) -> Unit,
     onDeleteNote: (Long) -> Unit,
 ) {
@@ -73,6 +82,7 @@ fun ChurchScreen(
     var arranged by remember { mutableStateOf<SermonArranger.Note?>(null) }
     var minutes by remember { mutableIntStateOf(0) }
     var openNote by remember { mutableStateOf<SermonNote?>(null) }
+    var pickLanguage by remember { mutableStateOf(false) }
 
     // the service outlives this screen — pick the stage back up on return
     LaunchedEffect(listening) {
@@ -87,6 +97,7 @@ fun ChurchScreen(
 
     fun begin() {
         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        SermonService.setLanguage(language)
         if (android.os.Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -103,12 +114,18 @@ fun ChurchScreen(
         val refs = caught.map { it.reference }
         SermonService.stop(context)
         stage = Stage.Arranging
-        arranged = SermonArranger.arrange(transcript, refs)
+        arranged = SermonArranger.arrange(transcript, refs, language)
     }
 
     Box(Modifier.fillMaxSize().background(dayWash())) {
         when (stage) {
-            Stage.Ready -> ReadyView(notes, onOpen = { openNote = it }, onStart = { begin() })
+            Stage.Ready -> ReadyView(
+                notes = notes,
+                language = language,
+                onLanguage = { pickLanguage = true },
+                onOpen = { openNote = it },
+                onStart = { begin() },
+            )
             Stage.Listening -> ListeningView(
                 startedAt = startedAt,
                 caught = caught,
@@ -148,6 +165,12 @@ fun ChurchScreen(
         }
     }
 
+    if (pickLanguage) LanguageSheet(
+        current = language,
+        onPick = { onLanguage(it); pickLanguage = false },
+        onClose = { pickLanguage = false },
+    )
+
     openNote?.let { saved ->
         SavedNoteSheet(saved, onClose = { openNote = null }, onDelete = { onDeleteNote(saved.id); openNote = null })
     }
@@ -156,7 +179,13 @@ fun ChurchScreen(
 /* ─────────────────────────── READY ─────────────────────────── */
 
 @Composable
-private fun ReadyView(notes: List<SermonNote>, onOpen: (SermonNote) -> Unit, onStart: () -> Unit) {
+private fun ReadyView(
+    notes: List<SermonNote>,
+    language: String,
+    onLanguage: () -> Unit,
+    onOpen: (SermonNote) -> Unit,
+    onStart: () -> Unit,
+) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState())
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 120.dp),
@@ -183,6 +212,22 @@ private fun ReadyView(notes: List<SermonNote>, onOpen: (SermonNote) -> Unit, onS
                 "Processed on your phone. Audio is never saved.",
                 color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 8.dp),
             )
+            Surface(
+                onClick = onLanguage, shape = R.pill, color = Color.White,
+                border = BorderStroke(1.dp, Hairline),
+                modifier = Modifier.padding(top = 16.dp),
+            ) {
+                Row(
+                    Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Outlined.Language, null, tint = Muted, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(sermonLanguageLabel(language), fontSize = 13.sp, fontWeight = FontWeight.Medium)
+                    Spacer(Modifier.width(4.dp))
+                    Icon(Icons.Outlined.KeyboardArrowDown, null, tint = Muted, modifier = Modifier.size(16.dp))
+                }
+            }
         }
 
         if (notes.isNotEmpty()) {
@@ -503,3 +548,54 @@ private fun dayLabel(millis: Long): String =
 private fun clockLabel(millis: Long): String =
     Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
         .format(DateTimeFormatter.ofPattern("h:mm a"))
+
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: () -> Unit) {
+    androidx.compose.material3.ModalBottomSheet(onDismissRequest = onClose, containerColor = Canvas) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 30.dp)) {
+            Text("What language is the service in?", fontFamily = FontFamily.Serif, fontSize = 24.sp)
+            Text(
+                "Your phone does the listening, so this needs that language pack installed. " +
+                    "Android offers to download it the first time you use one.",
+                color = Muted, fontSize = 12.5.sp, lineHeight = 19.sp,
+                modifier = Modifier.padding(top = 6.dp, bottom = 16.dp),
+            )
+            androidx.compose.foundation.lazy.LazyColumn(
+                Modifier.heightIn(max = 420.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                items(SERMON_LANGUAGES, key = { it.tag }) { lang ->
+                    val on = lang.tag == current
+                    Surface(
+                        onClick = { onPick(lang.tag) },
+                        shape = R.control,
+                        color = if (on) Ivory else Color.White,
+                        border = BorderStroke(1.dp, if (on) Gold.copy(alpha = .5f) else Hairline),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    lang.label, fontSize = 15.sp,
+                                    fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal,
+                                )
+                                // say plainly which languages get the sharper
+                                // treatment rather than being quietly worse
+                                if (SermonArranger.hasCuesFor(lang.tag)) {
+                                    Text("Full arranged notes", color = Gold, fontSize = 10.5.sp)
+                                } else {
+                                    Text("Transcript, scriptures and basic notes", color = Muted, fontSize = 10.5.sp)
+                                }
+                            }
+                            if (on) Icon(Icons.Outlined.Check, null, tint = Gold, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

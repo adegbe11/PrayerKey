@@ -120,6 +120,8 @@ fun MannaApp() {
                     2 -> PrayerScreen(journal, topics, viewModel::loadTopics, viewModel::savePrayer)
                     3 -> ChurchScreen(
                         notes = sermonNotes,
+                        language = preferences.sermonLanguage,
+                        onLanguage = { viewModel.updatePreferences(preferences.copy(sermonLanguage = it)) },
                         onSaveNote = viewModel::saveSermonNote,
                         onDeleteNote = viewModel::deleteSermonNote,
                     )

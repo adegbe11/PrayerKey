@@ -60,6 +60,7 @@ class SermonService : Service() {
 
         recognizer = SermonRecognizer(
             context = this,
+            language = _language.value,
             onChunk = { chunk ->
                 _chunks.value = _chunks.value + chunk
                 _partial.value = ""
@@ -155,6 +156,11 @@ class SermonService : Service() {
         val status = _status.asStateFlow()
         private val _startedAt = MutableStateFlow(0L)
         val startedAt = _startedAt.asStateFlow()
+        private val _language = MutableStateFlow("")
+        val language = _language.asStateFlow()
+
+        /** Set before start(); the recogniser reads it when it spins up. */
+        fun setLanguage(tag: String) { _language.value = tag }
 
         /** Chunks joined with a separator the arranger treats as a full stop. */
         fun transcript(): String = _chunks.value.joinToString(" | ")

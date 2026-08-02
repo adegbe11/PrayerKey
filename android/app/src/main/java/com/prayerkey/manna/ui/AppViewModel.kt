@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+private const val PRAYING_MOOD = "\uD83D\uDE4F"
+
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val store = MannaStore(application)
 
@@ -117,6 +119,21 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             minutes = minutes,
         )
         _sermonNotes.value = store.sermonNotes()
+
+        /* Sunday also becomes a journal page, so the whole walk lives in one
+           place instead of the sermon sitting in its own silo. */
+        store.addJournalEntry(
+            mood = PRAYING_MOOD,
+            body = buildString {
+                append(note.title)
+                if (note.takeaway.isNotBlank()) { append("\n\n"); append(note.takeaway) }
+            },
+            gratitude = "",
+            verseRef = note.scriptures.firstOrNull(),
+            verseText = null,
+            source = "sermon",
+        )
+        refreshEntries()
     }
 
     fun deleteSermonNote(id: Long) = io {

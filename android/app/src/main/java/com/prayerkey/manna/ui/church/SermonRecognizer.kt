@@ -22,6 +22,8 @@ import android.speech.SpeechRecognizer
  */
 class SermonRecognizer(
     context: Context,
+    /** BCP-47 tag, e.g. "en-NG". Empty means the device default. */
+    language: String = "",
     /** Every finished chunk, as it lands. */
     private val onChunk: (String) -> Unit,
     /** The in-flight utterance, for the live caption only. */
@@ -38,6 +40,10 @@ class SermonRecognizer(
         putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
         putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
         putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, app.packageName)
+        if (language.isNotBlank()) {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, language)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, language)
+        }
         // keep the audio on the device — free, private, works with no signal
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
