@@ -91,7 +91,6 @@ fun JournalScreen(
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Journal", fontFamily = FontFamily.Serif, fontSize = 32.sp)
-                    Text("Your walk with God, written down.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
                 }
                 androidx.compose.material3.IconButton(onClick = onProfile) {
                     Icon(Icons.Outlined.Settings, "Settings", tint = Muted)
@@ -258,12 +257,6 @@ private fun JournalTimeline(
                     "Your story starts here",
                     fontWeight = FontWeight.SemiBold, fontSize = 17.sp,
                     modifier = Modifier.padding(top = 22.dp),
-                )
-                Text(
-                    "Write what's on your heart today. In a year,\nyou'll be holding proof of how God moved.",
-                    color = Muted, fontSize = 13.5.sp, lineHeight = 21.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 10.dp),
                 )
             }
             return
@@ -524,11 +517,6 @@ private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, on
     if (entries.isEmpty() && words.isEmpty()) {
         Column(Modifier.fillMaxWidth().padding(top = 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Nothing marked answered yet", fontWeight = FontWeight.SemiBold)
-            Text(
-                "Mark a prayer answered and it stays here as proof.",
-                color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.padding(top = 6.dp),
-            )
         }
         return
     }
@@ -556,11 +544,6 @@ private fun WordList(words: List<SavedWord>, canAnswer: Boolean, onAnswer: (Save
     if (words.isEmpty()) {
         Column(Modifier.fillMaxWidth().padding(top = 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(if (canAnswer) "🗂" else "🏆", fontSize = 44.sp)
-            Text(
-                if (canAnswer) "Push a verse up when it speaks to you." else "When God does it, mark the word answered.\nYour proof grows here.",
-                color = Muted, fontSize = 13.sp, lineHeight = 19.sp,
-                modifier = Modifier.padding(top = 12.dp),
-            )
         }
         return
     }
