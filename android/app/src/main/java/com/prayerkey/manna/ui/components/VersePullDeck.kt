@@ -81,6 +81,7 @@ import kotlin.math.abs
 @Composable
 fun VersePullDeck(
     verses: List<RemoteVerse>,
+    reduceMotion: Boolean = false,
     topOverlay: @Composable () -> Unit = {},
     onSave: (RemoteVerse) -> Unit,
     onMemorize: (RemoteVerse) -> Unit,
@@ -170,8 +171,8 @@ fun VersePullDeck(
             },
     ) {
         /* back card — waits in the Z-stack, grows as the front leaves */
-        if (!stillMode) VerseFace(
-            verse = next, dimmed = true,
+        if (!stillMode) WorldFace(
+            verse = next, front = false, reduceMotion = reduceMotion,
             modifier = Modifier.fillMaxSize().graphicsLayer {
                 val take = abs(progress)
                 val grow = .94f + (.06f * take)
@@ -181,8 +182,8 @@ fun VersePullDeck(
 
         /* front card — full-bleed, rides the thumb straight down */
         Box(Modifier.fillMaxSize().graphicsLayer { translationY = offsetValue }) {
-            VerseFace(
-                verse = current, dimmed = false, still = stillMode,
+            WorldFace(
+                verse = current, front = true, reduceMotion = reduceMotion, still = stillMode,
                 modifier = Modifier.fillMaxSize().clickable { onOpen(current) },
             )
 
@@ -258,6 +259,29 @@ private fun ActionCircle(
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, label, tint = tint, modifier = Modifier.size(size * .44f))
+    }
+}
+
+@Composable
+private fun WorldFace(
+    verse: RemoteVerse,
+    front: Boolean,
+    reduceMotion: Boolean,
+    still: Boolean = false,
+    modifier: Modifier,
+) {
+    // "Be still" keeps the quiet night card; every other verse gets a world
+    if (still) {
+        VerseFace(verse = verse, dimmed = !front, still = true, modifier = modifier)
+    } else {
+        com.prayerkey.manna.ui.worlds.WorldVerseFace(
+            reference = verse.reference,
+            text = verse.text,
+            translation = verse.translation,
+            front = front,
+            reduceMotion = reduceMotion,
+            modifier = modifier,
+        )
     }
 }
 

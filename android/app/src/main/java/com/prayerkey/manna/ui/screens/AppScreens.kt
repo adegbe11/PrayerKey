@@ -71,6 +71,7 @@ fun BibleScreen(
     onSave: (VerseCard) -> Unit,
     onMemorize: (VerseCard) -> Unit,
     onAdvanceMemory: (String) -> Unit,
+    reduceMotion: Boolean = false,
 ) {
     var query by remember { mutableStateOf("") }
     var shown by remember { mutableStateOf<List<RemoteVerse>>(emptyList()) }
@@ -137,6 +138,7 @@ fun BibleScreen(
         } else {
             com.prayerkey.manna.ui.components.VersePullDeck(
                 verses = shown,
+                reduceMotion = reduceMotion,
                 topOverlay = {
                     Row(
                         Modifier.fillMaxWidth().padding(horizontal = 14.dp).padding(top = 12.dp),

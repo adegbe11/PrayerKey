@@ -115,6 +115,7 @@ fun MannaApp() {
                         onSave = viewModel::save,
                         onMemorize = viewModel::memorize,
                         onAdvanceMemory = viewModel::advanceMemory,
+                        reduceMotion = preferences.reduceMotion,
                     )
                     2 -> PrayerScreen(journal, topics, viewModel::loadTopics, viewModel::savePrayer)
                     3 -> ChurchScreen(
