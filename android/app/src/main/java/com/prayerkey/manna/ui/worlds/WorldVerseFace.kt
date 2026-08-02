@@ -51,10 +51,14 @@ fun WorldVerseFace(
         Box(
             Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
-                    0f to Color.Black.copy(alpha = .22f),
-                    .42f to Color.Transparent,
-                    .68f to Color.Black.copy(alpha = .38f),
-                    1f to Color.Black.copy(alpha = .72f),
+                    // pale worlds (wilderness, harvest, pasture) need a much
+                    // stronger foot than dark ones, so this is sized for the
+                    // worst case rather than the average
+                    0f to Color.Black.copy(alpha = .26f),
+                    .34f to Color.Transparent,
+                    .55f to Color.Black.copy(alpha = .34f),
+                    .78f to Color.Black.copy(alpha = .66f),
+                    1f to Color.Black.copy(alpha = .86f),
                 ),
             ),
         )
