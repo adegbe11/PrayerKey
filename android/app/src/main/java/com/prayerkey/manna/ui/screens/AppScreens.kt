@@ -514,44 +514,84 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
             }
 
             if (generated == null) {
-                Spacer(Modifier.height(Space.loose))
-                Text(
-                    "Tell me what to\npray about.",
-                    fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
-                    fontSize = 34.sp, lineHeight = 42.sp, textAlign = TextAlign.Center,
-                    color = InkSoft,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Spacer(Modifier.height(Space.loose))
+                /* ONE headline. The screen title already said "Pray for me";
+                   a second centred serif headline repeated it while everything
+                   around it was left aligned. */
 
-                /* A warm, roomy field instead of a support-ticket box, and one
-                   quiet invitation instead of clinical examples. */
+                /* The field is the hero, so it has to read as a control and
+                   not a void. It rests at three lines and grows as you type —
+                   the old six-line box was the largest thing on the screen and
+                   it was empty. */
                 OutlinedTextField(
                     request, { request = it },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            "Pour your heart out here…",
-                            fontSize = 16.sp, color = Muted,
+                            "Pour your heart out here...",
+                            fontSize = 17.sp, color = Muted,
                             fontFamily = FontFamily.Serif,
                         )
                     },
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        fontSize = 16.sp, lineHeight = 26.sp, color = InkSoft,
+                        fontSize = 17.sp, lineHeight = 27.sp, color = InkSoft,
+                        fontFamily = FontFamily.Serif,
                     ),
-                    minLines = 6,
+                    minLines = 3,
+                    maxLines = 10,
                     shape = R.card,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Gold.copy(alpha = .55f),
-                        unfocusedBorderColor = Color.Transparent,
+                        focusedBorderColor = Gold.copy(alpha = .7f),
+                        unfocusedBorderColor = Hairline,
                         focusedContainerColor = Ivory,
                         unfocusedContainerColor = Ivory,
                     ),
                 )
 
+                /* Starter prompts, so an empty screen is never a dead end. A
+                   blank input is the same blank-page problem the journal had,
+                   and the cure is a way in, not a bigger box. */
+                androidx.compose.animation.AnimatedVisibility(request.isBlank()) {
+                    Column {
+                        Text(
+                            "OR START HERE",
+                            color = Muted, fontSize = 10.sp, letterSpacing = 1.6.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = Space.block, bottom = 10.dp),
+                        )
+                        listOf(
+                            "I am anxious" to "I am anxious about something and I need peace.",
+                            "For my family" to "Please pray for my family.",
+                            "To give thanks" to "I want to thank God for what He has done.",
+                            "I cannot sleep" to "I cannot sleep and my mind will not rest.",
+                            "For healing" to "I need healing in my body.",
+                            "I need direction" to "I do not know what to do next and I need direction.",
+                        ).chunked(2).forEach { row ->
+                            Row(
+                                Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                row.forEach { pair ->
+                                    Surface(
+                                        onClick = { request = pair.second },
+                                        shape = R.pill, color = ChipFill,
+                                        modifier = Modifier.weight(1f),
+                                    ) {
+                                        Text(
+                                            pair.first, color = InkSoft, fontSize = 12.5.sp,
+                                            fontWeight = FontWeight.Medium, maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 /* Moods stay out of the way until there is something to
-                   colour. Asking someone to tick "Sick" before they have
-                   said a word is a form; offering it after is a nuance. */
+                   colour. Asking someone to tick "Sick" before they have said
+                   a word is a form; offering it after is a nuance. */
                 androidx.compose.animation.AnimatedVisibility(request.isNotBlank()) {
                     Column {
                         Text(
@@ -560,7 +600,6 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(top = Space.block, bottom = 10.dp),
                         )
-                        // one fluid row, with a fade telling you it keeps going
                         Box {
                             Row(
                                 Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -594,24 +633,33 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
 
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 10.dp)) }
 
-                val canGenerate = request.isNotBlank() && !loading
-                com.prayerkey.manna.ui.components.PkButton(
-                    label = if (loading) "Preparing your prayer…" else "Pray with me",
-                    enabled = canGenerate,
-                    icon = Icons.Outlined.AutoAwesome,
-                    modifier = Modifier.fillMaxWidth().padding(top = Space.loose),
-                ) {
-                    scope.launch {
-                        loading = true; error = null
-                        runCatching { PrayerKeyApi.generatePrayer(request, moods.toList()) }
-                            .onSuccess { generated = it }
-                            .onFailure { error = it.message ?: "Prayer could not be generated" }
-                        loading = false
+                /* The action appears when there is something to act on. A
+                   greyed-out slab was dead weight and the least attractive
+                   thing on the screen. */
+                androidx.compose.animation.AnimatedVisibility(request.isNotBlank() || loading) {
+                    com.prayerkey.manna.ui.components.PkButton(
+                        label = if (loading) "Preparing your prayer..." else "Pray with me",
+                        enabled = !loading,
+                        icon = Icons.Outlined.AutoAwesome,
+                        modifier = Modifier.fillMaxWidth().padding(top = Space.loose),
+                    ) {
+                        scope.launch {
+                            loading = true; error = null
+                            runCatching { PrayerKeyApi.generatePrayer(request, moods.toList()) }
+                                .onSuccess { generated = it }
+                                .onFailure { error = it.message ?: "Prayer could not be generated" }
+                            loading = false
+                        }
                     }
                 }
 
                 if (journal.isNotEmpty()) {
-                    Text("Prayer journal", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 26.dp, bottom = 8.dp))
+                    Text(
+                        "PRAYERS YOU KEPT",
+                        color = Muted, fontSize = 10.sp, letterSpacing = 1.6.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = Space.loose, bottom = 10.dp),
+                    )
                     journal.take(2).forEach { entry ->
                         Box(Modifier.fillMaxWidth().padding(bottom = 8.dp).premiumCard(fill = PaperFill, lift = false)) {
                             Column(Modifier.padding(15.dp)) { Text(entry.title, fontFamily = FontFamily.Serif, fontSize = 17.sp); Text(entry.scriptureRef.orEmpty(), color = Gold, fontSize = 11.sp) }
