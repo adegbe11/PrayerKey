@@ -444,6 +444,8 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
     LaunchedEffect(Unit) { onLoadTopics() }
     val topicsLoading = deckMode && topics.isEmpty()
 
+    androidx.activity.compose.BackHandler(enabled = deckMode) { deckMode = false }
+
     if (deckMode) {
         /* Prayer decks shuffle like Manna: the card is the screen, pull down
            for the next prayer, push up to keep it. 544 rows in a list was a
@@ -515,28 +517,9 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                             ) { selectedTopic = topic },
                         )
                     },
-                    topOverlay = { position ->
-                        Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(top = 16.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                com.prayerkey.manna.ui.components.PkGlassPill("‹  Pray for me", onClick = { deckMode = false })
-                                Spacer(Modifier.weight(1f))
-                                com.prayerkey.manna.ui.components.PkGlassPill("${position + 1} of ${filtered.size}")
-                            }
-                            OutlinedTextField(
-                                topicQuery, { topicQuery = it },
-                                modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
-                                placeholder = { Text("Healing, family, work, grief…", fontSize = 13.sp) },
-                                leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Muted) },
-                                singleLine = true, shape = R.control,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Gold.copy(alpha = .5f),
-                                    unfocusedBorderColor = Color.Transparent,
-                                    focusedContainerColor = Color.White,
-                                    unfocusedContainerColor = Color.White.copy(alpha = .92f),
-                                ),
-                            )
-                        }
-                    },
+                    // no chrome on the deck at all: no back chip, no
+                    // counter, no search field. The system back button
+                    // leaves the deck, so nothing has to sit on the card.
                 ) { topic, front, mod ->
                     PrayerDeckFace(topic, front, onOpen = { selectedTopic = topic }, modifier = mod)
                 }
@@ -794,23 +777,123 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
 
     selectedTopic?.let { topic ->
         ModalBottomSheet(onDismissRequest = { selectedTopic = null }, containerColor = Canvas) {
-            Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 36.dp)) {
-                Text(topic.title, fontFamily = FontFamily.Serif, fontSize = 29.sp)
-                Text(topic.category, color = Gold, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp, bottom = 22.dp))
-                Text(topic.prayer, fontSize = 17.sp, lineHeight = 27.sp)
-                topic.scripture.forEach { (ref, text) ->
-                    Surface(Modifier.fillMaxWidth().padding(top = 12.dp), color = Ivory, shape = RoundedCornerShape(15.dp)) {
-                        Column(Modifier.padding(14.dp)) { Text(ref, fontWeight = FontWeight.Bold); Text(text, color = Muted, modifier = Modifier.padding(top = 4.dp)) }
+            /* This is where the prayer is actually prayed, so it is set like
+               a page rather than a data dump: a centred head, the prayer
+               broken into breathing paragraphs, then scripture and points as
+               their own named sections. */
+            Column(
+                Modifier.fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 26.dp)
+                    .padding(bottom = 40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    topic.category.uppercase(),
+                    color = Gold, fontSize = 9.5.sp,
+                    letterSpacing = 3.2.sp, fontWeight = FontWeight.Bold,
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    topic.title,
+                    fontFamily = FontFamily.Serif, fontSize = 30.sp, lineHeight = 38.sp,
+                    letterSpacing = (-0.4).sp, textAlign = TextAlign.Center, color = InkSoft,
+                )
+                Spacer(Modifier.height(18.dp))
+                Box(Modifier.height(1.dp).fillMaxWidth(.20f).background(Gold.copy(alpha = .5f)))
+                Spacer(Modifier.height(26.dp))
+
+                /* One wall of text is hard to pray. Split on the sentence
+                   breaks the writer already put in and give each movement
+                   its own paragraph. */
+                prayerParagraphs(topic.prayer).forEachIndexed { i, para ->
+                    if (i > 0) Spacer(Modifier.height(16.dp))
+                    Text(
+                        para,
+                        fontSize = 17.sp, lineHeight = 29.sp,
+                        color = InkSoft, textAlign = TextAlign.Center,
+                    )
+                }
+
+                if (topic.scripture.isNotEmpty()) {
+                    SheetSection("THE WORD ON IT")
+                    topic.scripture.forEach { (ref, text) ->
+                        Box(
+                            Modifier.fillMaxWidth().padding(bottom = 10.dp)
+                                .premiumCard(fill = PaperFill, lift = false),
+                        ) {
+                            Column(Modifier.padding(18.dp)) {
+                                Text(
+                                    ref, color = Gold, fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp,
+                                )
+                                Spacer(Modifier.height(8.dp))
+                                Text(
+                                    text, fontFamily = FontFamily.Serif,
+                                    fontSize = 16.sp, lineHeight = 25.sp, color = InkSoft,
+                                )
+                            }
+                        }
                     }
                 }
+
                 if (topic.prayerPoints.isNotEmpty()) {
-                    Text("Prayer points", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 22.dp))
-                    topic.prayerPoints.forEach { Text("• $it", modifier = Modifier.padding(top = 7.dp)) }
+                    SheetSection("PRAY THESE")
+                    topic.prayerPoints.forEachIndexed { i, point ->
+                        Row(
+                            Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                            verticalAlignment = Alignment.Top,
+                        ) {
+                            Text(
+                                "${i + 1}", color = Gold, fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(end = 14.dp, top = 3.dp),
+                            )
+                            Text(point, fontSize = 16.sp, lineHeight = 26.sp, color = InkSoft)
+                        }
+                    }
                 }
-                Button(onClick = { selectedTopic = null }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp)) { Text("Amen") }
+
+                Spacer(Modifier.height(30.dp))
+                com.prayerkey.manna.ui.components.PkButton(
+                    label = "Amen",
+                    modifier = Modifier.fillMaxWidth(),
+                ) { selectedTopic = null }
             }
         }
     }
+}
+
+/** A named divider between the movements of the sheet. */
+@Composable
+private fun SheetSection(label: String) {
+    Spacer(Modifier.height(30.dp))
+    Text(
+        label, color = Muted, fontSize = 9.5.sp,
+        letterSpacing = 2.6.sp, fontWeight = FontWeight.Bold,
+    )
+    Spacer(Modifier.height(14.dp))
+}
+
+/**
+ * Breaks a prayer into paragraphs of two or three sentences.
+ *
+ * The source prayers arrive as one block. Praying a wall of text is hard —
+ * the eye loses its place and there is nowhere to breathe — so this groups
+ * whole sentences without altering a word of them.
+ */
+private fun prayerParagraphs(prayer: String): List<String> {
+    val blank = prayer.split(Regex("\\n\\s*\\n")).map { it.trim() }.filter { it.isNotEmpty() }
+    if (blank.size > 1) return blank
+
+    val sentences = Regex("[^.!?]+[.!?]+|[^.!?]+$")
+        .findAll(prayer.trim())
+        .map { it.value.trim() }
+        .filter { it.isNotEmpty() }
+        .toList()
+    if (sentences.size <= 3) return listOf(prayer.trim())
+
+    return sentences.chunked(3).map { it.joinToString(" ") }
 }
 
 @Composable
