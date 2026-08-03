@@ -96,10 +96,6 @@ fun SuggestionSheet(
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 34.dp)) {
             Text("What do you want to write about?", fontFamily = FontFamily.Serif, fontSize = 23.sp)
-            Text(
-                "Pulled from your own week. Nothing here left your phone.",
-                color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 5.dp, bottom = 18.dp),
-            )
 
             prompts.forEach { prompt ->
                 Box(
@@ -214,11 +210,6 @@ fun WriteSheet(
                     shape = RoundedCornerShape(12.dp), color = Color(0xFFE8EDF7),
                     modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
                 ) {
-                    Text(
-                        "Drop your shoulders. Unclench your jaw. Keep typing.",
-                        color = Color(0xFF3A4664), fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    )
                 }
             }
 

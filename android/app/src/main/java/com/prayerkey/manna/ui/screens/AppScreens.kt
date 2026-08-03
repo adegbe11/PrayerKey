@@ -392,11 +392,6 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text("No prayer for that yet", fontWeight = FontWeight.SemiBold)
-                    Text(
-                        "Try healing, family, work, fear or money.",
-                        color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 6.dp),
-                    )
                     Surface(
                         onClick = { topicQuery = "" }, shape = R.pill, color = ChipFill,
                         modifier = Modifier.padding(top = 18.dp),
@@ -482,10 +477,6 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                 .padding(top = 24.dp, bottom = Space.dock),
         ) {
             Text(if (generated == null) "Pray for me" else "Your prayer", fontFamily = FontFamily.Serif, fontSize = 32.sp)
-            Text(
-                "Bring what is on your heart. PrayerKey will pray with you.",
-                color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp),
-            )
             ModeChips(deckMode) { deckMode = it }
 
             /* ── Prayer of the Day — same daily prayer as prayerkey.com ── */
@@ -759,7 +750,7 @@ private fun deckColor(category: String): Color = when {
 fun SavedScreen(words: List<SavedWord>, onAnswered: (Long, String) -> Unit) {
     var answeredTab by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf<SavedWord?>(null) }
-    ScreenFrame("Saved", "Every word that met you, kept in one place.") {
+    ScreenFrame("Saved", "") {
         Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(!answeredTab, { answeredTab = false }, label = { Text("Saved ${words.count { it.answeredAt == null }}") })
             FilterChip(answeredTab, { answeredTab = true }, label = { Text("Answered ${words.count { it.answeredAt != null }}") })
@@ -799,7 +790,6 @@ private fun EmptySaved(answered: Boolean) {
     Column(Modifier.fillMaxWidth().padding(top = 60.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(if (answered) Icons.Outlined.FavoriteBorder else Icons.Outlined.BookmarkBorder, null, tint = Gold, modifier = Modifier.size(44.dp))
         Text(if (answered) "Your proof pile begins here" else "Push a card up to keep it", fontFamily = FontFamily.Serif, fontSize = 22.sp, modifier = Modifier.padding(top = 16.dp))
-        Text(if (answered) "Answered prayers become your testimony over time." else "The words that meet you will wait here.", color = Muted, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 8.dp))
     }
 }
 
