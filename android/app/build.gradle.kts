@@ -12,8 +12,8 @@ android {
         applicationId = "com.prayerkey.manna"
         minSdk = 26
         targetSdk = 35
-        versionCode = 13
-        versionName = "1.7.0"
+        versionCode = 15
+        versionName = "2.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true

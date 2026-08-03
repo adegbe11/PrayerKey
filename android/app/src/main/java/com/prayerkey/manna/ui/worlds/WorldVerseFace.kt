@@ -40,68 +40,15 @@ fun WorldVerseFace(
     modifier: Modifier = Modifier,
     bottomPadding: androidx.compose.ui.unit.Dp = 210.dp,
 ) {
-    val world = remember(reference, text) { WorldPicker.forVerse(reference, text) }
-    // PERF: only the front card animates, and never under reduce-motion
-    val animate = front && !reduceMotion
-
-    Box(modifier.clip(R.card)) {
-        WorldScene(world, animate, Modifier.fillMaxSize())
-
-        // scrim: keeps the sky readable at the top, the words readable below
-        Box(
-            Modifier.fillMaxSize().background(
-                Brush.verticalGradient(
-                    // pale worlds (wilderness, harvest, pasture) need a much
-                    // stronger foot than dark ones, so this is sized for the
-                    // worst case rather than the average
-                    0f to Color.Black.copy(alpha = .26f),
-                    .34f to Color.Transparent,
-                    .55f to Color.Black.copy(alpha = .34f),
-                    .78f to Color.Black.copy(alpha = .66f),
-                    1f to Color.Black.copy(alpha = .86f),
-                ),
-            ),
-        )
-
-        Column(
-            Modifier.fillMaxSize().padding(horizontal = 28.dp)
-                .padding(top = 96.dp, bottom = bottomPadding),
-            verticalArrangement = Arrangement.Bottom,
-        ) {
-            if (world.isPromise) {
-                Box(
-                    Modifier.clip(R.pill).background(Color(0xFFFFF4D6).copy(alpha = .92f))
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
-                ) {
-                    Text(
-                        "PROMISE CARD",
-                        color = Color(0xFF3A2A08), fontSize = 9.sp,
-                        letterSpacing = 2.4.sp, fontWeight = FontWeight.Bold,
-                    )
-                }
-                Spacer(Modifier.height(10.dp))
-            }
-
-            Text(
-                world.label.uppercase(),
-                color = Color.White.copy(alpha = .62f),
-                fontSize = 9.sp, letterSpacing = 2.8.sp, fontWeight = FontWeight.SemiBold,
-            )
-            Spacer(Modifier.height(7.dp))
-            Text(
-                "$reference  ·  $translation",
-                color = Color.White.copy(alpha = .9f),
-                fontSize = 13.sp, fontWeight = FontWeight.SemiBold, letterSpacing = .4.sp,
-            )
-            Spacer(Modifier.height(10.dp))
-            Text(
-                "“$text”",
-                color = Color.White,
-                fontFamily = FontFamily.Serif,
-                fontSize = if (text.length > 190) 21.sp else 27.sp,
-                lineHeight = if (text.length > 190) 30.sp else 37.sp,
-                letterSpacing = (-0.3).sp,
-            )
-        }
-    }
+    // The painterly scene is gone: flat printed-card art reads better and
+    // does not pretend to be a photograph. front/reduceMotion are kept in
+    // the signature because the deck still passes them, but nothing here
+    // animates now — which is also why it costs nothing to draw.
+    ScriptureCard(
+        reference = reference,
+        text = text,
+        translation = translation,
+        modifier = modifier,
+        bottomPadding = bottomPadding,
+    )
 }

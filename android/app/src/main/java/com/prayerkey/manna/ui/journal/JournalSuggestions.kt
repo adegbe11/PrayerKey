@@ -24,6 +24,7 @@ object JournalSuggestions {
         val verseRef: String? = null,
         val verseText: String? = null,
         val suggestPrayer: Boolean = false,
+        val starter: String = "",
     )
 
     private const val TWO_DAYS = 48L * 60 * 60 * 1000

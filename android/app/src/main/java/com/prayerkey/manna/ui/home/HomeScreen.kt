@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.home
 
 import android.view.HapticFeedbackConstants
+import android.speech.tts.TextToSpeech
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -34,15 +35,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import com.prayerkey.manna.model.VerseCard
+import com.prayerkey.manna.data.JourneyInsight
 import com.prayerkey.manna.ui.theme.*
 import kotlin.math.roundToInt
 import java.time.LocalTime
+import java.util.Locale
 
 private enum class CardState { Waiting, Revealed }
 
 @Composable
 fun HomeScreen(
     card: VerseCard,
+    journeyInsight: JourneyInsight? = null,
     reduceMotion: Boolean,
     onReceived: () -> Unit,
     onReceiveNext: () -> Unit,
@@ -55,6 +59,7 @@ fun HomeScreen(
     var pullCount by remember { mutableIntStateOf(0) }
     var lastRevealAt by remember { mutableLongStateOf(0L) }
     var ceremonial by remember { mutableStateOf(true) }
+    var showPause by remember { mutableStateOf(false) }
     val hour = remember { LocalTime.now().hour }
     val stillCard = remember { VerseCard("Psalm 46:10", "KJV", "Be still, and know that I am God.", "") }
     val nightCard = remember { VerseCard("Psalm 4:8", "KJV", "I will both lay me down in peace, and sleep: for thou, Lord, only makest me dwell in safety.", "") }
@@ -65,6 +70,17 @@ fun HomeScreen(
     }
     val density = LocalDensity.current
     val view = LocalView.current
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var speechReady by remember { mutableStateOf(false) }
+    val speaker = remember {
+        TextToSpeech(context.applicationContext) { status -> speechReady = status == TextToSpeech.SUCCESS }
+    }
+    LaunchedEffect(speechReady) {
+        if (speechReady) { speaker.language = Locale.getDefault(); speaker.setSpeechRate(.88f) }
+    }
+    DisposableEffect(speaker) {
+        onDispose { speaker.stop(); speaker.shutdown() }
+    }
     val maxPull = with(density) { (if (ceremonial) 300.dp else 225.dp).toPx() }
     val threshold = maxPull * .36f
     val rawProgress = (dragY / maxPull).coerceIn(0f, 1f)
@@ -128,13 +144,65 @@ fun HomeScreen(
                         ActionButton("Pray this", ElectricGloss, Color.White, Modifier.weight(1f)) { onPray(activeCard) }
                         ActionButton("Save", Brush.verticalGradient(listOf(Color.White, Color(0xFFEFEFF3))), Ink, Modifier.weight(1f)) { onSave(activeCard); onReceiveNext() }
                     }
-                    TextButton(onClick = { onShare(activeCard) }, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Outlined.Share, null, modifier = Modifier.size(17.dp)); Spacer(Modifier.width(7.dp)); Text("Share this word")
+                    Row(Modifier.fillMaxWidth()) {
+                        TextButton(onClick = { showPause = true }, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Outlined.SelfImprovement, null, modifier = Modifier.size(17.dp)); Spacer(Modifier.width(7.dp)); Text("Sacred pause")
+                        }
+                        TextButton(
+                            onClick = { speaker.speak("${activeCard.reference}. ${activeCard.verse}", TextToSpeech.QUEUE_FLUSH, null, activeCard.reference) },
+                            enabled = speechReady, modifier = Modifier.weight(1f),
+                        ) {
+                            Icon(Icons.Outlined.VolumeUp, "Listen to this Scripture", modifier = Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text("Listen")
+                        }
+                        TextButton(onClick = { onShare(activeCard) }, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Outlined.Share, "Share this Scripture", modifier = Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text("Share")
+                        }
                     }
                 }
             }
         }
     }
+    if (showPause) SacredPauseDialog(
+        card = activeCard,
+        why = journeyInsight?.takeIf { it.recommendedReference == activeCard.reference }?.let {
+            "This word was selected because ${it.title.lowercase()} is a pattern in your private journey."
+        },
+        onDismiss = { showPause = false },
+        onPray = { showPause = false; onPray(activeCard) },
+    )
+}
+
+@Composable
+private fun SacredPauseDialog(card: VerseCard, why: String?, onDismiss: () -> Unit, onPray: () -> Unit) {
+    val steps = listOf(
+        "Be still" to "Take one slow breath. Let your shoulders fall. You do not need to perform here.",
+        "Read slowly" to card.verse,
+        "Notice" to "Which word or phrase is holding your attention? Stay with it without rushing.",
+        "Respond" to "Tell God honestly what this word meets in you today.",
+    )
+    var step by remember(card.reference) { mutableIntStateOf(0) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Outlined.SelfImprovement, null, tint = Gold) },
+        title = { Text(steps[step].first, fontFamily = FontFamily.Serif) },
+        text = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(steps[step].second, textAlign = TextAlign.Center, fontSize = if (step == 1) 19.sp else 14.sp, lineHeight = if (step == 1) 27.sp else 21.sp)
+                if (step == 0 && why != null) {
+                    Surface(shape = RoundedCornerShape(12.dp), color = Gold.copy(alpha = .1f), modifier = Modifier.fillMaxWidth().padding(top = 18.dp)) {
+                        Text("WHY THIS WORD\n$why", color = InkSoft, fontSize = 11.sp, lineHeight = 17.sp, modifier = Modifier.padding(12.dp))
+                    }
+                }
+                Text("${step + 1} of ${steps.size}", color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 18.dp))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { if (step < steps.lastIndex) step++ else onPray() }) {
+                Text(if (step < steps.lastIndex) "Continue" else "Pray this word")
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Close") } },
+    )
 }
 
 @Composable
@@ -176,6 +244,9 @@ private fun CardBack() {
             Text("⚿", color = Gold, fontSize = 42.sp)
             Spacer(Modifier.height(14.dp))
             Text("MANNA", color = Color.White, fontSize = 13.sp, letterSpacing = 4.sp, fontWeight = FontWeight.Medium)
+            Spacer(Modifier.height(20.dp))
+            Text("Pull down to receive today’s Word", color = Color.White.copy(alpha = .68f), fontSize = 12.sp)
+            Icon(Icons.Outlined.KeyboardArrowDown, null, tint = Gold.copy(alpha = .85f), modifier = Modifier.padding(top = 6.dp).size(20.dp))
         }
     }
 }

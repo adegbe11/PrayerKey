@@ -59,6 +59,7 @@ fun MannaApp() {
     val topics by viewModel.topics.collectAsState()
     val hydrated by viewModel.hydrated.collectAsState()
     val sermonNotes by viewModel.sermonNotes.collectAsState()
+    val formation by viewModel.formation.collectAsState()
     val context = LocalContext.current
     val destinations = remember {
         listOf(
@@ -72,6 +73,16 @@ fun MannaApp() {
     var selected by remember { mutableIntStateOf(0) }
     var verseIndex by remember { mutableIntStateOf(0) }
     var showProfile by remember { androidx.compose.runtime.mutableStateOf(false) }
+    val journeyInsight = remember(entries, sermonNotes, journal, saved) {
+        com.prayerkey.manna.data.JourneyInsights.build(entries, sermonNotes, journal, saved)
+    }
+    val todayCard = remember(verseIndex, journeyInsight) {
+        if (verseIndex == 0) {
+            journeyInsight?.recommendedReference
+                ?.let { wanted -> DailyVerses.firstOrNull { it.reference == wanted } }
+                ?: DailyVerses.first()
+        } else DailyVerses[verseIndex % DailyVerses.size]
+    }
 
     Scaffold(
         containerColor = Canvas,
@@ -93,12 +104,18 @@ fun MannaApp() {
                     viewModel.updatePreferences(preferences.copy(name = chosenName, onboarded = true))
                 }
             } else if (showProfile) {
-                ProfileScreen(saved.size, streak, preferences, onBack = { showProfile = false }, onUpdate = viewModel::updatePreferences)
+                ProfileScreen(
+                    savedCount = saved.size, streak = streak, prefs = preferences,
+                    entries = entries, sermons = sermonNotes, prayers = journal, saved = saved,
+                    memory = memory, formation = formation, onRestoreArchive = viewModel::restoreArchive,
+                    onBack = { showProfile = false }, onUpdate = viewModel::updatePreferences,
+                )
             } else {
                 // instant tab switch — no transition animation, zero delay
                 when (selected) {
                     0 -> HomeScreen(
-                        card = DailyVerses[verseIndex % DailyVerses.size],
+                        card = todayCard,
+                        journeyInsight = journeyInsight,
                         reduceMotion = preferences.reduceMotion,
                         onReceived = viewModel::recordDailyPull,
                         onReceiveNext = { verseIndex++ },
@@ -110,11 +127,15 @@ fun MannaApp() {
                     )
                     1 -> BibleScreen(
                         memory = memory,
+                        saved = saved,
+                        entries = entries,
+                        prayers = journal,
+                        sermons = sermonNotes,
                         translation = preferences.translation,
                         onTranslation = { viewModel.updatePreferences(preferences.copy(translation = it)) },
                         onSave = viewModel::save,
                         onMemorize = viewModel::memorize,
-                        onAdvanceMemory = viewModel::advanceMemory,
+                        onReviewMemory = viewModel::reviewMemory,
                         reduceMotion = preferences.reduceMotion,
                     )
                     2 -> PrayerScreen(journal, topics, viewModel::loadTopics, viewModel::savePrayer)
@@ -129,7 +150,7 @@ fun MannaApp() {
                         entries = entries,
                         journalStreak = journalStreak,
                         words = saved,
-                        todayCard = DailyVerses[verseIndex % DailyVerses.size],
+                        todayCard = todayCard,
                         onAdd = viewModel::addEntry,
                         onUpdate = viewModel::updateEntry,
                         onDelete = viewModel::deleteEntry,
@@ -140,6 +161,11 @@ fun MannaApp() {
                         onAdd2 = viewModel::addWrite,
                         onUpdate2 = viewModel::updateWrite,
                         onAnswerEntry = viewModel::answerEntry,
+                        onUpdatePrayerJourney = viewModel::updatePrayerJourney,
+                        formation = formation,
+                        onUpdateFormation = viewModel::updateFormation,
+                        journalLocked = preferences.journalLock,
+                        concealPreviews = preferences.concealJournalPreviews,
                     )
                     else -> Unit
                 }

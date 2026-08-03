@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.prayerkey.manna.model.VerseCard
+import org.json.JSONObject
 
 data class SavedWord(
     val id: Long,
@@ -16,7 +17,7 @@ data class SavedWord(
     val testimony: String? = null,
 )
 
-data class MemoryVerse(val reference: String, val verse: String, val stage: Int)
+data class MemoryVerse(val reference: String, val verse: String, val stage: Int, val correctCount: Int = 0, val nextReviewAt: Long = 0L)
 data class UserPrefs(
     val name: String = "",
     val reminderHour: Int = 7,
@@ -26,10 +27,26 @@ data class UserPrefs(
     val translation: String = "KJV",
     val onboarded: Boolean = false,
     val sermonLanguage: String = "en-US",
+    val journalLock: Boolean = false,
+    val concealJournalPreviews: Boolean = false,
 )
 data class SermonVerse(val reference: String, val text: String, val detectedAt: Long)
 data class SermonSession(val id: Long, val title: String, val startedAt: Long, val endedAt: Long?, val verses: List<SermonVerse>)
 data class JournalPrayer(val id: Long, val title: String, val request: String, val prayer: String, val scriptureRef: String?, val createdAt: Long)
+
+enum class PrayerStage(val key: String, val label: String) {
+    Praying("praying", "Praying"),
+    Waiting("waiting", "Waiting"),
+    Acting("acting", "Taking action"),
+    Released("released", "Released"),
+    AnsweredDifferently("answered_differently", "Answered differently"),
+    Answered("answered", "Answered"),
+    ;
+
+    companion object {
+        fun from(raw: String?) = entries.firstOrNull { it.key == raw } ?: Praying
+    }
+}
 
 data class JournalEntry(
     val id: Long,
@@ -47,6 +64,25 @@ data class JournalEntry(
     val isPrayer: Boolean = false,
     val answeredAt: Long? = null,
     val testimony: String? = null,
+    val prayerStage: PrayerStage = PrayerStage.Praying,
+    val nextAction: String = "",
+    val title: String = "",
+    val tags: List<String> = emptyList(),
+    val journal: String = "My Journey",
+    val favorite: Boolean = false,
+    val location: String = "",
+    val weather: String = "",
+    val media: List<String> = emptyList(),
+)
+data class FormationState(
+    val morningWord: Boolean = true,
+    val middayPrayer: Boolean = false,
+    val eveningExamen: Boolean = true,
+    val sabbathDay: String = "Sunday",
+    val pilgrimageId: String = "",
+    val pilgrimageDay: Int = 0,
+    val familyNames: String = "",
+    val trustedPhone: String = "",
 )
 
 data class SermonNote(
@@ -61,7 +97,7 @@ data class SermonNote(
     val createdAt: Long,
 )
 
-class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 9) {
+class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 12) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""CREATE TABLE saved_words (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -103,6 +139,29 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
                 "ALTER TABLE journal_entries ADD COLUMN testimony TEXT",
             ).forEach { sql -> runCatching { db.execSQL(sql) } }
         }
+        if (oldVersion < 10) {
+            listOf(
+                "ALTER TABLE journal_entries ADD COLUMN prayer_status TEXT NOT NULL DEFAULT 'praying'",
+                "ALTER TABLE journal_entries ADD COLUMN next_action TEXT NOT NULL DEFAULT ''",
+            ).forEach { sql -> runCatching { db.execSQL(sql) } }
+        }
+        if (oldVersion < 11) {
+            listOf(
+                "ALTER TABLE memory_verses ADD COLUMN correct_count INTEGER NOT NULL DEFAULT 0",
+                "ALTER TABLE memory_verses ADD COLUMN next_review_at INTEGER NOT NULL DEFAULT 0",
+            ).forEach { sql -> runCatching { db.execSQL(sql) } }
+        }
+        if (oldVersion < 12) {
+            listOf(
+                "ALTER TABLE journal_entries ADD COLUMN title TEXT NOT NULL DEFAULT ''",
+                "ALTER TABLE journal_entries ADD COLUMN tags TEXT NOT NULL DEFAULT ''",
+                "ALTER TABLE journal_entries ADD COLUMN journal_name TEXT NOT NULL DEFAULT 'My Journey'",
+                "ALTER TABLE journal_entries ADD COLUMN favorite INTEGER NOT NULL DEFAULT 0",
+                "ALTER TABLE journal_entries ADD COLUMN location TEXT NOT NULL DEFAULT ''",
+                "ALTER TABLE journal_entries ADD COLUMN weather TEXT NOT NULL DEFAULT ''",
+                "ALTER TABLE journal_entries ADD COLUMN media TEXT NOT NULL DEFAULT ''",
+            ).forEach { sql -> runCatching { db.execSQL(sql) } }
+        }
     }
 
     /** A phone with a newer/foreign schema must never crash the app —
@@ -118,7 +177,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     }
 
     private fun createMemoryTable(db: SQLiteDatabase) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS memory_verses (reference TEXT PRIMARY KEY, verse TEXT NOT NULL, stage INTEGER NOT NULL DEFAULT 1)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS memory_verses (reference TEXT PRIMARY KEY, verse TEXT NOT NULL, stage INTEGER NOT NULL DEFAULT 1, correct_count INTEGER NOT NULL DEFAULT 0, next_review_at INTEGER NOT NULL DEFAULT 0)")
     }
 
     private fun createSermonTables(db: SQLiteDatabase) {
@@ -145,6 +204,15 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
             is_prayer INTEGER NOT NULL DEFAULT 0,
             answered_at INTEGER,
             testimony TEXT
+            ,prayer_status TEXT NOT NULL DEFAULT 'praying'
+            ,next_action TEXT NOT NULL DEFAULT ''
+            ,title TEXT NOT NULL DEFAULT ''
+            ,tags TEXT NOT NULL DEFAULT ''
+            ,journal_name TEXT NOT NULL DEFAULT 'My Journey'
+            ,favorite INTEGER NOT NULL DEFAULT 0
+            ,location TEXT NOT NULL DEFAULT ''
+            ,weather TEXT NOT NULL DEFAULT ''
+            ,media TEXT NOT NULL DEFAULT ''
         )""")
         db.execSQL("CREATE INDEX IF NOT EXISTS journal_day ON journal_entries(entry_day)")
     }
@@ -206,14 +274,19 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     fun addJournalEntry(
         mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?,
         source: String = "write", isPrayer: Boolean = false,
+        title: String = "", tags: List<String> = emptyList(), journal: String = "My Journey",
+        favorite: Boolean = false, location: String = "", weather: String = "", media: List<String> = emptyList(),
+        entryAt: Long = System.currentTimeMillis(),
     ): Long {
         val now = System.currentTimeMillis()
         return writableDatabase.insert("journal_entries", null, ContentValues().apply {
-            put("entry_day", java.time.LocalDate.now().toEpochDay())
+            put("entry_day", java.time.Instant.ofEpochMilli(entryAt).atZone(java.time.ZoneId.systemDefault()).toLocalDate().toEpochDay())
             put("mood", mood); put("body", body.trim()); put("gratitude", gratitude.trim())
             put("verse_ref", verseRef); put("verse_text", verseText)
-            put("created_at", now); put("updated_at", now)
+            put("created_at", entryAt); put("updated_at", now)
             put("source", source); put("is_prayer", if (isPrayer) 1 else 0)
+            put("title", title.trim()); put("tags", tags.joinToString("\n")); put("journal_name", journal.ifBlank { "My Journey" })
+            put("favorite", if (favorite) 1 else 0); put("location", location.trim()); put("weather", weather.trim()); put("media", media.joinToString("\n"))
         })
     }
 
@@ -222,15 +295,40 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         writableDatabase.update("journal_entries", ContentValues().apply {
             put("answered_at", System.currentTimeMillis())
             put("testimony", testimony.trim())
+            put("prayer_status", PrayerStage.Answered.key)
             put("updated_at", System.currentTimeMillis())
         }, "id = ?", arrayOf(id.toString()))
     }
 
-    fun updateJournalEntry(id: Long, mood: String, body: String, gratitude: String, isPrayer: Boolean? = null) {
+    fun updatePrayerJourney(id: Long, stage: PrayerStage, nextAction: String, testimony: String) {
+        val answered = stage == PrayerStage.Answered || stage == PrayerStage.AnsweredDifferently
+        writableDatabase.update("journal_entries", ContentValues().apply {
+            put("prayer_status", stage.key)
+            put("next_action", nextAction.trim())
+            put("updated_at", System.currentTimeMillis())
+            if (answered) {
+                put("answered_at", System.currentTimeMillis())
+                put("testimony", testimony.trim())
+            } else {
+                putNull("answered_at")
+                putNull("testimony")
+            }
+        }, "id = ?", arrayOf(id.toString()))
+    }
+
+    fun updateJournalEntry(
+        id: Long, mood: String, body: String, gratitude: String, isPrayer: Boolean? = null,
+        title: String? = null, tags: List<String>? = null, journal: String? = null,
+        favorite: Boolean? = null, location: String? = null, weather: String? = null, media: List<String>? = null,
+        entryAt: Long? = null,
+    ) {
         writableDatabase.update("journal_entries", ContentValues().apply {
             put("mood", mood); put("body", body.trim()); put("gratitude", gratitude.trim())
             put("updated_at", System.currentTimeMillis())
             isPrayer?.let { put("is_prayer", if (it) 1 else 0) }
+            title?.let { put("title", it.trim()) }; tags?.let { put("tags", it.joinToString("\n")) }; journal?.let { put("journal_name", it.ifBlank { "My Journey" }) }
+            favorite?.let { put("favorite", if (it) 1 else 0) }; location?.let { put("location", it.trim()) }; weather?.let { put("weather", it.trim()) }; media?.let { put("media", it.joinToString("\n")) }
+            entryAt?.let { value -> put("created_at", value); put("entry_day", java.time.Instant.ofEpochMilli(value).atZone(java.time.ZoneId.systemDefault()).toLocalDate().toEpochDay()) }
         }, "id = ?", arrayOf(id.toString()))
     }
 
@@ -255,6 +353,15 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
             cursor.getColumnIndex("is_prayer").let { it >= 0 && cursor.getInt(it) == 1 },
             cursor.getColumnIndex("answered_at").let { if (it < 0 || cursor.isNull(it)) null else cursor.getLong(it) },
             cursor.getColumnIndex("testimony").let { if (it < 0 || cursor.isNull(it)) null else cursor.getString(it) },
+            PrayerStage.from(cursor.getColumnIndex("prayer_status").let { if (it < 0 || cursor.isNull(it)) null else cursor.getString(it) }),
+            cursor.getColumnIndex("next_action").let { if (it < 0 || cursor.isNull(it)) "" else cursor.getString(it) },
+            cursor.getColumnIndex("title").let { if (it < 0 || cursor.isNull(it)) "" else cursor.getString(it) },
+            cursor.getColumnIndex("tags").let { if (it < 0 || cursor.isNull(it)) emptyList() else cursor.getString(it).lines().filter(String::isNotBlank) },
+            cursor.getColumnIndex("journal_name").let { if (it < 0 || cursor.isNull(it)) "My Journey" else cursor.getString(it) },
+            cursor.getColumnIndex("favorite").let { it >= 0 && cursor.getInt(it) == 1 },
+            cursor.getColumnIndex("location").let { if (it < 0 || cursor.isNull(it)) "" else cursor.getString(it) },
+            cursor.getColumnIndex("weather").let { if (it < 0 || cursor.isNull(it)) "" else cursor.getString(it) },
+            cursor.getColumnIndex("media").let { if (it < 0 || cursor.isNull(it)) emptyList() else cursor.getString(it).lines().filter(String::isNotBlank) },
         )) }
     }
 
@@ -324,16 +431,24 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         }, SQLiteDatabase.CONFLICT_IGNORE)
     }
 
-    fun advanceMemory(reference: String) {
-        writableDatabase.execSQL("UPDATE memory_verses SET stage = MIN(stage + 1, 5) WHERE reference = ?", arrayOf(reference))
+    fun reviewMemory(reference: String, correct: Boolean) {
+        val current = memoryVerses().firstOrNull { it.reference == reference } ?: return
+        val review = MemorySchedule.after(current, correct, System.currentTimeMillis())
+        writableDatabase.update("memory_verses", ContentValues().apply {
+            put("stage", review.stage)
+            put("correct_count", review.correctCount)
+            put("next_review_at", review.nextReviewAt)
+        }, "reference = ?", arrayOf(reference))
     }
 
-    fun memoryVerses(): List<MemoryVerse> = readableDatabase.query("memory_verses", null, null, null, null, null, "stage ASC").use { cursor ->
+    fun memoryVerses(): List<MemoryVerse> = readableDatabase.query("memory_verses", null, null, null, null, null, "next_review_at ASC, stage ASC").use { cursor ->
         buildList {
             while (cursor.moveToNext()) add(MemoryVerse(
                 cursor.getString(cursor.getColumnIndexOrThrow("reference")),
                 cursor.getString(cursor.getColumnIndexOrThrow("verse")),
                 cursor.getInt(cursor.getColumnIndexOrThrow("stage")),
+                cursor.getColumnIndex("correct_count").let { if (it < 0) 0 else cursor.getInt(it) },
+                cursor.getColumnIndex("next_review_at").let { if (it < 0) 0L else cursor.getLong(it) },
             ))
         }
     }
@@ -356,6 +471,9 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         reduceMotion = state("reduce_motion") == "true",
         translation = state("translation") ?: "KJV",
         onboarded = state("onboarded") == "true",
+        sermonLanguage = state("sermon_language") ?: "en-US",
+        journalLock = state("journal_lock") == "true",
+        concealJournalPreviews = state("journal_conceal") == "true",
     )
 
     fun savePreferences(prefs: UserPrefs) {
@@ -363,7 +481,89 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         putState("reminder_minute", prefs.reminderMinute.toString()); putState("reminder_enabled", prefs.reminderEnabled.toString())
         putState("reduce_motion", prefs.reduceMotion.toString()); putState("translation", prefs.translation)
         putState("onboarded", prefs.onboarded.toString())
+        putState("sermon_language", prefs.sermonLanguage)
+        putState("journal_lock", prefs.journalLock.toString()); putState("journal_conceal", prefs.concealJournalPreviews.toString())
     }
+
+    fun formation(): FormationState = FormationState(
+        morningWord = state("formation_morning")?.toBooleanStrictOrNull() ?: true,
+        middayPrayer = state("formation_midday")?.toBooleanStrictOrNull() ?: false,
+        eveningExamen = state("formation_evening")?.toBooleanStrictOrNull() ?: true,
+        sabbathDay = state("formation_sabbath") ?: "Sunday",
+        pilgrimageId = state("formation_pilgrimage") ?: "",
+        pilgrimageDay = state("formation_pilgrimage_day")?.toIntOrNull() ?: 0,
+        familyNames = state("formation_family") ?: "",
+        trustedPhone = state("formation_trusted_phone") ?: "",
+    )
+
+    fun saveFormation(value: FormationState) {
+        putState("formation_morning", value.morningWord.toString())
+        putState("formation_midday", value.middayPrayer.toString())
+        putState("formation_evening", value.eveningExamen.toString())
+        putState("formation_sabbath", value.sabbathDay)
+        putState("formation_pilgrimage", value.pilgrimageId)
+        putState("formation_pilgrimage_day", value.pilgrimageDay.toString())
+        putState("formation_family", value.familyNames)
+        putState("formation_trusted_phone", value.trustedPhone)
+    }
+
+    /** Replaces journey content from a MANNA-owned archive. The caller must
+     * obtain explicit confirmation because restore intentionally replaces the
+     * current private journey rather than creating silent duplicates. */
+    fun restoreArchive(raw: String) {
+        val root = JSONObject(raw)
+        require(root.optString("format").startsWith("manna-journey-v")) { "Not a MANNA journey archive" }
+        writableDatabase.beginTransaction()
+        try {
+            listOf("journal_entries", "sermon_notes", "prayer_journal", "saved_words", "memory_verses").forEach {
+                writableDatabase.delete(it, null, null)
+            }
+            root.optJSONArray("entries")?.let { rows -> repeat(rows.length()) { index ->
+                val item = rows.getJSONObject(index)
+                writableDatabase.insertOrThrow("journal_entries", null, ContentValues().apply {
+                    val created = item.optLong("createdAt", System.currentTimeMillis())
+                    put("entry_day", java.time.Instant.ofEpochMilli(created).atZone(java.time.ZoneId.systemDefault()).toLocalDate().toEpochDay())
+                    put("mood", item.optString("mood", "🙏")); put("body", item.optString("body")); put("gratitude", item.optString("gratitude"))
+                    putNullable("verse_ref", item, "verseRef"); putNullable("verse_text", item, "verseText")
+                    put("created_at", created); put("updated_at", created); put("source", item.optString("source", "write")); put("is_prayer", if (item.optBoolean("isPrayer")) 1 else 0)
+                    put("prayer_status", item.optString("prayerStage", "praying")); put("next_action", item.optString("nextAction"))
+                    putNullableLong("answered_at", item, "answeredAt"); putNullable("testimony", item)
+                    put("title", item.optString("title")); put("tags", jsonLines(item, "tags")); put("journal_name", item.optString("journal", "My Journey")); put("favorite", if (item.optBoolean("favorite")) 1 else 0)
+                    put("location", item.optString("location")); put("weather", item.optString("weather")); put("media", jsonLines(item, "media"))
+                })
+            } }
+            root.optJSONArray("sermons")?.let { rows -> repeat(rows.length()) { index ->
+                val item = rows.getJSONObject(index)
+                writableDatabase.insertOrThrow("sermon_notes", null, ContentValues().apply {
+                    put("title", item.optString("title")); put("scriptures", jsonLines(item, "scriptures")); put("points", jsonLines(item, "points")); put("quotes", jsonLines(item, "quotes")); put("takeaway", item.optString("takeaway")); put("transcript", item.optString("transcript")); put("minutes", item.optInt("minutes")); put("created_at", item.optLong("createdAt", System.currentTimeMillis()))
+                })
+            } }
+            root.optJSONArray("prayers")?.let { rows -> repeat(rows.length()) { index ->
+                val item = rows.getJSONObject(index)
+                writableDatabase.insertOrThrow("prayer_journal", null, ContentValues().apply { put("title", item.optString("title")); put("request", item.optString("request")); put("prayer", item.optString("prayer")); putNullable("scripture_ref", item, "scriptureRef"); put("created_at", item.optLong("createdAt", System.currentTimeMillis())) })
+            } }
+            root.optJSONArray("savedWords")?.let { rows -> repeat(rows.length()) { index ->
+                val item = rows.getJSONObject(index)
+                writableDatabase.insertWithOnConflict("saved_words", null, ContentValues().apply { put("reference", item.optString("reference")); put("translation", item.optString("translation", "KJV")); put("verse", item.optString("verse")); put("saved_at", item.optLong("savedAt", System.currentTimeMillis())); putNullableLong("answered_at", item, "answeredAt"); putNullable("testimony", item) }, SQLiteDatabase.CONFLICT_IGNORE)
+            } }
+            root.optJSONArray("memory")?.let { rows -> repeat(rows.length()) { index ->
+                val item = rows.getJSONObject(index)
+                writableDatabase.insertWithOnConflict("memory_verses", null, ContentValues().apply { put("reference", item.optString("reference")); put("verse", item.optString("verse")); put("stage", item.optInt("stage", 1)); put("correct_count", item.optInt("correctCount")); put("next_review_at", item.optLong("nextReviewAt")) }, SQLiteDatabase.CONFLICT_REPLACE)
+            } }
+            root.optJSONObject("formation")?.let { item -> saveFormation(FormationState(
+                item.optBoolean("morningWord", true), item.optBoolean("middayPrayer"), item.optBoolean("eveningExamen", true), item.optString("sabbathDay", "Sunday"), item.optString("pilgrimageId"), item.optInt("pilgrimageDay"), item.optString("familyNames"), item.optString("trustedPhone"),
+            )) }
+            writableDatabase.setTransactionSuccessful()
+        } finally { writableDatabase.endTransaction() }
+    }
+
+    private fun ContentValues.putNullable(column: String, json: JSONObject, key: String = column) {
+        if (json.has(key) && !json.isNull(key)) put(column, json.optString(key)) else putNull(column)
+    }
+    private fun ContentValues.putNullableLong(column: String, json: JSONObject, key: String) {
+        if (json.has(key) && !json.isNull(key)) put(column, json.optLong(key)) else putNull(column)
+    }
+    private fun jsonLines(json: JSONObject, key: String): String = json.optJSONArray(key)?.let { rows -> buildList { repeat(rows.length()) { add(rows.optString(it)) } }.joinToString("\n") }.orEmpty()
 
     fun streak(): Int = state("streak")?.toIntOrNull() ?: 0
 

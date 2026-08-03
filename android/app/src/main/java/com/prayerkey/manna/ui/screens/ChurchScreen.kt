@@ -32,6 +32,8 @@ import com.prayerkey.manna.ui.church.SERMON_LANGUAGES
 import com.prayerkey.manna.ui.church.sermonLanguageLabel
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Stop
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -429,6 +431,7 @@ private fun NoteView(
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 private fun SavedNoteSheet(note: SermonNote, onClose: () -> Unit, onDelete: () -> Unit) {
+    val context = LocalContext.current
     androidx.compose.material3.ModalBottomSheet(onDismissRequest = onClose, containerColor = Canvas) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
@@ -459,6 +462,19 @@ private fun SavedNoteSheet(note: SermonNote, onClose: () -> Unit, onDelete: () -
                     Text(note.takeaway, color = Ivory, fontFamily = FontFamily.Serif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(18.dp))
                 }
             }
+            Button(
+                onClick = { com.prayerkey.manna.share.MannaPack.share(context, note) },
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+            ) {
+                Icon(Icons.Outlined.Share, "Share a weekly MANNA Pack")
+                Spacer(Modifier.width(8.dp))
+                Text("Share MANNA Pack")
+            }
+            Text(
+                "Includes Scripture, discussion, prayer, and one action. Your private Journey is never included.",
+                color = Muted, fontSize = 10.5.sp, lineHeight = 15.sp, textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+            )
             Text(
                 "Delete this note",
                 color = Color(0xFFE0526B), fontSize = 13.sp, textAlign = TextAlign.Center,

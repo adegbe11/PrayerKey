@@ -45,6 +45,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val journalStreak = _journalStreak.asStateFlow()
     private val _sermonNotes = MutableStateFlow(emptyList<com.prayerkey.manna.data.SermonNote>())
     val sermonNotes = _sermonNotes.asStateFlow()
+    private val _formation = MutableStateFlow(com.prayerkey.manna.data.FormationState())
+    val formation = _formation.asStateFlow()
 
     /** False until the first disk read lands. The UI shows a branded hold
      *  instead of guessing — otherwise a returning user would flash the
@@ -66,8 +68,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val entries = safe(emptyList<JournalEntry>()) { store.journalEntries() }
             val jStreak = safe(0) { store.journalStreak() }
             val notes = safe(emptyList<com.prayerkey.manna.data.SermonNote>()) { store.sermonNotes() }
+            val formation = safe(com.prayerkey.manna.data.FormationState()) { store.formation() }
             withContext(Dispatchers.Main) {
                 _sermonNotes.value = notes
+                _formation.value = formation
                 _saved.value = saved
                 _streak.value = streak
                 _memory.value = memory
@@ -103,7 +107,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun markAnswered(id: Long, testimony: String) = io { store.markAnswered(id, testimony); _saved.value = store.all() }
     fun recordDailyPull() { io { val s = store.recordDailyPull(); _streak.value = s } }
     fun memorize(card: VerseCard) = io { store.memorize(card); _memory.value = store.memoryVerses() }
-    fun advanceMemory(reference: String) = io { store.advanceMemory(reference); _memory.value = store.memoryVerses() }
+    fun reviewMemory(reference: String, correct: Boolean) = io { store.reviewMemory(reference, correct); _memory.value = store.memoryVerses() }
     fun updatePreferences(prefs: UserPrefs) {
         // publish immediately so the UI reacts on this frame; persist behind it
         _preferences.value = prefs
@@ -151,16 +155,28 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     /** The richer write flow: carries the entry's origin and prayer flag. */
     fun addWrite(r: com.prayerkey.manna.ui.journal.WriteResult) = io {
-        store.addJournalEntry(r.mood, r.body, r.gratitude, r.verseRef, r.verseText, r.source, r.isPrayer)
+        store.addJournalEntry(r.mood, r.body, r.gratitude, r.verseRef, r.verseText, r.source, r.isPrayer, r.title, r.tags, r.journal, r.favorite, r.location, r.weather, r.media, r.entryAt)
         refreshEntries()
     }
 
     fun updateWrite(id: Long, r: com.prayerkey.manna.ui.journal.WriteResult) = io {
-        store.updateJournalEntry(id, r.mood, r.body, r.gratitude, r.isPrayer); refreshEntries()
+        store.updateJournalEntry(id, r.mood, r.body, r.gratitude, r.isPrayer, r.title, r.tags, r.journal, r.favorite, r.location, r.weather, r.media, r.entryAt); refreshEntries()
     }
 
     fun answerEntry(id: Long, testimony: String) = io {
         store.answerJournalEntry(id, testimony); refreshEntries()
+    }
+    fun updateFormation(value: com.prayerkey.manna.data.FormationState) {
+        _formation.value = value
+        io { store.saveFormation(value) }
+    }
+    fun restoreArchive(raw: String) = io {
+        store.restoreArchive(raw)
+        _saved.value = store.all(); _memory.value = store.memoryVerses(); _journal.value = store.prayerJournal()
+        _entries.value = store.journalEntries(); _journalStreak.value = store.journalStreak(); _sermonNotes.value = store.sermonNotes(); _formation.value = store.formation()
+    }
+    fun updatePrayerJourney(id: Long, stage: com.prayerkey.manna.data.PrayerStage, nextAction: String, testimony: String) = io {
+        store.updatePrayerJourney(id, stage, nextAction, testimony); refreshEntries()
     }
     fun updateEntry(id: Long, mood: String, body: String, gratitude: String) = io {
         store.updateJournalEntry(id, mood, body, gratitude); refreshEntries()

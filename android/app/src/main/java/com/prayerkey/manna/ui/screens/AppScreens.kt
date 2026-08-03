@@ -51,6 +51,8 @@ import com.prayerkey.manna.data.UserPrefs
 import com.prayerkey.manna.reminder.ReminderReceiver
 import com.prayerkey.manna.data.SermonSession
 import com.prayerkey.manna.data.JournalPrayer
+import com.prayerkey.manna.data.JournalEntry
+import com.prayerkey.manna.data.SermonNote
 import com.prayerkey.manna.data.RemoteVerse
 import com.prayerkey.manna.data.BibleVersion
 import com.prayerkey.manna.data.BIBLE_VERSIONS
@@ -60,17 +62,24 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Build
+import android.speech.tts.TextToSpeech
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BibleScreen(
     memory: List<MemoryVerse>,
+    saved: List<SavedWord>,
+    entries: List<JournalEntry>,
+    prayers: List<JournalPrayer>,
+    sermons: List<SermonNote>,
     translation: String,
     onTranslation: (String) -> Unit,
     onSave: (VerseCard) -> Unit,
     onMemorize: (VerseCard) -> Unit,
-    onAdvanceMemory: (String) -> Unit,
+    onReviewMemory: (String, Boolean) -> Unit,
     reduceMotion: Boolean = false,
 ) {
     var query by remember { mutableStateOf("") }
@@ -133,7 +142,7 @@ fun BibleScreen(
                         Icon(Icons.Outlined.Close, "Back to verses", tint = Ink, modifier = Modifier.size(19.dp))
                     }
                 }
-                MemoryTrainer(memory.firstOrNull(), onAdvanceMemory)
+                MemoryTrainer(memory, saved, entries, prayers, sermons, onReviewMemory)
             }
         } else {
             com.prayerkey.manna.ui.components.VersePullDeck(
@@ -300,6 +309,9 @@ private fun VerseDetail(
     onRelated: (BibleVerse) -> Unit,
     onReadChapter: () -> Unit,
 ) {
+    var showStudy by remember { mutableStateOf(false) }
+    var studyQuestion by remember { mutableStateOf("") }
+    var studyAnswer by remember { mutableStateOf<com.prayerkey.manna.data.StudyAnswer?>(null) }
     Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 36.dp)) {
         Text(reference, fontFamily = FontFamily.Serif, fontSize = 30.sp)
         Text("$versionName ($versionId)", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 3.dp))
@@ -309,6 +321,10 @@ private fun VerseDetail(
             OutlinedButton(onClick = onMemorize, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.School, null); Text(" Memorize") }
         }
         TextButton(onClick = onReadChapter, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) { Icon(Icons.Outlined.MenuBook, null); Text(" Read full chapter offline") }
+        TextButton(onClick = { showStudy = true }, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.Outlined.Psychology, "Open transparent study lens")
+            Text(" Study this passage safely")
+        }
         Text("Related verses", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 28.dp, bottom = 10.dp))
         if (related.isEmpty()) LinearProgressIndicator(Modifier.fillMaxWidth())
         related.forEach { item ->
@@ -324,14 +340,52 @@ private fun VerseDetail(
             }
         }
     }
+    if (showStudy) AlertDialog(
+        onDismissRequest = { showStudy = false },
+        title = { Text("Study lens", fontFamily = FontFamily.Serif) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                com.prayerkey.manna.data.StudyLens.notes(reference, text).forEach { note ->
+                    Text(note.label, color = Gold, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 10.dp))
+                    Text(note.text, fontSize = 12.5.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 4.dp))
+                    Text(note.source, color = Muted, fontSize = 9.5.sp, modifier = Modifier.padding(top = 3.dp))
+                }
+                HorizontalDivider(Modifier.padding(vertical = 14.dp), color = Hairline)
+                Text("ASK ABOUT THIS PASSAGE", color = Gold, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold)
+                Text("Answers stay anchored to the displayed text and clearly label reflection.", color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp, bottom = 8.dp))
+                OutlinedTextField(value = studyQuestion, onValueChange = { studyQuestion = it }, label = { Text("Your question") }, placeholder = { Text("What does this passage say?") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
+                Button(onClick = { studyAnswer = com.prayerkey.manna.data.StudyLens.answer(reference, text, studyQuestion) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), enabled = studyQuestion.isNotBlank()) { Text("Explore carefully") }
+                studyAnswer?.let { answer ->
+                    Text(answer.label, color = Gold, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 14.dp))
+                    Text(answer.text, fontSize = 12.5.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 4.dp))
+                    Text(answer.source, color = Muted, fontSize = 9.5.sp, modifier = Modifier.padding(top = 3.dp))
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { showStudy = false }) { Text("Done") } },
+    )
 }
 
 @Composable
-private fun MemoryTrainer(memory: MemoryVerse?, onAdvance: (String) -> Unit) {
-    if (memory == null) {
+private fun MemoryTrainer(
+    memories: List<MemoryVerse>,
+    saved: List<SavedWord>,
+    entries: List<JournalEntry>,
+    prayers: List<JournalPrayer>,
+    sermons: List<SermonNote>,
+    onReview: (String, Boolean) -> Unit,
+) {
+    if (memories.isEmpty()) {
         EmptySaved(false)
         return
     }
+    val now = System.currentTimeMillis()
+    val memory = memories.firstOrNull { it.nextReviewAt <= now } ?: memories.first()
+    val connections = remember(memory, saved, entries, prayers, sermons) {
+        com.prayerkey.manna.data.MemoryGraph.connections(memory, saved, entries, prayers, sermons)
+    }
+    val due = memories.count { it.nextReviewAt <= now }
+    val onAdvance: (String) -> Unit = { onReview(it, true) }
     val words = memory.verse.split(" ")
     val masked = words.mapIndexed { index, word ->
         val hideEvery = (6 - memory.stage).coerceAtLeast(1)
@@ -339,10 +393,30 @@ private fun MemoryTrainer(memory: MemoryVerse?, onAdvance: (String) -> Unit) {
     }.joinToString(" ")
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), color = Night) {
         Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("$due due", color = if (due > 0) Gold else Color.White.copy(.55f), fontSize = 11.sp)
+                Text("${memories.count { it.stage >= 5 }} rooted · ${memories.size} total", color = Color.White.copy(.55f), fontSize = 11.sp)
+            }
             Text("MEMORIZE · LEVEL ${memory.stage}", color = Gold, fontSize = 11.sp, letterSpacing = 1.4.sp)
             Text(masked, color = Color.White, fontFamily = FontFamily.Serif, fontSize = 25.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 30.dp))
             Text(memory.reference, color = Color.White.copy(.65f))
+            OutlinedButton(
+                onClick = { onReview(memory.reference, false) },
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            ) { Text("I need more practice") }
             Button(onClick = { onAdvance(memory.reference) }, modifier = Modifier.fillMaxWidth().padding(top = 22.dp)) { Text(if (memory.stage >= 5) "Practice again" else "I recited it — hide more") }
+        }
+    }
+    if (connections.isNotEmpty()) {
+        Text("WOVEN THROUGH YOUR JOURNEY", color = Gold, fontSize = 9.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp, bottom = 8.dp))
+        connections.forEach { connection ->
+            Surface(Modifier.fillMaxWidth().padding(bottom = 7.dp), shape = RoundedCornerShape(16.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
+                Column(Modifier.padding(13.dp)) {
+                    Text(connection.kind, color = Gold, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold)
+                    Text(connection.label, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, modifier = Modifier.padding(top = 3.dp))
+                    Text(connection.detail, color = Muted, fontSize = 11.sp, maxLines = 2, modifier = Modifier.padding(top = 2.dp))
+                }
+            }
         }
     }
 }
@@ -361,6 +435,11 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
     var potdOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val potd = remember { com.prayerkey.manna.model.todaysPrayer() }
+    val prayerContext = LocalContext.current
+    var prayerSpeechReady by remember { mutableStateOf(false) }
+    val prayerSpeaker = remember { TextToSpeech(prayerContext.applicationContext) { prayerSpeechReady = it == TextToSpeech.SUCCESS } }
+    LaunchedEffect(prayerSpeechReady) { if (prayerSpeechReady) { prayerSpeaker.language = Locale.getDefault(); prayerSpeaker.setSpeechRate(.86f) } }
+    DisposableEffect(prayerSpeaker) { onDispose { prayerSpeaker.stop(); prayerSpeaker.shutdown() } }
     // decks come from the app-wide cache — instant after first load
     LaunchedEffect(Unit) { onLoadTopics() }
     val topicsLoading = deckMode && topics.isEmpty()
@@ -665,6 +744,10 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                         Text(generated!!.prayer, lineHeight = 24.sp)
                         generated!!.verses.firstOrNull()?.let { Text(it.first, color = Gold, modifier = Modifier.padding(top = 20.dp)) }
                         if (generated!!.encouragement.isNotBlank()) Text(generated!!.encouragement, color = Muted, modifier = Modifier.padding(top = 14.dp))
+                        TextButton(
+                            onClick = { generated?.let { prayerSpeaker.speak("${it.title}. ${it.prayer}", TextToSpeech.QUEUE_FLUSH, null, it.id) } },
+                            enabled = prayerSpeechReady, modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+                        ) { Icon(Icons.Outlined.VolumeUp, "Listen to this prayer"); Spacer(Modifier.width(7.dp)); Text("Listen prayerfully") }
                         Row(Modifier.fillMaxWidth().padding(top = 22.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedButton(onClick = { generated?.let { onSavePrayer(request, it) } }, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" Journal") }
                             Button(onClick = { generated = null }, modifier = Modifier.weight(1f)) { Text("Pray again") }
@@ -794,15 +877,28 @@ private fun EmptySaved(answered: Boolean) {
 }
 
 @Composable
-fun ProfileScreen(savedCount: Int, streak: Int, prefs: UserPrefs, onBack: () -> Unit, onUpdate: (UserPrefs) -> Unit) {
+fun ProfileScreen(
+    savedCount: Int, streak: Int, prefs: UserPrefs,
+    entries: List<JournalEntry>, sermons: List<SermonNote>, prayers: List<JournalPrayer>, saved: List<SavedWord>,
+    memory: List<MemoryVerse>, formation: com.prayerkey.manna.data.FormationState,
+    onRestoreArchive: (String) -> Unit,
+    onBack: () -> Unit, onUpdate: (UserPrefs) -> Unit,
+) {
     val context = LocalContext.current
+    var confirmRestore by remember { mutableStateOf(false) }
+    val restoreArchive = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let {
+            runCatching { context.contentResolver.openInputStream(it)?.bufferedReader()?.use { reader -> reader.readText() } }
+                .getOrNull()?.let(onRestoreArchive)
+        }
+    }
     val notifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) {
             val next = prefs.copy(reminderEnabled = true); onUpdate(next)
             ReminderReceiver.schedule(context, next.reminderHour, next.reminderMinute, true)
         }
     }
-    Column(Modifier.fillMaxSize().background(Canvas).padding(horizontal = 22.dp).padding(top = 20.dp)) {
+    Column(Modifier.fillMaxSize().background(Canvas).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp).padding(top = 20.dp, bottom = 42.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, "Back") }
             Column { Text("You", fontFamily = FontFamily.Serif, fontSize = 32.sp); Text("Your quiet rhythm with God.", color = Muted, fontSize = 13.sp) }
@@ -840,8 +936,34 @@ fun ProfileScreen(savedCount: Int, streak: Int, prefs: UserPrefs, onBack: () -> 
         SettingRow("Reduce motion", if (prefs.reduceMotion) "On" else "Off") {
             Switch(prefs.reduceMotion, onCheckedChange = { onUpdate(prefs.copy(reduceMotion = it)) })
         }
+        SettingRow("Lock Journey", "Require your device PIN, pattern, or biometrics") {
+            Switch(prefs.journalLock, onCheckedChange = { onUpdate(prefs.copy(journalLock = it)) })
+        }
+        SettingRow("Conceal entry previews", "Hide private writing in the timeline") {
+            Switch(prefs.concealJournalPreviews, onCheckedChange = { onUpdate(prefs.copy(concealJournalPreviews = it)) })
+        }
+        SettingRow("Offline listening voices", "Manage downloaded voices for Scripture and prayer", onClick = {
+            runCatching { context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)) }
+                .recoverCatching { context.startActivity(Intent("com.android.settings.TTS_SETTINGS")) }
+        }) { Icon(Icons.Outlined.RecordVoiceOver, null, tint = Gold) }
+        SettingRow("Book of Remembrance", "Create my private ${java.time.LocalDate.now().year} PDF", onClick = {
+            com.prayerkey.manna.share.RemembranceBook.share(context, prefs.name, entries, sermons, prayers, saved)
+        }) { Icon(Icons.Outlined.AutoStories, null, tint = Gold) }
+        SettingRow("Export private archive", "Portable JSON - You own your data", onClick = {
+            com.prayerkey.manna.share.JourneyArchive.share(context, entries, sermons, prayers, saved, memory, formation)
+        }) { Icon(Icons.Outlined.FileDownload, null, tint = Electric) }
+        SettingRow("Restore private archive", "Replace this device's Journey from backup", onClick = { confirmRestore = true }) {
+            Icon(Icons.Outlined.Restore, null, tint = Muted)
+        }
         SettingRow("About MANNA", "Free · No ads") { Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted) }
     }
+    if (confirmRestore) AlertDialog(
+        onDismissRequest = { confirmRestore = false },
+        title = { Text("Restore your Journey?") },
+        text = { Text("This replaces the current Journey, prayers, sermon notes, saved words, and memory progress on this device. Export the current archive first if you may need it.") },
+        confirmButton = { TextButton(onClick = { confirmRestore = false; restoreArchive.launch(arrayOf("application/json", "text/plain")) }) { Text("Choose archive") } },
+        dismissButton = { TextButton(onClick = { confirmRestore = false }) { Text("Cancel") } },
+    )
 }
 
 @Composable
