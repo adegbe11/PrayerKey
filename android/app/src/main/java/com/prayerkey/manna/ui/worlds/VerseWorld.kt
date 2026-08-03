@@ -51,7 +51,7 @@ enum class VerseWorld(
     ),
     HARVEST(
         "The harvest",
-        listOf(Color(0xFF8FB6D9), Color(0xFFE4D9A6), Color(0xFFCFA648), Color(0xFF6B4E1C)),
+        listOf(Color(0xFF7FA8CE), Color(0xFFE8DCA4), Color(0xFFC79A3C), Color(0xFF3E2C0E)),
     ),
     RIVER(
         "Living water",
@@ -59,7 +59,10 @@ enum class VerseWorld(
     ),
     WILDERNESS(
         "The wilderness",
-        listOf(Color(0xFFE8C79A), Color(0xFFD9A46E), Color(0xFFA9743F), Color(0xFF5C3A1E)),
+        // was four browns of nearly the same value, which reads as mud.
+        // A dusk sky over a warm horizon gives the ivory text something to
+        // sit against.
+        listOf(Color(0xFF3F4A73), Color(0xFF8A6A72), Color(0xFFD9975C), Color(0xFF2E1D14)),
     ),
     CITY(
         "The city",

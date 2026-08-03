@@ -374,13 +374,15 @@ private fun DrawScope.river(phase: Float, animate: Boolean) {
 
 /** Dry country: sand ranges, heat haze, no water anywhere. */
 private fun DrawScope.wilderness() {
-    val sky = Color(0xFFD9A46E)
-    light(Offset(size.width * .68f, size.height * .18f), size.minDimension * .085f, Color(0xFFFFF6DF), Color(0xFFFFD9A0))
+    val sky = Color(0xFFD9975C)
+    light(Offset(size.width * .66f, size.height * .30f), size.minDimension * .10f, Color(0xFFFFF3DA), Color(0xFFFFC77E))
 
-    range(.56f, .11f, Color(0xFFC49A6A), sky, .74f, 3, 5151, jag = .5f)
-    rolling(.68f, .12f, Color(0xFFB8834A), sky, .48f, .22f)
-    rolling(.80f, .14f, Color(0xFF8A5E30), sky, .24f, -.24f)
-    rolling(1.04f, .18f, Color(0xFF5C3A1E), sky, 0f, .06f)
+    // each range steps down in value, so the dunes read as distance and the
+    // foreground is dark enough for ivory type to sit on
+    range(.56f, .11f, Color(0xFFC9A176), sky, .76f, 3, 5151, jag = .5f)
+    rolling(.68f, .12f, Color(0xFF9A6A3E), sky, .46f, .22f)
+    rolling(.80f, .14f, Color(0xFF6B4526), sky, .20f, -.24f)
+    rolling(1.04f, .18f, Color(0xFF32200F), sky, 0f, .06f)
 
     // one dead tree, for scale — kept high and left so it never sits in
     // the text column or behind the action buttons

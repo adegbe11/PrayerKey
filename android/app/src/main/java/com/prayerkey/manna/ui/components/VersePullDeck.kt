@@ -209,15 +209,6 @@ fun VersePullDeck(
         /* ── TOP OVERLAY: floats on the card (chips / search) ── */
         Column(Modifier.align(Alignment.TopCenter).fillMaxWidth()) {
             topOverlay()
-            Row(
-                Modifier.fillMaxWidth().padding(top = 6.dp),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    if (stillMode) "A word for the hurry" else "${(index % verses.size) + 1} of ${verses.size}",
-                    color = Muted, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.1.sp,
-                )
-            }
         }
 
         /* ── BOTTOM ACTION BAR: floats on the card, Tinder's five ── */

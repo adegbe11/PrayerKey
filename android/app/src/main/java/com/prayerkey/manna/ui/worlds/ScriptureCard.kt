@@ -45,8 +45,8 @@ fun ScriptureCard(
     text: String,
     translation: String,
     modifier: Modifier = Modifier,
-    bottomPadding: Dp = 200.dp,
-    topPadding: Dp = 104.dp,
+    bottomPadding: Dp = 28.dp,
+    topPadding: Dp = 34.dp,
 ) {
     val world = remember(reference, text) { WorldPicker.forVerse(reference, text) }
     val palette = remember(world, reference) { paletteFor(world, reference) }
@@ -64,7 +64,7 @@ fun ScriptureCard(
            it — the fix is to close the gap from the art side instead. */
         Column(
             Modifier.fillMaxWidth()
-                .padding(horizontal = 30.dp)
+                .padding(horizontal = 26.dp)
                 .padding(top = topPadding),
             verticalArrangement = Arrangement.Top,
         ) {
