@@ -128,6 +128,7 @@ fun BibleScreen(
         if (showMemory) {
             Column(Modifier.fillMaxSize().padding(horizontal = 14.dp).padding(top = 60.dp)) {
                 Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("Memorize", fontFamily = FontFamily.Serif, fontSize = 24.sp, modifier = Modifier.weight(1f))
                     FloatChip(onClick = { showMemory = false }) {
                         Icon(Icons.Outlined.Close, "Back to verses", tint = Ink, modifier = Modifier.size(19.dp))
                     }
@@ -157,6 +158,7 @@ fun BibleScreen(
                             modifier = Modifier.background(NightGloss, RoundedCornerShape(99.dp)),
                         ) {
                             Row(Modifier.padding(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text(version.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                                 Icon(Icons.Outlined.KeyboardArrowDown, "Change version", tint = Gold, modifier = Modifier.size(18.dp))
                             }
                         }
@@ -164,7 +166,7 @@ fun BibleScreen(
                     if (searchOpen) OutlinedTextField(
                         value = query, onValueChange = { query = it },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp).padding(top = 8.dp),
-                        placeholder = { },
+                        placeholder = { Text("Search", fontSize = 14.sp, color = Muted) },
                         singleLine = true, shape = RoundedCornerShape(16.dp), colors = fieldColors(),
                         trailingIcon = {
                             IconButton(onClick = { runSearch(query); searchOpen = false }) {
@@ -186,6 +188,8 @@ fun BibleScreen(
     if (pickerOpen) {
         ModalBottomSheet(onDismissRequest = { pickerOpen = false }, containerColor = Canvas) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 40.dp)) {
+                Text("Choose your Bible", fontFamily = FontFamily.Serif, fontSize = 28.sp)
+                Text("14 versions. All free, forever.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 3.dp, bottom = 16.dp))
                 LazyColumn(Modifier.heightIn(max = 560.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                     items(BIBLE_VERSIONS, key = { it.id }) { item ->
                         val active = item.id == translation
@@ -198,11 +202,14 @@ fun BibleScreen(
                             Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Column(Modifier.weight(1f)) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(item.id, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = if (active) Gold else Ink)
                                         Spacer(Modifier.width(8.dp))
                                         SourcePill(item.source)
                                     }
+                                    Text("${item.name} — ${item.tagline}", color = if (active) Color.White.copy(.7f) else Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                                 }
-                                }
+                                if (active) Text("✓", color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }
@@ -232,9 +239,13 @@ fun BibleScreen(
     if (chapterTitle.isNotBlank()) {
         ModalBottomSheet(onDismissRequest = { chapterTitle = ""; chapterVerses = emptyList() }, containerColor = Canvas) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 36.dp)) {
+                Text(chapterTitle, fontFamily = FontFamily.Serif, fontSize = 30.sp)
+                Text("King James Version · available offline", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp, bottom = 18.dp))
                 LazyColumn(Modifier.heightIn(max = 620.dp)) {
                     items(chapterVerses, key = { it.reference }) { item ->
                         Row(Modifier.fillMaxWidth().clickable { chapterTitle = ""; selectedVerse = RemoteVerse(item.reference, item.text, "KJV") }.padding(vertical = 8.dp)) {
+                            Text(item.verse.toString(), color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.width(34.dp))
+                            Text(item.text, fontFamily = FontFamily.Serif, fontSize = 19.sp, lineHeight = 27.sp)
                         }
                     }
                 }
@@ -264,12 +275,16 @@ private fun SourcePill(source: VersionSource) {
         VersionSource.PREMIUM -> Triple("Premium", Electric.copy(alpha = .13f), Electric)
     }
     Surface(shape = RoundedCornerShape(99.dp), color = bg) {
+        Text(label, color = fg, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = .4.sp,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
     }
 }
 
 @Composable
 private fun VersionPill(id: String) {
     Surface(shape = RoundedCornerShape(99.dp), color = Gold.copy(alpha = .15f)) {
+        Text(id, color = Gold, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = .6.sp,
+            modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp))
     }
 }
 
@@ -286,11 +301,15 @@ private fun VerseDetail(
     onReadChapter: () -> Unit,
 ) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 36.dp)) {
+        Text(reference, fontFamily = FontFamily.Serif, fontSize = 30.sp)
+        Text("$versionName ($versionId)", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 3.dp))
+        Text(text, fontFamily = FontFamily.Serif, fontSize = 28.sp, lineHeight = 38.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 34.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-            Button(onClick = onSave, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); }
-            OutlinedButton(onClick = onMemorize, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.School, null); }
+            Button(onClick = onSave, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" Save") }
+            OutlinedButton(onClick = onMemorize, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.School, null); Text(" Memorize") }
         }
-        TextButton(onClick = onReadChapter, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) { Icon(Icons.Outlined.MenuBook, null); }
+        TextButton(onClick = onReadChapter, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) { Icon(Icons.Outlined.MenuBook, null); Text(" Read full chapter offline") }
+        Text("Related verses", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 28.dp, bottom = 10.dp))
         if (related.isEmpty()) LinearProgressIndicator(Modifier.fillMaxWidth())
         related.forEach { item ->
             Surface(
@@ -299,6 +318,8 @@ private fun VerseDetail(
                 border = androidx.compose.foundation.BorderStroke(1.dp, Hairline),
             ) {
                 Column(Modifier.padding(14.dp)) {
+                    Text(item.reference, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                    Text(item.text, maxLines = 2, color = Muted, modifier = Modifier.padding(top = 5.dp))
                 }
             }
         }
@@ -318,7 +339,10 @@ private fun MemoryTrainer(memory: MemoryVerse?, onAdvance: (String) -> Unit) {
     }.joinToString(" ")
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp), color = Night) {
         Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(onClick = { onAdvance(memory.reference) }, modifier = Modifier.fillMaxWidth().padding(top = 22.dp)) { }
+            Text("MEMORIZE · LEVEL ${memory.stage}", color = Gold, fontSize = 11.sp, letterSpacing = 1.4.sp)
+            Text(masked, color = Color.White, fontFamily = FontFamily.Serif, fontSize = 25.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 30.dp))
+            Text(memory.reference, color = Color.White.copy(.65f))
+            Button(onClick = { onAdvance(memory.reference) }, modifier = Modifier.fillMaxWidth().padding(top = 22.dp)) { Text(if (memory.stage >= 5) "Practice again" else "I recited it — hide more") }
         }
     }
 }
@@ -359,6 +383,7 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CircularProgressIndicator(color = Electric, strokeWidth = 3.dp, modifier = Modifier.size(42.dp))
+                    Text("Shuffling 544 prayers…", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 18.dp))
                 }
             } else if (filtered.isEmpty()) {
                 Column(
@@ -366,10 +391,20 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    Text("No prayer for that yet", fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "Try healing, family, work, fear or money.",
+                        color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 6.dp),
+                    )
                     Surface(
                         onClick = { topicQuery = "" }, shape = R.pill, color = ChipFill,
                         modifier = Modifier.padding(top = 18.dp),
                     ) {
+                        Text(
+                            "Clear search", color = Electric, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
+                        )
                     }
                 }
             } else {
@@ -416,7 +451,7 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                             OutlinedTextField(
                                 topicQuery, { topicQuery = it },
                                 modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
-                                placeholder = { },
+                                placeholder = { Text("Healing, family, work, grief…", fontSize = 13.sp) },
                                 leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Muted) },
                                 singleLine = true, shape = R.control,
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -446,6 +481,11 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                 .padding(horizontal = 22.dp)
                 .padding(top = 24.dp, bottom = Space.dock),
         ) {
+            Text(if (generated == null) "Pray for me" else "Your prayer", fontFamily = FontFamily.Serif, fontSize = 32.sp)
+            Text(
+                "Bring what is on your heart. PrayerKey will pray with you.",
+                color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp),
+            )
             ModeChips(deckMode) { deckMode = it }
 
             /* ── Prayer of the Day — same daily prayer as prayerkey.com ── */
@@ -464,7 +504,11 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
             ) {
                 Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
+                        Text("✦ PRAYER OF THE DAY", color = Gold, fontSize = 10.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
+                        Text(potd.title, color = Color.White, fontFamily = FontFamily.Serif, fontSize = 19.sp, modifier = Modifier.padding(top = 4.dp))
+                        Text(potd.ref, color = Color.White.copy(.6f), fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                     }
+                    Text("Read", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                     Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Gold)
                 }
             }
@@ -482,6 +526,11 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     request, { request = it },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
+                        Text(
+                            "Pour your heart out here...",
+                            fontSize = 17.sp, color = Muted,
+                            fontFamily = FontFamily.Serif,
+                        )
                     },
                     textStyle = androidx.compose.ui.text.TextStyle(
                         fontSize = 17.sp, lineHeight = 27.sp, color = InkSoft,
@@ -503,6 +552,12 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                    and the cure is a way in, not a bigger box. */
                 androidx.compose.animation.AnimatedVisibility(request.isBlank()) {
                     Column {
+                        Text(
+                            "OR START HERE",
+                            color = Muted, fontSize = 10.sp, letterSpacing = 1.6.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = Space.block, bottom = 10.dp),
+                        )
                         listOf(
                             "I am anxious" to "I am anxious about something and I need peace.",
                             "For my family" to "Please pray for my family.",
@@ -521,6 +576,12 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                                         shape = R.pill, color = ChipFill,
                                         modifier = Modifier.weight(1f),
                                     ) {
+                                        Text(
+                                            pair.first, color = InkSoft, fontSize = 12.5.sp,
+                                            fontWeight = FontWeight.Medium, maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                                        )
                                     }
                                 }
                             }
@@ -533,6 +594,12 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                    a word is a form; offering it after is a nuance. */
                 androidx.compose.animation.AnimatedVisibility(request.isNotBlank()) {
                     Column {
+                        Text(
+                            "HOW ARE YOU FEELING? (OPTIONAL)",
+                            color = Muted, fontSize = 10.sp, letterSpacing = 1.4.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = Space.block, bottom = 10.dp),
+                        )
                         Box {
                             Row(
                                 Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
@@ -545,6 +612,13 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                                         shape = R.pill,
                                         color = if (on) ChipFillSelected else ChipFill,
                                     ) {
+                                        Text(
+                                            item,
+                                            color = if (on) Electric else InkSoft,
+                                            fontSize = 13.sp,
+                                            fontWeight = if (on) FontWeight.SemiBold else FontWeight.Medium,
+                                            modifier = Modifier.padding(horizontal = 17.dp, vertical = 11.dp),
+                                        )
                                     }
                                 }
                                 Spacer(Modifier.width(26.dp))
@@ -557,7 +631,7 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     }
                 }
 
-                error?.let { }
+                error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 10.dp)) }
 
                 /* The action appears when there is something to act on. A
                    greyed-out slab was dead weight and the least attractive
@@ -580,19 +654,29 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                 }
 
                 if (journal.isNotEmpty()) {
+                    Text(
+                        "PRAYERS YOU KEPT",
+                        color = Muted, fontSize = 10.sp, letterSpacing = 1.6.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = Space.loose, bottom = 10.dp),
+                    )
                     journal.take(2).forEach { entry ->
                         Box(Modifier.fillMaxWidth().padding(bottom = 8.dp).premiumCard(fill = PaperFill, lift = false)) {
-                            Column(Modifier.padding(15.dp)) { ; }
+                            Column(Modifier.padding(15.dp)) { Text(entry.title, fontFamily = FontFamily.Serif, fontSize = 17.sp); Text(entry.scriptureRef.orEmpty(), color = Gold, fontSize = 11.sp) }
                         }
                     }
                 }
             } else {
                 Box(Modifier.fillMaxWidth().premiumCard(fill = PaperFill)) {
                     Column(Modifier.padding(24.dp)) {
-                        generated!!.verses.firstOrNull()?.let { }
-                        if (generated!!.encouragement.isNotBlank())                         Row(Modifier.fillMaxWidth().padding(top = 22.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(onClick = { generated?.let { onSavePrayer(request, it) } }, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); }
-                            Button(onClick = { generated = null }, modifier = Modifier.weight(1f)) { }
+                        Text(generated!!.title, fontFamily = FontFamily.Serif, fontSize = 25.sp)
+                        Text("Prayed over your words", color = Electric, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp, bottom = 20.dp))
+                        Text(generated!!.prayer, lineHeight = 24.sp)
+                        generated!!.verses.firstOrNull()?.let { Text(it.first, color = Gold, modifier = Modifier.padding(top = 20.dp)) }
+                        if (generated!!.encouragement.isNotBlank()) Text(generated!!.encouragement, color = Muted, modifier = Modifier.padding(top = 14.dp))
+                        Row(Modifier.fillMaxWidth().padding(top = 22.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(onClick = { generated?.let { onSavePrayer(request, it) } }, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" Journal") }
+                            Button(onClick = { generated = null }, modifier = Modifier.weight(1f)) { Text("Pray again") }
                         }
                     }
                 }
@@ -605,10 +689,16 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
         ModalBottomSheet(onDismissRequest = { potdOpen = false }, containerColor = Canvas) {
             LazyColumn(Modifier.fillMaxWidth().padding(horizontal = 24.dp), contentPadding = PaddingValues(bottom = 44.dp)) {
                 item {
+                    Text("✦ PRAYER OF THE DAY ✦", color = Gold, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
+                    Text(potd.title, fontFamily = FontFamily.Serif, fontSize = 28.sp, modifier = Modifier.padding(top = 6.dp))
+                    Text(potd.ref, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.padding(top = 3.dp))
                     Surface(shape = RoundedCornerShape(14.dp), color = Ivory, modifier = Modifier.fillMaxWidth().padding(top = 14.dp)) {
+                        Text("“${potd.verse}”", fontFamily = FontFamily.Serif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(16.dp))
                     }
                     potd.prayer.split("\n\n").forEach { para ->
+                        Text(para, fontSize = 15.sp, lineHeight = 24.sp, color = Ink, modifier = Modifier.padding(top = 14.dp))
                     }
+                    Text("SHARE AS A CARD", color = Muted, fontSize = 11.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 26.dp, bottom = 10.dp))
                 }
                 items(com.prayerkey.manna.share.CardFormat.entries.toList(), key = { it.name }) { format ->
                     Surface(
@@ -619,6 +709,8 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     ) {
                         Row(Modifier.padding(horizontal = 18.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Outlined.Share, null, tint = Gold, modifier = Modifier.size(18.dp))
+                            Text(format.label, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
+                            Text("${format.w}×${format.h}", color = Muted, fontSize = 11.sp)
                         }
                     }
                 }
@@ -629,15 +721,19 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
     selectedTopic?.let { topic ->
         ModalBottomSheet(onDismissRequest = { selectedTopic = null }, containerColor = Canvas) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 36.dp)) {
+                Text(topic.title, fontFamily = FontFamily.Serif, fontSize = 29.sp)
+                Text(topic.category, color = Gold, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp, bottom = 22.dp))
+                Text(topic.prayer, fontSize = 17.sp, lineHeight = 27.sp)
                 topic.scripture.forEach { (ref, text) ->
                     Surface(Modifier.fillMaxWidth().padding(top = 12.dp), color = Ivory, shape = RoundedCornerShape(15.dp)) {
-                        Column(Modifier.padding(14.dp)) { ; }
+                        Column(Modifier.padding(14.dp)) { Text(ref, fontWeight = FontWeight.Bold); Text(text, color = Muted, modifier = Modifier.padding(top = 4.dp)) }
                     }
                 }
                 if (topic.prayerPoints.isNotEmpty()) {
-                    topic.prayerPoints.forEach { }
+                    Text("Prayer points", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 22.dp))
+                    topic.prayerPoints.forEach { Text("• $it", modifier = Modifier.padding(top = 7.dp)) }
                 }
-                Button(onClick = { selectedTopic = null }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp)) { }
+                Button(onClick = { selectedTopic = null }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp)) { Text("Amen") }
             }
         }
     }
@@ -663,7 +759,7 @@ private fun deckColor(category: String): Color = when {
 fun SavedScreen(words: List<SavedWord>, onAnswered: (Long, String) -> Unit) {
     var answeredTab by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf<SavedWord?>(null) }
-    ScreenFrame("Saved", "") {
+    ScreenFrame("Saved", "Every word that met you, kept in one place.") {
         Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(!answeredTab, { answeredTab = false }, label = { Text("Saved ${words.count { it.answeredAt == null }}") })
             FilterChip(answeredTab, { answeredTab = true }, label = { Text("Answered ${words.count { it.answeredAt != null }}") })
@@ -703,6 +799,7 @@ private fun EmptySaved(answered: Boolean) {
     Column(Modifier.fillMaxWidth().padding(top = 60.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(if (answered) Icons.Outlined.FavoriteBorder else Icons.Outlined.BookmarkBorder, null, tint = Gold, modifier = Modifier.size(44.dp))
         Text(if (answered) "Your proof pile begins here" else "Push a card up to keep it", fontFamily = FontFamily.Serif, fontSize = 22.sp, modifier = Modifier.padding(top = 16.dp))
+        Text(if (answered) "Answered prayers become your testimony over time." else "The words that meet you will wait here.", color = Muted, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 8.dp))
     }
 }
 

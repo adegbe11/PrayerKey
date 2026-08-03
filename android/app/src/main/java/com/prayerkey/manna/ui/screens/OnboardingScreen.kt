@@ -88,6 +88,11 @@ fun OnboardingScreen(onDone: (String) -> Unit) {
             fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
             fontSize = 30.sp, lineHeight = 37.sp, textAlign = TextAlign.Center, color = Ink,
         )
+        Text(
+            "One verse waits for you every morning.\nPull it down. Push it up to keep it.",
+            color = Muted, fontSize = 14.sp, lineHeight = 21.sp,
+            textAlign = TextAlign.Center, modifier = Modifier.padding(top = 10.dp),
+        )
 
         Spacer(Modifier.weight(.5f))
 

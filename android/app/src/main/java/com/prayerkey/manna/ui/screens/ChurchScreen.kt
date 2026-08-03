@@ -191,9 +191,15 @@ private fun ReadyView(
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 120.dp),
     ) {
         Text("Church", fontFamily = FontFamily.Serif, fontSize = 32.sp)
+        Text("Take every verse from Sunday home with you.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
 
         Column(Modifier.fillMaxWidth().padding(top = 46.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Ready when service starts", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            Text(
+                "You listen with your ears. We listen with the pen.",
+                color = Muted, fontSize = 14.sp, textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp),
+            )
             Wave(active = false, modifier = Modifier.padding(vertical = 34.dp))
             Box(
                 Modifier.size(104.dp)
@@ -202,6 +208,10 @@ private fun ReadyView(
                 contentAlignment = Alignment.Center,
             ) { Icon(Icons.Outlined.Mic, "Start listening", tint = Color.White, modifier = Modifier.size(40.dp)) }
             Text("Start listening", color = Electric, fontSize = 17.sp, modifier = Modifier.padding(top = 18.dp))
+            Text(
+                "Processed on your phone. Audio is never saved.",
+                color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 8.dp),
+            )
             Surface(
                 onClick = onLanguage, shape = R.pill, color = Color.White,
                 border = BorderStroke(1.dp, Hairline),
@@ -265,12 +275,14 @@ private fun ListeningView(
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 120.dp),
     ) {
         Text("Listening", fontFamily = FontFamily.Serif, fontSize = 32.sp)
+        Text("Phone can go in your pocket. Your notes are being written.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
 
         Column(Modifier.fillMaxWidth().padding(top = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 "%02d:%02d".format(secs / 60, secs % 60),
                 fontSize = 52.sp, fontWeight = FontWeight.Light, color = Ink,
             )
+            Text("Audio is processed live and never saved.", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
             Wave(active = true, modifier = Modifier.padding(vertical = 26.dp))
         }
 
@@ -316,6 +328,11 @@ private fun ArrangingView(onDone: () -> Unit) {
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         CircularProgressIndicator(color = Electric, strokeWidth = 3.dp, modifier = Modifier.size(46.dp))
         Text("Arranging your notes", fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 22.dp))
+        Text(
+            "Sorting the verses, the points, and the lines worth keeping.",
+            color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 8.dp, start = 40.dp, end = 40.dp),
+        )
     }
 }
 
@@ -538,6 +555,12 @@ private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: ()
     androidx.compose.material3.ModalBottomSheet(onDismissRequest = onClose, containerColor = Canvas) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 30.dp)) {
             Text("What language is the service in?", fontFamily = FontFamily.Serif, fontSize = 24.sp)
+            Text(
+                "Your phone does the listening, so this needs that language pack installed. " +
+                    "Android offers to download it the first time you use one.",
+                color = Muted, fontSize = 12.5.sp, lineHeight = 19.sp,
+                modifier = Modifier.padding(top = 6.dp, bottom = 16.dp),
+            )
             androidx.compose.foundation.lazy.LazyColumn(
                 Modifier.heightIn(max = 420.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),

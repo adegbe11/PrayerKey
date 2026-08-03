@@ -345,7 +345,8 @@ private fun VerseFace(
                     textAlign = TextAlign.Center,
                 )
                 Spacer(Modifier.weight(1.1f))
-                }
+                if (still) Text("Breathe this one. Then keep pulling.", color = Color.White.copy(.6f), fontSize = 12.sp)
+            }
         }
     }
 }
