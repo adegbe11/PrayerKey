@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,7 +46,7 @@ fun ScriptureCard(
     translation: String,
     modifier: Modifier = Modifier,
     bottomPadding: Dp = 200.dp,
-    topPadding: Dp = 116.dp,
+    topPadding: Dp = 104.dp,
 ) {
     val world = remember(reference, text) { WorldPicker.forVerse(reference, text) }
     val palette = remember(world, reference) { paletteFor(world, reference) }
@@ -58,12 +59,14 @@ fun ScriptureCard(
             settleMotif(palette.ground)
         }
 
+        /* Words at the top, art raised to meet them. Centring the block
+           inside a band only moved the hole from below the verse to above
+           it — the fix is to close the gap from the art side instead. */
         Column(
-            Modifier.fillMaxSize().padding(horizontal = 30.dp)
-                .padding(top = topPadding, bottom = bottomPadding),
-            // the words claim the upper half as one block instead of
-            // stranding a dead gap between the verse and the art
-            verticalArrangement = Arrangement.spacedBy(0.dp),
+            Modifier.fillMaxWidth()
+                .padding(horizontal = 30.dp)
+                .padding(top = topPadding),
+            verticalArrangement = Arrangement.Top,
         ) {
             if (world.isPromise) {
                 Text(

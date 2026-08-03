@@ -98,8 +98,9 @@ fun DrawScope.cardMotif(motif: CardMotif, p: CardPalette, seedRef: String) {
 
     val w = size.width
     // the art lives in the lower band only, and fades back into the ground
-    // at the very bottom so the floating controls sit on calm paper
-    val h = size.height * .88f
+    // at the very bottom so the floating controls sit on calm paper.
+    // .96 rather than .88: the shorter band left a hole under short verses.
+    val h = size.height * .96f
 
     when (motif) {
         CardMotif.PEAKS -> {
