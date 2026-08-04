@@ -135,16 +135,32 @@ fun JournalScreen(
     var libraryOpen by remember { mutableStateOf(false) }
 
     Box(Modifier.fillMaxSize().background(dayWash())) {
+        /* An empty journal is the whole screen, edge to edge — the sky the
+           user chose, with the header floating on top of it. Rendering it
+           inside the padded column left a white band under the title and
+           margins down both sides, which broke the illusion entirely. */
+        val emptyJourney = tab == JournalTab.Journey && entries.isEmpty()
+        if (emptyJourney) {
+            com.prayerkey.manna.ui.journal.JournalWelcome(
+                onOpen = { picking = true },
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
         Column(Modifier.fillMaxSize().padding(horizontal = 22.dp).padding(top = 24.dp)) {
             // Home is bare now, so Settings lives here — the one screen
             // that is already about the user rather than today's word.
+            /* Over the full-bleed welcome sky the chrome has to switch to
+               the theme's ink, or a dark title sits on a dark sky. */
+            val headerInk = if (emptyJourney) MaterialTheme.colorScheme.onBackground else Ink
+            val headerMuted = if (emptyJourney) MaterialTheme.colorScheme.onBackground.copy(alpha = .55f) else Muted
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (tab != JournalTab.Journey) IconButton(onClick = { tab = JournalTab.Journey }) { Icon(Icons.Outlined.ArrowBack, "Back to journal") }
                 Column(Modifier.weight(1f)) {
-                    Text(when (tab) { JournalTab.Journey -> "Journal"; JournalTab.Practices -> "Practices"; JournalTab.Saved -> "Saved words"; JournalTab.Answered -> "Answered prayers" }, fontFamily = FontFamily.Serif, fontSize = 32.sp)
+                    Text(when (tab) { JournalTab.Journey -> "Journal"; JournalTab.Practices -> "Practices"; JournalTab.Saved -> "Saved words"; JournalTab.Answered -> "Answered prayers" }, fontFamily = FontFamily.Serif, fontSize = 32.sp, color = headerInk)
                 }
                 if (tab == JournalTab.Journey) Box {
-                    IconButton(onClick = { libraryOpen = true }) { Icon(Icons.Outlined.MoreHoriz, "Open journal library", tint = Muted) }
+                    IconButton(onClick = { libraryOpen = true }) { Icon(Icons.Outlined.MoreHoriz, "Open journal library", tint = headerMuted) }
                     DropdownMenu(expanded = libraryOpen, onDismissRequest = { libraryOpen = false }) {
                         DropdownMenuItem(text = { Text("Practices") }, onClick = { tab = JournalTab.Practices; libraryOpen = false })
                         DropdownMenuItem(text = { Text("Saved words · ${words.count { it.answeredAt == null }}") }, onClick = { tab = JournalTab.Saved; libraryOpen = false })
@@ -152,7 +168,7 @@ fun JournalScreen(
                     }
                 }
                 androidx.compose.material3.IconButton(onClick = onProfile) {
-                    Icon(Icons.Outlined.Settings, "Settings", tint = Muted)
+                    Icon(Icons.Outlined.Settings, "Settings", tint = headerMuted)
                 }
             }
 
@@ -164,6 +180,7 @@ fun JournalScreen(
                     entries = entries, streak = journalStreak, query = query,
                     onQuery = { query = it }, onEdit = { viewing = it },
                     onAnswer = { reviewingPrayer = it },
+                    onWelcomeTap = { picking = true },
                     insight = journeyInsight,
                     concealPreviews = concealPreviews,
                 )
@@ -177,7 +194,9 @@ fun JournalScreen(
             }
         }
 
-        if (tab == JournalTab.Journey) {
+        // On the welcome the Bible itself is the invitation — a pencil button
+        // in the corner competes with it and says the same thing twice.
+        if (tab == JournalTab.Journey && !emptyJourney) {
             // gentle pull toward the one action, only while there is nothing else
             val transition = rememberInfiniteTransition(label = "fab")
             val pulse by transition.animateFloat(
@@ -302,6 +321,7 @@ private fun JournalTimeline(
     query: String,
     onQuery: (String) -> Unit,
     onEdit: (JournalEntry) -> Unit,
+    onWelcomeTap: () -> Unit,
     onAnswer: (JournalEntry) -> Unit,
     insight: JourneyInsight?,
     concealPreviews: Boolean,
@@ -327,20 +347,9 @@ private fun JournalTimeline(
         /* An empty journal should be an invitation, not a dashboard. No
            stats, no filters, no search until there is something to count,
            sort or find — just the line that makes someone want to write. */
-        if (entries.isEmpty()) {
-            Column(
-                Modifier.fillMaxWidth().padding(top = 64.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                JournalMark()
-                Text(
-                    "Your story starts here",
-                    fontWeight = FontWeight.SemiBold, fontSize = 17.sp,
-                    modifier = Modifier.padding(top = 22.dp),
-                )
-            }
-            return
-        }
+        // the empty state is drawn full-bleed by JournalScreen, behind the
+        // header — the timeline just stands down
+        if (entries.isEmpty()) return
 
         Row(Modifier.fillMaxWidth().padding(top = 18.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = RoundedCornerShape(16.dp), color = AppleGray, modifier = Modifier.weight(1f)) {
