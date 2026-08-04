@@ -82,7 +82,39 @@ private val MannaType = Typography(
 )
 
 @Composable
-fun MannaTheme(content: @Composable () -> Unit) {
+fun MannaTheme(
+    theme: com.prayerkey.manna.data.AppTheme = com.prayerkey.manna.data.APP_THEMES.first(),
+    content: @Composable () -> Unit,
+) {
+    // the chosen theme repaints the whole app, not just a preview tile
+    val scheme = if (theme.dark) {
+        androidx.compose.material3.darkColorScheme(
+            primary = theme.accent, onPrimary = if (theme.dark) Color(0xFF10131F) else Color.White,
+            secondary = theme.accent, onSecondary = Color(0xFF10131F),
+            background = theme.background, onBackground = theme.ink,
+            surface = theme.surface, onSurface = theme.ink,
+            surfaceVariant = theme.surface, onSurfaceVariant = theme.muted,
+            surfaceTint = Color.Transparent,
+            outline = theme.muted.copy(alpha = .3f), outlineVariant = theme.muted.copy(alpha = .22f),
+            error = Color(0xFFE0796A), onError = Color(0xFF2A0E0A),
+        )
+    } else {
+        lightColorScheme(
+            primary = theme.accent, onPrimary = Color.White,
+            secondary = theme.accent, onSecondary = Color.White,
+            background = theme.background, onBackground = theme.ink,
+            surface = theme.surface, onSurface = theme.ink,
+            surfaceVariant = theme.background, onSurfaceVariant = theme.muted,
+            surfaceTint = Color.Transparent,
+            outline = theme.muted.copy(alpha = .3f), outlineVariant = theme.muted.copy(alpha = .22f),
+            error = Color(0xFFB3402A), onError = Color.White,
+        )
+    }
+    MaterialTheme(colorScheme = scheme, typography = MannaType, content = content)
+}
+
+@Composable
+private fun LegacyTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         /* Every slot is named. Leaving the container/tint slots at their
            defaults let Material's baseline purple through on chips, ripples

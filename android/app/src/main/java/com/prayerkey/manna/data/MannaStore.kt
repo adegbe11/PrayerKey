@@ -27,6 +27,7 @@ data class UserPrefs(
     val translation: String = "KJV",
     val onboarded: Boolean = false,
     val sermonLanguage: String = "en-US",
+    val themeId: String = "imperial_key",
     val journalLock: Boolean = false,
     val concealJournalPreviews: Boolean = false,
 )

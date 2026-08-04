@@ -71,8 +71,12 @@ private val Ivory = Color(0xFFF6F0E1)
  * reminder, which is the only thing that brings anyone back tomorrow.
  */
 @Composable
-fun OnboardingScreen(onDone: (Boolean, Int) -> Unit) {
-    // 0..2 the three slides, 3 the gesture, 4 the reminder.
+fun OnboardingScreen(
+    themeId: String,
+    onTheme: (String) -> Unit,
+    onDone: (Boolean, Int) -> Unit,
+) {
+    // 0..2 slides, 3 the gesture, 4 the theme, 5 the reminder.
     // Skip jumps the slides but NOT the pull — reading about a gesture
     // teaches nobody, so everyone still does it once.
     var step by remember { mutableIntStateOf(0) }
@@ -84,6 +88,12 @@ fun OnboardingScreen(onDone: (Boolean, Int) -> Unit) {
             onDone = { step = 3 },
         )
         3 -> PullToLearn { step = 4 }
+        4 -> ThemePicker(
+            initialId = themeId,
+            onLater = { step = 5 },
+            // applied live, so the reminder screen already wears the choice
+            onUse = { theme -> onTheme(theme.id); step = 5 },
+        )
         else -> ReminderStep(onDone)
     }
 }

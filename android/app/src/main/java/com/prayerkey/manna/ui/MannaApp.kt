@@ -46,7 +46,7 @@ import com.prayerkey.manna.ui.theme.Muted
 private data class Destination(val label: String, val icon: ImageVector)
 
 @Composable
-fun MannaApp() {
+fun MannaApp(onThemeChange: (String) -> Unit = {}) {
     val viewModel: AppViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val saved by viewModel.saved.collectAsState()
     val streak by viewModel.streak.collectAsState()
@@ -100,7 +100,13 @@ fun MannaApp() {
                 // one frame of brand, never a flash of the wrong screen
                 Box(Modifier.fillMaxSize().background(Canvas))
             } else if (!preferences.onboarded) {
-                com.prayerkey.manna.ui.screens.OnboardingScreen { wantsReminder, hour ->
+                com.prayerkey.manna.ui.screens.OnboardingScreen(
+                    themeId = preferences.themeId,
+                    onTheme = { t ->
+                        viewModel.updatePreferences(preferences.copy(themeId = t))
+                        onThemeChange(t)
+                    },
+                ) { wantsReminder, hour ->
                     /* The reminder is set at the one moment people say yes.
                        It used to default off and hide behind Profile, which
                        is the strongest retention lever switched off. */
