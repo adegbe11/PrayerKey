@@ -89,14 +89,6 @@ fun ThemePicker(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(6.dp))
-            Text(
-                focused.mood.uppercase(),
-                color = accent, fontSize = 9.5.sp,
-                letterSpacing = 3.sp, fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
 
             HorizontalPager(
                 state = pager,
@@ -117,23 +109,6 @@ fun ThemePicker(
                         .scale(scale)
                         .padding(vertical = 18.dp)
                         .graphicsLayer { alpha = 1f - (offset * .35f).coerceIn(0f, .45f) },
-                )
-            }
-
-            Text(
-                focused.name,
-                color = ink, fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            Spacer(Modifier.height(6.dp))
-            Row(
-                Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center,
-            ) {
-                Text(
-                    "${pager.currentPage + 1} of ${APP_THEMES.size}",
-                    color = muted, fontSize = 11.sp, letterSpacing = 1.4.sp,
                 )
             }
 
