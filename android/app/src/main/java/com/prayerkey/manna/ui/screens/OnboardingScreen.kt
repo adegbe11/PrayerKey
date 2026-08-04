@@ -72,9 +72,18 @@ private val Ivory = Color(0xFFF6F0E1)
  */
 @Composable
 fun OnboardingScreen(onDone: (Boolean, Int) -> Unit) {
+    // 0..2 the three slides, 3 the gesture, 4 the reminder.
+    // Skip jumps the slides but NOT the pull — reading about a gesture
+    // teaches nobody, so everyone still does it once.
     var step by remember { mutableIntStateOf(0) }
     when (step) {
-        0 -> PullToLearn { step = 1 }
+        in 0..2 -> OnboardingSlides(
+            step = step,
+            onStep = { step = it },
+            onSkip = { step = 3 },
+            onDone = { step = 3 },
+        )
+        3 -> PullToLearn { step = 4 }
         else -> ReminderStep(onDone)
     }
 }
