@@ -100,8 +100,21 @@ fun MannaApp() {
                 // one frame of brand, never a flash of the wrong screen
                 Box(Modifier.fillMaxSize().background(Canvas))
             } else if (!preferences.onboarded) {
-                com.prayerkey.manna.ui.screens.OnboardingScreen { chosenName ->
-                    viewModel.updatePreferences(preferences.copy(name = chosenName, onboarded = true))
+                com.prayerkey.manna.ui.screens.OnboardingScreen { wantsReminder, hour ->
+                    /* The reminder is set at the one moment people say yes.
+                       It used to default off and hide behind Profile, which
+                       is the strongest retention lever switched off. */
+                    viewModel.updatePreferences(
+                        preferences.copy(
+                            onboarded = true,
+                            reminderEnabled = wantsReminder,
+                            reminderHour = hour,
+                            reminderMinute = 0,
+                        ),
+                    )
+                    if (wantsReminder) {
+                        com.prayerkey.manna.reminder.ReminderReceiver.schedule(context, hour, 0, true)
+                    }
                 }
             } else if (showProfile) {
                 ProfileScreen(

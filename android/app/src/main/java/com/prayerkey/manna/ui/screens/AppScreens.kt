@@ -235,11 +235,17 @@ fun BibleScreen(
                 onMemorize = { onMemorize(VerseCard(verse.reference, verse.translation, verse.text, "")) },
                 onRelated = { selectedVerse = RemoteVerse(it.reference, it.text, "KJV") },
                 onReadChapter = {
-                    val source = runCatching { kotlinx.coroutines.runBlocking { bible.search(verse.reference, 1).firstOrNull() } }.getOrNull()
-                    if (source != null) {
-                        selectedVerse = null
-                        chapterTitle = "${source.book} ${source.chapter}"
-                        scope.launch { chapterVerses = bible.chapter(source.book, source.chapter) }
+                    /* This used to runBlocking on the main thread, and on a
+                       cold cache that call parses the whole 4.4MB KJV — a
+                       guaranteed freeze the first time anyone tapped it.
+                       Both reads now happen off the main thread. */
+                    scope.launch {
+                        val source = runCatching { bible.search(verse.reference, 1).firstOrNull() }.getOrNull()
+                        if (source != null) {
+                            selectedVerse = null
+                            chapterTitle = "${source.book} ${source.chapter}"
+                            chapterVerses = bible.chapter(source.book, source.chapter)
+                        }
                     }
                 },
             )
@@ -432,6 +438,7 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
     var deckMode by remember { mutableStateOf(false) }
     var selectedTopic by remember { mutableStateOf<PrayerTopic?>(null) }
     var topicQuery by remember { mutableStateOf("") }
+    var searchOpen by remember { mutableStateOf(false) }
     var potdOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val potd = remember { com.prayerkey.manna.model.todaysPrayer() }
@@ -503,6 +510,12 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     },
                     actions = { topic, controls ->
                         listOf(
+                            /* Search lives here rather than on the card. 543
+                               prayers are unfindable by shuffling alone, but a
+                               field pinned over the art was the clutter. */
+                            com.prayerkey.manna.ui.components.DeckAction(
+                                Icons.Outlined.Search, "Find a prayer", Muted, 50.dp,
+                            ) { searchOpen = true },
                             com.prayerkey.manna.ui.components.DeckAction(
                                 Icons.Outlined.Close, "Next prayer", Color(0xFFE0526B), 58.dp,
                             ) { controls.next() },
@@ -775,6 +788,45 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
         }
     }
 
+    if (searchOpen) {
+        ModalBottomSheet(onDismissRequest = { searchOpen = false }, containerColor = Canvas) {
+            Column(
+                Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 30.dp),
+            ) {
+                OutlinedTextField(
+                    topicQuery, { topicQuery = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("Healing, family, work, grief…", fontSize = 14.sp) },
+                    leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Muted) },
+                    singleLine = true, shape = R.control, colors = fieldColors(),
+                )
+                Spacer(Modifier.height(14.dp))
+                val hits = topics.filter {
+                    topicQuery.isNotBlank() &&
+                        (it.title.contains(topicQuery, true) || it.category.contains(topicQuery, true))
+                }
+                androidx.compose.foundation.lazy.LazyColumn(
+                    Modifier.heightIn(max = 400.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    items(hits.take(40), key = { it.slug }) { topic ->
+                        Surface(
+                            onClick = { selectedTopic = topic; searchOpen = false },
+                            shape = R.control, color = Color.White,
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Hairline),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Column(Modifier.padding(horizontal = 16.dp, vertical = 13.dp)) {
+                                Text(topic.title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                                Text(topic.category, color = Gold, fontSize = 11.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     selectedTopic?.let { topic ->
         ModalBottomSheet(onDismissRequest = { selectedTopic = null }, containerColor = Canvas) {
             /* This is where the prayer is actually prayed, so it is set like
@@ -912,31 +964,6 @@ private fun deckColor(category: String): Color = when {
     else -> Color(0xFFF4F1FA)
 }
 
-@Composable
-fun SavedScreen(words: List<SavedWord>, onAnswered: (Long, String) -> Unit) {
-    var answeredTab by remember { mutableStateOf(false) }
-    var selected by remember { mutableStateOf<SavedWord?>(null) }
-    ScreenFrame("Saved", "") {
-        Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(!answeredTab, { answeredTab = false }, label = { Text("Saved ${words.count { it.answeredAt == null }}") })
-            FilterChip(answeredTab, { answeredTab = true }, label = { Text("Answered ${words.count { it.answeredAt != null }}") })
-        }
-        val shown = words.filter { (it.answeredAt != null) == answeredTab }
-        if (shown.isEmpty()) EmptySaved(answeredTab) else LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(bottom = 48.dp)) {
-            items(shown, key = { it.id }) { word -> SavedCard(word, !answeredTab) { selected = word } }
-        }
-    }
-    selected?.let { word ->
-        var testimony by remember(word.id) { mutableStateOf("") }
-        AlertDialog(
-            onDismissRequest = { selected = null },
-            title = { Text("What did God do?") },
-            text = { OutlinedTextField(testimony, { testimony = it }, placeholder = { Text("Write one line of testimony…") }, minLines = 3) },
-            confirmButton = { TextButton(onClick = { if (testimony.isNotBlank()) { onAnswered(word.id, testimony); selected = null } }) { Text("Mark answered") } },
-            dismissButton = { TextButton(onClick = { selected = null }) { Text("Cancel") } },
-        )
-    }
-}
 
 @Composable
 private fun SavedCard(word: SavedWord, canAnswer: Boolean, onAnswer: () -> Unit) {

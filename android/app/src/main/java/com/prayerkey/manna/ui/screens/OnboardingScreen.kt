@@ -1,8 +1,14 @@
 package com.prayerkey.manna.ui.screens
 
+import android.view.HapticFeedbackConstants
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,119 +17,223 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.ui.theme.AppleGray
+import com.prayerkey.manna.model.DailyVerses
 import com.prayerkey.manna.ui.theme.Canvas
-import com.prayerkey.manna.ui.theme.ElectricGloss
 import com.prayerkey.manna.ui.theme.Gold
-import com.prayerkey.manna.ui.theme.Hairline
-import com.prayerkey.manna.ui.theme.Ink
 import com.prayerkey.manna.ui.theme.Muted
-import com.prayerkey.manna.ui.theme.Night
-import com.prayerkey.manna.ui.theme.NightGloss
-import com.prayerkey.manna.ui.theme.TopSheen
+import com.prayerkey.manna.ui.theme.NightFill
+import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.worlds.WorldVerseFace
+import kotlin.math.roundToInt
+
+private val Ivory = Color(0xFFF6F0E1)
 
 /**
- * The first thing a stranger sees. Names the app, teaches the one
- * gesture in a single line, and asks for their name — so Home never
- * greets anyone with a hardcoded stranger's name again.
+ * Onboarding by doing, not by telling.
+ *
+ * The previous version asked for a name on a form and described the gesture
+ * in words. Two problems: the name was never displayed anywhere in the app,
+ * so it was data collected for nothing at the most sensitive moment; and
+ * reading about a gesture teaches nobody. A carousel of marketing slides
+ * would be worse — every slide is a screen between a person and their first
+ * verse.
+ *
+ * So: pull the card. That is the whole app, learned in four seconds, and it
+ * pays out immediately. Then one screen that earns its place — the morning
+ * reminder, which is the only thing that brings anyone back tomorrow.
  */
 @Composable
-fun OnboardingScreen(onDone: (String) -> Unit) {
-    var name by remember { mutableStateOf("") }
+fun OnboardingScreen(onDone: (Boolean, Int) -> Unit) {
+    var step by remember { mutableIntStateOf(0) }
+    when (step) {
+        0 -> PullToLearn { step = 1 }
+        else -> ReminderStep(onDone)
+    }
+}
+
+/* ─────────────────────── 1. the gesture itself ─────────────────────── */
+
+@Composable
+private fun PullToLearn(onPulled: () -> Unit) {
+    val view = LocalView.current
+    val density = LocalDensity.current
+    val card = remember { DailyVerses.first() }
+
+    var dragY by remember { mutableFloatStateOf(0f) }
+    var revealed by remember { mutableStateOf(false) }
+    val maxPull = with(density) { 300.dp.toPx() }
+    val threshold = maxPull * .34f
+    val progress by animateFloatAsState(
+        if (revealed) 1f else (dragY / maxPull).coerceIn(0f, 1f),
+        spring(dampingRatio = .72f, stiffness = Spring.StiffnessMediumLow),
+        label = "onboard-pull",
+    )
+
+    Box(Modifier.fillMaxSize().background(Canvas)) {
+        Box(
+            Modifier.fillMaxSize().padding(horizontal = 14.dp)
+                // the card has to clear the reveal copy AND the button, or
+                // it lands on top of them
+                .padding(top = 60.dp, bottom = if (revealed) 250.dp else 150.dp)
+                .offset { IntOffset(0, (dragY.coerceAtLeast(0f) * .16f).roundToInt()) }
+                .clip(R.card)
+                .pointerInput(revealed) {
+                    if (revealed) return@pointerInput
+                    detectDragGestures(
+                        onDragEnd = {
+                            if (dragY >= threshold) {
+                                revealed = true
+                                view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                            } else dragY = 0f
+                        },
+                    ) { change, amount ->
+                        change.consume()
+                        dragY = (dragY + amount.y).coerceIn(0f, maxPull)
+                    }
+                },
+        ) {
+            if (progress > .5f || revealed) {
+                WorldVerseFace(
+                    reference = card.reference,
+                    text = card.verse,
+                    translation = card.translation,
+                    front = true,
+                    reduceMotion = false,
+                    bottomPadding = 40.dp,
+                )
+            } else {
+                CardBackFace()
+            }
+        }
+
+        Column(
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+                .padding(horizontal = 30.dp).padding(bottom = 44.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            AnimatedVisibility(!revealed) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Outlined.KeyboardArrowDown, null, tint = Gold, modifier = Modifier.size(26.dp))
+                    Spacer(Modifier.height(6.dp))
+                    Text("Pull it down", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                }
+            }
+            AnimatedVisibility(revealed, enter = fadeIn()) {
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        "That is the whole app.",
+                        fontFamily = FontFamily.Serif, fontSize = 22.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(Modifier.height(20.dp))
+                    com.prayerkey.manna.ui.components.PkButton(
+                        label = "Continue",
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = onPulled,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CardBackFace() {
+    Box(Modifier.fillMaxSize().background(NightFill), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("⚿", color = Gold, fontSize = 40.sp)
+            Spacer(Modifier.height(14.dp))
+            Text("MANNA", color = Ivory, fontSize = 13.sp, letterSpacing = 5.sp, fontWeight = FontWeight.Medium)
+        }
+    }
+}
+
+/* ───────────── 2. the only thing that brings anyone back ───────────── */
+
+@Composable
+private fun ReminderStep(onDone: (Boolean, Int) -> Unit) {
+    var hour by remember { mutableIntStateOf(7) }
 
     Column(
-        Modifier.fillMaxSize().background(Canvas).padding(horizontal = 28.dp),
+        Modifier.fillMaxSize().background(Canvas).padding(horizontal = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(Modifier.weight(.7f))
+        Spacer(Modifier.weight(1f))
 
-        /* the card, in miniature — the object the whole app revolves around */
-        Box(
-            Modifier.fillMaxWidth(.62f).height(240.dp)
-                .shadow(26.dp, RoundedCornerShape(24.dp), spotColor = Night.copy(alpha = .4f))
-                .clip(RoundedCornerShape(24.dp)).background(NightGloss),
-            contentAlignment = Alignment.Center,
-        ) {
-            Box(Modifier.fillMaxSize().background(TopSheen))
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("⚿", color = Gold, fontSize = 38.sp)
-                Spacer(Modifier.height(12.dp))
-                Text("MANNA", color = Color.White, fontSize = 13.sp, letterSpacing = 4.sp, fontWeight = FontWeight.Medium)
-                Text("FRESH EVERY MORNING", color = Gold, fontSize = 8.sp, letterSpacing = 1.6.sp, modifier = Modifier.padding(top = 7.dp))
-            }
-            Icon(
-                Icons.Outlined.KeyboardArrowDown, null, tint = Gold,
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 12.dp).size(22.dp),
-            )
-        }
-
-        Spacer(Modifier.height(34.dp))
+        Text("⚿", color = Gold, fontSize = 34.sp)
+        Spacer(Modifier.height(26.dp))
         Text(
-            "Pull your word\ndown from above.",
+            "One word,\nevery morning.",
             fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
-            fontSize = 30.sp, lineHeight = 37.sp, textAlign = TextAlign.Center, color = Ink,
+            fontSize = 30.sp, lineHeight = 38.sp, textAlign = TextAlign.Center,
         )
 
-        Spacer(Modifier.weight(.5f))
+        Spacer(Modifier.height(36.dp))
 
-        OutlinedTextField(
-            value = name, onValueChange = { name = it },
+        // a row of hours rather than a picker dialog: one tap, no modal
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            listOf(5, 6, 7, 8, 9).forEach { h ->
+                val on = h == hour
+                Box(
+                    Modifier.size(54.dp).clip(R.pill)
+                        .background(
+                            if (on) NightFill
+                            else Brush.verticalGradient(listOf(Color(0xFFF0F0F3), Color(0xFFF0F0F3))),
+                        )
+                        .clickable { hour = h },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        "$h",
+                        color = if (on) Ivory else Muted,
+                        fontWeight = FontWeight.SemiBold, fontSize = 16.sp,
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        Text("AM", color = Muted, fontSize = 11.sp, letterSpacing = 2.sp)
+
+        Spacer(Modifier.weight(1f))
+
+        com.prayerkey.manna.ui.components.PkButton(
+            label = "Wake me at $hour AM",
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("What should we call you?", fontSize = 15.sp, color = Muted) },
-            singleLine = true, shape = RoundedCornerShape(17.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Gold, unfocusedBorderColor = Color.Transparent,
-                focusedContainerColor = AppleGray, unfocusedContainerColor = AppleGray,
-            ),
+        ) { onDone(true, hour) }
+
+        Text(
+            "Not now",
+            color = Muted, fontSize = 13.sp,
+            modifier = Modifier.padding(top = 18.dp, bottom = 38.dp)
+                .clickable { onDone(false, hour) },
         )
-
-        val ready = name.isNotBlank()
-        Box(
-            Modifier.fillMaxWidth().padding(top = 12.dp).height(56.dp)
-                .shadow(if (ready) 14.dp else 0.dp, RoundedCornerShape(17.dp), spotColor = Night.copy(alpha = .4f))
-                .clip(RoundedCornerShape(17.dp))
-                .background(if (ready) NightGloss else androidx.compose.ui.graphics.SolidColor(Color(0xFFD9D9DE)))
-                .border(0.5.dp, Color.White.copy(alpha = .3f), RoundedCornerShape(17.dp))
-                .clickable(enabled = ready) { onDone(name.trim()) },
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                "Receive my first word",
-                color = if (ready) Gold else Color.White,
-                fontWeight = FontWeight.SemiBold, fontSize = 15.sp,
-            )
-        }
-
-        Row(
-            Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 26.dp),
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            Text("Free forever · No account · Works offline", color = Muted, fontSize = 11.sp)
-        }
     }
 }

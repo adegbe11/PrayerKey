@@ -113,7 +113,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _preferences.value = prefs
         io { store.savePreferences(prefs) }
     }
-    fun startSermon(): Long = safe(0L) { store.startSermon() }
 
     /** Church mode: the arranged Sunday note, saved for good. */
     fun saveSermonNote(note: com.prayerkey.manna.ui.church.SermonArranger.Note, minutes: Int) = io {
@@ -143,8 +142,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteSermonNote(id: Long) = io {
         store.deleteSermonNote(id); _sermonNotes.value = store.sermonNotes()
     }
-    fun addSermonVerse(sessionId: Long, reference: String, text: String) = io { store.addSermonVerse(sessionId, reference, text); _sermons.value = store.sermons() }
-    fun endSermon(sessionId: Long) = io { store.endSermon(sessionId); _sermons.value = store.sermons() }
     private fun refreshEntries() {
         _entries.value = store.journalEntries()
         _journalStreak.value = store.journalStreak()
