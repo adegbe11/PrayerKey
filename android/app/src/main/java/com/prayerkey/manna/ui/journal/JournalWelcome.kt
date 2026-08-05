@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import java.time.LocalDate
+import com.prayerkey.manna.ui.theme.BookSerif
 
 /**
  * The first thing you see in an empty Journal.
@@ -114,7 +115,7 @@ fun JournalWelcome(onOpen: () -> Unit, modifier: Modifier = Modifier) {
                     Text(
                         "“",
                         color = scheme.primary,
-                        fontFamily = FontFamily.Serif, fontSize = 34.sp,
+                        fontFamily = BookSerif, fontSize = 34.sp,
                     )
                     Spacer(Modifier.height(4.dp))
                     StreamedVerse(line.text, scheme.onBackground, scheme.primary) { written = true }
@@ -188,7 +189,7 @@ private fun StreamedVerse(text: String, ink: Color, accent: Color, onDone: () ->
                 if (i != words.lastIndex) append(" ")
             }
         },
-        fontFamily = FontFamily.Serif,
+        fontFamily = BookSerif,
         fontSize = 24.sp, lineHeight = 34.sp,
         letterSpacing = (-0.3).sp,
         textAlign = TextAlign.Center,

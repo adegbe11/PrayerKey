@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.APP_THEMES
 import com.prayerkey.manna.data.AppTheme
 import kotlin.math.absoluteValue
+import com.prayerkey.manna.ui.theme.BookSerif
 
 /**
  * Twelve themes, chosen at the end of onboarding.
@@ -84,7 +85,7 @@ fun ThemePicker(
 
             Text(
                 "Choose your theme",
-                color = ink, fontFamily = FontFamily.Serif,
+                color = ink, fontFamily = BookSerif,
                 fontSize = 27.sp, letterSpacing = (-0.4).sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),

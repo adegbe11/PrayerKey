@@ -53,6 +53,7 @@ import com.prayerkey.manna.ui.theme.NightFill
 import com.prayerkey.manna.ui.theme.R
 import com.prayerkey.manna.ui.worlds.WorldVerseFace
 import kotlin.math.roundToInt
+import com.prayerkey.manna.ui.theme.BookSerif
 
 private val Ivory = Color(0xFFF6F0E1)
 
@@ -169,7 +170,7 @@ private fun PullToLearn(onPulled: () -> Unit) {
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         "That is the whole app.",
-                        fontFamily = FontFamily.Serif, fontSize = 22.sp,
+                        fontFamily = BookSerif, fontSize = 22.sp,
                         textAlign = TextAlign.Center,
                     )
                     Spacer(Modifier.height(20.dp))
@@ -211,7 +212,7 @@ private fun ReminderStep(onDone: (Boolean, Int) -> Unit) {
         Spacer(Modifier.height(26.dp))
         Text(
             "One word,\nevery morning.",
-            fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
+            fontFamily = BookSerif, fontWeight = FontWeight.Bold,
             fontSize = 30.sp, lineHeight = 38.sp, textAlign = TextAlign.Center,
         )
 

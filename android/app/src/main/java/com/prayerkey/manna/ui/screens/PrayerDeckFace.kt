@@ -29,6 +29,7 @@ import com.prayerkey.manna.data.PrayerTopic
 import com.prayerkey.manna.ui.theme.R
 import com.prayerkey.manna.ui.worlds.VerseWorld
 import com.prayerkey.manna.ui.worlds.WorldScene
+import com.prayerkey.manna.ui.theme.BookSerif
 
 private val Ivory = Color(0xFFF6F0E1)
 private val Gilt = Color(0xFFC9A24B)
@@ -94,7 +95,7 @@ fun PrayerDeckFace(
             Text(
                 topic.title,
                 color = Ivory,
-                fontFamily = FontFamily.Serif,
+                fontFamily = BookSerif,
                 fontSize = if (topic.title.length > 34) 27.sp else 32.sp,
                 lineHeight = if (topic.title.length > 34) 35.sp else 40.sp,
                 letterSpacing = (-0.3).sp,

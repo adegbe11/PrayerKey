@@ -109,7 +109,7 @@ fun JournalScreen(
         Box(Modifier.fillMaxSize().background(dayWash()), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
                 JournalMark()
-                Text("Your Journal is private", fontFamily = FontFamily.Serif, fontSize = 24.sp, modifier = Modifier.padding(top = 18.dp))
+                Text("Your Journal is private", fontFamily = BookSerif, fontSize = 24.sp, modifier = Modifier.padding(top = 18.dp))
                 Text("Unlock with your device security to read or write entries.", color = Muted, fontSize = 12.5.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 7.dp))
                 Button(onClick = {
                     val manager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
@@ -158,7 +158,7 @@ fun JournalScreen(
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (tab != JournalTab.Journey) IconButton(onClick = { tab = JournalTab.Journey }) { Icon(Icons.Outlined.ArrowBack, "Back to journal") }
                 Column(Modifier.weight(1f)) {
-                    Text(when (tab) { JournalTab.Journey -> "Journal"; JournalTab.Practices -> "Practices"; JournalTab.Saved -> "Saved words"; JournalTab.Answered -> "Answered prayers" }, fontFamily = FontFamily.Serif, fontSize = 32.sp, color = headerInk)
+                    Text(when (tab) { JournalTab.Journey -> "Journal"; JournalTab.Practices -> "Practices"; JournalTab.Saved -> "Saved words"; JournalTab.Answered -> "Answered prayers" }, fontFamily = BookSerif, fontSize = 32.sp, color = headerInk)
                 }
                 if (tab == JournalTab.Journey) Box {
                     IconButton(onClick = { libraryOpen = true }) { Icon(Icons.Outlined.MoreHoriz, "Open journal library", tint = headerMuted) }
@@ -433,7 +433,7 @@ private fun JournalMemories(
             Surface(onClick = { onEdit(memory) }, shape = R.card, color = Night, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp)) {
                     Text("ON THIS DAY", color = Gold, fontSize = 9.sp, letterSpacing = 1.8.sp, fontWeight = FontWeight.Bold)
-                    Text(memory.title.ifBlank { "A page from your story" }, color = Color.White, fontFamily = FontFamily.Serif, fontSize = 21.sp, modifier = Modifier.padding(top = 8.dp))
+                    Text(memory.title.ifBlank { "A page from your story" }, color = Color.White, fontFamily = BookSerif, fontSize = 21.sp, modifier = Modifier.padding(top = 8.dp))
                     Text(if (conceal) "Private entry · Tap to open" else memory.body, color = Color.White.copy(alpha = .72f), fontSize = 12.5.sp, lineHeight = 19.sp, maxLines = 3, modifier = Modifier.padding(top = 7.dp))
                 }
             }
@@ -462,7 +462,7 @@ private fun JournalCalendar(entries: List<JournalEntry>, conceal: Boolean, onEdi
     Column(Modifier.fillMaxSize().padding(top = 12.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { month = month.minusMonths(1) }) { Icon(Icons.Outlined.ChevronLeft, "Previous month") }
-            Text("${month.month.name.lowercase().replaceFirstChar(Char::uppercase)} ${month.year}", fontFamily = FontFamily.Serif, fontSize = 19.sp, textAlign = TextAlign.Center, modifier = Modifier.weight(1f))
+            Text("${month.month.name.lowercase().replaceFirstChar(Char::uppercase)} ${month.year}", fontFamily = BookSerif, fontSize = 19.sp, textAlign = TextAlign.Center, modifier = Modifier.weight(1f))
             IconButton(onClick = { month = month.plusMonths(1) }) { Icon(Icons.Outlined.ChevronRight, "Next month") }
         }
         Row(Modifier.fillMaxWidth()) { listOf("M","T","W","T","F","S","S").forEach { Text(it, color = Muted, fontSize = 10.sp, textAlign = TextAlign.Center, modifier = Modifier.weight(1f).padding(vertical = 7.dp)) } }
@@ -488,7 +488,7 @@ private fun JourneyInsightCard(insight: JourneyInsight) {
     ) {
         Column(Modifier.fillMaxWidth().padding(18.dp)) {
             Text(insight.eyebrow, color = Gold, fontSize = 9.sp, letterSpacing = 1.7.sp, fontWeight = FontWeight.Bold)
-            Text(insight.title, color = Color.White, fontFamily = FontFamily.Serif, fontSize = 21.sp, modifier = Modifier.padding(top = 7.dp))
+            Text(insight.title, color = Color.White, fontFamily = BookSerif, fontSize = 21.sp, modifier = Modifier.padding(top = 7.dp))
             Text(insight.body, color = Color(0xFFD8D5CC), fontSize = 12.5.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 8.dp))
             Surface(
                 shape = RoundedCornerShape(12.dp), color = Color.White.copy(alpha = .08f),
@@ -564,10 +564,10 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
                 }
                 if (entry.favorite) Text("★", color = Gold, fontSize = 20.sp)
             }
-            Text(entry.title.ifBlank { MOODS.firstOrNull { it.first == entry.mood }?.second ?: "Journal entry" }, fontFamily = FontFamily.Serif, fontSize = 28.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 18.dp))
-            Text(entry.body, fontFamily = FontFamily.Serif, fontSize = 17.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 16.dp))
+            Text(entry.title.ifBlank { MOODS.firstOrNull { it.first == entry.mood }?.second ?: "Journal entry" }, fontFamily = BookSerif, fontSize = 28.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 18.dp))
+            Text(entry.body, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 16.dp))
             if (entry.gratitude.isNotBlank()) Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFEAF5EC), modifier = Modifier.fillMaxWidth().padding(top = 18.dp)) { Text("Grateful for · ${entry.gratitude}", color = Color(0xFF257345), fontSize = 13.sp, modifier = Modifier.padding(14.dp)) }
-            entry.verseRef?.let { ref -> Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFF4EDDC), modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) { Column(Modifier.padding(14.dp)) { Text(ref, color = Gold, fontWeight = FontWeight.Bold); entry.verseText?.let { Text(it, fontFamily = FontFamily.Serif, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 6.dp)) } } } }
+            entry.verseRef?.let { ref -> Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFF4EDDC), modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) { Column(Modifier.padding(14.dp)) { Text(ref, color = Gold, fontWeight = FontWeight.Bold); entry.verseText?.let { Text(it, fontFamily = BookSerif, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 6.dp)) } } } }
             if (entry.media.isNotEmpty()) {
                 Text("ATTACHMENTS", color = Muted, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 20.dp, bottom = 7.dp))
                 entry.media.forEachIndexed { index, value ->
@@ -589,8 +589,8 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
     }
     if (showReflection) AlertDialog(
         onDismissRequest = { showReflection = false },
-        title = { Text("Reflect deeper", fontFamily = FontFamily.Serif) },
-        text = { Column { Text("ON-DEVICE REFLECTION", color = Gold, fontSize = 9.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold); Text(reflection.suggestedTitle, fontFamily = FontFamily.Serif, fontSize = 20.sp, modifier = Modifier.padding(top = 7.dp)); Text(reflection.highlight, color = Muted, fontSize = 12.5.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 8.dp)); reflection.questions.forEach { Text("•  $it", fontSize = 13.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 10.dp)) }; Text("Generated only from this entry on your device—not divine guidance.", color = Muted, fontSize = 9.5.sp, modifier = Modifier.padding(top = 14.dp)) } },
+        title = { Text("Reflect deeper", fontFamily = BookSerif) },
+        text = { Column { Text("ON-DEVICE REFLECTION", color = Gold, fontSize = 9.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold); Text(reflection.suggestedTitle, fontFamily = BookSerif, fontSize = 20.sp, modifier = Modifier.padding(top = 7.dp)); Text(reflection.highlight, color = Muted, fontSize = 12.5.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 8.dp)); reflection.questions.forEach { Text("•  $it", fontSize = 13.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 10.dp)) }; Text("Generated only from this entry on your device—not divine guidance.", color = Muted, fontSize = 9.5.sp, modifier = Modifier.padding(top = 14.dp)) } },
         confirmButton = { TextButton(onClick = { showReflection = false }) { Text("Done") } },
     )
 }
@@ -673,8 +673,8 @@ private fun EntryCard(entry: JournalEntry, conceal: Boolean = false, onAnswer: (
                     color = Muted, fontSize = 10.sp,
                 )
             }
-            if (entry.title.isNotBlank() && !conceal) Text(entry.title, fontFamily = FontFamily.Serif, fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 10.dp))
-            Text(if (conceal) "Private entry · Tap to open" else entry.body, color = if (conceal) Muted else Ink, fontFamily = FontFamily.Serif, fontSize = 15.5.sp, lineHeight = 23.sp, maxLines = 5, modifier = Modifier.padding(top = 10.dp))
+            if (entry.title.isNotBlank() && !conceal) Text(entry.title, fontFamily = BookSerif, fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 10.dp))
+            Text(if (conceal) "Private entry · Tap to open" else entry.body, color = if (conceal) Muted else Ink, fontFamily = BookSerif, fontSize = 15.5.sp, lineHeight = 23.sp, maxLines = 5, modifier = Modifier.padding(top = 10.dp))
             if (entry.media.isNotEmpty()) {
                 Surface(shape = RoundedCornerShape(12.dp), color = Night.copy(alpha = .06f), modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) {
                     Text("▣  ${entry.media.size} ${if (entry.media.size == 1) "memory" else "memories"} attached", color = InkSoft, fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(11.dp))
@@ -703,7 +703,7 @@ private fun EntryCard(entry: JournalEntry, conceal: Boolean = false, onAnswer: (
                     Column(Modifier.padding(12.dp)) {
                         Text("✦ GOD ANSWERED", color = Gold, fontSize = 9.5.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold)
                         entry.testimony?.let {
-                            Text(it, fontFamily = FontFamily.Serif, fontSize = 13.5.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 5.dp))
+                            Text(it, fontFamily = BookSerif, fontSize = 13.5.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 5.dp))
                         }
                     }
                 }
@@ -827,7 +827,7 @@ private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, on
             Surface(shape = RoundedCornerShape(22.dp), color = Color(0xFFF1F8F3), border = BorderStroke(1.dp, Hairline)) {
                 Column(Modifier.fillMaxWidth().padding(18.dp)) {
                     Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
-                    Text(word.verse, fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
+                    Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
                     word.testimony?.let { Text("“$it”", color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
                 }
             }
@@ -848,7 +848,7 @@ private fun WordList(words: List<SavedWord>, canAnswer: Boolean, onAnswer: (Save
             Surface(shape = RoundedCornerShape(22.dp), color = if (word.answeredAt == null) Ivory else Color(0xFFF1F8F3), border = BorderStroke(1.dp, Hairline)) {
                 Column(Modifier.fillMaxWidth().padding(18.dp)) {
                     Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
-                    Text(word.verse, fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
+                    Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
                     word.testimony?.let { Text("“$it”", color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
                     Text(DateFormat.getDateInstance().format(Date(word.answeredAt ?: word.savedAt)), color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
                     if (canAnswer) TextButton(onClick = { onAnswer(word) }, modifier = Modifier.align(Alignment.End)) { Text("Mark answered") }

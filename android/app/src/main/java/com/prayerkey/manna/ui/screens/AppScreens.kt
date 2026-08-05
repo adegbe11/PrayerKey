@@ -146,7 +146,7 @@ fun BibleScreen(
         if (showMemory) {
             Column(Modifier.fillMaxSize().padding(horizontal = 14.dp).padding(top = 60.dp)) {
                 Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text("Memorize", fontFamily = FontFamily.Serif, fontSize = 24.sp, modifier = Modifier.weight(1f))
+                    Text("Memorize", fontFamily = BookSerif, fontSize = 24.sp, modifier = Modifier.weight(1f))
                     FloatChip(onClick = { showMemory = false }) {
                         Icon(Icons.Outlined.Close, "Back to verses", tint = Ink, modifier = Modifier.size(19.dp))
                     }
@@ -206,7 +206,7 @@ fun BibleScreen(
     if (pickerOpen) {
         ModalBottomSheet(onDismissRequest = { pickerOpen = false }, containerColor = Canvas) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 40.dp)) {
-                Text("Choose your Bible", fontFamily = FontFamily.Serif, fontSize = 28.sp)
+                Text("Choose your Bible", fontFamily = BookSerif, fontSize = 28.sp)
                 Text("14 versions. All free, forever.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 3.dp, bottom = 16.dp))
                 LazyColumn(Modifier.heightIn(max = 560.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                     items(BIBLE_VERSIONS, key = { it.id }) { item ->
@@ -263,13 +263,13 @@ fun BibleScreen(
     if (chapterTitle.isNotBlank()) {
         ModalBottomSheet(onDismissRequest = { chapterTitle = ""; chapterVerses = emptyList() }, containerColor = Canvas) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 36.dp)) {
-                Text(chapterTitle, fontFamily = FontFamily.Serif, fontSize = 30.sp)
+                Text(chapterTitle, fontFamily = BookSerif, fontSize = 30.sp)
                 Text("King James Version · available offline", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp, bottom = 18.dp))
                 LazyColumn(Modifier.heightIn(max = 620.dp)) {
                     items(chapterVerses, key = { it.reference }) { item ->
                         Row(Modifier.fillMaxWidth().clickable { chapterTitle = ""; selectedVerse = RemoteVerse(item.reference, item.text, "KJV") }.padding(vertical = 8.dp)) {
                             Text(item.verse.toString(), color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.width(34.dp))
-                            Text(item.text, fontFamily = FontFamily.Serif, fontSize = 19.sp, lineHeight = 27.sp)
+                            Text(item.text, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 27.sp)
                         }
                     }
                 }
@@ -328,9 +328,9 @@ private fun VerseDetail(
     var studyQuestion by remember { mutableStateOf("") }
     var studyAnswer by remember { mutableStateOf<com.prayerkey.manna.data.StudyAnswer?>(null) }
     Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 36.dp)) {
-        Text(reference, fontFamily = FontFamily.Serif, fontSize = 30.sp)
+        Text(reference, fontFamily = BookSerif, fontSize = 30.sp)
         Text("$versionName ($versionId)", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 3.dp))
-        Text(text, fontFamily = FontFamily.Serif, fontSize = 28.sp, lineHeight = 38.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 34.dp))
+        Text(text, fontFamily = BookSerif, fontSize = 28.sp, lineHeight = 38.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 34.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             Button(onClick = onSave, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" Save") }
             OutlinedButton(onClick = onMemorize, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.School, null); Text(" Memorize") }
@@ -357,7 +357,7 @@ private fun VerseDetail(
     }
     if (showStudy) AlertDialog(
         onDismissRequest = { showStudy = false },
-        title = { Text("Study lens", fontFamily = FontFamily.Serif) },
+        title = { Text("Study lens", fontFamily = BookSerif) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 com.prayerkey.manna.data.StudyLens.notes(reference, text).forEach { note ->
@@ -413,7 +413,7 @@ private fun MemoryTrainer(
                 Text("${memories.count { it.stage >= 5 }} rooted · ${memories.size} total", color = Color.White.copy(.55f), fontSize = 11.sp)
             }
             Text("MEMORIZE · LEVEL ${memory.stage}", color = Gold, fontSize = 11.sp, letterSpacing = 1.4.sp)
-            Text(masked, color = Color.White, fontFamily = FontFamily.Serif, fontSize = 25.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 30.dp))
+            Text(masked, color = Color.White, fontFamily = BookSerif, fontSize = 25.sp, lineHeight = 34.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(vertical = 30.dp))
             Text(memory.reference, color = Color.White.copy(.65f))
             OutlinedButton(
                 onClick = { onReview(memory.reference, false) },
@@ -599,7 +599,7 @@ fun PrayerScreen(
                title said it again, twice on one screen. */
             Text(
                 if (generated == null) "Pray" else "Your prayer",
-                color = cs.onBackground, fontFamily = FontFamily.Serif, fontSize = 32.sp,
+                color = cs.onBackground, fontFamily = BookSerif, fontSize = 32.sp,
             )
             ModeChips(deckMode) { deckMode = it }
 
@@ -620,7 +620,7 @@ fun PrayerScreen(
                 Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text("✦ PRAYER OF THE DAY", color = Gold, fontSize = 10.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
-                        Text(potd.title, color = Color.White, fontFamily = FontFamily.Serif, fontSize = 19.sp, modifier = Modifier.padding(top = 4.dp))
+                        Text(potd.title, color = Color.White, fontFamily = BookSerif, fontSize = 19.sp, modifier = Modifier.padding(top = 4.dp))
                         Text(potd.ref, color = Color.White.copy(.6f), fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                     }
                     Text("Read", color = Gold, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
@@ -644,12 +644,12 @@ fun PrayerScreen(
                         Text(
                             "Pour your heart out here...",
                             fontSize = 17.sp, color = cs.onBackground.copy(alpha = .42f),
-                            fontFamily = FontFamily.Serif,
+                            fontFamily = BookSerif,
                         )
                     },
                     textStyle = androidx.compose.ui.text.TextStyle(
                         fontSize = 17.sp, lineHeight = 27.sp, color = cs.onBackground,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = BookSerif,
                     ),
                     minLines = 3,
                     maxLines = 10,
@@ -791,14 +791,14 @@ fun PrayerScreen(
                     )
                     journal.take(2).forEach { entry ->
                         Box(Modifier.fillMaxWidth().padding(bottom = 8.dp).premiumCard(fill = PaperFill, lift = false)) {
-                            Column(Modifier.padding(15.dp)) { Text(entry.title, fontFamily = FontFamily.Serif, fontSize = 17.sp); Text(entry.scriptureRef.orEmpty(), color = Gold, fontSize = 11.sp) }
+                            Column(Modifier.padding(15.dp)) { Text(entry.title, fontFamily = BookSerif, fontSize = 17.sp); Text(entry.scriptureRef.orEmpty(), color = Gold, fontSize = 11.sp) }
                         }
                     }
                 }
             } else {
                 Box(Modifier.fillMaxWidth().premiumCard(fill = PaperFill)) {
                     Column(Modifier.padding(24.dp)) {
-                        Text(generated!!.title, fontFamily = FontFamily.Serif, fontSize = 25.sp)
+                        Text(generated!!.title, fontFamily = BookSerif, fontSize = 25.sp)
                         Text("Prayed over your words", color = Electric, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp, bottom = 20.dp))
                         Text(generated!!.prayer, lineHeight = 24.sp)
                         generated!!.verses.firstOrNull()?.let { Text(it.first, color = Gold, modifier = Modifier.padding(top = 20.dp)) }
@@ -823,10 +823,10 @@ fun PrayerScreen(
             LazyColumn(Modifier.fillMaxWidth().padding(horizontal = 24.dp), contentPadding = PaddingValues(bottom = 44.dp)) {
                 item {
                     Text("✦ PRAYER OF THE DAY ✦", color = Gold, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.SemiBold)
-                    Text(potd.title, fontFamily = FontFamily.Serif, fontSize = 28.sp, modifier = Modifier.padding(top = 6.dp))
+                    Text(potd.title, fontFamily = BookSerif, fontSize = 28.sp, modifier = Modifier.padding(top = 6.dp))
                     Text(potd.ref, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.padding(top = 3.dp))
                     Surface(shape = RoundedCornerShape(14.dp), color = Ivory, modifier = Modifier.fillMaxWidth().padding(top = 14.dp)) {
-                        Text("“${potd.verse}”", fontFamily = FontFamily.Serif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(16.dp))
+                        Text("“${potd.verse}”", fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(16.dp))
                     }
                     potd.prayer.split("\n\n").forEach { para ->
                         Text(para, fontSize = 15.sp, lineHeight = 24.sp, color = Ink, modifier = Modifier.padding(top = 14.dp))
@@ -911,7 +911,7 @@ fun PrayerScreen(
                 Spacer(Modifier.height(12.dp))
                 Text(
                     topic.title,
-                    fontFamily = FontFamily.Serif, fontSize = 30.sp, lineHeight = 38.sp,
+                    fontFamily = BookSerif, fontSize = 30.sp, lineHeight = 38.sp,
                     letterSpacing = (-0.4).sp, textAlign = TextAlign.Center, color = InkSoft,
                 )
                 Spacer(Modifier.height(18.dp))
@@ -944,7 +944,7 @@ fun PrayerScreen(
                                 )
                                 Spacer(Modifier.height(8.dp))
                                 Text(
-                                    text, fontFamily = FontFamily.Serif,
+                                    text, fontFamily = BookSerif,
                                     fontSize = 16.sp, lineHeight = 25.sp, color = InkSoft,
                                 )
                             }
@@ -1075,7 +1075,7 @@ private fun SavedCard(word: SavedWord, canAnswer: Boolean, onAnswer: () -> Unit)
     Surface(shape = RoundedCornerShape(22.dp), color = if (word.answeredAt == null) Ivory else Color(0xFFF1F8F3), border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
         Column(Modifier.fillMaxWidth().padding(18.dp)) {
             Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
-            Text(word.verse, fontFamily = FontFamily.Serif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
+            Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
             word.testimony?.let { Text("“$it”", color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
             Text(DateFormat.getDateInstance().format(Date(word.answeredAt ?: word.savedAt)), color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
             if (canAnswer) TextButton(onClick = onAnswer, modifier = Modifier.align(Alignment.End)) { Text("Mark answered") }
@@ -1087,7 +1087,7 @@ private fun SavedCard(word: SavedWord, canAnswer: Boolean, onAnswer: () -> Unit)
 private fun EmptySaved(answered: Boolean) {
     Column(Modifier.fillMaxWidth().padding(top = 60.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(if (answered) Icons.Outlined.FavoriteBorder else Icons.Outlined.BookmarkBorder, null, tint = Gold, modifier = Modifier.size(44.dp))
-        Text(if (answered) "Your proof pile begins here" else "Push a card up to keep it", fontFamily = FontFamily.Serif, fontSize = 22.sp, modifier = Modifier.padding(top = 16.dp))
+        Text(if (answered) "Your proof pile begins here" else "Push a card up to keep it", fontFamily = BookSerif, fontSize = 22.sp, modifier = Modifier.padding(top = 16.dp))
     }
 }
 
@@ -1116,12 +1116,12 @@ fun ProfileScreen(
     Column(Modifier.fillMaxSize().background(Canvas).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp).padding(top = 20.dp, bottom = 42.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, "Back") }
-            Column { Text("You", fontFamily = FontFamily.Serif, fontSize = 32.sp); Text("Your quiet rhythm with God.", color = Muted, fontSize = 13.sp) }
+            Column { Text("You", fontFamily = BookSerif, fontSize = 32.sp); Text("Your quiet rhythm with God.", color = Muted, fontSize = 13.sp) }
         }
         OutlinedTextField(prefs.name, { onUpdate(prefs.copy(name = it)) }, label = { Text("Your name") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 16.dp), shape = RoundedCornerShape(16.dp))
         Surface(Modifier.fillMaxWidth().padding(vertical = 18.dp), color = Night, shape = RoundedCornerShape(26.dp)) {
             Row(Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { Text(streak.toString(), color = Color.White, fontFamily = FontFamily.Serif, fontSize = 48.sp); Text("day streak", color = Color.White.copy(.7f)) }
+                Column(Modifier.weight(1f)) { Text(streak.toString(), color = Color.White, fontFamily = BookSerif, fontSize = 48.sp); Text("day streak", color = Color.White.copy(.7f)) }
                 Column(horizontalAlignment = Alignment.End) { Text(savedCount.toString(), color = Gold, fontSize = 30.sp); Text("words saved", color = Color.White.copy(.7f)) }
             }
         }
@@ -1192,7 +1192,7 @@ private fun SettingRow(label: String, value: String, onClick: () -> Unit = {}, a
 @Composable
 private fun ScreenFrame(title: String, subtitle: String, content: @Composable ColumnScope.() -> Unit) {
     Column(Modifier.fillMaxSize().background(Canvas).padding(horizontal = 22.dp).padding(top = 24.dp)) {
-        Text(title, fontFamily = FontFamily.Serif, fontSize = 32.sp)
+        Text(title, fontFamily = BookSerif, fontSize = 32.sp)
         Text(subtitle, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
         content()
     }

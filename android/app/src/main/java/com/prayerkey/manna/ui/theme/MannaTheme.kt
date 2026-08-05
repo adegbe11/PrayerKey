@@ -39,7 +39,7 @@ private val Trim = LineHeightStyle(
 )
 
 private fun display(size: Int, line: Int, tracking: Double) = TextStyle(
-    fontFamily = FontFamily.Serif,
+    fontFamily = BookSerif,
     fontWeight = FontWeight.Medium,
     fontSize = size.sp,
     lineHeight = line.sp,

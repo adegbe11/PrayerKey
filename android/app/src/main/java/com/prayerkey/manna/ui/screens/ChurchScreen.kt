@@ -217,7 +217,7 @@ private fun ReadyView(
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 "Church", color = cs.onBackground,
-                fontFamily = FontFamily.Serif, fontSize = 32.sp,
+                fontFamily = BookSerif, fontSize = 32.sp,
                 modifier = Modifier.weight(1f),
             )
             Row(
@@ -290,7 +290,7 @@ private fun ReadyView(
                         )
                         if (note.takeaway.isNotBlank()) Text(
                             note.takeaway, color = Ink, fontSize = 13.sp, maxLines = 2,
-                            fontFamily = FontFamily.Serif, modifier = Modifier.padding(top = 8.dp),
+                            fontFamily = BookSerif, modifier = Modifier.padding(top = 8.dp),
                         )
                     }
                 }
@@ -318,7 +318,7 @@ private fun ListeningView(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState())
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 120.dp),
     ) {
-        Text("Listening", fontFamily = FontFamily.Serif, fontSize = 32.sp)
+        Text("Listening", fontFamily = BookSerif, fontSize = 32.sp)
 
         Column(Modifier.fillMaxWidth().padding(top = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
@@ -389,7 +389,7 @@ private fun NoteView(
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 130.dp),
     ) {
         Text("SUNDAY NOTES · WRITTEN FOR YOU", color = Gold, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
-        Text(note.title, fontFamily = FontFamily.Serif, fontSize = 33.sp, lineHeight = 38.sp, modifier = Modifier.padding(top = 8.dp))
+        Text(note.title, fontFamily = BookSerif, fontSize = 33.sp, lineHeight = 38.sp, modifier = Modifier.padding(top = 8.dp))
         Text(
             "${todayLabel()} · $minutes min · ${note.scriptures.size} scriptures caught",
             color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp),
@@ -416,7 +416,7 @@ private fun NoteView(
                 Row(Modifier.padding(bottom = 16.dp)) {
                     Box(Modifier.width(3.dp).height(52.dp).background(Gold))
                     Text(
-                        "“$quote”", fontFamily = FontFamily.Serif, fontSize = 19.sp,
+                        "“$quote”", fontFamily = BookSerif, fontSize = 19.sp,
                         lineHeight = 27.sp, modifier = Modifier.padding(start = 16.dp),
                     )
                 }
@@ -427,7 +427,7 @@ private fun NoteView(
             SectionLabel("CARRY THIS INTO YOUR WEEK")
             Box(Modifier.fillMaxWidth().premiumCard(fill = NightFill).goldEdge()) {
                 Text(
-                    note.takeaway, color = Ivory, fontFamily = FontFamily.Serif,
+                    note.takeaway, color = Ivory, fontFamily = BookSerif,
                     fontSize = 19.sp, lineHeight = 27.sp, modifier = Modifier.padding(21.dp),
                 )
             }
@@ -489,7 +489,7 @@ private fun SavedNoteSheet(note: SermonNote, onClose: () -> Unit, onDelete: () -
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
                 .padding(horizontal = 22.dp).padding(bottom = 40.dp),
         ) {
-            Text(note.title, fontFamily = FontFamily.Serif, fontSize = 28.sp, lineHeight = 33.sp)
+            Text(note.title, fontFamily = BookSerif, fontSize = 28.sp, lineHeight = 33.sp)
             Text(
                 "${dayLabel(note.createdAt)} · ${note.minutes} min",
                 color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp),
@@ -506,12 +506,12 @@ private fun SavedNoteSheet(note: SermonNote, onClose: () -> Unit, onDelete: () -
             }
             if (note.quotes.isNotEmpty()) {
                 SectionLabel("LINES WORTH KEEPING")
-                note.quotes.forEach { Text("“$it”", fontFamily = FontFamily.Serif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(bottom = 11.dp)) }
+                note.quotes.forEach { Text("“$it”", fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(bottom = 11.dp)) }
             }
             if (note.takeaway.isNotBlank()) {
                 SectionLabel("CARRY THIS")
                 Surface(shape = RoundedCornerShape(16.dp), color = Night, modifier = Modifier.fillMaxWidth()) {
-                    Text(note.takeaway, color = Ivory, fontFamily = FontFamily.Serif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(18.dp))
+                    Text(note.takeaway, color = Ivory, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(18.dp))
                 }
             }
             Button(
@@ -605,7 +605,7 @@ private fun clockLabel(millis: Long): String =
 private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: () -> Unit) {
     androidx.compose.material3.ModalBottomSheet(onDismissRequest = onClose, containerColor = Canvas) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 30.dp)) {
-            Text("What language is the service in?", fontFamily = FontFamily.Serif, fontSize = 24.sp)
+            Text("What language is the service in?", fontFamily = BookSerif, fontSize = 24.sp)
             androidx.compose.foundation.lazy.LazyColumn(
                 Modifier.heightIn(max = 420.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),

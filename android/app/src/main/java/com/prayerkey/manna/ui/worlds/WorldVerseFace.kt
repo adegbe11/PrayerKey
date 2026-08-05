@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.theme.BookSerif
 
 /* Ivory on night, gold for the small marks. */
 private val Ivory = Color(0xFFF6F0E1)
@@ -93,7 +94,7 @@ fun WorldVerseFace(
             Text(
                 "“$text”",
                 color = Ivory,
-                fontFamily = FontFamily.Serif,
+                fontFamily = BookSerif,
                 fontSize = if (text.length > 190) 22.sp else 28.sp,
                 lineHeight = if (text.length > 190) 32.sp else 39.sp,
                 letterSpacing = (-0.2).sp,

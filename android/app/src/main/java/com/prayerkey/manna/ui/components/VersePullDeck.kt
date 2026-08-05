@@ -77,6 +77,7 @@ import com.prayerkey.manna.ui.theme.TopSheen
 import com.prayerkey.manna.ui.theme.TopSheenLight
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import com.prayerkey.manna.ui.theme.BookSerif
 
 /**
  * Tinder anatomy, exactly: the CARD IS THE SCREEN — full-bleed, edge to
@@ -363,7 +364,7 @@ private fun VerseFace(
                 Text(
                     verse.text,
                     color = if (still) Color.White else Ink,
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = BookSerif,
                     fontSize = if (verse.text.length > 220) 22.sp else 28.sp,
                     lineHeight = if (verse.text.length > 220) 32.sp else 40.sp,
                     textAlign = TextAlign.Center,

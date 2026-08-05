@@ -101,6 +101,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.prayerkey.manna.ui.theme.BookSerif
 
 
 // markdown the toolbar inserts at the caret
@@ -163,7 +164,7 @@ fun SuggestionSheet(
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
     ) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 34.dp)) {
-            Text("What do you want to write about?", color = ink, fontFamily = FontFamily.Serif, fontSize = 23.sp)
+            Text("What do you want to write about?", color = ink, fontFamily = BookSerif, fontSize = 23.sp)
 
             Text("TEMPLATES", color = muted, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 15.dp))
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -467,10 +468,10 @@ fun WriteSheet(
 
                 TextField(
                     title, { title = it },
-                    placeholder = { Text("Title", fontFamily = FontFamily.Serif, fontSize = 23.sp) },
+                    placeholder = { Text("Title", fontFamily = BookSerif, fontSize = 23.sp) },
                     singleLine = true, colors = bare,
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        fontFamily = FontFamily.Serif, fontSize = 23.sp, color = ink,
+                        fontFamily = BookSerif, fontSize = 23.sp, color = ink,
                     ),
                     modifier = Modifier.fillMaxWidth(),
                 )

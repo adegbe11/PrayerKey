@@ -210,7 +210,7 @@ private fun SacredPauseDialog(card: VerseCard, why: String?, onDismiss: () -> Un
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Outlined.SelfImprovement, null, tint = Gold) },
-        title = { Text(steps[step].first, fontFamily = FontFamily.Serif) },
+        title = { Text(steps[step].first, fontFamily = BookSerif) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(steps[step].second, textAlign = TextAlign.Center, fontSize = if (step == 1) 19.sp else 14.sp, lineHeight = if (step == 1) 27.sp else 21.sp)
@@ -303,7 +303,7 @@ private fun CardBack() {
             Spacer(Modifier.height(16.dp))
             Text(
                 "MANNA",
-                color = Ivory, fontFamily = FontFamily.Serif,
+                color = Ivory, fontFamily = BookSerif,
                 fontSize = 19.sp, letterSpacing = 9.sp, fontWeight = FontWeight.Medium,
             )
             Spacer(Modifier.height(20.dp))
@@ -335,7 +335,7 @@ private fun CardFront(
         ) {
             Icon(Icons.Outlined.WbSunny, null, tint = Gold, modifier = Modifier.size(24.dp))
             Spacer(Modifier.height(24.dp))
-            Text(card.verse, color = Ink, fontFamily = FontFamily.Serif, fontSize = 31.sp, lineHeight = 40.sp, textAlign = TextAlign.Center)
+            Text(card.verse, color = Ink, fontFamily = BookSerif, fontSize = 31.sp, lineHeight = 40.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height(20.dp))
             Text("${card.reference}   |   ${card.translation}", color = Ink, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
 
