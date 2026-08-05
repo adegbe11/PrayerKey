@@ -54,7 +54,10 @@ private fun body(size: Int, line: Int, weight: FontWeight = FontWeight.Normal) =
     fontSize = size.sp,
     lineHeight = line.sp,
     letterSpacing = (-0.1).sp,
-    color = InkSoft,
+    /* No colour here. A colour baked into the type scale wins over the
+       theme for every Text that does not name one, which is why labels,
+       placeholders and chips stayed near-black on the dark themes. Leaving
+       it unset lets LocalContentColor — and so the palette — decide. */
     platformStyle = NoPad,
     lineHeightStyle = Trim,
 )
@@ -76,7 +79,6 @@ private val MannaType = Typography(
         fontSize = 10.sp,
         lineHeight = 13.sp,
         letterSpacing = 1.6.sp,
-        color = Muted,
         platformStyle = NoPad,
     ),
 )

@@ -19,6 +19,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Create
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
@@ -194,27 +195,42 @@ fun JournalScreen(
             }
         }
 
-        // On the welcome the Bible itself is the invitation — a pencil button
-        // in the corner competes with it and says the same thing twice.
-        if (tab == JournalTab.Journey && !emptyJourney) {
-            // gentle pull toward the one action, only while there is nothing else
-            val transition = rememberInfiniteTransition(label = "fab")
-            val pulse by transition.animateFloat(
+        if (tab == JournalTab.Journey) {
+            /* Centred, not tucked in a corner. Writing is the only thing this
+               screen asks of you, so the button sits on the centre line under
+               the page with a halo breathing behind it. */
+            val transition = rememberInfiniteTransition(label = "write")
+            val halo by transition.animateFloat(
                 initialValue = 1f,
-                targetValue = if (entries.isEmpty()) 1.06f else 1f,
-                animationSpec = infiniteRepeatable(tween(1100), RepeatMode.Reverse),
-                label = "fab-pulse",
+                targetValue = if (entries.isEmpty()) 1.14f else 1.04f,
+                animationSpec = infiniteRepeatable(tween(1600), RepeatMode.Reverse),
+                label = "halo",
             )
-            // circular, soft-shadowed — Wallet's action button, not a Material pill
+            val accent = MaterialTheme.colorScheme.primary
             Box(
-                Modifier.align(Alignment.BottomEnd).padding(24.dp).scale(pulse)
-                    .size(62.dp)
-                    .shadow(16.dp, CircleShape, spotColor = Night.copy(alpha = .28f))
-                    .clip(CircleShape).background(Night)
-                    .clickable { picking = true },
+                Modifier.align(Alignment.BottomCenter).padding(bottom = 26.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Outlined.Create, "Write an entry", tint = Gold, modifier = Modifier.size(25.dp))
+                Box(
+                    Modifier.size(104.dp).scale(halo).clip(CircleShape)
+                        .background(accent.copy(alpha = .09f)),
+                )
+                Box(
+                    Modifier.size(78.dp).scale(halo).clip(CircleShape)
+                        .background(accent.copy(alpha = .13f)),
+                )
+                Box(
+                    Modifier.size(62.dp)
+                        .shadow(20.dp, CircleShape, spotColor = accent.copy(alpha = .55f))
+                        .clip(CircleShape).background(accent)
+                        .clickable { picking = true },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Outlined.Add, "Write an entry",
+                        tint = Night, modifier = Modifier.size(30.dp),
+                    )
+                }
             }
         }
     }

@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -25,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,6 +36,9 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -75,9 +78,10 @@ fun JournalWelcome(onOpen: () -> Unit, modifier: Modifier = Modifier) {
     // the verse holds long enough to be read, then hands over to the book
     var showVerse by remember { mutableStateOf(false) }
     var showBook by remember { mutableStateOf(false) }
+    var written by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         delay(260); showVerse = true
-        delay(4200); showVerse = false
+        delay(5400); showVerse = false
         delay(520); showBook = true
     }
 
@@ -101,7 +105,9 @@ fun JournalWelcome(onOpen: () -> Unit, modifier: Modifier = Modifier) {
         ) {
             AnimatedVisibility(
                 visible = showVerse,
-                enter = fadeIn(tween(900)) + slideInVertically(tween(900)) { it / 5 },
+                // the writing is the entrance now, so the block itself only
+                // needs to be there — a 900ms fade over it read as a stutter
+                enter = fadeIn(tween(220)),
                 exit = fadeOut(tween(500)) + slideOutVertically(tween(500)) { -it / 6 },
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -111,21 +117,16 @@ fun JournalWelcome(onOpen: () -> Unit, modifier: Modifier = Modifier) {
                         fontFamily = FontFamily.Serif, fontSize = 34.sp,
                     )
                     Spacer(Modifier.height(4.dp))
-                    Text(
-                        line.text,
-                        color = scheme.onBackground,
-                        fontFamily = FontFamily.Serif,
-                        fontSize = 24.sp, lineHeight = 34.sp,
-                        letterSpacing = (-0.3).sp,
-                        textAlign = TextAlign.Center,
-                    )
+                    StreamedVerse(line.text, scheme.onBackground, scheme.primary) { written = true }
                     Spacer(Modifier.height(20.dp))
-                    Text(
-                        line.ref,
-                        color = scheme.primary,
-                        fontSize = 12.sp, letterSpacing = 2.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
+                    AnimatedVisibility(visible = written, enter = fadeIn(tween(600))) {
+                        Text(
+                            line.ref,
+                            color = scheme.primary,
+                            fontSize = 12.sp, letterSpacing = 2.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
                 }
             }
 
@@ -149,6 +150,49 @@ fun JournalWelcome(onOpen: () -> Unit, modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+/**
+ * The verse writes itself, a word at a time.
+ *
+ * The whole string is laid out from the first frame and the unwritten part
+ * is drawn transparent, so nothing reflows as it arrives — growing a
+ * centred paragraph would make every line jump sideways on each word. The
+ * word at the write head carries the accent and settles to ink behind it,
+ * with the next word ghosted in so text reads as arriving rather than
+ * blinking on.
+ */
+@Composable
+private fun StreamedVerse(text: String, ink: Color, accent: Color, onDone: () -> Unit) {
+    val words = remember(text) { text.split(" ") }
+    var head by remember(text) { mutableIntStateOf(0) }
+    LaunchedEffect(text) {
+        while (head < words.size) {
+            // longer words take a beat longer, the way real typing does
+            delay(46L + words[head].length * 8L)
+            head++
+        }
+        onDone()
+    }
+
+    Text(
+        buildAnnotatedString {
+            words.forEachIndexed { i, word ->
+                val color = when {
+                    i < head - 1 -> ink
+                    i == head - 1 -> lerp(ink, accent, .45f)
+                    i == head -> ink.copy(alpha = .16f)
+                    else -> Color.Transparent
+                }
+                withStyle(SpanStyle(color = color)) { append(word) }
+                if (i != words.lastIndex) append(" ")
+            }
+        },
+        fontFamily = FontFamily.Serif,
+        fontSize = 24.sp, lineHeight = 34.sp,
+        letterSpacing = (-0.3).sp,
+        textAlign = TextAlign.Center,
+    )
 }
 
 /**
