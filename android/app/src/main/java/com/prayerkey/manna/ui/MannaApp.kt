@@ -85,7 +85,9 @@ fun MannaApp(onThemeChange: (String) -> Unit = {}) {
     }
 
     Scaffold(
-        containerColor = Canvas,
+        // the theme runs to the bottom edge of the phone; a white Scaffold
+        // left a pale band showing under the dock
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
         bottomBar = {
             // no dock during onboarding — the first screen stays undistracted
             if (hydrated && preferences.onboarded) com.prayerkey.manna.ui.components.MannaDock(
@@ -98,7 +100,7 @@ fun MannaApp(onThemeChange: (String) -> Unit = {}) {
         Box(Modifier.fillMaxSize().padding(padding)) {
             if (!hydrated) {
                 // one frame of brand, never a flash of the wrong screen
-                Box(Modifier.fillMaxSize().background(Canvas))
+                Box(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background))
             } else if (!preferences.onboarded) {
                 com.prayerkey.manna.ui.screens.OnboardingScreen(
                     themeId = preferences.themeId,

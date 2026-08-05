@@ -54,14 +54,19 @@ data class DockItem(val label: String, val icon: ImageVector)
 @Composable
 fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
     val view = LocalView.current
+    val cs = androidx.compose.material3.MaterialTheme.colorScheme
     Box(
         Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 14.dp),
         contentAlignment = Alignment.Center,
     ) {
+        /* Glass in the theme's own colour, not a slab of white. A stark
+           white bar under a midnight screen cut the immersion off an inch
+           from the bottom of the phone; on a light theme this still reads
+           as white, because the theme says so. */
         Surface(
             shape = RoundedCornerShape(30.dp),
-            color = Color.White.copy(alpha = .96f),
-            border = BorderStroke(0.5.dp, Color(0xFFE8E8ED)),
+            color = cs.surface.copy(alpha = .86f),
+            border = BorderStroke(0.6.dp, cs.onSurface.copy(alpha = .10f)),
             shadowElevation = 26.dp,
             modifier = Modifier.padding(horizontal = 12.dp),
         ) {
@@ -77,7 +82,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                         spring(dampingRatio = Spring.DampingRatioMediumBouncy), label = "dock-scale",
                     )
                     val tint by animateColorAsState(
-                        if (active) Gold else Muted,
+                        if (active) cs.primary else cs.onSurface.copy(alpha = .55f),
                         spring(stiffness = Spring.StiffnessMediumLow), label = "dock-tint",
                     )
 
@@ -87,7 +92,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                     Column(
                         Modifier.weight(1f)
                             .clip(RoundedCornerShape(24.dp))
-                            .background(if (active) NightGloss else SolidColor(Color.Transparent))
+                            .background(if (active) SolidColor(cs.primary.copy(alpha = .15f)) else SolidColor(Color.Transparent))
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
@@ -111,7 +116,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                            app, which is the wrong place to be subtle. */
                         Text(
                             item.label,
-                            color = if (active) Color.White else Muted,
+                            color = if (active) cs.primary else cs.onSurface.copy(alpha = .55f),
                             fontSize = 10.sp,
                             fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium,
                             letterSpacing = .1.sp,

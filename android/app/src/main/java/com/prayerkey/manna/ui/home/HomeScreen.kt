@@ -15,6 +15,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.fadeIn
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -102,6 +110,15 @@ fun HomeScreen(
                 progress = progress,
                 dragY = dragY,
                 reduceMotion = reduceMotion,
+                speechReady = speechReady,
+                onPause = { showPause = true },
+                onListen = {
+                    speaker.speak(
+                        activeCard.reference + ". " + activeCard.verse,
+                        TextToSpeech.QUEUE_FLUSH, null, activeCard.reference,
+                    )
+                },
+                onShare = { onShare(activeCard) },
                 modifier = Modifier.pointerInput(card.reference, state) {
                     detectDragGestures(
                         onDragStart = {
@@ -136,27 +153,36 @@ fun HomeScreen(
            a word has actually been pulled. */
         Column(
             Modifier.align(Alignment.BottomCenter).fillMaxWidth()
-                .padding(horizontal = 14.dp).padding(bottom = 92.dp),
+                // clears the mountain: at 92dp the pills sat on the ridge line
+                .padding(horizontal = 14.dp).padding(bottom = 196.dp),
         ) {
-            AnimatedVisibility(state == CardState.Revealed) {
+            AnimatedVisibility(
+                state == CardState.Revealed,
+                // crisp, slightly overshooting — Apple's own reveal, not a
+                // linear dissolve
+                enter = fadeIn(tween(320)) + slideInVertically(
+                    spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow),
+                ) { it / 3 },
+                exit = fadeOut(tween(160)),
+            ) {
                 Column {
-                    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        ActionButton("Pray this", ElectricGloss, Color.White, Modifier.weight(1f)) { onPray(activeCard) }
-                        ActionButton("Save", Brush.verticalGradient(listOf(Color.White, Color(0xFFEFEFF3))), Ink, Modifier.weight(1f)) { onSave(activeCard); onReceiveNext() }
-                    }
-                    Row(Modifier.fillMaxWidth()) {
-                        TextButton(onClick = { showPause = true }, modifier = Modifier.weight(1f)) {
-                            Icon(Icons.Outlined.SelfImprovement, null, modifier = Modifier.size(17.dp)); Spacer(Modifier.width(7.dp)); Text("Sacred pause")
-                        }
-                        TextButton(
-                            onClick = { speaker.speak("${activeCard.reference}. ${activeCard.verse}", TextToSpeech.QUEUE_FLUSH, null, activeCard.reference) },
-                            enabled = speechReady, modifier = Modifier.weight(1f),
-                        ) {
-                            Icon(Icons.Outlined.VolumeUp, "Listen to this Scripture", modifier = Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text("Listen")
-                        }
-                        TextButton(onClick = { onShare(activeCard) }, modifier = Modifier.weight(1f)) {
-                            Icon(Icons.Outlined.Share, "Share this Scripture", modifier = Modifier.size(17.dp)); Spacer(Modifier.width(6.dp)); Text("Share")
-                        }
+                    /* Two pills, and only two. Champagne gold and charcoal:
+                       electric blue was the loudest thing on a screen whose
+                       whole point is quiet. */
+                    Row(
+                        Modifier.fillMaxWidth().padding(horizontal = 22.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        ActionButton(
+                            "Pray this",
+                            Brush.verticalGradient(listOf(Color(0xFFE0C063), Gold)),
+                            Color(0xFF2A1F05), Modifier.weight(1f),
+                        ) { onPray(activeCard) }
+                        ActionButton(
+                            "Save",
+                            Brush.verticalGradient(listOf(Color(0xFF2C3350), Night)),
+                            Ivory, Modifier.weight(1f),
+                        ) { onSave(activeCard); onReceiveNext() }
                     }
                 }
             }
@@ -206,7 +232,18 @@ private fun SacredPauseDialog(card: VerseCard, why: String?, onDismiss: () -> Un
 }
 
 @Composable
-private fun VerseDeckCard(card: VerseCard, revealed: Boolean, progress: Float, dragY: Float, reduceMotion: Boolean, modifier: Modifier) {
+private fun VerseDeckCard(
+    card: VerseCard,
+    revealed: Boolean,
+    progress: Float,
+    dragY: Float,
+    reduceMotion: Boolean,
+    speechReady: Boolean,
+    onPause: () -> Unit,
+    onListen: () -> Unit,
+    onShare: () -> Unit,
+    modifier: Modifier,
+) {
     val shape = R.card
     // Resting card stands perfectly straight and flat, Tinder-style.
     // The 3D tumble only happens DURING the pull (0° -> -180° flip).
@@ -227,44 +264,87 @@ private fun VerseDeckCard(card: VerseCard, revealed: Boolean, progress: Float, d
             .border(1.dp, if (front) Color(0xFFE8D7B5) else Color(0xFF343A58), shape),
     ) {
         if (front) {
-            Box(Modifier.fillMaxSize().graphicsLayer { if (!reduceMotion) rotationX = 180f }) { CardFront(card) }
+            Box(Modifier.fillMaxSize().graphicsLayer { if (!reduceMotion) rotationX = 180f }) { CardFront(card, speechReady, onPause, onListen, onShare) }
         } else CardBack()
     }
 }
 
 @Composable
 private fun CardBack() {
+    // the aura breathes, so the disc reads as lit rather than printed
+    val pulse = rememberInfiniteTransition(label = "aura")
+    val bloom by pulse.animateFloat(
+        initialValue = .30f, targetValue = .52f,
+        animationSpec = infiniteRepeatable(tween(3600), RepeatMode.Reverse),
+        label = "bloom",
+    )
+
     Box(Modifier.fillMaxSize().background(Brush.radialGradient(listOf(Color(0xFF2A304D), Night))), contentAlignment = Alignment.Center) {
         Box(Modifier.fillMaxSize().background(TopSheen))
         Canvas(Modifier.fillMaxSize().padding(16.dp)) {
             drawRoundRect(Gold.copy(alpha = .65f), cornerRadius = CornerRadius(68f), style = Stroke(1.2f))
-            drawCircle(Gold.copy(alpha = .11f), radius = size.minDimension * .29f)
+
+            /* The disc was a flat wash of gold at 11%. It is a glass
+               container now: a gold aura bloomed behind it, a translucent
+               dark body, and a bright rim where the light catches. */
+            val r = size.minDimension * .30f
+            drawCircle(
+                Brush.radialGradient(
+                    listOf(Gold.copy(alpha = bloom * .55f), Gold.copy(alpha = bloom * .12f), Color.Transparent),
+                    center = center, radius = r * 1.95f,
+                ),
+                radius = r * 1.95f,
+            )
+            drawCircle(Color.White.copy(alpha = .05f), radius = r)
+            drawCircle(Gold.copy(alpha = .30f), radius = r, style = Stroke(1.1f))
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text("⚿", color = Gold, fontSize = 42.sp)
-            Spacer(Modifier.height(14.dp))
-            Text("MANNA", color = Color.White, fontSize = 13.sp, letterSpacing = 4.sp, fontWeight = FontWeight.Medium)
+            Spacer(Modifier.height(16.dp))
+            Text(
+                "MANNA",
+                color = Ivory, fontFamily = FontFamily.Serif,
+                fontSize = 19.sp, letterSpacing = 9.sp, fontWeight = FontWeight.Medium,
+            )
             Spacer(Modifier.height(20.dp))
-            Text("Pull down to receive today’s Word", color = Color.White.copy(alpha = .68f), fontSize = 12.sp)
-            Icon(Icons.Outlined.KeyboardArrowDown, null, tint = Gold.copy(alpha = .85f), modifier = Modifier.padding(top = 6.dp).size(20.dp))
+            // was 68% white and disappeared into the disc behind it
+            Text("Pull down to receive today’s Word", color = Color.White.copy(alpha = .92f), fontSize = 13.sp)
+            Icon(Icons.Outlined.KeyboardArrowDown, null, tint = Gold, modifier = Modifier.padding(top = 6.dp).size(20.dp))
         }
     }
 }
 
 @Composable
-private fun CardFront(card: VerseCard) {
+private fun CardFront(
+    card: VerseCard,
+    speechReady: Boolean,
+    onPause: () -> Unit,
+    onListen: () -> Unit,
+    onShare: () -> Unit,
+) {
     Box(Modifier.fillMaxSize()) {
         MountainScene(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(170.dp))
         // top/bottom padding clears the floating overlays
-        Column(Modifier.fillMaxSize().padding(horizontal = 30.dp).padding(top = 96.dp, bottom = 150.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        /* Bottom padding clears the mountain completely. Listen and Share
+           used to be text links sitting at the foot of the screen, where
+           the ridge line ran straight through them. */
+        Column(
+            Modifier.fillMaxSize().padding(horizontal = 30.dp).padding(top = 84.dp, bottom = 210.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Icon(Icons.Outlined.WbSunny, null, tint = Gold, modifier = Modifier.size(24.dp))
             Spacer(Modifier.height(24.dp))
             Text(card.verse, color = Ink, fontFamily = FontFamily.Serif, fontSize = 31.sp, lineHeight = 40.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height(20.dp))
             Text("${card.reference}   |   ${card.translation}", color = Ink, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-            Spacer(Modifier.weight(1f))
-            // sits on ivory, not on the mountain — needs a dark ink, not white
-            Text("Pulled by ${card.receivedBy} people today", color = Muted, fontSize = 11.sp)
+
+            // the shortcuts live with the reference now, as marks not links
+            Row(Modifier.padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                QuietAction(Icons.Outlined.SelfImprovement, "Sacred pause", onPause)
+                QuietAction(Icons.Outlined.VolumeUp, "Listen to this Scripture", onListen, enabled = speechReady)
+                QuietAction(Icons.Outlined.Share, "Share this Scripture", onShare)
+            }
         }
     }
 }
@@ -284,7 +364,6 @@ private fun MountainScene(modifier: Modifier) {
             lineTo(size.width, size.height * .72f); lineTo(size.width, size.height); close()
         }
         drawPath(front, Color(0xFF765F52).copy(alpha = .8f))
-        drawCircle(Color.White.copy(alpha = .85f), 5.dp.toPx(), Offset(size.width / 2, size.height * .34f))
     }
 }
 
@@ -298,13 +377,42 @@ private fun DeckShadow() {
 private fun ActionButton(label: String, brush: Brush, content: Color, modifier: Modifier, onClick: () -> Unit) {
     // glossy gradient pill with a real shadow — no flat Material button
     Box(
-        modifier.height(50.dp)
+        // 44dp, not 50 — two full-bleed slabs dominated the reveal
+        modifier.height(44.dp)
             .shadow(12.dp, R.control, spotColor = SoftShadow)
             .clip(R.control).background(brush)
             .border(0.5.dp, Color.White.copy(alpha = .35f), R.control)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Text(label, color = content, fontWeight = FontWeight.SemiBold)
+        Text(label, color = content, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+    }
+}
+
+/**
+ * A shortcut that does not shout. Three of these sit under the reference
+ * where the eye already is, instead of a row of gold text links down at
+ * the foot of the card.
+ */
+@Composable
+private fun QuietAction(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+) {
+    Box(
+        Modifier.size(42.dp)
+            .clip(CircleShape)
+            .background(Ink.copy(alpha = .05f))
+            .border(0.7.dp, Ink.copy(alpha = .10f), CircleShape)
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            icon, label,
+            tint = if (enabled) Ink.copy(alpha = .62f) else Ink.copy(alpha = .22f),
+            modifier = Modifier.size(18.dp),
+        )
     }
 }

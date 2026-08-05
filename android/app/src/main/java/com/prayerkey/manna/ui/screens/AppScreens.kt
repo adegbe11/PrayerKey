@@ -473,14 +473,14 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     it.category.contains(topicQuery, true)
             }
         }
-        Box(Modifier.fillMaxSize().background(dayWash())) {
+        val deckCs = MaterialTheme.colorScheme
+        Box(Modifier.fillMaxSize().background(deckCs.background)) {
             if (topicsLoading) {
                 Column(
                     Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    CircularProgressIndicator(color = Electric, strokeWidth = 3.dp, modifier = Modifier.size(42.dp))
-                    Text("Shuffling 544 prayers…", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 18.dp))
+                    CircularProgressIndicator(color = deckCs.primary, strokeWidth = 3.dp, modifier = Modifier.size(42.dp))
                 }
             } else if (filtered.isEmpty()) {
                 Column(
