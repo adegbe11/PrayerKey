@@ -23,6 +23,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Check
@@ -119,7 +125,18 @@ fun ChurchScreen(
         arranged = SermonArranger.arrange(transcript, refs, language)
     }
 
-    Box(Modifier.fillMaxSize().background(dayWash())) {
+    val cs = MaterialTheme.colorScheme
+    Box(
+        Modifier.fillMaxSize().background(
+            // the chosen theme, not a fixed daylight wash — this screen was
+            // a sheet of white in every one of the eleven other themes
+            Brush.verticalGradient(
+                0f to androidx.compose.ui.graphics.lerp(cs.background, cs.primary, .13f),
+                .5f to cs.background,
+                1f to androidx.compose.ui.graphics.lerp(cs.background, Color.Black, .14f),
+            ),
+        ),
+    ) {
         when (stage) {
             Stage.Ready -> ReadyView(
                 notes = notes,
@@ -192,46 +209,81 @@ private fun ReadyView(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState())
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 120.dp),
     ) {
-        Text("Church", fontFamily = FontFamily.Serif, fontSize = 32.sp)
+        val cs = MaterialTheme.colorScheme
 
-        Column(Modifier.fillMaxWidth().padding(top = 46.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Ready when service starts", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-            Wave(active = false, modifier = Modifier.padding(vertical = 34.dp))
-            Box(
-                Modifier.size(104.dp)
-                    .shadow(20.dp, CircleShape, spotColor = Electric.copy(alpha = .5f))
-                    .clip(CircleShape).background(ElectricGloss).clickable(onClick = onStart),
-                contentAlignment = Alignment.Center,
-            ) { Icon(Icons.Outlined.Mic, "Start listening", tint = Color.White, modifier = Modifier.size(40.dp)) }
-            Text("Start listening", color = Electric, fontSize = 17.sp, modifier = Modifier.padding(top = 18.dp))
-            Surface(
-                onClick = onLanguage, shape = R.pill, color = Color.White,
-                border = BorderStroke(1.dp, Hairline),
-                modifier = Modifier.padding(top = 16.dp),
+        /* The language picker used to sit in the middle of the screen under
+           the button, a form control competing with the one thing you came
+           here to press. It belongs beside the title. */
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "Church", color = cs.onBackground,
+                fontFamily = FontFamily.Serif, fontSize = 32.sp,
+                modifier = Modifier.weight(1f),
+            )
+            Row(
+                Modifier.clip(R.pill).clickable(onClick = onLanguage)
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                Icon(
+                    Icons.Outlined.Language, "Change language",
+                    tint = cs.onBackground.copy(alpha = .55f), modifier = Modifier.size(17.dp),
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    sermonLanguageLabel(language),
+                    color = cs.onBackground.copy(alpha = .55f),
+                    fontSize = 12.5.sp, fontWeight = FontWeight.Medium,
+                )
+            }
+        }
+
+        Box(
+            Modifier.fillMaxWidth().padding(top = 28.dp),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            // a room to sit in while you wait, instead of a field of white
+            Sanctuary(cs.primary, cs.onBackground, Modifier.fillMaxWidth().height(300.dp))
+
+            Column(
+                Modifier.padding(bottom = 6.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(
+                    Modifier.size(104.dp)
+                        .shadow(24.dp, CircleShape, spotColor = cs.primary.copy(alpha = .55f))
+                        .clip(CircleShape).background(cs.primary)
+                        .clickable(onClick = onStart),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Outlined.Language, null, tint = Muted, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(sermonLanguageLabel(language), fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                    Spacer(Modifier.width(4.dp))
-                    Icon(Icons.Outlined.KeyboardArrowDown, null, tint = Muted, modifier = Modifier.size(16.dp))
+                    Icon(
+                        Icons.Outlined.Mic, "Start listening",
+                        tint = cs.onPrimary, modifier = Modifier.size(40.dp),
+                    )
                 }
+                Text(
+                    "Start listening",
+                    color = cs.onBackground, fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 18.dp),
+                )
+                Text(
+                    "Works without signal",
+                    color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
             }
         }
 
         if (notes.isNotEmpty()) {
-            Text("Your Sundays", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 40.dp, bottom = 10.dp))
+            Text("Your Sundays", color = cs.onBackground, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 40.dp, bottom = 10.dp))
             notes.take(6).forEach { note ->
                 Box(
                     Modifier.fillMaxWidth().padding(bottom = 10.dp)
-                        .premiumCard(fill = PaperFill)
+                        .clip(R.card).background(cs.surface)
                         .clickable { onOpen(note) },
                 ) {
                     Column(Modifier.padding(16.dp)) {
-                        Text(note.title, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(note.title, color = cs.onBackground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Text(
                             "${dayLabel(note.createdAt)} · ${note.minutes} min · ${note.scriptures.size} scriptures",
                             color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp),
@@ -590,5 +642,83 @@ private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: ()
                 }
             }
         }
+    }
+}
+
+/**
+ * A room to wait in.
+ *
+ * The idle screen was a large white field with a button in it. This puts a
+ * sanctuary behind the button — three arches, a rose window and a pool of
+ * light — drawn on a Canvas so it costs nothing in the APK and takes the
+ * colour of whichever theme is on. The light breathes, so the screen is
+ * alive before the service starts without playing a sound at anyone.
+ */
+@Composable
+private fun Sanctuary(accent: Color, ink: Color, modifier: Modifier = Modifier) {
+    val breath = rememberInfiniteTransition(label = "sanctuary")
+    val glow by breath.animateFloat(
+        initialValue = .34f, targetValue = .62f,
+        animationSpec = infiniteRepeatable(tween(4200), RepeatMode.Reverse),
+        label = "glow",
+    )
+
+    androidx.compose.foundation.Canvas(modifier) {
+        val w = size.width
+        val h = size.height
+
+        // the pool of light on the floor, which is what the eye reads first
+        drawCircle(
+            Brush.radialGradient(
+                listOf(accent.copy(alpha = glow * .30f), Color.Transparent),
+                center = Offset(w / 2f, h * .70f),
+                radius = w * .52f,
+            ),
+            radius = w * .52f,
+            center = Offset(w / 2f, h * .70f),
+        )
+
+        val line = ink.copy(alpha = .17f)
+        val stroke = Stroke(width = 1.6f)
+
+        // three arches, the middle one taller
+        // the arches clear the button; at the old heights the mic sat on top
+        // of the rose window and swallowed it
+        listOf(
+            Triple(w * .50f, w * .195f, h * .09f),
+            Triple(w * .165f, w * .120f, h * .34f),
+            Triple(w * .835f, w * .120f, h * .34f),
+        ).forEach { (cx, half, top) ->
+            val base = h * .80f
+            val path = Path().apply {
+                moveTo(cx - half, base)
+                lineTo(cx - half, top + half)
+                quadraticBezierTo(cx - half, top, cx, top)
+                quadraticBezierTo(cx + half, top, cx + half, top + half)
+                lineTo(cx + half, base)
+            }
+            drawPath(path, line, style = stroke)
+        }
+
+        // the rose window
+        drawCircle(
+            accent.copy(alpha = .38f), radius = w * .052f,
+            center = Offset(w / 2f, h * .21f), style = Stroke(width = 1.4f),
+        )
+        for (i in 0 until 8) {
+            val a = i * Math.PI.toFloat() / 4f
+            drawLine(
+                accent.copy(alpha = .22f),
+                Offset(w / 2f, h * .21f),
+                Offset(
+                    w / 2f + kotlin.math.cos(a) * w * .052f,
+                    h * .21f + kotlin.math.sin(a) * w * .052f,
+                ),
+                strokeWidth = 1f,
+            )
+        }
+
+        // the floor
+        drawLine(line, Offset(0f, h * .80f), Offset(w, h * .80f), strokeWidth = 1.4f)
     }
 }

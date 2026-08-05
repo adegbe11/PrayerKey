@@ -111,8 +111,11 @@ fun WorldVerseFace(
 
             Spacer(Modifier.height(16.dp))
 
+            /* Reference only. The translation was printed here and again on
+               the picker pill at the top of the screen — the same three
+               letters twice on one small display. */
             Text(
-                "$reference  ·  $translation",
+                reference,
                 color = Gilt,
                 fontSize = 12.sp, letterSpacing = 1.6.sp,
                 fontWeight = FontWeight.SemiBold,

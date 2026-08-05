@@ -13,6 +13,12 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -105,7 +111,14 @@ fun VersePullDeck(
     var dragY by remember { mutableFloatStateOf(0f) }
     val anim = remember { Animatable(0f) }
     var animating by remember { mutableStateOf(false) }
+    /* The chrome is hidden until asked for. Five white circles and a row of
+       chips sat permanently on top of the artwork, which is the one thing on
+       this screen nobody came to look at. Tap once to bring them up, tap the
+       card again to open the verse, tap the backdrop to put them away. */
+    var chrome by remember { mutableStateOf(false) }
     val offsetValue = if (animating) anim.value else dragY
+
+    LaunchedEffect(index, stillMode) { chrome = false }
 
     val current = if (stillMode)
         RemoteVerse("Psalm 46:10", "Be still, and know that I am God.", "KJV")
@@ -184,7 +197,9 @@ fun VersePullDeck(
         Box(Modifier.fillMaxSize().graphicsLayer { translationY = offsetValue }) {
             WorldFace(
                 verse = current, front = true, reduceMotion = reduceMotion, still = stillMode,
-                modifier = Modifier.fillMaxSize().clickable { onOpen(current) },
+                modifier = Modifier.fillMaxSize().clickable {
+                    if (chrome) onOpen(current) else chrome = true
+                },
             )
 
             /* stamps — opacity rides the gesture, Tinder-style */
@@ -207,28 +222,44 @@ fun VersePullDeck(
         }
 
         /* ── TOP OVERLAY: floats on the card (chips / search) ── */
-        Column(Modifier.align(Alignment.TopCenter).fillMaxWidth()) {
-            topOverlay()
+        AnimatedVisibility(
+            visible = chrome,
+            enter = fadeIn(tween(220)) + slideInVertically(tween(260)) { -it / 3 },
+            exit = fadeOut(tween(180)) + slideOutVertically(tween(220)) { -it / 3 },
+            modifier = Modifier.align(Alignment.TopCenter),
+        ) {
+            Column(Modifier.fillMaxWidth()) { topOverlay() }
         }
 
-        /* ── BOTTOM ACTION BAR: floats on the card, Tinder's five ── */
-        Row(
-            Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(bottom = 96.dp),
-            horizontalArrangement = Arrangement.Center,
+        /* ── BOTTOM ACTION BAR: one translucent dock, not five loose discs ── */
+        AnimatedVisibility(
+            visible = chrome,
+            enter = fadeIn(tween(220)) + slideInVertically(tween(300)) { it / 2 },
+            exit = fadeOut(tween(180)) + slideOutVertically(tween(240)) { it / 2 },
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 96.dp),
         ) {
-            ActionCircle(Icons.Outlined.Refresh, "Previous verse", Gold, 50.dp) {
+        Row(
+            Modifier.clip(RoundedCornerShape(34.dp))
+                .background(Night.copy(alpha = .34f))
+                .border(0.7.dp, Color.White.copy(alpha = .16f), RoundedCornerShape(34.dp))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ActionCircle(Icons.Outlined.Refresh, "Previous verse", Ivory.copy(alpha = .85f), 50.dp) {
                 if (index > 0) { index--; view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK) }
             }
             Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.Close, "Skip", Color(0xFFE0526B), 58.dp) { flingNext() }
+            ActionCircle(Icons.Outlined.Close, "Skip", Ivory.copy(alpha = .85f), 58.dp) { flingNext() }
             Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.School, "Memorize", Color(0xFF3C7BE0), 50.dp) {
+            ActionCircle(Icons.Outlined.School, "Memorize", Ivory.copy(alpha = .85f), 50.dp) {
                 onMemorize(current); view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
             }
             Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.BookmarkBorder, "Save", Color(0xFF2E9E63), 58.dp) { flingSave() }
+            ActionCircle(Icons.Outlined.BookmarkBorder, "Save", Gold, 58.dp) { flingSave() }
             Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.Share, "Share", Color(0xFF3C7BE0), 50.dp) { onShare(current) }
+            ActionCircle(Icons.Outlined.Share, "Share", Ivory.copy(alpha = .85f), 50.dp) { onShare(current) }
+        }
         }
     }
 }
@@ -242,10 +273,12 @@ private fun ActionCircle(
     onClick: () -> Unit,
 ) {
     Box(
+        /* Glass discs on the dock, not white buttons with coloured icons —
+           a red cross and a green bookmark side by side read as marking
+           schoolwork rather than reading scripture. */
         Modifier.size(size)
-            .shadow(10.dp, CircleShape, spotColor = Night.copy(alpha = .3f))
-            .clip(CircleShape).background(Color.White)
-            .border(0.5.dp, Hairline, CircleShape)
+            .clip(CircleShape).background(Color.White.copy(alpha = .10f))
+            .border(0.7.dp, Color.White.copy(alpha = .22f), CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {

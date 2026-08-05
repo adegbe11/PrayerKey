@@ -11,7 +11,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.outlined.Explore
+import androidx.compose.material.icons.outlined.Spa
+import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -545,13 +554,28 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
            headline under that hard viewport edge and clipped it mid-glyph,
            which read exactly like two views colliding. A single scroll has
            no interior edge to clip against. */
+        val cs = MaterialTheme.colorScheme
         Column(
-            Modifier.fillMaxSize().background(dayWash())
+            Modifier.fillMaxSize()
+                // the page follows the chosen theme; it was pinned to a light
+                // wash, so eleven of the twelve themes stopped at this screen
+                .background(
+                    Brush.verticalGradient(
+                        0f to androidx.compose.ui.graphics.lerp(cs.background, cs.primary, .10f),
+                        .45f to cs.background,
+                        1f to cs.background,
+                    ),
+                )
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 22.dp)
                 .padding(top = 24.dp, bottom = Space.dock),
         ) {
-            Text(if (generated == null) "Pray for me" else "Your prayer", fontFamily = FontFamily.Serif, fontSize = 32.sp)
+            /* "Pray" — the tab underneath already says "Pray for me", and the
+               title said it again, twice on one screen. */
+            Text(
+                if (generated == null) "Pray" else "Your prayer",
+                color = cs.onBackground, fontFamily = FontFamily.Serif, fontSize = 32.sp,
+            )
             ModeChips(deckMode) { deckMode = it }
 
             /* ── Prayer of the Day — same daily prayer as prayerkey.com ── */
@@ -594,22 +618,26 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     placeholder = {
                         Text(
                             "Pour your heart out here...",
-                            fontSize = 17.sp, color = Muted,
+                            fontSize = 17.sp, color = cs.onBackground.copy(alpha = .42f),
                             fontFamily = FontFamily.Serif,
                         )
                     },
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        fontSize = 17.sp, lineHeight = 27.sp, color = InkSoft,
+                        fontSize = 17.sp, lineHeight = 27.sp, color = cs.onBackground,
                         fontFamily = FontFamily.Serif,
                     ),
                     minLines = 3,
                     maxLines = 10,
                     shape = R.card,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Gold.copy(alpha = .7f),
-                        unfocusedBorderColor = Hairline,
-                        focusedContainerColor = Ivory,
-                        unfocusedContainerColor = Ivory,
+                        // a tinted pane rather than a filled beige box; the
+                        // solid fill read as a web contact form
+                        focusedBorderColor = cs.primary.copy(alpha = .55f),
+                        unfocusedBorderColor = cs.outlineVariant,
+                        focusedContainerColor = cs.surface.copy(alpha = .55f),
+                        unfocusedContainerColor = cs.surface.copy(alpha = .35f),
+                        focusedTextColor = cs.onBackground,
+                        unfocusedTextColor = cs.onBackground,
                     ),
                 )
 
@@ -620,33 +648,43 @@ fun PrayerScreen(journal: List<JournalPrayer>, topics: List<PrayerTopic>, onLoad
                     Column {
                         Text(
                             "OR START HERE",
-                            color = Muted, fontSize = 10.sp, letterSpacing = 1.6.sp,
+                            color = cs.onBackground.copy(alpha = .5f), fontSize = 10.sp, letterSpacing = 1.6.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(top = Space.block, bottom = 10.dp),
                         )
-                        listOf(
-                            "I am anxious" to "I am anxious about something and I need peace.",
-                            "For my family" to "Please pray for my family.",
-                            "To give thanks" to "I want to thank God for what He has done.",
-                            "I cannot sleep" to "I cannot sleep and my mind will not rest.",
-                            "For healing" to "I need healing in my body.",
-                            "I need direction" to "I do not know what to do next and I need direction.",
-                        ).chunked(2).forEach { row ->
+                        /* Tiles, not capsules. Six identical white pills read
+                           as a multiple-choice question; a tile with its own
+                           quiet glow and a mark reads as a door. */
+                        STARTERS.chunked(2).forEach { row ->
                             Row(
-                                Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                Modifier.fillMaxWidth().padding(bottom = 9.dp),
+                                horizontalArrangement = Arrangement.spacedBy(9.dp),
                             ) {
-                                row.forEach { pair ->
-                                    Surface(
-                                        onClick = { request = pair.second },
-                                        shape = R.pill, color = ChipFill,
-                                        modifier = Modifier.weight(1f),
+                                row.forEach { starter ->
+                                    Column(
+                                        Modifier.weight(1f)
+                                            .clip(RoundedCornerShape(18.dp))
+                                            .background(
+                                                Brush.verticalGradient(
+                                                    listOf(
+                                                        starter.tint.copy(alpha = .22f),
+                                                        cs.surface.copy(alpha = .45f),
+                                                    ),
+                                                ),
+                                            )
+                                            .border(0.8.dp, starter.tint.copy(alpha = .28f), RoundedCornerShape(18.dp))
+                                            .clickable { request = starter.body }
+                                            .padding(horizontal = 14.dp, vertical = 13.dp),
                                     ) {
+                                        Icon(
+                                            starter.icon, null, tint = starter.tint,
+                                            modifier = Modifier.size(19.dp),
+                                        )
                                         Text(
-                                            pair.first, color = InkSoft, fontSize = 12.5.sp,
+                                            starter.label, color = cs.onBackground, fontSize = 13.sp,
                                             fontWeight = FontWeight.Medium, maxLines = 1,
                                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+                                            modifier = Modifier.padding(top = 9.dp),
                                         )
                                     }
                                 }
@@ -948,11 +986,53 @@ private fun prayerParagraphs(prayer: String): List<String> {
     return sentences.chunked(3).map { it.joinToString(" ") }
 }
 
+private data class Starter(
+    val label: String,
+    val body: String,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val tint: Color,
+)
+
+/** Six ways in, for the days when the empty box is the hardest part. */
+private val STARTERS = listOf(
+    Starter("I am anxious", "I am anxious about something and I need peace.", Icons.Outlined.Air, Color(0xFF6E8BC7)),
+    Starter("For my family", "Please pray for my family.", Icons.Outlined.FavoriteBorder, Color(0xFFC77E7E)),
+    Starter("To give thanks", "I want to thank God for what He has done.", Icons.Outlined.AutoAwesome, Color(0xFFC9A227)),
+    Starter("I cannot sleep", "I cannot sleep and my mind will not rest.", Icons.Outlined.DarkMode, Color(0xFF7C74B8)),
+    Starter("For healing", "I need healing in my body.", Icons.Outlined.Spa, Color(0xFF5FA37E)),
+    Starter("I need direction", "I do not know what to do next and I need direction.", Icons.Outlined.Explore, Color(0xFF5E93B8)),
+)
+
 @Composable
 private fun ModeChips(deckMode: Boolean, onMode: (Boolean) -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(top = Space.block), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        com.prayerkey.manna.ui.components.PkChip("Pray for me", !deckMode, Icons.Outlined.AutoAwesome) { onMode(false) }
-        com.prayerkey.manna.ui.components.PkChip("Prayer decks", deckMode, Icons.Outlined.Style) { onMode(true) }
+    /* One track, two halves, and the selection slides between them —
+       two free-floating pills read as tags rather than a switch. */
+    val cs = MaterialTheme.colorScheme
+    Row(
+        Modifier.fillMaxWidth().padding(top = Space.block)
+            .clip(RoundedCornerShape(15.dp))
+            .background(cs.onBackground.copy(alpha = .07f))
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        listOf("Pray for me" to false, "Prayer decks" to true).forEach { (label, deck) ->
+            val on = deckMode == deck
+            val fill by animateColorAsState(
+                if (on) cs.surface else Color.Transparent, tween(220), label = "seg-fill",
+            )
+            Box(
+                Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(fill)
+                    .clickable { onMode(deck) }
+                    .padding(vertical = 11.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    label,
+                    color = if (on) cs.onBackground else cs.onBackground.copy(alpha = .55f),
+                    fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
     }
 }
 
