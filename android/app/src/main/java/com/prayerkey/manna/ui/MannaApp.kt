@@ -57,6 +57,7 @@ fun MannaApp(onThemeChange: (String) -> Unit = {}) {
     val entries by viewModel.entries.collectAsState()
     val journalStreak by viewModel.journalStreak.collectAsState()
     val topics by viewModel.topics.collectAsState()
+    val topicsReady by viewModel.topicsReady.collectAsState()
     val hydrated by viewModel.hydrated.collectAsState()
     val sermonNotes by viewModel.sermonNotes.collectAsState()
     val formation by viewModel.formation.collectAsState()
@@ -159,7 +160,7 @@ fun MannaApp(onThemeChange: (String) -> Unit = {}) {
                         onReviewMemory = viewModel::reviewMemory,
                         reduceMotion = preferences.reduceMotion,
                     )
-                    2 -> PrayerScreen(journal, topics, viewModel::loadTopics, viewModel::savePrayer)
+                    2 -> PrayerScreen(journal, topics, topicsReady, viewModel::loadTopics, viewModel::savePrayer)
                     3 -> ChurchScreen(
                         notes = sermonNotes,
                         language = preferences.sermonLanguage,

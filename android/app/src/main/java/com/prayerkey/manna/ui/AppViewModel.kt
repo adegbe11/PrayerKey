@@ -89,13 +89,40 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val _topics = MutableStateFlow<List<com.prayerkey.manna.data.PrayerTopic>>(emptyList())
     val topics = _topics.asStateFlow()
     private var topicsRequested = false
+
+    /* The deck is on the device, so it opens with no signal. The network is
+       only ever a refresh on top of what already loaded — it used to be the
+       only source, which meant no signal was an endless spinner. */
+    private val _topicsReady = MutableStateFlow(false)
+    val topicsReady = _topicsReady.asStateFlow()
+
     fun loadTopics() {
         if (topicsRequested) return
         topicsRequested = true
-        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            val local = com.prayerkey.manna.data.LocalPrayerTopics.load(getApplication())
+            if (local.isNotEmpty()) withContext(Dispatchers.Main) {
+                _topics.value = local
+                _topicsReady.value = true
+            }
+
+            // a newer catalogue if the phone happens to be online; a failure
+            // here costs nothing, because the deck is already up
             runCatching { com.prayerkey.manna.data.PrayerKeyApi.prayerTopics() }
-                .onSuccess { _topics.value = it }
-                .onFailure { topicsRequested = false }
+                .onSuccess { remote ->
+                    if (remote.isNotEmpty()) withContext(Dispatchers.Main) {
+                        _topics.value = remote
+                        _topicsReady.value = true
+                    }
+                }
+                .onFailure {
+                    // mark the attempt over either way, so the screen can
+                    // stop waiting and say something honest
+                    if (local.isEmpty()) {
+                        topicsRequested = false
+                        withContext(Dispatchers.Main) { _topicsReady.value = true }
+                    }
+                }
         }
     }
 

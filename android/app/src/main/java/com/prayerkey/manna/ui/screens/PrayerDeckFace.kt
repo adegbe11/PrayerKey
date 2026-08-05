@@ -40,8 +40,13 @@ private val Gilt = Color(0xFFC9A24B)
  * full-bleed night — two products in one app. This is the same card: a
  * world behind it, ivory serif centred on the axis, gold for the marks.
  *
- * The card carries the opening of the prayer, not the whole thing. Finding
- * the right prayer is the deck's job; praying it is the sheet's.
+ * The card shows the whole prayer whenever it fits, and when it does not it
+ * stops at the end of a sentence rather than mid-word, and says so. Finding
+ * the right prayer is the deck's job; praying it is the sheet's — but a card
+ * that trails off at "Where there is …" tells you nothing either way.
+ *
+ * Sharing is never abridged: CardShareRenderer.sharePrayer fits the type to
+ * the prayer, because whoever receives it is meant to pray it.
  */
 @Composable
 fun PrayerDeckFace(
@@ -71,7 +76,9 @@ fun PrayerDeckFace(
 
         Column(
             Modifier.fillMaxSize().padding(horizontal = 30.dp)
-                .padding(top = 150.dp, bottom = 200.dp),
+                // 150dp of the card was empty sky above the category; most
+                // prayers fit whole in the space that reclaims
+                .padding(top = 96.dp, bottom = 190.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -98,14 +105,23 @@ fun PrayerDeckFace(
             Box(Modifier.height(1.dp).fillMaxWidth(.22f).background(Gilt.copy(alpha = .55f)))
             Spacer(Modifier.height(20.dp))
 
+            val (body, trimmed) = remember(topic.slug) { preview(topic.prayer) }
             Text(
-                topic.prayer,
-                color = Ivory.copy(alpha = .84f),
+                body,
+                color = Ivory.copy(alpha = .86f),
                 fontSize = 15.sp, lineHeight = 26.sp,
                 textAlign = TextAlign.Center,
-                maxLines = 6,
+                maxLines = 12,
                 overflow = TextOverflow.Ellipsis,
             )
+            if (trimmed) {
+                Spacer(Modifier.height(14.dp))
+                Text(
+                    "Read the full prayer",
+                    color = Gilt, fontSize = 11.5.sp,
+                    fontWeight = FontWeight.SemiBold, letterSpacing = .6.sp,
+                )
+            }
 
             if (topic.scripture.isNotEmpty()) {
                 Spacer(Modifier.height(22.dp))
@@ -144,4 +160,27 @@ private fun worldFor(category: String, slug: String): VerseWorld {
             pool[(slug.fold(11) { a, ch -> a * 31 + ch.code } and 0x7fffffff) % pool.size]
         }
     }
+}
+
+/**
+ * How much of a prayer the card shows.
+ *
+ * A fixed character budget rather than a measured layout: it is coarse, but
+ * it is deterministic, and it lets the cut land on a full stop. The old
+ * six-line clamp ended wherever the line happened to break — usually
+ * mid-word, always mid-thought.
+ *
+ * Returns the text to draw and whether anything was held back.
+ */
+private const val CARD_BUDGET = 380
+
+internal fun preview(prayer: String): Pair<String, Boolean> {
+    val clean = prayer.replace(Regex("""\s+"""), " ").trim()
+    if (clean.length <= CARD_BUDGET) return clean to false
+
+    val head = clean.take(CARD_BUDGET)
+    val stop = maxOf(head.lastIndexOf(". "), head.lastIndexOf("! "), head.lastIndexOf("? "))
+    // only honour a sentence break if it leaves a worthwhile amount of prayer
+    return if (stop > CARD_BUDGET / 2) clean.take(stop + 1) to true
+    else head.substringBeforeLast(' ') + "…" to true
 }

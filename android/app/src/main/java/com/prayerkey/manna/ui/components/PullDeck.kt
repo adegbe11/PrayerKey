@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -195,9 +196,16 @@ fun <T> PullDeck(
         }
 
         val controls = actions(current, DeckControls(next = { flingNext() }, keep = { flingKeep() }))
+        /* One dock, matching the verse deck. Five loose white discs with
+           coloured glyphs read as a toolbar bolted onto the artwork. */
         if (controls.isNotEmpty()) Row(
-            Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(bottom = 108.dp),
+            Modifier.align(Alignment.BottomCenter).padding(bottom = 108.dp)
+                .clip(RoundedCornerShape(34.dp))
+                .background(Night.copy(alpha = .34f))
+                .border(0.7.dp, Color.White.copy(alpha = .16f), RoundedCornerShape(34.dp))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             controls.forEachIndexed { i, action ->
                 if (i > 0) Spacer(Modifier.size(12.dp))
@@ -211,9 +219,8 @@ fun <T> PullDeck(
 private fun ActionCircle(action: DeckAction) {
     Box(
         Modifier.size(action.size)
-            .shadow(10.dp, CircleShape, spotColor = Night.copy(alpha = .3f))
-            .clip(CircleShape).background(Color.White)
-            .border(0.5.dp, Hairline, CircleShape)
+            .clip(CircleShape).background(Color.White.copy(alpha = .10f))
+            .border(0.7.dp, Color.White.copy(alpha = .22f), CircleShape)
             .clickable(onClick = action.onClick),
         contentAlignment = Alignment.Center,
     ) {
