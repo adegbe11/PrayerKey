@@ -38,3 +38,22 @@ val BookSerif = FontFamily(
     garamond(600),
     garamond(700),
 )
+
+/**
+ * Roman capitals, for the board of the Bible and nothing else.
+ *
+ * Cinzel is drawn from the inscriptional capitals of the Roman Empire — the
+ * Trajan tradition that tooled book covers have used ever since. Garamond's
+ * caps are lovely in a paragraph but too fine to carry a stamped title, which
+ * is why HOLY BIBLE looked printed rather than pressed.
+ *
+ * SIL Open Font License, one variable file, 123K.
+ */
+@OptIn(ExperimentalTextApi::class)
+private fun cinzel(weight: Int) = Font(
+    R.font.cinzel,
+    weight = FontWeight(weight),
+    variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
+)
+
+val RomanCaps = FontFamily(cinzel(400), cinzel(600), cinzel(700), cinzel(900))

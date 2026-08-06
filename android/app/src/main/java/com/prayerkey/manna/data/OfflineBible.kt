@@ -6,7 +6,15 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import android.util.JsonReader
 
-data class BibleVerse(val book: String, val chapter: Int, val verse: Int, val text: String) {
+data class BibleVerse(
+    val book: String,
+    val chapter: Int,
+    val verse: Int,
+    /** Display text: the 1611 braces are already resolved away. */
+    val text: String,
+    /** Where the translators supplied words, for setting them in italic. */
+    val supplied: List<IntRange> = emptyList(),
+) {
     val reference: String get() = "$book $chapter:$verse"
 }
 
@@ -81,8 +89,19 @@ class OfflineBible(private val context: Context) {
                     }
                     reader.endObject()
                     chapters.forEachIndexed { chapterIndex, chapter ->
-                        chapter.forEachIndexed { verseIndex, text ->
-                            add(BibleVerse(name, chapterIndex + 1, verseIndex + 1, text))
+                        chapter.forEachIndexed { verseIndex, raw ->
+                            /* The asset carries the 1611 apparatus inline —
+                               {was} for supplied words, {x: Heb. y} for
+                               marginal notes — and it was all reaching the
+                               screen with the braces showing. Resolve it once,
+                               here, so every reader of this Bible benefits. */
+                            val clean = cleanScripture(raw)
+                            add(
+                                BibleVerse(
+                                    name, chapterIndex + 1, verseIndex + 1,
+                                    clean.text, clean.supplied,
+                                ),
+                            )
                         }
                     }
                 }

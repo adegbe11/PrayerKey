@@ -30,6 +30,12 @@ data class UserPrefs(
     val themeId: String = "imperial_key",
     val journalLock: Boolean = false,
     val concealJournalPreviews: Boolean = false,
+    /* The book reader. Bible readers skew older and a fixed small serif
+       would shut a lot of them out, so the size is theirs to set and the
+       reader re-paginates around it. */
+    val readerTextSize: Int = 17,
+    /** Where the ribbon is resting, as "Psalms 23". Null = not dropped. */
+    val readerRibbon: String? = null,
 )
 data class SermonVerse(val reference: String, val text: String, val detectedAt: Long)
 data class SermonSession(val id: Long, val title: String, val startedAt: Long, val endedAt: Long?, val verses: List<SermonVerse>)
@@ -475,6 +481,8 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         sermonLanguage = state("sermon_language") ?: "en-US",
         journalLock = state("journal_lock") == "true",
         concealJournalPreviews = state("journal_conceal") == "true",
+        readerTextSize = state("reader_size")?.toIntOrNull() ?: 17,
+        readerRibbon = state("reader_ribbon")?.takeIf { it.isNotBlank() },
     )
 
     fun savePreferences(prefs: UserPrefs) {
@@ -484,6 +492,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         putState("onboarded", prefs.onboarded.toString())
         putState("sermon_language", prefs.sermonLanguage)
         putState("journal_lock", prefs.journalLock.toString()); putState("journal_conceal", prefs.concealJournalPreviews.toString())
+        putState("reader_size", prefs.readerTextSize.toString()); putState("reader_ribbon", prefs.readerRibbon.orEmpty())
     }
 
     fun formation(): FormationState = FormationState(

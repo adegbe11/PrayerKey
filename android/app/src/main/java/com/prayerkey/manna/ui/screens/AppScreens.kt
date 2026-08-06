@@ -15,6 +15,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Spa
@@ -79,6 +80,10 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BibleScreen(
+    readerTextSize: Int,
+    onReaderTextSize: (Int) -> Unit,
+    readerRibbon: String?,
+    onReaderRibbon: (String?) -> Unit,
     memory: List<MemoryVerse>,
     saved: List<SavedWord>,
     entries: List<JournalEntry>,
@@ -142,6 +147,29 @@ fun BibleScreen(
     val shareContext = LocalContext.current
     var searchOpen by remember { mutableStateOf(false) }
 
+    /* Two ways to be in the Bible, and they are different acts. The deck
+       hands you a verse; the book is for sitting down and reading one. */
+    var bookMode by remember { mutableStateOf(false) }
+    androidx.activity.compose.BackHandler(enabled = bookMode) { bookMode = false }
+
+    if (bookMode) {
+        com.prayerkey.manna.ui.book.BibleBookScreen(
+            bible = bible,
+            textSize = readerTextSize,
+            onTextSize = onReaderTextSize,
+            ribbon = readerRibbon,
+            onRibbon = onReaderRibbon,
+            onReadPlain = { book, chapter ->
+                bookMode = false
+                scope.launch {
+                    chapterVerses = bible.chapter(book, chapter)
+                    chapterTitle = "$book $chapter"
+                }
+            },
+        )
+        return
+    }
+
     Box(Modifier.fillMaxSize().background(Canvas)) {
         if (showMemory) {
             Column(Modifier.fillMaxSize().padding(horizontal = 14.dp).padding(top = 60.dp)) {
@@ -166,6 +194,10 @@ fun BibleScreen(
                             Icon(Icons.Outlined.Search, "Search", tint = Ink, modifier = Modifier.size(19.dp))
                         }
                         Spacer(Modifier.weight(1f))
+                        FloatChip(onClick = { bookMode = true }) {
+                            Icon(Icons.Outlined.MenuBook, "Read the Bible as a book", tint = Ink, modifier = Modifier.size(19.dp))
+                        }
+                        Spacer(Modifier.width(8.dp))
                         FloatChip(onClick = { showMemory = true }) {
                             Icon(Icons.Outlined.School, "Memorize", tint = Ink, modifier = Modifier.size(19.dp))
                         }

@@ -148,6 +148,10 @@ fun MannaApp(onThemeChange: (String) -> Unit = {}) {
                         },
                     )
                     1 -> BibleScreen(
+                        readerTextSize = preferences.readerTextSize,
+                        onReaderTextSize = { viewModel.updatePreferences(preferences.copy(readerTextSize = it)) },
+                        readerRibbon = preferences.readerRibbon,
+                        onReaderRibbon = { viewModel.updatePreferences(preferences.copy(readerRibbon = it)) },
                         memory = memory,
                         saved = saved,
                         entries = entries,

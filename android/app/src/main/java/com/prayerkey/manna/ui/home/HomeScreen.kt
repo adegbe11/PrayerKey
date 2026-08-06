@@ -369,8 +369,16 @@ private fun MountainScene(modifier: Modifier) {
 
 @Composable
 private fun DeckShadow() {
-    Box(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 8.dp).offset(y = 12.dp).graphicsLayer { rotationZ = 2.2f }
-        .shadow(16.dp, RoundedCornerShape(28.dp)).background(AppleGray, RoundedCornerShape(28.dp)))
+    /* The card sitting under the top one, so the deck reads as a stack.
+       It was painted near-white, which on any of the dark themes left a pale
+       slab peeking out along the bottom edge of the screen. */
+    val behind = androidx.compose.material3.MaterialTheme.colorScheme.surface
+    Box(
+        Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 8.dp).offset(y = 12.dp)
+            .graphicsLayer { rotationZ = 2.2f }
+            .shadow(16.dp, RoundedCornerShape(28.dp))
+            .background(behind, RoundedCornerShape(28.dp)),
+    )
 }
 
 @Composable
