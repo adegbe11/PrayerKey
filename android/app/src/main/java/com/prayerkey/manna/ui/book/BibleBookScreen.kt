@@ -172,11 +172,10 @@ fun BibleBookScreen(
             )
 
             BoxWithConstraints(
-                Modifier.fillMaxSize()
-                    // the header floats on the board above the page block
-                    .padding(start = 15.dp, end = 34.dp, top = 52.dp, bottom = 34.dp),
+                // the leaf owns the screen; only the gilt fore edge is kept
+                Modifier.fillMaxSize().padding(end = 22.dp),
             ) {
-                val pageW = with(density) { maxWidth.toPx() } - with(density) { 38.dp.toPx() }
+                val pageW = with(density) { maxWidth.toPx() } - with(density) { 48.dp.toPx() }
                 val pageH = with(density) { maxHeight.toPx() }
 
                 val body = remember(textSize) {
@@ -237,148 +236,140 @@ fun BibleBookScreen(
                 val window = windows.getOrElse(pageIndex) { windows.first() }
                 val shown = versesInWindow(flow.verseLines(layout), window)
 
-                fun turn(forward: Boolean) {
-                    sizeOpen = false
-                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                    if (forward) {
-                        if (pageIndex < windows.lastIndex) pageIndex++
-                        else if (chapterIndex < chapters.lastIndex) { chapterIndex++; pageIndex = 0 }
-                    } else {
-                        if (pageIndex > 0) pageIndex--
-                        else if (chapterIndex > 0) { chapterIndex--; landOnLast = true }
+                val canGoForward = pageIndex < windows.lastIndex || chapterIndex < chapters.lastIndex
+                val canGoBack = pageIndex > 0 || chapterIndex > 0
+
+
+                /* ── the turn ────────────────────────────────────────────
+                   A real page turn is a reflection, not a rotation: the part
+                   of the sheet past the crease is that same sheet mirrored
+                   about the crease. See FoldedPage. The crease position is
+                   the only thing that animates, and which face is folding
+                   depends on which way you are going:
+
+                     forward — the current page folds, the next is revealed,
+                               the crease travels from the fore edge to the
+                               spine
+                     back    — the previous page unfolds back over the
+                               current one, crease spine to fore edge
+
+                   Held in an Animatable and read inside the draw phase, so
+                   dragging a page never recomposes the text. */
+                // 0 flat, 1 fully over
+                val crease = remember { Animatable(0f) }
+                var direction by remember { mutableIntStateOf(0) }
+                var travelled by remember { mutableFloatStateOf(0f) }
+                var startedAt by remember { androidx.compose.runtime.mutableLongStateOf(0L) }
+
+                fun settle(commit: Boolean, forward: Boolean) {
+                    scope.launch {
+                        val to = if (commit) 1f else 0f
+                        crease.animateTo(to, tween(330))
+                        if (commit) {
+                            sizeOpen = false
+                            if (forward) {
+                                if (pageIndex < windows.lastIndex) pageIndex++
+                                else if (chapterIndex < chapters.lastIndex) { chapterIndex++; pageIndex = 0 }
+                            } else {
+                                if (pageIndex > 0) pageIndex--
+                                else if (chapterIndex > 0) { chapterIndex--; landOnLast = true }
+                            }
+                            view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                        }
+                        direction = 0
+                        crease.snapTo(0f)
                     }
                 }
 
-                // the leaf, and the drag that turns it
-                val fold = remember { Animatable(0f) }
-                /* Two numbers, because they answer different questions: how
-                   far the leaf has lifted (a capped angle) and how far the
-                   thumb actually travelled (raw pixels). Deciding the turn
-                   from the capped angle meant a quick flick — which never
-                   accumulates much angle — did nothing. */
-                var drag by remember { mutableFloatStateOf(0f) }
-                var travelled by remember { mutableFloatStateOf(0f) }
-                var startedAt by remember { androidx.compose.runtime.mutableLongStateOf(0L) }
-                val angle = if (fold.isRunning) fold.value else drag
+                fun animateTurn(forward: Boolean) {
+                    if (forward && !canGoForward) return
+                    if (!forward && !canGoBack) return
+                    direction = if (forward) 1 else -1
+                    scope.launch { crease.snapTo(0f) }
+                    settle(commit = true, forward = forward)
+                }
 
                 Box(
                     Modifier.fillMaxSize()
-                        .graphicsLayer {
-                            rotationY = angle
-                            cameraDistance = 26f * this.density
-                            transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0f, .5f)
-                        }
-                        .clip(RoundedCornerShape(2.dp, 5.dp, 5.dp, 2.dp))
-                        .background(
-                            Brush.radialGradient(
-                                listOf(Color(0xFFFBF6E7), Page, PageEdge),
-                                center = Offset(pageW * .9f, pageH * .1f),
-                                radius = pageW * 1.6f,
-                            ),
-                        )
-                        .pointerInput(chapterIndex, pageIndex, windows) {
+                        .pointerInput(chapterIndex, pageIndex, windows, pageW) {
                             detectDragGestures(
                                 onDragStart = {
                                     travelled = 0f
                                     startedAt = System.currentTimeMillis()
                                 },
                                 onDragEnd = {
-                                    val lifted = drag
                                     val went = travelled
-                                    scope.launch {
-                                        fold.snapTo(lifted)
-                                        fold.animateTo(0f, tween(240))
-                                        drag = 0f
-                                    }
-                                    // a deliberate drag, or a flick
                                     val quick = System.currentTimeMillis() - startedAt < 320
-                                    val far = 44f
-                                    val flick = 18f
-                                    if (went < -far || (quick && went < -flick)) turn(forward = true)
-                                    else if (went > far || (quick && went > flick)) turn(forward = false)
+                                    val far = pageW * .28f
+                                    val flick = 20f
+                                    val forward = direction >= 0
+                                    val enough = if (forward) {
+                                        went < -far || (quick && went < -flick)
+                                    } else {
+                                        went > far || (quick && went > flick)
+                                    }
+                                    settle(commit = enough && direction != 0, forward = forward)
                                 },
+                                onDragCancel = { settle(commit = false, forward = direction >= 0) },
                             ) { change, amount ->
                                 change.consume()
                                 travelled += amount.x
-                                // a leaf lifts at the spine; it does not slide
-                                drag = (drag + amount.x / 4f).coerceIn(-70f, 70f)
+                                if (direction == 0) {
+                                    // the first real movement decides the way
+                                    direction = when {
+                                        travelled < -6f && canGoForward -> 1
+                                        travelled > 6f && canGoBack -> -1
+                                        else -> 0
+                                    }
+                                    if (direction != 0) scope.launch { crease.snapTo(0f) }
+                                }
+                                if (direction != 0) {
+                                    // the crease tracks the thumb one to one
+                                    val span = size.width.toFloat().coerceAtLeast(1f)
+                                    val gone = (if (direction > 0) -travelled else travelled) / span
+                                    scope.launch { crease.snapTo(gone.coerceIn(0f, 1f)) }
+                                }
                             }
                         }
                         /* Tap zones as well as the drag. A horizontal drag
                            that starts near either screen edge competes with
-                           Android's back gesture and loses — the reader can
-                           be thrown out of the book mid-turn. Every real
-                           e-reader gives you tap-to-turn for the same reason,
-                           and it is the faster gesture anyway. */
-                        .pointerInput(chapterIndex, pageIndex, windows) {
+                           Android's back gesture and loses — testing threw
+                           the reader clean out of the book mid-turn. Every
+                           real e-reader gives you tap-to-turn for the same
+                           reason, and it is the quicker gesture anyway. */
+                        .pointerInput(chapterIndex, pageIndex, windows, pageW) {
                             detectTapGestures { at ->
                                 when {
-                                    at.x > size.width * .62f -> turn(forward = true)
-                                    at.x < size.width * .38f -> turn(forward = false)
+                                    at.x > size.width * .62f -> animateTurn(forward = true)
+                                    at.x < size.width * .38f -> animateTurn(forward = false)
                                 }
                             }
                         },
                 ) {
-                    Column(Modifier.fillMaxSize().padding(horizontal = 19.dp)) {
-                        Row(
-                            Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
-                            verticalAlignment = Alignment.Bottom,
-                        ) {
-                            Text(
-                                here.book.name.uppercase(),
-                                color = Color(0xFF5A4828).copy(alpha = .8f), fontFamily = BookSerif,
-                                fontSize = 10.sp, letterSpacing = 2.2.sp,
-                                modifier = Modifier.weight(1f),
-                            )
-                            Text(
-                                shown?.let { "${here.chapter}:${it.first}–${it.last}" } ?: "KJV",
-                                color = Color(0xFF5A4828).copy(alpha = .8f), fontFamily = BookSerif,
-                                fontSize = 10.sp, letterSpacing = 1.6.sp,
-                            )
-                        }
-                        Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFF8C6E32).copy(alpha = .3f)))
-
-                        /* The heading's space is reserved on every leaf, even
-                           where it draws nothing: a body box that changed
-                           height between page one and page two would change
-                           the page capacity, which changes how many pages
-                           there are, which is a loop. */
-                        Box(
-                            Modifier.fillMaxWidth().height(38.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            if (window.index == 0) {
-                                Text(
-                                    "Chapter ${here.chapter}",
-                                    color = BookInk, fontFamily = BookSerif,
-                                    fontSize = (textSize - 1).sp, fontWeight = FontWeight.SemiBold,
-                                    letterSpacing = 1.sp, textAlign = TextAlign.Center,
-                                )
-                            }
-                        }
-
-                        // the window onto the chapter's one layout
-                        Box(
-                            Modifier.fillMaxWidth().weight(1f)
-                                .onSizeChanged { bodyPx = it.height.toFloat() },
-                        ) {
-                            if (layout != null && window.lines > 0) {
-                                val top = layout.getLineTop(window.firstLine)
-                                Canvas(Modifier.fillMaxSize()) {
-                                    clipRect {
-                                        translate(top = -top) { drawText(layout) }
-                                    }
-                                }
-                            }
-                        }
-
-                        Text(
-                            "${chapterIndex + 1}",
-                            color = Color(0xFF785F2D).copy(alpha = .7f), fontFamily = BookSerif,
-                            fontSize = 10.sp, textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp, top = 6.dp),
+                    val leaf: @Composable (PageWindow?) -> Unit = { win ->
+                        Leaf(
+                            book = here.book.name,
+                            chapter = here.chapter,
+                            folio = chapterIndex + 1,
+                            window = win,
+                            verses = win?.let { versesInWindow(flow.verseLines(layout), it) },
+                            layout = layout,
+                            textSize = textSize,
+                            onBodyHeight = { if (win === window) bodyPx = it },
                         )
                     }
+
+                    /* Which sheet is in the air. Going back it is the page
+                       before this one that comes over the top, so the faces
+                       swap; forward, the page under is the one arriving. */
+                    val ahead = windows.getOrNull(pageIndex + 1)
+                    val behind = windows.getOrNull(pageIndex - 1)
+
+                    FoldedPage(
+                        progress = { if (direction == 0) 0f else crease.value },
+                        under = { leaf(if (direction < 0) window else ahead) },
+                        folding = { leaf(if (direction < 0) behind else window) },
+                    )
                 }
             }
 
@@ -392,8 +383,7 @@ fun BibleBookScreen(
             var edgeHeight by remember { mutableFloatStateOf(0f) }
 
             Box(
-                Modifier.align(Alignment.CenterEnd).fillMaxHeight().width(24.dp)
-                    .padding(top = 52.dp, bottom = 34.dp)
+                Modifier.align(Alignment.CenterEnd).fillMaxHeight().width(22.dp)
                     .onSizeChanged { edgeHeight = it.height.toFloat() }
                     .clip(RoundedCornerShape(0.dp, 8.dp, 8.dp, 0.dp))
                     .background(
@@ -465,8 +455,7 @@ fun BibleBookScreen(
             if (scrubbing) {
                 val target = chapters[scrubTarget]
                 Box(
-                    Modifier.fillMaxSize().padding(start = 15.dp, end = 34.dp, top = 52.dp, bottom = 34.dp)
-                        .clip(RoundedCornerShape(2.dp, 5.dp, 5.dp, 2.dp))
+                    Modifier.fillMaxSize().padding(end = 22.dp)
                         .background(Brush.horizontalGradient(listOf(Page.copy(alpha = .94f), PageEdge.copy(alpha = .97f)))),
                     contentAlignment = Alignment.Center,
                 ) {
@@ -563,29 +552,17 @@ fun BibleBookScreen(
             }
         }
 
-        /* Drawn after the board, which would otherwise cover it — and on a
-           scrim, because gold filigree behind gold chrome is unreadable. */
-        Box(
-            Modifier.fillMaxWidth().height(58.dp)
-                .graphicsLayer { alpha = cover.value }
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color(0xFF1B0B04).copy(alpha = .82f),
-                            Color(0xFF1B0B04).copy(alpha = .55f),
-                            Color.Transparent,
-                        ),
-                    ),
-                ),
-        )
+        /* Drawn after the page, which would otherwise cover it. On paper now
+           rather than on leather, so it takes ink and needs no scrim — the
+           dark band existed only to lift gold chrome off gold filigree. */
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 20.dp).padding(top = 10.dp)
+            Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(top = 14.dp)
                 .graphicsLayer { alpha = cover.value },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                "Manna", color = Gild.copy(alpha = .9f), fontFamily = BookSerif,
-                fontSize = 18.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp,
+                "Manna", color = BookInk.copy(alpha = .55f), fontFamily = BookSerif,
+                fontSize = 17.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp,
                 modifier = Modifier.weight(1f),
             )
             EdgeButton("Aa") { sizeOpen = !sizeOpen }
@@ -626,12 +603,15 @@ fun BibleBookScreen(
 private fun EdgeButton(label: String, onClick: () -> Unit) {
     Box(
         Modifier.clip(RoundedCornerShape(99.dp))
-            .background(Color.White.copy(alpha = .07f))
-            .border(1.dp, Gild.copy(alpha = .4f), RoundedCornerShape(99.dp))
+            .background(BookInk.copy(alpha = .05f))
+            .border(1.dp, Color(0xFF8C6E32).copy(alpha = .4f), RoundedCornerShape(99.dp))
             .clickable(onClick = onClick)
             .padding(horizontal = 13.dp, vertical = 7.dp),
     ) {
-        Text(label, color = Gild, fontSize = 9.5.sp, letterSpacing = 1.6.sp)
+        Text(
+            label, color = Color(0xFF6B5424), fontFamily = BookSerif,
+            fontSize = 10.sp, letterSpacing = 1.4.sp,
+        )
     }
 }
 
@@ -682,4 +662,105 @@ private fun chapterText(verses: List<BibleVerse>): ChapterText {
         }
     }
     return ChapterText(text, starts)
+}
+
+/**
+ * One leaf of the book: run-head, chapter heading, a window of the chapter's
+ * layout, and the folio.
+ *
+ * Pulled out of the screen because a page turn needs to draw two of these —
+ * the sheet in the air and the one being revealed — and they have to be the
+ * same thing or the fold gives itself away.
+ *
+ * A null [window] is the blank leaf you see across a chapter boundary, where
+ * the page arriving belongs to a chapter whose layout has not been measured
+ * yet. Cream paper is the honest thing to show there.
+ */
+@Composable
+private fun Leaf(
+    book: String,
+    chapter: Int,
+    folio: Int,
+    window: PageWindow?,
+    verses: IntRange?,
+    layout: TextLayoutResult?,
+    textSize: Int,
+    onBodyHeight: (Float) -> Unit,
+) {
+    Box(
+        Modifier.fillMaxSize().background(
+            /* Cream, edge to edge. The leather bands above and below the page
+               cost about a ninth of the height to ornament and put the header
+               on top of gold filigree; the board belongs to the cover. */
+            Brush.linearGradient(
+                0f to Color(0xFFFDFAF0),
+                .45f to Page,
+                1f to PageEdge,
+            ),
+        ),
+    ) {
+        // the gutter, where the leaf turns into the spine
+        Box(
+            Modifier.fillMaxHeight().width(16.dp)
+                .background(
+                    Brush.horizontalGradient(
+                        listOf(Color(0xFF6B5A34).copy(alpha = .22f), Color.Transparent),
+                    ),
+                ),
+        )
+
+        Column(Modifier.fillMaxSize().padding(start = 26.dp, end = 22.dp)) {
+            Row(
+                Modifier.fillMaxWidth().padding(top = 58.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.Bottom,
+            ) {
+                Text(
+                    book.uppercase(),
+                    color = Color(0xFF5A4828).copy(alpha = .8f), fontFamily = BookSerif,
+                    fontSize = 10.sp, letterSpacing = 2.2.sp,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    verses?.let { "$chapter:${it.first}–${it.last}" } ?: "KJV",
+                    color = Color(0xFF5A4828).copy(alpha = .8f), fontFamily = BookSerif,
+                    fontSize = 10.sp, letterSpacing = 1.6.sp,
+                )
+            }
+            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFF8C6E32).copy(alpha = .3f)))
+
+            /* The heading's space is reserved on every leaf, even where it
+               draws nothing: a body box that changed height between page one
+               and page two would change the page capacity, which changes how
+               many pages there are, which is a loop. */
+            Box(Modifier.fillMaxWidth().height(38.dp), contentAlignment = Alignment.Center) {
+                if (window?.index == 0) {
+                    Text(
+                        "Chapter $chapter",
+                        color = BookInk, fontFamily = BookSerif,
+                        fontSize = (textSize - 1).sp, fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 1.sp, textAlign = TextAlign.Center,
+                    )
+                }
+            }
+
+            Box(
+                Modifier.fillMaxWidth().weight(1f)
+                    .onSizeChanged { onBodyHeight(it.height.toFloat()) },
+            ) {
+                if (layout != null && window != null && window.lines > 0) {
+                    val top = layout.getLineTop(window.firstLine)
+                    Canvas(Modifier.fillMaxSize()) {
+                        clipRect { translate(top = -top) { drawText(layout) } }
+                    }
+                }
+            }
+
+            Text(
+                "$folio",
+                color = Color(0xFF785F2D).copy(alpha = .7f), fontFamily = BookSerif,
+                fontSize = 10.sp, textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp, top = 6.dp),
+            )
+        }
+    }
 }

@@ -143,7 +143,7 @@ fun JournalWelcome(onOpen: () -> Unit, modifier: Modifier = Modifier) {
                     HolyBible(scheme.primary, scheme.surface, scheme.onBackground)
                     Spacer(Modifier.height(26.dp))
                     Text(
-                        "Your story starts here",
+                        "Write your vision here",
                         color = scheme.onBackground,
                         fontWeight = FontWeight.SemiBold, fontSize = 17.sp,
                     )
