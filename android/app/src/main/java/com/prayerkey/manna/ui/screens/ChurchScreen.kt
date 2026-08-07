@@ -257,19 +257,14 @@ private fun ReadyView(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        Icons.Outlined.Mic, "Start listening",
+                        Icons.Outlined.Mic, "Listen to the Message",
                         tint = cs.onPrimary, modifier = Modifier.size(40.dp),
                     )
                 }
                 Text(
-                    "Start listening",
+                    "Listen to the Message",
                     color = cs.onBackground, fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(top = 18.dp),
-                )
-                Text(
-                    "Works without signal",
-                    color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp,
-                    modifier = Modifier.padding(top = 4.dp),
                 )
             }
         }
