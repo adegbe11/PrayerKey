@@ -20,6 +20,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -77,6 +78,36 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
     val journeyInsight = remember(entries, sermonNotes, journal, saved) {
         com.prayerkey.manna.data.JourneyInsights.build(entries, sermonNotes, journal, saved)
     }
+    /* What the dashboard renders from. All of it is either already in the
+       database or derived from a shipped asset, so Home works with the radio
+       off like the rest of the app. */
+    val activeDays = remember(entries) {
+        entries.map {
+            java.time.Instant.ofEpochMilli(it.createdAt)
+                .atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+        }.toSet()
+    }
+    val today = remember { java.time.LocalDate.now() }
+    val devotion = remember(topics, today) {
+        com.prayerkey.manna.data.devotionFor(
+            today,
+            DailyVerses.map { Triple(it.reference, it.translation, it.verse) },
+            topics,
+        )
+    }
+    LaunchedEffect(Unit) {
+        viewModel.loadTopics()
+        viewModel.loadChallenge("read-the-gospels")
+        viewModel.loadChallenge("twenty-one-days")
+    }
+    val challengeTicks by viewModel.challengeDays.collectAsState()
+    val bibleChallenge = remember(challengeTicks, today) {
+        com.prayerkey.manna.data.bibleChallenge(today, challengeTicks["read-the-gospels"].orEmpty())
+    }
+    val prayerChallenge = remember(challengeTicks, topics, today) {
+        com.prayerkey.manna.data.prayerChallenge(today, topics, challengeTicks["twenty-one-days"].orEmpty())
+    }
+
     val todayCard = remember(verseIndex, journeyInsight) {
         if (verseIndex == 0) {
             journeyInsight?.recommendedReference
@@ -127,6 +158,24 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                 when (selected) {
                     0 -> HomeScreen(
                         card = todayCard,
+                        name = preferences.name,
+                        streak = streak,
+                        activeDays = activeDays,
+                        devotion = devotion,
+                        bibleChallenge = bibleChallenge,
+                        prayerChallenge = prayerChallenge,
+                        onToggleChallenge = { c ->
+                            viewModel.markChallengeDay(c.id, c.today.index - 1, !c.today.done)
+                        },
+                        onOpenChallenge = { c ->
+                            // the Bible plan opens the Bible, the prayer plan the deck
+                            selected = if (c.id == "read-the-gospels") 1 else 2
+                        },
+                        onWriteDevotion = { selected = 4 },
+                        onOpenBible = { selected = 1 },
+                        onOpenJournal = { selected = 4 },
+                        onOpenChurch = { selected = 3 },
+                        onSettings = { showProfile = true },
                         journeyInsight = journeyInsight,
                         reduceMotion = preferences.reduceMotion,
                         onReceived = viewModel::recordDailyPull,

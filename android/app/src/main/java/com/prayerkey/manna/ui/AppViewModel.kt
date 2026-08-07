@@ -126,6 +126,28 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /* Challenge ticks, held in memory as a map so the dashboard recomposes
+       the moment one is marked rather than after a round trip to disk. */
+    private val _challengeDays = MutableStateFlow<Map<String, Set<Int>>>(emptyMap())
+    val challengeDays = _challengeDays.asStateFlow()
+
+    fun loadChallenge(id: String) {
+        if (_challengeDays.value.containsKey(id)) return
+        viewModelScope.launch(Dispatchers.IO) {
+            val days = safe(emptySet<Int>()) { store.challengeDays(id) }
+            withContext(Dispatchers.Main) {
+                _challengeDays.value = _challengeDays.value + (id to days)
+            }
+        }
+    }
+
+    fun markChallengeDay(id: String, day: Int, done: Boolean) {
+        val current = _challengeDays.value[id].orEmpty().toMutableSet()
+        if (done) current.add(day) else current.remove(day)
+        _challengeDays.value = _challengeDays.value + (id to current)
+        io { store.setChallengeDay(id, day, done) }
+    }
+
     /** Every mutation writes on the IO dispatcher and publishes on Main,
      *  so a card swipe is never blocked by a disk write. */
     private fun io(block: () -> Unit) = viewModelScope.launch(Dispatchers.IO) { runCatching(block) }

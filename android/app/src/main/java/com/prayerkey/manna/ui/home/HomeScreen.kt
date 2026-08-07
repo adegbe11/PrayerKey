@@ -63,12 +63,56 @@ fun HomeScreen(
     card: VerseCard,
     journeyInsight: JourneyInsight? = null,
     reduceMotion: Boolean,
+    name: String = "",
+    streak: Int = 0,
+    activeDays: Set<java.time.LocalDate> = emptySet(),
+    devotion: com.prayerkey.manna.data.Devotion? = null,
+    bibleChallenge: com.prayerkey.manna.data.Challenge? = null,
+    prayerChallenge: com.prayerkey.manna.data.Challenge? = null,
+    onToggleChallenge: (com.prayerkey.manna.data.Challenge) -> Unit = {},
+    onOpenChallenge: (com.prayerkey.manna.data.Challenge) -> Unit = {},
+    onWriteDevotion: () -> Unit = {},
+    onOpenBible: () -> Unit = {},
+    onOpenJournal: () -> Unit = {},
+    onOpenChurch: () -> Unit = {},
+    onSettings: () -> Unit = {},
     onReceived: () -> Unit,
     onReceiveNext: () -> Unit,
     onSave: (VerseCard) -> Unit,
     onPray: (VerseCard) -> Unit,
     onShare: (VerseCard) -> Unit,
 ) {
+    /* Home is the dashboard; the card is a room you step into.
+     *
+     * It used to be the card and nothing else, which meant Home could not tell
+     * you what day it was, whether you had shown up, or that the app did
+     * anything beyond one gesture. */
+    var pullOpen by remember { mutableStateOf(false) }
+
+    if (!pullOpen) {
+        androidx.compose.foundation.layout.Box(Modifier.fillMaxSize()) {
+            HomeDashboard(
+                name = name,
+                streak = streak,
+                activeDays = activeDays,
+                devotion = devotion,
+                bible = bibleChallenge,
+                prayer = prayerChallenge,
+                onOpenWord = { pullOpen = true },
+                onWriteDevotion = onWriteDevotion,
+                onOpenChallenge = onOpenChallenge,
+                onToggleChallenge = onToggleChallenge,
+                onOpenBible = onOpenBible,
+                onOpenJournal = onOpenJournal,
+                onOpenChurch = onOpenChurch,
+                onSettings = onSettings,
+            )
+        }
+        return
+    }
+
+    androidx.activity.compose.BackHandler { pullOpen = false }
+
     var state by remember { mutableStateOf(CardState.Waiting) }
     var dragY by remember { mutableFloatStateOf(0f) }
     var pullCount by remember { mutableIntStateOf(0) }

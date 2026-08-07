@@ -472,6 +472,23 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         }, SQLiteDatabase.CONFLICT_REPLACE)
     }
 
+    /* ── Challenge progress ─────────────────────────────────────────────
+       Which days of a challenge have been ticked, as a comma-separated set of
+       day indices in the existing key/value table. A set of small integers per
+       challenge does not earn a table of its own, and adding one would mean
+       another schema version for every device. */
+
+    fun challengeDays(id: String): Set<Int> =
+        state("challenge_$id").orEmpty()
+            .split(',')
+            .mapNotNull { it.trim().toIntOrNull() }
+            .toSet()
+
+    fun setChallengeDay(id: String, day: Int, done: Boolean) {
+        val next = challengeDays(id).toMutableSet().apply { if (done) add(day) else remove(day) }
+        putState("challenge_$id", next.sorted().joinToString(","))
+    }
+
     fun preferences(): UserPrefs = UserPrefs(
         name = state("name") ?: "",
         reminderHour = state("reminder_hour")?.toIntOrNull() ?: 7,
