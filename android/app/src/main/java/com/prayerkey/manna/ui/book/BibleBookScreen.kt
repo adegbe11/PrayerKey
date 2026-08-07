@@ -25,6 +25,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -490,32 +494,6 @@ fun BibleBookScreen(
                 }
             }
 
-            /* ── the ribbon ──────────────────────────────────────────────── */
-            val ribbonHere = ribbon == here.label
-            val ribbonDrop = if (ribbon != null) .46f else .30f
-            Box(
-                Modifier.align(Alignment.TopStart)
-                    // in the gutter, not on the text: at 34dp it was lying
-                    // across the first character of the opening six lines
-                    .padding(start = 15.dp)
-                    .width(10.dp)
-                    .fillMaxHeight(ribbonDrop)
-                    .background(Brush.horizontalGradient(listOf(Color(0xFF6D1622), Ribbon, Color(0xFF5D121D))))
-                    .graphicsLayer { alpha = if (ribbon != null) 1f else .5f }
-                    .clickable {
-                        if (ribbon == null || ribbonHere) {
-                            // drop it here, or pick it up if it is already here
-                            onRibbon(if (ribbonHere) null else here.label)
-                            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                        } else {
-                            val at = ribbon.substringBeforeLast(' ')
-                            val ch = ribbon.substringAfterLast(' ').toIntOrNull() ?: 1
-                            val index = BibleCanon.indexOf(at, ch)
-                            if (index >= 0) { chapterIndex = index; pageIndex = 0 }
-                            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                        }
-                    },
-            )
         }
 
         if (closed) {
@@ -565,6 +543,45 @@ fun BibleBookScreen(
                 fontSize = 17.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp,
                 modifier = Modifier.weight(1f),
             )
+            /* The bookmark used to be a silk ribbon hanging down the gutter.
+               Whatever margin it was given it lay across the first character
+               of the opening lines, so it is a mark in the chrome now: filled
+               where you have left it, hollow where you have not, and it still
+               takes you back from anywhere. */
+            val ribbonHere = ribbon == here.label
+            Box(
+                Modifier.size(34.dp).clip(RoundedCornerShape(99.dp))
+                    .background(if (ribbonHere) Color(0xFF8C1F2B).copy(alpha = .14f) else BookInk.copy(alpha = .05f))
+                    .border(
+                        1.dp,
+                        if (ribbonHere) Color(0xFF8C1F2B).copy(alpha = .5f) else Color(0xFF8C6E32).copy(alpha = .4f),
+                        RoundedCornerShape(99.dp),
+                    )
+                    .clickable {
+                        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                        if (ribbon == null || ribbonHere) {
+                            onRibbon(if (ribbonHere) null else here.label)
+                        } else {
+                            val at = ribbon.substringBeforeLast(' ')
+                            val ch = ribbon.substringAfterLast(' ').toIntOrNull() ?: 1
+                            val index = BibleCanon.indexOf(at, ch)
+                            if (index >= 0) { chapterIndex = index; pageIndex = 0 }
+                        }
+                    },
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    if (ribbon != null) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                    when {
+                        ribbonHere -> "Remove the bookmark"
+                        ribbon != null -> "Go to $ribbon"
+                        else -> "Leave a bookmark here"
+                    },
+                    tint = if (ribbon != null) Color(0xFF8C1F2B) else Color(0xFF6B5424),
+                    modifier = Modifier.size(17.dp),
+                )
+            }
+            Spacer(Modifier.width(8.dp))
             EdgeButton("Aa") { sizeOpen = !sizeOpen }
             Spacer(Modifier.width(8.dp))
             EdgeButton("Read plain") { onReadPlain(here.book.name, here.chapter) }

@@ -15,6 +15,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import com.prayerkey.manna.ui.theme.tooledBorder
+import com.prayerkey.manna.ui.theme.ogee
+import com.prayerkey.manna.ui.theme.goldLeaf
+import com.prayerkey.manna.ui.theme.goldKey
+import com.prayerkey.manna.ui.theme.emboss
+import com.prayerkey.manna.ui.theme.StampedGold
+import com.prayerkey.manna.ui.theme.Leaf
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.animateFloat
@@ -271,7 +278,7 @@ private fun VerseDeckCard(
 
 @Composable
 private fun CardBack() {
-    // the aura breathes, so the disc reads as lit rather than printed
+    // the aura breathes, so the panel reads as lit rather than printed
     val pulse = rememberInfiniteTransition(label = "aura")
     val bloom by pulse.animateFloat(
         initialValue = .30f, targetValue = .52f,
@@ -279,37 +286,68 @@ private fun CardBack() {
         label = "bloom",
     )
 
-    Box(Modifier.fillMaxSize().background(Brush.radialGradient(listOf(Color(0xFF2A304D), Night))), contentAlignment = Alignment.Center) {
+    Box(
+        Modifier.fillMaxSize().background(Brush.radialGradient(listOf(Color(0xFF2A304D), Night))),
+        contentAlignment = Alignment.Center,
+    ) {
         Box(Modifier.fillMaxSize().background(TopSheen))
-        Canvas(Modifier.fillMaxSize().padding(16.dp)) {
-            drawRoundRect(Gold.copy(alpha = .65f), cornerRadius = CornerRadius(68f), style = Stroke(1.2f))
 
-            /* The disc was a flat wash of gold at 11%. It is a glass
-               container now: a gold aura bloomed behind it, a translucent
-               dark body, and a bright rim where the light catches. */
-            val r = size.minDimension * .30f
+        Canvas(Modifier.fillMaxSize()) {
+            /* The frame is the cover's frame. A single hairline rectangle read
+               as a modern app border; this is the same blind-stamped edge and
+               double gold rule as the board, so the two screens are visibly
+               the same object. */
+            tooledBorder(outer = size.width * .045f, track = size.width * .085f, radius = size.width * .05f)
+
+            /* And the centrepiece is the cover's ogee, not a frosted circle.
+               The circle was the one modern shape left on this screen. */
+            val cx = size.width / 2f
+            val cy = size.height * .5f
+            /* Both axes off the width. Taking the height from the card made
+               the ogee taller than it was wide on a full-screen card, and a
+               tall ogee just reads as a circle — the shoulders only show when
+               it is wider than it is tall, as it is on the board. */
+            val hw = size.width * .34f
+            val hh = size.width * .27f
+            val panel = ogee(cx, cy, hw, hh)
+
             drawCircle(
                 Brush.radialGradient(
-                    listOf(Gold.copy(alpha = bloom * .55f), Gold.copy(alpha = bloom * .12f), Color.Transparent),
-                    center = center, radius = r * 1.95f,
+                    listOf(Leaf.copy(alpha = bloom * .30f), Color.Transparent),
+                    center = Offset(cx, cy), radius = hw * 2.1f,
                 ),
-                radius = r * 1.95f,
+                radius = hw * 2.1f, center = Offset(cx, cy),
             )
-            drawCircle(Color.White.copy(alpha = .05f), radius = r)
-            drawCircle(Gold.copy(alpha = .30f), radius = r, style = Stroke(1.1f))
+            drawPath(
+                panel,
+                Brush.radialGradient(
+                    listOf(Color(0xFF2E3557).copy(alpha = .72f), Color(0xFF12162B).copy(alpha = .88f)),
+                    center = Offset(cx, cy - hh * .3f), radius = hw * 2f,
+                ),
+            )
+            emboss(panel, width = 2.4f)
+            drawPath(ogee(cx, cy, hw * .88f, hh * .88f), Leaf.copy(alpha = .35f), style = Stroke(1f))
         }
+
+        /* Key, title and prompt stack in one column, centred on the same
+           point as the shield. Placing the key by canvas coordinates while
+           the text was laid out by the column meant the two were measured in
+           different systems and the teeth landed on the M. */
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("⚿", color = Gold, fontSize = 42.sp)
+            Canvas(Modifier.size(38.dp)) {
+                goldKey(Offset(size.width / 2f, size.height / 2f), height = size.height)
+            }
+            Spacer(Modifier.height(16.dp))
+            StampedGold("MANNA", size = 21.sp, tracking = 8.sp)
             Spacer(Modifier.height(16.dp))
             Text(
-                "MANNA",
-                color = Ivory, fontFamily = BookSerif,
-                fontSize = 19.sp, letterSpacing = 9.sp, fontWeight = FontWeight.Medium,
+                "Pull down to receive today’s Word",
+                color = Color.White.copy(alpha = .92f), fontSize = 13.sp,
             )
-            Spacer(Modifier.height(20.dp))
-            // was 68% white and disappeared into the disc behind it
-            Text("Pull down to receive today’s Word", color = Color.White.copy(alpha = .92f), fontSize = 13.sp)
-            Icon(Icons.Outlined.KeyboardArrowDown, null, tint = Gold, modifier = Modifier.padding(top = 6.dp).size(20.dp))
+            Icon(
+                Icons.Outlined.KeyboardArrowDown, null,
+                tint = Leaf, modifier = Modifier.padding(top = 6.dp).size(20.dp),
+            )
         }
     }
 }

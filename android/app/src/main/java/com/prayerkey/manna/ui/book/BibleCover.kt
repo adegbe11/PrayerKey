@@ -39,6 +39,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prayerkey.manna.ui.theme.emboss
+import com.prayerkey.manna.ui.theme.goldLeaf
+import com.prayerkey.manna.ui.theme.ogee
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.RomanCaps
 import kotlin.math.cos
@@ -110,11 +113,6 @@ fun BibleCover(onOpen: () -> Unit, modifier: Modifier = Modifier) {
  * right, a bright line above and left, the metal between. This is the whole
  * difference between tooled and printed.
  */
-private fun DrawScope.emboss(path: Path, width: Float) {
-    translate(1.6f, 2.2f) { drawPath(path, Color(0xFF1C0A03).copy(alpha = .55f), style = Stroke(width * 1.15f)) }
-    translate(-1.2f, -1.6f) { drawPath(path, GoldLit.copy(alpha = .35f), style = Stroke(width * .9f)) }
-    drawPath(path, goldLeaf(), style = Stroke(width))
-}
 
 /**
  * Gold leaf rather than golden-yellow paint.
