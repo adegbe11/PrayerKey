@@ -170,7 +170,7 @@ fun BibleScreen(
         return
     }
 
-    Box(Modifier.fillMaxSize().background(Canvas)) {
+    Box(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background)) {
         if (showMemory) {
             Column(Modifier.fillMaxSize().padding(horizontal = 14.dp).padding(top = 60.dp)) {
                 Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1145,7 +1145,7 @@ fun ProfileScreen(
             ReminderReceiver.schedule(context, next.reminderHour, next.reminderMinute, true)
         }
     }
-    Column(Modifier.fillMaxSize().background(Canvas).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp).padding(top = 20.dp, bottom = 42.dp)) {
+    Column(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp).padding(top = 20.dp, bottom = 42.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, "Back") }
             Column { Text("You", fontFamily = BookSerif, fontSize = 32.sp); Text("Your quiet rhythm with God.", color = Muted, fontSize = 13.sp) }
@@ -1223,7 +1223,7 @@ private fun SettingRow(label: String, value: String, onClick: () -> Unit = {}, a
 
 @Composable
 private fun ScreenFrame(title: String, subtitle: String, content: @Composable ColumnScope.() -> Unit) {
-    Column(Modifier.fillMaxSize().background(Canvas).padding(horizontal = 22.dp).padding(top = 24.dp)) {
+    Column(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background).padding(horizontal = 22.dp).padding(top = 24.dp)) {
         Text(title, fontFamily = BookSerif, fontSize = 32.sp)
         Text(subtitle, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
         content()

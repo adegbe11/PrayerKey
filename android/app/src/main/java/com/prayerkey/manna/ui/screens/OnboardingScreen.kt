@@ -117,7 +117,7 @@ private fun PullToLearn(onPulled: () -> Unit) {
         label = "onboard-pull",
     )
 
-    Box(Modifier.fillMaxSize().background(Canvas)) {
+    Box(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background)) {
         Box(
             Modifier.fillMaxSize().padding(horizontal = 14.dp)
                 // the card has to clear the reveal copy AND the button, or
@@ -203,7 +203,7 @@ private fun ReminderStep(onDone: (Boolean, Int) -> Unit) {
     var hour by remember { mutableIntStateOf(7) }
 
     Column(
-        Modifier.fillMaxSize().background(Canvas).padding(horizontal = 30.dp),
+        Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background).padding(horizontal = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.weight(1f))

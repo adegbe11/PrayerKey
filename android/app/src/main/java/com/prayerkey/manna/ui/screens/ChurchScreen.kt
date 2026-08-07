@@ -379,6 +379,7 @@ private fun NoteView(
     onDiscard: () -> Unit,
 ) {
     var showTranscript by remember { mutableStateOf(false) }
+    val cs = MaterialTheme.colorScheme
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState())
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 130.dp),
@@ -441,15 +442,29 @@ private fun NoteView(
             Box(
                 Modifier.weight(1f).height(52.dp)
                     .shadow(12.dp, R.control, spotColor = Electric.copy(alpha = .4f))
-                    .clip(R.control).background(ElectricGloss).clickable(onClick = onSave),
+                    .clip(R.control).background(cs.primary).clickable(onClick = onSave),
                 contentAlignment = Alignment.Center,
-            ) { Text("Save to journal", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp) }
+            ) {
+                Text(
+                    "Save to journal", color = cs.onPrimary,
+                    fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                )
+            }
+            /* Was a white pill with an unset text colour: once the type scale
+               stopped carrying a baked-in ink, that text took the theme's and
+               went pale-on-white. And its neighbour was electric blue, the
+               loudest thing on a screen about listening. */
             Box(
                 Modifier.weight(1f).height(52.dp)
-                    .clip(R.control).background(Color.White)
-                    .border(1.dp, Hairline, R.control).clickable(onClick = onShare),
+                    .clip(R.control)
+                    .border(1.dp, cs.outlineVariant, R.control).clickable(onClick = onShare),
                 contentAlignment = Alignment.Center,
-            ) { Text("Share", fontWeight = FontWeight.SemiBold, fontSize = 14.sp) }
+            ) {
+                Text(
+                    "Share", color = cs.onBackground,
+                    fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                )
+            }
         }
 
         if (note.transcript.isNotBlank()) {
