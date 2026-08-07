@@ -46,7 +46,7 @@ import com.prayerkey.manna.ui.theme.Muted
 private data class Destination(val label: String, val icon: ImageVector)
 
 @Composable
-fun MannaApp(onThemeChange: (String) -> Unit = {}) {
+fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
     val viewModel: AppViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val saved by viewModel.saved.collectAsState()
     val streak by viewModel.streak.collectAsState()
@@ -103,27 +103,17 @@ fun MannaApp(onThemeChange: (String) -> Unit = {}) {
                 // one frame of brand, never a flash of the wrong screen
                 Box(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background))
             } else if (!preferences.onboarded) {
-                com.prayerkey.manna.ui.screens.OnboardingScreen(
-                    themeId = preferences.themeId,
-                    onTheme = { t ->
-                        viewModel.updatePreferences(preferences.copy(themeId = t))
-                        onThemeChange(t)
-                    },
-                ) { wantsReminder, hour ->
-                    /* The reminder is set at the one moment people say yes.
-                       It used to default off and hide behind Profile, which
-                       is the strongest retention lever switched off. */
+                com.prayerkey.manna.ui.screens.OnboardingScreen {
+                    /* The reminder used to be set here, at the one moment
+                       people say yes. It is still on by default — the setting
+                       lives in Profile, and defaulting it off would switch
+                       off the only thing that brings anyone back tomorrow. */
                     viewModel.updatePreferences(
-                        preferences.copy(
-                            onboarded = true,
-                            reminderEnabled = wantsReminder,
-                            reminderHour = hour,
-                            reminderMinute = 0,
-                        ),
+                        preferences.copy(onboarded = true, reminderEnabled = true),
                     )
-                    if (wantsReminder) {
-                        com.prayerkey.manna.reminder.ReminderReceiver.schedule(context, hour, 0, true)
-                    }
+                    com.prayerkey.manna.reminder.ReminderReceiver.schedule(
+                        context, preferences.reminderHour, preferences.reminderMinute, true,
+                    )
                 }
             } else if (showProfile) {
                 ProfileScreen(

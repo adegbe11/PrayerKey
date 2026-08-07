@@ -27,7 +27,9 @@ data class UserPrefs(
     val translation: String = "KJV",
     val onboarded: Boolean = false,
     val sermonLanguage: String = "en-US",
-    val themeId: String = "imperial_key",
+    val themeId: String = DEFAULT_THEME_ID,
+    /** Let the phone decide light or dark; the theme supplies the accent. */
+    val followSystemTheme: Boolean = true,
     val journalLock: Boolean = false,
     val concealJournalPreviews: Boolean = false,
     /* The book reader. Bible readers skew older and a fixed small serif
@@ -483,6 +485,10 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         concealJournalPreviews = state("journal_conceal") == "true",
         readerTextSize = state("reader_size")?.toIntOrNull() ?: 17,
         readerRibbon = state("reader_ribbon")?.takeIf { it.isNotBlank() },
+        /* The theme was in this model but in neither the read nor the write,
+           so choosing one lasted exactly as long as the process did. */
+        themeId = state("theme") ?: DEFAULT_THEME_ID,
+        followSystemTheme = state("theme_follow_system") != "false",
     )
 
     fun savePreferences(prefs: UserPrefs) {
@@ -493,6 +499,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         putState("sermon_language", prefs.sermonLanguage)
         putState("journal_lock", prefs.journalLock.toString()); putState("journal_conceal", prefs.concealJournalPreviews.toString())
         putState("reader_size", prefs.readerTextSize.toString()); putState("reader_ribbon", prefs.readerRibbon.orEmpty())
+        putState("theme", prefs.themeId); putState("theme_follow_system", prefs.followSystemTheme.toString())
     }
 
     fun formation(): FormationState = FormationState(

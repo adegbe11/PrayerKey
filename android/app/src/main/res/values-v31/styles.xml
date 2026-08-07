@@ -5,8 +5,8 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">#FAFAF8</item>
-        <item name="android:windowSplashScreenBackground">#14182A</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_manna</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">#14182A</item>
+        <item name="android:windowSplashScreenBackground">#0A1428</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#0A1428</item>
     </style>
 </resources>

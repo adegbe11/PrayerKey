@@ -1,6 +1,8 @@
 package com.prayerkey.manna.ui.screens
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
+import com.prayerkey.manna.ui.theme.goldKey
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -103,7 +105,7 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
 
         Text(
             slide.headline,
-            color = InkSoft,
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
             fontSize = 34.sp, lineHeight = 44.sp,
             letterSpacing = (-0.6).sp,
             fontWeight = FontWeight.Normal,
@@ -111,7 +113,7 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
 
         slide.sub?.let {
             Spacer(Modifier.height(14.dp))
-            Text(it, color = Muted, fontSize = 13.5.sp, lineHeight = 21.sp)
+            Text(it, color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground.copy(alpha = .62f), fontSize = 13.5.sp, lineHeight = 21.sp)
         }
 
         Spacer(Modifier.height(34.dp))
@@ -122,7 +124,7 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
         ) {
             Text(
                 "Skip",
-                color = Muted, fontSize = 14.sp,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground.copy(alpha = .62f), fontSize = 14.sp,
                 modifier = Modifier.clickable(onClick = onSkip),
             )
             Spacer(Modifier.weight(1f))
@@ -159,8 +161,9 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
 private fun VerseCardArt() {
     Box(
         Modifier.fillMaxWidth(.62f).height(260.dp)
-            .shadow(26.dp, R.card, spotColor = Color(0xFF14182A).copy(alpha = .4f))
-            .clip(R.card).background(NightFill),
+            .shadow(26.dp, R.card, spotColor = Color(0xFF000000).copy(alpha = .5f))
+            .clip(R.card).background(NightFill)
+            .border(1.dp, com.prayerkey.manna.ui.theme.Leaf.copy(alpha = .30f), R.card),
         contentAlignment = Alignment.Center,
     ) {
         Canvas(Modifier.fillMaxSize()) {
@@ -181,9 +184,15 @@ private fun VerseCardArt() {
             )
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("⚿", color = Gold, fontSize = 38.sp)
-            Spacer(Modifier.height(12.dp))
-            Text("MANNA", color = Ivory, fontSize = 12.sp, letterSpacing = 4.sp, fontWeight = FontWeight.Medium)
+            /* The mark, not the ⚿ glyph in a box — the same cross-topped key
+               the launcher icon and Home now carry. */
+            Canvas(Modifier.size(34.dp)) {
+                goldKey(
+                    Offset(size.width / 2f, size.height / 2f), height = size.height,
+                )
+            }
+            Spacer(Modifier.height(14.dp))
+            com.prayerkey.manna.ui.theme.StampedGold("MANNA", size = 13.sp, tracking = 4.sp)
         }
     }
 }

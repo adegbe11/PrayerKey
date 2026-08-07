@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.prayerkey.manna.data.SavedWord
 import com.prayerkey.manna.data.GeneratedPrayer
 import com.prayerkey.manna.data.PrayerKeyApi
+import com.prayerkey.manna.data.APP_THEMES
 import com.prayerkey.manna.data.PrayerTopic
 import com.prayerkey.manna.data.OfflineBible
 import com.prayerkey.manna.data.BibleVerse
@@ -1164,6 +1165,12 @@ fun ProfileScreen(
                 Column(horizontalAlignment = Alignment.End) { Text(savedCount.toString(), color = Gold, fontSize = 30.sp); Text("words saved", color = Color.White.copy(.7f)) }
             }
         }
+        /* ── Theme ──────────────────────────────────────────────────────
+           This was the last screen of onboarding — a twelve-card carousel
+           asked before anyone had seen a verse. It belongs here, where a
+           choice about how the app looks can be changed on a whim. */
+        ThemeSetting(prefs, onUpdate)
+
         SettingRow("Daily reminder", String.format("%02d:%02d", prefs.reminderHour, prefs.reminderMinute), onClick = {
             TimePickerDialog(context, { _, hour, minute ->
                 val next = prefs.copy(reminderHour = hour, reminderMinute = minute); onUpdate(next)
@@ -1242,3 +1249,74 @@ private fun fieldColors() = OutlinedTextFieldDefaults.colors(
     focusedBorderColor = Electric, unfocusedBorderColor = Color.Transparent,
     focusedContainerColor = AppleGray, unfocusedContainerColor = AppleGray,
 )
+
+/**
+ * Picking a theme, in settings.
+ *
+ * Five rows, each showing its own accent against its own paper, so the choice
+ * is made by looking at the thing rather than at a word. Plus the system
+ * switch: with it on the phone decides light or dark and the chosen theme
+ * only supplies the accent, which is why someone who picked Peace still gets
+ * sage at 2am instead of being dragged back onto a white page.
+ */
+@Composable
+private fun ThemeSetting(prefs: UserPrefs, onUpdate: (UserPrefs) -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Column(Modifier.padding(top = 20.dp)) {
+        Text(
+            "THEME",
+            color = cs.onBackground.copy(alpha = .5f), fontSize = 9.5.sp,
+            letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold,
+        )
+        Row(
+            Modifier.fillMaxWidth().padding(top = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            APP_THEMES.forEach { theme ->
+                val chosen = theme.id == prefs.themeId
+                Column(
+                    Modifier.weight(1f)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(if (chosen) theme.accent.copy(alpha = .12f) else Color.Transparent)
+                        .border(
+                            1.dp,
+                            if (chosen) theme.accent else cs.outlineVariant,
+                            RoundedCornerShape(16.dp),
+                        )
+                        .clickable { onUpdate(prefs.copy(themeId = theme.id)) }
+                        .padding(vertical = 12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    // the paper, with the accent sitting on it
+                    Box(
+                        Modifier.size(30.dp).clip(CircleShape).background(theme.background)
+                            .border(1.dp, theme.ink.copy(alpha = .18f), CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Box(Modifier.size(15.dp).clip(CircleShape).background(theme.accent))
+                    }
+                    Text(
+                        theme.name,
+                        color = if (chosen) theme.accent else cs.onBackground.copy(alpha = .7f),
+                        fontSize = 10.sp, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 7.dp),
+                    )
+                }
+            }
+        }
+        Text(
+            APP_THEMES.firstOrNull { it.id == prefs.themeId }?.note.orEmpty(),
+            color = cs.onBackground.copy(alpha = .55f), fontSize = 12.sp,
+            modifier = Modifier.padding(top = 10.dp),
+        )
+        SettingRow(
+            "Match my phone",
+            if (prefs.followSystemTheme) "Light and dark follow the system" else "Always the theme I chose",
+        ) {
+            Switch(
+                prefs.followSystemTheme,
+                onCheckedChange = { onUpdate(prefs.copy(followSystemTheme = it)) },
+            )
+        }
+    }
+}

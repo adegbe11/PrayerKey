@@ -3,20 +3,29 @@ package com.prayerkey.manna.data
 import androidx.compose.ui.graphics.Color
 
 /**
- * The twelve themes, in four moods of three.
+ * Five themes.
  *
- * Every value here is a real palette the app renders from — the picker
- * changes the whole product, not just a preview tile. A theme chooser that
- * does not repaint the app is theatre.
+ * There were twelve, in four moods of three. Twelve is a worse offer than
+ * five: it is a wall of near-identical swatches, it triples the surface area
+ * where contrast can go wrong, and nobody browses past the third. Three is
+ * the floor — light, dark, and one accent. Five is the room to have a mood
+ * without the app becoming a colour picker.
  *
- * One rule throughout: no pure black. #000000 reads as cheap on OLED and is
- * harsh to look at for long. Dark themes are tinted — navy, moss, indigo,
- * teal — which is also what makes gold and ivory sit well on them.
+ * The discipline that makes five work: **backgrounds stay neutral and only
+ * the accent moves.** Grace and Vigil set the two papers, warm white and deep
+ * navy. Peace, Joy and Spirit are Grace's paper with a different accent, so
+ * body text is the same charcoal on the same warm white in all four light
+ * themes and cannot be made unreadable by a colour choice.
+ *
+ * No pure black and no pure white. #000000 is harsh to read against for long
+ * and #FFFFFF is clinical; both are the giveaway of an app that picked its
+ * colours from a default palette.
  */
 data class AppTheme(
     val id: String,
     val name: String,
-    val mood: String,
+    /** One line, shown under the name in settings. */
+    val note: String,
     val dark: Boolean,
     /** Page behind everything. */
     val background: Color,
@@ -25,174 +34,113 @@ data class AppTheme(
     val ink: Color,
     val muted: Color,
     val accent: Color,
-    /** The cover art gradient, top to bottom; the last stop must meet
-     *  [background] so the header bleeds into the cards below it. */
+    /** Header wash, top to bottom; the last stop must meet [background] so a
+     *  header bleeds into the cards below it rather than banding. */
     val header: List<Color>,
 )
 
-const val MOOD_MIDNIGHT = "Midnight Sanctuary"
-const val MOOD_CATHEDRAL = "Cathedral Heritage"
-const val MOOD_DAWN = "The Dawn of Hope"
-const val MOOD_EARTH = "Creation & Earth"
+/* The two papers. Every light theme shares Grace's, so text contrast is
+   settled once rather than five times. */
+private val WarmWhite = Color(0xFFFBF7F0)
+private val WarmCard = Color(0xFFFFFFFF)
+private val Charcoal = Color(0xFF2C2A26)
+private val WarmMuted = Color(0xFF8A8378)
+
+private val Navy = Color(0xFF0F1626)
+private val NavyCard = Color(0xFF19223A)
+private val OffWhite = Color(0xFFF2EFE6)
+private val NavyMuted = Color(0xFF93A0BC)
 
 val APP_THEMES: List<AppTheme> = listOf(
 
-    /* ── Mood 1 · Midnight Sanctuary ─────────────────────────────── */
+    AppTheme(
+        id = "grace",
+        name = "Grace",
+        note = "Warm paper and charcoal",
+        dark = false,
+        background = WarmWhite,
+        surface = WarmCard,
+        ink = Charcoal,
+        muted = WarmMuted,
+        // terracotta gold: the warm metal of a tooled board, not lime
+        accent = Color(0xFFB8863B),
+        header = listOf(Color(0xFFF6E9D2), Color(0xFFFDF6EA), WarmWhite),
+    ),
 
     AppTheme(
-        id = "imperial_key",
-        name = "The Imperial Key",
-        mood = MOOD_MIDNIGHT,
+        id = "vigil",
+        name = "Vigil",
+        note = "Deep navy, for reading at night",
         dark = true,
-        background = Color(0xFF0A1128),
-        surface = Color(0xFF141C3A),
-        ink = Color(0xFFF6F0E1),
-        muted = Color(0xFF8E97B8),
+        background = Navy,
+        surface = NavyCard,
+        ink = OffWhite,
+        muted = NavyMuted,
         accent = Color(0xFFD4AF37),
-        header = listOf(Color(0xFF1B2A5B), Color(0xFF131E42), Color(0xFF0A1128)),
-    ),
-    AppTheme(
-        id = "gethsemane",
-        name = "Gethsemane Shadows",
-        mood = MOOD_MIDNIGHT,
-        dark = true,
-        background = Color(0xFF14201A),
-        surface = Color(0xFF1E2C24),
-        ink = Color(0xFFEDEFE4),
-        muted = Color(0xFF8B9A88),
-        accent = Color(0xFFB6C48A),
-        header = listOf(Color(0xFF2A3C2E), Color(0xFF1D2B22), Color(0xFF14201A)),
-    ),
-    AppTheme(
-        id = "eternal_grace",
-        name = "Eternal Grace",
-        mood = MOOD_MIDNIGHT,
-        dark = true,
-        background = Color(0xFF120E22),
-        surface = Color(0xFF1D1734),
-        ink = Color(0xFFF1ECF8),
-        muted = Color(0xFF9A8FB8),
-        accent = Color(0xFFB98BE0),
-        header = listOf(Color(0xFF3A2260), Color(0xFF241844), Color(0xFF120E22)),
+        header = listOf(Color(0xFF1E2A47), Color(0xFF151E33), Navy),
     ),
 
-    /* ── Mood 2 · Cathedral Heritage ─────────────────────────────── */
+    AppTheme(
+        id = "peace",
+        name = "Peace",
+        note = "Sage, to settle",
+        dark = false,
+        background = WarmWhite,
+        surface = WarmCard,
+        ink = Charcoal,
+        muted = WarmMuted,
+        accent = Color(0xFF6E8F72),
+        header = listOf(Color(0xFFE4EDE3), Color(0xFFF6FAF4), WarmWhite),
+    ),
 
     AppTheme(
-        id = "vatican_scroll",
-        name = "The Vatican Scroll",
-        mood = MOOD_CATHEDRAL,
+        id = "joy",
+        name = "Joy",
+        note = "Terracotta, to lift",
         dark = false,
-        background = Color(0xFFFDFBF7),
-        surface = Color(0xFFFFFFFF),
-        ink = Color(0xFF2C1A1C),
-        muted = Color(0xFF8A7A72),
-        accent = Color(0xFF7B2233),
-        header = listOf(Color(0xFFF3E3E0), Color(0xFFFAF1EC), Color(0xFFFDFBF7)),
-    ),
-    AppTheme(
-        id = "monastery",
-        name = "Monastery Library",
-        mood = MOOD_CATHEDRAL,
-        dark = false,
-        background = Color(0xFFF6EFE2),
-        surface = Color(0xFFFFFBF3),
-        ink = Color(0xFF3A2A1C),
-        muted = Color(0xFF8C7A64),
-        accent = Color(0xFF6B4A28),
-        header = listOf(Color(0xFFE2D2B6), Color(0xFFEEE3CC), Color(0xFFF6EFE2)),
-    ),
-    AppTheme(
-        id = "ancient_covenant",
-        name = "Ancient Covenant",
-        mood = MOOD_CATHEDRAL,
-        dark = false,
-        background = Color(0xFFFFFFFC),
-        surface = Color(0xFFFFFFFF),
-        ink = Color(0xFF1E1B18),
-        muted = Color(0xFF8E8A82),
-        accent = Color(0xFFB08A2E),
-        header = listOf(Color(0xFFF3EAD4), Color(0xFFFAF6EA), Color(0xFFFFFFFC)),
+        background = WarmWhite,
+        surface = WarmCard,
+        ink = Charcoal,
+        muted = WarmMuted,
+        accent = Color(0xFFB5654C),
+        header = listOf(Color(0xFFF6E2DA), Color(0xFFFDF1EC), WarmWhite),
     ),
 
-    /* ── Mood 3 · The Dawn of Hope ───────────────────────────────── */
-
     AppTheme(
-        id = "rising_grace",
-        name = "Rising Grace",
-        mood = MOOD_DAWN,
+        id = "spirit",
+        name = "Spirit",
+        note = "Lavender, to reflect",
         dark = false,
-        background = Color(0xFFFFFDFC),
-        surface = Color(0xFFFFFFFF),
-        ink = Color(0xFF2A1E22),
-        muted = Color(0xFF9A8288),
-        accent = Color(0xFFE8734A),
-        header = listOf(Color(0xFFF8A07A), Color(0xFFFBC9AE), Color(0xFFFFFDFC)),
-    ),
-    AppTheme(
-        id = "mercy_dew",
-        name = "Mercy Dew",
-        mood = MOOD_DAWN,
-        dark = false,
-        background = Color(0xFFFAFCFA),
-        surface = Color(0xFFFFFFFF),
-        ink = Color(0xFF1E2A24),
-        muted = Color(0xFF88998E),
-        accent = Color(0xFF5FA383),
-        header = listOf(Color(0xFFBEDDCB), Color(0xFFDCEDE2), Color(0xFFFAFCFA)),
-    ),
-    AppTheme(
-        id = "seraphim_sky",
-        name = "Seraphim Sky",
-        mood = MOOD_DAWN,
-        dark = false,
-        background = Color(0xFFFCFBFF),
-        surface = Color(0xFFFFFFFF),
-        ink = Color(0xFF23203A),
-        muted = Color(0xFF8E8AA8),
-        accent = Color(0xFF7C7BD8),
-        header = listOf(Color(0xFFC4C6F0), Color(0xFFDEDFF8), Color(0xFFFCFBFF)),
-    ),
-
-    /* ── Mood 4 · Creation & Earth ───────────────────────────────── */
-
-    AppTheme(
-        id = "quiet_mountain",
-        name = "The Quiet Mountain",
-        mood = MOOD_EARTH,
-        dark = true,
-        background = Color(0xFF16202C),
-        surface = Color(0xFF1F2B3A),
-        ink = Color(0xFFEAF0F6),
-        muted = Color(0xFF8496A8),
-        accent = Color(0xFF7FA8C9),
-        header = listOf(Color(0xFF33506B), Color(0xFF223448), Color(0xFF16202C)),
-    ),
-    AppTheme(
-        id = "living_water",
-        name = "Living Water",
-        mood = MOOD_EARTH,
-        dark = true,
-        background = Color(0xFF0E2226),
-        surface = Color(0xFF163038),
-        ink = Color(0xFFE6F3F0),
-        muted = Color(0xFF7EA09C),
-        accent = Color(0xFF6FCBB0),
-        header = listOf(Color(0xFF1D4A4E), Color(0xFF143338), Color(0xFF0E2226)),
-    ),
-    AppTheme(
-        id = "autumn_devotion",
-        name = "Autumn Devotion",
-        mood = MOOD_EARTH,
-        dark = false,
-        background = Color(0xFFFBF4EE),
-        surface = Color(0xFFFFFBF7),
-        ink = Color(0xFF31201A),
-        muted = Color(0xFF987868),
-        accent = Color(0xFFB35A38),
-        header = listOf(Color(0xFFDE9B78), Color(0xFFEFC5AA), Color(0xFFFBF4EE)),
+        background = WarmWhite,
+        surface = WarmCard,
+        ink = Charcoal,
+        muted = WarmMuted,
+        accent = Color(0xFF7B6BA8),
+        header = listOf(Color(0xFFE8E3F2), Color(0xFFF7F4FB), WarmWhite),
     ),
 )
 
-/** Falls back to the first theme rather than crashing on a stale id. */
-fun themeById(id: String): AppTheme = APP_THEMES.firstOrNull { it.id == id } ?: APP_THEMES.first()
+/** Grace, unless the phone is in dark mode and the user follows the system. */
+const val DEFAULT_THEME_ID = "grace"
+const val DARK_THEME_ID = "vigil"
+
+fun themeById(id: String): AppTheme =
+    APP_THEMES.firstOrNull { it.id == id } ?: APP_THEMES.first()
+
+/**
+ * Resolves what to actually paint.
+ *
+ * With [followSystem] on, the phone decides light or dark and the chosen
+ * theme only supplies the accent — so someone who picked Peace gets sage on
+ * warm white by day and sage on navy at night, rather than being dragged
+ * back to a light page at 2am.
+ */
+fun resolveTheme(id: String, followSystem: Boolean, systemDark: Boolean): AppTheme {
+    val chosen = themeById(id)
+    if (!followSystem) return chosen
+    return if (systemDark) {
+        themeById(DARK_THEME_ID).copy(accent = chosen.accent)
+    } else {
+        themeById(DEFAULT_THEME_ID).copy(accent = chosen.accent)
+    }
+}

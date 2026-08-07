@@ -118,59 +118,47 @@ fun DrawScope.tooledBorder(outer: Float, track: Float, radius: Float) {
 }
 
 /**
- * A key, drawn rather than set as a glyph.
+ * The PrayerKey mark: a key whose bow is a budded cross.
  *
- * The brand mark used to be the character ⚿ inside a square outline, which is
- * the exact silhouette of an app icon and read as a password manager. Drawn
- * with the leaf and the groove — and without the square — it reads as what an
- * old Bible actually carried on its board: a clasp.
+ * It began as the character ⚿ inside a square outline, which is the exact
+ * silhouette of an app icon and read as a password manager. Then it was a
+ * plain ring-bowed key, which was better but was not the brand's mark — the
+ * brand's key is cross-topped, and the cross is the whole point of it.
+ *
+ * Kept in step with res/drawable/ic_key_mark.xml, which is the same mark as a
+ * vector for the launcher and the splash. If one changes, change both.
  */
 fun DrawScope.goldKey(centre: Offset, height: Float) {
-    val bowR = height * .215f
-    val shankTop = centre.y - height / 2f + bowR * 2f
-    val shankW = height * .075f
-    val bottom = centre.y + height / 2f
+    val h = height
+    val cx = centre.x
+    val top = centre.y - h / 2f
+
+    val bar = h * .066f
+    val bud = h * .054f
+    val armHalf = h * .19f
+    val crossMid = top + h * .17f
 
     val body = Path().apply {
-        // the bow
-        addOval(
-            androidx.compose.ui.geometry.Rect(
-                centre.x - bowR, centre.y - height / 2f,
-                centre.x + bowR, centre.y - height / 2f + bowR * 2f,
-            ),
-        )
-        // the shank
-        addRect(
-            androidx.compose.ui.geometry.Rect(
-                centre.x - shankW / 2f, shankTop - bowR * .3f,
-                centre.x + shankW / 2f, bottom,
-            ),
-        )
-        // two teeth, the longer one at the tip
-        addRect(
-            androidx.compose.ui.geometry.Rect(
-                centre.x + shankW / 2f, bottom - height * .28f,
-                centre.x + shankW / 2f + height * .17f, bottom - height * .21f,
-            ),
-        )
-        addRect(
-            androidx.compose.ui.geometry.Rect(
-                centre.x + shankW / 2f, bottom - height * .12f,
-                centre.x + shankW / 2f + height * .12f, bottom - height * .05f,
-            ),
-        )
+        // the cross that forms the bow
+        addRect(androidx.compose.ui.geometry.Rect(cx - bar, top + h * .05f, cx + bar, top + h * .50f))
+        addRect(androidx.compose.ui.geometry.Rect(cx - armHalf, crossMid - bar, cx + armHalf, crossMid + bar))
+        // budded ends: head, and one on each arm
+        addOval(androidx.compose.ui.geometry.Rect(cx - bud, top - bud * .2f, cx + bud, top + bud * 1.8f))
+        addOval(androidx.compose.ui.geometry.Rect(cx - armHalf - bud, crossMid - bud, cx - armHalf + bud, crossMid + bud))
+        addOval(androidx.compose.ui.geometry.Rect(cx + armHalf - bud, crossMid - bud, cx + armHalf + bud, crossMid + bud))
+        // the collar, then the shank
+        addRect(androidx.compose.ui.geometry.Rect(cx - h * .085f, top + h * .49f, cx + h * .085f, top + h * .555f))
+        addRect(androidx.compose.ui.geometry.Rect(cx - bar * .82f, top + h * .55f, cx + bar * .82f, top + h * .93f))
+        // two wards
+        addRect(androidx.compose.ui.geometry.Rect(cx + bar * .6f, top + h * .61f, cx + h * .175f, top + h * .675f))
+        addRect(androidx.compose.ui.geometry.Rect(cx + bar * .6f, top + h * .735f, cx + h * .125f, top + h * .80f))
+        // the tip
+        addOval(androidx.compose.ui.geometry.Rect(cx - h * .036f, top + h * .90f, cx + h * .036f, top + h * .972f))
     }
 
     translate(1.4f, 2f) { drawPath(body, Groove.copy(alpha = .5f)) }
     drawPath(body, goldLeaf())
-    drawPath(body, LeafLit.copy(alpha = .28f), style = Stroke(.9f))
-
-    // the ward, punched through the bow
-    drawCircle(
-        Color(0xFF1B0E07),
-        radius = bowR * .42f,
-        center = Offset(centre.x, centre.y - height / 2f + bowR),
-    )
+    drawPath(body, LeafLit.copy(alpha = .26f), style = Stroke(.9f))
 }
 
 /**

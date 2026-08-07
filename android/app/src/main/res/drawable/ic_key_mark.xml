@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The PrayerKey mark: a key whose bow is a budded cross.
+
+  Drawn from the brand tile, with two changes the tile cannot make and an
+  icon must:
+
+  Solid, not outlined. The tile's cross is a fine hollow line, which is
+  legible at 1256px and gone at 48dp — the size a launcher icon is actually
+  rendered. Every stroke here has weight.
+
+  No wordmark. The tile carries PRAYERKEY across the bottom; at 48dp that is
+  a grey smudge, and the launcher already prints the app's name underneath.
+
+  Kept inside the central 66% of the canvas, because both the launcher and
+  the API 31 splash mask this to a circle and clip whatever falls outside.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+
+    <!-- the cross that forms the bow -->
+    <path android:fillColor="#D4AF37"
+        android:pathData="M51.2,22h5.6v36h-5.6z" />
+    <path android:fillColor="#D4AF37"
+        android:pathData="M38,31.4h32v5.6h-32z" />
+
+    <!-- budded ends: one at the head, one on each arm -->
+    <path android:fillColor="#D4AF37"
+        android:pathData="M54,17.4a4.6,4.6 0,1 1,0 9.2a4.6,4.6 0,0 1,0 -9.2z" />
+    <path android:fillColor="#D4AF37"
+        android:pathData="M37.4,29.6a4.6,4.6 0,1 1,0 9.2a4.6,4.6 0,0 1,0 -9.2z" />
+    <path android:fillColor="#D4AF37"
+        android:pathData="M70.6,29.6a4.6,4.6 0,1 1,0 9.2a4.6,4.6 0,0 1,0 -9.2z" />
+
+    <!-- the collar, where the bow meets the shank -->
+    <path android:fillColor="#D4AF37"
+        android:pathData="M46.6,57.4h14.8v5.4h-14.8z" />
+
+    <!-- the shank -->
+    <path android:fillColor="#D4AF37"
+        android:pathData="M51.4,62.8h5.2v25.4h-5.2z" />
+
+    <!-- two wards -->
+    <path android:fillColor="#D4AF37"
+        android:pathData="M56.6,69.6h13.4v5.2h-13.4z" />
+    <path android:fillColor="#D4AF37"
+        android:pathData="M56.6,79.2h9v5.2h-9z" />
+
+    <!-- the tip -->
+    <path android:fillColor="#D4AF37"
+        android:pathData="M54,86.4a2.9,2.9 0,1 1,0 5.8a2.9,2.9 0,0 1,0 -5.8z" />
+</vector>

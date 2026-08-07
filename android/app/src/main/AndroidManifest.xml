@@ -14,7 +14,7 @@
             <action android:name="android.speech.RecognitionService" />
         </intent>
     </queries>
-    <application android:allowBackup="false" android:icon="@drawable/ic_manna" android:roundIcon="@drawable/ic_manna" android:label="MANNA" android:supportsRtl="true" android:theme="@style/Theme.Manna">
+    <application android:allowBackup="false" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher_round" android:label="PrayerKey" android:supportsRtl="true" android:theme="@style/Theme.Manna">
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.files"

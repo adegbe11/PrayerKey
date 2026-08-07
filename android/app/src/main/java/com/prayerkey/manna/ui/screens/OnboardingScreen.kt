@@ -6,6 +6,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
+import com.prayerkey.manna.ui.theme.goldKey
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -72,31 +73,22 @@ private val Ivory = Color(0xFFF6F0E1)
  * reminder, which is the only thing that brings anyone back tomorrow.
  */
 @Composable
-fun OnboardingScreen(
-    themeId: String,
-    onTheme: (String) -> Unit,
-    onDone: (Boolean, Int) -> Unit,
-) {
-    // 0..2 slides, 3 the gesture, 4 the theme, 5 the reminder.
-    // Skip jumps the slides but NOT the pull — reading about a gesture
-    // teaches nobody, so everyone still does it once.
+fun OnboardingScreen(onDone: () -> Unit) {
+    /* Three slides, and that is all.
+     *
+     * It used to be six: three slides, a pull-the-card lesson, a twelve-theme
+     * picker and a reminder screen. Five screens of setup before anybody had
+     * seen a verse. The gesture teaches itself the first time Home is opened,
+     * the theme belongs in settings where it can be changed on a whim rather
+     * than guessed at at install time, and the reminder already lives in
+     * settings too. */
     var step by remember { mutableIntStateOf(0) }
-    when (step) {
-        in 0..2 -> OnboardingSlides(
-            step = step,
-            onStep = { step = it },
-            onSkip = { step = 3 },
-            onDone = { step = 3 },
-        )
-        3 -> PullToLearn { step = 4 }
-        4 -> ThemePicker(
-            initialId = themeId,
-            onLater = { step = 5 },
-            // applied live, so the reminder screen already wears the choice
-            onUse = { theme -> onTheme(theme.id); step = 5 },
-        )
-        else -> ReminderStep(onDone)
-    }
+    OnboardingSlides(
+        step = step,
+        onStep = { step = it },
+        onSkip = onDone,
+        onDone = onDone,
+    )
 }
 
 /* ─────────────────────── 1. the gesture itself ─────────────────────── */
@@ -189,9 +181,15 @@ private fun PullToLearn(onPulled: () -> Unit) {
 private fun CardBackFace() {
     Box(Modifier.fillMaxSize().background(NightFill), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("⚿", color = Gold, fontSize = 40.sp)
-            Spacer(Modifier.height(14.dp))
-            Text("MANNA", color = Ivory, fontSize = 13.sp, letterSpacing = 5.sp, fontWeight = FontWeight.Medium)
+            // the brand's mark, matching the launcher icon and Home
+            androidx.compose.foundation.Canvas(Modifier.size(38.dp)) {
+                goldKey(
+                    androidx.compose.ui.geometry.Offset(size.width / 2f, size.height / 2f),
+                    height = size.height,
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+            com.prayerkey.manna.ui.theme.StampedGold("MANNA", size = 14.sp, tracking = 5.sp)
         }
     }
 }
@@ -240,7 +238,7 @@ private fun ReminderStep(onDone: (Boolean, Int) -> Unit) {
             }
         }
         Spacer(Modifier.height(12.dp))
-        Text("AM", color = Muted, fontSize = 11.sp, letterSpacing = 2.sp)
+        Text("AM", color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground.copy(alpha = .62f), fontSize = 11.sp, letterSpacing = 2.sp)
 
         Spacer(Modifier.weight(1f))
 
@@ -251,7 +249,7 @@ private fun ReminderStep(onDone: (Boolean, Int) -> Unit) {
 
         Text(
             "Not now",
-            color = Muted, fontSize = 13.sp,
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground.copy(alpha = .62f), fontSize = 13.sp,
             modifier = Modifier.padding(top = 18.dp, bottom = 38.dp)
                 .clickable { onDone(false, hour) },
         )

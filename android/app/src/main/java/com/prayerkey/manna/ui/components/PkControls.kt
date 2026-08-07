@@ -100,9 +100,17 @@ fun PkButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: ImageVector? = null,
-    fill: Brush = Brush.verticalGradient(listOf(Color(0xFF4E70FF), Electric)),
+    /* The theme's accent, not electric blue. This is the app's primary
+       button, and blue was the loudest colour on every screen it appeared
+       on — it had already been pulled off Home and the sermon note one at a
+       time, which is the wrong place to fix it. */
+    fill: Brush? = null,
     onClick: () -> Unit,
 ) {
+    val cs = androidx.compose.material3.MaterialTheme.colorScheme
+    val paint = fill ?: Brush.verticalGradient(
+        listOf(androidx.compose.ui.graphics.lerp(cs.primary, Color.White, .18f), cs.primary),
+    )
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val press by animateFloatAsState(
@@ -115,14 +123,16 @@ fun PkButton(
             .height(56.dp)
             .then(
                 if (enabled) Modifier
-                    .shadow(20.dp, R.control, spotColor = Electric.copy(alpha = .42f), ambientColor = Color.Transparent)
+                    .shadow(20.dp, R.control, spotColor = cs.primary.copy(alpha = .42f), ambientColor = Color.Transparent)
                     .shadow(3.dp, R.control, spotColor = Night.copy(alpha = .2f), ambientColor = Color.Transparent)
                 else Modifier,
             )
             .clip(R.control)
             .background(
-                if (enabled) fill
-                else Brush.verticalGradient(listOf(Color(0xFFDCDCE2), Color(0xFFD1D1D8))),
+                if (enabled) paint
+                else Brush.verticalGradient(
+                    listOf(cs.onSurface.copy(alpha = .16f), cs.onSurface.copy(alpha = .10f)),
+                ),
             )
             .topHighlight(R.control, strength = if (enabled) .42f else .2f)
             .clickable(enabled = enabled, interactionSource = interaction, indication = null, onClick = onClick),
@@ -130,10 +140,14 @@ fun PkButton(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             icon?.let {
-                Icon(it, null, tint = Color.White, modifier = Modifier.size(18.dp))
+                Icon(it, null, tint = cs.onPrimary, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
             }
-            Text(label, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            Text(
+                label,
+                color = if (enabled) cs.onPrimary else cs.onSurface.copy(alpha = .5f),
+                fontWeight = FontWeight.SemiBold, fontSize = 15.sp,
+            )
         }
     }
 }
