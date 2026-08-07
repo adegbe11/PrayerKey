@@ -176,7 +176,7 @@ fun BibleScreen(
                 Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("Memorize", fontFamily = BookSerif, fontSize = 24.sp, modifier = Modifier.weight(1f))
                     FloatChip(onClick = { showMemory = false }) {
-                        Icon(Icons.Outlined.Close, "Back to verses", tint = Ink, modifier = Modifier.size(19.dp))
+                        Icon(Icons.Outlined.Close, "Back to verses", tint = Ivory, modifier = Modifier.size(19.dp))
                     }
                 }
                 MemoryTrainer(memory, saved, entries, prayers, sermons, onReviewMemory)
@@ -191,15 +191,15 @@ fun BibleScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         FloatChip(onClick = { searchOpen = !searchOpen }) {
-                            Icon(Icons.Outlined.Search, "Search", tint = Ink, modifier = Modifier.size(19.dp))
+                            Icon(Icons.Outlined.Search, "Search", tint = Ivory, modifier = Modifier.size(19.dp))
                         }
                         Spacer(Modifier.weight(1f))
                         FloatChip(onClick = { bookMode = true }) {
-                            Icon(Icons.Outlined.MenuBook, "Read the Bible as a book", tint = Ink, modifier = Modifier.size(19.dp))
+                            Icon(Icons.Outlined.MenuBook, "Read the Bible as a book", tint = Ivory, modifier = Modifier.size(19.dp))
                         }
                         Spacer(Modifier.width(8.dp))
                         FloatChip(onClick = { showMemory = true }) {
-                            Icon(Icons.Outlined.School, "Memorize", tint = Ink, modifier = Modifier.size(19.dp))
+                            Icon(Icons.Outlined.School, "Memorize", tint = Ivory, modifier = Modifier.size(19.dp))
                         }
                         Spacer(Modifier.width(8.dp))
                         Surface(
@@ -310,14 +310,21 @@ fun BibleScreen(
     }
 }
 
-/** Floating white circular chip that sits on top of the card. */
+/**
+ * A chip floating on the card.
+ *
+ * Glass, not white. The five discs along the bottom of this screen became a
+ * translucent dock a while back and these were left as opaque white circles,
+ * so the top of the artwork carried the only bright white left in the app —
+ * and on a photograph of a desert at dusk it read as a hole punched in the
+ * picture.
+ */
 @Composable
 private fun FloatChip(onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
         Modifier.size(42.dp)
-            .shadow(8.dp, CircleShape, spotColor = Night.copy(alpha = .3f))
-            .clip(CircleShape).background(Color.White)
-            .border(0.5.dp, Hairline, CircleShape)
+            .clip(CircleShape).background(Night.copy(alpha = .34f))
+            .border(0.7.dp, Color.White.copy(alpha = .22f), CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) { content() }

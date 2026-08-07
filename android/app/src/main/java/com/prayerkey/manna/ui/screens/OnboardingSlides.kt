@@ -91,7 +91,9 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
     val slide = slides[step.coerceIn(0, slides.lastIndex)]
 
     Column(
-        Modifier.fillMaxSize().background(CanvasColour).padding(horizontal = 30.dp),
+        Modifier.fillMaxSize()
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
+            .padding(horizontal = 30.dp),
     ) {
         Spacer(Modifier.height(40.dp))
 
