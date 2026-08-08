@@ -3,6 +3,12 @@ package com.prayerkey.manna.ui.screens
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import com.prayerkey.manna.ui.theme.goldKey
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.graphics.Path
+import com.prayerkey.manna.ui.theme.Leaf
+import com.prayerkey.manna.ui.theme.StampedGold
+import com.prayerkey.manna.ui.theme.BookSerif
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -97,17 +103,23 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
             .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
             .padding(horizontal = 30.dp),
     ) {
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(18.dp))
 
         Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
             slide.art()
         }
 
+        Spacer(Modifier.height(26.dp))
+
+        /* Garamond, like the rest of the app. This was Roboto Bold, so the
+           first screen anyone saw was set in a different typeface from the
+           dashboard it leads to. */
         Text(
             slide.headline,
             color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
-            fontSize = 34.sp, lineHeight = 44.sp,
-            letterSpacing = (-0.6).sp,
+            fontFamily = BookSerif,
+            fontSize = 36.sp, lineHeight = 44.sp,
+            letterSpacing = (-0.8).sp,
             fontWeight = FontWeight.Normal,
         )
 
@@ -116,7 +128,7 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
             Text(it, color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground.copy(alpha = .62f), fontSize = 13.5.sp, lineHeight = 21.sp)
         }
 
-        Spacer(Modifier.height(34.dp))
+        Spacer(Modifier.height(26.dp))
 
         Row(
             Modifier.fillMaxWidth().padding(bottom = 40.dp),
@@ -156,43 +168,92 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
 
 /* ───────────────────────── slide artwork ───────────────────────── */
 
-/** A single night card with the key — the thing they pull each morning. */
+/**
+ * The card they pull each morning.
+ *
+ * The first version was a squarish navy box with a hard `drawRect` across it
+ * at 62% for the "ground" — which read as a rendering seam rather than a
+ * horizon — and the mark floating tiny in the middle of it. It is portrait
+ * now, in the proportion the real card actually has, with a dusk sky that
+ * falls to a hill rather than meeting a straight line, and a verse block
+ * where the verse really sits.
+ */
 @Composable
 private fun VerseCardArt() {
     Box(
-        Modifier.fillMaxWidth(.62f).height(260.dp)
-            .shadow(26.dp, R.card, spotColor = Color(0xFF000000).copy(alpha = .5f))
+        Modifier.fillMaxWidth(.70f).fillMaxHeight()
+            .shadow(30.dp, R.card, spotColor = Color(0xFF000000).copy(alpha = .45f))
             .clip(R.card).background(NightFill)
-            .border(1.dp, com.prayerkey.manna.ui.theme.Leaf.copy(alpha = .30f), R.card),
-        contentAlignment = Alignment.Center,
+            .border(1.dp, Leaf.copy(alpha = .28f), R.card),
     ) {
         Canvas(Modifier.fillMaxSize()) {
-            // a low horizon so it reads as one of the worlds
+            val w = size.width
+            val h = size.height
+
+            // dusk, warm at the horizon and cool overhead
+            drawRect(
+                Brush.verticalGradient(
+                    0f to Color(0xFF20294A),
+                    .48f to Color(0xFF3A3350),
+                    .70f to Color(0xFF7A5B3C),
+                    1f to Color(0xFF2A1C13),
+                ),
+            )
+            // the sun, low
             drawCircle(
                 Brush.radialGradient(
-                    listOf(Gold.copy(alpha = .30f), Color.Transparent),
-                    center = Offset(size.width * .5f, size.height * .42f),
-                    radius = size.minDimension * .6f,
+                    listOf(Color(0xFFFFF3D0), Color(0xFFE9C27E).copy(alpha = .35f), Color.Transparent),
+                    center = Offset(w * .60f, h * .34f), radius = w * .46f,
                 ),
-                size.minDimension * .6f,
-                Offset(size.width * .5f, size.height * .42f),
+                radius = w * .46f, center = Offset(w * .60f, h * .34f),
             )
-            drawRect(
-                Color(0xFF0B0E1F).copy(alpha = .55f),
-                topLeft = Offset(0f, size.height * .72f),
-                size = Size(size.width, size.height * .28f),
-            )
+            drawCircle(Color(0xFFFCF3DC), radius = w * .058f, center = Offset(w * .60f, h * .34f))
+
+            // two hills, so the horizon is a shape and not a rule
+            val far = Path().apply {
+                moveTo(0f, h)
+                lineTo(0f, h * .74f)
+                cubicTo(w * .28f, h * .66f, w * .62f, h * .80f, w, h * .70f)
+                lineTo(w, h); close()
+            }
+            drawPath(far, Color(0xFF2E2434).copy(alpha = .92f))
+            val near = Path().apply {
+                moveTo(0f, h)
+                lineTo(0f, h * .86f)
+                cubicTo(w * .34f, h * .79f, w * .70f, h * .92f, w, h * .84f)
+                lineTo(w, h); close()
+            }
+            drawPath(near, Color(0xFF171326))
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            /* The mark, not the ⚿ glyph in a box — the same cross-topped key
-               the launcher icon and Home now carry. */
-            Canvas(Modifier.size(34.dp)) {
-                goldKey(
-                    Offset(size.width / 2f, size.height / 2f), height = size.height,
+
+        // where the verse sits on the real card
+        /* Low on the card, the way WorldVerseFace sets it — the sky stays
+           open above. Centred, the sun came up behind the verse and the gold
+           rule ran straight into it. */
+        Column(
+            Modifier.fillMaxSize().padding(horizontal = 18.dp).padding(bottom = 30.dp),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Canvas(Modifier.size(26.dp)) {
+                goldKey(Offset(size.width / 2f, size.height / 2f), height = size.height)
+            }
+            Spacer(Modifier.height(10.dp))
+            StampedGold("MANNA", size = 11.sp, tracking = 3.5.sp)
+            Spacer(Modifier.height(20.dp))
+            repeat(3) { i ->
+                Box(
+                    Modifier.padding(bottom = 7.dp)
+                        .fillMaxWidth(if (i == 2) .58f else .9f)
+                        .height(5.dp).clip(R.pill)
+                        .background(Ivory.copy(alpha = .40f)),
                 )
             }
-            Spacer(Modifier.height(14.dp))
-            com.prayerkey.manna.ui.theme.StampedGold("MANNA", size = 13.sp, tracking = 4.sp)
+            Spacer(Modifier.height(8.dp))
+            Box(
+                Modifier.width(46.dp).height(4.dp).clip(R.pill)
+                    .background(Leaf.copy(alpha = .75f)),
+            )
         }
     }
 }

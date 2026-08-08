@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -189,14 +190,21 @@ fun StampedGold(
         textAlign = TextAlign.Center,
     )
 
+    /* Only the metal copy is real text. The groove and the lip are paint, and
+       leaving them in the tree made a screen reader say "MANNA" three times
+       on every screen this is used. */
     Box(modifier, contentAlignment = Alignment.Center) {
         Text(
             text, style = shared.copy(color = Color(0xFF160700).copy(alpha = .9f)),
-            modifier = Modifier.offset(x = (1.6f * depth).dp, y = (2.2f * depth).dp),
+            modifier = Modifier
+                .offset(x = (1.6f * depth).dp, y = (2.2f * depth).dp)
+                .clearAndSetSemantics {},
         )
         Text(
             text, style = shared.copy(color = LeafLit.copy(alpha = .55f)),
-            modifier = Modifier.offset(x = (-1.1f * depth).dp, y = (-1.5f * depth).dp),
+            modifier = Modifier
+                .offset(x = (-1.1f * depth).dp, y = (-1.5f * depth).dp)
+                .clearAndSetSemantics {},
         )
         Text(
             text,
