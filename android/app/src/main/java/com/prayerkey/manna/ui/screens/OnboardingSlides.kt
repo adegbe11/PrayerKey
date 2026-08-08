@@ -9,6 +9,9 @@ import com.prayerkey.manna.ui.theme.Leaf
 import com.prayerkey.manna.ui.theme.StampedGold
 import com.prayerkey.manna.ui.theme.BookSerif
 import androidx.compose.foundation.layout.width
+import com.prayerkey.manna.ui.worlds.VerseWorld
+import com.prayerkey.manna.ui.worlds.WorldScene
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -86,8 +89,8 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
         ),
         Slide(
             headline = heavy("Find" to true, "A Prayer For" to false, "Anything You Face" to true),
-            sub = "543 prayers for healing, family, money, fear and grief. " +
-                "Or type what's happening and get one written for you.",
+            sub = "For healing, family, money, fear and grief. Or say what is " +
+                "happening and get one written for you.",
             art = { PrayerFanArt() },
         ),
         Slide(
@@ -258,36 +261,74 @@ private fun VerseCardArt() {
     }
 }
 
-/** Three prayer cards fanned, the way the deck feels in the hand. */
+/**
+ * Three prayer cards fanned, the way the deck feels in the hand.
+ *
+ * These were three blank tinted rectangles. They are three real cards now,
+ * each a different world from the same set the deck actually draws from, with
+ * a category, a title and the shape of a prayer on it — so the slide shows
+ * the thing the app contains rather than a placeholder for it.
+ *
+ * Drawn rather than photographed, and deliberately: the deck's cards *are*
+ * drawn worlds, so a photograph here would be a promise the app then breaks.
+ */
 @Composable
 private fun PrayerFanArt() {
-    Box(Modifier.fillMaxWidth().height(260.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.Center) {
         listOf(
-            Triple(-14f, (-64).dp, Color(0xFFDDE5EC)),
-            Triple(7f, 46.dp, Color(0xFFF3DFDA)),
-            Triple(-2f, 0.dp, Color(0xFFF6EEDC)),
-        ).forEachIndexed { i, (deg, dx, fill) ->
+            Triple(VerseWorld.WATCH, "FEAR" to "When I cannot sleep", -13f),
+            Triple(VerseWorld.PASTURE, "FAMILY" to "For those I love", 13f),
+            Triple(VerseWorld.DAWN, "HEALING" to "For a body that hurts", -2f),
+        ).forEachIndexed { i, (world, label, deg) ->
+            val (category, title) = label
+            val front = i == 2
+            /* Offset, not padding. Padding squeezed the layout so the two
+               back cards ended up almost entirely behind the front one —
+               three cards showing as one card and two slivers. */
             Box(
-                Modifier.padding(start = if (dx > 0.dp) dx else 0.dp, end = if (dx < 0.dp) -dx else 0.dp)
-                    .rotate(deg)
-                    .fillMaxWidth(.46f).height(220.dp)
-                    .shadow(if (i == 2) 22.dp else 10.dp, R.card, spotColor = Color(0xFF14182A).copy(alpha = .28f))
-                    .clip(R.card).background(fill),
-            ) {
-                Canvas(Modifier.fillMaxSize()) {
-                    // a motif hint at the foot of each card
-                    drawRect(
-                        Color.Black.copy(alpha = .07f),
-                        topLeft = Offset(0f, size.height * .68f),
-                        size = Size(size.width, size.height * .32f),
+                Modifier
+                    .offset(
+                        x = when (i) { 0 -> (-62).dp; 1 -> 62.dp; else -> 0.dp },
+                        y = if (front) 10.dp else (-6).dp,
                     )
-                    listOf(.30f, .40f, .50f).forEach { y ->
-                        drawRect(
-                            Color.Black.copy(alpha = .13f),
-                            topLeft = Offset(size.width * .14f, size.height * y),
-                            size = Size(size.width * .72f, 5f),
-                        )
-                    }
+                    .rotate(deg)
+                    .fillMaxWidth(.415f).fillMaxHeight(if (front) .86f else .76f)
+                    .shadow(if (front) 26.dp else 12.dp, R.card, spotColor = Color(0xFF000000).copy(alpha = .4f))
+                    .clip(R.card)
+                    .border(1.dp, Leaf.copy(alpha = if (front) .3f else .16f), R.card),
+            ) {
+                WorldScene(world, animate = false, Modifier.fillMaxSize())
+                Box(
+                    Modifier.fillMaxSize().background(
+                        Brush.verticalGradient(
+                            0f to Color.Black.copy(alpha = .34f),
+                            .45f to Color.Black.copy(alpha = .12f),
+                            1f to Color.Black.copy(alpha = .78f),
+                        ),
+                    ),
+                )
+                /* Only the front card is lettered. The two behind it are
+                   overlapped by design, and a half-covered "FEA…" reads as a
+                   clipping bug rather than as a card underneath. */
+                if (front) Column(
+                    Modifier.fillMaxSize().padding(14.dp),
+                    verticalArrangement = Arrangement.Bottom,
+                ) {
+                    Text(
+                        category,
+                        color = Leaf, fontSize = 7.5.sp,
+                        letterSpacing = 2.sp, fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        title,
+                        color = Ivory, fontFamily = BookSerif,
+                        fontSize = 13.sp, lineHeight = 17.sp,
+                        modifier = Modifier.padding(top = 5.dp),
+                    )
+                    Box(
+                        Modifier.padding(top = 8.dp).width(26.dp).height(2.dp)
+                            .clip(R.pill).background(Leaf.copy(alpha = .8f)),
+                    )
                 }
             }
         }
