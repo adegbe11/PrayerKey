@@ -335,45 +335,98 @@ private fun PrayerFanArt() {
     }
 }
 
-/** A mic ringed by sound, with a page catching the words. */
+/**
+ * The note the sermon becomes.
+ *
+ * This was a mic ringed by sound with a blank white rectangle beside it —
+ * abstract, where the other two slides show a real artefact, and small enough
+ * to leave a hand's depth of empty page under it. A slide about recording the
+ * sermon should show the thing you get, which is a page with the sermon on it.
+ */
 @Composable
 private fun ListenArt() {
-    Box(Modifier.fillMaxWidth().height(260.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center) {
+
+        // the room listening, behind the page
         Canvas(Modifier.fillMaxSize()) {
-            val c = Offset(size.width * .5f, size.height * .46f)
-            listOf(.34f, .46f, .58f).forEachIndexed { i, r ->
+            val c = Offset(size.width * .5f, size.height * .40f)
+            listOf(.28f, .40f, .52f, .64f).forEachIndexed { i, r ->
                 drawCircle(
-                    Gold.copy(alpha = .30f - i * .08f),
+                    Gold.copy(alpha = .26f - i * .05f),
                     size.minDimension * r, c,
-                    style = Stroke(width = 2f),
-                )
-            }
-            // the note page, tucked under
-            val w = size.width * .30f
-            val h = size.height * .34f
-            drawRoundRect(
-                Color.White,
-                topLeft = Offset(size.width * .58f, size.height * .56f),
-                size = Size(w, h),
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(14f),
-            )
-            listOf(.62f, .70f, .78f).forEach { y ->
-                drawRect(
-                    Color(0xFFCFCFD6),
-                    topLeft = Offset(size.width * .63f, size.height * y),
-                    size = Size(w * .66f, 4f),
+                    style = Stroke(width = 1.6f),
                 )
             }
         }
+
+        // the page
         Box(
-            Modifier.size(96.dp)
-                .shadow(20.dp, CircleShape, spotColor = Color(0xFF14182A).copy(alpha = .4f))
+            Modifier.fillMaxWidth(.66f).fillMaxHeight(.92f)
+                .shadow(24.dp, R.card, spotColor = Color(0xFF14182A).copy(alpha = .30f))
+                .clip(R.card).background(Color(0xFFFFFDF8))
+                .border(1.dp, Color(0xFFE6DCC6), R.card)
+                .padding(horizontal = 18.dp, vertical = 20.dp),
+        ) {
+            Column {
+                Text(
+                    "SUNDAY", color = Gold,
+                    fontSize = 8.5.sp, letterSpacing = 2.6.sp, fontWeight = FontWeight.Bold,
+                )
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    "The Weight of Grace",
+                    color = Color(0xFF2C2A26), fontFamily = BookSerif,
+                    fontSize = 17.sp, lineHeight = 22.sp, fontWeight = FontWeight.SemiBold,
+                )
+                Spacer(Modifier.height(12.dp))
+
+                // the references it heard, which is the feature's real trick
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf("Rom 8:28", "Eph 2:8").forEach { ref ->
+                        Box(
+                            Modifier.clip(R.pill).background(Gold.copy(alpha = .12f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                        ) {
+                            Text(ref, color = Gold, fontSize = 8.5.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+                Canvas(Modifier.fillMaxWidth().weight(1f)) {
+                    /* The body, as ruled lines: real words at this size would
+                       be a texture pretending to be readable. Filled to the
+                       foot of the page — a fixed row count left the lower half
+                       of the leaf blank, which read as a half-written note. */
+                    val widths = listOf(1f, .92f, .97f, .74f, 1f, .88f, .95f, .58f, .94f, .8f, .96f, .69f)
+                    var y = 0f
+                    var i = 0
+                    while (y < size.height - 4f) {
+                        drawRect(
+                            Color(0xFF2C2A26).copy(alpha = .16f),
+                            topLeft = Offset(0f, y),
+                            size = Size(size.width * widths[i % widths.size], 3.2f),
+                        )
+                        y += 15f
+                        i++
+                    }
+                }
+            }
+        }
+
+        // the mic, clipped to the page's corner the way a badge sits on paper
+        Box(
+            /* Top right, over the one empty corner. On the left it sat
+               squarely on the SUNDAY kicker and clipped it to "UNDAY". */
+            Modifier.align(Alignment.TopEnd).padding(end = 20.dp, top = 12.dp)
+                .size(62.dp)
+                .shadow(18.dp, CircleShape, spotColor = Color(0xFF14182A).copy(alpha = .45f))
                 .clip(CircleShape).background(NightFill),
             contentAlignment = Alignment.Center,
         ) {
             // drawn, not an emoji: a system glyph renders in its own colours
             // and breaks a scene built from gold line work
-            Canvas(Modifier.size(40.dp)) {
+            Canvas(Modifier.size(28.dp)) {
                 val w = size.width
                 val h = size.height
                 drawRoundRect(
@@ -386,15 +439,15 @@ private fun ListenArt() {
                     Gold, 0f, 180f, false,
                     topLeft = Offset(w * .18f, h * .34f),
                     size = Size(w * .64f, h * .42f),
-                    style = Stroke(width = w * .075f, cap = androidx.compose.ui.graphics.StrokeCap.Round),
+                    style = Stroke(width = w * .085f, cap = androidx.compose.ui.graphics.StrokeCap.Round),
                 )
                 drawLine(
                     Gold, Offset(w * .5f, h * .76f), Offset(w * .5f, h * .93f),
-                    strokeWidth = w * .075f, cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                    strokeWidth = w * .085f, cap = androidx.compose.ui.graphics.StrokeCap.Round,
                 )
                 drawLine(
                     Gold, Offset(w * .32f, h * .95f), Offset(w * .68f, h * .95f),
-                    strokeWidth = w * .075f, cap = androidx.compose.ui.graphics.StrokeCap.Round,
+                    strokeWidth = w * .085f, cap = androidx.compose.ui.graphics.StrokeCap.Round,
                 )
             }
         }
