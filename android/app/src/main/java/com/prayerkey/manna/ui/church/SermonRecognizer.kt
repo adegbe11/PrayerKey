@@ -45,19 +45,21 @@ class SermonRecognizer(
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, language)
         }
         // keep the audio on the device — free, private, works with no signal
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
-        }
         // don't cut the mic the moment he pauses for breath
         putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 4000L)
         putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 4000L)
         putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 8000L)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            putExtra(
+                RecognizerIntent.EXTRA_SEGMENTED_SESSION,
+                RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,
+            )
+        }
     }
 
     private var running = false
     /** Guards against two startListening calls racing after an error. */
     private var pendingRestart = false
-    private var offlineFailures = 0
 
     val available: Boolean get() = SpeechRecognizer.isRecognitionAvailable(app)
 
@@ -97,11 +99,23 @@ class SermonRecognizer(
     }
 
     override fun onResults(results: Bundle) {
+        emitFinal(results)
+        restart()
+    }
+
+    override fun onSegmentResults(segmentResults: Bundle) {
+        emitFinal(segmentResults)
+    }
+
+    override fun onEndOfSegmentedSession() {
+        restart(80)
+    }
+
+    private fun emitFinal(results: Bundle) {
         results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
             ?.firstOrNull()?.trim()
             ?.takeIf { it.isNotEmpty() }
             ?.let(onChunk)
-        restart()
     }
 
     override fun onPartialResults(partialResults: Bundle) {
@@ -120,14 +134,16 @@ class SermonRecognizer(
             // once, rather than silently capturing nothing all service
             SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE,
             SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED -> {
-                if (offlineFailures++ == 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false)
-                    onStatus("Listening")
-                }
+                intent.removeExtra(RecognizerIntent.EXTRA_LANGUAGE)
+                intent.removeExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE)
+                onStatus("Listening")
                 restart(400)
             }
             // silence and no-match are normal in a service — just go again
-            SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> restart(80)
+            SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> {
+                onStatus("Listening")
+                restart(80)
+            }
             SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> restart(700)
             else -> restart(400)
         }

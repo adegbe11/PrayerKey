@@ -116,10 +116,10 @@ fun VersePullDeck(
        chips sat permanently on top of the artwork, which is the one thing on
        this screen nobody came to look at. Tap once to bring them up, tap the
        card again to open the verse, tap the backdrop to put them away. */
-    var chrome by remember { mutableStateOf(false) }
+    var chrome by remember { mutableStateOf(true) }
     val offsetValue = if (animating) anim.value else dragY
 
-    LaunchedEffect(index, stillMode) { chrome = false }
+    LaunchedEffect(index, stillMode) { chrome = true }
 
     val current = if (stillMode)
         RemoteVerse("Psalm 46:10", "Be still, and know that I am God.", "KJV")
@@ -199,7 +199,7 @@ fun VersePullDeck(
             WorldFace(
                 verse = current, front = true, reduceMotion = reduceMotion, still = stillMode,
                 modifier = Modifier.fillMaxSize().clickable {
-                    if (chrome) onOpen(current) else chrome = true
+                    onOpen(current)
                 },
             )
 
@@ -247,19 +247,19 @@ fun VersePullDeck(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ActionCircle(Icons.Outlined.Refresh, "Previous verse", Ivory.copy(alpha = .85f), 50.dp) {
+            ActionCircle(Icons.Outlined.Refresh, "Previous verse", Ivory.copy(alpha = .85f), 58.dp) {
                 if (index > 0) { index--; view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK) }
             }
             Spacer(Modifier.size(12.dp))
             ActionCircle(Icons.Outlined.Close, "Skip", Ivory.copy(alpha = .85f), 58.dp) { flingNext() }
             Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.School, "Memorize", Ivory.copy(alpha = .85f), 50.dp) {
+            ActionCircle(Icons.Outlined.School, "Memorize", Ivory.copy(alpha = .85f), 58.dp) {
                 onMemorize(current); view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
             }
             Spacer(Modifier.size(12.dp))
             ActionCircle(Icons.Outlined.BookmarkBorder, "Save", Gold, 58.dp) { flingSave() }
             Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.Share, "Share", Ivory.copy(alpha = .85f), 50.dp) { onShare(current) }
+            ActionCircle(Icons.Outlined.Share, "Share", Ivory.copy(alpha = .85f), 58.dp) { onShare(current) }
         }
         }
     }

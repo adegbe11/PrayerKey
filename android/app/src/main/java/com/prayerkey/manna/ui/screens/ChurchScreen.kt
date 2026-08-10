@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.view.HapticFeedbackConstants
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -84,6 +85,8 @@ fun ChurchScreen(
     val listening by SermonService.listening.collectAsState()
     val caught by SermonService.references.collectAsState()
     val partial by SermonService.partial.collectAsState()
+    val chunks by SermonService.chunks.collectAsState()
+    val captureStatus by SermonService.status.collectAsState()
     val startedAt by SermonService.startedAt.collectAsState()
 
     var stage by remember { mutableStateOf(Stage.Ready) }
@@ -116,13 +119,19 @@ fun ChurchScreen(
     }
 
     fun end() {
+        if (stage != Stage.Listening) return
+        stage = Stage.Arranging
         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
         minutes = SermonService.elapsedMinutes()
         val transcript = SermonService.transcript()
         val refs = caught.map { it.reference }
         SermonService.stop(context)
-        stage = Stage.Arranging
-        arranged = SermonArranger.arrange(transcript, refs, language)
+        if (transcript.isBlank()) {
+            stage = Stage.Ready
+            Toast.makeText(context, "No words were transcribed. Audio backup kept.", Toast.LENGTH_LONG).show()
+            return
+        }
+        arranged = SermonArranger.arrange(transcript, refs, language).also { onSaveNote(it, minutes) }
     }
 
     val cs = MaterialTheme.colorScheme
@@ -149,6 +158,8 @@ fun ChurchScreen(
                 startedAt = startedAt,
                 caught = caught,
                 partial = partial,
+                chunks = chunks,
+                captureStatus = captureStatus,
                 onEnd = { end() },
             )
             Stage.Arranging -> ArrangingView { stage = Stage.Note }
@@ -159,7 +170,6 @@ fun ChurchScreen(
                         // the references live in the note itself; we don't mint
                         // saved-word cards here because detection gives us the
                         // reference, not the verse text — an empty card is junk
-                        onSaveNote(note, minutes)
                         SermonService.reset()
                         arranged = null
                         stage = Stage.Ready
@@ -217,7 +227,7 @@ private fun ReadyView(
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 "Church", color = cs.onBackground,
-                fontFamily = BookSerif, fontSize = 32.sp,
+                fontFamily = DisplaySerif, fontSize = 32.sp, fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f),
             )
             Row(
@@ -239,32 +249,44 @@ private fun ReadyView(
         }
 
         Box(
-            Modifier.fillMaxWidth().padding(top = 28.dp),
+            Modifier.fillMaxWidth().padding(top = 28.dp)
+                .shadow(24.dp, R.card, spotColor = cs.primary.copy(alpha = .30f))
+                .clip(R.card).background(NightGloss)
+                .border(1.dp, Ivory.copy(alpha = .12f), R.card),
             contentAlignment = Alignment.BottomCenter,
         ) {
-            // a room to sit in while you wait, instead of a field of white
-            Sanctuary(cs.primary, cs.onBackground, Modifier.fillMaxWidth().height(300.dp))
+            Sanctuary(GiltLine, Ivory, Modifier.fillMaxWidth().height(390.dp).graphicsLayer(alpha = .18f))
+            Box(Modifier.fillMaxWidth().height(390.dp).background(TopSheen))
 
             Column(
-                Modifier.padding(bottom = 6.dp),
+                Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 26.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Text("SERMON COMPANION", color = Ivory.copy(alpha = .60f), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                Text(
+                    "Remember every word",
+                    color = Ivory, fontFamily = DisplaySerif, fontSize = 28.sp, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+                Spacer(Modifier.height(20.dp))
                 Box(
-                    Modifier.size(104.dp)
-                        .shadow(24.dp, CircleShape, spotColor = cs.primary.copy(alpha = .55f))
-                        .clip(CircleShape).background(cs.primary)
+                    Modifier.size(106.dp)
+                        .shadow(16.dp, CircleShape, spotColor = Color.Black.copy(alpha = .34f))
+                        .clip(CircleShape)
+                        .background(cs.primary)
+                        .border(1.2.dp, Ivory.copy(alpha = .30f), CircleShape)
                         .clickable(onClick = onStart),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         Icons.Outlined.Mic, "Listen to the Message",
-                        tint = cs.onPrimary, modifier = Modifier.size(40.dp),
+                        tint = Ivory, modifier = Modifier.size(42.dp),
                     )
                 }
                 Text(
-                    "Listen to the Message",
-                    color = cs.onBackground, fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 18.dp),
+                    "Start listening",
+                    color = Ivory, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 14.dp),
                 )
             }
         }
@@ -301,6 +323,8 @@ private fun ListeningView(
     startedAt: Long,
     caught: List<SermonService.Caught>,
     partial: String,
+    chunks: List<String>,
+    captureStatus: String,
     onEnd: () -> Unit,
 ) {
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
@@ -321,17 +345,38 @@ private fun ListeningView(
                 fontSize = 52.sp, fontWeight = FontWeight.Light, color = Ink,
             )
             Wave(active = true, modifier = Modifier.padding(vertical = 26.dp))
+            Text(
+                captureStatus,
+                color = if (captureStatus.startsWith("Live")) MaterialTheme.colorScheme.primary else Muted,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(bottom = 14.dp),
+            )
         }
 
-        if (partial.isNotBlank()) Text(
-            partial, color = Muted, fontSize = 12.sp, maxLines = 2,
-            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 18.dp),
-        )
+        Text("LIVE TRANSCRIPT", color = MaterialTheme.colorScheme.primary, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.6.sp, modifier = Modifier.padding(bottom = 10.dp))
+        Column(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
+                .background(MaterialTheme.colorScheme.surface).padding(18.dp),
+        ) {
+            if (chunks.isEmpty() && partial.isBlank()) {
+                Text("Listening…", color = Muted, fontFamily = BookSerif, fontSize = 18.sp)
+            } else {
+                chunks.takeLast(12).forEach { chunk ->
+                    Text(chunk, color = Ink, fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 27.sp, modifier = Modifier.padding(bottom = 9.dp))
+                }
+                if (partial.isNotBlank()) Text(
+                    partial, color = Muted, fontFamily = BookSerif,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    fontSize = 17.sp, lineHeight = 25.sp,
+                )
+            }
+        }
 
         Text(
             if (caught.isEmpty()) "LISTENING FOR SCRIPTURE" else "CAUGHT SO FAR",
             color = Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp,
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(top = 22.dp, bottom = 12.dp),
         )
         caught.reversed().forEach { hit ->
             Box(Modifier.fillMaxWidth().padding(bottom = 10.dp).premiumCard(lift = false)) {
@@ -363,7 +408,7 @@ private fun ListeningView(
 private fun ArrangingView(onDone: () -> Unit) {
     LaunchedEffect(Unit) { delay(1400); onDone() }
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        CircularProgressIndicator(color = Electric, strokeWidth = 3.dp, modifier = Modifier.size(46.dp))
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary, strokeWidth = 2.dp, modifier = Modifier.size(42.dp))
         Text("Arranging your notes", fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 22.dp))
     }
 }
@@ -441,7 +486,7 @@ private fun NoteView(
         if (!empty) Row(Modifier.fillMaxWidth().padding(top = 26.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(
                 Modifier.weight(1f).height(52.dp)
-                    .shadow(12.dp, R.control, spotColor = Electric.copy(alpha = .4f))
+                    .shadow(6.dp, R.control, spotColor = cs.onBackground.copy(alpha = .16f))
                     .clip(R.control).background(cs.primary).clickable(onClick = onSave),
                 contentAlignment = Alignment.Center,
             ) {
@@ -641,9 +686,9 @@ private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: ()
                                 // say plainly which languages get the sharper
                                 // treatment rather than being quietly worse
                                 if (SermonArranger.hasCuesFor(lang.tag)) {
-                                    Text("Full arranged notes", color = Gold, fontSize = 10.5.sp)
+                                    Text("FULL NOTES", color = Gold, fontSize = 10.5.sp)
                                 } else {
-                                    Text("Transcript, scriptures and basic notes", color = Muted, fontSize = 10.5.sp)
+                                    Text("BASIC NOTES", color = Muted, fontSize = 10.5.sp)
                                 }
                             }
                             if (on) Icon(Icons.Outlined.Check, null, tint = Gold, modifier = Modifier.size(18.dp))
@@ -666,27 +711,9 @@ private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: ()
  */
 @Composable
 private fun Sanctuary(accent: Color, ink: Color, modifier: Modifier = Modifier) {
-    val breath = rememberInfiniteTransition(label = "sanctuary")
-    val glow by breath.animateFloat(
-        initialValue = .34f, targetValue = .62f,
-        animationSpec = infiniteRepeatable(tween(4200), RepeatMode.Reverse),
-        label = "glow",
-    )
-
     androidx.compose.foundation.Canvas(modifier) {
         val w = size.width
         val h = size.height
-
-        // the pool of light on the floor, which is what the eye reads first
-        drawCircle(
-            Brush.radialGradient(
-                listOf(accent.copy(alpha = glow * .30f), Color.Transparent),
-                center = Offset(w / 2f, h * .70f),
-                radius = w * .52f,
-            ),
-            radius = w * .52f,
-            center = Offset(w / 2f, h * .70f),
-        )
 
         val line = ink.copy(alpha = .17f)
         val stroke = Stroke(width = 1.6f)

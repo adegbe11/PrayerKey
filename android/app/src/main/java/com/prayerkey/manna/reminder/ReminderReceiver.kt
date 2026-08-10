@@ -16,6 +16,8 @@ import android.content.pm.PackageManager
 import com.prayerkey.manna.MainActivity
 import com.prayerkey.manna.R
 import java.util.Calendar
+import java.time.LocalDate
+import com.prayerkey.manna.data.quoteFor
 
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
@@ -26,11 +28,17 @@ class ReminderReceiver : BroadcastReceiver() {
             })
         }
         val open = PendingIntent.getActivity(context, 2, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val quote = quoteFor(LocalDate.now())
         val notification = NotificationCompat.Builder(context, CHANNEL)
-            .setSmallIcon(android.R.drawable.ic_menu_today)
-            .setContentTitle("Your word is waiting")
-            .setContentText("Fresh manna for today. Pull down when you are ready.")
-            .setContentIntent(open).setAutoCancel(true).build()
+            .setSmallIcon(R.drawable.ic_notification)
+            .setColor(0xFF2F73EA.toInt())
+            .setContentTitle("A new day with God")
+            .setContentText(quote.text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText("${quote.text} — ${quote.author}"))
+            .setContentIntent(open).setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .build()
         if (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             NotificationManagerCompat.from(context).notify(1001, notification)
         }

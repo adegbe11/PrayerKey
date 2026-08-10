@@ -1,6 +1,17 @@
 package com.prayerkey.manna.ui.screens
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import com.prayerkey.manna.ui.theme.goldKey
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -29,6 +40,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,6 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -81,91 +95,101 @@ private fun heavy(vararg parts: Pair<String, Boolean>): AnnotatedString = buildA
 
 @Composable
 fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: (Int) -> Unit) {
-    val slides = listOf(
-        Slide(
-            headline = heavy("Read" to true, "One Bible Verse" to false, "Every Morning" to true),
-            sub = null,
-            art = { VerseCardArt() },
-        ),
-        Slide(
-            headline = heavy("Find" to true, "A Prayer For" to false, "Anything You Face" to true),
-            sub = "For healing, family, money, fear and grief. Or say what is " +
-                "happening and get one written for you.",
-            art = { PrayerFanArt() },
-        ),
-        Slide(
-            headline = heavy("Record" to true, "The Sermon." to false, "Journal" to true, "It All." to false),
-            sub = null,
-            art = { ListenArt() },
-        ),
+    val stories = listOf(
+        com.prayerkey.manna.R.drawable.onboarding_bible to
+            "Start every morning with one Bible verse.",
+        com.prayerkey.manna.R.drawable.onboarding_prayer to
+            "Tell God what you’re facing. Find a prayer for it.",
+        com.prayerkey.manna.R.drawable.onboarding_church to
+            "Record the sermon. Manna writes the notes.",
+        com.prayerkey.manna.R.drawable.onboarding_journal to
+            "Keep your prayers, answers and growth in one private journal.",
     )
-    val slide = slides[step.coerceIn(0, slides.lastIndex)]
 
     Column(
-        Modifier.fillMaxSize()
-            .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
-            .padding(horizontal = 30.dp),
+        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 28.dp),
     ) {
         Spacer(Modifier.height(18.dp))
-
-        Box(Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
-            slide.art()
-        }
-
-        Spacer(Modifier.height(26.dp))
-
-        /* Garamond, like the rest of the app. This was Roboto Bold, so the
-           first screen anyone saw was set in a different typeface from the
-           dashboard it leads to. */
         Text(
-            slide.headline,
-            color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground,
+            "PRAYERKEY",
+            color = MaterialTheme.colorScheme.primary,
             fontFamily = BookSerif,
-            fontSize = 36.sp, lineHeight = 44.sp,
-            letterSpacing = (-0.8).sp,
-            fontWeight = FontWeight.Normal,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 3.2.sp,
         )
+        Spacer(Modifier.height(18.dp))
 
-        slide.sub?.let {
-            Spacer(Modifier.height(14.dp))
-            Text(it, color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground.copy(alpha = .62f), fontSize = 13.5.sp, lineHeight = 21.sp)
+        AnimatedContent(
+        targetState = step.coerceIn(0, stories.lastIndex),
+        modifier = Modifier.weight(1f),
+        transitionSpec = {
+            (androidx.compose.animation.slideInVertically(
+                animationSpec = spring(dampingRatio = .9f, stiffness = Spring.StiffnessLow),
+                initialOffsetY = { it / 3 },
+            ) + fadeIn()) togetherWith
+                (androidx.compose.animation.slideOutVertically(
+                    animationSpec = spring(dampingRatio = 1f, stiffness = Spring.StiffnessLow),
+                    targetOffsetY = { -it / 4 },
+                ) + fadeOut())
+        },
+        label = "onboarding-promise",
+    ) { page ->
+            val (world, message) = stories[page]
+            Column(Modifier.fillMaxSize()) {
+                Box(Modifier.fillMaxWidth().weight(1f)) {
+                    EditorialOnboardingImage(world)
+                }
+                Text(
+                    message,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 31.sp,
+                    lineHeight = 38.sp,
+                    letterSpacing = (-.7).sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(top = 22.dp),
+                )
+            }
         }
 
-        Spacer(Modifier.height(26.dp))
-
-        Row(
-            Modifier.fillMaxWidth().padding(bottom = 40.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                "Skip",
-                color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground.copy(alpha = .62f), fontSize = 14.sp,
-                modifier = Modifier.clickable(onClick = onSkip),
-            )
-            Spacer(Modifier.weight(1f))
-
-            // page dots, so three screens do not feel endless
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                repeat(slides.size) { i ->
-                    Box(
-                        Modifier.size(if (i == step) 20.dp else 6.dp, 6.dp)
-                            .clip(R.pill)
-                            .background(if (i == step) Gold else Color(0xFFDCDCE2)),
-                    )
-                }
-            }
-            Spacer(Modifier.weight(1f))
-
+        Spacer(Modifier.height(18.dp))
+        AnimatedVisibility(step == stories.lastIndex, enter = fadeIn(tween(600))) {
             Box(
-                Modifier.size(56.dp)
-                    .shadow(14.dp, CircleShape, spotColor = Gold.copy(alpha = .45f))
-                    .clip(CircleShape).background(NightFill)
-                    .clickable { if (step < slides.lastIndex) onStep(step + 1) else onDone() },
+                Modifier.fillMaxWidth().height(56.dp)
+                    .shadow(6.dp, R.pill, spotColor = Color.Black.copy(alpha = .16f))
+                    .clip(R.pill).background(MaterialTheme.colorScheme.primary)
+                    .clickable(onClick = onDone),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Outlined.ArrowForward, "Next", tint = Gold, modifier = Modifier.size(22.dp))
+                Text("Continue", color = MaterialTheme.colorScheme.onPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         }
+        if (step != stories.lastIndex) Spacer(Modifier.height(56.dp))
+        Spacer(Modifier.height(28.dp))
+    }
+}
+
+/**
+ * One photographic language across onboarding. The image is intentionally
+ * treated as an editorial plate rather than a full-screen wallpaper: the
+ * rounded edge, quiet keyline and small natural shadow keep the type readable
+ * and make the sequence feel like a considered book rather than an advert.
+ */
+@Composable
+private fun EditorialOnboardingImage(imageRes: Int) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .shadow(10.dp, RoundedCornerShape(28.dp), spotColor = Color.Black.copy(alpha = .18f))
+            .clip(RoundedCornerShape(28.dp))
+            .border(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = .08f), RoundedCornerShape(28.dp)),
+    ) {
+        Image(
+            painter = painterResource(imageRes),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
     }
 }
 
@@ -185,7 +209,7 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
 private fun VerseCardArt() {
     Box(
         Modifier.fillMaxWidth(.70f).fillMaxHeight()
-            .shadow(30.dp, R.card, spotColor = Color(0xFF000000).copy(alpha = .45f))
+            .shadow(14.dp, R.card, spotColor = Color.Black.copy(alpha = .24f))
             .clip(R.card).background(NightFill)
             .border(1.dp, Leaf.copy(alpha = .28f), R.card),
     ) {
@@ -293,7 +317,7 @@ private fun PrayerFanArt() {
                     )
                     .rotate(deg)
                     .fillMaxWidth(.415f).fillMaxHeight(if (front) .86f else .76f)
-                    .shadow(if (front) 26.dp else 12.dp, R.card, spotColor = Color(0xFF000000).copy(alpha = .4f))
+                    .shadow(if (front) 14.dp else 7.dp, R.card, spotColor = Color.Black.copy(alpha = .22f))
                     .clip(R.card)
                     .border(1.dp, Leaf.copy(alpha = if (front) .3f else .16f), R.card),
             ) {
@@ -362,7 +386,7 @@ private fun ListenArt() {
         // the page
         Box(
             Modifier.fillMaxWidth(.66f).fillMaxHeight(.92f)
-                .shadow(24.dp, R.card, spotColor = Color(0xFF14182A).copy(alpha = .30f))
+                .shadow(12.dp, R.card, spotColor = Color.Black.copy(alpha = .18f))
                 .clip(R.card).background(Color(0xFFFFFDF8))
                 .border(1.dp, Color(0xFFE6DCC6), R.card)
                 .padding(horizontal = 18.dp, vertical = 20.dp),
@@ -420,7 +444,7 @@ private fun ListenArt() {
                squarely on the SUNDAY kicker and clipped it to "UNDAY". */
             Modifier.align(Alignment.TopEnd).padding(end = 20.dp, top = 12.dp)
                 .size(62.dp)
-                .shadow(18.dp, CircleShape, spotColor = Color(0xFF14182A).copy(alpha = .45f))
+                .shadow(7.dp, CircleShape, spotColor = Color.Black.copy(alpha = .22f))
                 .clip(CircleShape).background(NightFill),
             contentAlignment = Alignment.Center,
         ) {

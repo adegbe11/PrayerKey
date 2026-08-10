@@ -15,11 +15,11 @@ import java.time.LocalTime
  */
 object R {
     /** Big surfaces: cards, sheets, the verse deck. */
-    val card = RoundedCornerShape(20.dp)
+    val card = RoundedCornerShape(28.dp)
     /** Things you touch: buttons, fields, chips with square-ish ends. */
-    val control = RoundedCornerShape(16.dp)
+    val control = RoundedCornerShape(20.dp)
     /** Small inline tags. */
-    val tag = RoundedCornerShape(12.dp)
+    val tag = RoundedCornerShape(15.dp)
     /** Fully round. */
     val pill = RoundedCornerShape(99.dp)
 }
@@ -37,8 +37,8 @@ object Space {
 val InkSoft = Color(0xFF2C2C2E)
 
 /** Unselected chips: ambient tint, no wireframe border. */
-val ChipFill = Color(0xFFF2F2F5)
-val ChipFillSelected = Color(0xFFE6EBFF)
+val ChipFill = Color(0xFFF2EBE0)
+val ChipFillSelected = Color(0xFFF0DDD8)
 
 /**
  * The canvas is never flat white. It carries a barely-there wash that
@@ -46,20 +46,9 @@ val ChipFillSelected = Color(0xFFE6EBFF)
  * lit rather than printed. Kept under 4% alpha; it should register as
  * atmosphere, not colour.
  */
-fun dayWash(hour: Int = LocalTime.now().hour): Brush = when (hour) {
-    in 5..9 -> Brush.verticalGradient(       // dawn
-        listOf(Color(0xFFFFF8EC), Color(0xFFFFFFFF), Color(0xFFFFFDF8)),
-    )
-    in 10..16 -> Brush.verticalGradient(     // daylight
-        listOf(Color(0xFFFFFFFF), Color(0xFFFDFDFF), Color(0xFFF9FAFF)),
-    )
-    in 17..20 -> Brush.verticalGradient(     // evening
-        listOf(Color(0xFFFFF6EE), Color(0xFFFFFFFF), Color(0xFFFBF7FF)),
-    )
-    else -> Brush.verticalGradient(          // night
-        listOf(Color(0xFFF7F8FD), Color(0xFFFFFFFF), Color(0xFFF6F7FC)),
-    )
-}
+fun dayWash(hour: Int = LocalTime.now().hour): Brush = Brush.verticalGradient(
+    listOf(Color(0xFFFAF6EF), Color(0xFFF7F1E8), Color(0xFFFAF6EF)),
+)
 
 /** A soft ambient shadow colour — never black, always the ink at low alpha. */
 val SoftShadow = Night.copy(alpha = .22f)

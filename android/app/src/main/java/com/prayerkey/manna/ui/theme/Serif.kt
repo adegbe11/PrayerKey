@@ -5,6 +5,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontStyle
 import com.prayerkey.manna.R
 
 /**
@@ -32,12 +33,39 @@ private fun garamond(weight: Int) = Font(
     variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
 )
 
-val BookSerif = FontFamily(
-    garamond(400),
-    garamond(500),
-    garamond(600),
-    garamond(700),
+@OptIn(ExperimentalTextApi::class)
+private fun playfair(weight: Int) = Font(
+    R.font.playfair_display,
+    weight = FontWeight(weight),
+    variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
 )
+
+@OptIn(ExperimentalTextApi::class)
+private fun lora(weight: Int, italic: Boolean = false) = Font(
+    if (italic) R.font.lora_italic else R.font.lora,
+    weight = FontWeight(weight),
+    style = if (italic) FontStyle.Italic else FontStyle.Normal,
+    variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
+)
+
+@OptIn(ExperimentalTextApi::class)
+private fun inter(weight: Int) = Font(
+    R.font.inter,
+    weight = FontWeight(weight),
+    variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
+)
+
+/** Sacred display titles only. */
+val DisplaySerif = FontFamily(playfair(600), playfair(700))
+
+/** Scripture, devotional prose, quotes and prayer. */
+val BookSerif = FontFamily(
+    lora(400), lora(500), lora(600), lora(700),
+    lora(400, true), lora(500, true), lora(600, true),
+)
+
+/** Dates, controls, buttons, metadata and navigation. */
+val UtilitySans = FontFamily(inter(400), inter(500), inter(600), inter(700))
 
 /**
  * Roman capitals, for the board of the Bible and nothing else.

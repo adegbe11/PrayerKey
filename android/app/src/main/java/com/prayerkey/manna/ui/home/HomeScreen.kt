@@ -69,6 +69,9 @@ fun HomeScreen(
     devotion: com.prayerkey.manna.data.Devotion? = null,
     bibleChallenge: com.prayerkey.manna.data.Challenge? = null,
     prayerChallenge: com.prayerkey.manna.data.Challenge? = null,
+    savedCount: Int = 0,
+    journalCount: Int = 0,
+    sermonCount: Int = 0,
     onToggleChallenge: (com.prayerkey.manna.data.Challenge) -> Unit = {},
     onOpenChallenge: (com.prayerkey.manna.data.Challenge) -> Unit = {},
     onWriteDevotion: () -> Unit = {},
@@ -91,20 +94,24 @@ fun HomeScreen(
 
     if (!pullOpen) {
         androidx.compose.foundation.layout.Box(Modifier.fillMaxSize()) {
-            HomeDashboard(
+            AwardHomeDashboard(
                 name = name,
                 streak = streak,
                 activeDays = activeDays,
                 devotion = devotion,
                 bible = bibleChallenge,
                 prayer = prayerChallenge,
+                savedCount = savedCount,
+                journalCount = journalCount,
+                sermonCount = sermonCount,
                 onOpenWord = { pullOpen = true },
                 onWriteDevotion = onWriteDevotion,
-                onOpenChallenge = onOpenChallenge,
-                onToggleChallenge = onToggleChallenge,
                 onOpenBible = onOpenBible,
+                onOpenPrayer = { onPray(card) },
                 onOpenJournal = onOpenJournal,
                 onOpenChurch = onOpenChurch,
+                onOpenChallenge = onOpenChallenge,
+                onToggleChallenge = onToggleChallenge,
                 onSettings = onSettings,
             )
         }

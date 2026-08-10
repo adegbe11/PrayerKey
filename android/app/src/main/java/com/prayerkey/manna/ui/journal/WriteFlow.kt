@@ -63,6 +63,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -249,7 +250,7 @@ fun WriteSheet(
     var location by remember { mutableStateOf(initialLocation) }
     var weather by remember { mutableStateOf(initialWeather) }
     var media by remember { mutableStateOf(initialMedia) }
-    var entryAt by remember { mutableStateOf(initialEntryAt) }
+    var entryAt by remember { mutableLongStateOf(initialEntryAt) }
     var attachToday by remember { mutableStateOf(false) }
     var attachedRef by remember { mutableStateOf(prompt?.verseRef) }
     var attachedText by remember { mutableStateOf(prompt?.verseText) }

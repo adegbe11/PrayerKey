@@ -32,6 +32,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -74,19 +76,36 @@ private val Ivory = Color(0xFFF6F0E1)
  */
 @Composable
 fun OnboardingScreen(onDone: () -> Unit) {
-    /* Three slides, and that is all.
-     *
-     * It used to be six: three slides, a pull-the-card lesson, a twelve-theme
-     * picker and a reminder screen. Five screens of setup before anybody had
-     * seen a verse. The gesture teaches itself the first time Home is opened,
-     * the theme belongs in settings where it can be changed on a whim rather
-     * than guessed at at install time, and the reminder already lives in
-     * settings too. */
+    var opening by remember { mutableStateOf(true) }
+    var openingStage by remember { mutableIntStateOf(0) }
     var step by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        delay(1450)
+        repeat(22) { index ->
+            openingStage = index + 1
+            delay(145)
+        }
+        delay(1450)
+        opening = false
+    }
+
+    LaunchedEffect(opening, step) {
+        if (!opening && step < 3) {
+            delay(2700)
+            step += 1
+        }
+    }
+
+    if (opening) {
+        LaunchPrelude(openingStage)
+        return
+    }
+
     OnboardingSlides(
         step = step,
         onStep = { step = it },
-        onSkip = onDone,
+        onSkip = { step = 2 },
         onDone = onDone,
     )
 }

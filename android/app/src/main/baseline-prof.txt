@@ -1,0 +1,7 @@
+Lcom/prayerkey/manna/MainActivity;
+Lcom/prayerkey/manna/ui/MannaAppKt;
+Lcom/prayerkey/manna/ui/home/**;
+Lcom/prayerkey/manna/ui/screens/**;
+Lcom/prayerkey/manna/ui/components/**;
+Lcom/prayerkey/manna/ui/theme/**;
+Lcom/prayerkey/manna/ui/worlds/**;

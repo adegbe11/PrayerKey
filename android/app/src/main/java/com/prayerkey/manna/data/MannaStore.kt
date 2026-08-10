@@ -376,7 +376,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
 
     /** Consecutive days (ending today or yesterday) with at least one entry. */
     fun journalStreak(): Int {
-        val days = journalEntries().map { it.entryDay }.toSortedSet().reversed()
+        val days = journalEntries().map { it.entryDay }.toSortedSet(compareByDescending { it })
         if (days.isEmpty()) return 0
         val today = java.time.LocalDate.now().toEpochDay()
         var cursor = when (days.first()) { today, today - 1 -> days.first(); else -> return 0 }

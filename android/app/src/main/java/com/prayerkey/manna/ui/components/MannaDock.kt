@@ -34,12 +34,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.ui.theme.Gold
 import com.prayerkey.manna.ui.theme.Muted
 import com.prayerkey.manna.ui.theme.NightGloss
+import com.prayerkey.manna.ui.theme.GiltLine
+import com.prayerkey.manna.ui.theme.Ivory
+import com.prayerkey.manna.ui.theme.Electric
+import com.prayerkey.manna.ui.theme.UtilitySans
 
 data class DockItem(val label: String, val icon: ImageVector)
 
@@ -56,7 +65,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
     val view = LocalView.current
     val cs = androidx.compose.material3.MaterialTheme.colorScheme
     Box(
-        Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 14.dp),
+        Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 14.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
         /* Glass in the theme's own colour, not a slab of white. A stark
@@ -64,14 +73,13 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
            from the bottom of the phone; on a light theme this still reads
            as white, because the theme says so. */
         Surface(
-            shape = RoundedCornerShape(30.dp),
-            color = cs.surface.copy(alpha = .86f),
-            border = BorderStroke(0.6.dp, cs.onSurface.copy(alpha = .10f)),
-            shadowElevation = 26.dp,
-            modifier = Modifier.padding(horizontal = 12.dp),
+            shape = RoundedCornerShape(31.dp),
+            color = Color(0xFF1A1F2A),
+            border = BorderStroke(0.6.dp, GiltLine.copy(alpha = .48f)),
+            shadowElevation = 24.dp,
         ) {
             Row(
-                Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 7.dp),
+                Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -82,7 +90,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                         spring(dampingRatio = Spring.DampingRatioMediumBouncy), label = "dock-scale",
                     )
                     val tint by animateColorAsState(
-                        if (active) cs.primary else cs.onSurface.copy(alpha = .55f),
+                        if (active) Electric else Ivory.copy(alpha = .60f),
                         spring(stiffness = Spring.StiffnessMediumLow), label = "dock-tint",
                     )
 
@@ -91,8 +99,13 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                        when the selection moves. */
                     Column(
                         Modifier.weight(1f)
-                            .clip(RoundedCornerShape(24.dp))
-                            .background(if (active) SolidColor(cs.primary.copy(alpha = .15f)) else SolidColor(Color.Transparent))
+                            .clip(RoundedCornerShape(21.dp))
+                            .background(SolidColor(Color.Transparent))
+                            .semantics(mergeDescendants = true) {
+                                contentDescription = item.label
+                                role = Role.Tab
+                                this.selected = active
+                            }
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
@@ -102,26 +115,27 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                                     onSelect(index)
                                 }
                             }
-                            .padding(top = 10.dp, bottom = 9.dp),
+                            .padding(top = 7.dp, bottom = 7.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Icon(
                             item.icon, contentDescription = null,
                             tint = tint,
-                            modifier = Modifier.size(23.dp).scale(iconScale),
+                            modifier = Modifier.size(21.dp).scale(iconScale),
                         )
                         /* Every tab is named, always. A sparkle and a church
                            glyph are not guessable, and Home carries no other
                            wayfinding — the dock is the only signpost in the
                            app, which is the wrong place to be subtle. */
                         Text(
-                            item.label,
-                            color = if (active) cs.primary else cs.onSurface.copy(alpha = .55f),
+                            if (item.label == "Home") "TODAY" else item.label.uppercase(),
+                            color = if (active) Ivory else Ivory.copy(alpha = .60f),
+                            fontFamily = UtilitySans,
                             fontSize = 10.sp,
-                            fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium,
-                            letterSpacing = .1.sp,
+                            fontWeight = FontWeight.Medium,
+                            letterSpacing = 1.sp,
                             maxLines = 1,
-                            modifier = Modifier.padding(top = 5.dp),
+                            modifier = Modifier.padding(top = 4.dp),
                             // kill Android's font padding so the label sits
                             // optically centred under the icon
                             style = androidx.compose.ui.text.TextStyle(

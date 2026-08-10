@@ -28,6 +28,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import android.content.Intent
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import com.prayerkey.manna.share.CardShareRenderer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -63,6 +68,16 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
     val sermonNotes by viewModel.sermonNotes.collectAsState()
     val formation by viewModel.formation.collectAsState()
     val context = LocalContext.current
+    val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
+    LaunchedEffect(hydrated, preferences.onboarded, preferences.reminderEnabled) {
+        if (hydrated && preferences.onboarded && preferences.reminderEnabled &&
+            android.os.Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+    LaunchedEffect(hydrated, preferences.themeId, preferences.followSystemTheme) {
+        if (hydrated) onThemeChange(preferences.themeId, preferences.followSystemTheme)
+    }
     val destinations = remember {
         listOf(
             Destination("Home", Icons.Outlined.Home),
@@ -131,8 +146,7 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
             if (!hydrated) {
-                // one frame of brand, never a flash of the wrong screen
-                Box(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background))
+                com.prayerkey.manna.ui.screens.LaunchPrelude(stage = 0)
             } else if (!preferences.onboarded) {
                 com.prayerkey.manna.ui.screens.OnboardingScreen {
                     /* The reminder used to be set here, at the one moment
@@ -151,7 +165,16 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                     savedCount = saved.size, streak = streak, prefs = preferences,
                     entries = entries, sermons = sermonNotes, prayers = journal, saved = saved,
                     memory = memory, formation = formation, onRestoreArchive = viewModel::restoreArchive,
-                    onBack = { showProfile = false }, onUpdate = viewModel::updatePreferences,
+                    onBack = { showProfile = false },
+                    onUpdate = { updated ->
+                        /* Preferences own persistence; MainActivity owns the
+                           Material theme wrapped around this composition.
+                           Updating only the store made a chosen palette look
+                           inert until the process was recreated. Repaint the
+                           running app in the same frame as the selection. */
+                        viewModel.updatePreferences(updated)
+                        onThemeChange(updated.themeId, updated.followSystemTheme)
+                    },
                 )
             } else {
                 // instant tab switch — no transition animation, zero delay
@@ -164,6 +187,9 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                         devotion = devotion,
                         bibleChallenge = bibleChallenge,
                         prayerChallenge = prayerChallenge,
+                        savedCount = saved.size,
+                        journalCount = entries.size,
+                        sermonCount = sermonNotes.size,
                         onToggleChallenge = { c ->
                             viewModel.markChallengeDay(c.id, c.today.index - 1, !c.today.done)
                         },

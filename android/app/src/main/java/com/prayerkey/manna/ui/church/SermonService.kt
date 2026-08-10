@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class SermonService : Service() {
 
-    private var recognizer: SermonRecognizer? = null
+    private var audioEngine: SermonAudioEngine? = null
     private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -58,10 +58,10 @@ class SermonService : Service() {
         _partial.value = ""
         _listening.value = true
 
-        recognizer = SermonRecognizer(
+        audioEngine = SermonAudioEngine(
             context = this,
             language = _language.value,
-            onChunk = { chunk ->
+            onFinal = { chunk ->
                 _chunks.value = _chunks.value + chunk
                 _partial.value = ""
                 harvestReferences(chunk)
@@ -88,8 +88,9 @@ class SermonService : Service() {
     }
 
     private fun stopListening() {
-        recognizer?.destroy()
-        recognizer = null
+        audioEngine?.stop()
+        _audioPath.value = audioEngine?.audioFile?.absolutePath.orEmpty()
+        audioEngine = null
         runCatching { wakeLock?.takeIf { it.isHeld }?.release() }
         wakeLock = null
         _listening.value = false
@@ -100,7 +101,9 @@ class SermonService : Service() {
     }
 
     override fun onDestroy() {
-        recognizer?.destroy()
+        audioEngine?.stop()
+        _audioPath.value = audioEngine?.audioFile?.absolutePath.orEmpty()
+        audioEngine = null
         runCatching { wakeLock?.takeIf { it.isHeld }?.release() }
         _listening.value = false
         super.onDestroy()
@@ -154,6 +157,8 @@ class SermonService : Service() {
         val partial = _partial.asStateFlow()
         private val _status = MutableStateFlow("Ready")
         val status = _status.asStateFlow()
+        private val _audioPath = MutableStateFlow("")
+        val audioPath = _audioPath.asStateFlow()
         private val _startedAt = MutableStateFlow(0L)
         val startedAt = _startedAt.asStateFlow()
         private val _language = MutableStateFlow("")
@@ -187,6 +192,7 @@ class SermonService : Service() {
             _references.value = emptyList()
             _partial.value = ""
             _startedAt.value = 0L
+            _audioPath.value = ""
         }
     }
 }

@@ -98,7 +98,18 @@ fun BibleScreen(
     reduceMotion: Boolean = false,
 ) {
     var query by remember { mutableStateOf("") }
-    var shown by remember { mutableStateOf<List<RemoteVerse>>(emptyList()) }
+    /* Never open the Bible onto an empty canvas. OfflineBible has to parse
+       the bundled scripture asset on its first query, which can take a few
+       seconds on a cold, inexpensive device. A daily verse is already
+       available in memory, so paint the first world immediately and replace
+       it with search results as soon as the local index is ready. */
+    var shown by remember {
+        mutableStateOf(
+            // Psalm 23 used to be the compulsory first card every time the
+            // Bible opened. Start with the broader daily library instead.
+            DailyVerses.drop(1).take(8).map { RemoteVerse(it.reference, it.verse, it.translation) },
+        )
+    }
     var loading by remember { mutableStateOf(false) }
     var pickerOpen by remember { mutableStateOf(false) }
     var showMemory by remember { mutableStateOf(false) }
@@ -151,7 +162,8 @@ fun BibleScreen(
     /* Two ways to be in the Bible, and they are different acts. The deck
        hands you a verse; the book is for sitting down and reading one. */
     var bookMode by remember { mutableStateOf(false) }
-    androidx.activity.compose.BackHandler(enabled = bookMode) { bookMode = false }
+    var libraryMode by remember { mutableStateOf(false) }
+    androidx.activity.compose.BackHandler(enabled = bookMode || libraryMode) { bookMode = false; libraryMode = false }
 
     if (bookMode) {
         com.prayerkey.manna.ui.book.BibleBookScreen(
@@ -162,6 +174,23 @@ fun BibleScreen(
             onRibbon = onReaderRibbon,
             onReadPlain = { book, chapter ->
                 bookMode = false
+                scope.launch {
+                    chapterVerses = bible.chapter(book, chapter)
+                    chapterTitle = "$book $chapter"
+                }
+            },
+        )
+        return
+    }
+
+    if (libraryMode) {
+        com.prayerkey.manna.ui.book.BibleLibraryScreen(
+            translation = translation,
+            onChooseTranslation = { libraryMode = false; pickerOpen = true },
+            onPull = { libraryMode = false },
+            onFlip = { libraryMode = false; bookMode = true },
+            onOpenChapter = { book, chapter ->
+                libraryMode = false
                 scope.launch {
                     chapterVerses = bible.chapter(book, chapter)
                     chapterTitle = "$book $chapter"
@@ -199,6 +228,10 @@ fun BibleScreen(
                             Icon(Icons.Outlined.MenuBook, "Read the Bible as a book", tint = Ivory, modifier = Modifier.size(19.dp))
                         }
                         Spacer(Modifier.width(8.dp))
+                        FloatChip(onClick = { libraryMode = true }) {
+                            Icon(Icons.Outlined.ViewList, "Browse the Bible library", tint = Ivory, modifier = Modifier.size(19.dp))
+                        }
+                        Spacer(Modifier.width(8.dp))
                         FloatChip(onClick = { showMemory = true }) {
                             Icon(Icons.Outlined.School, "Memorize", tint = Ivory, modifier = Modifier.size(19.dp))
                         }
@@ -206,7 +239,7 @@ fun BibleScreen(
                         Surface(
                             onClick = { pickerOpen = true }, shape = RoundedCornerShape(99.dp),
                             color = Color.Transparent, shadowElevation = 8.dp,
-                            modifier = Modifier.background(NightGloss, RoundedCornerShape(99.dp)),
+                            modifier = Modifier.height(54.dp).background(NightGloss, RoundedCornerShape(99.dp)),
                         ) {
                             Row(Modifier.padding(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text(version.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
@@ -240,7 +273,7 @@ fun BibleScreen(
         ModalBottomSheet(onDismissRequest = { pickerOpen = false }, containerColor = Canvas) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 40.dp)) {
                 Text("Choose your Bible", fontFamily = BookSerif, fontSize = 28.sp)
-                Text("14 versions. All free, forever.", color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 3.dp, bottom = 16.dp))
+                Spacer(Modifier.height(16.dp))
                 LazyColumn(Modifier.heightIn(max = 560.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
                     items(BIBLE_VERSIONS, key = { it.id }) { item ->
                         val active = item.id == translation
@@ -257,7 +290,7 @@ fun BibleScreen(
                                         Spacer(Modifier.width(8.dp))
                                         SourcePill(item.source)
                                     }
-                                    Text("${item.name} — ${item.tagline}", color = if (active) Color.White.copy(.7f) else Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
+                                    Text(item.name, color = if (active) Color.White.copy(.7f) else Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                                 }
                                 if (active) Text("✓", color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold)
                             }
@@ -297,7 +330,7 @@ fun BibleScreen(
         ModalBottomSheet(onDismissRequest = { chapterTitle = ""; chapterVerses = emptyList() }, containerColor = Canvas) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 36.dp)) {
                 Text(chapterTitle, fontFamily = BookSerif, fontSize = 30.sp)
-                Text("King James Version · available offline", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp, bottom = 18.dp))
+                Spacer(Modifier.height(18.dp))
                 LazyColumn(Modifier.heightIn(max = 620.dp)) {
                     items(chapterVerses, key = { it.reference }) { item ->
                         Row(Modifier.fillMaxWidth().clickable { chapterTitle = ""; selectedVerse = RemoteVerse(item.reference, item.text, "KJV") }.padding(vertical = 8.dp)) {
@@ -323,9 +356,10 @@ fun BibleScreen(
 @Composable
 private fun FloatChip(onClick: () -> Unit, content: @Composable () -> Unit) {
     Box(
-        Modifier.size(42.dp)
-            .clip(CircleShape).background(Night.copy(alpha = .34f))
-            .border(0.7.dp, Color.White.copy(alpha = .22f), CircleShape)
+        Modifier.size(54.dp)
+            .shadow(14.dp, CircleShape, spotColor = Color.Black.copy(alpha = .28f))
+            .clip(CircleShape).background(Brush.verticalGradient(listOf(Color(0xCC285FC2), Color(0xDD071A3D))))
+            .border(1.dp, Color.White.copy(alpha = .30f), CircleShape)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) { content() }
@@ -407,7 +441,7 @@ private fun VerseDetail(
                 }
                 HorizontalDivider(Modifier.padding(vertical = 14.dp), color = Hairline)
                 Text("ASK ABOUT THIS PASSAGE", color = Gold, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold)
-                Text("Answers stay anchored to the displayed text and clearly label reflection.", color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp, bottom = 8.dp))
+                Spacer(Modifier.height(8.dp))
                 OutlinedTextField(value = studyQuestion, onValueChange = { studyQuestion = it }, label = { Text("Your question") }, placeholder = { Text("What does this passage say?") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
                 Button(onClick = { studyAnswer = com.prayerkey.manna.data.StudyLens.answer(reference, text, studyQuestion) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), enabled = studyQuestion.isNotBlank()) { Text("Explore carefully") }
                 studyAnswer?.let { answer ->
@@ -639,7 +673,7 @@ fun PrayerScreen(
                title said it again, twice on one screen. */
             Text(
                 if (generated == null) "Pray" else "Your prayer",
-                color = cs.onBackground, fontFamily = BookSerif, fontSize = 32.sp,
+                color = cs.onBackground, fontFamily = DisplaySerif, fontSize = 32.sp, fontWeight = FontWeight.Bold,
             )
             ModeChips(deckMode) { deckMode = it }
 
@@ -839,7 +873,7 @@ fun PrayerScreen(
                 Box(Modifier.fillMaxWidth().premiumCard(fill = PaperFill)) {
                     Column(Modifier.padding(24.dp)) {
                         Text(generated!!.title, fontFamily = BookSerif, fontSize = 25.sp)
-                        Text("Prayed over your words", color = Electric, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp, bottom = 20.dp))
+                        Spacer(Modifier.height(20.dp))
                         Text(generated!!.prayer, lineHeight = 24.sp)
                         generated!!.verses.firstOrNull()?.let { Text(it.first, color = Gold, modifier = Modifier.padding(top = 20.dp)) }
                         if (generated!!.encouragement.isNotBlank()) Text(generated!!.encouragement, color = Muted, modifier = Modifier.padding(top = 14.dp))
@@ -1060,12 +1094,12 @@ private data class Starter(
 
 /** Six ways in, for the days when the empty box is the hardest part. */
 private val STARTERS = listOf(
-    Starter("I am anxious", "I am anxious about something and I need peace.", Icons.Outlined.Air, Color(0xFF6E8BC7)),
-    Starter("For my family", "Please pray for my family.", Icons.Outlined.FavoriteBorder, Color(0xFFC77E7E)),
-    Starter("To give thanks", "I want to thank God for what He has done.", Icons.Outlined.AutoAwesome, Color(0xFFC9A227)),
-    Starter("I cannot sleep", "I cannot sleep and my mind will not rest.", Icons.Outlined.DarkMode, Color(0xFF7C74B8)),
-    Starter("For healing", "I need healing in my body.", Icons.Outlined.Spa, Color(0xFF5FA37E)),
-    Starter("I need direction", "I do not know what to do next and I need direction.", Icons.Outlined.Explore, Color(0xFF5E93B8)),
+    Starter("I am anxious", "I am anxious about something and I need peace.", Icons.Outlined.Air, Color(0xFF12161F)),
+    Starter("For my family", "Please pray for my family.", Icons.Outlined.FavoriteBorder, Color(0xFF12161F)),
+    Starter("To give thanks", "I want to thank God for what He has done.", Icons.Outlined.AutoAwesome, Color(0xFF12161F)),
+    Starter("I cannot sleep", "I cannot sleep and my mind will not rest.", Icons.Outlined.DarkMode, Color(0xFF12161F)),
+    Starter("For healing", "I need healing in my body.", Icons.Outlined.Spa, Color(0xFF12161F)),
+    Starter("I need direction", "I do not know what to do next and I need direction.", Icons.Outlined.Explore, Color(0xFF12161F)),
 )
 
 @Composable
@@ -1101,13 +1135,7 @@ private fun ModeChips(deckMode: Boolean, onMode: (Boolean) -> Unit) {
     }
 }
 
-private fun deckColor(category: String): Color = when {
-    category.contains("Health", true) -> Color(0xFFEAF6F0)
-    category.contains("Mental", true) -> Color(0xFFEEF1FF)
-    category.contains("Family", true) || category.contains("Relationship", true) -> Color(0xFFFFF0ED)
-    category.contains("Finance", true) -> Color(0xFFFFF6DF)
-    else -> Color(0xFFF4F1FA)
-}
+private fun deckColor(category: String): Color = Color(0xFFF2EBE0)
 
 
 @Composable
@@ -1127,7 +1155,7 @@ private fun SavedCard(word: SavedWord, canAnswer: Boolean, onAnswer: () -> Unit)
 private fun EmptySaved(answered: Boolean) {
     Column(Modifier.fillMaxWidth().padding(top = 60.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(if (answered) Icons.Outlined.FavoriteBorder else Icons.Outlined.BookmarkBorder, null, tint = Gold, modifier = Modifier.size(44.dp))
-        Text(if (answered) "Your proof pile begins here" else "Push a card up to keep it", fontFamily = BookSerif, fontSize = 22.sp, modifier = Modifier.padding(top = 16.dp))
+        Text(if (answered) "No answered prayers" else "No saved words", fontFamily = BookSerif, fontSize = 22.sp, modifier = Modifier.padding(top = 16.dp))
     }
 }
 
@@ -1156,7 +1184,7 @@ fun ProfileScreen(
     Column(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp).padding(top = 20.dp, bottom = 42.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, "Back") }
-            Column { Text("You", fontFamily = BookSerif, fontSize = 32.sp); Text("Your quiet rhythm with God.", color = Muted, fontSize = 13.sp) }
+            Text("You", fontFamily = BookSerif, fontSize = 32.sp)
         }
         OutlinedTextField(prefs.name, { onUpdate(prefs.copy(name = it)) }, label = { Text("Your name") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 16.dp), shape = RoundedCornerShape(16.dp))
         Surface(Modifier.fillMaxWidth().padding(vertical = 18.dp), color = Night, shape = RoundedCornerShape(26.dp)) {
@@ -1171,7 +1199,7 @@ fun ProfileScreen(
            choice about how the app looks can be changed on a whim. */
         ThemeSetting(prefs, onUpdate)
 
-        SettingRow("Daily reminder", String.format("%02d:%02d", prefs.reminderHour, prefs.reminderMinute), onClick = {
+        SettingRow("Daily reminder", String.format(java.util.Locale.getDefault(), "%02d:%02d", prefs.reminderHour, prefs.reminderMinute), onClick = {
             TimePickerDialog(context, { _, hour, minute ->
                 val next = prefs.copy(reminderHour = hour, reminderMinute = minute); onUpdate(next)
                 ReminderReceiver.schedule(context, hour, minute, next.reminderEnabled)
@@ -1239,7 +1267,6 @@ private fun SettingRow(label: String, value: String, onClick: () -> Unit = {}, a
 private fun ScreenFrame(title: String, subtitle: String, content: @Composable ColumnScope.() -> Unit) {
     Column(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background).padding(horizontal = 22.dp).padding(top = 24.dp)) {
         Text(title, fontFamily = BookSerif, fontSize = 32.sp)
-        Text(subtitle, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
         content()
     }
 }
@@ -1283,7 +1310,15 @@ private fun ThemeSetting(prefs: UserPrefs, onUpdate: (UserPrefs) -> Unit) {
                             if (chosen) theme.accent else cs.outlineVariant,
                             RoundedCornerShape(16.dp),
                         )
-                        .clickable { onUpdate(prefs.copy(themeId = theme.id)) }
+                        .clickable {
+                            /* An explicit palette choice should look exactly
+                               like its preview. Leaving system-follow enabled
+                               silently replaced Vigil's navy paper with Grace
+                               on a light phone, making the picker appear
+                               broken. People can opt back into system mode
+                               with the switch directly below. */
+                            onUpdate(prefs.copy(themeId = theme.id, followSystemTheme = false))
+                        }
                         .padding(vertical = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {

@@ -28,7 +28,7 @@ import com.prayerkey.manna.ui.theme.BookSerif
 
 /* Ivory on night, gold for the small marks. */
 private val Ivory = Color(0xFFF6F0E1)
-private val Gilt = Color(0xFFC9A24B)
+private val Gilt = Color(0xFFA4231C)
 
 /**
  * A verse inside its world — full bleed, edge to edge.

@@ -14,15 +14,18 @@ import androidx.compose.ui.unit.sp
 
 /* Apple-white premium system:
    pure #FFFFFF canvas, #1D1D1F ink, #86868B secondary, #F5F5F7 fills. */
-val Ink = Color(0xFF1D1D1F)
-val Muted = Color(0xFF86868B)
-val Canvas = Color(0xFFFFFFFF)
-val AppleGray = Color(0xFFF5F5F7)
-val Ivory = Color(0xFFFFFCF4)
-val Night = Color(0xFF14182A)
-val Gold = Color(0xFFB07C1F)
-val Electric = Color(0xFF315CFF)
-val Hairline = Color(0xFFE8E8ED)
+val Ink = Color(0xFF12161F)
+val Muted = Color(0x8C12161F)
+val Canvas = Color(0xFFFAF6EF)
+val AppleGray = Color(0xFFF2EBE0)
+val Ivory = Color(0xFFFAF6EF)
+val Night = Color(0xFF12161F)
+/** Historic name retained for call sites; semantic accent is now rubric red. */
+val Gold = Color(0xFFA4231C)
+val GiltLine = Color(0xFFC9A227)
+/** Compatibility accent for older surfaces; intentionally blue-grey, never neon. */
+val Electric = Color(0xFFA4231C)
+val Hairline = Color(0x1712161F)
 
 /**
  * Type scale.
@@ -39,7 +42,7 @@ private val Trim = LineHeightStyle(
 )
 
 private fun display(size: Int, line: Int, tracking: Double) = TextStyle(
-    fontFamily = BookSerif,
+    fontFamily = DisplaySerif,
     fontWeight = FontWeight.Medium,
     fontSize = size.sp,
     lineHeight = line.sp,
@@ -49,7 +52,7 @@ private fun display(size: Int, line: Int, tracking: Double) = TextStyle(
 )
 
 private fun body(size: Int, line: Int, weight: FontWeight = FontWeight.Normal) = TextStyle(
-    fontFamily = FontFamily.SansSerif,
+    fontFamily = UtilitySans,
     fontWeight = weight,
     fontSize = size.sp,
     lineHeight = line.sp,
@@ -74,7 +77,7 @@ private val MannaType = Typography(
     bodySmall = body(12, 18),
     labelLarge = body(14, 18, FontWeight.SemiBold),
     labelMedium = TextStyle(
-        fontFamily = FontFamily.SansSerif,
+        fontFamily = UtilitySans,
         fontWeight = FontWeight.Bold,
         fontSize = 10.sp,
         lineHeight = 13.sp,
@@ -91,8 +94,12 @@ fun MannaTheme(
     // the chosen theme repaints the whole app, not just a preview tile
     val scheme = if (theme.dark) {
         androidx.compose.material3.darkColorScheme(
-            primary = theme.accent, onPrimary = if (theme.dark) Color(0xFF10131F) else Color.White,
+            primary = theme.accent, onPrimary = Ivory,
+            primaryContainer = Color(0xFF2A1718), onPrimaryContainer = Color(0xFFFAF6EF),
             secondary = theme.accent, onSecondary = Color(0xFF10131F),
+            secondaryContainer = Color(0xFF2A1718), onSecondaryContainer = Color(0xFFFAF6EF),
+            tertiary = GiltLine, onTertiary = Color(0xFF12161F),
+            tertiaryContainer = Color(0xFF25221A), onTertiaryContainer = Color(0xFFFAF6EF),
             background = theme.background, onBackground = theme.ink,
             surface = theme.surface, onSurface = theme.ink,
             surfaceVariant = theme.surface, onSurfaceVariant = theme.muted,
@@ -102,14 +109,18 @@ fun MannaTheme(
         )
     } else {
         lightColorScheme(
-            primary = theme.accent, onPrimary = Color.White,
-            secondary = theme.accent, onSecondary = Color.White,
+            primary = theme.accent, onPrimary = Ivory,
+            primaryContainer = Color(0xFFF2DDD8), onPrimaryContainer = Color(0xFF68130F),
+            secondary = theme.accent, onSecondary = Ivory,
+            secondaryContainer = Color(0xFFF2DDD8), onSecondaryContainer = Color(0xFF68130F),
+            tertiary = GiltLine, onTertiary = Ink,
+            tertiaryContainer = Color(0xFFF1E8CF), onTertiaryContainer = Color(0xFF4B3A08),
             background = theme.background, onBackground = theme.ink,
             surface = theme.surface, onSurface = theme.ink,
             surfaceVariant = theme.background, onSurfaceVariant = theme.muted,
             surfaceTint = Color.Transparent,
             outline = theme.muted.copy(alpha = .3f), outlineVariant = theme.muted.copy(alpha = .22f),
-            error = Color(0xFFB3402A), onError = Color.White,
+            error = Color(0xFFB3402A), onError = Ivory,
         )
     }
     MaterialTheme(colorScheme = scheme, typography = MannaType, content = content)

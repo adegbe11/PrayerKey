@@ -4,6 +4,7 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.WindowManager
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,15 +33,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.Modifier
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Path
@@ -101,6 +97,12 @@ fun JournalScreen(
     concealPreviews: Boolean = false,
 ) {
     val context = LocalContext.current
+    val view = LocalView.current
+    DisposableEffect(journalLocked, view) {
+        val window = (view.context as? android.app.Activity)?.window
+        if (journalLocked) window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose { window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) }
+    }
     var unlocked by remember(journalLocked) { mutableStateOf(!journalLocked) }
     val unlock = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) unlocked = true
@@ -158,7 +160,7 @@ fun JournalScreen(
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (tab != JournalTab.Journey) IconButton(onClick = { tab = JournalTab.Journey }) { Icon(Icons.Outlined.ArrowBack, "Back to journal") }
                 Column(Modifier.weight(1f)) {
-                    Text(when (tab) { JournalTab.Journey -> "Journal"; JournalTab.Practices -> "Practices"; JournalTab.Saved -> "Saved words"; JournalTab.Answered -> "Answered prayers" }, fontFamily = BookSerif, fontSize = 32.sp, color = headerInk)
+                    Text(when (tab) { JournalTab.Journey -> "Journal"; JournalTab.Practices -> "Practices"; JournalTab.Saved -> "Saved words"; JournalTab.Answered -> "Answered prayers" }, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 32.sp, color = headerInk)
                 }
                 if (tab == JournalTab.Journey) Box {
                     IconButton(onClick = { libraryOpen = true }) { Icon(Icons.Outlined.MoreHoriz, "Open journal library", tint = headerMuted) }
@@ -196,39 +198,25 @@ fun JournalScreen(
         }
 
         if (tab == JournalTab.Journey) {
-            /* Centred, not tucked in a corner. Writing is the only thing this
-               screen asks of you, so the button sits on the centre line under
-               the page with a halo breathing behind it. */
-            val transition = rememberInfiniteTransition(label = "write")
-            val halo by transition.animateFloat(
-                initialValue = 1f,
-                targetValue = if (entries.isEmpty()) 1.14f else 1.04f,
-                animationSpec = infiniteRepeatable(tween(1600), RepeatMode.Reverse),
-                label = "halo",
-            )
+            /* Writing is the one primary action. Treat it like the clasp on a
+               private journal: substantial, quiet, and always in the same
+               place. Pulsing rings made the action look promotional and
+               introduced the neon language this app deliberately avoids. */
             val accent = MaterialTheme.colorScheme.primary
             Box(
                 Modifier.align(Alignment.BottomCenter).padding(bottom = 26.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Box(
-                    Modifier.size(104.dp).scale(halo).clip(CircleShape)
-                        .background(accent.copy(alpha = .09f)),
-                )
-                Box(
-                    Modifier.size(78.dp).scale(halo).clip(CircleShape)
-                        .background(accent.copy(alpha = .13f)),
-                )
-                Box(
-                    Modifier.size(62.dp)
-                        .shadow(20.dp, CircleShape, spotColor = accent.copy(alpha = .55f))
+                    Modifier.size(58.dp)
+                        .shadow(5.dp, CircleShape, spotColor = Color.Black.copy(alpha = .16f))
                         .clip(CircleShape).background(accent)
                         .clickable { picking = true },
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         Icons.Outlined.Add, "Write an entry",
-                        tint = Night, modifier = Modifier.size(30.dp),
+                        tint = MaterialTheme.colorScheme.surface, modifier = Modifier.size(28.dp),
                     )
                 }
             }
@@ -439,7 +427,7 @@ private fun JournalMemories(
             }
         } }
         insight?.let { item(key = "insight") { JourneyInsightCard(it) } }
-        if (meaningful.isEmpty() && onThisDay == null && insight == null) item { Box(Modifier.fillParentMaxHeight(.65f).fillMaxWidth(), contentAlignment = Alignment.Center) { Text("Favorites, answered prayers and attached memories will gather here.", color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center) } }
+        if (meaningful.isEmpty() && onThisDay == null && insight == null) item { Box(Modifier.fillParentMaxHeight(.65f).fillMaxWidth(), contentAlignment = Alignment.Center) { Text("No saved moments", color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center) } }
         items(meaningful, key = { "memory-${it.id}" }) { EntryCard(it, conceal, { onAnswer(it) }) { onEdit(it) } }
     }
 }

@@ -31,8 +31,8 @@ import com.prayerkey.manna.ui.worlds.VerseWorld
 import com.prayerkey.manna.ui.worlds.WorldScene
 import com.prayerkey.manna.ui.theme.BookSerif
 
-private val Ivory = Color(0xFFF6F0E1)
-private val Gilt = Color(0xFFC9A24B)
+private val Ivory = Color(0xFFF4F8FF)
+private val Gilt = Color(0xFF78A9FF)
 
 /**
  * A prayer, in the same world language as the verses.

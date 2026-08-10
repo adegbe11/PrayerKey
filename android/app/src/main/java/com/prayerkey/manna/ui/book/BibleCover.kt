@@ -49,10 +49,10 @@ import kotlin.math.sin
 
 /* The board. Redder and deeper than the spine, the way a rebound family
    Bible is, and mottled rather than flat. */
-private val Board = Color(0xFF6B3018)
-private val BoardDeep = Color(0xFF2B1108)
-private val BoardLit = Color(0xFF8C4426)
-private val Gold = Color(0xFFD4AF37)
+private val Board = Color(0xFF5A1E18)
+private val BoardDeep = Color(0xFF1B0807)
+private val BoardLit = Color(0xFF87382A)
+private val Gold = Color(0xFFC9A227)
 private val GoldLit = Color(0xFFF3E5AB)
 private val GoldDim = Color(0xFF7A5A15)
 
@@ -78,7 +78,7 @@ fun BibleCover(onOpen: () -> Unit, modifier: Modifier = Modifier) {
         TooledBoard(centrepiece = true)
 
         Column(
-            Modifier.fillMaxWidth().padding(horizontal = 52.dp),
+            Modifier.fillMaxWidth().offset(y = (-34).dp).padding(horizontal = 58.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             /* Stamped, not filled. A gradient on the glyphs alone reads as
@@ -86,7 +86,7 @@ fun BibleCover(onOpen: () -> Unit, modifier: Modifier = Modifier) {
                a groove: there is a shadow cast down into the recess, a bright
                lip on the near edge, and the metal between. So the letters are
                drawn three times, the same way every gold line here is. */
-            StampedText("HOLY BIBLE", 33.sp, 2.sp, FontWeight.Bold)
+            StampedText("HOLY BIBLE", 30.sp, 1.7.sp, FontWeight.Bold)
             Box(
                 Modifier.padding(top = 11.dp, bottom = 9.dp)
                     .height(1.5.dp).fillMaxWidth(.5f)
@@ -266,16 +266,18 @@ private fun DrawScope.shield() {
     val w = size.width
     val h = size.height
     val cx = w / 2f
-    val cy = h * .47f
-    val hw = w * .355f
-    val hh = h * .168f
+    val cy = h * .455f
+    val hw = w * .305f
+    val hh = h * .215f
 
     val ogee = Path().apply {
         moveTo(cx, cy - hh)
-        cubicTo(cx + hw * .52f, cy - hh * .96f, cx + hw, cy - hh * .62f, cx + hw, cy)
-        cubicTo(cx + hw, cy + hh * .62f, cx + hw * .52f, cy + hh * .96f, cx, cy + hh)
-        cubicTo(cx - hw * .52f, cy + hh * .96f, cx - hw, cy + hh * .62f, cx - hw, cy)
-        cubicTo(cx - hw, cy - hh * .62f, cx - hw * .52f, cy - hh * .96f, cx, cy - hh)
+        cubicTo(cx + hw * .18f, cy - hh * .80f, cx + hw * .86f, cy - hh * .90f, cx + hw, cy - hh * .43f)
+        cubicTo(cx + hw * .84f, cy - hh * .08f, cx + hw, cy + hh * .18f, cx + hw * .72f, cy + hh * .48f)
+        cubicTo(cx + hw * .48f, cy + hh * .72f, cx + hw * .20f, cy + hh * .86f, cx, cy + hh)
+        cubicTo(cx - hw * .20f, cy + hh * .86f, cx - hw * .48f, cy + hh * .72f, cx - hw * .72f, cy + hh * .48f)
+        cubicTo(cx - hw, cy + hh * .18f, cx - hw * .84f, cy - hh * .08f, cx - hw, cy - hh * .43f)
+        cubicTo(cx - hw * .86f, cy - hh * .90f, cx - hw * .18f, cy - hh * .80f, cx, cy - hh)
         close()
     }
 
@@ -288,13 +290,26 @@ private fun DrawScope.shield() {
         val iw = hw * .88f
         val ih = hh * .88f
         moveTo(cx, cy - ih)
-        cubicTo(cx + iw * .52f, cy - ih * .96f, cx + iw, cy - ih * .62f, cx + iw, cy)
-        cubicTo(cx + iw, cy + ih * .62f, cx + iw * .52f, cy + ih * .96f, cx, cy + ih)
-        cubicTo(cx - iw * .52f, cy + ih * .96f, cx - iw, cy + ih * .62f, cx - iw, cy)
-        cubicTo(cx - iw, cy - ih * .62f, cx - iw * .52f, cy - ih * .96f, cx, cy - ih)
+        cubicTo(cx + iw * .20f, cy - ih * .78f, cx + iw * .84f, cy - ih * .88f, cx + iw, cy - ih * .42f)
+        cubicTo(cx + iw * .84f, cy - ih * .08f, cx + iw, cy + ih * .16f, cx + iw * .70f, cy + ih * .47f)
+        cubicTo(cx + iw * .46f, cy + ih * .70f, cx + iw * .18f, cy + ih * .84f, cx, cy + ih)
+        cubicTo(cx - iw * .18f, cy + ih * .84f, cx - iw * .46f, cy + ih * .70f, cx - iw * .70f, cy + ih * .47f)
+        cubicTo(cx - iw, cy + ih * .16f, cx - iw * .84f, cy - ih * .08f, cx - iw, cy - ih * .42f)
+        cubicTo(cx - iw * .84f, cy - ih * .88f, cx - iw * .20f, cy - ih * .78f, cx, cy - ih)
         close()
     }
     drawPath(inner, goldLeaf(), style = Stroke(1f), alpha = .55f)
+
+    // Fine hand-tooled rays and vines inside the gothic panel.
+    for (i in 0 until 12) {
+        val angle = (Math.PI * 2.0 * i / 12.0).toFloat()
+        val innerRadius = hw * .48f
+        val outerRadius = hw * .76f
+        val start = Offset(cx + cos(angle) * innerRadius, cy + sin(angle) * innerRadius * .82f)
+        val end = Offset(cx + cos(angle) * outerRadius, cy + sin(angle) * outerRadius * .82f)
+        drawLine(GoldDim.copy(alpha = .42f), start, end, strokeWidth = 1f)
+        drawCircle(Gold.copy(alpha = .38f), radius = 1.8f, center = end)
+    }
 
     // a fleur at the point, top and bottom
     listOf(cy - hh to -1f, cy + hh to 1f).forEach { (at, dir) ->
@@ -311,9 +326,9 @@ private fun DrawScope.shield() {
     }
 
     // the cross, standing above the cartouche
-    val crossY = cy - hh - h * .055f
-    val stem = h * .062f
-    val arm = w * .062f
+    val crossY = cy - hh - h * .045f
+    val stem = h * .072f
+    val arm = w * .105f
     val cross = Path().apply {
         addRect(androidx.compose.ui.geometry.Rect(cx - w * .0055f, crossY - stem * .62f, cx + w * .0055f, crossY + stem * .38f))
         addRect(androidx.compose.ui.geometry.Rect(cx - arm / 2f, crossY - stem * .16f, cx + arm / 2f, crossY - stem * .16f + h * .009f))

@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
  */
 fun Modifier.premiumCard(
     shape: RoundedCornerShape = R.card,
-    fill: Brush = Brush.verticalGradient(listOf(Color.White, Color(0xFFFBFBFD))),
+    fill: Brush = Brush.verticalGradient(listOf(Color(0xFFFAF6EF), Color(0xFFF7F1E8))),
     lift: Boolean = true,
 ): Modifier = this
     // wide, soft — the lift
-    .then(if (lift) Modifier.shadow(22.dp, shape, spotColor = Night.copy(alpha = .13f), ambientColor = Night.copy(alpha = .08f)) else Modifier)
+    .then(if (lift) Modifier.shadow(18.dp, shape, spotColor = Night.copy(alpha = .16f), ambientColor = Night.copy(alpha = .05f)) else Modifier)
     // tight, close — the edge
     .shadow(3.dp, shape, spotColor = Night.copy(alpha = .16f), ambientColor = Color.Transparent)
     .clip(shape)
@@ -36,13 +36,13 @@ fun Modifier.premiumCard(
     .topHighlight(shape)
 
 /** Warm paper, for scripture and prayer. */
-val PaperFill = Brush.verticalGradient(listOf(Color(0xFFFFFEF9), Color(0xFFFBF5E7)))
+val PaperFill = Brush.verticalGradient(listOf(Color(0xFFFAF6EF), Color(0xFFF2EBE0)))
 
 /** The sacred layer. */
-val NightFill = Brush.verticalGradient(listOf(Color(0xFF262C45), Color(0xFF14182A)))
+val NightFill = Brush.verticalGradient(listOf(Color(0xFF1A1F2A), Color(0xFF12161F)))
 
 /** A gold-leaf wash, for anything answered or kept. */
-val GoldFill = Brush.verticalGradient(listOf(Color(0xFFFFFBF0), Color(0xFFF8EFD9)))
+val GoldFill = Brush.verticalGradient(listOf(Color(0xFFFAF6EF), Color(0xFFF2EBE0)))
 
 /**
  * The one-pixel catch of light along a surface's upper edge. This is the
@@ -67,8 +67,8 @@ fun Modifier.goldEdge(shape: RoundedCornerShape = R.card): Modifier = this
     .border(
         width = 0.8.dp,
         brush = Brush.verticalGradient(
-            0f to Gold.copy(alpha = .55f),
-            .5f to Gold.copy(alpha = .14f),
+            0f to GiltLine.copy(alpha = .75f),
+            .5f to GiltLine.copy(alpha = .25f),
             1f to Color.White.copy(alpha = .05f),
         ),
         shape = shape,
@@ -94,7 +94,7 @@ fun Modifier.bloom(color: Color = Gold, alpha: Float = .10f): Modifier =
 
 /** Floating glass, for pills that sit over content. */
 fun Modifier.glassPill(): Modifier = this
-    .shadow(14.dp, R.pill, spotColor = Night.copy(alpha = .16f))
+    .shadow(9.dp, R.pill, spotColor = Night.copy(alpha = .12f))
     .clip(R.pill)
     .background(Brush.verticalGradient(listOf(Color.White, Color(0xFFF7F7FA))))
     .topHighlight(R.pill, strength = .9f)

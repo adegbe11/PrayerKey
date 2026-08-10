@@ -41,30 +41,30 @@ data class AppTheme(
 
 /* The two papers. Every light theme shares Grace's, so text contrast is
    settled once rather than five times. */
-private val WarmWhite = Color(0xFFFBF7F0)
-private val WarmCard = Color(0xFFFFFFFF)
-private val Charcoal = Color(0xFF2C2A26)
-private val WarmMuted = Color(0xFF8A8378)
+private val WarmWhite = Color(0xFFFAF6EF)
+private val WarmCard = Color(0xFFFAF6EF)
+private val Charcoal = Color(0xFF12161F)
+private val WarmMuted = Color(0x8C12161F)
 
-private val Navy = Color(0xFF0F1626)
-private val NavyCard = Color(0xFF19223A)
-private val OffWhite = Color(0xFFF2EFE6)
-private val NavyMuted = Color(0xFF93A0BC)
+private val Navy = Color(0xFF12161F)
+private val NavyCard = Color(0xFF1A1F2A)
+private val OffWhite = Color(0xFFFAF6EF)
+private val NavyMuted = Color(0x99FAF6EF)
 
 val APP_THEMES: List<AppTheme> = listOf(
 
     AppTheme(
         id = "grace",
         name = "Grace",
-        note = "Warm paper and charcoal",
+        note = "Ink binding and warm scripture page",
         dark = false,
         background = WarmWhite,
         surface = WarmCard,
         ink = Charcoal,
         muted = WarmMuted,
         // terracotta gold: the warm metal of a tooled board, not lime
-        accent = Color(0xFFB8863B),
-        header = listOf(Color(0xFFF6E9D2), Color(0xFFFDF6EA), WarmWhite),
+        accent = Color(0xFFA4231C),
+        header = listOf(Color(0xFF12161F), Color(0xFF1A1F2A), WarmWhite),
     ),
 
     AppTheme(
@@ -76,8 +76,8 @@ val APP_THEMES: List<AppTheme> = listOf(
         surface = NavyCard,
         ink = OffWhite,
         muted = NavyMuted,
-        accent = Color(0xFFD4AF37),
-        header = listOf(Color(0xFF1E2A47), Color(0xFF151E33), Navy),
+        accent = Color(0xFFA4231C),
+        header = listOf(Color(0xFF1A1F2A), Color(0xFF12161F), Navy),
     ),
 
     AppTheme(
@@ -89,8 +89,8 @@ val APP_THEMES: List<AppTheme> = listOf(
         surface = WarmCard,
         ink = Charcoal,
         muted = WarmMuted,
-        accent = Color(0xFF6E8F72),
-        header = listOf(Color(0xFFE4EDE3), Color(0xFFF6FAF4), WarmWhite),
+        accent = Color(0xFFA4231C),
+        header = listOf(Color(0xFF12161F), Color(0xFF1A1F2A), WarmWhite),
     ),
 
     AppTheme(
@@ -102,8 +102,8 @@ val APP_THEMES: List<AppTheme> = listOf(
         surface = WarmCard,
         ink = Charcoal,
         muted = WarmMuted,
-        accent = Color(0xFFB5654C),
-        header = listOf(Color(0xFFF6E2DA), Color(0xFFFDF1EC), WarmWhite),
+        accent = Color(0xFFA4231C),
+        header = listOf(Color(0xFF12161F), Color(0xFF1A1F2A), WarmWhite),
     ),
 
     AppTheme(
@@ -115,8 +115,8 @@ val APP_THEMES: List<AppTheme> = listOf(
         surface = WarmCard,
         ink = Charcoal,
         muted = WarmMuted,
-        accent = Color(0xFF7B6BA8),
-        header = listOf(Color(0xFFE8E3F2), Color(0xFFF7F4FB), WarmWhite),
+        accent = Color(0xFFA4231C),
+        header = listOf(Color(0xFF12161F), Color(0xFF1A1F2A), WarmWhite),
     ),
 )
 

@@ -4,9 +4,9 @@
         <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">#FAFAF8</item>
-        <item name="android:windowSplashScreenBackground">#0A1428</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">#0A1428</item>
+        <item name="android:navigationBarColor">#12161F</item>
+        <item name="android:windowSplashScreenBackground">#12161F</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_blank</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#12161F</item>
     </style>
 </resources>

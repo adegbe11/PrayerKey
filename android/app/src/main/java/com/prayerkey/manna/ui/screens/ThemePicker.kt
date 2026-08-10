@@ -128,7 +128,7 @@ fun ThemePicker(
                 }
                 Box(
                     Modifier.weight(1.4f).height(54.dp)
-                        .shadow(16.dp, RoundedCornerShape(18.dp), spotColor = accent.copy(alpha = .5f))
+                        .shadow(9.dp, RoundedCornerShape(18.dp), spotColor = Color.Black.copy(alpha = .16f))
                         .clip(RoundedCornerShape(18.dp)).background(accent)
                         .clickable { onUse(focused) },
                     contentAlignment = Alignment.Center,
@@ -153,7 +153,7 @@ fun ThemePicker(
 private fun ThemeCard(theme: AppTheme, modifier: Modifier = Modifier) {
     Box(
         modifier
-            .shadow(24.dp, RoundedCornerShape(24.dp), spotColor = Color.Black.copy(alpha = .45f))
+            .shadow(14.dp, RoundedCornerShape(24.dp), spotColor = Color.Black.copy(alpha = .20f))
             .clip(RoundedCornerShape(24.dp))
             .background(theme.background)
             .border(1.dp, theme.muted.copy(alpha = .18f), RoundedCornerShape(24.dp)),

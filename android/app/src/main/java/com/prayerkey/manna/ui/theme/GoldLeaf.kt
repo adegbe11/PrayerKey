@@ -36,9 +36,9 @@ import androidx.compose.ui.unit.dp
  * Flat yellow with no groove is the clearest possible tell of a vector
  * illustration pretending to be a bound book.
  */
-val Leaf = Color(0xFFD4AF37)
-val LeafLit = Color(0xFFF3E5AB)
-val LeafDim = Color(0xFF7A5A15)
+val Leaf = Color(0xFF4D84EA)
+val LeafLit = Color(0xFFC9DEFF)
+val LeafDim = Color(0xFF174EA6)
 private val Groove = Color(0xFF1C0A03)
 
 /** A metallic sweep, lit from above and to the left. */
