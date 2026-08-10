@@ -63,19 +63,16 @@ fun PkHeader(
             Text(
                 title.uppercase(),
                 color = Pk.Cream,
-                fontFamily = Spectral,
-                fontSize = PkType.Brand,
-                letterSpacing = PkType.BrandTracking,
-                fontWeight = FontWeight.Medium,
+                style = PkText.Brand,
                 modifier = Modifier.weight(1f),
             )
             trailingLabel?.let {
                 Text(
                     it.uppercase(),
+                    // 60% cream on oxblood is 5.8:1 — the label stays quiet
+                    // without dropping under the floor
                     color = Pk.Cream.copy(alpha = .6f),
-                    fontFamily = Spectral,
-                    fontSize = PkType.Label,
-                    letterSpacing = PkType.LabelTracking,
+                    style = PkText.SectionLabel,
                 )
             }
         }
@@ -88,17 +85,19 @@ fun PkHeader(
                 Modifier.padding(top = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                /* Dimmed gold, not full. At full strength the streak was the
+                   loudest thing on a screen whose subject is scripture — a
+                   record of faithfulness should not out-shout the reason for
+                   it. */
                 Icon(
                     Icons.Filled.Bolt, null,
-                    tint = Pk.Gold, modifier = Modifier.size(14.dp),
+                    tint = Pk.Gold.copy(alpha = .75f), modifier = Modifier.size(12.dp),
                 )
                 Spacer(Modifier.width(6.dp))
                 Text(
                     "$streakDays DAY STREAK",
-                    color = Pk.Gold,
-                    fontFamily = Spectral,
-                    fontSize = 12.sp,
-                    letterSpacing = 1.4.sp,
+                    color = Pk.Gold.copy(alpha = .82f),
+                    style = PkText.Meta,
                 )
             }
         }
@@ -122,7 +121,11 @@ fun PkHeader(
                 ) {
                     Text(
                         letter,
-                        color = if (isToday) Pk.Cream else Pk.Cream.copy(alpha = .55f),
+                        color = when {
+                            isToday -> Pk.Cream
+                            kept -> Pk.Cream.copy(alpha = .78f)
+                            else -> Pk.Cream.copy(alpha = .45f)
+                        },
                         fontFamily = Spectral,
                         fontSize = 13.sp,
                         letterSpacing = 1.sp,
@@ -132,11 +135,13 @@ fun PkHeader(
                        the reference underlined only today, which meant the
                        strip showed the date and nothing about your week. */
                     Box(
-                        Modifier.height(2.dp).fillMaxWidth()
+                        Modifier.height(if (isToday) 2.5.dp else 1.5.dp).fillMaxWidth()
                             .background(
                                 when {
+                                    // today is unmistakable; kept days are a
+                                    // muted record; nothing marks a day missed
                                     isToday -> Pk.Gold
-                                    kept -> Pk.Gold.copy(alpha = .45f)
+                                    kept -> Pk.Gold.copy(alpha = .38f)
                                     else -> androidx.compose.ui.graphics.Color.Transparent
                                 },
                             ),
@@ -169,14 +174,14 @@ fun PkNav(
         /* No navigationBarsPadding here. MainActivity sets
            decorFitsSystemWindows(true), so the window is already inset and
            adding it again floated the bar a finger's width off the bottom. */
-        Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 14.dp),
+        Modifier.fillMaxWidth().padding(start = 20.dp, end = 20.dp, bottom = 18.dp),
     ) {
         Row(
             Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(Pk.NavRadius))
                 .background(Pk.Charcoal)
-                .border(1.dp, Pk.Gold.copy(alpha = .5f), RoundedCornerShape(Pk.NavRadius))
-                .padding(vertical = 11.dp),
+                .border(0.7.dp, Pk.Gold.copy(alpha = .34f), RoundedCornerShape(Pk.NavRadius))
+                .padding(vertical = 9.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             items.forEachIndexed { index, item ->
@@ -204,14 +209,12 @@ fun PkNav(
                         .padding(vertical = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Icon(item.icon, null, tint = tint, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.height(6.dp))
+                    Icon(item.icon, null, tint = tint, modifier = Modifier.size(19.dp))
+                    Spacer(Modifier.height(5.dp))
                     Text(
                         item.label.uppercase(),
                         color = label,
-                        fontFamily = Spectral,
-                        fontSize = PkType.Tiny,
-                        letterSpacing = 1.sp,
+                        style = PkText.NavLabel,
                         maxLines = 1,
                     )
                 }
