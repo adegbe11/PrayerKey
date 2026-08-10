@@ -59,7 +59,8 @@ fun PrayerDeckFace(
     val world = remember(topic.slug) { worldFor(topic.category, topic.slug) }
 
     Box(
-        (if (front) modifier.clickable(onClick = onOpen) else modifier).clip(R.card),
+        // full bleed: no corner radius, because there is no page behind it
+        if (front) modifier.clickable(onClick = onOpen) else modifier,
     ) {
         // PERF: only the front card animates its scene
         WorldScene(world, animate = front, Modifier.fillMaxSize())

@@ -55,7 +55,9 @@ fun WorldVerseFace(
     // PERF: only the front card animates, and never under reduce-motion
     val animate = front && !reduceMotion
 
-    Box(modifier.clip(R.card)) {
+    /* No rounded clip. The card IS the screen — corners belong to a card that
+       sits on a page, and this one has no page behind it. */
+    Box(modifier) {
         WorldScene(world, animate, Modifier.fillMaxSize())
 
         /* One scrim, weighted low: the scene stays open up top and the words

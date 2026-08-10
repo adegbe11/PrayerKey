@@ -17,6 +17,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -131,20 +133,17 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
         } else DailyVerses[verseIndex % DailyVerses.size]
     }
 
-    Scaffold(
-        // the theme runs to the bottom edge of the phone; a white Scaffold
-        // left a pale band showing under the dock
-        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
-        bottomBar = {
-            // no dock during onboarding — the first screen stays undistracted
-            if (hydrated && preferences.onboarded) com.prayerkey.manna.ui.components.MannaDock(
-                items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon) },
-                selected = selected,
-                onSelect = { selected = it },
-            )
-        },
-    ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
+    /* The dock floats over the content instead of sitting in a bottomBar.
+       As a bottomBar it inset every screen by its own height, which is why the
+       Bible and prayer decks could never reach the bottom of the glass — a
+       Tinder card that stops short of the edge is just a card. Screens that
+       scroll add their own bottom clearance (Pk.NavClearance); screens that are
+       a single full-bleed card simply run underneath it. */
+    Box(
+        Modifier.fillMaxSize()
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.background),
+    ) {
+        Box(Modifier.fillMaxSize()) {
             if (!hydrated) {
                 com.prayerkey.manna.ui.screens.LaunchPrelude(stage = 0)
             } else if (!preferences.onboarded) {
@@ -179,39 +178,78 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
             } else {
                 // instant tab switch — no transition animation, zero delay
                 when (selected) {
-                    0 -> HomeScreen(
-                        card = todayCard,
-                        name = preferences.name,
-                        streak = streak,
-                        activeDays = activeDays,
-                        devotion = devotion,
-                        bibleChallenge = bibleChallenge,
-                        prayerChallenge = prayerChallenge,
-                        savedCount = saved.size,
-                        journalCount = entries.size,
-                        sermonCount = sermonNotes.size,
-                        onToggleChallenge = { c ->
-                            viewModel.markChallengeDay(c.id, c.today.index - 1, !c.today.done)
-                        },
-                        onOpenChallenge = { c ->
-                            // the Bible plan opens the Bible, the prayer plan the deck
-                            selected = if (c.id == "read-the-gospels") 1 else 2
-                        },
-                        onWriteDevotion = { selected = 4 },
-                        onOpenBible = { selected = 1 },
-                        onOpenJournal = { selected = 4 },
-                        onOpenChurch = { selected = 3 },
-                        onSettings = { showProfile = true },
-                        journeyInsight = journeyInsight,
-                        reduceMotion = preferences.reduceMotion,
-                        onReceived = viewModel::recordDailyPull,
-                        onReceiveNext = { verseIndex++ },
-                        onSave = viewModel::save,
-                        onPray = { selected = 2 },
-                        onShare = { verse ->
-                            CardShareRenderer.share(context, verse)
-                        },
-                    )
+                    0 -> {
+                        /* Today, built from the design system. The previous
+                           dashboard is kept in HomeScreen for reference but is
+                           no longer routed to — this screen answers "what do I
+                           do with God today?" in one scroll, which the old one
+                           could not. */
+                        val quote = remember(today) { com.prayerkey.manna.data.quoteFor(today) }
+                        val passage = remember(today) { com.prayerkey.manna.data.passageFor(today) }
+                        val answered = remember(saved, entries) {
+                            saved.count { it.answeredAt != null } + entries.count { it.answeredAt != null }
+                        }
+                        // Sunday-first, seven entries ending today
+                        val week = remember(activeDays, today) {
+                            (6 downTo 0).map { back -> activeDays.contains(today.minusDays(back.toLong())) }
+                        }
+                        var bookmarked by remember { mutableStateOf(false) }
+
+                        val plan = com.prayerkey.manna.ui.home.TodayPlan(
+                            title = passage.title,
+                            quote = quote.text,
+                            quoteSource = quote.author,
+                            passageRef = passage.reference,
+                            // the challenges load asynchronously; until they do,
+                            // nothing is marked done rather than crashing
+                            passageDone = bibleChallenge?.today?.done == true,
+                            devotionalMinutes = 4,
+                            devotionalDone = activeDays.contains(today),
+                            prayerMinutes = 5,
+                            prayerDone = prayerChallenge?.today?.done == true,
+                            // devotion needs the topic list, which arrives after
+                            // first paint; the passage is always available
+                            verse = devotion?.verse ?: passage.introduction,
+                            verseReference = devotion?.reference ?: passage.reference,
+                            answeredCount = answered,
+                        )
+
+                        Column(Modifier.fillMaxSize()) {
+                            com.prayerkey.manna.ui.theme.PkHeader(
+                                title = "PrayerKey",
+                                streakDays = streak,
+                                week = week,
+                                trailingLabel = "Today",
+                            )
+                            Box(Modifier.weight(1f)) {
+                                com.prayerkey.manna.ui.home.TodayScreen(
+                                    plan = plan,
+                                    bookmarked = bookmarked,
+                                    onBookmark = { bookmarked = !bookmarked },
+                                    onRead = { selected = 1 },
+                                    onPassage = {
+                                        bibleChallenge?.let {
+                                            viewModel.markChallengeDay(
+                                                it.id, it.today.index - 1, !it.today.done,
+                                            )
+                                        }
+                                    },
+                                    onDevotional = { selected = 4 },
+                                    onPrayer = {
+                                        prayerChallenge?.let {
+                                            viewModel.markChallengeDay(
+                                                it.id, it.today.index - 1, !it.today.done,
+                                            )
+                                        }
+                                    },
+                                    onMidnight = { selected = 2 },
+                                    onMyPrayers = { selected = 4 },
+                                    onJournal = { selected = 4 },
+                                    onCalendar = { showProfile = true },
+                                )
+                            }
+                        }
+                    }
                     1 -> BibleScreen(
                         readerTextSize = preferences.readerTextSize,
                         onReaderTextSize = { viewModel.updatePreferences(preferences.copy(readerTextSize = it)) },
@@ -260,6 +298,17 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                     )
                     else -> Unit
                 }
+            }
+        }
+
+        // no dock during onboarding — the first screen stays undistracted
+        if (hydrated && preferences.onboarded) {
+            Box(Modifier.align(Alignment.BottomCenter)) {
+                com.prayerkey.manna.ui.components.MannaDock(
+                    items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon) },
+                    selected = selected,
+                    onSelect = { selected = it },
+                )
             }
         }
     }

@@ -20,6 +20,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -229,7 +230,10 @@ fun VersePullDeck(
             exit = fadeOut(tween(180)) + slideOutVertically(tween(220)) { -it / 3 },
             modifier = Modifier.align(Alignment.TopCenter),
         ) {
-            Column(Modifier.fillMaxWidth()) { topOverlay() }
+            /* The card is full bleed now, so it runs beneath the status bar.
+               Its chrome has to inset itself or the search chip sits on the
+               clock. */
+            Column(Modifier.fillMaxWidth().statusBarsPadding()) { topOverlay() }
         }
 
         /* ── BOTTOM ACTION BAR: one translucent dock, not five loose discs ── */

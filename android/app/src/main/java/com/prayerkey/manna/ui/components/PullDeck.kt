@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -191,7 +192,10 @@ fun <T> PullDeck(
             }
         }
 
-        Column(Modifier.align(Alignment.TopCenter).fillMaxWidth()) {
+        Column(
+            // the deck is full bleed, so its chrome insets itself
+            Modifier.align(Alignment.TopCenter).fillMaxWidth().statusBarsPadding(),
+        ) {
             topOverlay(index % items.size)
         }
 
