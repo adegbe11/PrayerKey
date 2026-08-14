@@ -85,9 +85,17 @@ class SermonCaptureEngine(
         }
     }
 
+    /**
+     * Opens the offline recogniser, if the model has been installed.
+     *
+     * This used to test `exists() && list() not empty`, which passes for a
+     * directory left behind by an interrupted unzip — and `Model()` on a
+     * partial model dies in native code. [VoskModel.isInstalled] checks for the
+     * subfolders Vosk actually reads.
+     */
     private fun prepareVosk(dir: File) {
-        val modelDir = File(app.filesDir, "vosk-model")
-        if (!modelDir.exists() || modelDir.list().isNullOrEmpty()) return
+        if (!VoskModel.isInstalled(app)) return
+        val modelDir = VoskModel.directory(app)
         runCatching { model = Model(modelDir.absolutePath); recognizer = Recognizer(model, RATE.toFloat()).apply { setWords(true) } }
             .onFailure { recognizer = null; model = null }
     }

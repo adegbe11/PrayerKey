@@ -539,7 +539,7 @@ private fun MemoryTrainer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrayerScreen(
+fun LegacyPrayerScreen(
     journal: List<JournalPrayer>,
     topics: List<PrayerTopic>,
     topicsReady: Boolean,

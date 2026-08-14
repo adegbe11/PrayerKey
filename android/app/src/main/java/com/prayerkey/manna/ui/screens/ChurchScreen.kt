@@ -65,7 +65,12 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.prayerkey.manna.data.SermonNote
 import com.prayerkey.manna.ui.church.SermonArranger
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import com.prayerkey.manna.ui.church.SermonService
+import com.prayerkey.manna.ui.church.VoskModel
+import kotlinx.coroutines.launch
 import com.prayerkey.manna.ui.theme.*
 import kotlinx.coroutines.delay
 import java.time.Instant
@@ -220,6 +225,93 @@ fun ChurchScreen(
 
 /* ─────────────────────────── READY ─────────────────────────── */
 
+/**
+ * Turning live captions on.
+ *
+ * Recording always works and never depended on this. What did not work was the
+ * transcription: the shipped build pointed at a socket relay that answers 404,
+ * and the offline recogniser could never start because nothing ever installed
+ * its model. This is the switch that installs it.
+ *
+ * It states the size before it spends the user's data, because 39 MB on a phone
+ * plan is a real cost and a spinner that appears without warning is how you
+ * lose someone's trust in a church car park.
+ *
+ * Once installed it says so once and gets out of the way — a permanent banner
+ * advertising a solved problem is clutter.
+ */
+@Composable
+private fun LiveCaptionsCard() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val state by VoskModel.state.collectAsState()
+    LaunchedEffect(Unit) { VoskModel.refresh(context) }
+
+    if (state is VoskModel.State.Ready) return
+    val cs = MaterialTheme.colorScheme
+
+    Column(
+        Modifier.fillMaxWidth().padding(top = 20.dp)
+            .clip(R.card)
+            .background(cs.surfaceVariant.copy(alpha = .5f))
+            .border(1.dp, cs.onBackground.copy(alpha = .10f), R.card)
+            .padding(18.dp),
+    ) {
+        Text(
+            "Live captions",
+            color = cs.onBackground, fontFamily = DisplaySerif,
+            fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(
+            when (val s = state) {
+                is VoskModel.State.Failed ->
+                    "That did not download: ${s.reason}. Recording still works — you can try again."
+                else ->
+                    "Turn on to see the sermon written out as it is spoken, and to catch " +
+                        "the verses that are quoted. It runs on your phone, so it works with " +
+                        "no signal and costs nothing to use."
+            },
+            color = cs.onBackground.copy(alpha = .68f), fontSize = 13.5.sp, lineHeight = 20.sp,
+        )
+
+        when (val s = state) {
+            is VoskModel.State.Downloading -> {
+                Spacer(Modifier.height(14.dp))
+                LinearProgressIndicator(
+                    progress = { s.fraction },
+                    color = cs.primary,
+                    trackColor = cs.onBackground.copy(alpha = .10f),
+                    modifier = Modifier.fillMaxWidth().height(4.dp).clip(R.pill),
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "Downloading · ${(s.fraction * VoskModel.MEGABYTES).toInt()} of ${VoskModel.MEGABYTES} MB",
+                    color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp,
+                )
+            }
+            VoskModel.State.Unpacking -> {
+                Spacer(Modifier.height(14.dp))
+                Text("Installing…", color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp)
+            }
+            else -> {
+                Spacer(Modifier.height(14.dp))
+                Box(
+                    Modifier.clip(R.pill).background(cs.primary)
+                        .clickable { scope.launch { VoskModel.install(context) } }
+                        .padding(horizontal = 18.dp, vertical = 11.dp),
+                ) {
+                    Text(
+                        if (state is VoskModel.State.Failed) "Try again"
+                        else "Turn on · ${VoskModel.MEGABYTES} MB once",
+                        color = cs.onPrimary, fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun ReadyView(
     notes: List<SermonNote>,
@@ -260,6 +352,8 @@ private fun ReadyView(
                 )
             }
         }
+
+        LiveCaptionsCard()
 
         Box(
             Modifier.fillMaxWidth().padding(top = 28.dp)
