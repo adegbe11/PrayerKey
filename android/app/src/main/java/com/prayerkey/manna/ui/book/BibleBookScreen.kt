@@ -85,7 +85,11 @@ private val Leather = Color(0xFF3A2116)
 private val LeatherDark = Color(0xFF22120B)
 private val Page = Color(0xFFF6EFDC)
 private val PageEdge = Color(0xFFE6D9B6)
-private val Gild = Color(0xFF5D91F2)
+/* Gilt, and it has to actually be gold. This was #5D91F2 — a blue — left
+   behind by the app-wide violet pass, which painted the sheen on the fore
+   edge of a leather Bible cornflower blue on every page. The book is the one
+   surface in the app that does not follow the theme: gilding is a metal. */
+private val Gild = Color(0xFFC9A26D)
 private val BookInk = Color(0xFF221C12)
 private val Rubric = Color(0xFF4A0E17)
 private val Ribbon = Color(0xFF8C1F2B)
@@ -151,8 +155,24 @@ fun BibleBookScreen(
 
     val here = chapters[chapterIndex]
 
+    /* Which chapter [verses] actually holds. Loading is a suspend hop, so for
+       a frame or two after [chapterIndex] moves the layout below is still the
+       old chapter's. Anything that reasons about page counts has to know that. */
+    var loadedChapter by remember { mutableIntStateOf(-1) }
+
+    /* Where you are, in characters rather than pages.
+       Changing the type size relaid the chapter and sent you back to page one,
+       which is the one thing a reader will not forgive: you changed the size
+       *because* you were reading, and it threw away the place you were reading
+       from. A page number means nothing across a relayout; a character offset
+       survives it. [restoreTo] is set when the size changes and consumed once
+       the new layout exists. */
+    var readingAt by remember { mutableIntStateOf(0) }
+    var restoreTo by remember { mutableIntStateOf(-1) }
+
     LaunchedEffect(chapterIndex) {
         verses = bible.chapter(here.book.name, here.chapter)
+        loadedChapter = chapterIndex
     }
 
     Box(Modifier.fillMaxSize().background(Brush.radialGradient(listOf(Color(0xFF2A2016), Desk), radius = 1400f))) {
@@ -234,12 +254,36 @@ fun BibleBookScreen(
                     pageWindows(layout?.lineCount ?: 0, perPage)
                 }
 
-                LaunchedEffect(windows, landOnLast) {
-                    if (landOnLast) { pageIndex = windows.lastIndex.coerceAtLeast(0); landOnLast = false }
-                    else if (pageIndex > windows.lastIndex) pageIndex = windows.lastIndex.coerceAtLeast(0)
+                /* Wait for the chapter you are actually in.
+                   Turning back past the start of a chapter asked to land on the
+                   last leaf of the previous one — but this fired straight away,
+                   while [windows] still described the chapter being left. It
+                   spent the flag on the old page count and cleared it, so by the
+                   time the real chapter arrived nothing was asking for its last
+                   leaf any more. Going back into a longer chapter dropped you
+                   somewhere in its middle. */
+                LaunchedEffect(windows, landOnLast, loadedChapter, restoreTo, layout) {
+                    if (loadedChapter != chapterIndex || windows.isEmpty()) return@LaunchedEffect
+                    val l = layout
+                    if (restoreTo >= 0 && l != null) {
+                        // the line that offset now falls on, and the leaf holding it
+                        val line = l.getLineForOffset(restoreTo.coerceIn(0, l.layoutInput.text.length))
+                        pageIndex = windows.indexOfFirst { line < it.firstLine + it.lines }
+                            .coerceIn(0, windows.lastIndex)
+                        restoreTo = -1
+                    } else if (landOnLast) {
+                        pageIndex = windows.lastIndex; landOnLast = false
+                    } else if (pageIndex > windows.lastIndex) {
+                        pageIndex = windows.lastIndex
+                    }
                 }
 
                 val window = windows.getOrElse(pageIndex) { windows.first() }
+
+                // the character the current leaf opens on, kept for the above
+                LaunchedEffect(window, layout) {
+                    layout?.let { readingAt = it.getLineStart(window.firstLine) }
+                }
                 val shown = versesInWindow(flow.verseLines(layout), window)
 
                 val canGoForward = pageIndex < windows.lastIndex || chapterIndex < chapters.lastIndex
@@ -606,7 +650,7 @@ fun BibleBookScreen(
                     Box(
                         Modifier.clip(RoundedCornerShape(10.dp))
                             .background(if (size == textSize) Gild.copy(alpha = .22f) else Color.Transparent)
-                            .clickable { onTextSize(size); pageIndex = 0; sizeOpen = false }
+                            .clickable { restoreTo = readingAt; onTextSize(size); sizeOpen = false }
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                     ) {
                         Text(

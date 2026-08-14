@@ -339,7 +339,8 @@ private fun ScriptureCard(passage: DailyPassage, verses: List<BibleVerse>) {
             )
         }
         HorizontalDivider(color = Pk.Gold.copy(alpha = .25f), modifier = Modifier.padding(top = 15.dp, bottom = 13.dp))
-        Text(passage.reference.uppercase(Locale.getDefault()), color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.1.sp)
+        // the range actually on screen, now that the verses are in hand
+        Text(passage.rangeOf(verses.map { it.verse }).uppercase(Locale.getDefault()), color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.1.sp)
     }
 }
 

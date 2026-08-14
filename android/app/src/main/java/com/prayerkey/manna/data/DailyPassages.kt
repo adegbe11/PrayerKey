@@ -7,10 +7,32 @@ data class DailyPassage(
     val book: String,
     val chapter: Int,
     val firstVerse: Int = 1,
+    /** How far the excerpt reaches *at most*. Short chapters simply end sooner. */
     val lastVerse: Int = 9,
     val introduction: String,
 ) {
-    val reference: String get() = "$book $chapter:$firstVerse–$lastVerse"
+    /**
+     * The chapter, not a verse range.
+     *
+     * This used to read "$book $chapter:$firstVerse–$lastVerse", and because
+     * [lastVerse] is a fixed 9 that nothing ever measured, **21 of the 365
+     * days cited verses that do not exist** — "Psalms 23:1–9" over a psalm
+     * with six verses, "Psalms 100:1–9" over one with five. The readers filter
+     * to whatever the chapter actually has, so nothing crashed; the heading
+     * just quietly lied, on the best-known psalm in the Bible.
+     *
+     * There is no verse-count table to clamp against — the canon carries
+     * chapter counts only, and the verse text arrives from an asset long after
+     * this string is built. So this stops claiming a precision it cannot have.
+     * Naming the chapter is also what the reading instruction already says to
+     * do, and [rangeOf] gives the exact range to anything holding real verses.
+     */
+    val reference: String get() = "$book $chapter"
+
+    /** The precise range, for a caller that has actually loaded the verses. */
+    fun rangeOf(verseNumbers: List<Int>): String =
+        if (verseNumbers.isEmpty()) reference
+        else "$book $chapter:${verseNumbers.min()}–${verseNumbers.max()}"
 }
 
 private fun passageTitle(book: BibleBook): String = when (book.name) {
