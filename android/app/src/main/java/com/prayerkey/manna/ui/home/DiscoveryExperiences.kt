@@ -77,6 +77,10 @@ private fun experience(title: String): Experience = when (title) {
         BibleChallengeMachine(onClose)
         return
     }
+    if (title in setOf("Prayer points", "Fasting", "Memory verse", "Midnight prayer", "Warfare prayer", "Declarations")) {
+        FaithProgrammeMachine(title, onClose)
+        return
+    }
     val spec = remember(title) { experience(title) }
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("discovery_experiences", Context.MODE_PRIVATE) }

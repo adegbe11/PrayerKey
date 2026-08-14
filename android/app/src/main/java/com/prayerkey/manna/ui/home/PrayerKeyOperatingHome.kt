@@ -559,18 +559,30 @@ fun PrayerKeyOperatingHome(
     }
 }
 
+/**
+ * The programmes grid.
+ *
+ * This used to carry twelve hardcoded colours — steel blue, olive, brown,
+ * teal, maroon, forest green and three off-brand purples — of which exactly
+ * two were in the app's palette. They were assigned by grid position, so
+ * "Fasting" was brown for no reason except that it was sixth, and inserting a
+ * card anywhere repainted everything below it.
+ *
+ * Now the tint comes from the hub a card belongs to, which means it survives
+ * reordering and actually tells you something: prayer programmes read as one
+ * family, and the four that are not prayer separate themselves. All four
+ * tints are from [Pk].
+ *
+ * The variety is carried by the photography instead, which is the right thing
+ * to carry it — see [DiscoveryCard].
+ */
 @Composable private fun DiscoveryGrid(items: List<Feature>, go: (Feature) -> Unit) {
-    val colours = listOf(
-        Color(0xFF6200ED), Color(0xFF1A0A2E), Color(0xFF7C3AED), Color(0xFF355C7D),
-        Color(0xFF6F5528), Color(0xFF4338CA), Color(0xFF5B2A86), Color(0xFF805B36),
-        Color(0xFF2D6A6A), Color(0xFF6D3B58), Color(0xFF344E41), Color(0xFF725AC1),
-    )
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         items.chunked(2).forEachIndexed { row, pair ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 pair.forEachIndexed { column, item ->
                     val index = row * 2 + column
-                    DiscoveryCard(item, colours[index % colours.size], index, Modifier.weight(1f)) { go(item) }
+                    DiscoveryCard(item, hubTint(item.hub), index, Modifier.weight(1f)) { go(item) }
                 }
                 if (pair.size == 1) Spacer(Modifier.weight(1f))
             }
@@ -578,10 +590,31 @@ fun PrayerKeyOperatingHome(
     }
 }
 
+/** Four tints, all from the palette, chosen by meaning rather than position. */
+private fun hubTint(hub: Hub): Color = when (hub) {
+    Hub.PRAY -> Pk.Oxblood
+    Hub.BIBLE -> Pk.DeepDark
+    Hub.JOURNAL -> Pk.VioletDeep
+    Hub.CHURCH -> Pk.VioletLit
+}
+
+/**
+ * One programme.
+ *
+ * The artwork is the card. It used to be a 76dp rectangle pinned to the right
+ * edge, rotated eight degrees, and then buried under a horizontal gradient
+ * that was fully opaque across the first two thirds — so most of every picture
+ * was painted over, and what survived read as a sticker rather than a cover.
+ *
+ * Full bleed, with the tint held at low alpha over the top so the same six
+ * covers read differently in different sections, and a scrim from the bottom
+ * so the title has something to sit on whatever the photograph is doing there.
+ * That scrim, not a flat fill, is what keeps white text legible on art.
+ */
 @Composable private fun DiscoveryCard(item: Feature, colour: Color, index: Int, modifier: Modifier, open: () -> Unit) {
     Surface(
-        modifier.height(108.dp).clickable(onClick = open),
-        shape = RoundedCornerShape(12.dp), color = colour,
+        modifier.height(116.dp).clickable(onClick = open),
+        shape = RoundedCornerShape(14.dp), color = colour,
         shadowElevation = 2.dp,
     ) {
         Box(Modifier.fillMaxSize()) {
@@ -595,14 +628,23 @@ fun PrayerKeyOperatingHome(
             }
             Image(
                 painterResource(cover), null,
-                Modifier.align(Alignment.CenterEnd).offset(x = 9.dp).width(76.dp).height(98.dp)
-                    .rotate(if (index % 2 == 0) 8f else -8f),
+                Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
             )
-            Box(Modifier.fillMaxSize().background(Brush.horizontalGradient(listOf(colour, colour, Color.Transparent))))
+            // the hub's colour, worn lightly, so six covers serve eighteen cards
+            Box(Modifier.fillMaxSize().background(colour.copy(alpha = .52f)))
+            Box(
+                Modifier.fillMaxSize().background(
+                    Brush.verticalGradient(
+                        0f to Color.Transparent,
+                        .45f to Color(0xFF0E0320).copy(alpha = .28f),
+                        1f to Color(0xFF0E0320).copy(alpha = .82f),
+                    ),
+                ),
+            )
             Text(
                 item.title,
-                Modifier.align(Alignment.CenterStart).padding(start = 13.dp, end = 65.dp),
+                Modifier.align(Alignment.BottomStart).padding(start = 13.dp, end = 13.dp, bottom = 12.dp),
                 fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 14.sp,
                 lineHeight = 18.sp, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis,
             )

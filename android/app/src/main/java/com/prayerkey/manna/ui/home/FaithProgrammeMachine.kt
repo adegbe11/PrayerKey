@@ -1,0 +1,220 @@
+package com.prayerkey.manna.ui.home
+
+import android.content.Context
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.prayerkey.manna.reminder.ReminderReceiver
+import com.prayerkey.manna.ui.theme.BookSerif
+import com.prayerkey.manna.ui.theme.DisplaySerif
+import com.prayerkey.manna.ui.theme.Pk
+import com.prayerkey.manna.ui.theme.UtilitySans
+
+private data class FaithDay(
+    val title: String,
+    val reference: String,
+    val scripture: String,
+    val reflection: String,
+    val actions: List<String>,
+    val closing: String,
+)
+
+private data class FaithProgramme(
+    val title: String,
+    val eyebrow: String,
+    val description: String,
+    val choices: List<String>,
+    val days: Int,
+    val icon: ImageVector,
+    val reminderLabel: String,
+    val content: List<FaithDay>,
+)
+
+private val coreDays = listOf(
+    FaithDay("Begin with surrender", "Psalm 37:5", "Commit your way to the Lord; trust in him, and he will act.", "Prayer begins by placing the outcome in God's hands.", listOf("Thank God for His faithfulness", "Name the need plainly", "Surrender the result to God"), "Father, I entrust this matter to You. Order my steps and let Your will be done."),
+    FaithDay("Ask with confidence", "Hebrews 4:16", "Let us approach the throne of grace with boldness, so that we may receive mercy.", "Bold prayer is confidence in God's mercy, not confidence in our performance.", listOf("Ask for mercy", "Pray the promise aloud", "Wait quietly for one minute"), "Lord, I come because You invited me. Give me mercy and help for today."),
+    FaithDay("Stand on the Word", "Isaiah 55:11", "My word that comes from my mouth will not return to me empty.", "Our feelings change; God's character and truth remain steady.", listOf("Read the verse twice", "Turn it into a personal prayer", "Write one sentence of faith"), "Let Your Word accomplish Your purpose in me and in this situation."),
+    FaithDay("Pray without fear", "Philippians 4:6–7", "In everything, through prayer and petition with thanksgiving, present your requests to God.", "Thanksgiving interrupts panic and reminds the heart who is holding it.", listOf("Name the fear", "Give thanks for three things", "Ask for guarding peace"), "God of peace, guard my heart and mind in Christ Jesus."),
+    FaithDay("Wait with strength", "Isaiah 40:31", "Those who trust in the Lord will renew their strength.", "Waiting with God is active trust, not wasted time.", listOf("Release your deadline", "Ask for today's strength", "Choose one faithful action"), "Renew my strength, Lord. Keep me faithful while I wait."),
+    FaithDay("Walk in obedience", "James 1:22", "Be doers of the word and not hearers only.", "A prayer journey becomes fruitful when truth becomes practice.", listOf("Recall what God showed you", "Choose one act of obedience", "Set a time to do it"), "Give me grace to obey quickly, humbly, and completely."),
+    FaithDay("Finish with praise", "Psalm 126:3", "The Lord has done great things for us; we are joyful.", "Praise remembers what God has done and prepares us to keep trusting.", listOf("Review the journey", "Record one change", "Praise God aloud"), "Thank You for carrying me. Keep this work alive in me beyond this programme."),
+)
+
+private fun programme(name: String): FaithProgramme = when (name) {
+    "Prayer points" -> FaithProgramme(name, "PRAY BY SITUATION", "Choose what you are standing for. Each day gives Scripture and focused prayer points to pray aloud.", listOf("Marriage and family", "Healing and health", "Work and provision", "Open doors", "Children", "Protection", "Freedom from fear", "Justice and restoration", "Purpose and direction", "Spiritual growth"), 21, Icons.Outlined.FormatListBulleted, "Prayer points", coreDays)
+    "Fasting" -> FaithProgramme(name, "PRAYER WITH CONSECRATION", "Choose a safe fast, define its purpose, and follow a daily rhythm of Scripture, prayer, reflection, and breaking the fast wisely.", listOf("Single day", "Timed hours", "Daniel fast", "Three-day fast", "Seven-day fast", "Esther fast", "Lent", "First fruits", "Church-wide", "Custom"), 7, Icons.Outlined.WaterDrop, "Fasting prayer", coreDays.mapIndexed { i, d -> d.copy(title = listOf("Prepare the heart", "Hunger for God", "Repent and return", "Pray for others", "Listen in stillness", "Receive direction", "Break with thanksgiving")[i]) })
+    "Memory verse" -> FaithProgramme(name, "HIDE THE WORD", "Learn one passage through reading, listening, phrase practice, missing words, reciting, and spaced review.", listOf("Philippians 4:6–7", "Psalm 23:1–4", "Proverbs 3:5–6", "Romans 8:28", "Isaiah 41:10", "John 3:16"), 7, Icons.Outlined.BookmarkBorder, "Memory verse review", coreDays.mapIndexed { i, d -> d.copy(title = listOf("Read slowly", "Listen and repeat", "Learn the first phrase", "Hide key words", "Write from memory", "Recite without help", "Final review")[i]) })
+    "Midnight prayer" -> FaithProgramme(name, "THE NIGHT WATCH", "A focused seven-night watch. Complete tonight's Scripture, prayer points, and declaration before the next watch unlocks.", listOf("Personal consecration", "Family", "Deliverance", "Open doors", "Healing", "Nation and church", "Thanksgiving"), 7, Icons.Outlined.DarkMode, "Midnight watch", coreDays)
+    "Warfare prayer" -> FaithProgramme(name, "STAND IN SCRIPTURE", "Pray against fear, temptation, oppression, and destructive patterns. People are never treated as the enemy.", listOf("Freedom from fear", "Breaking destructive habits", "Protection of my home", "Peace over confusion", "Strength against temptation", "Justice and vindication"), 7, Icons.Outlined.Shield, "Warfare prayer", coreDays)
+    else -> FaithProgramme("Declarations", "SPEAK THE WORD", "Build seven days of Scripture-shaped declarations. These words express faith; they do not replace prayer, wisdom, or action.", listOf("Identity in Christ", "Peace", "Courage", "Wisdom", "Provision", "Healing", "Family"), 7, Icons.Outlined.Campaign, "Daily declaration", coreDays)
+}
+
+@Composable
+internal fun FaithProgrammeMachine(title: String, onClose: () -> Unit) {
+    val spec = remember(title) { programme(title) }
+    val context = LocalContext.current
+    val prefs = remember(title) { context.getSharedPreferences("faith_programme_${title.lowercase().replace(' ', '_')}", Context.MODE_PRIVATE) }
+    var selected by remember { mutableStateOf(prefs.getString("selected", "").orEmpty()) }
+    var started by remember { mutableStateOf(prefs.getBoolean("started", false)) }
+    var openDay by remember { mutableStateOf<Int?>(null) }
+    var done by remember { mutableStateOf(prefs.getStringSet("done", emptySet()).orEmpty().mapNotNull(String::toIntOrNull).toSet()) }
+    var hour by remember { mutableIntStateOf(prefs.getInt("hour", if (title == "Midnight prayer") 0 else 6)) }
+
+    openDay?.let { day ->
+        val base = spec.content[(day - 1) % spec.content.size]
+        val personalised = if (selected.isBlank()) base else base.copy(closing = "Father, concerning $selected: ${base.closing}")
+        FaithProgrammeDay(spec, day, personalised, onBack = { openDay = null }) {
+            done = done + day
+            prefs.edit().putStringSet("done", done.map(Int::toString).toSet()).apply()
+            openDay = null
+        }
+        return
+    }
+
+    if (!started) {
+        ProgrammeSetup(spec, selected, hour, onSelect = { selected = it }, onHour = { hour = it }, onClose = onClose) {
+            if (selected.isNotBlank()) {
+                started = true
+                prefs.edit().putString("selected", selected).putInt("hour", hour).putBoolean("started", true).apply()
+                ReminderReceiver.schedule(context, hour, 0, true)
+            }
+        }
+    } else {
+        ProgrammeHome(spec, selected, done, onClose, onReset = {
+            prefs.edit().clear().apply(); selected = ""; done = emptySet(); started = false
+        }) { openDay = it }
+    }
+}
+
+@Composable
+private fun ProgrammeSetup(spec: FaithProgramme, selected: String, hour: Int, onSelect: (String) -> Unit, onHour: (Int) -> Unit, onClose: () -> Unit, onStart: () -> Unit) {
+    Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            ProgrammeBar(onClose, spec.title)
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp)) {
+                Surface(shape = CircleShape, color = Pk.Oxblood.copy(alpha = .1f)) { Icon(spec.icon, null, Modifier.padding(14.dp).size(26.dp), tint = Pk.Oxblood) }
+                Text(spec.eyebrow, Modifier.padding(top = 20.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.4.sp, color = Pk.GoldDeep)
+                Text(spec.title, Modifier.padding(top = 6.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 35.sp, color = Pk.Charcoal)
+                Text(spec.description, Modifier.padding(top = 12.dp, bottom = 22.dp), fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 26.sp, color = Pk.Muted)
+                Text("CHOOSE YOUR FOCUS", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.Muted)
+                spec.choices.chunked(2).forEach { row ->
+                    Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        row.forEach { choice -> ChoiceCard(choice, selected == choice, Modifier.weight(1f)) { onSelect(choice) } }
+                        if (row.size == 1) Spacer(Modifier.weight(1f))
+                    }
+                }
+                Text("DAILY REMINDER", Modifier.padding(top = 26.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.Muted)
+                Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(0 to "MIDNIGHT", 6 to "MORNING", 12 to "MIDDAY", 21 to "EVENING").forEach { (value, label) ->
+                        FilterChip(selected = hour == value, onClick = { onHour(value) }, label = { Text(label, fontSize = 9.sp) })
+                    }
+                }
+                if (spec.title == "Fasting") Text("If you are pregnant, under 18, have diabetes, take medication, or have an eating-disorder history, speak with a qualified clinician before fasting. Choose a non-food fast when appropriate.", Modifier.padding(top = 20.dp), fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 17.sp, color = Pk.Muted)
+                Spacer(Modifier.height(24.dp))
+            }
+            Button(onStart, enabled = selected.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(20.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
+                Text("BEGIN ${spec.days}-DAY PROGRAMME", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .7.sp)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProgrammeHome(spec: FaithProgramme, selected: String, done: Set<Int>, onClose: () -> Unit, onReset: () -> Unit, onDay: (Int) -> Unit) {
+    val next = (done.size + 1).coerceAtMost(spec.days)
+    Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
+        Column(Modifier.fillMaxSize().statusBarsPadding()) {
+            ProgrammeBar(onClose, spec.title)
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp, vertical = 10.dp)) {
+                Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), color = Pk.VioletDeep) {
+                    Column(Modifier.padding(24.dp)) {
+                        Text(spec.eyebrow, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp, color = Pk.GoldLight)
+                        Text(selected, Modifier.padding(top = 8.dp), fontFamily = DisplaySerif, fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.Bold, color = Pk.Crisp)
+                        Text("${done.size} of ${spec.days} days complete", Modifier.padding(top = 18.dp), fontFamily = UtilitySans, fontSize = 12.sp, color = Pk.Crisp.copy(alpha = .75f))
+                        LinearProgressIndicator(progress = { done.size.toFloat() / spec.days }, Modifier.fillMaxWidth().padding(top = 10.dp).height(6.dp), color = Pk.GoldLight, trackColor = Pk.Crisp.copy(alpha = .18f))
+                    }
+                }
+                Text("YOUR JOURNEY", Modifier.padding(top = 28.dp, bottom = 12.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.3.sp, color = Pk.Charcoal)
+                (1..spec.days).forEach { day ->
+                    val locked = day > done.size + 1
+                    val complete = day in done
+                    Surface(Modifier.fillMaxWidth().padding(bottom = 9.dp).clickable(enabled = !locked) { onDay(day) }, shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
+                        Row(Modifier.padding(17.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Surface(shape = CircleShape, color = if (complete) Pk.Sage else if (day == next) Pk.Oxblood else Pk.Sunken) {
+                                Box(Modifier.size(36.dp), contentAlignment = Alignment.Center) { if (complete) Icon(Icons.Outlined.Check, null, tint = Color.White) else Text(day.toString(), fontWeight = FontWeight.Bold, color = if (day == next) Color.White else Pk.Muted) }
+                            }
+                            Column(Modifier.weight(1f).padding(start = 14.dp)) {
+                                Text("DAY $day", fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, color = Pk.Muted)
+                                Text(spec.content[(day - 1) % spec.content.size].title, Modifier.padding(top = 3.dp), fontFamily = BookSerif, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = if (locked) Pk.Muted else Pk.Charcoal)
+                            }
+                            Icon(if (locked) Icons.Outlined.Lock else Icons.Outlined.ChevronRight, null, tint = Pk.Muted, modifier = Modifier.size(18.dp))
+                        }
+                    }
+                }
+                TextButton(onClick = onReset, modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 16.dp)) { Text("CHANGE PROGRAMME", color = Pk.Muted, fontSize = 10.sp, letterSpacing = 1.sp) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FaithProgrammeDay(spec: FaithProgramme, day: Int, content: FaithDay, onBack: () -> Unit, onComplete: () -> Unit) {
+    var checked by remember(day) { mutableStateOf(emptySet<Int>()) }
+    Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            ProgrammeBar(onBack, "DAY $day OF ${spec.days}")
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)) {
+                Text(content.title, Modifier.padding(top = 18.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 34.sp, lineHeight = 39.sp, color = Pk.Charcoal)
+                Text(content.reference.uppercase(), Modifier.padding(top = 24.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.2.sp, color = Pk.Oxblood)
+                Text("“${content.scripture}”", Modifier.padding(top = 10.dp), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 22.sp, lineHeight = 32.sp, color = Pk.Charcoal)
+                HorizontalDivider(Modifier.padding(vertical = 24.dp), color = Pk.Hair)
+                Text("REFLECTION", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.GoldDeep)
+                Text(content.reflection, Modifier.padding(top = 10.dp), fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 28.sp, color = Pk.Charcoal)
+                Text("PRAY THESE POINTS", Modifier.padding(top = 28.dp, bottom = 8.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.GoldDeep)
+                content.actions.forEachIndexed { index, action ->
+                    Surface(Modifier.fillMaxWidth().padding(top = 9.dp).clickable { checked = if (index in checked) checked - index else checked + index }, shape = RoundedCornerShape(17.dp), color = Color.White, border = BorderStroke(1.dp, if (index in checked) Pk.Sage else Pk.Hair)) {
+                        Row(Modifier.padding(17.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(if (index in checked) Icons.Outlined.CheckCircle else Icons.Outlined.RadioButtonUnchecked, null, tint = if (index in checked) Pk.Sage else Pk.Oxblood)
+                            Text(action, Modifier.padding(start = 13.dp), fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 20.sp, color = Pk.Charcoal)
+                        }
+                    }
+                }
+                Surface(Modifier.fillMaxWidth().padding(top = 24.dp), shape = RoundedCornerShape(22.dp), color = Pk.DeepDark) {
+                    Text(content.closing, Modifier.padding(22.dp), fontFamily = BookSerif, fontStyle = FontStyle.Italic, textAlign = TextAlign.Center, fontSize = 18.sp, lineHeight = 27.sp, color = Pk.Crisp)
+                }
+                Spacer(Modifier.height(22.dp))
+            }
+            Button(onComplete, enabled = checked.size == content.actions.size, modifier = Modifier.fillMaxWidth().padding(20.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
+                Text("COMPLETE DAY $day", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .8.sp)
+            }
+        }
+    }
+}
+
+@Composable private fun ProgrammeBar(onBack: () -> Unit, title: String) = Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+    IconButton(onBack) { Icon(Icons.Outlined.ArrowBackIosNew, "Back", tint = Pk.Charcoal, modifier = Modifier.size(18.dp)) }
+    Text(title.uppercase(), Modifier.weight(1f), textAlign = TextAlign.Center, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.3.sp, color = Pk.Charcoal)
+    Spacer(Modifier.width(48.dp))
+}
+
+@Composable private fun ChoiceCard(label: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) = Surface(modifier.height(76.dp).clickable(onClick = onClick), shape = RoundedCornerShape(17.dp), color = if (selected) Pk.Oxblood else Color.White, border = BorderStroke(1.dp, if (selected) Pk.Oxblood else Pk.Hair)) {
+    Box(Modifier.padding(13.dp), contentAlignment = Alignment.CenterStart) { Text(label, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, lineHeight = 17.sp, color = if (selected) Color.White else Pk.Charcoal) }
+}
