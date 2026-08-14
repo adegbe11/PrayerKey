@@ -108,6 +108,8 @@ fun AwardHomeDashboard(
     onOpenPrayer: () -> Unit,
     onOpenJournal: () -> Unit,
     onOpenChurch: () -> Unit,
+    onKeepPrayer: (String, String) -> Unit,
+    onKeepReflection: (String, String) -> Unit,
     onOpenChallenge: (Challenge) -> Unit,
     onToggleChallenge: (Challenge) -> Unit,
     onSettings: () -> Unit,
@@ -126,6 +128,8 @@ fun AwardHomeDashboard(
         onOpenPrayer = onOpenPrayer,
         onOpenJournal = onOpenJournal,
         onOpenChurch = onOpenChurch,
+        onKeepPrayer = onKeepPrayer,
+        onKeepReflection = onKeepReflection,
         onSettings = onSettings,
     )
 }

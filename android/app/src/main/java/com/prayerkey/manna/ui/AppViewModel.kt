@@ -200,6 +200,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _entries.value = store.journalEntries()
         _journalStreak.value = store.journalStreak()
     }
+    /**
+     * Keeps what a devotional invited you to bring.
+     *
+     * The reader says "it goes to your prayer list, dated today", so it has to
+     * actually go there — a confirmation that only changes a button's colour is
+     * worse than no button.
+     */
+    fun keepDevotionalPrayer(title: String, bringing: String) = io {
+        store.savePrayer(title, bringing, "", null)
+        _journal.value = store.prayerJournal()
+    }
+
     fun addEntry(mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?) = io {
         store.addJournalEntry(mood, body, gratitude, verseRef, verseText); refreshEntries()
     }

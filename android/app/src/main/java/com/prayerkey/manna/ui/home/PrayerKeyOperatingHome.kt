@@ -64,6 +64,10 @@ fun PrayerKeyOperatingHome(
     onOpenPrayer: () -> Unit,
     onOpenJournal: () -> Unit,
     onOpenChurch: () -> Unit,
+    /** Devotional -> prayer list. The day's title and what it invites you to bring. */
+    onKeepPrayer: (String, String) -> Unit,
+    /** Devotional -> journal. The day's question, and the answer written to it. */
+    onKeepReflection: (String, String) -> Unit,
     onSettings: () -> Unit,
 ) {
     val today = remember { LocalDate.now() }
@@ -71,12 +75,39 @@ fun PrayerKeyOperatingHome(
     val dailyPassage = remember(today) { passageFor(today) }
     var devotionalOpen by rememberSaveable { mutableStateOf(false) }
     var topicalBibleOpen by rememberSaveable { mutableStateOf(false) }
+
+    /* The written year walks from the day you started, not from 1 January, so
+       somebody installing in November gets day 1 rather than day 318. */
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val startedOn = remember {
+        val prefs = context.getSharedPreferences("daily_journey", android.content.Context.MODE_PRIVATE)
+        prefs.getString("devotional-started", null)?.let(LocalDate::parse)
+            ?: today.also { prefs.edit().putString("devotional-started", it.toString()).apply() }
+    }
+    var written by remember(today) { mutableStateOf<com.prayerkey.manna.data.Devotional?>(null) }
+    var writtenNext by remember(today) { mutableStateOf<com.prayerkey.manna.data.Devotional?>(null) }
+    LaunchedEffect(today, startedOn) {
+        written = com.prayerkey.manna.data.Devotionals.forDate(context, today, startedOn)
+        written?.let { writtenNext = com.prayerkey.manna.data.Devotionals.after(context, it) }
+    }
+
     if (devotionalOpen) {
         Dialog(
             onDismissRequest = { devotionalOpen = false },
             properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
         ) {
-            DailyDevotionalReader(dailyDevotional, dailyPassage) { devotionalOpen = false }
+            val day = written
+            if (day != null) {
+                DevotionalReader(
+                    day = day,
+                    tomorrow = writtenNext,
+                    onClose = { devotionalOpen = false },
+                    onOpenPassage = { _, _ -> devotionalOpen = false; onOpenBible() },
+                    onAddPrayer = { onKeepPrayer(day.title, day.addLabel) },
+                    onKeepReflection = { onKeepReflection(day.question, it) },
+                    onComplete = { devotionalOpen = false },
+                )
+            }
         }
     }
     if (topicalBibleOpen) {
@@ -105,7 +136,7 @@ fun PrayerKeyOperatingHome(
             .verticalScroll(rememberScrollState()).padding(bottom = Pk.NavClearance)
     ) {
         Header(today, streak, onSettings)
-        HeroRail(dailyDevotional.title) { devotionalOpen = true }
+        HeroRail(written?.title ?: dailyDevotional.title) { devotionalOpen = true }
         QuickActions(onOpenPrayer, onOpenBible, onOpenJournal, onOpenChurch)
 
         Section("TODAY") {

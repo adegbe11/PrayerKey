@@ -200,6 +200,12 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                             onOpenPrayer = { selected = 2 },
                             onOpenJournal = { selected = 4 },
                             onOpenChurch = { selected = 3 },
+                            onKeepPrayer = { title, bringing ->
+                                viewModel.keepDevotionalPrayer(title, bringing)
+                            },
+                            onKeepReflection = { question, answer ->
+                                viewModel.addEntry("devotional", answer, "", null, question)
+                            },
                             onOpenChallenge = { challenge ->
                                 viewModel.markChallengeDay(
                                     challenge.id, challenge.today.index - 1, !challenge.today.done,

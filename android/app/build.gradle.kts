@@ -100,6 +100,11 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.10.1")
 
     testImplementation("junit:junit:4.13.2")
+    /* android.jar's org.json is a stub that throws "not mocked" off-device, so
+       the devotional asset could not be validated on the JVM. This puts a real
+       implementation on the test classpath only — the app still uses the
+       platform's. */
+    testImplementation("org.json:json:20240303")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")

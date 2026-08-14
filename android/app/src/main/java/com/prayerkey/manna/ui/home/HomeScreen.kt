@@ -110,6 +110,9 @@ fun HomeScreen(
                 onOpenPrayer = { onPray(card) },
                 onOpenJournal = onOpenJournal,
                 onOpenChurch = onOpenChurch,
+                // this screen is not on any route; MannaApp wires the real ones
+                onKeepPrayer = { _, _ -> },
+                onKeepReflection = { _, _ -> },
                 onOpenChallenge = onOpenChallenge,
                 onToggleChallenge = onToggleChallenge,
                 onSettings = onSettings,
