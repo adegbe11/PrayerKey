@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,11 +31,13 @@ import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.PrayerTopic
 import com.prayerkey.manna.ui.theme.R
 import com.prayerkey.manna.ui.worlds.VerseWorld
-import com.prayerkey.manna.ui.worlds.WorldScene
 import com.prayerkey.manna.ui.theme.BookSerif
+import com.prayerkey.manna.R as AppR
 
-private val Ivory = Color(0xFFF4F8FF)
-private val Gilt = Color(0xFF78A9FF)
+private val Ivory = Color(0xFFFDFBF7)
+private val PrayerInk = Color(0xFF241D28)
+private val PrayerViolet = Color(0xFF6200ED)
+private val Gilt = Color(0xFFC9A26D)
 
 /**
  * A prayer, in the same world language as the verses.
@@ -56,37 +61,30 @@ fun PrayerDeckFace(
     onOpen: () -> Unit,
     modifier: Modifier,
 ) {
-    val world = remember(topic.slug) { worldFor(topic.category, topic.slug) }
+    val artwork = remember(topic.category, topic.slug) { prayerArtwork(topic.category, topic.slug) }
 
     Box(
         // full bleed: no corner radius, because there is no page behind it
         if (front) modifier.clickable(onClick = onOpen) else modifier,
     ) {
-        // PERF: only the front card animates its scene
-        WorldScene(world, animate = front, Modifier.fillMaxSize())
-
-        Box(
-            Modifier.fillMaxSize().background(
-                Brush.verticalGradient(
-                    0f to Color.Black.copy(alpha = .42f),
-                    .30f to Color.Black.copy(alpha = .22f),
-                    .60f to Color.Black.copy(alpha = .52f),
-                    1f to Color.Black.copy(alpha = .84f),
-                ),
-            ),
+        Image(
+            painter = painterResource(artwork), contentDescription = null,
+            contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(),
         )
 
+        // A quiet wash ties all three photographed paper scenes to PrayerKey
+        // violet without covering their tactile paper, leaves and cloth.
+        Box(Modifier.fillMaxSize().background(PrayerViolet.copy(alpha = .045f)))
+
         Column(
-            Modifier.fillMaxSize().padding(horizontal = 30.dp)
-                // 150dp of the card was empty sky above the category; most
-                // prayers fit whole in the space that reclaims
-                .padding(top = 96.dp, bottom = 190.dp),
+            Modifier.fillMaxSize().padding(horizontal = 52.dp)
+                .padding(top = 210.dp, bottom = 215.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 topic.category.uppercase(),
-                color = Gilt, fontSize = 9.5.sp,
+                color = PrayerViolet, fontSize = 9.5.sp,
                 letterSpacing = 3.2.sp, fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )
@@ -95,7 +93,7 @@ fun PrayerDeckFace(
 
             Text(
                 topic.title,
-                color = Ivory,
+                color = PrayerInk,
                 fontFamily = BookSerif,
                 fontSize = if (topic.title.length > 34) 27.sp else 32.sp,
                 lineHeight = if (topic.title.length > 34) 35.sp else 40.sp,
@@ -104,13 +102,13 @@ fun PrayerDeckFace(
             )
 
             Spacer(Modifier.height(20.dp))
-            Box(Modifier.height(1.dp).fillMaxWidth(.22f).background(Gilt.copy(alpha = .55f)))
+            Box(Modifier.height(1.dp).fillMaxWidth(.22f).background(Gilt.copy(alpha = .85f)))
             Spacer(Modifier.height(20.dp))
 
             val (body, trimmed) = remember(topic.slug) { preview(topic.prayer) }
             Text(
                 body,
-                color = Ivory.copy(alpha = .86f),
+                color = PrayerInk.copy(alpha = .82f),
                 fontSize = 15.sp, lineHeight = 26.sp,
                 textAlign = TextAlign.Center,
                 maxLines = 12,
@@ -120,7 +118,7 @@ fun PrayerDeckFace(
                 Spacer(Modifier.height(14.dp))
                 Text(
                     "Read the full prayer",
-                    color = Gilt, fontSize = 11.5.sp,
+                    color = PrayerViolet, fontSize = 11.5.sp,
                     fontWeight = FontWeight.SemiBold, letterSpacing = .6.sp,
                 )
             }
@@ -130,12 +128,34 @@ fun PrayerDeckFace(
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     topic.scripture.take(2).forEach { (ref, _) ->
                         Text(
-                            ref, color = Gilt, fontSize = 11.sp,
+                            ref, color = PrayerViolet, fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold, letterSpacing = 1.1.sp,
                         )
                     }
                 }
             }
+        }
+    }
+}
+
+/** The same realistic paper-card world used by the Bible deck. Categories
+ * stay visually stable, while individual prayers rotate the scene subtly. */
+private fun prayerArtwork(category: String, slug: String): Int {
+    val c = category.lowercase()
+    return when {
+        c.contains("marriage") || c.contains("family") || c.contains("relationship") ->
+            AppR.drawable.verse_card_botanical
+        c.contains("grief") || c.contains("mental") || c.contains("night") || c.contains("protection") ->
+            AppR.drawable.verse_card_oxblood
+        c.contains("health") || c.contains("healing") || c.contains("thank") || c.contains("celebration") ->
+            AppR.drawable.verse_card_dawn
+        else -> {
+            val cards = intArrayOf(
+                AppR.drawable.verse_card_botanical,
+                AppR.drawable.verse_card_dawn,
+                AppR.drawable.verse_card_oxblood,
+            )
+            cards[(slug.hashCode() and Int.MAX_VALUE) % cards.size]
         }
     }
 }

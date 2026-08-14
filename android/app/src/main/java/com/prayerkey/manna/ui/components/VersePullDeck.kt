@@ -95,6 +95,7 @@ fun VersePullDeck(
     onMemorize: (RemoteVerse) -> Unit,
     onShare: (RemoteVerse) -> Unit,
     onOpen: (RemoteVerse) -> Unit,
+    onCurrentChanged: (RemoteVerse) -> Unit = {},
 ) {
     if (verses.isEmpty()) return
     val view = LocalView.current
@@ -126,6 +127,8 @@ fun VersePullDeck(
         RemoteVerse("Psalm 46:10", "Be still, and know that I am God.", "KJV")
     else verses[index % verses.size]
     val next = verses[(index + 1) % verses.size]
+
+    LaunchedEffect(current) { onCurrentChanged(current) }
 
     val threshold = screenH * .18f
     val progress = (offsetValue / threshold).coerceIn(-1f, 1f)
@@ -236,36 +239,10 @@ fun VersePullDeck(
             Column(Modifier.fillMaxWidth().statusBarsPadding()) { topOverlay() }
         }
 
-        /* ── BOTTOM ACTION BAR: one translucent dock, not five loose discs ── */
-        AnimatedVisibility(
-            visible = chrome,
-            enter = fadeIn(tween(220)) + slideInVertically(tween(300)) { it / 2 },
-            exit = fadeOut(tween(180)) + slideOutVertically(tween(240)) { it / 2 },
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 96.dp),
-        ) {
-        Row(
-            Modifier.clip(RoundedCornerShape(34.dp))
-                .background(Night.copy(alpha = .34f))
-                .border(0.7.dp, Color.White.copy(alpha = .16f), RoundedCornerShape(34.dp))
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            ActionCircle(Icons.Outlined.Refresh, "Previous verse", Ivory.copy(alpha = .85f), 58.dp) {
-                if (index > 0) { index--; view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK) }
-            }
-            Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.Close, "Skip", Ivory.copy(alpha = .85f), 58.dp) { flingNext() }
-            Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.School, "Memorize", Ivory.copy(alpha = .85f), 58.dp) {
-                onMemorize(current); view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-            }
-            Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.BookmarkBorder, "Save", Gold, 58.dp) { flingSave() }
-            Spacer(Modifier.size(12.dp))
-            ActionCircle(Icons.Outlined.Share, "Share", Ivory.copy(alpha = .85f), 58.dp) { onShare(current) }
-        }
-        }
+        /* The dock is gone. Skip and Save were already full gestures — drag
+           down, drag up — the buttons were a second, redundant way to do the
+           same thing. Memorize and Share had no gesture, so they moved to the
+           mode bar rather than losing a way in. */
     }
 }
 

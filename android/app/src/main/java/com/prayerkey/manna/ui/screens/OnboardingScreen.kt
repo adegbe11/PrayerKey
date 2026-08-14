@@ -91,7 +91,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
     }
 
     LaunchedEffect(opening, step) {
-        if (!opening && step < 3) {
+        if (!opening && step < 4) {
             delay(2700)
             step += 1
         }
@@ -105,7 +105,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
     OnboardingSlides(
         step = step,
         onStep = { step = it },
-        onSkip = { step = 2 },
+        onSkip = { step = 4 },
         onDone = onDone,
     )
 }

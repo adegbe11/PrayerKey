@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export const metadata = {
   title: "Privacy Policy — PrayerKey",
-  description: "PrayerKey privacy policy. No account, no tracking, no data stored.",
+  description: "How PrayerKey processes and protects your information.",
 };
 
 export default function PrivacyPage() {
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: 0, letterSpacing: "0.02em" }}>
-          Last updated: April 2026
+          Last updated: August 9, 2026
         </p>
       </div>
 
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
         </LegalSection>
 
         <LegalSection title="Information We Do Not Collect">
-          Because PrayerKey requires no account or registration, we do not collect or store your name, email address, phone number, date of birth or any other personal identifier. We do not build a user profile for you. We do not store your prayer requests or the text of prayers generated for you after your session ends. We do not retain audio from live sermon sessions. Your personal faith journey is your own and PrayerKey has no interest in recording or monetising it.
+          The Android app does not require an account and does not use advertising trackers. Prayer requests, journal entries, saved verses, preferences, sermon notes and optional sermon audio backups are stored locally on your device so the app can work offline. PrayerKey does not sell this information or use it for advertising.
         </LegalSection>
 
         <LegalSection title="Information That Is Processed During Use">
@@ -57,9 +57,9 @@ export default function PrivacyPage() {
 
           {"\n\n"}When you use the prayer generator, the text you type is sent to an AI language model to generate your prayer. This text is processed in real time to produce the response you see on screen. It is not stored by PrayerKey after the request is completed.
 
-          {"\n\n"}When you use the live sermon verse detection feature, audio from your microphone is processed by a speech recognition service that converts it to text. That text is then analysed to detect Bible verse references. The audio itself is not recorded or stored. The transcription is processed in memory and used only to identify verses in the moment.
+          {"\n\n"}When you start Church listening, microphone audio is recorded to a private file on your device and streamed to our transcription provider to produce live text. The resulting transcript is arranged into sermon notes and stored locally. The local audio backup protects an active session during network interruption. You can remove locally stored app data by deleting it in the app or uninstalling PrayerKey.
 
-          {"\n\n"}When you use Bible search, your search query is sent to an AI service to retrieve relevant Bible verses and cross-references. The query is not stored after the response is returned.
+          {"\n\n"}When an online Bible source is needed, the requested Bible reference and translation are sent to that provider. Most Bible reading and daily content is bundled for offline use.
         </LegalSection>
 
         <LegalSection title="Cookies and Local Storage">
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
         </LegalSection>
 
         <LegalSection title="Third-Party AI Services">
-          PrayerKey uses third-party artificial intelligence services to power its features. These providers receive the minimum data necessary to process your request, specifically the text you provide or the audio from your microphone during a live session. These providers are bound by their own privacy policies and do not use your data to train their public models based on your individual requests. PrayerKey does not share your data with advertisers, data brokers or any unrelated third parties.
+          PrayerKey uses third-party services to provide transcription and selected online features. Those providers receive only the information needed to complete the requested feature, such as microphone audio during an active Church session or a Bible reference during an online lookup. Their handling of that information is governed by their own terms and privacy policies. PrayerKey does not share your data with advertisers or data brokers.
         </LegalSection>
 
         <LegalSection title="Children's Privacy">
@@ -75,11 +75,11 @@ export default function PrivacyPage() {
         </LegalSection>
 
         <LegalSection title="Data Security">
-          All communication between your browser and PrayerKey is encrypted using HTTPS. We take reasonable technical measures to protect any data that passes through our systems. Because we do not store personal user data, the risk of a data breach exposing your information is significantly lower than platforms that build and maintain user databases.
+          Network communication uses encrypted HTTPS or secure WebSocket connections in production. Android app data is stored in the app's private storage and Android backup is disabled. If you enable Journal Lock, PrayerKey also hides journal screens from screenshots and recent-app previews. Device compromise, rooting or exporting content can reduce these protections.
         </LegalSection>
 
         <LegalSection title="Your Rights">
-          Because PrayerKey does not store personal data linked to your identity, there is generally no personal data for us to retrieve, correct or delete on your behalf. If you have used PrayerKey and have a specific concern about data that may have been retained, you may contact us at prayerkey.com and we will respond to your request in good faith.
+          Most Android data is stored only on your device and can be edited or deleted in the app. Uninstalling PrayerKey removes its private local data. If you have used an online feature and have a question about information processed by our service, contact us through prayerkey.com.
 
           {"\n\n"}If you are located in the European Union or United Kingdom, you have rights under the GDPR and UK GDPR including the right to access, rectify and erase personal data. If you are located in California, you have rights under the CCPA. We respect these rights and will respond to legitimate requests.
         </LegalSection>

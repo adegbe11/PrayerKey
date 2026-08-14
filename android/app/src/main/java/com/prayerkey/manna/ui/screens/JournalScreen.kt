@@ -26,6 +26,12 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.MoreHoriz
+import androidx.compose.material.icons.outlined.AutoStories
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.CheckCircleOutline
+import androidx.compose.material.icons.outlined.Celebration
+import androidx.compose.material.icons.outlined.Nightlight
+import androidx.compose.material.icons.outlined.GraphicEq
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChevronLeft
 import androidx.compose.material.icons.outlined.ChevronRight
@@ -142,13 +148,11 @@ fun JournalScreen(
            user chose, with the header floating on top of it. Rendering it
            inside the padded column left a white band under the title and
            margins down both sides, which broke the illusion entirely. */
-        val emptyJourney = tab == JournalTab.Journey && entries.isEmpty()
-        if (emptyJourney) {
-            com.prayerkey.manna.ui.journal.JournalWelcome(
-                onOpen = { picking = true },
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
+        // The Journal home must be useful on the first launch. The previous
+        // five-second verse interlude hid writing and collections from a new
+        // user; the premium overview below now handles both empty and active
+        // journals immediately.
+        val emptyJourney = false
 
         Column(Modifier.fillMaxSize().padding(horizontal = 22.dp).padding(top = 24.dp)) {
             // Home is bare now, so Settings lives here — the one screen
@@ -183,7 +187,7 @@ fun JournalScreen(
                     entries = entries, streak = journalStreak, query = query,
                     onQuery = { query = it }, onEdit = { viewing = it },
                     onAnswer = { reviewingPrayer = it },
-                    onWelcomeTap = { picking = true },
+                    onWelcomeTap = { chosen = null; writing = true },
                     insight = journeyInsight,
                     concealPreviews = concealPreviews,
                 )
@@ -211,7 +215,7 @@ fun JournalScreen(
                     Modifier.size(58.dp)
                         .shadow(5.dp, CircleShape, spotColor = Color.Black.copy(alpha = .16f))
                         .clip(CircleShape).background(accent)
-                        .clickable { picking = true },
+                        .clickable { chosen = null; writing = true },
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -353,7 +357,14 @@ private fun JournalTimeline(
            sort or find — just the line that makes someone want to write. */
         // the empty state is drawn full-bleed by JournalScreen, behind the
         // header — the timeline just stands down
-        if (entries.isEmpty()) return
+        JournalOverview(
+            entries = entries,
+            streak = streak,
+            memory = memory,
+            onWrite = onWelcomeTap,
+            onOpen = onEdit,
+            onCollection = { collection -> selectedTag = collection },
+        )
 
         Row(Modifier.fillMaxWidth().padding(top = 18.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = RoundedCornerShape(16.dp), color = AppleGray, modifier = Modifier.weight(1f)) {
@@ -406,6 +417,89 @@ private fun JournalTimeline(
         }
         JourneyView.Calendar -> JournalCalendar(entries, concealPreviews, onEdit)
         JourneyView.Memories -> JournalMemories(entries, memory, insight, concealPreviews, onEdit, onAnswer)
+        }
+    }
+}
+
+private data class JournalCollection(val title: String, val count: Int, val icon: androidx.compose.ui.graphics.vector.ImageVector, val tint: Color)
+
+@Composable
+private fun JournalOverview(
+    entries: List<JournalEntry>, streak: Int, memory: JournalEntry?,
+    onWrite: () -> Unit, onOpen: (JournalEntry) -> Unit, onCollection: (String?) -> Unit,
+) {
+    val violet = Color(0xFF6200ED)
+    val ink = Color(0xFF1A0A2E)
+    val muted = Color(0xFF6E6E73)
+    val latest = entries.maxByOrNull { it.updatedAt }
+    val collections = listOf(
+        JournalCollection("Prayers", entries.count { it.isPrayer }, Icons.Outlined.FavoriteBorder, violet),
+        JournalCollection("Answered", entries.count { it.answeredAt != null }, Icons.Outlined.CheckCircleOutline, Color(0xFF237A57)),
+        JournalCollection("Thanksgiving", entries.count { it.gratitude.isNotBlank() || it.journal.equals("Gratitude", true) }, Icons.Outlined.Celebration, Color(0xFFB56B00)),
+        JournalCollection("Dreams", entries.count { it.journal.equals("Dreams", true) }, Icons.Outlined.Nightlight, Color(0xFF4C4FC7)),
+        JournalCollection("Sermon notes", entries.count { it.source == "sermon" }, Icons.Outlined.GraphicEq, Color(0xFF8A3D72)),
+        JournalCollection("All pages", entries.size, Icons.Outlined.AutoStories, ink),
+    )
+    Column(Modifier.padding(top = 18.dp)) {
+        Surface(
+            Modifier.fillMaxWidth().clickable(onClick = onWrite),
+            shape = RoundedCornerShape(28.dp), color = violet, shadowElevation = 5.dp,
+        ) {
+            Column(Modifier.padding(24.dp)) {
+                Text("TODAY'S PAGE", color = Color.White.copy(alpha = .70f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.5.sp)
+                Text("What do you want to remember?", color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 27.sp, lineHeight = 32.sp, modifier = Modifier.padding(top = 10.dp))
+                Text("Write freely. PrayerKey saves the page privately on this device.", color = Color.White.copy(alpha = .76f), fontFamily = BookSerif, fontSize = 14.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 8.dp))
+                Surface(shape = RoundedCornerShape(99.dp), color = Color.White, modifier = Modifier.padding(top = 20.dp)) {
+                    Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Create, null, tint = violet, modifier = Modifier.size(17.dp))
+                        Text("WRITE TODAY", color = violet, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = .9.sp, modifier = Modifier.padding(start = 8.dp))
+                    }
+                }
+            }
+        }
+
+        Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
+                Column(Modifier.padding(16.dp)) { Text(entries.size.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("PAGES", color = muted, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold) }
+            }
+            Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
+                Column(Modifier.padding(16.dp)) { Text(streak.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("DAY STREAK", color = muted, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold) }
+            }
+            Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
+                Column(Modifier.padding(16.dp)) { Text(entries.count { it.favorite }.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("FAVOURITES", color = muted, fontSize = 9.sp, letterSpacing = 1.0.sp, fontWeight = FontWeight.Bold) }
+            }
+        }
+
+        Text("COLLECTIONS", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            collections.forEach { item ->
+                Surface(
+                    Modifier.width(142.dp).height(112.dp).clickable { onCollection(if (item.title == "All pages") null else item.title.lowercase()) },
+                    shape = RoundedCornerShape(20.dp), color = Color.White, border = BorderStroke(1.dp, item.tint.copy(alpha = .12f)),
+                ) {
+                    Column(Modifier.padding(15.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                        Icon(item.icon, null, tint = item.tint, modifier = Modifier.size(22.dp))
+                        Column { Text(item.title, color = ink, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1); Text("${item.count} ${if (item.count == 1) "page" else "pages"}", color = muted, fontSize = 10.sp, modifier = Modifier.padding(top = 3.dp)) }
+                    }
+                }
+            }
+        }
+
+        latest?.let { entry ->
+            Text("CONTINUE WRITING", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
+            Surface(Modifier.fillMaxWidth().clickable { onOpen(entry) }, shape = RoundedCornerShape(22.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .12f))) {
+                Column(Modifier.padding(18.dp)) {
+                    Text(entry.title.ifBlank { "Your latest page" }, color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 19.sp)
+                    Text(entry.body, color = muted, fontFamily = BookSerif, fontSize = 13.sp, lineHeight = 20.sp, maxLines = 2, modifier = Modifier.padding(top = 6.dp))
+                    Text("OPEN PAGE  →", color = violet, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = .8.sp, modifier = Modifier.padding(top = 12.dp))
+                }
+            }
+        }
+        memory?.let { entry ->
+            Text("ON THIS DAY", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
+            Surface(Modifier.fillMaxWidth().clickable { onOpen(entry) }, shape = RoundedCornerShape(22.dp), color = ink) {
+                Column(Modifier.padding(20.dp)) { Text(entry.title.ifBlank { "A page from your story" }, color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 20.sp); Text(entry.body, color = Color.White.copy(alpha = .70f), fontFamily = BookSerif, fontSize = 13.sp, lineHeight = 20.sp, maxLines = 3, modifier = Modifier.padding(top = 7.dp)) }
+            }
         }
     }
 }

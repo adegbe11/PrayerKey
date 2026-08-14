@@ -110,6 +110,7 @@ fun BibleScreen(
             DailyVerses.drop(1).take(8).map { RemoteVerse(it.reference, it.verse, it.translation) },
         )
     }
+    var currentVerse by remember { mutableStateOf<RemoteVerse?>(shown.firstOrNull()) }
     var loading by remember { mutableStateOf(false) }
     var pickerOpen by remember { mutableStateOf(false) }
     var showMemory by remember { mutableStateOf(false) }
@@ -163,7 +164,25 @@ fun BibleScreen(
        hands you a verse; the book is for sitting down and reading one. */
     var bookMode by remember { mutableStateOf(false) }
     var libraryMode by remember { mutableStateOf(false) }
-    androidx.activity.compose.BackHandler(enabled = bookMode || libraryMode) { bookMode = false; libraryMode = false }
+    var audioMode by remember { mutableStateOf(false) }
+    androidx.activity.compose.BackHandler(enabled = bookMode || libraryMode || audioMode) {
+        bookMode = false
+        libraryMode = false
+        audioMode = false
+    }
+
+    if (audioMode) {
+        val active = currentVerse ?: shown.first()
+        val activeBook = active.reference.substringBeforeLast(' ').ifBlank { "Genesis" }
+        val activeChapter = active.reference.substringAfterLast(' ')
+            .substringBefore(':').toIntOrNull() ?: 1
+        com.prayerkey.manna.ui.book.AudioBibleScreen(
+            book = activeBook,
+            chapter = activeChapter,
+            onClose = { audioMode = false },
+        )
+        return
+    }
 
     if (bookMode) {
         com.prayerkey.manna.ui.book.BibleBookScreen(
@@ -212,41 +231,41 @@ fun BibleScreen(
                 MemoryTrainer(memory, saved, entries, prayers, sermons, onReviewMemory)
             }
         } else {
+            /* The chrome hides behind the card and is pulled down, so the deck
+               stays full bleed. Ten permanent floating controls on a screen
+               whose whole job is to show one verse was the clutter; they live
+               in the bar now, together with the choice of how to read. */
+            val density = androidx.compose.ui.platform.LocalDensity.current
+            val barPx = with(density) { 132.dp.toPx() }
+            val here = currentVerse?.reference ?: shown.firstOrNull()?.reference.orEmpty()
+
+            com.prayerkey.manna.ui.theme.PullToReveal(
+                barHeight = barPx,
+                bar = {
+                    com.prayerkey.manna.ui.theme.BibleModeBar(
+                        reference = here.substringBeforeLast(' ').ifBlank { "Genesis" },
+                        chapter = here.substringAfterLast(' ').substringBefore(':').ifBlank { "1" },
+                        version = version.id,
+                        mode = com.prayerkey.manna.ui.theme.BibleMode.Cards,
+                        onReference = { libraryMode = true },
+                        onVersion = { pickerOpen = true },
+                        onMode = { picked ->
+                            when (picked) {
+                                com.prayerkey.manna.ui.theme.BibleMode.Cards -> Unit
+                                com.prayerkey.manna.ui.theme.BibleMode.Book -> bookMode = true
+                                com.prayerkey.manna.ui.theme.BibleMode.Library -> libraryMode = true
+                                com.prayerkey.manna.ui.theme.BibleMode.Audio -> audioMode = true
+                            }
+                        },
+                        onMemorize = { currentVerse?.let { onMemorize(VerseCard(it.reference, it.translation, it.text, "")) } },
+                        onShare = { currentVerse?.let { com.prayerkey.manna.share.CardShareRenderer.share(shareContext, VerseCard(it.reference, it.translation, it.text, "")) } },
+                    )
+                },
+            ) {
             com.prayerkey.manna.ui.components.VersePullDeck(
                 verses = shown,
                 reduceMotion = reduceMotion,
                 topOverlay = {
-                    Row(
-                        Modifier.fillMaxWidth().padding(horizontal = 14.dp).padding(top = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        FloatChip(onClick = { searchOpen = !searchOpen }) {
-                            Icon(Icons.Outlined.Search, "Search", tint = Ivory, modifier = Modifier.size(19.dp))
-                        }
-                        Spacer(Modifier.weight(1f))
-                        FloatChip(onClick = { bookMode = true }) {
-                            Icon(Icons.Outlined.MenuBook, "Read the Bible as a book", tint = Ivory, modifier = Modifier.size(19.dp))
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        FloatChip(onClick = { libraryMode = true }) {
-                            Icon(Icons.Outlined.ViewList, "Browse the Bible library", tint = Ivory, modifier = Modifier.size(19.dp))
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        FloatChip(onClick = { showMemory = true }) {
-                            Icon(Icons.Outlined.School, "Memorize", tint = Ivory, modifier = Modifier.size(19.dp))
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        Surface(
-                            onClick = { pickerOpen = true }, shape = RoundedCornerShape(99.dp),
-                            color = Color.Transparent, shadowElevation = 8.dp,
-                            modifier = Modifier.height(54.dp).background(NightGloss, RoundedCornerShape(99.dp)),
-                        ) {
-                            Row(Modifier.padding(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text(version.id, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                Icon(Icons.Outlined.KeyboardArrowDown, "Change version", tint = Gold, modifier = Modifier.size(18.dp))
-                            }
-                        }
-                    }
                     if (searchOpen) OutlinedTextField(
                         value = query, onValueChange = { query = it },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp).padding(top = 8.dp),
@@ -264,7 +283,15 @@ fun BibleScreen(
                 onMemorize = { onMemorize(VerseCard(it.reference, it.translation, it.text, "")) },
                 onShare = { com.prayerkey.manna.share.CardShareRenderer.share(shareContext, VerseCard(it.reference, it.translation, it.text, "")) },
                 onOpen = { selectedVerse = it },
+                onCurrentChanged = { currentVerse = it },
             )
+
+            // told once, then never again
+            com.prayerkey.manna.ui.theme.PullCoach(
+                "Pull down to navigate",
+                Modifier.align(Alignment.BottomCenter).padding(bottom = 150.dp),
+            )
+            }
         }
     }
 
@@ -525,6 +552,7 @@ fun PrayerScreen(
     var loading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var deckMode by remember { mutableStateOf(false) }
+    var selectedPrayerCategory by remember { mutableStateOf<String?>(null) }
     var selectedTopic by remember { mutableStateOf<PrayerTopic?>(null) }
     var topicQuery by remember { mutableStateOf("") }
     var searchOpen by remember { mutableStateOf(false) }
@@ -543,18 +571,25 @@ fun PrayerScreen(
        the same thing on screen — an spinner that never stopped. */
     val topicsLoading = deckMode && topics.isEmpty() && !topicsReady
 
-    androidx.activity.compose.BackHandler(enabled = deckMode) { deckMode = false }
+    androidx.activity.compose.BackHandler(enabled = deckMode) {
+        if (selectedPrayerCategory != null) selectedPrayerCategory = null else deckMode = false
+    }
 
     if (deckMode) {
+        if (selectedPrayerCategory == null) {
+            PrayerSituationLibrary(
+                topics = topics,
+                loading = topicsLoading,
+                onRetry = onLoadTopics,
+                onBack = { deckMode = false },
+                onSelect = { selectedPrayerCategory = it },
+            )
+        } else {
         /* Prayer decks shuffle like Manna: the card is the screen, pull down
            for the next prayer, push up to keep it. 544 rows in a list was a
            directory; this is a deck you can actually browse with a thumb. */
-        val filtered = remember(topics, topicQuery) {
-            topics.filter {
-                topicQuery.isBlank() ||
-                    it.title.contains(topicQuery, true) ||
-                    it.category.contains(topicQuery, true)
-            }
+        val filtered = remember(topics, selectedPrayerCategory) {
+            topics.filter { it.category.equals(selectedPrayerCategory, ignoreCase = true) }
         }
         val deckCs = MaterialTheme.colorScheme
         Box(Modifier.fillMaxSize().background(deckCs.background)) {
@@ -610,41 +645,23 @@ fun PrayerScreen(
                             ),
                         )
                     },
-                    actions = { topic, controls ->
-                        listOf(
-                            /* Search lives here rather than on the card. 543
-                               prayers are unfindable by shuffling alone, but a
-                               field pinned over the art was the clutter. */
-                            com.prayerkey.manna.ui.components.DeckAction(
-                                Icons.Outlined.Search, "Find a prayer", Ivory.copy(alpha = .85f), 50.dp,
-                            ) { searchOpen = true },
-                            com.prayerkey.manna.ui.components.DeckAction(
-                                Icons.Outlined.Close, "Next prayer", Ivory.copy(alpha = .85f), 58.dp,
-                            ) { controls.next() },
-                            com.prayerkey.manna.ui.components.DeckAction(
-                                Icons.Outlined.AutoAwesome, "Pray it", Gold, 50.dp,
-                            ) { selectedTopic = topic },
-                            com.prayerkey.manna.ui.components.DeckAction(
-                                Icons.Outlined.BookmarkBorder, "Keep", Gold, 58.dp,
-                            ) { controls.keep() },
-                            /* This used to open the detail sheet, so the
-                               one button labelled Share was the one button
-                               that did not share. */
-                            com.prayerkey.manna.ui.components.DeckAction(
-                                Icons.Outlined.Share, "Share", Ivory.copy(alpha = .85f), 50.dp,
-                            ) {
-                                com.prayerkey.manna.share.CardShareRenderer
-                                    .sharePrayer(prayerContext, topic)
-                            },
+                    topOverlay = { index ->
+                        PrayerDeckCategoryHeader(
+                            category = selectedPrayerCategory.orEmpty(),
+                            position = index + 1,
+                            total = filtered.size,
+                            onBack = { selectedPrayerCategory = null },
                         )
                     },
-                    // no chrome on the deck at all: no back chip, no
-                    // counter, no search field. The system back button
-                    // leaves the deck, so nothing has to sit on the card.
+                    // The prayer card stays full-bleed. Pull down for the next
+                    // prayer, push up to keep it, and tap to pray it. The old
+                    // five-button action dock duplicated those gestures and
+                    // covered the artwork.
                 ) { topic, front, mod ->
                     PrayerDeckFace(topic, front, onOpen = { selectedTopic = topic }, modifier = mod)
                 }
             }
+        }
         }
     } else {
         /* ONE scroll for the whole screen.
@@ -1094,12 +1111,12 @@ private data class Starter(
 
 /** Six ways in, for the days when the empty box is the hardest part. */
 private val STARTERS = listOf(
-    Starter("I am anxious", "I am anxious about something and I need peace.", Icons.Outlined.Air, Color(0xFF12161F)),
-    Starter("For my family", "Please pray for my family.", Icons.Outlined.FavoriteBorder, Color(0xFF12161F)),
-    Starter("To give thanks", "I want to thank God for what He has done.", Icons.Outlined.AutoAwesome, Color(0xFF12161F)),
-    Starter("I cannot sleep", "I cannot sleep and my mind will not rest.", Icons.Outlined.DarkMode, Color(0xFF12161F)),
-    Starter("For healing", "I need healing in my body.", Icons.Outlined.Spa, Color(0xFF12161F)),
-    Starter("I need direction", "I do not know what to do next and I need direction.", Icons.Outlined.Explore, Color(0xFF12161F)),
+    Starter("I am anxious", "I am anxious about something and I need peace.", Icons.Outlined.Air, Pk.Charcoal),
+    Starter("For my family", "Please pray for my family.", Icons.Outlined.FavoriteBorder, Pk.Charcoal),
+    Starter("To give thanks", "I want to thank God for what He has done.", Icons.Outlined.AutoAwesome, Pk.Charcoal),
+    Starter("I cannot sleep", "I cannot sleep and my mind will not rest.", Icons.Outlined.DarkMode, Pk.Charcoal),
+    Starter("For healing", "I need healing in my body.", Icons.Outlined.Spa, Pk.Charcoal),
+    Starter("I need direction", "I do not know what to do next and I need direction.", Icons.Outlined.Explore, Pk.Charcoal),
 )
 
 @Composable

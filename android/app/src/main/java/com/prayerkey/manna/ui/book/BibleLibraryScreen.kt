@@ -1,10 +1,12 @@
 package com.prayerkey.manna.ui.book
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,12 +15,14 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.AutoStories
 import androidx.compose.material.icons.outlined.Style
 import androidx.compose.material.icons.outlined.MenuBook
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,23 +42,39 @@ fun BibleLibraryScreen(
     onOpenChapter: (String, Int) -> Unit,
 ) {
     val cs = MaterialTheme.colorScheme
+    val view = LocalView.current
+    DisposableEffect(Unit) {
+        val window = (view.context as? android.app.Activity)?.window
+        @Suppress("DEPRECATION")
+        window?.statusBarColor = android.graphics.Color.rgb(249, 246, 240)
+        window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = true }
+        onDispose {
+            @Suppress("DEPRECATION")
+            window?.statusBarColor = android.graphics.Color.rgb(34, 34, 34)
+            window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = false }
+        }
+    }
     var oldTestament by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     var selectedBook by remember { mutableStateOf<BibleBook?>(null) }
     var viewMenuOpen by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
     val books = remember(oldTestament, query) {
         BibleCanon.books.filter { it.oldTestament == oldTestament }
             .filter { query.isBlank() || it.name.contains(query.trim(), ignoreCase = true) }
     }
+    LaunchedEffect(oldTestament, query) { listState.scrollToItem(0) }
 
-    Column(Modifier.fillMaxSize().background(Color(0xFFF2EBE0)).padding(horizontal = 18.dp)) {
-        Row(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(44.dp).clip(RoundedCornerShape(15.dp)).background(cs.primary.copy(alpha = .13f)), contentAlignment = Alignment.Center) {
-                Text("P", color = cs.primary, fontFamily = DisplaySerif, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+    Column(Modifier.fillMaxSize().background(cs.background).statusBarsPadding().padding(horizontal = 22.dp)) {
+        Row(Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("PRAYERKEY", color = cs.primary, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.8.sp)
+                Text("Bible Library", color = cs.onBackground, fontFamily = DisplaySerif, fontSize = 31.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
             }
-            Text("Bible", color = cs.onBackground, fontFamily = DisplaySerif, fontSize = 27.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 12.dp))
             Row(
-                Modifier.padding(start = 10.dp).height(42.dp).clip(RoundedCornerShape(13.dp)).background(cs.surface).clickable(onClick = onChooseTranslation).padding(horizontal = 12.dp),
+                Modifier.height(46.dp).clip(RoundedCornerShape(23.dp)).background(cs.surface)
+                    .border(1.dp, cs.outlineVariant, RoundedCornerShape(23.dp))
+                    .clickable(onClick = onChooseTranslation).padding(horizontal = 15.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(translation, color = cs.onSurface, fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold)
@@ -63,26 +83,15 @@ fun BibleLibraryScreen(
             Spacer(Modifier.weight(1f))
         }
 
-        Row(Modifier.fillMaxWidth().padding(bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("CHOOSE A BOOK", color = cs.onBackground.copy(alpha = .55f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.1.sp, modifier = Modifier.weight(1f))
-            Row(
-                Modifier.height(48.dp).clip(RoundedCornerShape(12.dp)).background(cs.surface).clickable { viewMenuOpen = true }.padding(horizontal = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(Icons.Outlined.AutoStories, null, tint = cs.primary, modifier = Modifier.size(16.dp))
-                Text("  LIBRARY", color = cs.onSurface, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = .5.sp)
-                Icon(Icons.Outlined.KeyboardArrowDown, "Change Bible view", tint = cs.onSurface, modifier = Modifier.padding(start = 4.dp).size(16.dp))
-            }
-        }
-
-        Row(Modifier.fillMaxWidth().height(54.dp).clip(RoundedCornerShape(18.dp)).background(cs.surface.copy(alpha = .52f))) {
+        Row(Modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(16.dp)).background(cs.surface)) {
             TestamentTab("OLD TESTAMENT", oldTestament, Modifier.weight(1f)) { oldTestament = true }
             TestamentTab("NEW TESTAMENT", !oldTestament, Modifier.weight(1f)) { oldTestament = false }
         }
 
-        Row(Modifier.fillMaxWidth().padding(top = 14.dp, bottom = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Row(
-                Modifier.weight(1f).height(54.dp).clip(RoundedCornerShape(16.dp)).background(cs.surface).padding(horizontal = 16.dp),
+                Modifier.weight(1f).height(50.dp).clip(RoundedCornerShape(15.dp)).background(cs.surface)
+                    .border(1.dp, cs.outlineVariant, RoundedCornerShape(15.dp)).padding(horizontal = 15.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(Icons.Outlined.Search, null, tint = cs.onSurface.copy(alpha = .46f), modifier = Modifier.size(20.dp))
@@ -95,15 +104,24 @@ fun BibleLibraryScreen(
             }
         }
 
-        LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(13.dp), contentPadding = PaddingValues(bottom = 110.dp)) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(if (oldTestament) "THE OLD TESTAMENT" else "THE NEW TESTAMENT", color = cs.onBackground.copy(alpha = .58f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp, modifier = Modifier.weight(1f))
+            Text("${books.size} BOOKS", color = cs.onBackground.copy(alpha = .42f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Medium, letterSpacing = .8.sp)
+        }
+
+        LazyColumn(state = listState, modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp), contentPadding = PaddingValues(top = 8.dp, bottom = 118.dp)) {
             items(books, key = { it.name }) { book ->
+                val canonNumber = BibleCanon.books.indexOf(book) + 1
                 Row(
-                    Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(22.dp)).background(cs.surface)
-                        .clickable { selectedBook = book }.padding(horizontal = 22.dp),
+                    Modifier.fillMaxWidth().height(70.dp).clip(RoundedCornerShape(17.dp)).background(cs.surface)
+                        .border(1.dp, cs.outlineVariant, RoundedCornerShape(17.dp))
+                        .clickable { selectedBook = book }.padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(book.name, color = cs.onSurface, fontFamily = UtilitySans, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                    Text("${book.chapters} CH", color = cs.onSurface.copy(alpha = .42f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Medium, letterSpacing = .7.sp)
+                    Text(canonNumber.toString().padStart(2, '0'), color = cs.primary, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.width(32.dp))
+                    Text(book.name, color = cs.onSurface, fontFamily = DisplaySerif, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Text("${book.chapters} chapters", color = cs.onSurface.copy(alpha = .48f), fontFamily = UtilitySans, fontSize = 11.sp)
+                    Icon(Icons.Outlined.ChevronRight, "Choose chapter", tint = cs.onSurface.copy(alpha = .35f), modifier = Modifier.padding(start = 7.dp).size(18.dp))
                 }
             }
         }

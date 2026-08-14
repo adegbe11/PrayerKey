@@ -25,28 +25,41 @@ object Pk {
     /* ── the six ─────────────────────────────────────────────────────── */
 
     /** The page. Warm, never #FFFFFF — clinical white is the tell of a default theme. */
-    val Cream = Color(0xFFF9F6F0)
+    val Cream = Color(0xFFF5F5F7)
+
+    /** Crisp text used directly on oxblood and midnight surfaces. */
+    val Crisp = Color(0xFFFFFFFF)
+
+    /** Midnight canvas: a near-black oxblood, never pure black. */
+    val DeepDark = Color(0xFF1A0A2E)
 
     /** Ink, and the floating nav. Not #000000: black is harsh to read against. */
-    val Charcoal = Color(0xFF222222)
+    val Charcoal = Color(0xFF1A0A2E)
 
     /** Masthead, primary buttons, eyebrows. 14.3:1 on cream. */
-    val Oxblood = Color(0xFF4A0E17)
+    val Oxblood = Color(0xFF6200ED)
+
+    /** Brighter top edge and deeper pressed state for brand surfaces. */
+    val VioletLit = Color(0xFF6F18F2)
+    val VioletDeep = Color(0xFF4401B2)
 
     /** Hairlines, the streak, today. Used sparingly — gold stops reading as
      *  metal the moment it fills an area. */
-    val Gold = Color(0xFFD4AF37)
+    val Gold = Color(0xFFC9A26D)
+    val GoldLight = Color(0xFFEFD5A8)
+    /** Accessible gold ink for use on white surfaces. */
+    val GoldDeep = Color(0xFF6F5528)
 
     /** Done, complete, answered. The only green in the app. */
-    val Sage = Color(0xFF8A9A86)
+    val Sage = Color(0xFF5C02D8)
 
     /** Invitations, and the nav at rest. */
-    val Blush = Color(0xFFD8B4A0)
+    val Blush = Color(0xFFEFD5A8)
 
     /* ── derived, not new colours ────────────────────────────────────── */
 
     /** Card fill: the page pressed slightly in. */
-    val Sunken = Color(0xFFF1ECE3)
+    val Sunken = Color(0xFFFFFFFF)
 
     /**
      * Secondary text — metadata, supporting lines.

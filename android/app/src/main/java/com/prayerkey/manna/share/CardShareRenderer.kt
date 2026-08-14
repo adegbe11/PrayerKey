@@ -3,6 +3,7 @@ package com.prayerkey.manna.share
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
@@ -10,6 +11,10 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Shader
 import android.graphics.Typeface
+import android.content.ContentValues
+import android.provider.MediaStore
+import android.os.Environment
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.prayerkey.manna.data.PrayerTopic
 import com.prayerkey.manna.model.VerseCard
@@ -22,6 +27,143 @@ object CardShareRenderer {
     private val GOLD = Color.rgb(176, 124, 31)
     private val PAPER = Color.rgb(255, 252, 244)
     private val MUTED = Color.rgb(90, 90, 94)
+
+    /** A portrait PrayerKey keepsake sized for WhatsApp/Instagram status. */
+    fun shareStatus(context: Context, card: VerseCard) {
+        send(context, brandedStatus(context, card), "${card.reference}\n\n${card.verse}\n\n— PrayerKey", "Share verse image")
+    }
+
+    fun saveStatus(context: Context, card: VerseCard) {
+        val bitmap = brandedStatus(context, card)
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "PrayerKey-${card.reference.replace(Regex("[^A-Za-z0-9]+"), "-")}-${System.currentTimeMillis()}.png")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/PrayerKey")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        if (uri != null) {
+            context.contentResolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 96, it) }
+            values.clear(); values.put(MediaStore.Images.Media.IS_PENDING, 0)
+            context.contentResolver.update(uri, values, null, null)
+            Toast.makeText(context, "Saved to Pictures / PrayerKey", Toast.LENGTH_SHORT).show()
+        } else Toast.makeText(context, "Could not save image", Toast.LENGTH_SHORT).show()
+        bitmap.recycle()
+    }
+
+    fun sharePrayerStatus(context: Context, prayer: String) {
+        send(context, prayerStatus(context, prayer), "$prayer\n\n— PrayerKey", "Share today's prayer")
+    }
+
+    fun savePrayerStatus(context: Context, prayer: String) {
+        val bitmap = prayerStatus(context, prayer)
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "PrayerKey-prayer-${System.currentTimeMillis()}.png")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/PrayerKey")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        if (uri != null) {
+            context.contentResolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 96, it) }
+            values.clear(); values.put(MediaStore.Images.Media.IS_PENDING, 0)
+            context.contentResolver.update(uri, values, null, null)
+            Toast.makeText(context, "Prayer image saved", Toast.LENGTH_SHORT).show()
+        }
+        bitmap.recycle()
+    }
+
+    fun shareClosingVerse(context: Context, verse: String, reference: String) {
+        send(context, closingVerseStatus(context, verse, reference), "$reference\n\n$verse\n\n— PrayerKey", "Share closing verse")
+    }
+
+    fun saveClosingVerse(context: Context, verse: String, reference: String) {
+        val bitmap = closingVerseStatus(context, verse, reference)
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "PrayerKey-closing-verse-${System.currentTimeMillis()}.png")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/PrayerKey")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+        context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)?.let { uri ->
+            context.contentResolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.PNG, 96, it) }
+            values.clear(); values.put(MediaStore.Images.Media.IS_PENDING, 0)
+            context.contentResolver.update(uri, values, null, null)
+            Toast.makeText(context, "Closing verse saved", Toast.LENGTH_SHORT).show()
+        }
+        bitmap.recycle()
+    }
+
+    private fun closingVerseStatus(context: Context, verse: String, reference: String): Bitmap {
+        val out = Bitmap.createBitmap(1080, 1920, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(out)
+        val art = BitmapFactory.decodeResource(context.resources, com.prayerkey.manna.R.drawable.closing_verse_violet)
+        canvas.drawBitmap(art, null, android.graphics.Rect(0, 0, 1080, 1920), Paint(Paint.ANTI_ALIAS_FLAG)); art.recycle()
+        val shade = Paint().apply { shader = LinearGradient(0f, 450f, 0f, 1780f, Color.TRANSPARENT, Color.argb(230, 26, 10, 46), Shader.TileMode.CLAMP) }
+        canvas.drawRect(0f, 0f, 1080f, 1920f, shade)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
+        paint.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD); paint.color = Color.rgb(239, 213, 168); paint.textSize = 25f; paint.letterSpacing = .18f
+        canvas.drawText("A WORD TO CARRY", 540f, 990f, paint); paint.letterSpacing = 0f
+        paint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD); paint.color = Color.WHITE
+        val fitted = fit(paint, "“$verse”", 820f, 520f, 58f, 38f)
+        drawLines(canvas, paint, fitted.lines, 540f, 1110f, fitted.leading)
+        paint.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD); paint.color = Color.rgb(239, 213, 168); paint.textSize = 25f; paint.letterSpacing = .16f
+        canvas.drawText(reference.uppercase(), 540f, 1530f, paint)
+        canvas.drawText("PRAYERKEY", 540f, 1710f, paint)
+        return out
+    }
+
+    private fun prayerStatus(context: Context, prayer: String): Bitmap {
+        val out = Bitmap.createBitmap(1080, 1920, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(out)
+        val art = BitmapFactory.decodeResource(context.resources, com.prayerkey.manna.R.drawable.today_prayer_violet)
+        canvas.drawBitmap(art, null, android.graphics.Rect(0, 0, 1080, 1920), Paint(Paint.ANTI_ALIAS_FLAG))
+        art.recycle()
+        val shade = Paint().apply { shader = LinearGradient(0f, 220f, 0f, 1680f, Color.argb(55, 26, 10, 46), Color.argb(190, 26, 10, 46), Shader.TileMode.CLAMP) }
+        canvas.drawRect(0f, 0f, 1080f, 1920f, shade)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
+        paint.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD); paint.color = Color.rgb(239, 213, 168); paint.textSize = 26f; paint.letterSpacing = .2f
+        canvas.drawText("TODAY'S PRAYER", 540f, 365f, paint); paint.letterSpacing = 0f
+        paint.typeface = Typeface.create(Typeface.SERIF, Typeface.ITALIC); paint.color = Color.WHITE
+        val fitted = fit(paint, prayer, 820f, 800f, 50f, 32f)
+        val height = (fitted.lines.size - 1) * fitted.leading + paint.textSize
+        drawLines(canvas, paint, fitted.lines, 540f, 980f - height / 2f, fitted.leading)
+        paint.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD); paint.color = Color.rgb(239, 213, 168); paint.textSize = 24f; paint.letterSpacing = .16f
+        canvas.drawText("PRAYERKEY", 540f, 1580f, paint)
+        return out
+    }
+
+    private fun brandedStatus(context: Context, card: VerseCard): Bitmap {
+        val out = Bitmap.createBitmap(1080, 1920, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(out)
+        val art = BitmapFactory.decodeResource(context.resources, com.prayerkey.manna.R.drawable.verse_card_oxblood)
+        val scale = maxOf(1080f / art.width, 1920f / art.height)
+        val left = (1080f - art.width * scale) / 2f
+        canvas.drawBitmap(art, null, android.graphics.RectF(left, 0f, left + art.width * scale, art.height * scale), Paint(Paint.ANTI_ALIAS_FLAG))
+        art.recycle()
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
+        val violet = Color.rgb(98, 0, 237)
+        val goldDeep = Color.rgb(111, 85, 40)
+        paint.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
+        paint.color = goldDeep; paint.textSize = 25f; paint.letterSpacing = .20f
+        canvas.drawText("VERSE OF THE DAY", 540f, 535f, paint)
+        paint.letterSpacing = 0f
+        paint.typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
+        paint.color = violet; paint.textSize = 64f
+        canvas.drawText(card.reference.uppercase(), 540f, 650f, paint)
+        paint.color = Color.rgb(201, 162, 109); paint.strokeWidth = 3f
+        canvas.drawLine(415f, 704f, 665f, 704f, paint)
+        paint.typeface = Typeface.create(Typeface.SERIF, Typeface.NORMAL)
+        paint.color = Color.rgb(26, 10, 46)
+        val verse = fit(paint, "“${card.verse}”", 700f, 520f, 52f, 34f)
+        val blockHeight = (verse.lines.size - 1) * verse.leading + paint.textSize
+        drawLines(canvas, paint, verse.lines, 540f, 930f - blockHeight / 2f, verse.leading)
+        paint.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
+        paint.color = goldDeep; paint.textSize = 24f; paint.letterSpacing = .16f
+        canvas.drawText("PRAYERKEY", 540f, 1460f, paint)
+        return out
+    }
 
     fun share(context: Context, card: VerseCard) {
         val bitmap = Bitmap.createBitmap(1080, 1350, Bitmap.Config.ARGB_8888)

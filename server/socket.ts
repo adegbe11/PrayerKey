@@ -57,6 +57,7 @@ interface ServiceState {
   attendees:           Set<string>;
   streamers:           Map<string, DeepgramStreamer>;
   translationBySocket: Map<string, string>;   // per-socket translation preference
+  languageBySocket:    Map<string, string>;
 }
 
 const serviceState = new Map<string, ServiceState>();
@@ -70,6 +71,7 @@ function getOrCreateState(serviceId: string): ServiceState {
       attendees:           new Set(),
       streamers:           new Map(),
       translationBySocket: new Map(),
+      languageBySocket:    new Map(),
     });
   }
   return serviceState.get(serviceId)!;
@@ -116,6 +118,11 @@ io.on("connection", (socket: Socket<ClientToServerEvents, ServerToClientEvents>)
     }
   });
 
+  socket.on("service:language", (language, serviceId) => {
+    const state = getOrCreateState(serviceId);
+    state.languageBySocket.set(socket.id, language || "en-US");
+  });
+
   // ── Receive raw audio chunk from microphone ──────────────────────
   socket.on("audio:chunk", async (chunk) => {
     const rooms = [...socket.rooms].filter((r) => r.startsWith("service:"));
@@ -130,6 +137,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents, ServerToClientEvents>)
 
       const streamer = new DeepgramStreamer({
         translation,
+        language: state.languageBySocket.get(socket.id) ?? "en-US",
 
         onVerse: async (payload: VerseDetectedPayload, isSuggestion: boolean) => {
           const state = getOrCreateState(serviceId);
@@ -211,6 +219,7 @@ io.on("connection", (socket: Socket<ClientToServerEvents, ServerToClientEvents>)
     for (const [serviceId, state] of serviceState.entries()) {
       state.attendees.delete(socket.id);
       state.translationBySocket.delete(socket.id);
+      state.languageBySocket.delete(socket.id);
       const streamer = state.streamers.get(socket.id);
       if (streamer) {
         streamer.disconnect();

@@ -39,6 +39,7 @@ export class DeepgramStreamer {
   private translation: string;
   private onVerse: OnVerseDetected;
   private onTranscript: OnTranscript;
+  private language: string;
   private buffer: string[] = [];
   private detectionInProgress = false;
 
@@ -46,10 +47,12 @@ export class DeepgramStreamer {
     translation:  string;
     onVerse:      OnVerseDetected;
     onTranscript: OnTranscript;
+    language?:     string;
   }) {
     this.translation  = opts.translation;
     this.onVerse      = opts.onVerse;
     this.onTranscript = opts.onTranscript;
+    this.language     = opts.language || "en-US";
   }
 
   async connect() {
@@ -61,7 +64,12 @@ export class DeepgramStreamer {
       smart_format:    "true",
       punctuate:       "true",
       interim_results: "true",
-      language:        "en-US",
+      language:        this.language,
+      encoding:        "linear16",
+      sample_rate:     "16000",
+      channels:        "1",
+      endpointing:     "600",
+      utterance_end_ms:"1200",
       Authorization:   process.env.DEEPGRAM_API_KEY ?? "",
     }) as LiveSocket;
 

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -35,6 +36,8 @@ import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -71,6 +74,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.Challenge
 import com.prayerkey.manna.data.Devotion
+import com.prayerkey.manna.data.OfflineBible
+import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.GiltLine
 import com.prayerkey.manna.ui.theme.Ink
@@ -107,17 +112,21 @@ fun AwardHomeDashboard(
     onToggleChallenge: (Challenge) -> Unit,
     onSettings: () -> Unit,
 ) {
-    ExactDailyHome(
+    PrayerKeyOperatingHome(
+        streak = streak,
+        savedCount = savedCount,
+        journalCount = journalCount,
+        sermonCount = sermonCount,
         devotion = devotion,
         bible = bible,
         prayer = prayer,
-        activeDays = activeDays,
         onOpenWord = onOpenWord,
         onWriteDevotion = onWriteDevotion,
         onOpenBible = onOpenBible,
         onOpenPrayer = onOpenPrayer,
         onOpenJournal = onOpenJournal,
         onOpenChurch = onOpenChurch,
+        onSettings = onSettings,
     )
 }
 
@@ -133,9 +142,11 @@ private fun ExactDailyHome(
     onOpenPrayer: () -> Unit,
     onOpenJournal: () -> Unit,
     onOpenChurch: () -> Unit,
+    onSettings: () -> Unit,
 ) {
     val cs = MaterialTheme.colorScheme
-    val today = LocalDate.now()
+    var dayOffset by rememberSaveable { mutableIntStateOf(0) }
+    val today = LocalDate.now().plusDays(dayOffset.toLong())
     val context = LocalContext.current
     val journeyPrefs = remember { context.getSharedPreferences("daily_journey", android.content.Context.MODE_PRIVATE) }
     val journeyKey = remember(today) { "step_$today" }
@@ -155,6 +166,19 @@ private fun ExactDailyHome(
     val dailyDevotional = remember(today) { com.prayerkey.manna.data.devotionalFor(today) }
     val dailyPrayer = remember(today) { com.prayerkey.manna.data.dailyPrayerFor(today) }
     val dailyQuote = remember(today) { com.prayerkey.manna.data.quoteFor(today) }
+    var dailyVerseText by remember(today) { mutableStateOf("") }
+    LaunchedEffect(today, dailyPassage) {
+        dailyVerseText = OfflineBible(context).chapter(dailyPassage.book, dailyPassage.chapter)
+            .firstOrNull { it.verse == dailyPassage.firstVerse }?.text.orEmpty()
+    }
+    val dailyVerseArtwork = remember(today) {
+        val cards = intArrayOf(
+            R.drawable.verse_card_botanical,
+            R.drawable.verse_card_dawn,
+            R.drawable.verse_card_oxblood,
+        )
+        cards[Math.floorMod(today.toEpochDay().toInt(), cards.size)]
+    }
     if (quoteOpen) {
         QuoteCinema(
             quote = dailyQuote.text,
@@ -195,67 +219,228 @@ private fun ExactDailyHome(
         Modifier.fillMaxSize().background(cs.background).verticalScroll(rememberScrollState())
             .padding(bottom = 112.dp),
     ) {
-        Column(
-            Modifier.fillMaxWidth().background(Ink)
-                .drawBehind { drawLine(GiltLine, start = Offset(0f, size.height - 1f), end = Offset(size.width, size.height - 1f), strokeWidth = 1f) }
-                .padding(horizontal = 24.dp, vertical = 18.dp),
+        Row(
+            Modifier.fillMaxWidth().background(com.prayerkey.manna.ui.theme.Pk.Cream)
+                .statusBarsPadding().padding(horizontal = 20.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("PRAYERKEY", color = Ivory, fontFamily = DisplaySerif, fontSize = 24.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp, modifier = Modifier.weight(1f))
-                Text("TODAY", color = Ivory.copy(alpha = .60f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.sp)
-            }
-            Row(
-                Modifier.fillMaxWidth().padding(top = 20.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+            Text(
+                "PRAYERKEY",
+                color = com.prayerkey.manna.ui.theme.Pk.Charcoal,
+                fontFamily = DisplaySerif,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.1.sp,
+                modifier = Modifier.weight(1f),
+            )
+            Box(
+                Modifier.clip(RoundedCornerShape(10.dp))
+                    .background(com.prayerkey.manna.ui.theme.Pk.Oxblood)
+                    .clickable {
+                        runCatching {
+                            context.startActivity(
+                                android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse("https://www.prayerkey.com/donate"),
+                                ),
+                            )
+                        }
+                    }.padding(horizontal = 13.dp, vertical = 10.dp),
             ) {
-                (6 downTo 0).forEach { back ->
-                    val day = today.minusDays(back.toLong())
-                    val selected = day == today
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(day.dayOfWeek.name.take(1), color = if (selected) Ivory else Ivory.copy(alpha = .60f), fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Medium)
-                        Box(Modifier.padding(top = 7.dp).width(28.dp).height(if (selected) 2.dp else 1.dp).background(if (selected) cs.primary else Color.Transparent))
-                    }
-                }
+                Text("DONATE", color = Ivory, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = .8.sp)
+            }
+            Icon(
+                Icons.Outlined.Search,
+                "Search Bible",
+                tint = com.prayerkey.manna.ui.theme.Pk.Charcoal,
+                modifier = Modifier.padding(start = 15.dp).size(25.dp).clickable(onClick = onOpenBible),
+            )
+            Icon(
+                Icons.Outlined.Menu,
+                "Open menu",
+                tint = com.prayerkey.manna.ui.theme.Pk.Charcoal,
+                modifier = Modifier.padding(start = 16.dp).size(27.dp).clickable(onClick = onSettings),
+            )
+        }
+
+        Box(
+            Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp)
+                .height(176.dp).clip(RoundedCornerShape(12.dp)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painter = painterResource(R.drawable.today_manuscript_hero),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+            Box(Modifier.fillMaxSize().background(com.prayerkey.manna.ui.theme.Pk.Charcoal.copy(alpha = .24f)))
+            Text(
+                "Today",
+                color = Ivory,
+                fontFamily = UtilitySans,
+                fontSize = 68.sp,
+                lineHeight = 70.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-2).sp,
+            )
+        }
+
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 18.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(com.prayerkey.manna.ui.theme.Pk.Sunken)
+                .padding(horizontal = 18.dp, vertical = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                "←",
+                color = com.prayerkey.manna.ui.theme.Pk.Muted,
+                fontFamily = UtilitySans,
+                fontSize = 24.sp,
+                modifier = Modifier.clickable { dayOffset-- }.padding(8.dp),
+            )
+            Text(
+                today.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, MMMM d, uuuu")),
+                color = com.prayerkey.manna.ui.theme.Pk.Charcoal,
+                fontFamily = UtilitySans,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                "→",
+                color = com.prayerkey.manna.ui.theme.Pk.Muted,
+                fontFamily = UtilitySans,
+                fontSize = 24.sp,
+                modifier = Modifier.clickable { dayOffset++ }.padding(8.dp),
+            )
+        }
+
+        Text(
+            "BIBLE VERSE OF THE DAY",
+            color = com.prayerkey.manna.ui.theme.Pk.Muted,
+            fontFamily = UtilitySans,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.5.sp,
+            modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 12.dp),
+        )
+        Box(
+            Modifier.fillMaxWidth().padding(horizontal = 18.dp)
+                .height(390.dp).clip(RoundedCornerShape(18.dp))
+                .clickable { passageOpen = true },
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painter = painterResource(dailyVerseArtwork),
+                contentDescription = "${dailyPassage.reference}, Bible verse of the day",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+            Column(
+                Modifier.fillMaxSize().padding(horizontal = 52.dp, vertical = 82.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    if (dailyVerseText.isBlank()) "Loading today’s word…" else "“$dailyVerseText”",
+                    color = com.prayerkey.manna.ui.theme.Pk.Charcoal,
+                    fontFamily = BookSerif,
+                    fontSize = when {
+                        dailyVerseText.length > 190 -> 18.sp
+                        dailyVerseText.length > 120 -> 20.sp
+                        else -> 23.sp
+                    },
+                    lineHeight = when {
+                        dailyVerseText.length > 190 -> 25.sp
+                        dailyVerseText.length > 120 -> 28.sp
+                        else -> 32.sp
+                    },
+                    fontWeight = FontWeight.Medium,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                )
+                Box(
+                    Modifier.padding(top = 18.dp, bottom = 13.dp).width(52.dp).height(1.dp)
+                        .background(com.prayerkey.manna.ui.theme.Pk.Gold),
+                )
+                Text(
+                    "${dailyPassage.book} ${dailyPassage.chapter}:${dailyPassage.firstVerse}",
+                    color = com.prayerkey.manna.ui.theme.Pk.Oxblood,
+                    fontFamily = UtilitySans,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.2.sp,
+                )
             }
         }
-        Text(
-            "VIEW CALENDAR & SAVED",
-            color = cs.onBackground.copy(alpha = .55f), fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.2.sp,
-            modifier = Modifier.padding(horizontal = 24.dp, vertical = 22.dp).clickable(onClick = onOpenJournal),
-        )
 
         Column(
             Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp))
-                .background(cs.surface)
-                .padding(horizontal = 24.dp, vertical = 28.dp),
+                .padding(horizontal = 18.dp, vertical = 22.dp),
         ) {
-            Text(
-                today.format(java.time.format.DateTimeFormatter.ofPattern("d MMM uuuu")).uppercase(),
-                color = cs.onSurface.copy(alpha = .55f), fontFamily = UtilitySans, fontSize = 14.sp, fontWeight = FontWeight.Normal,
-            )
-            Text(
-                dailyPassage.title,
-                color = cs.onSurface, fontFamily = DisplaySerif, fontSize = 32.sp, lineHeight = 36.sp, fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(top = 10.dp),
-            )
-            Row(Modifier.fillMaxWidth().padding(top = 28.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("DAILY DEVOTIONAL", color = cs.onSurface.copy(alpha = .55f), fontFamily = UtilitySans, fontSize = 12.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.2.sp, modifier = Modifier.weight(1f))
-                Box(
-                    Modifier.size(48.dp).clip(CircleShape)
-                        .background(cs.primaryContainer.copy(alpha = .55f))
-                        .clickable(onClick = onWriteDevotion),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(Icons.Outlined.BookmarkBorder, "Save today", tint = cs.primary, modifier = Modifier.size(25.dp))
+            Column(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
+                    .background(com.prayerkey.manna.ui.theme.Pk.Sunken)
+                    .border(1.dp, com.prayerkey.manna.ui.theme.Pk.Hair, RoundedCornerShape(20.dp))
+                    .padding(20.dp),
+            ) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            "TODAY’S DEVOTION",
+                            color = com.prayerkey.manna.ui.theme.Pk.Oxblood,
+                            fontFamily = UtilitySans,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.4.sp,
+                        )
+                        Text(
+                            dailyPassage.title,
+                            color = cs.onSurface,
+                            fontFamily = DisplaySerif,
+                            fontSize = 30.sp,
+                            lineHeight = 34.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
+                        Text(
+                            dailyPassage.reference.uppercase(),
+                            color = com.prayerkey.manna.ui.theme.Pk.Muted,
+                            fontFamily = UtilitySans,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            letterSpacing = .8.sp,
+                            modifier = Modifier.padding(top = 10.dp),
+                        )
+                    }
+                    Box(
+                        Modifier.size(48.dp).clip(CircleShape)
+                            .background(com.prayerkey.manna.ui.theme.Pk.Blush.copy(alpha = .45f))
+                            .clickable(onClick = onWriteDevotion),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(Icons.Outlined.BookmarkBorder, "Save today", tint = cs.primary, modifier = Modifier.size(24.dp))
+                    }
                 }
             }
+
+            Text(
+                "DAILY JOURNEY",
+                color = com.prayerkey.manna.ui.theme.Pk.Muted,
+                fontFamily = UtilitySans,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.4.sp,
+                modifier = Modifier.padding(top = 26.dp, bottom = 12.dp),
+            )
 
             Column(
                 Modifier.fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFF2EBE0))
-                    .border(1.dp, Color(0x1712161F), RoundedCornerShape(16.dp))
+                    .background(com.prayerkey.manna.ui.theme.Pk.Sunken)
+                    .border(1.dp, com.prayerkey.manna.ui.theme.Pk.Hair, RoundedCornerShape(16.dp))
                     .padding(20.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -285,8 +470,8 @@ private fun ExactDailyHome(
             Column(
                 Modifier.fillMaxWidth().padding(top = 14.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFF2EBE0))
-                    .border(1.dp, Color(0x1712161F), RoundedCornerShape(16.dp)),
+                    .background(com.prayerkey.manna.ui.theme.Pk.Sunken)
+                    .border(1.dp, com.prayerkey.manna.ui.theme.Pk.Hair, RoundedCornerShape(16.dp)),
             ) {
                 DailyJourneyRow(Icons.Outlined.MenuBook, "Passage", "3 MIN", active = journeyStep == 1, done = journeyStep > 1, showRule = true) { passageOpen = true }
                 DailyJourneyRow(Icons.Outlined.EditNote, "Devotional", "4 MIN", active = journeyStep == 2, done = journeyStep > 2, showRule = true) { devotionalOpen = true }
@@ -450,17 +635,36 @@ private fun DevotionalRow(
 ) {
     val cs = MaterialTheme.colorScheme
     Row(
-        Modifier.fillMaxWidth().padding(top = 10.dp).height(62.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFFF2EBE0))
-            .border(1.dp, Color(0x1712161F), RoundedCornerShape(14.dp))
-            .clickable(onClick = onClick).padding(horizontal = 16.dp),
+        Modifier.fillMaxWidth().padding(top = 10.dp).height(72.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(com.prayerkey.manna.ui.theme.Pk.Sunken)
+            .border(1.dp, com.prayerkey.manna.ui.theme.Pk.Hair, RoundedCornerShape(18.dp))
+            .clickable(onClick = onClick).padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val timed = trailing.contains("MIN")
-        Icon(icon, null, tint = cs.onSurface.copy(alpha = .80f), modifier = Modifier.size(21.dp))
-        Text(title, color = cs.onSurface, fontFamily = UtilitySans, fontSize = if (timed) 12.sp else 14.sp, fontWeight = if (timed) FontWeight.Normal else FontWeight.Medium, modifier = Modifier.weight(1f).padding(start = 13.dp))
-        Text(trailing, color = if (timed) cs.onSurface.copy(alpha = .55f) else cs.primary, fontFamily = UtilitySans, fontSize = if (timed) 12.sp else 11.sp, fontWeight = if (timed) FontWeight.Normal else FontWeight.Bold, letterSpacing = if (timed) 0.sp else .5.sp)
+        Box(
+            Modifier.size(42.dp).clip(CircleShape)
+                .background(com.prayerkey.manna.ui.theme.Pk.Blush.copy(alpha = .38f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, null, tint = com.prayerkey.manna.ui.theme.Pk.Oxblood, modifier = Modifier.size(20.dp))
+        }
+        Text(title, color = cs.onSurface, fontFamily = UtilitySans, fontSize = if (timed) 13.sp else 15.sp, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f).padding(start = 13.dp))
+        Box(
+            Modifier.clip(RoundedCornerShape(99.dp))
+                .background(if (done) com.prayerkey.manna.ui.theme.Pk.Sage else com.prayerkey.manna.ui.theme.Pk.Blush.copy(alpha = .55f))
+                .padding(horizontal = 11.dp, vertical = 7.dp),
+        ) {
+            Text(
+                if (done) "DONE" else trailing,
+                color = if (done) com.prayerkey.manna.ui.theme.Pk.Cream else com.prayerkey.manna.ui.theme.Pk.Oxblood,
+                fontFamily = UtilitySans,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = .6.sp,
+            )
+        }
     }
 }
 

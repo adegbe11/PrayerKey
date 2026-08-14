@@ -143,7 +143,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun markChallengeDay(id: String, day: Int, done: Boolean) {
         val current = _challengeDays.value[id].orEmpty().toMutableSet()
-        if (done) current.add(day) else current.remove(day)
+        val next = (0..day).firstOrNull { it !in current } ?: (day + 1)
+        // Lessons unlock in order. A completed history can only be rolled
+        // back from its most recent lesson, never punched full of holes.
+        if (done && day == next) current.add(day)
+        else if (!done && day == current.maxOrNull()) current.remove(day)
+        else return
         _challengeDays.value = _challengeDays.value + (id to current)
         io { store.setChallengeDay(id, day, done) }
     }

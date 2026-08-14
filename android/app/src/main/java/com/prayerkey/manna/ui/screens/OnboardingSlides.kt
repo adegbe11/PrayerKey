@@ -96,14 +96,11 @@ private fun heavy(vararg parts: Pair<String, Boolean>): AnnotatedString = buildA
 @Composable
 fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: (Int) -> Unit) {
     val stories = listOf(
-        com.prayerkey.manna.R.drawable.onboarding_bible to
-            "Start every morning with one Bible verse.",
-        com.prayerkey.manna.R.drawable.onboarding_prayer to
-            "Tell God what you’re facing. Find a prayer for it.",
-        com.prayerkey.manna.R.drawable.onboarding_church to
-            "Record the sermon. Manna writes the notes.",
-        com.prayerkey.manna.R.drawable.onboarding_journal to
-            "Keep your prayers, answers and growth in one private journal.",
+        Triple(com.prayerkey.manna.R.drawable.onboarding_read_v2, "Read the Bible", "Read any book, chapter, or verse."),
+        Triple(com.prayerkey.manna.R.drawable.onboarding_audio_v2, "Listen to the Bible", "Hear Scripture wherever you are."),
+        Triple(com.prayerkey.manna.R.drawable.onboarding_pray_v2, "Pray Every Day", "Use daily prayers and powerful prayer points."),
+        Triple(com.prayerkey.manna.R.drawable.onboarding_church, "Record Church Messages", "See sermons turn into clear notes as they are preached."),
+        Triple(com.prayerkey.manna.R.drawable.onboarding_journal, "Keep Your Journal", "Save prayers, thoughts, sermon notes, and answered prayers."),
     )
 
     Column(
@@ -136,19 +133,26 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
         },
         label = "onboarding-promise",
     ) { page ->
-            val (world, message) = stories[page]
+            val (world, title, message) = stories[page]
             Column(Modifier.fillMaxSize()) {
                 Box(Modifier.fillMaxWidth().weight(1f)) {
                     EditorialOnboardingImage(world)
                 }
                 Text(
-                    message,
+                    title,
                     color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 31.sp,
-                    lineHeight = 38.sp,
+                    fontSize = 29.sp,
+                    lineHeight = 35.sp,
                     letterSpacing = (-.7).sp,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 22.dp),
+                )
+                Text(
+                    message,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = .72f),
+                    fontSize = 16.sp,
+                    lineHeight = 23.sp,
+                    modifier = Modifier.padding(top = 8.dp),
                 )
             }
         }
@@ -162,7 +166,7 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
                     .clickable(onClick = onDone),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("Continue", color = MaterialTheme.colorScheme.onPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text("Start PrayerKey", color = MaterialTheme.colorScheme.onPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         }
         if (step != stories.lastIndex) Spacer(Modifier.height(56.dp))

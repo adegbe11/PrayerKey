@@ -23,18 +23,24 @@ class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         val manager = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createNotificationChannel(NotificationChannel(CHANNEL, "Daily word", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = "A quiet reminder to receive today's word"
+            manager.createNotificationChannel(NotificationChannel(CHANNEL, "Prayer and challenge reminders", NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = "Daily reminders for prayer, fasting and active challenges"
             })
         }
         val open = PendingIntent.getActivity(context, 2, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val quote = quoteFor(LocalDate.now())
+        val messages = listOf(
+            "Your prayer time is ready. Bring today's need before God.",
+            "Do not lose your prayer streak. Complete today's guided prayer.",
+            "One faithful day at a time. Your PrayerKey challenge is waiting.",
+            "Pause, pray and record what God places on your heart.",
+        )
+        val message = messages[LocalDate.now().dayOfYear % messages.size]
         val notification = NotificationCompat.Builder(context, CHANNEL)
             .setSmallIcon(R.drawable.ic_notification)
-            .setColor(0xFF2F73EA.toInt())
-            .setContentTitle("A new day with God")
-            .setContentText(quote.text)
-            .setStyle(NotificationCompat.BigTextStyle().bigText("${quote.text} — ${quote.author}"))
+            .setColor(0xFF6200ED.toInt())
+            .setContentTitle("It is time to pray")
+            .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setContentIntent(open).setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)

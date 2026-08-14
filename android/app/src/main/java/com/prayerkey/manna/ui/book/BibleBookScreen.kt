@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -86,7 +87,7 @@ private val Page = Color(0xFFF6EFDC)
 private val PageEdge = Color(0xFFE6D9B6)
 private val Gild = Color(0xFF5D91F2)
 private val BookInk = Color(0xFF221C12)
-private val Rubric = Color(0xFF8E2F24)
+private val Rubric = Color(0xFF4A0E17)
 private val Ribbon = Color(0xFF8C1F2B)
 
 /**
@@ -187,6 +188,7 @@ fun BibleBookScreen(
                         fontFamily = BookSerif,
                         fontSize = textSize.sp,
                         lineHeight = (textSize * 1.52f).sp,
+                        fontWeight = FontWeight.SemiBold,
                         color = BookInk,
                         textAlign = TextAlign.Justify,
                     )
@@ -534,12 +536,15 @@ fun BibleBookScreen(
            rather than on leather, so it takes ink and needs no scrim — the
            dark band existed only to lift gold chrome off gold filigree. */
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(top = 14.dp)
+            // statusBarsPadding, or the row sits under the clock and battery —
+            // it was drawn at a fixed 14dp from the top of the window
+            Modifier.fillMaxWidth().statusBarsPadding()
+                .padding(horizontal = 22.dp).padding(top = 10.dp)
                 .graphicsLayer { alpha = cover.value },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                "Manna", color = BookInk.copy(alpha = .55f), fontFamily = BookSerif,
+                "PrayerKey", color = BookInk.copy(alpha = .55f), fontFamily = BookSerif,
                 fontSize = 17.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp,
                 modifier = Modifier.weight(1f),
             )
@@ -590,7 +595,7 @@ fun BibleBookScreen(
         // drawn last, or the book paints over it
         if (sizeOpen) {
             Row(
-                Modifier.align(Alignment.TopEnd).padding(top = 52.dp, end = 20.dp)
+                Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 52.dp, end = 20.dp)
                     .clip(RoundedCornerShape(14.dp))
                     .background(Color(0xFF1E1207))
                     .border(1.dp, Gild.copy(alpha = .35f), RoundedCornerShape(14.dp))
@@ -655,8 +660,8 @@ private fun chapterText(verses: List<BibleVerse>): ChapterText {
             starts += verse.verse to length
             withStyle(
                 SpanStyle(
-                    color = Rubric, fontSize = 9.sp,
-                    baselineShift = BaselineShift.Superscript, fontWeight = FontWeight.SemiBold,
+                    color = Rubric, fontSize = 10.sp,
+                    baselineShift = BaselineShift.Superscript, fontWeight = FontWeight.Bold,
                 ),
             ) { append("${verse.verse}") }
             append(" ")
@@ -665,12 +670,25 @@ private fun chapterText(verses: List<BibleVerse>): ChapterText {
                ranges from the parser rather than braces in the text. */
             val body = verse.text
             var cursor = 0
+            if (index == 0 && body.isNotEmpty()) {
+                withStyle(
+                    SpanStyle(
+                        color = BookInk,
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
+                        baselineShift = BaselineShift(-0.16f),
+                    ),
+                ) { append(body.substring(0, 1)) }
+                cursor = 1
+            }
             verse.supplied.sortedBy { it.first }.forEach { range ->
-                val from = range.first.coerceIn(0, body.length)
+                val from = range.first.coerceIn(cursor, body.length)
                 val to = (range.last + 1).coerceIn(from, body.length)
                 if (from > cursor) append(body.substring(cursor, from))
-                withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                    append(body.substring(from, to))
+                if (to > cursor) {
+                    withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
+                        append(body.substring(from, to))
+                    }
                 }
                 cursor = to
             }
@@ -726,9 +744,15 @@ private fun Leaf(
                 ),
         )
 
-        Column(Modifier.fillMaxSize().padding(start = 26.dp, end = 22.dp)) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().padding(start = 26.dp, end = 22.dp)) {
             Row(
-                Modifier.fillMaxWidth().padding(top = 58.dp, bottom = 8.dp),
+                /* 58dp assumed the header row sat flush against the top of the
+                   window. It now insets for the status bar itself, so GENESIS
+                   was landing under PrayerKey. Its own statusBarsPadding above
+                   accounts for the bar; this only has to clear the floating
+                   header row (bookmark circle at 34dp, plus its own 10dp top
+                   padding). */
+                Modifier.fillMaxWidth().padding(top = 48.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
@@ -776,7 +800,8 @@ private fun Leaf(
                 "$folio",
                 color = Color(0xFF785F2D).copy(alpha = .7f), fontFamily = BookSerif,
                 fontSize = 10.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp, top = 6.dp),
+                // clears the floating nav — the folio was landing behind it
+                modifier = Modifier.fillMaxWidth().padding(bottom = 96.dp, top = 6.dp),
             )
         }
     }

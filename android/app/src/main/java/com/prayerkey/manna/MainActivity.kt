@@ -38,12 +38,12 @@ class MainActivity : ComponentActivity() {
             val resolvedTheme = resolveTheme(themeId, followSystem, isSystemInDarkTheme())
             SideEffect {
                 @Suppress("DEPRECATION")
-                window.statusBarColor = android.graphics.Color.rgb(18, 22, 31)
+                window.statusBarColor = android.graphics.Color.rgb(34, 34, 34)
                 @Suppress("DEPRECATION")
-                window.navigationBarColor = android.graphics.Color.rgb(18, 22, 31)
+                window.navigationBarColor = android.graphics.Color.rgb(34, 34, 34)
                 WindowCompat.getInsetsController(window, window.decorView).apply {
-                    isAppearanceLightStatusBars = true
-                    isAppearanceLightNavigationBars = true
+                    isAppearanceLightStatusBars = false
+                    isAppearanceLightNavigationBars = false
                 }
             }
 

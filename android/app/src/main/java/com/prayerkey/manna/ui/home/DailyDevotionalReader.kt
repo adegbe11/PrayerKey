@@ -4,22 +4,47 @@ import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Headphones
 import androidx.compose.material.icons.outlined.Stop
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -30,10 +55,12 @@ import com.prayerkey.manna.data.DailyPassage
 import com.prayerkey.manna.data.OfflineBible
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
-import com.prayerkey.manna.ui.theme.Ink
+import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
@@ -43,11 +70,20 @@ fun DailyDevotionalReader(
     onComplete: () -> Unit,
 ) {
     BackHandler(onBack = onComplete)
-    val cs = MaterialTheme.colorScheme
     val context = LocalContext.current
+    val scroll = rememberScrollState()
+    val today = remember { LocalDate.now() }
+    val date = remember(today) {
+        today.format(DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.getDefault())).uppercase(Locale.getDefault())
+    }
     var verses by remember(passage.reference) { mutableStateOf<List<BibleVerse>>(emptyList()) }
     var speechReady by remember { mutableStateOf(false) }
     var listening by remember { mutableStateOf(false) }
+    var saved by remember { mutableStateOf(false) }
+    var prayerAdded by remember { mutableStateOf(false) }
+    var reflection by remember { mutableStateOf("") }
+    var completed by remember { mutableStateOf(false) }
+
     val speaker = remember {
         TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS }
     }
@@ -56,7 +92,7 @@ fun DailyDevotionalReader(
         if (speechReady) {
             speaker.language = Locale.getDefault()
             speaker.setSpeechRate(.88f)
-            speaker.setPitch(.96f)
+            speaker.setPitch(.97f)
         }
     }
     LaunchedEffect(passage.reference) {
@@ -65,107 +101,257 @@ fun DailyDevotionalReader(
                 .filter { it.verse in passage.firstVerse..passage.lastVerse }
         }
     }
-    val scriptureText = verses.joinToString(" ") { "Verse ${it.verse}. ${it.text}" }
-    val spokenDevotional = remember(scriptureText, devotional) {
-        buildString {
-            append(devotional.title).append(". Scripture. ").append(scriptureText)
-            append(". Reflection. ").append(devotional.opening).append(' ')
-            append(devotional.reading.joinToString(" "))
-            append(". Prayer. ").append(devotional.prayer)
-            append(". Application. ").append(devotional.reflectionQuestion).append(' ')
-            append(devotional.practice)
-        }
+
+    val scripture = verses.joinToString(" ") { "${it.verse} ${it.text}" }
+    val spokenDevotional = remember(scripture, devotional) {
+        listOf(
+            devotional.title,
+            scripture,
+            devotional.opening,
+            devotional.reading.joinToString(" "),
+            devotional.prayer,
+            devotional.reflectionQuestion,
+        ).filter { it.isNotBlank() }.joinToString(". ")
     }
 
-    Column(Modifier.fillMaxSize().background(cs.surface)) {
-        Row(
-            Modifier.fillMaxWidth().background(Ink).padding(start = 18.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text("DAILY DEVOTIONAL", color = cs.surface.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
-                Text(passage.reference, color = cs.surface, fontFamily = UtilitySans, fontSize = 12.sp, modifier = Modifier.padding(top = 3.dp))
+    Box(Modifier.fillMaxSize().background(Pk.Cream)) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            Box(Modifier.fillMaxWidth().height(2.dp).background(Pk.Charcoal.copy(alpha = .06f))) {
+                val progress = if (scroll.maxValue == 0) 0f else scroll.value.toFloat() / scroll.maxValue
+                Box(Modifier.fillMaxWidth(progress).height(2.dp).background(Pk.Oxblood))
             }
-            IconButton(onClick = { speaker.stop(); listening = false; onComplete() }) {
-                Icon(Icons.Outlined.Close, "Close", tint = cs.surface)
-            }
-        }
-
-        Column(
-            Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 24.dp),
-        ) {
-            Text(devotional.title, color = cs.onSurface, fontFamily = DisplaySerif, fontSize = 34.sp, lineHeight = 40.sp, fontWeight = FontWeight.Bold)
-            Text("5–15 MINUTES · TODAY", color = cs.onSurface.copy(alpha = .52f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Medium, letterSpacing = 1.2.sp, modifier = Modifier.padding(top = 10.dp))
 
             Row(
-                Modifier.padding(top = 20.dp).height(48.dp).clip(RoundedCornerShape(16.dp))
-                    .background(if (listening) cs.onSurface.copy(alpha = .08f) else cs.primary)
-                    .clickable(enabled = speechReady && spokenDevotional.isNotBlank()) {
-                        if (listening) {
-                            speaker.stop(); listening = false
-                        } else {
-                            speaker.speak(spokenDevotional, TextToSpeech.QUEUE_FLUSH, null, "daily-devotional")
-                            listening = true
-                        }
-                    }.padding(horizontal = 18.dp),
+                Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(if (listening) Icons.Outlined.Stop else Icons.Outlined.Headphones, null, tint = if (listening) cs.onSurface else cs.onPrimary, modifier = Modifier.size(19.dp))
-                Text(if (listening) "  STOP LISTENING" else "  LISTEN", color = if (listening) cs.onSurface else cs.onPrimary, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = .7.sp)
-            }
-
-            SectionLabel("01", "SCRIPTURE", "THE ANCHOR")
-            Column(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(cs.background).padding(18.dp),
-            ) {
-                Text(passage.reference, color = cs.primary, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
-                if (verses.isEmpty()) {
-                    LinearProgressIndicator(color = cs.primary, trackColor = cs.onSurface.copy(alpha = .08f), modifier = Modifier.fillMaxWidth().padding(top = 18.dp).height(2.dp))
-                } else {
-                    verses.forEach { verse ->
-                        Text("${verse.verse}  ${verse.text}", color = cs.onSurface, fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 28.sp, modifier = Modifier.padding(top = 12.dp))
+                QuietIcon(onClick = { speaker.stop(); onComplete() }) {
+                    Icon(Icons.Outlined.ArrowBackIosNew, "Back", tint = Pk.Charcoal, modifier = Modifier.size(15.dp))
+                }
+                Text(
+                    "$date  ·  4 MIN",
+                    color = Pk.Charcoal.copy(alpha = .58f),
+                    fontFamily = UtilitySans,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 1.1.sp,
+                    modifier = Modifier.weight(1f).padding(start = 14.dp),
+                )
+                QuietIcon(onClick = {
+                    if (listening) {
+                        speaker.stop(); listening = false
+                    } else if (speechReady) {
+                        speaker.speak(spokenDevotional, TextToSpeech.QUEUE_FLUSH, null, "devotional")
+                        listening = true
                     }
+                }) {
+                    Icon(
+                        if (listening) Icons.Outlined.Stop else Icons.Outlined.Headphones,
+                        if (listening) "Stop listening" else "Listen",
+                        tint = if (listening) Pk.Oxblood else Pk.Charcoal,
+                        modifier = Modifier.size(17.dp),
+                    )
+                }
+                Spacer(Modifier.size(7.dp))
+                QuietIcon(onClick = { saved = !saved }) {
+                    Icon(
+                        Icons.Outlined.BookmarkBorder,
+                        if (saved) "Saved" else "Save",
+                        tint = if (saved) Pk.Oxblood else Pk.Charcoal,
+                        modifier = Modifier.size(17.dp),
+                    )
                 }
             }
 
-            SectionLabel("02", "REFLECTION", "THE INSIGHT")
-            Text(devotional.opening, color = cs.onSurface, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 30.sp, fontWeight = FontWeight.Medium)
-            devotional.reading.forEach { paragraph ->
-                Text(paragraph, color = cs.onSurface.copy(alpha = .86f), fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 28.sp, modifier = Modifier.padding(top = 18.dp))
-            }
+            Column(
+                Modifier.weight(1f).verticalScroll(scroll).padding(horizontal = 26.dp),
+            ) {
+                Text(
+                    "DAILY DEVOTIONAL",
+                    color = Pk.GoldDeep,
+                    fontFamily = UtilitySans,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 1.7.sp,
+                    modifier = Modifier.padding(top = 18.dp),
+                )
+                Text(
+                    devotional.title,
+                    color = Pk.Charcoal,
+                    fontFamily = DisplaySerif,
+                    fontSize = 39.sp,
+                    lineHeight = 42.sp,
+                    fontWeight = FontWeight.Normal,
+                    modifier = Modifier.padding(top = 13.dp),
+                )
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 22.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(date, color = Pk.Charcoal.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.sp)
+                    Box(Modifier.size(3.dp).clip(CircleShape).background(Pk.Charcoal.copy(alpha = .3f)))
+                    Text("4 MIN READ", color = Pk.Charcoal.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.sp)
+                }
+                HorizontalDivider(color = Pk.Charcoal.copy(alpha = .09f))
 
-            SectionLabel("03", "PRAYER", "THE RESPONSE")
-            Text("“${devotional.prayer}”", color = cs.onSurface, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 19.sp, lineHeight = 29.sp)
+                ScriptureCard(passage = passage, verses = verses)
 
-            SectionLabel("04", "APPLICATION", "THE TAKEAWAY")
-            Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(Ink).padding(20.dp)) {
-                Text(devotional.reflectionQuestion, color = cs.surface, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 19.sp, lineHeight = 27.sp)
-                HorizontalDivider(color = cs.surface.copy(alpha = .12f), modifier = Modifier.padding(vertical = 16.dp))
-                Text("MY ACTION TODAY", color = cs.primary, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
-                Text(devotional.practice, color = cs.surface.copy(alpha = .82f), fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 7.dp))
+                Text(
+                    devotional.opening,
+                    color = Pk.Charcoal,
+                    fontFamily = BookSerif,
+                    fontSize = 20.sp,
+                    lineHeight = 32.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(top = 30.dp),
+                )
+                devotional.reading.forEach { paragraph ->
+                    Text(
+                        paragraph,
+                        color = Pk.Charcoal.copy(alpha = .9f),
+                        fontFamily = BookSerif,
+                        fontSize = 19.sp,
+                        lineHeight = 32.sp,
+                        modifier = Modifier.padding(top = 20.dp),
+                    )
+                }
+
+                Box(
+                    Modifier.fillMaxWidth().padding(top = 34.dp).clip(RoundedCornerShape(24.dp))
+                        .background(Pk.Oxblood).padding(horizontal = 24.dp, vertical = 28.dp),
+                ) {
+                    Column {
+                        Text(
+                            devotional.declaration,
+                            color = Pk.Crisp,
+                            fontFamily = DisplaySerif,
+                            fontSize = 27.sp,
+                            lineHeight = 34.sp,
+                            fontWeight = FontWeight.Normal,
+                        )
+                        HorizontalDivider(color = Pk.GoldLight.copy(alpha = .32f), modifier = Modifier.padding(top = 20.dp, bottom = 14.dp))
+                        Text("KEEP THIS WITH YOU", color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.3.sp)
+                    }
+                }
+
+                Column(
+                    Modifier.fillMaxWidth().padding(top = 34.dp).clip(RoundedCornerShape(22.dp))
+                        .background(Pk.Sunken).padding(24.dp),
+                ) {
+                    EditorialLabel("PRAY IT")
+                    Text(
+                        devotional.prayer,
+                        color = Pk.Charcoal,
+                        fontFamily = BookSerif,
+                        fontSize = 20.sp,
+                        lineHeight = 31.sp,
+                        modifier = Modifier.padding(top = 14.dp),
+                    )
+                    Text("Amen.", color = Pk.Oxblood, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 20.sp, modifier = Modifier.padding(top = 6.dp))
+                    Box(
+                        Modifier.fillMaxWidth().padding(top = 20.dp).clip(RoundedCornerShape(16.dp))
+                            .background(if (prayerAdded) Pk.GoldWash else Pk.Oxblood.copy(alpha = .07f))
+                            .clickable { prayerAdded = true }.padding(vertical = 15.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            if (prayerAdded) "Added to my prayer list" else "Add this to my prayer list",
+                            color = if (prayerAdded) Pk.GoldDeep else Pk.Oxblood,
+                            fontFamily = UtilitySans,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
+
+                Column(Modifier.fillMaxWidth().padding(top = 34.dp)) {
+                    HorizontalDivider(color = Pk.Charcoal.copy(alpha = .09f))
+                    EditorialLabel("ONE QUESTION", Modifier.padding(top = 28.dp))
+                    Text(
+                        devotional.reflectionQuestion,
+                        color = Pk.Charcoal,
+                        fontFamily = DisplaySerif,
+                        fontSize = 27.sp,
+                        lineHeight = 34.sp,
+                        modifier = Modifier.padding(top = 14.dp),
+                    )
+                    BasicTextField(
+                        value = reflection,
+                        onValueChange = { reflection = it },
+                        textStyle = TextStyle(color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 27.sp),
+                        modifier = Modifier.fillMaxWidth().padding(top = 18.dp).height(112.dp)
+                            .clip(RoundedCornerShape(17.dp)).background(Pk.Sunken).padding(17.dp),
+                        decorationBox = { field ->
+                            Box {
+                                if (reflection.isBlank()) Text("A sentence is enough.", color = Pk.Charcoal.copy(alpha = .4f), fontFamily = BookSerif, fontSize = 18.sp)
+                                field()
+                            }
+                        },
+                    )
+                    Text("SAVED TO YOUR PRIVATE JOURNAL", color = Pk.Charcoal.copy(alpha = .52f), fontFamily = UtilitySans, fontSize = 8.sp, letterSpacing = 1.sp, modifier = Modifier.padding(top = 10.dp))
+                }
+
+                Box(
+                    Modifier.fillMaxWidth().padding(top = 36.dp).height(56.dp).clip(RoundedCornerShape(17.dp))
+                        .background(if (completed) Pk.GoldWash else Pk.Oxblood)
+                        .clickable {
+                            completed = true
+                            speaker.stop()
+                            listening = false
+                            onComplete()
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        if (completed) "Read today" else "Mark as read",
+                        color = if (completed) Pk.GoldDeep else Pk.Crisp,
+                        fontFamily = UtilitySans,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+
+                Spacer(Modifier.height(48.dp))
             }
-            Spacer(Modifier.height(28.dp))
         }
-
-        Box(
-            Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp).height(56.dp)
-                .clip(RoundedCornerShape(17.dp)).background(cs.primary).clickable {
-                    speaker.stop(); listening = false; onComplete()
-                },
-            contentAlignment = Alignment.Center,
-        ) { Text("COMPLETE DEVOTIONAL", color = cs.onPrimary, fontFamily = UtilitySans, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = .5.sp) }
     }
 }
 
 @Composable
-private fun SectionLabel(number: String, title: String, meaning: String) {
-    val cs = MaterialTheme.colorScheme
-    Row(Modifier.fillMaxWidth().padding(top = 30.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(28.dp).clip(CircleShape).background(cs.primary), contentAlignment = Alignment.Center) {
-            Text(number, color = cs.onPrimary, fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+private fun ScriptureCard(passage: DailyPassage, verses: List<BibleVerse>) {
+    Column(
+        Modifier.fillMaxWidth().padding(top = 26.dp).clip(RoundedCornerShape(20.dp))
+            .background(Pk.Sunken).padding(22.dp),
+    ) {
+        EditorialLabel("TODAY'S READING")
+        if (verses.isEmpty()) {
+            CircularProgressIndicator(color = Pk.Oxblood, strokeWidth = 2.dp, modifier = Modifier.padding(top = 18.dp).size(22.dp))
+        } else {
+            Text(
+                verses.joinToString(" ") { it.text },
+                color = Pk.Charcoal,
+                fontFamily = BookSerif,
+                fontStyle = FontStyle.Italic,
+                fontSize = 20.sp,
+                lineHeight = 30.sp,
+                modifier = Modifier.padding(top = 13.dp),
+            )
         }
-        Text(title, color = cs.onSurface, fontFamily = DisplaySerif, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, letterSpacing = .5.sp, modifier = Modifier.padding(start = 10.dp))
-        Spacer(Modifier.weight(1f))
-        Text(meaning, color = cs.onSurface.copy(alpha = .45f), fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.Medium, letterSpacing = .8.sp)
+        HorizontalDivider(color = Pk.Gold.copy(alpha = .25f), modifier = Modifier.padding(top = 15.dp, bottom = 13.dp))
+        Text(passage.reference.uppercase(Locale.getDefault()), color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.1.sp)
     }
+}
+
+@Composable
+private fun EditorialLabel(text: String, modifier: Modifier = Modifier) {
+    Text(text, color = Pk.GoldDeep, fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 1.5.sp, modifier = modifier)
+}
+
+@Composable
+private fun QuietIcon(onClick: () -> Unit, content: @Composable () -> Unit) {
+    Box(
+        Modifier.size(32.dp).clip(CircleShape).background(Pk.Charcoal.copy(alpha = .055f)).clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) { content() }
 }

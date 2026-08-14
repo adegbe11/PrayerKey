@@ -1,0 +1,46 @@
+
+🔴 PrayerKey Socket.io server running on port 3001
+   Health: http://localhost:3001/health
+
+[socket] Client connected: 5Airq3cWYQHQcySAAAAB
+[socket] 5Airq3cWYQHQcySAAAAB joined service:a648fcff-6afb-4b08-ac40-084a418669e0
+[deepgram] Connection opened
+[socket] Client disconnected: 5Airq3cWYQHQcySAAAAB
+[deepgram] Connection closed
+[socket] Client connected: fH7Doww4R0dliw7dAAAD
+[socket] fH7Doww4R0dliw7dAAAD joined service:02320e2b-e495-4dba-a6ed-b2d7c2bd9740
+[deepgram] Connection opened
+[deepgram] Connection closed
+[deepgram] Connection opened
+[deepgram] Connection closed
+[deepgram] Connection opened
+[socket] Client disconnected: fH7Doww4R0dliw7dAAAD
+[deepgram] Connection closed
+[socket] Client connected: m6gHyCftLMFXoVvgAAAF
+[socket] m6gHyCftLMFXoVvgAAAF joined service:1ccce3d0-5d5b-4813-a7f4-337e0f6df19e
+[deepgram] Connection opened
+[deepgram] Connection closed
+[deepgram] Connection opened
+[deepgram] Connection closed
+[socket] Client disconnected: m6gHyCftLMFXoVvgAAAF
+[deepgram] Connection closed
+[socket] Client connected: zE-ClNIfd2ap3OetAAAH
+[socket] zE-ClNIfd2ap3OetAAAH joined service:d6131415-39bf-4680-842e-12ad05440693
+[deepgram] Connection opened
+[deepgram] Connection closed
+[deepgram] Connection opened
+[deepgram] Connection closed
+[deepgram] Connection opened
+[deepgram] Connection closed
+[socket] Client disconnected: zE-ClNIfd2ap3OetAAAH
+[deepgram] Connection closed
+[socket] Client connected: bxdBi71yLCvs_IvDAAAJ
+[socket] bxdBi71yLCvs_IvDAAAJ joined service:c7342948-8854-4728-94d1-d0af9685e0d8
+[deepgram] Connection opened
+[socket] Client disconnected: bxdBi71yLCvs_IvDAAAJ
+[deepgram] Connection closed
+[socket] Client connected: 5GL7VbdXSMfGTSYAAAAL
+[socket] 5GL7VbdXSMfGTSYAAAAL joined service:d8672df7-4062-439e-a9f5-841dced1a035
+[deepgram] Connection opened
+[socket] Client disconnected: 5GL7VbdXSMfGTSYAAAAL
+[deepgram] Connection closed

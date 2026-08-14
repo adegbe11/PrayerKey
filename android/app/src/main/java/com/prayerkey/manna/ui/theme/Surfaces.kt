@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
  */
 fun Modifier.premiumCard(
     shape: RoundedCornerShape = R.card,
-    fill: Brush = Brush.verticalGradient(listOf(Color(0xFFFAF6EF), Color(0xFFF7F1E8))),
+    fill: Brush = Brush.verticalGradient(listOf(Pk.Cream, Pk.Sunken)),
     lift: Boolean = true,
 ): Modifier = this
     // wide, soft — the lift
@@ -36,13 +36,13 @@ fun Modifier.premiumCard(
     .topHighlight(shape)
 
 /** Warm paper, for scripture and prayer. */
-val PaperFill = Brush.verticalGradient(listOf(Color(0xFFFAF6EF), Color(0xFFF2EBE0)))
+val PaperFill = Brush.verticalGradient(listOf(Pk.Cream, Pk.Sunken))
 
 /** The sacred layer. */
-val NightFill = Brush.verticalGradient(listOf(Color(0xFF1A1F2A), Color(0xFF12161F)))
+val NightFill = Brush.verticalGradient(listOf(Pk.Charcoal, Pk.Charcoal))
 
 /** A gold-leaf wash, for anything answered or kept. */
-val GoldFill = Brush.verticalGradient(listOf(Color(0xFFFAF6EF), Color(0xFFF2EBE0)))
+val GoldFill = Brush.verticalGradient(listOf(Pk.Cream, Pk.Sunken))
 
 /**
  * The one-pixel catch of light along a surface's upper edge. This is the
@@ -96,7 +96,7 @@ fun Modifier.bloom(color: Color = Gold, alpha: Float = .10f): Modifier =
 fun Modifier.glassPill(): Modifier = this
     .shadow(9.dp, R.pill, spotColor = Night.copy(alpha = .12f))
     .clip(R.pill)
-    .background(Brush.verticalGradient(listOf(Color.White, Color(0xFFF7F7FA))))
+    .background(Brush.verticalGradient(listOf(Pk.Cream, Pk.Sunken)))
     .topHighlight(R.pill, strength = .9f)
 
 @Suppress("unused")

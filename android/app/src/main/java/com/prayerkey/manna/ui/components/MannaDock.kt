@@ -74,7 +74,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
            as white, because the theme says so. */
         Surface(
             shape = RoundedCornerShape(31.dp),
-            color = Color(0xFF1A1F2A),
+            color = Color(0xFF1A0A2E),
             border = BorderStroke(0.6.dp, GiltLine.copy(alpha = .48f)),
             shadowElevation = 24.dp,
         ) {
@@ -90,7 +90,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                         spring(dampingRatio = Spring.DampingRatioMediumBouncy), label = "dock-scale",
                     )
                     val tint by animateColorAsState(
-                        if (active) Electric else Ivory.copy(alpha = .60f),
+                        if (active) com.prayerkey.manna.ui.theme.Pk.GoldLight else Ivory.copy(alpha = .60f),
                         spring(stiffness = Spring.StiffnessMediumLow), label = "dock-tint",
                     )
 
@@ -129,7 +129,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                            app, which is the wrong place to be subtle. */
                         Text(
                             if (item.label == "Home") "TODAY" else item.label.uppercase(),
-                            color = if (active) Ivory else Ivory.copy(alpha = .60f),
+                            color = if (active) com.prayerkey.manna.ui.theme.Pk.GoldLight else Ivory.copy(alpha = .60f),
                             fontFamily = UtilitySans,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Medium,

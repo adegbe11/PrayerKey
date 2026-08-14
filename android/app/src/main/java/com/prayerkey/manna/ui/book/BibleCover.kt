@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.book
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +12,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.prayerkey.manna.R
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.runtime.setValue
@@ -52,7 +58,7 @@ import kotlin.math.sin
 private val Board = Color(0xFF5A1E18)
 private val BoardDeep = Color(0xFF1B0807)
 private val BoardLit = Color(0xFF87382A)
-private val Gold = Color(0xFFC9A227)
+private val Gold = Color(0xFFD4AF37)
 private val GoldLit = Color(0xFFF3E5AB)
 private val GoldDim = Color(0xFF7A5A15)
 
@@ -74,36 +80,29 @@ private val GoldDim = Color(0xFF7A5A15)
  */
 @Composable
 fun BibleCover(onOpen: () -> Unit, modifier: Modifier = Modifier) {
-    Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        TooledBoard(centrepiece = true)
-
-        Column(
-            Modifier.fillMaxWidth().offset(y = (-34).dp).padding(horizontal = 58.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            /* Stamped, not filled. A gradient on the glyphs alone reads as
-               bright paint sitting on top of the board. Real hot-foil sits in
-               a groove: there is a shadow cast down into the recess, a bright
-               lip on the near edge, and the metal between. So the letters are
-               drawn three times, the same way every gold line here is. */
-            StampedText("HOLY BIBLE", 30.sp, 1.7.sp, FontWeight.Bold)
-            Box(
-                Modifier.padding(top = 11.dp, bottom = 9.dp)
-                    .height(1.5.dp).fillMaxWidth(.5f)
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(Color.Transparent, GoldLit, Gold, Color(0xFF7A5A15), Color.Transparent),
-                        ),
-                    ),
-            )
-            StampedText("OLD & NEW TESTAMENTS", 9.5.sp, 2.4.sp, FontWeight.SemiBold)
+    val view = LocalView.current
+    DisposableEffect(Unit) {
+        val window = (view.context as? android.app.Activity)?.window
+        @Suppress("DEPRECATION")
+        window?.statusBarColor = android.graphics.Color.rgb(90, 30, 24)
+        @Suppress("DEPRECATION")
+        window?.navigationBarColor = android.graphics.Color.rgb(90, 30, 24)
+        onDispose {
+            @Suppress("DEPRECATION")
+            window?.statusBarColor = android.graphics.Color.rgb(34, 34, 34)
+            @Suppress("DEPRECATION")
+            window?.navigationBarColor = android.graphics.Color.rgb(34, 34, 34)
         }
-
-        Text(
-            "Tap to open",
-            color = GoldLit.copy(alpha = .32f), fontFamily = BookSerif,
-            fontSize = 9.5.sp, letterSpacing = 2.6.sp,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 104.dp),
+    }
+    Box(modifier.fillMaxSize().background(Color(0xFF8B0909)), contentAlignment = Alignment.Center) {
+        // One cover, edge to edge. A second illustrated board behind the
+        // photograph competed with its border and made the cover look pasted
+        // onto another book.
+        Image(
+            painter = painterResource(R.drawable.bible_cover_red),
+            contentDescription = "The Holy Bible cover",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }

@@ -14,18 +14,17 @@ import androidx.compose.ui.unit.sp
 
 /* Apple-white premium system:
    pure #FFFFFF canvas, #1D1D1F ink, #86868B secondary, #F5F5F7 fills. */
-val Ink = Color(0xFF12161F)
-val Muted = Color(0x8C12161F)
-val Canvas = Color(0xFFFAF6EF)
-val AppleGray = Color(0xFFF2EBE0)
-val Ivory = Color(0xFFFAF6EF)
-val Night = Color(0xFF12161F)
-/** Historic name retained for call sites; semantic accent is now rubric red. */
-val Gold = Color(0xFFA4231C)
-val GiltLine = Color(0xFFC9A227)
-/** Compatibility accent for older surfaces; intentionally blue-grey, never neon. */
-val Electric = Color(0xFFA4231C)
-val Hairline = Color(0x1712161F)
+val Ink = Color(0xFF1A0A2E)
+val Muted = Color(0xBD1A0A2E)
+val Canvas = Color(0xFFF5F5F7)
+val AppleGray = Color(0xFFF5F5F7)
+val Ivory = Color(0xFFFFFFFF)
+val Night = Color(0xFF1A0A2E)
+val Gold = Color(0xFFC9A26D)
+val GiltLine = Color(0xFFC9A26D)
+/** Historic name retained for call sites; it now means the one primary action. */
+val Electric = Color(0xFF6200ED)
+val Hairline = Color(0x1A1A0A2E)
 
 /**
  * Type scale.
@@ -91,38 +90,40 @@ fun MannaTheme(
     theme: com.prayerkey.manna.data.AppTheme = com.prayerkey.manna.data.APP_THEMES.first(),
     content: @Composable () -> Unit,
 ) {
-    // the chosen theme repaints the whole app, not just a preview tile
-    val scheme = if (theme.dark) {
-        androidx.compose.material3.darkColorScheme(
-            primary = theme.accent, onPrimary = Ivory,
-            primaryContainer = Color(0xFF2A1718), onPrimaryContainer = Color(0xFFFAF6EF),
-            secondary = theme.accent, onSecondary = Color(0xFF10131F),
-            secondaryContainer = Color(0xFF2A1718), onSecondaryContainer = Color(0xFFFAF6EF),
-            tertiary = GiltLine, onTertiary = Color(0xFF12161F),
-            tertiaryContainer = Color(0xFF25221A), onTertiaryContainer = Color(0xFFFAF6EF),
-            background = theme.background, onBackground = theme.ink,
-            surface = theme.surface, onSurface = theme.ink,
-            surfaceVariant = theme.surface, onSurfaceVariant = theme.muted,
-            surfaceTint = Color.Transparent,
-            outline = theme.muted.copy(alpha = .3f), outlineVariant = theme.muted.copy(alpha = .22f),
-            error = Color(0xFFE0796A), onError = Color(0xFF2A0E0A),
-        )
-    } else {
-        lightColorScheme(
-            primary = theme.accent, onPrimary = Ivory,
-            primaryContainer = Color(0xFFF2DDD8), onPrimaryContainer = Color(0xFF68130F),
-            secondary = theme.accent, onSecondary = Ivory,
-            secondaryContainer = Color(0xFFF2DDD8), onSecondaryContainer = Color(0xFF68130F),
-            tertiary = GiltLine, onTertiary = Ink,
-            tertiaryContainer = Color(0xFFF1E8CF), onTertiaryContainer = Color(0xFF4B3A08),
-            background = theme.background, onBackground = theme.ink,
-            surface = theme.surface, onSurface = theme.ink,
-            surfaceVariant = theme.background, onSurfaceVariant = theme.muted,
-            surfaceTint = Color.Transparent,
-            outline = theme.muted.copy(alpha = .3f), outlineVariant = theme.muted.copy(alpha = .22f),
-            error = Color(0xFFB3402A), onError = Ivory,
-        )
-    }
+    // One identity in two reading conditions: warm paper by day, midnight
+    // oxblood after dark. Accent and semantic colours never change brands.
+    val scheme = if (theme.dark) androidx.compose.material3.darkColorScheme(
+        primary = Pk.Oxblood, onPrimary = Pk.Crisp,
+        primaryContainer = Pk.Oxblood, onPrimaryContainer = Pk.Crisp,
+        secondary = Pk.Sage, onSecondary = Pk.DeepDark,
+        secondaryContainer = Pk.Sage.copy(alpha = .24f), onSecondaryContainer = Pk.Crisp,
+        tertiary = Pk.Gold, onTertiary = Pk.DeepDark,
+        background = Pk.DeepDark, onBackground = Pk.Crisp,
+        surface = Pk.DeepDark, onSurface = Pk.Crisp,
+        surfaceVariant = Pk.Oxblood.copy(alpha = .42f), onSurfaceVariant = Pk.Crisp.copy(alpha = .74f),
+        inverseSurface = Pk.Crisp, inverseOnSurface = Pk.DeepDark,
+        surfaceTint = Color.Transparent,
+        outline = Pk.Crisp.copy(alpha = .16f), outlineVariant = Pk.Crisp.copy(alpha = .10f),
+        scrim = Pk.DeepDark.copy(alpha = .72f),
+        error = Pk.Blush, onError = Pk.DeepDark,
+    ) else lightColorScheme(
+        primary = Pk.Oxblood, onPrimary = Pk.Crisp,
+        primaryContainer = Pk.Blush, onPrimaryContainer = Pk.Oxblood,
+        secondary = Pk.Sage, onSecondary = Pk.Charcoal,
+        secondaryContainer = Pk.Sage.copy(alpha = .24f), onSecondaryContainer = Pk.Charcoal,
+        tertiary = Pk.Gold, onTertiary = Pk.Charcoal,
+        tertiaryContainer = Pk.Gold.copy(alpha = .14f), onTertiaryContainer = Pk.Charcoal,
+        background = Pk.Cream, onBackground = Pk.Charcoal,
+        surface = Pk.Cream, onSurface = Pk.Charcoal,
+        surfaceVariant = Pk.Sunken, onSurfaceVariant = Pk.Muted,
+        inverseSurface = Pk.DeepDark, inverseOnSurface = Pk.Crisp,
+        inversePrimary = Pk.Blush,
+        surfaceTint = Color.Transparent,
+        outline = Pk.Hair, outlineVariant = Pk.Hair,
+        scrim = Pk.DeepDark.copy(alpha = .42f),
+        error = Pk.Oxblood, onError = Pk.Crisp,
+        errorContainer = Pk.Blush, onErrorContainer = Pk.Oxblood,
+    )
     MaterialTheme(colorScheme = scheme, typography = MannaType, content = content)
 }
 

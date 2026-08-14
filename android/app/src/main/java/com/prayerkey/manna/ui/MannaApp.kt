@@ -184,71 +184,34 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                            no longer routed to — this screen answers "what do I
                            do with God today?" in one scroll, which the old one
                            could not. */
-                        val quote = remember(today) { com.prayerkey.manna.data.quoteFor(today) }
-                        val passage = remember(today) { com.prayerkey.manna.data.passageFor(today) }
-                        val answered = remember(saved, entries) {
-                            saved.count { it.answeredAt != null } + entries.count { it.answeredAt != null }
-                        }
-                        // Sunday-first, seven entries ending today
-                        val week = remember(activeDays, today) {
-                            (6 downTo 0).map { back -> activeDays.contains(today.minusDays(back.toLong())) }
-                        }
-                        var bookmarked by remember { mutableStateOf(false) }
-
-                        val plan = com.prayerkey.manna.ui.home.TodayPlan(
-                            title = passage.title,
-                            quote = quote.text,
-                            quoteSource = quote.author,
-                            passageRef = passage.reference,
-                            // the challenges load asynchronously; until they do,
-                            // nothing is marked done rather than crashing
-                            passageDone = bibleChallenge?.today?.done == true,
-                            devotionalMinutes = 4,
-                            devotionalDone = activeDays.contains(today),
-                            prayerMinutes = 5,
-                            prayerDone = prayerChallenge?.today?.done == true,
-                            // devotion needs the topic list, which arrives after
-                            // first paint; the passage is always available
-                            verse = devotion?.verse ?: passage.introduction,
-                            verseReference = devotion?.reference ?: passage.reference,
-                            answeredCount = answered,
-                        )
-
-                        Column(Modifier.fillMaxSize()) {
-                            com.prayerkey.manna.ui.theme.PkHeader(
-                                title = "PrayerKey",
-                                streakDays = streak,
-                                week = week,
-                                trailingLabel = "Today",
-                            )
-                            Box(Modifier.weight(1f)) {
-                                com.prayerkey.manna.ui.home.TodayScreen(
-                                    plan = plan,
-                                    bookmarked = bookmarked,
-                                    onBookmark = { bookmarked = !bookmarked },
-                                    onRead = { selected = 1 },
-                                    onPassage = {
-                                        bibleChallenge?.let {
-                                            viewModel.markChallengeDay(
-                                                it.id, it.today.index - 1, !it.today.done,
-                                            )
-                                        }
-                                    },
-                                    onDevotional = { selected = 4 },
-                                    onPrayer = {
-                                        prayerChallenge?.let {
-                                            viewModel.markChallengeDay(
-                                                it.id, it.today.index - 1, !it.today.done,
-                                            )
-                                        }
-                                    },
-                                    onMidnight = { selected = 2 },
-                                    onMyPrayers = { selected = 4 },
-                                    onJournal = { selected = 4 },
-                                    onCalendar = { showProfile = true },
+                        com.prayerkey.manna.ui.home.AwardHomeDashboard(
+                            name = "",
+                            streak = streak,
+                            activeDays = activeDays,
+                            devotion = devotion,
+                            bible = bibleChallenge,
+                            prayer = prayerChallenge,
+                            savedCount = saved.size,
+                            journalCount = entries.size,
+                            sermonCount = sermonNotes.size,
+                            onOpenWord = { selected = 1 },
+                            onWriteDevotion = { selected = 4 },
+                            onOpenBible = { selected = 1 },
+                            onOpenPrayer = { selected = 2 },
+                            onOpenJournal = { selected = 4 },
+                            onOpenChurch = { selected = 3 },
+                            onOpenChallenge = { challenge ->
+                                viewModel.markChallengeDay(
+                                    challenge.id, challenge.today.index - 1, !challenge.today.done,
                                 )
-                            }
-                        }
+                            },
+                            onToggleChallenge = { challenge ->
+                                viewModel.markChallengeDay(
+                                    challenge.id, challenge.today.index - 1, !challenge.today.done,
+                                )
+                            },
+                            onSettings = { showProfile = true },
+                        )
                     }
                     1 -> BibleScreen(
                         readerTextSize = preferences.readerTextSize,

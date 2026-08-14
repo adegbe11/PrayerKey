@@ -69,6 +69,7 @@ export interface ClientToServerEvents {
   "service:join":        (serviceId: string)                               => void;
   "service:leave":       (serviceId: string)                               => void;
   "service:translation": (translation: string, serviceId: string)          => void;
+  "service:language":    (language: string, serviceId: string)             => void;
   "audio:chunk":         (chunk: ArrayBuffer)                              => void;
   "transcript:send":     (text: string, serviceId: string)                 => void;
   "verse:push":          (payload: VerseDetectedPayload, serviceId: string)=> void;

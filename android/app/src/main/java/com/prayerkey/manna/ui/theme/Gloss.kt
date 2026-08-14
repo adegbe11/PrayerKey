@@ -16,17 +16,17 @@ import androidx.compose.ui.graphics.Color
 
 /** Night surfaces — deep blue with a lifted top edge, like lacquer */
 val NightGloss = Brush.verticalGradient(
-    listOf(Color(0xFF202632), Color(0xFF1A1F2A), Color(0xFF12161F))
+    listOf(Color(0xFF303030), Color(0xFF292929), Color(0xFF222222))
 )
 
 /** Ivory cards — warm light falling from the top */
 val IvoryGloss = Brush.verticalGradient(
-    listOf(Color(0xFFFAF6EF), Color(0xFFF7F1E8), Color(0xFFF2EBE0))
+    listOf(Color(0xFFF9F6F0), Color(0xFFF5F0E8), Color(0xFFF1ECE3))
 )
 
 /** Electric CTAs — glossy blue with a bright crown */
 val ElectricGloss = Brush.verticalGradient(
-    listOf(Color(0xFFA4231C), Color(0xFFA4231C), Color(0xFFA4231C))
+    listOf(Color(0xFF5B1520), Color(0xFF4A0E17), Color(0xFF3E0C13))
 )
 
 /** Soft sheen overlay for the top of dark cards */

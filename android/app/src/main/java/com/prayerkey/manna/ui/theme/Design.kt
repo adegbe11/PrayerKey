@@ -34,7 +34,7 @@ object Space {
 
 /* Softer than pure black — editorial rather than harsh. Apple's own label
    colour is #1D1D1F; body copy sits a touch lighter still. */
-val InkSoft = Color(0xFF2C2C2E)
+val InkSoft = Color(0xFF222222)
 
 /** Unselected chips: ambient tint, no wireframe border. */
 val ChipFill = Color(0xFFF2EBE0)
@@ -47,7 +47,7 @@ val ChipFillSelected = Color(0xFFF0DDD8)
  * atmosphere, not colour.
  */
 fun dayWash(hour: Int = LocalTime.now().hour): Brush = Brush.verticalGradient(
-    listOf(Color(0xFFFAF6EF), Color(0xFFF7F1E8), Color(0xFFFAF6EF)),
+    listOf(Pk.Cream, Pk.Sunken, Pk.Cream),
 )
 
 /** A soft ambient shadow colour — never black, always the ink at low alpha. */
@@ -55,7 +55,7 @@ val SoftShadow = Night.copy(alpha = .22f)
 
 /** Fade applied to the right edge of a horizontal carousel, so a cut-off
  *  item reads as "keep swiping" rather than "clipped by accident". */
-fun edgeFade(background: Color = Color.White): Brush = Brush.horizontalGradient(
+fun edgeFade(background: Color = Pk.Cream): Brush = Brush.horizontalGradient(
     0f to background.copy(alpha = 0f),
     1f to background,
 )

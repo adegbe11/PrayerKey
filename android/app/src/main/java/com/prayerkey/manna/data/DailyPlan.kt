@@ -92,7 +92,9 @@ fun bibleChallenge(date: LocalDate, doneDays: Set<Int>): Challenge {
         (1..21).forEach { add("John" to it) }
         (1..16).forEach { add("Mark" to it) }
     }
-    val day = Math.floorMod(dayIndex(date), plan.size)
+    // Course progression, not calendar roulette: the first unfinished lesson
+    // is always today's lesson. A new member begins at Day 1.
+    val day = (0 until plan.size).firstOrNull { it !in doneDays } ?: (plan.size - 1)
     val (book, chapter) = plan[day]
     return Challenge(
         id = "read-the-gospels",
@@ -121,8 +123,8 @@ fun prayerChallenge(
 ): Challenge? {
     if (topics.isEmpty()) return null
     val total = 21
-    val day = Math.floorMod(dayIndex(date), total)
-    val topic = topics[Math.floorMod(dayIndex(date) * 13, topics.size)]
+    val day = (0 until total).firstOrNull { it !in doneDays } ?: (total - 1)
+    val topic = topics[Math.floorMod(day * 13, topics.size)]
     return Challenge(
         id = "twenty-one-days",
         title = "21 days of prayer",

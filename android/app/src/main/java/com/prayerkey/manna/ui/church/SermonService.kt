@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class SermonService : Service() {
 
-    private var audioEngine: SermonAudioEngine? = null
+    private var capture: SermonCaptureEngine? = null
     private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -58,17 +58,23 @@ class SermonService : Service() {
         _partial.value = ""
         _listening.value = true
 
-        audioEngine = SermonAudioEngine(
+        // The previous implementation only streamed PCM to a Socket.IO server.
+        // When that server was absent (the debug build points at 10.0.2.2:3001),
+        // audio was saved but no words could ever reach the UI. Android's
+        // recognizer is the dependable first engine: it produces partial and
+        // final text directly on the device and continuously restarts between
+        // utterances for a full sermon.
+        capture = SermonCaptureEngine(
             context = this,
-            language = _language.value,
-            onFinal = { chunk ->
-                _chunks.value = _chunks.value + chunk
+            onSegment = { segment ->
+                _segments.value = _segments.value + segment
+                _chunks.value = _chunks.value + segment.text
                 _partial.value = ""
-                harvestReferences(chunk)
+                harvestReferences(segment.text)
             },
             onPartial = { _partial.value = it },
             onStatus = { _status.value = it },
-        ).also { it.start() }
+        ).also { it.start(_startedAt.value) }
     }
 
     /**
@@ -88,9 +94,9 @@ class SermonService : Service() {
     }
 
     private fun stopListening() {
-        audioEngine?.stop()
-        _audioPath.value = audioEngine?.audioFile?.absolutePath.orEmpty()
-        audioEngine = null
+        capture?.stop(_startedAt.value)
+        _audioPath.value = capture?.audioFile?.absolutePath.orEmpty()
+        capture = null
         runCatching { wakeLock?.takeIf { it.isHeld }?.release() }
         wakeLock = null
         _listening.value = false
@@ -101,9 +107,9 @@ class SermonService : Service() {
     }
 
     override fun onDestroy() {
-        audioEngine?.stop()
-        _audioPath.value = audioEngine?.audioFile?.absolutePath.orEmpty()
-        audioEngine = null
+        capture?.stop(_startedAt.value)
+        _audioPath.value = capture?.audioFile?.absolutePath.orEmpty()
+        capture = null
         runCatching { wakeLock?.takeIf { it.isHeld }?.release() }
         _listening.value = false
         super.onDestroy()
@@ -151,6 +157,8 @@ class SermonService : Service() {
         val listening = _listening.asStateFlow()
         private val _chunks = MutableStateFlow<List<String>>(emptyList())
         val chunks = _chunks.asStateFlow()
+        private val _segments = MutableStateFlow<List<SermonSegment>>(emptyList())
+        val segments = _segments.asStateFlow()
         private val _references = MutableStateFlow<List<Caught>>(emptyList())
         val references = _references.asStateFlow()
         private val _partial = MutableStateFlow("")
@@ -168,7 +176,7 @@ class SermonService : Service() {
         fun setLanguage(tag: String) { _language.value = tag }
 
         /** Chunks joined with a separator the arranger treats as a full stop. */
-        fun transcript(): String = _chunks.value.joinToString(" | ")
+        fun transcript(): String = SermonCleanup.clean(_segments.value)
 
         fun elapsedMinutes(): Int {
             val started = _startedAt.value
@@ -189,6 +197,7 @@ class SermonService : Service() {
         /** Clears the finished session once its note has been saved. */
         fun reset() {
             _chunks.value = emptyList()
+            _segments.value = emptyList()
             _references.value = emptyList()
             _partial.value = ""
             _startedAt.value = 0L

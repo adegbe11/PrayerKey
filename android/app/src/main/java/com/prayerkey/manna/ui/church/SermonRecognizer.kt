@@ -49,12 +49,8 @@ class SermonRecognizer(
         putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 4000L)
         putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 4000L)
         putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 8000L)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            putExtra(
-                RecognizerIntent.EXTRA_SEGMENTED_SESSION,
-                RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,
-            )
-        }
+        // Continuous restarts below are more compatible than segmented mode:
+        // several Google/OEM recognizers reject the segmented-session extra.
     }
 
     private var running = false
@@ -145,7 +141,14 @@ class SermonRecognizer(
                 restart(80)
             }
             SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> restart(700)
-            else -> restart(400)
+            SpeechRecognizer.ERROR_NETWORK,
+            SpeechRecognizer.ERROR_NETWORK_TIMEOUT,
+            SpeechRecognizer.ERROR_SERVER -> {
+                onStatus("Speech service reconnecting")
+                restart(900)
+            }
+            SpeechRecognizer.ERROR_CLIENT -> restart(500)
+            else -> { onStatus("Listening · retrying"); restart(400) }
         }
     }
 

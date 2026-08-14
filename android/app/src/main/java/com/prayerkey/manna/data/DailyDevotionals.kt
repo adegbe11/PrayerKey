@@ -11,6 +11,7 @@ data class DailyDevotional(
     val reflectionQuestion: String,
     val practice: String,
     val prayer: String,
+    val declaration: String,
 )
 
 private data class DevotionalTheme(
@@ -47,11 +48,13 @@ fun devotionalFor(date: LocalDate): DailyDevotional {
         reading = listOf(
             theme.truth,
             "As you consider ${passage.reference}, notice what it reveals about God and the kind of life faith produces. You may not resolve every question today. Let one clear truth become enough to live with faithfully.",
+            "The pressure to understand everything at once can make the soul restless. Scripture invites you into a different rhythm: receive truth, trust God's character, and walk out the obedience available today. Growth often arrives quietly through one surrendered decision repeated with faith.",
             theme.invitation,
         ),
         reflectionQuestion = theme.question,
         practice = theme.practice,
         prayer = theme.prayer,
+        declaration = "Today I receive God's grace for ${theme.title.lowercase()}. His Word guides me, His presence steadies me, and I will walk faithfully in the light He gives me.",
     )
 }
 
