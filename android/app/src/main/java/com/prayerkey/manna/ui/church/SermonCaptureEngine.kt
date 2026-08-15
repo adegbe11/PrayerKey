@@ -94,8 +94,8 @@ class SermonCaptureEngine(
      * subfolders Vosk actually reads.
      */
     private fun prepareVosk(dir: File) {
-        if (!VoskModel.isInstalled(app)) return
-        val modelDir = VoskModel.directory(app)
+        if (!VoskModel.isInstalled(app, VoskModel.Kind.Live)) return
+        val modelDir = VoskModel.directory(app, VoskModel.Kind.Live)
         runCatching { model = Model(modelDir.absolutePath); recognizer = Recognizer(model, RATE.toFloat()).apply { setWords(true) } }
             .onFailure { recognizer = null; model = null }
     }

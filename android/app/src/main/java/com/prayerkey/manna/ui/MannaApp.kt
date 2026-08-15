@@ -242,6 +242,9 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                         language = preferences.sermonLanguage,
                         onLanguage = { viewModel.updatePreferences(preferences.copy(sermonLanguage = it)) },
                         onSaveNote = viewModel::saveSermonNote,
+                        onRefineNote = { id, transcript ->
+                            viewModel.refineSermonNote(id, transcript, preferences.sermonLanguage)
+                        },
                         onDeleteNote = viewModel::deleteSermonNote,
                     )
                     4 -> JournalScreen(

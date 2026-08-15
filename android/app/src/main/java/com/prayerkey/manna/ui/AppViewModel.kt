@@ -169,11 +169,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /** Church mode: the arranged Sunday note, saved for good. */
-    fun saveSermonNote(note: com.prayerkey.manna.ui.church.SermonArranger.Note, minutes: Int) = io {
+    fun saveSermonNote(
+        note: com.prayerkey.manna.ui.church.SermonArranger.Note,
+        minutes: Int,
+        audioPath: String = "",
+    ) = io {
         store.saveSermonNote(
             title = note.title, scriptures = note.scriptures, points = note.points,
             quotes = note.quotes, takeaway = note.takeaway, transcript = note.transcript,
-            minutes = minutes,
+            minutes = minutes, audioPath = audioPath,
         )
         _sermonNotes.value = store.sermonNotes()
 
@@ -191,6 +195,26 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             source = "sermon",
         )
         refreshEntries()
+    }
+
+    /**
+     * Replaces a note with one built from the better transcript.
+     *
+     * Re-arranging rather than only swapping the text: the points, quotes and
+     * scriptures were all derived from the rough transcript, so leaving them
+     * untouched would attach a better transcript to a worse summary of it.
+     */
+    fun refineSermonNote(id: Long, transcript: String, language: String) = io {
+        val note = com.prayerkey.manna.ui.church.SermonArranger.arrange(
+            transcript,
+            com.prayerkey.manna.ui.church.ReferenceDetector.scan(transcript).map { it.reference },
+            language,
+        )
+        store.refineSermonNote(
+            id = id, title = note.title, scriptures = note.scriptures, points = note.points,
+            quotes = note.quotes, takeaway = note.takeaway, transcript = note.transcript,
+        )
+        _sermonNotes.value = store.sermonNotes()
     }
 
     fun deleteSermonNote(id: Long) = io {

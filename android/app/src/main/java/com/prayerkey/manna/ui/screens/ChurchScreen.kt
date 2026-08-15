@@ -68,6 +68,7 @@ import com.prayerkey.manna.ui.church.SermonArranger
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import com.prayerkey.manna.ui.church.SermonRefiner
 import com.prayerkey.manna.ui.church.SermonService
 import com.prayerkey.manna.ui.church.VoskModel
 import androidx.compose.ui.window.Dialog
@@ -86,7 +87,8 @@ fun ChurchScreen(
     notes: List<SermonNote>,
     language: String,
     onLanguage: (String) -> Unit,
-    onSaveNote: (SermonArranger.Note, Int) -> Unit,
+    onSaveNote: (SermonArranger.Note, Int, String) -> Unit,
+    onRefineNote: (Long, String) -> Unit,
     onDeleteNote: (Long) -> Unit,
 ) {
     val context = LocalContext.current
@@ -148,7 +150,7 @@ fun ChurchScreen(
 
     fun begin() {
         val asked = captionPrefs.getBoolean("captions-asked", false)
-        if (!asked && !VoskModel.isInstalled(context)) { offerCaptions = true; return }
+        if (!asked && !VoskModel.isInstalled(context, VoskModel.Kind.Live)) { offerCaptions = true; return }
         record()
     }
 
@@ -175,13 +177,15 @@ fun ChurchScreen(
         minutes = SermonService.elapsedMinutes()
         val transcript = SermonService.transcript()
         val refs = caught.map { it.reference }
+        // read before stop() clears it — the note needs it to be re-transcribed later
+        val audio = SermonService.audioPath.value
         SermonService.stop(context)
         if (transcript.isBlank()) {
             stage = Stage.Ready
             Toast.makeText(context, "No words were transcribed. Audio backup kept.", Toast.LENGTH_LONG).show()
             return
         }
-        arranged = SermonArranger.arrange(transcript, refs, language).also { onSaveNote(it, minutes) }
+        arranged = SermonArranger.arrange(transcript, refs, language).also { onSaveNote(it, minutes, audio) }
     }
 
     val cs = MaterialTheme.colorScheme
@@ -251,7 +255,7 @@ fun ChurchScreen(
     )
 
     openNote?.let { saved ->
-        SavedNoteSheet(saved, onClose = { openNote = null }, onDelete = { onDeleteNote(saved.id); openNote = null })
+        SavedNoteSheet(saved, language, onRefine = onRefineNote, onClose = { openNote = null }, onDelete = { onDeleteNote(saved.id); openNote = null })
     }
 }
 
@@ -276,8 +280,8 @@ fun ChurchScreen(
 private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val state by VoskModel.state.collectAsState()
-    LaunchedEffect(Unit) { VoskModel.refresh(context) }
+    val state by VoskModel.state(VoskModel.Kind.Live).collectAsState()
+    LaunchedEffect(Unit) { VoskModel.refresh(context, VoskModel.Kind.Live) }
     // installing is the answer to the question; go straight on to recording
     LaunchedEffect(state) { if (state is VoskModel.State.Ready) onReady() }
 
@@ -320,7 +324,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Downloading · ${(s.fraction * VoskModel.MEGABYTES).toInt()} of ${VoskModel.MEGABYTES} MB",
+                    "Downloading · ${(s.fraction * VoskModel.Kind.Live.megabytes).toInt()} of ${VoskModel.Kind.Live.megabytes} MB",
                     color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp,
                 )
             }
@@ -333,12 +337,12 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         Modifier.clip(R.pill).background(cs.primary)
-                            .clickable { scope.launch { VoskModel.install(context) } }
+                            .clickable { scope.launch { VoskModel.install(context, VoskModel.Kind.Live) } }
                             .padding(horizontal = 18.dp, vertical = 11.dp),
                     ) {
                         Text(
                             if (state is VoskModel.State.Failed) "Try again"
-                            else "Turn on · ${VoskModel.MEGABYTES} MB",
+                            else "Turn on · ${VoskModel.Kind.Live.megabytes} MB",
                             color = cs.onPrimary, fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -691,9 +695,106 @@ private fun NoteView(
     }
 }
 
+/**
+ * Offers the better transcript, once there is a rough one to compare it to.
+ *
+ * The small model has to keep up with speech in real time, which caps how good
+ * it can be; the larger one is far too slow to caption live but has no clock to
+ * beat once the sermon is over — and the recording was kept anyway. So the
+ * quality ceiling of live captioning is not the quality ceiling of the note.
+ *
+ * Offered here rather than up front because this is where the value is legible:
+ * the user is looking at a transcript they can see the flaws in. Asking on the
+ * Church screen would be asking someone to spend 125 MB on a problem they have
+ * not met yet.
+ *
+ * Hidden entirely once the note has been refined, and when the recording has
+ * been deleted — an action with nothing behind it is worse than no action.
+ */
+@Composable
+private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, String) -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val cs = MaterialTheme.colorScheme
+    val model by VoskModel.state(VoskModel.Kind.Studio).collectAsState()
+    var progress by remember(note.id) { mutableStateOf<Float?>(null) }
+    var failure by remember(note.id) { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) { VoskModel.refresh(context, VoskModel.Kind.Studio) }
+
+    if (note.refined || note.audioPath.isBlank() || !java.io.File(note.audioPath).isFile) return
+
+    fun run() = scope.launch {
+        failure = null
+        if (!VoskModel.isInstalled(context, VoskModel.Kind.Studio)) {
+            if (!VoskModel.install(context, VoskModel.Kind.Studio)) {
+                failure = "the model could not be downloaded"
+                return@launch
+            }
+        }
+        progress = 0f
+        SermonRefiner.refine(context, java.io.File(note.audioPath)) { progress = it }
+            .onSuccess { onRefine(note.id, it) }
+            .onFailure { failure = it.message ?: "it could not be read" }
+        progress = null
+    }
+
+    Column(Modifier.fillMaxWidth().padding(top = 12.dp)) {
+        when {
+            progress != null -> {
+                LinearProgressIndicator(
+                    progress = { progress ?: 0f },
+                    color = cs.primary, trackColor = cs.onBackground.copy(alpha = .10f),
+                    modifier = Modifier.fillMaxWidth().height(4.dp).clip(R.pill),
+                )
+                Text(
+                    "Reading the recording · ${((progress ?: 0f) * 100).toInt()}%",
+                    color = Muted, fontSize = 11.5.sp, modifier = Modifier.padding(top = 7.dp),
+                )
+            }
+            model is VoskModel.State.Downloading -> {
+                val f = (model as VoskModel.State.Downloading).fraction
+                LinearProgressIndicator(
+                    progress = { f },
+                    color = cs.primary, trackColor = cs.onBackground.copy(alpha = .10f),
+                    modifier = Modifier.fillMaxWidth().height(4.dp).clip(R.pill),
+                )
+                Text(
+                    "Downloading the better model · ${(f * VoskModel.Kind.Studio.megabytes).toInt()} of ${VoskModel.Kind.Studio.megabytes} MB",
+                    color = Muted, fontSize = 11.5.sp, modifier = Modifier.padding(top = 7.dp),
+                )
+            }
+            else -> {
+                Box(
+                    Modifier.clip(R.pill).background(cs.primary.copy(alpha = .10f))
+                        .clickable { run() }
+                        .padding(horizontal = 14.dp, vertical = 9.dp),
+                ) {
+                    Text(
+                        if (VoskModel.isInstalled(context, VoskModel.Kind.Studio)) "Improve this transcript"
+                        else "Improve this transcript · ${VoskModel.Kind.Studio.megabytes} MB once",
+                        color = cs.primary, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold,
+                    )
+                }
+                Text(
+                    failure?.let { "That did not work: $it." }
+                        ?: "Re-reads the recording with a larger model. Takes a few minutes and stays on your phone.",
+                    color = Muted, fontSize = 11.5.sp, lineHeight = 16.sp,
+                    modifier = Modifier.padding(top = 7.dp),
+                )
+            }
+        }
+    }
+}
+
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
-private fun SavedNoteSheet(note: SermonNote, onClose: () -> Unit, onDelete: () -> Unit) {
+private fun SavedNoteSheet(
+    note: SermonNote,
+    language: String,
+    onRefine: (Long, String) -> Unit,
+    onClose: () -> Unit,
+    onDelete: () -> Unit,
+) {
     val context = LocalContext.current
     androidx.compose.material3.ModalBottomSheet(onDismissRequest = onClose, containerColor = Canvas) {
         Column(
@@ -701,6 +802,7 @@ private fun SavedNoteSheet(note: SermonNote, onClose: () -> Unit, onDelete: () -
                 .padding(horizontal = 22.dp).padding(bottom = 40.dp),
         ) {
             Text(note.title, fontFamily = BookSerif, fontSize = 28.sp, lineHeight = 33.sp)
+            RefineRow(note, language, onRefine)
             Text(
                 "${dayLabel(note.createdAt)} · ${note.minutes} min",
                 color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp),

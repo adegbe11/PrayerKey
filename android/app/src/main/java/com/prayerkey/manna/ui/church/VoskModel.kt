@@ -12,40 +12,62 @@ import java.net.URL
 import java.util.zip.ZipInputStream
 
 /**
- * The speech model that makes live transcription work, on the device, for free.
+ * The speech models that make transcription work, on the device, for free.
  *
- * Church was recording audio and transcribing nothing. Two things were broken
- * at once and either alone would have been fatal:
+ * Church recorded audio and transcribed nothing. [SermonCaptureEngine] already
+ * had a complete offline path — it opened `filesDir/vosk-model` and returned
+ * quietly when the folder was absent — but **nothing in the app ever created
+ * that folder**, so the Vosk dependency shipped in every build and could never
+ * initialise. This is the missing half.
  *
- *  - The release build pointed at a Deepgram relay on `www.prayerkey.com`. That
- *    endpoint answers 404 — the socket server was never deployed — so the
- *    online path was dead in every shipped build.
- *  - [SermonCaptureEngine] already had an offline path, but it opened
- *    `filesDir/vosk-model` and returned quietly if the folder was missing, and
- *    **nothing in the app ever created that folder**. The Vosk dependency was
- *    being shipped and could never initialise.
+ * There are two models rather than one, because live captioning and a good
+ * transcript are different problems:
  *
- * This is the missing half. Vosk's small English model is Apache 2.0, needs no
- * key, no account and no server, and runs entirely on the phone — which is the
- * only option that satisfies "everything free" and is also the only one that
- * works in a building with bad signal, which is where churches tend to be.
+ *  - [Live] runs during the sermon, keeping up with speech in real time on a
+ *    phone. It is 39 MB and it is small enough that its accuracy shows it,
+ *    especially in a reverberant room at a distance from the speaker.
+ *  - [Studio] is three times the size and correspondingly better, far too slow
+ *    to caption live but perfectly happy running afterwards against the audio
+ *    we already keep. See [SermonRefiner].
  *
- * It is downloaded once rather than bundled. At 39 MB it would have taken the
- * APK from 54 MB to 93 MB for a feature most users open occasionally, and a
- * download can be repeated if it is corrupt where a bad asset cannot.
+ * Both are Apache 2.0 from the Vosk project's own host: no key, no account, no
+ * server, and no network at all once installed — which matters twice, because
+ * it is the only arrangement that is genuinely free and the only one that works
+ * in a building with no signal, which is where churches tend to be.
  *
- * Model: vosk-model-small-en-us-0.15, from the Vosk project's own host.
  * https://alphacephei.com/vosk/models
  */
 object VoskModel {
 
-    private const val URL = "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"
+    /**
+     * A model that can be installed.
+     *
+     * [expectedBytes] is the published size, checked against what actually
+     * arrived so a dropped connection is rejected rather than unpacked into a
+     * half model that looks installed and crashes on use.
+     */
+    enum class Kind(
+        internal val url: String,
+        internal val folder: String,
+        internal val expectedBytes: Long,
+        val megabytes: Int,
+    ) {
+        /** vosk-model-small-en-us-0.15 — real time, modest accuracy. */
+        Live(
+            "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip",
+            "vosk-model",
+            41_205_931L,
+            39,
+        ),
 
-    /** Checked against Content-Length before unzipping, so a truncated
-     *  download is rejected rather than unpacked into a half model. */
-    private const val EXPECTED_BYTES = 41_205_931L
-
-    const val MEGABYTES = 39
+        /** vosk-model-en-us-0.22-lgraph — too slow to caption, much better. */
+        Studio(
+            "https://alphacephei.com/vosk/models/vosk-model-en-us-0.22-lgraph.zip",
+            "vosk-model-studio",
+            130_557_655L,
+            125,
+        ),
+    }
 
     sealed interface State {
         data object Absent : State
@@ -55,56 +77,59 @@ object VoskModel {
         data class Failed(val reason: String) : State
     }
 
-    private val _state = MutableStateFlow<State>(State.Absent)
-    val state: StateFlow<State> = _state.asStateFlow()
+    private val states = Kind.entries.associateWith { MutableStateFlow<State>(State.Absent) }
 
-    /** Where the unpacked model lives. */
-    fun directory(context: Context) = File(context.applicationContext.filesDir, "vosk-model")
+    fun state(kind: Kind): StateFlow<State> = states.getValue(kind).asStateFlow()
+
+    /** Where an unpacked model lives. */
+    fun directory(context: Context, kind: Kind) =
+        File(context.applicationContext.filesDir, kind.folder)
 
     /**
      * Whether a *usable* model is present.
      *
-     * Checks for the subfolders Vosk actually needs rather than just that the
+     * Checks for the subfolders Vosk actually reads rather than just that the
      * directory exists — an interrupted unzip leaves a folder behind, and
-     * `Model()` on a partial folder crashes in native code where it cannot be
-     * caught cleanly.
+     * `Model()` on a partial folder dies in native code where it cannot be
+     * caught.
      */
-    fun isInstalled(context: Context): Boolean {
-        val dir = directory(context)
+    fun isInstalled(context: Context, kind: Kind): Boolean {
+        val dir = directory(context, kind)
         return dir.isDirectory && File(dir, "am").isDirectory && File(dir, "conf").isDirectory
     }
 
-    fun refresh(context: Context) {
-        _state.value = if (isInstalled(context)) State.Ready else State.Absent
+    fun refresh(context: Context, kind: Kind) {
+        states.getValue(kind).value = if (isInstalled(context, kind)) State.Ready else State.Absent
     }
 
     /**
-     * Fetches and unpacks the model. Safe to call when it is already present.
+     * Fetches and unpacks a model. Safe to call when it is already present.
      *
-     * Downloads to a temporary file, unpacks to a temporary directory, and only
-     * then swaps it into place, so an interrupted install never leaves a broken
-     * model where [isInstalled] would find it.
+     * Downloads to a temporary file, unpacks to a staging directory, and swaps
+     * it into place last, so an interrupted install never leaves a broken model
+     * where [isInstalled] would find it.
      */
-    suspend fun install(context: Context): Boolean = withContext(Dispatchers.IO) {
+    suspend fun install(context: Context, kind: Kind): Boolean = withContext(Dispatchers.IO) {
         val app = context.applicationContext
-        if (isInstalled(app)) { _state.value = State.Ready; return@withContext true }
+        val state = states.getValue(kind)
+        if (isInstalled(app, kind)) { state.value = State.Ready; return@withContext true }
 
-        val target = directory(app)
-        val zip = File(app.cacheDir, "vosk-model.zip.part")
-        val staging = File(app.filesDir, "vosk-model.staging")
+        val target = directory(app, kind)
+        val zip = File(app.cacheDir, "${kind.folder}.zip.part")
+        val staging = File(app.filesDir, "${kind.folder}.staging")
 
         runCatching {
             staging.deleteRecursively()
             zip.delete()
 
-            _state.value = State.Downloading(0f)
-            val connection = (URL(URL).openConnection() as HttpURLConnection).apply {
+            state.value = State.Downloading(0f)
+            val connection = (URL(kind.url).openConnection() as HttpURLConnection).apply {
                 connectTimeout = 30_000
                 readTimeout = 60_000
                 instanceFollowRedirects = true
             }
             connection.inputStream.use { input ->
-                val total = connection.contentLengthLong.takeIf { it > 0 } ?: EXPECTED_BYTES
+                val total = connection.contentLengthLong.takeIf { it > 0 } ?: kind.expectedBytes
                 zip.outputStream().use { output ->
                     val buffer = ByteArray(64 * 1024)
                     var written = 0L
@@ -113,25 +138,22 @@ object VoskModel {
                         if (read < 0) break
                         output.write(buffer, 0, read)
                         written += read
-                        _state.value = State.Downloading((written.toFloat() / total).coerceIn(0f, 1f))
+                        state.value = State.Downloading((written.toFloat() / total).coerceIn(0f, 1f))
                     }
                 }
             }
             connection.disconnect()
 
-            /* A short file means the connection dropped. Unpacking it would
-               produce a directory that looks installed and crashes on use. */
-            if (zip.length() < EXPECTED_BYTES * 9 / 10) {
-                error("download was cut short at ${zip.length() / 1_048_576} MB")
+            if (zip.length() < kind.expectedBytes * 9 / 10) {
+                error("the download was cut short at ${zip.length() / 1_048_576} MB")
             }
 
-            _state.value = State.Unpacking
+            state.value = State.Unpacking
             unzip(zip, staging)
 
-            /* The archive contains one top-level folder named for the model
-               version. Vosk wants the folder holding `am` and `conf`, so find
-               it rather than assuming the name and breaking on the next
-               release. */
+            /* The archive holds one folder named for the model version. Find
+               the one containing `am` and `conf` rather than assuming the name,
+               so the next release does not silently install nothing. */
             val root = findModelRoot(staging) ?: error("the archive did not contain a model")
 
             target.deleteRecursively()
@@ -140,22 +162,22 @@ object VoskModel {
                 root.deleteRecursively()
             }
 
-            require(isInstalled(app)) { "the unpacked model was incomplete" }
+            require(isInstalled(app, kind)) { "the unpacked model was incomplete" }
             true
         }.onSuccess {
-            _state.value = State.Ready
+            state.value = State.Ready
         }.onFailure { failure ->
             target.deleteRecursively()
-            _state.value = State.Failed(failure.message ?: "the download failed")
+            state.value = State.Failed(failure.message ?: "the download failed")
         }.also {
             zip.delete()
             staging.deleteRecursively()
         }.getOrDefault(false)
     }
 
-    fun remove(context: Context) {
-        directory(context).deleteRecursively()
-        _state.value = State.Absent
+    fun remove(context: Context, kind: Kind) {
+        directory(context, kind).deleteRecursively()
+        states.getValue(kind).value = State.Absent
     }
 
     internal fun findModelRoot(from: File): File? {
@@ -167,10 +189,10 @@ object VoskModel {
      * Unpacks the archive.
      *
      * Every entry's resolved path is checked to be inside [into] before it is
-     * written. A zip entry named `../../databases/x` would otherwise be written
-     * outside the target directory — the Zip Slip vulnerability. The archive
-     * here is trusted, but an unpacker that only works on trusted input is one
-     * refactor away from being a hole.
+     * written. An entry named `../../databases/x` would otherwise be written
+     * outside the target — the Zip Slip vulnerability. These archives are
+     * trusted; an unpacker that only works on trusted input is one refactor
+     * away from being a hole.
      */
     internal fun unzip(archive: File, into: File) {
         into.mkdirs()

@@ -49,6 +49,47 @@ object PrayerKeyApi {
         )
     }
 
+    /**
+     * The prayer experience must never become a dead button because a phone is
+     * offline or the API is briefly unavailable. Prefer the server's richer
+     * response, then create a complete Scripture-shaped prayer locally.
+     */
+    suspend fun generatePrayerReliable(userRequest: String, moods: List<String>): GeneratedPrayer =
+        runCatching { generatePrayer(userRequest, moods) }.getOrElse {
+            localPrayer(userRequest, moods)
+        }
+
+    private fun localPrayer(userRequest: String, moods: List<String>): GeneratedPrayer {
+        val need = userRequest.trim().ifBlank { "the need I carry today" }
+        val lower = need.lowercase()
+        val (reference, verse) = when {
+            listOf("fear", "afraid", "anxious", "worry", "worried").any(lower::contains) ->
+                "Philippians 4:6–7" to "In everything, through prayer and petition with thanksgiving, present your requests to God. And the peace of God will guard your hearts and minds in Christ Jesus."
+            listOf("wisdom", "decision", "direction", "confused").any(lower::contains) ->
+                "James 1:5" to "If any of you lacks wisdom, he should ask God—who gives to all generously and ungrudgingly—and it will be given to him."
+            listOf("heal", "health", "sick", "pain").any(lower::contains) ->
+                "Psalm 103:2–3" to "My soul, bless the Lord, and do not forget all his benefits. He forgives all your iniquity; he heals all your diseases."
+            listOf("family", "marriage", "child", "children").any(lower::contains) ->
+                "Joshua 24:15" to "As for me and my family, we will worship the Lord."
+            listOf("work", "job", "money", "provision", "debt").any(lower::contains) ->
+                "Philippians 4:19" to "My God will supply all your needs according to his riches in glory in Christ Jesus."
+            else -> "Psalm 37:5" to "Commit your way to the Lord; trust in him, and he will act."
+        }
+        val feeling = moods.firstOrNull()?.lowercase()?.let { " You see that I feel $it, and I do not have to hide it from You." }.orEmpty()
+        return GeneratedPrayer(
+            id = "local-${System.currentTimeMillis()}",
+            title = when {
+                "family" in lower -> "Peace for My Family"
+                "wisdom" in lower || "decision" in lower -> "Wisdom for the Next Step"
+                "heal" in lower || "health" in lower -> "Grace and Healing"
+                else -> "I Place This in Your Hands"
+            },
+            prayer = "Father, I come to You honestly and without pretending.$feeling\n\nYou know this concern completely: $need\n\nLet Your Word steady my heart. Give me wisdom for what I must do, courage for what I must face, and peace about what I must leave in Your hands. Close every path that would lead me away from Your will, and make the next faithful step clear.\n\nGuard my heart from fear and impatience. Help me notice Your grace today and respond with obedience. I trust Your character even while I wait for the answer.\n\nIn the name of Jesus, amen.",
+            encouragement = "Your prayer is ready offline. Pray it slowly, then remain quiet for a moment and write down the next faithful step.",
+            verses = listOf(reference to verse),
+        )
+    }
+
     suspend fun detectVerse(transcript: String): DetectedVerse = withContext(Dispatchers.IO) {
         val json = request("/api/detect-verses", "POST", JSONObject().put("transcript", transcript))
         DetectedVerse(json.optBoolean("detected"), json.optString("ref"), json.optString("text"), json.optDouble("confidence"))

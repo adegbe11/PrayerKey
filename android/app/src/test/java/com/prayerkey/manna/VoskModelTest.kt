@@ -13,7 +13,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 /**
- * The archive handling behind live transcription.
+ * The archive handling behind transcription.
  *
  * The download itself needs a network and the recogniser needs a device, but
  * the part most likely to be wrong is the unpacking — where the model ends up,
@@ -34,6 +34,22 @@ class VoskModelTest {
             }
         }
         return file
+    }
+
+    /**
+     * The two models must never share a folder. They are installed
+     * independently and either can be absent, so a collision would let one
+     * removal silently break the other.
+     */
+    @Test
+    fun `each model has its own folder`() {
+        val folders = VoskModel.Kind.entries.map { it.folder }
+        assertEquals(folders.size, folders.toSet().size)
+        assertEquals(2, VoskModel.Kind.entries.size)
+        VoskModel.Kind.entries.forEach {
+            assertTrue("${it.name} has no published size", it.expectedBytes > 1_000_000)
+            assertTrue("${it.name} url is not a zip", it.url.endsWith(".zip"))
+        }
     }
 
     @Test

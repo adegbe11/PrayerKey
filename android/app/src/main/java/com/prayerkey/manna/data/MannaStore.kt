@@ -104,9 +104,14 @@ data class SermonNote(
     val transcript: String,
     val minutes: Int,
     val createdAt: Long,
+    /** The AAC master this note was made from, if it still exists. Lets the
+     *  transcript be redone later with a better model — see SermonRefiner. */
+    val audioPath: String = "",
+    /** True once the better model has re-read the recording. */
+    val refined: Boolean = false,
 )
 
-class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 12) {
+class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 13) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""CREATE TABLE saved_words (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -130,6 +135,12 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 13) {
+            listOf(
+                "ALTER TABLE sermon_notes ADD COLUMN audio_path TEXT NOT NULL DEFAULT ''",
+                "ALTER TABLE sermon_notes ADD COLUMN refined INTEGER NOT NULL DEFAULT 0",
+            ).forEach { sql -> runCatching { db.execSQL(sql) } }
+        }
         if (oldVersion < 2) createStateTable(db)
         if (oldVersion < 3) createMemoryTable(db)
         if (oldVersion < 4) createSermonTables(db)
@@ -236,7 +247,9 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
             takeaway TEXT NOT NULL,
             transcript TEXT NOT NULL,
             minutes INTEGER NOT NULL,
-            created_at INTEGER NOT NULL
+            created_at INTEGER NOT NULL,
+            audio_path TEXT NOT NULL DEFAULT '',
+            refined INTEGER NOT NULL DEFAULT 0
         )""")
     }
 
@@ -247,7 +260,9 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     fun saveSermonNote(
         title: String, scriptures: List<String>, points: List<String>,
         quotes: List<String>, takeaway: String, transcript: String, minutes: Int,
+        audioPath: String = "",
     ): Long = writableDatabase.insert("sermon_notes", null, ContentValues().apply {
+        put("audio_path", audioPath)
         put("title", title)
         put("scriptures", join(scriptures))
         put("points", join(points))
@@ -257,6 +272,32 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         put("minutes", minutes)
         put("created_at", System.currentTimeMillis())
     })
+
+    /**
+     * Replaces a note with the version built from the better transcript.
+     *
+     * The recording is the source of truth, not the note, so re-reading it
+     * produces a strictly better note rather than an alternative one — the
+     * old text is not worth keeping alongside.
+     */
+    fun refineSermonNote(
+        id: Long, title: String, scriptures: List<String>, points: List<String>,
+        quotes: List<String>, takeaway: String, transcript: String,
+    ) {
+        writableDatabase.update(
+            "sermon_notes",
+            ContentValues().apply {
+                put("title", title)
+                put("scriptures", join(scriptures))
+                put("points", join(points))
+                put("quotes", join(quotes))
+                put("takeaway", takeaway)
+                put("transcript", transcript)
+                put("refined", 1)
+            },
+            "id = ?", arrayOf(id.toString()),
+        )
+    }
 
     fun sermonNotes(): List<SermonNote> = readableDatabase.query(
         "sermon_notes", null, null, null, null, null, "created_at DESC"
@@ -272,6 +313,8 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
                 c.getString(c.getColumnIndexOrThrow("transcript")),
                 c.getInt(c.getColumnIndexOrThrow("minutes")),
                 c.getLong(c.getColumnIndexOrThrow("created_at")),
+                c.getString(c.getColumnIndexOrThrow("audio_path")).orEmpty(),
+                c.getInt(c.getColumnIndexOrThrow("refined")) == 1,
             ))
         }
     }
