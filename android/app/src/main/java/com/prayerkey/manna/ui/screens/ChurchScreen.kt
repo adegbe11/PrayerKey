@@ -70,6 +70,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import com.prayerkey.manna.ui.church.SermonService
 import com.prayerkey.manna.ui.church.VoskModel
+import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 import com.prayerkey.manna.ui.theme.*
 import kotlinx.coroutines.delay
@@ -114,7 +115,16 @@ fun ChurchScreen(
     }
     val notifyPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
-    fun begin() {
+    /* Asked once, at the only moment it matters: the first time someone presses
+       Start without the model. It was a card on the Ready screen, which put a
+       setup chore in the spot the main action belongs in and showed it to
+       people who had not asked for the feature. Recording never needed it. */
+    val captionPrefs = remember {
+        context.getSharedPreferences("church", android.content.Context.MODE_PRIVATE)
+    }
+    var offerCaptions by remember { mutableStateOf(false) }
+
+    fun record() {
         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
         SermonService.setLanguage(language)
         val power = context.getSystemService(PowerManager::class.java)
@@ -134,6 +144,28 @@ fun ChurchScreen(
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
             SermonService.start(context)
         } else micPermission.launch(Manifest.permission.RECORD_AUDIO)
+    }
+
+    fun begin() {
+        val asked = captionPrefs.getBoolean("captions-asked", false)
+        if (!asked && !VoskModel.isInstalled(context)) { offerCaptions = true; return }
+        record()
+    }
+
+    if (offerCaptions) {
+        CaptionsOffer(
+            onSkip = {
+                // remembered, so it is never asked again
+                captionPrefs.edit().putBoolean("captions-asked", true).apply()
+                offerCaptions = false
+                record()
+            },
+            onReady = {
+                captionPrefs.edit().putBoolean("captions-asked", true).apply()
+                offerCaptions = false
+                record()
+            },
+        )
     }
 
     fun end() {
@@ -241,21 +273,23 @@ fun ChurchScreen(
  * advertising a solved problem is clutter.
  */
 @Composable
-private fun LiveCaptionsCard() {
+private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val state by VoskModel.state.collectAsState()
     LaunchedEffect(Unit) { VoskModel.refresh(context) }
+    // installing is the answer to the question; go straight on to recording
+    LaunchedEffect(state) { if (state is VoskModel.State.Ready) onReady() }
 
-    if (state is VoskModel.State.Ready) return
     val cs = MaterialTheme.colorScheme
+    val busy = state is VoskModel.State.Downloading || state is VoskModel.State.Unpacking
 
+    Dialog(onDismissRequest = { if (!busy) onSkip() }) {
     Column(
-        Modifier.fillMaxWidth().padding(top = 20.dp)
+        Modifier.fillMaxWidth()
             .clip(R.card)
-            .background(cs.surfaceVariant.copy(alpha = .5f))
-            .border(1.dp, cs.onBackground.copy(alpha = .10f), R.card)
-            .padding(18.dp),
+            .background(cs.surface)
+            .padding(22.dp),
     ) {
         Text(
             "Live captions",
@@ -268,9 +302,9 @@ private fun LiveCaptionsCard() {
                 is VoskModel.State.Failed ->
                     "That did not download: ${s.reason}. Recording still works — you can try again."
                 else ->
-                    "Turn on to see the sermon written out as it is spoken, and to catch " +
-                        "the verses that are quoted. It runs on your phone, so it works with " +
-                        "no signal and costs nothing to use."
+                    "See the sermon written out as it is spoken, and catch the verses " +
+                        "quoted. It runs on your phone, so it works with no signal and costs " +
+                        "nothing. You only need this once."
             },
             color = cs.onBackground.copy(alpha = .68f), fontSize = 13.5.sp, lineHeight = 20.sp,
         )
@@ -295,20 +329,37 @@ private fun LiveCaptionsCard() {
                 Text("Installing…", color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp)
             }
             else -> {
-                Spacer(Modifier.height(14.dp))
-                Box(
-                    Modifier.clip(R.pill).background(cs.primary)
-                        .clickable { scope.launch { VoskModel.install(context) } }
-                        .padding(horizontal = 18.dp, vertical = 11.dp),
-                ) {
-                    Text(
-                        if (state is VoskModel.State.Failed) "Try again"
-                        else "Turn on · ${VoskModel.MEGABYTES} MB once",
-                        color = cs.onPrimary, fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold,
-                    )
+                Spacer(Modifier.height(18.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        Modifier.clip(R.pill).background(cs.primary)
+                            .clickable { scope.launch { VoskModel.install(context) } }
+                            .padding(horizontal = 18.dp, vertical = 11.dp),
+                    ) {
+                        Text(
+                            if (state is VoskModel.State.Failed) "Try again"
+                            else "Turn on · ${VoskModel.MEGABYTES} MB",
+                            color = cs.onPrimary, fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    /* Recording has never needed the model, so declining has to
+                       start the recording rather than cancel it — the sermon is
+                       beginning and this question is not worth missing it for. */
+                    Box(
+                        Modifier.clip(R.pill).clickable(onClick = onSkip)
+                            .padding(horizontal = 16.dp, vertical = 11.dp),
+                    ) {
+                        Text(
+                            "Just record",
+                            color = cs.onBackground.copy(alpha = .6f),
+                            fontSize = 13.5.sp, fontWeight = FontWeight.Medium,
+                        )
+                    }
                 }
             }
         }
+    }
     }
 }
 
@@ -352,8 +403,6 @@ private fun ReadyView(
                 )
             }
         }
-
-        LiveCaptionsCard()
 
         Box(
             Modifier.fillMaxWidth().padding(top = 28.dp)

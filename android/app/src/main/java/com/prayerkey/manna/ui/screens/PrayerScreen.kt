@@ -34,9 +34,9 @@ import com.prayerkey.manna.ui.theme.UtilitySans
 import java.util.Locale
 import kotlinx.coroutines.launch
 
-private val PrayBlack = Color(0xFF09090C)
-private val PrayPanel = Color(0xFF121217)
-private val PrayLine = Color(0xFF343039)
+private val PrayBlack = Color(0xFF6200ED)
+private val PrayPanel = Color(0xFF4B00B8)
+private val PrayLine = Color(0xFF8F52F4)
 private val PrayGold = Color(0xFFC9A26D)
 private val PrayViolet = Color(0xFF6200ED)
 
