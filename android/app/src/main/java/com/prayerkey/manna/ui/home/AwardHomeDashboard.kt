@@ -168,7 +168,12 @@ private fun ExactDailyHome(
     var backdropIndex by remember { mutableIntStateOf(Math.floorMod(today.toEpochDay().toInt(), 120)) }
     val dailyPassage = remember(today) { com.prayerkey.manna.data.passageFor(today) }
     val dailyDevotional = remember(today) { com.prayerkey.manna.data.devotionalFor(today) }
-    val dailyPrayer = remember(today) { com.prayerkey.manna.data.dailyPrayerFor(today) }
+    /* The 543 bundled prayers, so the daily prayer is a written one rather than
+       a template with the date's reference dropped into it. */
+    val prayerTopics = remember { com.prayerkey.manna.data.LocalPrayerTopics.load(context) }
+    val dailyPrayer = remember(today, prayerTopics) {
+        com.prayerkey.manna.data.dailyPrayerFor(today, prayerTopics)
+    }
     val dailyQuote = remember(today) { com.prayerkey.manna.data.quoteFor(today) }
     var dailyVerseText by remember(today) { mutableStateOf("") }
     LaunchedEffect(today, dailyPassage) {

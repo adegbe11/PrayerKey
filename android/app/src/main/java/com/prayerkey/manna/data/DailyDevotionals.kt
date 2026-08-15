@@ -58,8 +58,48 @@ fun devotionalFor(date: LocalDate): DailyDevotional {
     )
 }
 
-/** One full, original prayer for every daily passage in the 365-day plan. */
-fun dailyPrayerFor(date: LocalDate): DailyPrayer {
+/**
+ * The day's prayer, drawn from the 543 written prayers the app already ships.
+ *
+ * What this replaces was a template. Measured across a year, it produced 365
+ * "different" prayers — but blank out the one substituted verse reference and
+ * **only twelve remained**, on the same twelve-day cycle as the old devotional
+ * themes. "Faithful in Small Things" landed on the 14th of August and again on
+ * the 26th. A daily user would have noticed inside a fortnight.
+ *
+ * There was no need to write anything: [LocalPrayerTopics] already holds 543
+ * full prayers with their own scripture, bundled and offline. Rotating those by
+ * date gives 543 genuinely distinct prayers instead of twelve wearing costumes,
+ * and it uses content that was already there and already good.
+ *
+ * [topics] is passed in rather than loaded here because it comes from an asset
+ * and this stays a pure function of the date — the property that makes the
+ * whole plan the same for everybody on the same calendar day.
+ *
+ * Falls back to the old template only when the topics have not loaded yet, so
+ * a cold start shows a prayer rather than a gap.
+ */
+fun dailyPrayerFor(date: LocalDate, topics: List<PrayerTopic>): DailyPrayer {
+    if (topics.isEmpty()) return templatedPrayerFor(date)
+    /* A stride coprime with almost any list length, so consecutive days land in
+       different parts of the library rather than walking it in order — two
+       prayers about grief on Monday and Tuesday read as a rut. */
+    val topic = topics[Math.floorMod(date.toEpochDay() * 7, topics.size.toLong()).toInt()]
+    return DailyPrayer(
+        ref = topic.scripture.firstOrNull()?.first ?: passageFor(date).reference,
+        title = topic.title,
+        verse = topic.scripture.firstOrNull()?.second ?: "",
+        prayer = topic.prayer,
+    )
+}
+
+/**
+ * The old generated prayer, kept only as the cold-start fallback.
+ *
+ * Twelve distinct bodies across a year. Not for display when anything better
+ * is available — see [dailyPrayerFor].
+ */
+private fun templatedPrayerFor(date: LocalDate): DailyPrayer {
     val passage = passageFor(date)
     val devotional = devotionalFor(date)
     return DailyPrayer(
