@@ -2,6 +2,7 @@ package com.prayerkey.manna.ui.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -138,13 +139,13 @@ fun PrayerKeyOperatingHome(
     val go: (Feature) -> Unit = { selectedFeature = it }
     selectedFeature?.let { feature ->
         Dialog(onDismissRequest = { selectedFeature = null }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-            FeatureDestination(feature, onClose = { selectedFeature = null }) { }
+            FeatureDestination(feature, onKeep = onKeepPrayer, onClose = { selectedFeature = null }) { }
         }
     }
     val fixed = remember { fixedFeatures() }
     val discovery = remember(fixed) {
         val start = fixed.indexOfFirst { it.title == "My prayer list" }
-        val end = fixed.indexOfLast { it.title == "Prayer partner" }
+        val end = fixed.indexOfLast { it.title == "Testimonies" }
         if (start >= 0 && end >= start) fixed.subList(start, end + 1) else fixed
     }
     val conditional = remember(today) { conditionalFeatures(today) }
@@ -166,8 +167,12 @@ fun PrayerKeyOperatingHome(
         EmergencyCard(onOpenPrayer)
         TopicalBibleEntry { topicalBibleOpen = true }
 
-        Section("YOUR PRAYER LIFE") {
-            PrayerLifePanel(savedCount, journalCount, streak, onOpenPrayer, onOpenJournal)
+        Section("TODAY'S RHYTHM") {
+            TodayRhythmPanel(
+                savedCount, journalCount, streak,
+                onOpenPrayer, { devotionalOpen = true }, onOpenBible,
+                onOpenJournal, onOpenPrayer, onOpenJournal,
+            )
         }
 
         conditional.takeIf { it.isNotEmpty() }?.let { items ->
@@ -497,6 +502,72 @@ fun PrayerKeyOperatingHome(
     }
 }
 
+@Composable private fun TodayRhythmPanel(
+    saved: Int, journal: Int, streak: Int,
+    morningPrayer: () -> Unit, devotional: () -> Unit, bible: () -> Unit,
+    reflection: () -> Unit, eveningPrayer: () -> Unit, history: () -> Unit,
+) {
+    val context = LocalContext.current
+    val dateKey = LocalDate.now().toString()
+    val prefs = remember { context.getSharedPreferences("today_rhythm", android.content.Context.MODE_PRIVATE) }
+    var completed by remember(dateKey) { mutableStateOf(prefs.getStringSet(dateKey, emptySet()).orEmpty()) }
+    fun open(id: String, destination: () -> Unit) {
+        completed = completed + id
+        prefs.edit().putStringSet(dateKey, completed).apply()
+        destination()
+    }
+    val items = listOf(
+        Triple("morning", "Morning prayer", "Begin the day with God") to Pair(Icons.Outlined.WbSunny, morningPrayer),
+        Triple("devotional", "Daily devotional", "Scripture · reflection · prayer") to Pair(Icons.Outlined.AutoStories, devotional),
+        Triple("bible", "Read today's Bible", "Continue your reading journey") to Pair(Icons.Outlined.MenuBook, bible),
+        Triple("reflection", "Guided reflection", "Notice what God is teaching") to Pair(Icons.Outlined.EditNote, reflection),
+        Triple("evening", "Evening prayer", "Review the day with gratitude") to Pair(Icons.Outlined.NightsStay, eveningPrayer),
+    )
+    Surface(shape = RoundedCornerShape(28.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair), shadowElevation = 2.dp) {
+        Column(Modifier.padding(vertical = 8.dp)) {
+            Row(Modifier.padding(horizontal = 20.dp, vertical = 15.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Today, ${LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d"))}", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 25.sp, color = Pk.Charcoal)
+                    Text("${completed.size} of ${items.size} moments completed", Modifier.padding(top = 4.dp), fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted)
+                }
+                Box(Modifier.size(44.dp).clip(CircleShape).background(Pk.Oxblood.copy(alpha = .08f)), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Outlined.CalendarToday, null, tint = Pk.Oxblood, modifier = Modifier.size(21.dp))
+                }
+            }
+            LinearProgressIndicator(progress = { completed.size.toFloat() / items.size }, modifier = Modifier.fillMaxWidth().height(4.dp), color = Pk.Oxblood, trackColor = Pk.Oxblood.copy(alpha = .08f))
+            items.forEachIndexed { index, item ->
+                val identity = item.first
+                val icon = item.second.first
+                val destination = item.second.second
+                val done = identity.first in completed
+                Row(Modifier.fillMaxWidth().clickable { open(identity.first, destination) }.padding(horizontal = 20.dp, vertical = 15.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(43.dp).clip(RoundedCornerShape(13.dp)).background(if (done) Pk.Oxblood else Pk.Oxblood.copy(alpha = .08f)), contentAlignment = Alignment.Center) {
+                        Icon(icon, null, tint = if (done) Color.White else Pk.Oxblood, modifier = Modifier.size(21.dp))
+                    }
+                    Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
+                        Text(identity.second, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Pk.Charcoal)
+                        Text(identity.third, Modifier.padding(top = 3.dp), fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted)
+                    }
+                    Box(Modifier.size(30.dp).clip(CircleShape).border(1.5.dp, if (done) Pk.Oxblood else Pk.Muted.copy(alpha = .45f), CircleShape), contentAlignment = Alignment.Center) {
+                        if (done) Icon(Icons.Outlined.Check, null, tint = Pk.Oxblood, modifier = Modifier.size(17.dp))
+                    }
+                }
+                if (index < items.lastIndex) HorizontalDivider(Modifier.padding(start = 77.dp), color = Pk.Hair)
+            }
+        }
+    }
+    Surface(onClick = history, modifier = Modifier.fillMaxWidth().padding(top = 12.dp), shape = RoundedCornerShape(20.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
+        Row(Modifier.padding(horizontal = 18.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Outlined.History, null, tint = Pk.Oxblood)
+            Column(Modifier.weight(1f).padding(start = 13.dp)) {
+                Text("Prayer history", fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Pk.Charcoal)
+                Text("$saved open · $journal entries · ${streak.coerceAtLeast(1)} day streak", Modifier.padding(top = 3.dp), fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted)
+            }
+            Icon(Icons.Outlined.ChevronRight, null, tint = Pk.Muted)
+        }
+    }
+}
+
 @Composable private fun MomentCards(items: List<Feature>, go: (Feature) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         items.forEachIndexed { index, item ->
@@ -765,10 +836,24 @@ private fun labelStyle() = androidx.compose.ui.text.TextStyle(fontFamily = Utili
  * these actually open, and two rival implementations is how the dead one got
  * there in the first place.
  */
-@Composable private fun FeatureDestination(feature: Feature, onClose: () -> Unit, openFull: () -> Unit) {
-    DiscoveryExperienceScreen(feature.title, feature.detail, feature.icon, onClose, openFull)
+@Composable private fun FeatureDestination(
+    feature: Feature,
+    onKeep: (String, String) -> Unit,
+    onClose: () -> Unit,
+    openFull: () -> Unit,
+) {
+    DiscoveryExperienceScreen(feature.title, feature.detail, feature.icon, onKeep, onClose, openFull)
 }
 
+/**
+ * The programmes on Home.
+ *
+ * "Prayer wall" and "Prayer partner" were removed rather than fixed. Both are
+ * community features and there is no server behind them — the wall shipped
+ * hardcoded activity ("Healing before surgery · 41 prayed") presenting invented
+ * people as real ones praying for real requests. A facade that convincing is
+ * worse than an absent feature, and it cannot be made honest without a backend.
+ */
 private fun fixedFeatures() = listOf(
     Feature("My prayer list", "Bring every name", Icons.Outlined.FormatListBulleted, Hub.PRAY),
     Feature("Prayer points", "Pray by situation", Icons.Outlined.AutoAwesome, Hub.PRAY),
@@ -786,8 +871,6 @@ private fun fixedFeatures() = listOf(
     Feature("Thanksgiving", "Name the goodness", Icons.Outlined.Celebration, Hub.JOURNAL),
     Feature("Dreams", "Record, pray and discern", Icons.Outlined.Nightlight, Hub.JOURNAL),
     Feature("Testimonies", "Tell what God did", Icons.Outlined.RecordVoiceOver, Hub.JOURNAL),
-    Feature("Prayer wall", "Pray together", Icons.Outlined.ViewAgenda, Hub.CHURCH),
-    Feature("Prayer partner", "Never pray alone", Icons.Outlined.PeopleOutline, Hub.CHURCH),
 )
 
 private fun conditionalFeatures(today: LocalDate): List<Feature> = buildList {

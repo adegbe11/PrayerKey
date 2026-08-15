@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.prayerkey.manna.model.DailyVerses
-import com.prayerkey.manna.ui.home.HomeScreen
 import com.prayerkey.manna.ui.screens.BibleScreen
 import com.prayerkey.manna.ui.screens.PrayerScreen
 import com.prayerkey.manna.ui.screens.ProfileScreen

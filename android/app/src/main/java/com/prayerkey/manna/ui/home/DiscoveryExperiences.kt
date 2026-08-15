@@ -36,7 +36,11 @@ private data class Experience(
 )
 
 private fun experience(title: String): Experience = when (title) {
-    "My prayer list" -> Experience(ExperienceKind.LIST, "YOUR PRIVATE ALTAR", "Keep the people and situations you are carrying before God in one quiet place.", listOf("My family", "Wisdom for the next step", "Healing and strength"), "Write a name or prayer need", "ADD PRAYER")
+    /* The three items here used to be "My family", "Wisdom for the next step" and
+       "Healing and strength" — which read as the user's own list on a screen
+       headed YOUR PRIVATE ALTAR, on a first launch, before they had written
+       anything. Prompts now, phrased as prompts. */
+    "My prayer list" -> Experience(ExperienceKind.LIST, "YOUR PRIVATE ALTAR", "Keep the people and situations you are carrying before God in one quiet place.", listOf("Someone you are carrying", "A decision ahead of you", "A body that needs healing"), "Write a name or prayer need", "ADD PRAYER")
     "Prayer points" -> Experience(ExperienceKind.GUIDE, "PRAY BY SITUATION", "Choose the need before you. Each path opens Scripture-led prayer points you can pray one at a time.", listOf("Health & body", "Family & children", "Work & money", "Travel & protection", "Justice & legal matters", "Spiritual warfare"), "What are you standing in prayer for?", "BEGIN PRAYING")
     "Prayer times" -> Experience(ExperienceKind.SCHEDULE, "A RHYTHM OF PRAYER", "Return your attention to God throughout the day with complete prayers and timely reminders.", listOf("Morning · Surrender the day", "Midday · Renew your focus", "Evening · Review with gratitude", "Midnight · Take your watch"), "Choose a prayer time", "SET REMINDER")
     "Voice prayers" -> Experience(ExperienceKind.JOURNAL, "PRAY ALOUD", "Speak naturally. PrayerKey keeps your words as a private prayer transcript you can return to.", listOf("Record a new prayer", "Recent voice prayers", "Extract prayer points", "Move an answer to Testimonies"), "What is on your heart?", "START RECORDING")
@@ -52,7 +56,9 @@ private fun experience(title: String): Experience = when (title) {
     "Hymn of the day" -> Experience(ExperienceKind.LIBRARY, "SING THE FAITH", "Meet one historic hymn through its story, Scripture and a licensed listening experience.", listOf("Today · Great Is Thy Faithfulness", "The story behind the hymn", "Related Scripture", "Instrumental reflection", "Saved hymns"), "Today’s hymn", "LISTEN")
     "Anchors" -> Experience(ExperienceKind.LIBRARY, "WORDS CHRISTIANS CARRY", "Read, hear and memorize the foundational prayers and declarations of the faith.", listOf("The Lord’s Prayer", "The Apostles’ Creed", "The Nicene Creed", "The Ten Commandments", "The Beatitudes", "Psalm 23"), "Choose an anchor", "READ")
     "Quote of the day" -> Experience(ExperienceKind.LIBRARY, "WISDOM FOR TODAY", "One carefully sourced Christian reflection each day, ready to save and share.", listOf("Today’s quote", "Author context", "Saved quotes", "365-day archive"), "A thought worth carrying", "OPEN TODAY’S QUOTE")
-    "Answered" -> Experience(ExperienceKind.LIST, "REMEMBER HIS FAITHFULNESS", "Move answered prayers here and preserve the story of what changed.", listOf("Healing for Mum", "A new work opportunity", "Peace in our home"), "What prayer has been answered?", "RECORD AN ANSWER")
+    // "Healing for Mum" / "A new work opportunity" / "Peace in our home" read as
+    // the user's own answered prayers. They were nobody's.
+    "Answered" -> Experience(ExperienceKind.LIST, "REMEMBER HIS FAITHFULNESS", "Move answered prayers here and preserve the story of what changed.", listOf("What you asked for", "What actually changed", "The date it happened"), "What prayer has been answered?", "RECORD AN ANSWER")
     "Thanksgiving" -> Experience(ExperienceKind.JOURNAL, "NAME THE GOODNESS", "Notice grace in ordinary days and build a record of gratitude you can revisit.", listOf("Today’s gratitude", "Seven-day thanksgiving", "Voice thanksgiving", "Past memories"), "Father, thank You for…", "WRITE THANKS")
     "Dreams" -> Experience(ExperienceKind.JOURNAL, "DREAM JOURNAL", "Record details before interpreting them. PrayerKey does not claim every dream is prophetic.", listOf("People", "Places", "Words", "Emotions", "What happened before waking"), "Record everything you remember", "NEW DREAM")
     "Midnight prayer" -> Experience(ExperienceKind.COURSE, "THE MIDNIGHT WATCH", "A guided seven-night prayer watch. Complete tonight's Scripture, prayer points and closing declaration before the next watch unlocks.", listOf("Night 1 · Consecration", "Night 2 · Family", "Night 3 · Deliverance", "Night 4 · Open doors", "Night 5 · Healing", "Night 6 · Nation and church", "Night 7 · Thanksgiving"), "What are you bringing before God tonight?", "BEGIN NIGHT 1")
@@ -63,12 +69,30 @@ private fun experience(title: String): Experience = when (title) {
     "Milestones" -> Experience(ExperienceKind.LIST, "YOUR FAITH JOURNEY", "See the moments and practices that have shaped your walk with God.", listOf("First completed Bible plan", "Seven-day prayer streak", "First recorded testimony", "Fast completed", "Create my own milestone"), "What do you want to remember?", "ADD MILESTONE")
     "Nation & church" -> Experience(ExperienceKind.GUIDE, "STAND IN THE GAP", "Pray with clear, factual context for leaders, churches, communities and persecuted believers.", listOf("My nation", "Leaders", "Local community", "The persecuted church", "Missionaries", "Pastors and churches"), "Choose an intercession focus", "PRAY NOW")
     "Watchman rota" -> Experience(ExperienceKind.SCHEDULE, "TAKE YOUR WATCH", "Join a church prayer watch, receive a reminder and leave a handover for the next person.", listOf("6:00 AM · Morning watch", "12:00 PM · Midday watch", "6:00 PM · Evening watch", "12:00 AM · Midnight watch"), "Select an available watch", "JOIN THIS WATCH")
-    "Prayer wall" -> Experience(ExperienceKind.COMMUNITY, "PRAY TOGETHER", "Stand with real requests. Mark ‘I prayed’ only after you have genuinely prayed.", listOf("Peace after bereavement · 18 prayed", "Healing before surgery · 41 prayed", "Wisdom for a family · 27 prayed", "Mission team protection · 33 prayed"), "Share a request privately or anonymously", "ADD REQUEST")
-    "Prayer partner" -> Experience(ExperienceKind.COMMUNITY, "NEVER PRAY ALONE", "Invite someone you know, share selected prayers and keep a safe rhythm of encouragement.", listOf("Invite a trusted person", "Shared prayer list", "Weekly check-in", "Prayer schedule", "Safety and privacy"), "Who would you trust to pray with?", "INVITE PARTNER")
-    else -> Experience(ExperienceKind.GUIDE, "PRAYERKEY", "A focused space for your next faithful step.", listOf("Begin", "Reflect", "Save your progress"), "What is on your heart?", "CONTINUE")
+            else -> Experience(ExperienceKind.GUIDE, "PRAYERKEY", "A focused space for your next faithful step.", listOf("Begin", "Reflect", "Save your progress"), "What is on your heart?", "CONTINUE")
 }
 
-@Composable internal fun DiscoveryExperienceScreen(title: String, detail: String, icon: ImageVector, onClose: () -> Unit, openHub: () -> Unit) {
+/**
+ * A programme.
+ *
+ * [onKeep] is why this exists in its current form. What the user wrote here
+ * used to go to `prefs.putString("note_$title", ...)` — **one string per
+ * programme, overwritten every time** — under a button that said "Prayer added
+ * to your private list". There was no list. Nothing written here ever reached
+ * the prayer list, the journal or anything else in the app; it was a parallel
+ * store that only ever held the most recent sentence.
+ *
+ * It now goes to the same place the rest of the app keeps things, so a prayer
+ * added here is in the prayer list and a dream is in the journal.
+ */
+@Composable internal fun DiscoveryExperienceScreen(
+    title: String,
+    detail: String,
+    icon: ImageVector,
+    onKeep: (String, String) -> Unit,
+    onClose: () -> Unit,
+    openHub: () -> Unit,
+) {
     if (title == "Prayer challenge") {
         PrayerChallengeMachine(onClose)
         return
@@ -147,6 +171,8 @@ private fun experience(title: String): Experience = when (title) {
                             } else confirmation = "Programme completed. Your progress is saved."
                         }
                         else -> {
+                            // kept in the app's own store, not a private preference
+                            onKeep(title, note)
                             prefs.edit().putString("note_$title", note).apply()
                             confirmation = when (title) {
                                 "Dreams" -> "Dream saved privately. Review it with Scripture, prayer and wise counsel."
