@@ -22,6 +22,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
 import com.prayerkey.manna.reminder.ReminderReceiver
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
@@ -104,37 +110,114 @@ internal fun FaithProgrammeMachine(title: String, onClose: () -> Unit) {
     }
 }
 
+/**
+ * The programme landing.
+ *
+ * It was a white form reached by tapping a full-bleed artwork card — the only
+ * screen in the app that looked like a settings pane, so the transition into it
+ * fell off a cliff. It also said the programme's name three times before any
+ * content: in the bar, as a gold eyebrow, and as the title.
+ *
+ * It now opens the way every other surface here opens: artwork, the name over
+ * it, and the commitment in the same breath — how many days, and that a
+ * reminder will be set — so nobody starts a 21-day watch without knowing it is
+ * 21 days.
+ */
 @Composable
 private fun ProgrammeSetup(spec: FaithProgramme, selected: String, hour: Int, onSelect: (String) -> Unit, onHour: (Int) -> Unit, onClose: () -> Unit, onStart: () -> Unit) {
     Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
-        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            ProgrammeBar(onClose, spec.title)
-            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp)) {
-                Surface(shape = CircleShape, color = Pk.Oxblood.copy(alpha = .1f)) { Icon(spec.icon, null, Modifier.padding(14.dp).size(26.dp), tint = Pk.Oxblood) }
-                Text(spec.eyebrow, Modifier.padding(top = 20.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.4.sp, color = Pk.GoldDeep)
-                Text(spec.title, Modifier.padding(top = 6.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 35.sp, color = Pk.Charcoal)
-                Text(spec.description, Modifier.padding(top = 12.dp, bottom = 22.dp), fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 26.sp, color = Pk.Muted)
-                Text("CHOOSE YOUR FOCUS", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.Muted)
-                spec.choices.chunked(2).forEach { row ->
-                    Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        row.forEach { choice -> ChoiceCard(choice, selected == choice, Modifier.weight(1f)) { onSelect(choice) } }
-                        if (row.size == 1) Spacer(Modifier.weight(1f))
+        Column(Modifier.fillMaxSize()) {
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+
+                Box(Modifier.fillMaxWidth().height(272.dp)) {
+                    Image(
+                        painterResource(programmeArt(spec.title)), null,
+                        Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
+                    )
+                    Box(
+                        Modifier.fillMaxSize().background(
+                            Brush.verticalGradient(
+                                0f to Pk.DeepDark.copy(alpha = .34f),
+                                .5f to Pk.DeepDark.copy(alpha = .55f),
+                                1f to Pk.DeepDark.copy(alpha = .92f),
+                            ),
+                        ),
+                    )
+                    Box(
+                        Modifier.statusBarsPadding().padding(start = 8.dp, top = 4.dp)
+                            .size(42.dp).clip(CircleShape).clickable(onClick = onClose),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(Icons.Outlined.Close, "Back", tint = Color.White, modifier = Modifier.size(22.dp))
+                    }
+                    Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 22.dp, vertical = 20.dp)) {
+                        Text(
+                            spec.title, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold,
+                            fontSize = 38.sp, lineHeight = 42.sp, color = Color.White,
+                        )
+                        Text(
+                            "${spec.days} days \u00B7 one each day \u00B7 reminder set",
+                            Modifier.padding(top = 8.dp), fontFamily = UtilitySans,
+                            fontSize = 12.sp, color = Pk.GoldLight,
+                        )
                     }
                 }
-                Text("DAILY REMINDER", Modifier.padding(top = 26.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.Muted)
-                Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf(0 to "MIDNIGHT", 6 to "MORNING", 12 to "MIDDAY", 21 to "EVENING").forEach { (value, label) ->
-                        FilterChip(selected = hour == value, onClick = { onHour(value) }, label = { Text(label, fontSize = 9.sp) })
+
+                Column(Modifier.padding(horizontal = 22.dp)) {
+                    Text(
+                        "CHOOSE YOUR FOCUS", Modifier.padding(top = 24.dp),
+                        fontFamily = UtilitySans, fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.Muted,
+                    )
+                    spec.choices.chunked(2).forEach { row ->
+                        Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            row.forEach { choice -> ChoiceCard(choice, selected == choice, Modifier.weight(1f)) { onSelect(choice) } }
+                            if (row.size == 1) Spacer(Modifier.weight(1f))
+                        }
                     }
+                    Text(
+                        "REMIND ME", Modifier.padding(top = 26.dp), fontFamily = UtilitySans,
+                        fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.Muted,
+                    )
+                    Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf(0 to "MIDNIGHT", 6 to "MORNING", 12 to "MIDDAY", 21 to "EVENING").forEach { (value, label) ->
+                            FilterChip(selected = hour == value, onClick = { onHour(value) }, label = { Text(label, fontSize = 9.sp) })
+                        }
+                    }
+                    if (spec.title == "Fasting") Text("If you are pregnant, under 18, have diabetes, take medication, or have an eating-disorder history, speak with a qualified clinician before fasting. Choose a non-food fast when appropriate.", Modifier.padding(top = 20.dp), fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 17.sp, color = Pk.Muted)
+                    Spacer(Modifier.height(24.dp))
                 }
-                if (spec.title == "Fasting") Text("If you are pregnant, under 18, have diabetes, take medication, or have an eating-disorder history, speak with a qualified clinician before fasting. Choose a non-food fast when appropriate.", Modifier.padding(top = 20.dp), fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 17.sp, color = Pk.Muted)
-                Spacer(Modifier.height(24.dp))
             }
-            Button(onStart, enabled = selected.isNotBlank(), modifier = Modifier.fillMaxWidth().padding(20.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
-                Text("BEGIN ${spec.days}-DAY PROGRAMME", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .7.sp)
+
+            /* The button sat grey and disabled on arrival with nothing saying
+               why. It now names what it is waiting for, and then names the
+               choice back to the user. */
+            Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 20.dp).navigationBarsPadding()) {
+                Button(
+                    onStart, enabled = selected.isNotBlank(),
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood),
+                ) {
+                    Text(
+                        if (selected.isBlank()) "CHOOSE A FOCUS TO BEGIN" else "BEGIN \u00B7 ${selected.uppercase()}",
+                        fontFamily = UtilitySans, fontWeight = FontWeight.Bold,
+                        fontSize = 11.sp, letterSpacing = .7.sp,
+                    )
+                }
             }
         }
     }
+}
+
+/** Each programme gets a face, so the landing continues the card that opened it. */
+private fun programmeArt(title: String): Int = when (title) {
+    "Prayer points" -> com.prayerkey.manna.R.drawable.discovery_cover_1
+    "Fasting" -> com.prayerkey.manna.R.drawable.discovery_cover_3
+    "Memory verse" -> com.prayerkey.manna.R.drawable.discovery_cover_2
+    "Midnight prayer" -> com.prayerkey.manna.R.drawable.discovery_cover_4
+    "Warfare prayer" -> com.prayerkey.manna.R.drawable.discovery_cover_5
+    else -> com.prayerkey.manna.R.drawable.discovery_cover_6
 }
 
 @Composable
@@ -215,6 +298,21 @@ private fun FaithProgrammeDay(spec: FaithProgramme, day: Int, content: FaithDay,
     Spacer(Modifier.width(48.dp))
 }
 
-@Composable private fun ChoiceCard(label: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) = Surface(modifier.height(76.dp).clickable(onClick = onClick), shape = RoundedCornerShape(17.dp), color = if (selected) Pk.Oxblood else Color.White, border = BorderStroke(1.dp, if (selected) Pk.Oxblood else Pk.Hair)) {
-    Box(Modifier.padding(13.dp), contentAlignment = Alignment.CenterStart) { Text(label, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, lineHeight = 17.sp, color = if (selected) Color.White else Pk.Charcoal) }
+/* Ten identical boxes of 12sp grey gave the eye nothing to choose between.
+   Bigger type, and a selected state visible from across the room. */
+@Composable private fun ChoiceCard(label: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) = Surface(
+    modifier.height(84.dp).clickable(onClick = onClick),
+    shape = RoundedCornerShape(18.dp),
+    color = if (selected) Pk.Oxblood else Color.White,
+    border = BorderStroke(if (selected) 0.dp else 1.dp, if (selected) Pk.Oxblood else Pk.Hair),
+    shadowElevation = if (selected) 6.dp else 0.dp,
+) {
+    Box(Modifier.padding(horizontal = 15.dp, vertical = 13.dp), contentAlignment = Alignment.CenterStart) {
+        Text(
+            label, fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp, lineHeight = 20.sp,
+            color = if (selected) Color.White else Pk.Charcoal,
+        )
+    }
 }
+
