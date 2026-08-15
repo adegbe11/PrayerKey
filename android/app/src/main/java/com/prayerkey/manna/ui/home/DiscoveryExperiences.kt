@@ -36,6 +36,9 @@ private data class Experience(
 )
 
 private fun experience(title: String): Experience = when (title) {
+    "Prayer ledger" -> Experience(ExperienceKind.JOURNAL, "YOUR HISTORY WITH GOD", "Write the prayer, keep the date, and return to record what changed. Open prayers remain visible until you mark them answered.", listOf("Write a new prayer", "Open prayers", "Answered prayers", "How God answered", "Year in review", "Share an answer card"), "What are you asking God for?", "ADD TO MY LEDGER")
+    "I need prayer now" -> Experience(ExperienceKind.COMMUNITY, "PRAYER RIGHT NOW", "Write one honest line and begin praying immediately. Your request stays private on this device until a verified church prayer team is connected.", listOf("Write my need", "Read the anchor Scripture", "Pray the guided prayer", "Save to my prayer ledger", "Choose a reminder"), "I need prayer for…", "SAVE PRIVATE REQUEST")
+    "Sunday into Monday" -> Experience(ExperienceKind.COURSE, "SUNDAY CONTINUES", "Turn the message you heard into five short days of Scripture, reflection, prayer and practice.", listOf("Monday · Remember the message", "Tuesday · Read the anchor text", "Wednesday · Examine my life", "Thursday · Pray the message", "Friday · Practice one truth"), "What was Sunday's sermon about?", "CREATE MY WEEK")
     /* The three items here used to be "My family", "Wisdom for the next step" and
        "Healing and strength" — which read as the user's own list on a screen
        headed YOUR PRIVATE ALTAR, on a first launch, before they had written
@@ -93,7 +96,7 @@ private fun experience(title: String): Experience = when (title) {
     onClose: () -> Unit,
     openHub: () -> Unit,
 ) {
-    if (title == "Prayer challenge") {
+    if (title in setOf("Prayer challenge", "30 prayers for my family", "40 days before the door opens", "Back to the altar", "Thanksgiving challenge", "Church challenge")) {
         PrayerChallengeMachine(onClose)
         return
     }
@@ -101,8 +104,17 @@ private fun experience(title: String): Experience = when (title) {
         BibleChallengeMachine(onClose)
         return
     }
-    if (title in setOf("Prayer points", "Fasting", "Memory verse", "Midnight prayer", "Warfare prayer", "Declarations")) {
-        FaithProgrammeMachine(title, onClose)
+    val faithMachine = when (title) {
+        "Prayer points" -> "Prayer points"
+        "Start a fast", "Daniel fast", "Full fast", "Partial fast", "Esther fast", "Timed fast", "First fruits", "Church-wide fast", "Fasting record" -> "Fasting"
+        "Memory verse" -> "Memory verse"
+        "Midnight prayer", "Three watches", "Night vigil" -> "Midnight prayer"
+        "Warfare prayer", "Imprecatory Psalms" -> "Warfare prayer"
+        "Declarations" -> "Declarations"
+        else -> null
+    }
+    if (faithMachine != null) {
+        FaithProgrammeMachine(faithMachine, onClose)
         return
     }
     val spec = remember(title) { experience(title) }
@@ -119,10 +131,11 @@ private fun experience(title: String): Experience = when (title) {
                 Text("${completed.size}/${spec.items.size}", fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted)
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp)) {
-                Surface(shape = CircleShape, color = Pk.Oxblood.copy(alpha = .10f)) { Icon(icon, null, Modifier.padding(14.dp).size(27.dp), tint = Pk.Oxblood) }
-                Text(spec.eyebrow, Modifier.padding(top = 20.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.4.sp, color = Pk.GoldDeep)
-                Text(title, Modifier.padding(top = 7.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 35.sp, lineHeight = 40.sp, color = Pk.Charcoal)
-                Text(spec.intro, Modifier.padding(top = 12.dp, bottom = 22.dp), fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 27.sp, color = Pk.Muted)
+                /* Title, then the thing. The icon medallion, the tracked
+                   eyebrow and the paragraph of explanation above it were three
+                   pieces of furniture between the user and what they came for.
+                   No screen in this app introduces itself any more. */
+                Text(title, Modifier.padding(top = 4.dp, bottom = 20.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 35.sp, lineHeight = 40.sp, color = Pk.Charcoal)
                 when (spec.kind) {
                     ExperienceKind.COURSE -> CourseProgress(completed.size, spec.items.size)
                     ExperienceKind.SCHEDULE -> TimeBanner()

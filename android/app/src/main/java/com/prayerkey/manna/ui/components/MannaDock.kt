@@ -128,7 +128,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                            wayfinding — the dock is the only signpost in the
                            app, which is the wrong place to be subtle. */
                         Text(
-                            if (item.label == "Home") "TODAY" else item.label.uppercase(),
+                            item.label.uppercase(),
                             color = if (active) com.prayerkey.manna.ui.theme.Pk.GoldLight else Ivory.copy(alpha = .60f),
                             fontFamily = UtilitySans,
                             fontSize = 10.sp,

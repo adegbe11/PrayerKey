@@ -49,6 +49,7 @@ import java.time.format.DateTimeFormatter
 
 private enum class Hub { BIBLE, PRAY, CHURCH, JOURNAL }
 private data class Feature(val title: String, val detail: String, val icon: ImageVector, val hub: Hub)
+private data class ProgrammeCategory(val title: String, val items: List<Feature>)
 
 @Composable
 fun PrayerKeyOperatingHome(
@@ -95,7 +96,15 @@ fun PrayerKeyOperatingHome(
     /* Today, assembled from one day rather than four rotations that never met.
        The devotional is the spine: its passage is the day's reading and its
        subject chooses the day's prayer. */
-    val prayerTopics = remember { com.prayerkey.manna.data.LocalPrayerTopics.load(context) }
+    /* Off the main thread. `remember { load(context) }` opened and parsed a
+       543-entry JSON during composition, which is file I/O on the thread that
+       draws the frame. */
+    var prayerTopics by remember { mutableStateOf<List<com.prayerkey.manna.data.PrayerTopic>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        prayerTopics = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            com.prayerkey.manna.data.LocalPrayerTopics.load(context)
+        }
+    }
     val plan = remember(written, prayerTopics, today) {
         written?.let { com.prayerkey.manna.data.planFor(it, prayerTopics, today) }
     }
@@ -136,18 +145,26 @@ fun PrayerKeyOperatingHome(
         ) { TopicalBibleScreen { topicalBibleOpen = false } }
     }
     var selectedFeature by remember { mutableStateOf<Feature?>(null) }
-    val go: (Feature) -> Unit = { selectedFeature = it }
+    /* Six of these have finished screens already built. They were opening a
+       placeholder instead, which is the difference between a feature that works
+       and a card that lies. Routed to the real thing. */
+    val go: (Feature) -> Unit = { feature ->
+        when (feature.title) {
+            "Read the Bible" -> onOpenBible()
+            "Audio Bible" -> onOpenBible()
+            "Topical Bible verses" -> topicalBibleOpen = true
+            "Journal" -> onOpenJournal()
+            "Live sermon", "Sermon notes" -> onOpenChurch()
+            "My prayer list" -> onOpenPrayer()
+            else -> selectedFeature = feature
+        }
+    }
     selectedFeature?.let { feature ->
         Dialog(onDismissRequest = { selectedFeature = null }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
             FeatureDestination(feature, onKeep = onKeepPrayer, onClose = { selectedFeature = null }) { }
         }
     }
-    val fixed = remember { fixedFeatures() }
-    val discovery = remember(fixed) {
-        val start = fixed.indexOfFirst { it.title == "My prayer list" }
-        val end = fixed.indexOfLast { it.title == "Testimonies" }
-        if (start >= 0 && end >= start) fixed.subList(start, end + 1) else fixed
-    }
+    val programmes = remember { programmeCategories() }
     val conditional = remember(today) { conditionalFeatures(today) }
 
     Column(
@@ -155,8 +172,15 @@ fun PrayerKeyOperatingHome(
             .verticalScroll(rememberScrollState()).padding(bottom = Pk.NavClearance)
     ) {
         Header(today, streak, onSettings)
+        ShortcutRail(
+            streak = streak,
+            prayNow = onOpenPrayer,
+            ledger = onOpenJournal,
+            bible = onOpenBible,
+            church = onOpenChurch,
+            open = go,
+        )
         HeroRail(written?.title ?: dailyDevotional.title) { devotionalOpen = true }
-        QuickActions(onOpenPrayer, onOpenBible, onOpenJournal, onOpenChurch)
 
         Section("TODAY") {
             VerseCard(todayVerse, onOpenWord)
@@ -165,7 +189,6 @@ fun PrayerKeyOperatingHome(
         }
 
         EmergencyCard(onOpenPrayer)
-        TopicalBibleEntry { topicalBibleOpen = true }
 
         Section("TODAY'S RHYTHM") {
             TodayRhythmPanel(
@@ -179,16 +202,8 @@ fun PrayerKeyOperatingHome(
             Section("FOR THIS MOMENT") { MomentCards(items, go) }
         }
 
-        Section("PRAYERKEY PROGRAMMES") { DiscoveryGrid(discovery, go) }
+        ProgrammeLibrary(programmes, go)
 
-        if (false) Section("CLOSING VERSE") {
-            Surface(shape = RoundedCornerShape(24.dp), color = Pk.DeepDark) {
-                Column(Modifier.padding(24.dp)) {
-                    Text("“The Lord will watch over your coming and going both now and forevermore.”", fontFamily = DisplaySerif, fontSize = 20.sp, lineHeight = 29.sp, color = Color.White)
-                    Text("PSALM 121:8", Modifier.padding(top = 14.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.4.sp, color = Pk.GoldLight)
-                }
-            }
-        }
         Section("CLOSING VERSE") { ClosingVerseCard() }
     }
 }
@@ -215,19 +230,86 @@ fun PrayerKeyOperatingHome(
 }
 
 @Composable private fun Header(date: LocalDate, streak: Int, settings: () -> Unit) {
-    Row(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 18.dp), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) {
-            Text("PRAYERKEY", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Pk.Charcoal)
-            Text(date.format(DateTimeFormatter.ofPattern("EEEE, MMMM d")), fontFamily = UtilitySans, fontSize = 12.sp, color = Pk.Muted)
+    Box(Modifier.fillMaxWidth().height(88.dp).padding(horizontal = 14.dp)) {
+        IconButton(settings, Modifier.align(Alignment.CenterStart)) {
+            Icon(Icons.Outlined.Menu, "Open settings", tint = Pk.Charcoal, modifier = Modifier.size(27.dp))
         }
-        Surface(shape = RoundedCornerShape(50), color = Pk.Oxblood.copy(alpha = .08f)) {
-            Row(Modifier.padding(horizontal = 13.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.LocalFireDepartment, null, tint = Pk.Oxblood, modifier = Modifier.size(17.dp))
-                val days = streak.coerceAtLeast(1)
-                Text(" $days ${if (days == 1) "DAY" else "DAYS"}", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, color = Pk.Oxblood)
+        Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("PRAYERKEY", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 23.sp, letterSpacing = 1.4.sp, color = Pk.Charcoal)
+            Text(date.format(DateTimeFormatter.ofPattern("EEEE, MMM d")), Modifier.padding(top = 3.dp), fontFamily = UtilitySans, fontSize = 10.sp, color = Pk.Muted)
+        }
+        IconButton(settings, Modifier.align(Alignment.CenterEnd)) {
+            BadgedBox(
+                badge = {
+                    if (streak > 0) Badge(containerColor = Pk.Oxblood, contentColor = Color.White) {
+                        Text(streak.coerceAtMost(99).toString(), fontSize = 8.sp)
+                    }
+                },
+            ) { Icon(Icons.Outlined.NotificationsNone, "Prayer reminders", tint = Pk.Charcoal, modifier = Modifier.size(27.dp)) }
+        }
+    }
+}
+
+private data class HomeShortcut(val label: String, val icon: ImageVector, val badge: String? = null, val open: () -> Unit)
+
+@Composable private fun ShortcutRail(
+    streak: Int,
+    prayNow: () -> Unit,
+    ledger: () -> Unit,
+    bible: () -> Unit,
+    church: () -> Unit,
+    open: (Feature) -> Unit,
+) {
+    // Shortcuts always open at the urgent first action. A saveable scroll state
+    // could restore this rail halfway across after process recreation.
+    val shortcutScroll = remember { androidx.compose.foundation.ScrollState(0) }
+    val shortcuts = listOf(
+        HomeShortcut("Pray now", Icons.Outlined.Bolt, open = prayNow),
+        HomeShortcut("Ledger", Icons.Outlined.FactCheck, open = ledger),
+        HomeShortcut("Prayer points", Icons.Outlined.FormatListBulleted) { open(Feature("Prayer points", "Pray by situation", Icons.Outlined.FormatListBulleted, Hub.PRAY)) },
+        HomeShortcut("Challenge", Icons.Outlined.LocalFireDepartment, if (streak > 0) "DAY $streak" else null) { open(Feature("Prayer challenge", "One guided day at a time", Icons.Outlined.LocalFireDepartment, Hub.PRAY)) },
+        HomeShortcut("Midnight", Icons.Outlined.DarkMode) { open(Feature("Midnight prayer", "Take the night watch", Icons.Outlined.DarkMode, Hub.PRAY)) },
+        HomeShortcut("Fasting", Icons.Outlined.WaterDrop) { open(Feature("Start a fast", "Choose a focus and a safe rhythm", Icons.Outlined.WaterDrop, Hub.PRAY)) },
+        HomeShortcut("Bible", Icons.Outlined.MenuBook, open = bible),
+        HomeShortcut("Audio", Icons.Outlined.Headphones) { open(Feature("Audio Bible", "Listen chapter by chapter", Icons.Outlined.Headphones, Hub.BIBLE)) },
+        HomeShortcut("Warfare", Icons.Outlined.Shield) { open(Feature("Warfare prayer", "Scripture-led prayer sets", Icons.Outlined.Shield, Hub.PRAY)) },
+        HomeShortcut("Answered", Icons.Outlined.CheckCircle, open = ledger),
+        HomeShortcut("Church", Icons.Outlined.Church, open = church),
+        HomeShortcut("Places", Icons.Outlined.Place) { open(Feature("The Holy Land", "Jerusalem, Bethlehem and Galilee", Icons.Outlined.Place, Hub.BIBLE)) },
+    )
+    Row(
+        Modifier.fillMaxWidth().horizontalScroll(shortcutScroll).padding(start = 18.dp, end = 18.dp, bottom = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        shortcuts.forEach { item ->
+            Column(
+                Modifier.width(76.dp).clickable(onClick = item.open),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Surface(
+                        Modifier.size(72.dp), shape = CircleShape, color = Color.White,
+                        border = BorderStroke(1.5.dp, Pk.Oxblood.copy(alpha = .18f)), shadowElevation = 2.dp,
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(item.icon, null, tint = Pk.Oxblood, modifier = Modifier.size(29.dp))
+                        }
+                    }
+                    item.badge?.let { badge ->
+                        Surface(
+                            Modifier.align(Alignment.TopEnd), shape = RoundedCornerShape(99.dp),
+                            color = Pk.Oxblood, border = BorderStroke(1.dp, Pk.Cream),
+                        ) { Text(badge, Modifier.padding(horizontal = 6.dp, vertical = 3.dp), color = Color.White, fontSize = 7.sp, fontWeight = FontWeight.Bold) }
+                    }
+                }
+                Text(
+                    item.label, Modifier.padding(top = 7.dp),
+                    fontFamily = UtilitySans, fontSize = 10.sp, lineHeight = 12.sp,
+                    fontWeight = FontWeight.Medium, color = Pk.Charcoal,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2,
+                )
             }
         }
-        IconButton(settings) { Icon(Icons.Outlined.PersonOutline, "Profile", tint = Pk.Charcoal) }
     }
 }
 
@@ -263,28 +345,6 @@ fun PrayerKeyOperatingHome(
                 repeat(4) { Box(Modifier.padding(end = 6.dp).size(if (it == 0) 20.dp else 6.dp, 6.dp).background(if (it == 0) Pk.GoldLight else Color.White.copy(alpha = .38f), CircleShape)) }
                 Spacer(Modifier.weight(1f))
                 Text("8 MIN", fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Pk.GoldLight)
-            }
-        }
-    }
-}
-
-@Composable private fun QuickActions(pray: () -> Unit, bible: () -> Unit, journal: () -> Unit, church: () -> Unit) {
-    val actions = listOf(
-        Triple("PRAY NOW", Icons.Outlined.Bolt, pray),
-        Triple("BIBLE", Icons.Outlined.MenuBook, bible),
-        Triple("JOURNAL", Icons.Outlined.EditNote, journal),
-        Triple("LIVE", Icons.Outlined.GraphicEq, church),
-    )
-    Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        actions.forEach { action ->
-            Surface(
-                Modifier.weight(1f).height(84.dp).clickable(onClick = action.third),
-                shape = RoundedCornerShape(20.dp), color = Color.White,
-            ) {
-                Column(Modifier.padding(vertical = 13.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceBetween) {
-                    Icon(action.second, null, tint = Pk.Oxblood, modifier = Modifier.size(24.dp))
-                    Text(action.first, fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = .6.sp, color = Pk.Charcoal, maxLines = 1)
-                }
             }
         }
     }
@@ -694,6 +754,104 @@ fun PrayerKeyOperatingHome(
  * The variety is carried by the photography instead, which is the right thing
  * to carry it — see [DiscoveryCard].
  */
+@Composable private fun ProgrammeLibrary(categories: List<ProgrammeCategory>, go: (Feature) -> Unit) {
+    var selectedCategory by remember { mutableStateOf<ProgrammeCategory?>(null) }
+    selectedCategory?.let { category ->
+        Dialog(
+            onDismissRequest = { selectedCategory = null },
+            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) { ProgrammeCategoryScreen(category, { selectedCategory = null }, go) }
+    }
+    Column(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 12.dp)) {
+        Column(Modifier.padding(horizontal = 22.dp)) {
+            Text("PROGRAMS", style = labelStyle(), color = Pk.Oxblood)
+            Text(
+                "Grow through prayer, Scripture and practice.",
+                Modifier.padding(top = 7.dp),
+                fontFamily = DisplaySerif,
+                fontWeight = FontWeight.Bold,
+                fontSize = 27.sp,
+                lineHeight = 32.sp,
+                color = Pk.Charcoal,
+            )
+        }
+        val originals = categories.first()
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(originals.title.uppercase(), Modifier.weight(1f), style = labelStyle(), color = Pk.Oxblood)
+            Text("3 ORIGINALS", fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = .8.sp, color = Pk.Muted)
+        }
+        Column(Modifier.padding(horizontal = 22.dp), verticalArrangement = Arrangement.spacedBy(11.dp)) {
+            originals.items.forEachIndexed { index, item -> OriginalProgrammeCard(item, index) { go(item) } }
+        }
+        Text("EXPLORE BY CATEGORY", Modifier.padding(start = 22.dp, top = 30.dp, bottom = 12.dp), style = labelStyle(), color = Pk.Charcoal)
+        Row(
+            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 22.dp),
+            horizontalArrangement = Arrangement.spacedBy(11.dp),
+        ) {
+            categories.drop(1).forEachIndexed { index, category ->
+                val lead = category.items.first()
+                Surface(
+                    Modifier.width(164.dp).height(176.dp).clickable { selectedCategory = category },
+                    shape = RoundedCornerShape(22.dp), color = hubTint(lead.hub), shadowElevation = 3.dp,
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        Image(painterResource(listOf(R.drawable.discovery_cover_1, R.drawable.discovery_cover_3, R.drawable.discovery_cover_5)[index % 3]), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Pk.DeepDark.copy(alpha = .92f)))))
+                        Column(Modifier.align(Alignment.BottomStart).padding(16.dp)) {
+                            Text(category.title, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 20.sp, lineHeight = 22.sp, color = Color.White)
+                            Text("${category.items.size} PROGRAMS  →", Modifier.padding(top = 7.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 8.sp, letterSpacing = .7.sp, color = Pk.GoldLight)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable private fun ProgrammeCategoryScreen(category: ProgrammeCategory, close: () -> Unit, go: (Feature) -> Unit) {
+    Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(close) { Icon(Icons.Outlined.Close, "Close", tint = Pk.Charcoal) }
+                Text("PRAYERKEY", Modifier.weight(1f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.5.sp, color = Pk.Oxblood)
+                Text("${category.items.size}", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, color = Pk.Muted)
+            }
+            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 22.dp, vertical = 12.dp)) {
+                Text(category.title, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 36.sp, color = Pk.Charcoal)
+                Text("Choose where you want to begin.", Modifier.padding(top = 7.dp, bottom = 22.dp), fontFamily = UtilitySans, fontSize = 13.sp, color = Pk.Muted)
+                DiscoveryGrid(category.items) { feature -> close(); go(feature) }
+                Spacer(Modifier.height(24.dp))
+            }
+        }
+    }
+}
+
+@Composable private fun OriginalProgrammeCard(item: Feature, index: Int, open: () -> Unit) {
+    val cover = listOf(R.drawable.discovery_cover_2, R.drawable.discovery_cover_4, R.drawable.discovery_cover_6)[index % 3]
+    Surface(
+        Modifier.fillMaxWidth().height(188.dp).clickable(onClick = open),
+        shape = RoundedCornerShape(26.dp), color = Pk.DeepDark, shadowElevation = 5.dp,
+    ) {
+        Box(Modifier.fillMaxSize()) {
+            Image(painterResource(cover), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+            Box(Modifier.fillMaxSize().background(Brush.horizontalGradient(listOf(Pk.DeepDark.copy(alpha = .96f), Pk.VioletDeep.copy(alpha = .68f), Color.Transparent))))
+            Column(Modifier.fillMaxSize().padding(22.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                Surface(shape = CircleShape, color = Color.White.copy(alpha = .14f)) {
+                    Icon(item.icon, null, Modifier.padding(10.dp).size(22.dp), tint = Pk.GoldLight)
+                }
+                Column(Modifier.fillMaxWidth(.76f)) {
+                    Text(item.title, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 27.sp, color = Color.White)
+                    Text(item.detail, Modifier.padding(top = 5.dp), fontFamily = UtilitySans, fontSize = 12.sp, lineHeight = 17.sp, color = Color.White.copy(alpha = .76f))
+                    Text("OPEN  →", Modifier.padding(top = 12.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.1.sp, color = Pk.GoldLight)
+                }
+            }
+        }
+    }
+}
+
 @Composable private fun DiscoveryGrid(items: List<Feature>, go: (Feature) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         items.chunked(2).forEachIndexed { row, pair ->
@@ -862,27 +1020,56 @@ private fun labelStyle() = androidx.compose.ui.text.TextStyle(fontFamily = Utili
  * people as real ones praying for real requests. A facade that convincing is
  * worse than an absent feature, and it cannot be made honest without a backend.
  */
-private fun fixedFeatures() = listOf(
-    Feature("My prayer list", "Bring every name", Icons.Outlined.FormatListBulleted, Hub.PRAY),
-    Feature("Prayer points", "Pray by situation", Icons.Outlined.AutoAwesome, Hub.PRAY),
-    Feature("Prayer times", "Morning to midnight", Icons.Outlined.Schedule, Hub.PRAY),
-    Feature("Prayer challenge", "One guided day at a time", Icons.Outlined.LocalFireDepartment, Hub.PRAY),
-    Feature("Fasting", "Purpose, prayer and progress", Icons.Outlined.WaterDrop, Hub.PRAY),
-    Feature("Bible challenge", "Read with purpose", Icons.Outlined.MenuBook, Hub.BIBLE),
-    Feature("Memory verse", "Carry the word", Icons.Outlined.BookmarkBorder, Hub.BIBLE),
-    Feature("Voice prayers", "Pray aloud and keep it", Icons.Outlined.MicNone, Hub.PRAY),
-    Feature("Prayer timer", "Stay in His presence", Icons.Outlined.Timer, Hub.PRAY),
-    Feature("Midnight prayer", "Take the night watch", Icons.Outlined.DarkMode, Hub.PRAY),
-    Feature("Warfare prayer", "Scripture-led prayer sets", Icons.Outlined.Shield, Hub.PRAY),
-    Feature("Declarations", "Speak God's word", Icons.Outlined.Campaign, Hub.PRAY),
-    Feature("Answered", "Remember His faithfulness", Icons.Outlined.CheckCircle, Hub.JOURNAL),
-    Feature("Thanksgiving", "Name the goodness", Icons.Outlined.Celebration, Hub.JOURNAL),
-    Feature("Dreams", "Record, pray and discern", Icons.Outlined.Nightlight, Hub.JOURNAL),
-    Feature("Testimonies", "Tell what God did", Icons.Outlined.RecordVoiceOver, Hub.JOURNAL),
+/**
+ * The programme library.
+ *
+ * This held 86 entries. 45 of them opened the same placeholder screen, and six
+ * more — Read the Bible, Audio Bible, Topical Bible, Journal, Live sermon,
+ * Sermon notes — opened that placeholder despite having finished screens of
+ * their own sitting in the app.
+ *
+ * What is left is what works: the programmes that run the full machine, and the
+ * screens that already exist. A card that opens nothing is not a feature, and
+ * removing it is the whole difference between a library and a menu of promises.
+ *
+ * Anything cut is in git. Nothing here is a placeholder.
+ */
+private fun programmeCategories() = listOf(
+    ProgrammeCategory("Pray", listOf(
+        Feature("Prayer points", "Pray by situation", Icons.Outlined.FormatListBulleted, Hub.PRAY),
+        Feature("Prayer challenge", "One guided day at a time", Icons.Outlined.LocalFireDepartment, Hub.PRAY),
+        Feature("Midnight prayer", "Take the night watch", Icons.Outlined.DarkMode, Hub.PRAY),
+        Feature("Warfare prayer", "Scripture-led prayer sets", Icons.Outlined.Shield, Hub.PRAY),
+        Feature("Declarations", "Speak God's Word", Icons.Outlined.Campaign, Hub.PRAY),
+        Feature("My prayer list", "Every prayer in one place", Icons.Outlined.FactCheck, Hub.PRAY),
+    )),
+    ProgrammeCategory("Bible", listOf(
+        Feature("Read the Bible", "Translations and offline reading", Icons.Outlined.MenuBook, Hub.BIBLE),
+        Feature("Audio Bible", "Listen chapter by chapter", Icons.Outlined.Headphones, Hub.BIBLE),
+        Feature("Bible challenge", "Finish today's portion to continue", Icons.Outlined.AutoStories, Hub.BIBLE),
+        Feature("Memory verse", "Carry the Word", Icons.Outlined.BookmarkBorder, Hub.BIBLE),
+        Feature("Topical Bible verses", "Scripture for subjects and situations", Icons.Outlined.Search, Hub.BIBLE),
+    )),
+    ProgrammeCategory("Fast", listOf(
+        Feature("Start a fast", "Choose a focus and a safe rhythm", Icons.Outlined.WaterDrop, Hub.PRAY),
+        Feature("Daniel fast", "A guided Daniel fast", Icons.Outlined.Spa, Hub.PRAY),
+        Feature("Esther fast", "A serious guided fast", Icons.Outlined.Shield, Hub.PRAY),
+        Feature("Timed fast", "Choose the hours you will keep", Icons.Outlined.Schedule, Hub.PRAY),
+    )),
+    ProgrammeCategory("Keep", listOf(
+        Feature("Journal", "Write your walk with God", Icons.Outlined.EditNote, Hub.JOURNAL),
+        Feature("Answered", "Remember His faithfulness", Icons.Outlined.CheckCircle, Hub.JOURNAL),
+        Feature("Testimonies", "Tell what God did", Icons.Outlined.RecordVoiceOver, Hub.JOURNAL),
+        Feature("Thanksgiving", "Name the goodness", Icons.Outlined.Celebration, Hub.JOURNAL),
+        Feature("Dreams", "Record, pray and discern", Icons.Outlined.Nightlight, Hub.JOURNAL),
+    )),
+    ProgrammeCategory("Church", listOf(
+        Feature("Live sermon", "Capture audio and live notes", Icons.Outlined.MicNone, Hub.CHURCH),
+        Feature("Sermon notes", "Keep what was preached", Icons.Outlined.Notes, Hub.CHURCH),
+    )),
 )
 
 private fun conditionalFeatures(today: LocalDate): List<Feature> = buildList {
-    add(Feature("Prayed for you", "Someone stood with you", Icons.Outlined.Favorite, Hub.PRAY))
     if (LocalTime.now().hour >= 21) add(Feature("Midnight watch", "The watch is open", Icons.Outlined.DarkMode, Hub.PRAY))
     if (today.dayOfWeek.value == 7 || today.dayOfWeek.value == 1) add(Feature("New sermon", "Sunday continues", Icons.Outlined.GraphicEq, Hub.CHURCH))
     if (today.dayOfMonth == 1) add(Feature("First fruits", "Begin the month with God", Icons.Outlined.Spa, Hub.PRAY))
