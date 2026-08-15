@@ -303,8 +303,15 @@ fun PrayerKeyOperatingHome(
  */
 @Composable private fun VerseCard(today: VerseCard?, open: () -> Unit) {
     val context = LocalContext.current
-    val card = today
-        ?: remember { VerseCard("Matthew 7:7", "KJV", "Ask, and it will be given to you; seek, and you will find; knock, and the door will be opened to you.", "") }
+    /* The reference and the quote below used to be literal strings, while
+       `card` was passed only to SAVE and SHARE. So the card drew Matthew 7:7 on
+       every day of the year, and once the day's verse started arriving the two
+       diverged: the screen showed one verse and sharing exported another.
+       Everything visible now comes from `card`. */
+    val fallback = remember {
+        VerseCard("Matthew 7:7", "KJV", "Ask, and it will be given to you; seek, and you will find; knock, and the door will be opened to you.", "")
+    }
+    val card = today ?: fallback
     Surface(
         Modifier.fillMaxWidth().clickable(onClick = open),
         shape = RoundedCornerShape(30.dp), color = Pk.DeepDark,
@@ -322,14 +329,14 @@ fun PrayerKeyOperatingHome(
             ) {
                 Icon(Icons.Outlined.MenuBook, null, tint = Pk.Oxblood, modifier = Modifier.size(25.dp))
                 Text("VERSE OF THE DAY", Modifier.padding(top = 10.dp), style = labelStyle(), color = Pk.GoldDeep)
-                Text("MATTHEW 7:7", Modifier.padding(top = 17.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 27.sp, letterSpacing = 1.1.sp, color = Pk.Oxblood)
+                Text(card.reference.uppercase(), Modifier.padding(top = 17.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 27.sp, letterSpacing = 1.1.sp, color = Pk.Oxblood, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 Row(Modifier.padding(vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
                     HorizontalDivider(Modifier.width(42.dp), color = Pk.Gold.copy(alpha = .72f))
                     Box(Modifier.padding(horizontal = 8.dp).size(5.dp).background(Pk.Oxblood, CircleShape))
                     HorizontalDivider(Modifier.width(42.dp), color = Pk.Gold.copy(alpha = .72f))
                 }
                 Text(
-                    "“Ask, and it will be given to you; seek, and you will find; knock, and the door will be opened to you.”",
+                    "“" + card.verse + "”",
                     fontFamily = DisplaySerif, fontSize = 19.sp, lineHeight = 27.sp, color = Pk.Charcoal,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
@@ -372,7 +379,8 @@ fun PrayerKeyOperatingHome(
                     Icon(Icons.Outlined.SelfImprovement, null, Modifier.padding(11.dp).size(25.dp), tint = Pk.GoldLight)
                 }
                 Text("TODAY'S PRAYER", Modifier.padding(top = 13.dp), style = labelStyle(), color = Pk.GoldLight)
-                Text("Order My Steps", Modifier.padding(top = 8.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 27.sp, color = Color.White)
+                // the day's prayer, not a fixed title over a changing body
+                Text(topic?.title ?: "Order My Steps", Modifier.padding(top = 8.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 27.sp, color = Color.White, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 Text(words, Modifier.weight(1f).padding(top = 18.dp), fontFamily = DisplaySerif, fontSize = 17.sp, lineHeight = 25.sp, color = Color.White.copy(alpha = .94f), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 Row(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalAlignment = Alignment.CenterVertically) {
                     PrayerImageAction(Icons.Outlined.Download, "SAVE") { CardShareRenderer.savePrayerStatus(context, words) }
