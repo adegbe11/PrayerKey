@@ -8,297 +8,663 @@
         {
           "title": "The Room He Painted Yellow",
           "minutes": 4,
-          "read": { "book": "Luke", "chapter": 2, "verse": 26, "from": 25, "to": 32 },
+          "read": {
+            "book": "Luke",
+            "chapter": 2,
+            "verse": 26,
+            "from": 25,
+            "to": 32
+          },
           "body": [
-            { "p": "A friend of mine painted a small bedroom yellow. He and his wife had been trying for a child for two years, and one Saturday he decided he was tired of the room being a place where suitcases went to die. He bought the paint. He did the skirting boards properly. He put up a shelf." },
-            { "p": "That was four years ago. The room is still yellow, and it is still empty. I have stayed in that house. You walk past the door on the way to the bathroom and you can feel it." },
-            { "p": "I used to think that room was a sad thing. I have come to think it is one of the bravest things I have seen." },
-            { "q": { "book": "Luke", "chapter": 2, "verse": 25 } },
-            { "p": "Luke gives us Simeon in a handful of verses and then he is gone. We are never told how long he waited. We know only that it was long enough for the text to mention his death in the same breath as his hope — that he would not see death before he had seen. He was old. He had been holding this a long time." },
-            { "p": "What strikes me is that Luke does not describe him as passing time. He describes him as waiting for the consolation of Israel. The waiting had a direction. It was aimed at something. And when the moment finally came, Simeon was in the temple, which is to say he was standing exactly where a man waiting for that particular thing would need to be standing." },
-            { "p": "He did not miss it. After all those years, he did not miss it, because the waiting had kept him in position." }
+            {
+              "p": "A friend of mine painted a small bedroom yellow. He and his wife had been trying for a child for two years, and one Saturday he decided he was tired of the room being a place where suitcases went to die. He bought the paint. He did the skirting boards properly. He put up a shelf."
+            },
+            {
+              "p": "That was four years ago. The room is still yellow, and it is still empty. I have stayed in that house. You walk past the door on the way to the bathroom and you can feel it."
+            },
+            {
+              "p": "I used to think that room was a sad thing. I have come to think it is one of the bravest things I have seen."
+            },
+            {
+              "q": {
+                "book": "Luke",
+                "chapter": 2,
+                "verse": 25
+              }
+            },
+            {
+              "p": "Luke gives us Simeon in a handful of verses and then he is gone. We are never told how long he waited. We know only that it was long enough for the text to mention his death in the same breath as his hope — that he would not see death before he had seen. He was old. He had been holding this a long time."
+            },
+            {
+              "p": "What strikes me is that Luke does not describe him as passing time. He describes him as waiting for the consolation of Israel. The waiting had a direction. It was aimed at something. And when the moment finally came, Simeon was in the temple, which is to say he was standing exactly where a man waiting for that particular thing would need to be standing."
+            },
+            {
+              "p": "He did not miss it. After all those years, he did not miss it, because the waiting had kept him in position."
+            }
           ],
-          "line": { "a": "He was not killing time.", "b": "He was keeping watch." },
+          "line": {
+            "a": "He was not killing time.",
+            "b": "He was keeping watch."
+          },
           "after": [
             "There is a kind of waiting that empties you out, and there is a kind that keeps you standing where you need to be standing. Most of us do not get to choose what we are waiting for. We do get to choose which kind of waiting it will be.",
             "The yellow room is not a monument to disappointment. It is a man standing in the temple."
           ],
           "prayer": "Father, you know the thing I have been holding for a long time now. I am not asking you to explain the delay. I am asking you to keep me in position — awake, expectant, standing where I would need to be standing if today were the day. Let the waiting shape me instead of hollowing me out.",
           "addLabel": "Add what you're waiting for",
-          "question": "What have you stopped preparing for?"
+          "question": "What have you stopped preparing for?",
+          "prayerCategory": "Family"
         },
         {
           "title": "What Hannah Said On The Way Home",
           "minutes": 4,
-          "read": { "book": "1 Samuel", "chapter": 1, "verse": 18, "from": 9, "to": 18 },
+          "read": {
+            "book": "1 Samuel",
+            "chapter": 1,
+            "verse": 18,
+            "from": 9,
+            "to": 18
+          },
           "body": [
-            { "p": "Hannah goes up to the house of the Lord and prays so hard that her lips move without sound, and the priest watching her concludes she is drunk. It is worth sitting with how badly she was misread by the one man in the building whose job was to read people." },
-            { "p": "She corrects him. Not angrily — she just tells him plainly what she is doing. And Eli, to his credit, changes his mind in a single sentence and blesses her." },
-            { "q": { "book": "1 Samuel", "chapter": 1, "verse": 18 } },
-            { "p": "Read that last line slowly, because everything in it happens before anything changes. Hannah is not pregnant. She has no promise with a date on it. She has a blessing from a man who thought she was drunk ninety seconds ago." },
-            { "p": "And she eats. That detail is not decoration. She had refused food; the grief had reached her appetite, the way it does. Now she eats, and her face is different, and she goes home to the same house and the same silence she left." },
-            { "p": "Something lifted in the temple that had nothing to do with the outcome. She had said the true thing out loud to God, and the weight of carrying it alone came off her before the thing she asked for ever arrived." }
+            {
+              "p": "Hannah goes up to the house of the Lord and prays so hard that her lips move without sound, and the priest watching her concludes she is drunk. It is worth sitting with how badly she was misread by the one man in the building whose job was to read people."
+            },
+            {
+              "p": "She corrects him. Not angrily — she just tells him plainly what she is doing. And Eli, to his credit, changes his mind in a single sentence and blesses her."
+            },
+            {
+              "q": {
+                "book": "1 Samuel",
+                "chapter": 1,
+                "verse": 18
+              }
+            },
+            {
+              "p": "Read that last line slowly, because everything in it happens before anything changes. Hannah is not pregnant. She has no promise with a date on it. She has a blessing from a man who thought she was drunk ninety seconds ago."
+            },
+            {
+              "p": "And she eats. That detail is not decoration. She had refused food; the grief had reached her appetite, the way it does. Now she eats, and her face is different, and she goes home to the same house and the same silence she left."
+            },
+            {
+              "p": "Something lifted in the temple that had nothing to do with the outcome. She had said the true thing out loud to God, and the weight of carrying it alone came off her before the thing she asked for ever arrived."
+            }
           ],
-          "line": { "a": "The answer came later.", "b": "The relief came that day." },
+          "line": {
+            "a": "The answer came later.",
+            "b": "The relief came that day."
+          },
           "after": [
             "We tend to assume the burden lifts when the situation resolves. Sometimes it lifts the moment we stop performing and say the actual thing.",
             "Hannah went home to nothing new. She just did not go home alone with it any more."
           ],
           "prayer": "Lord, I have been carrying this quietly and calling it faith. Today I want to say it plainly to you instead — not a tidy version, the real one. Take the weight of holding it by myself, even if the circumstance stays exactly as it is tonight.",
           "addLabel": "Add what you've been carrying quietly",
-          "question": "What have you been too composed to say to God?"
+          "question": "What have you been too composed to say to God?",
+          "prayerCategory": "Family"
         },
         {
           "title": "The Man Who Kept Opening The Window",
           "minutes": 3,
-          "read": { "book": "Genesis", "chapter": 8, "verse": 10, "from": 6, "to": 12 },
+          "read": {
+            "book": "Genesis",
+            "chapter": 8,
+            "verse": 10,
+            "from": 6,
+            "to": 12
+          },
           "body": [
-            { "p": "The flood is over. That is the part we remember. What we forget is that Noah has no way of knowing it is over, and no way to find out except to open a window and let a bird go." },
-            { "p": "The raven does not come back. The dove does, because there is nowhere yet to land. So he waits." },
-            { "q": { "book": "Genesis", "chapter": 8, "verse": 10 } },
-            { "p": "Seven days. He does not send the dove again the next morning, which is what I would have done, and probably what you would have done. He waits a full week inside a dark boat with the animals and does nothing, and then he tries again." },
-            { "p": "The second time the dove comes back with a leaf. The third time it does not come back at all, which is the real answer — the bird has found somewhere to live." },
-            { "p": "Three attempts, two weeks of silence in between, and no guarantee at any point that the next attempt would be different from the last." }
+            {
+              "p": "The flood is over. That is the part we remember. What we forget is that Noah has no way of knowing it is over, and no way to find out except to open a window and let a bird go."
+            },
+            {
+              "p": "The raven does not come back. The dove does, because there is nowhere yet to land. So he waits."
+            },
+            {
+              "q": {
+                "book": "Genesis",
+                "chapter": 8,
+                "verse": 10
+              }
+            },
+            {
+              "p": "Seven days. He does not send the dove again the next morning, which is what I would have done, and probably what you would have done. He waits a full week inside a dark boat with the animals and does nothing, and then he tries again."
+            },
+            {
+              "p": "The second time the dove comes back with a leaf. The third time it does not come back at all, which is the real answer — the bird has found somewhere to live."
+            },
+            {
+              "p": "Three attempts, two weeks of silence in between, and no guarantee at any point that the next attempt would be different from the last."
+            }
           ],
-          "line": { "a": "He waited seven days,", "b": "and sent the dove again." },
+          "line": {
+            "a": "He waited seven days,",
+            "b": "and sent the dove again."
+          },
           "after": [
             "Faithfulness in a waiting season is rarely dramatic. It is usually the willingness to try again on a schedule that nothing external is rewarding yet.",
             "The window opened three times. Only the third one meant anything, and he could not have known that on the first."
           ],
           "prayer": "God, I am tired of trying and getting the same answer back. Give me the patience of a week I did not choose, and the courage to open the window one more time when it comes round. Let me keep doing the small faithful thing while I cannot see the ground.",
           "addLabel": "Add what you'll try again",
-          "question": "What have you given up trying because it came back empty?"
+          "question": "What have you given up trying because it came back empty?",
+          "prayerCategory": "Faith"
         },
         {
           "title": "It Will Not Lie",
           "minutes": 3,
-          "read": { "book": "Habakkuk", "chapter": 2, "verse": 3, "from": 1, "to": 4 },
+          "read": {
+            "book": "Habakkuk",
+            "chapter": 2,
+            "verse": 3,
+            "from": 1,
+            "to": 4
+          },
           "body": [
-            { "p": "Habakkuk is a short book by a man who is furious with God and says so. He is not asking a theoretical question. He is watching his country come apart and he wants to know why the God he believes in is not doing anything about it." },
-            { "p": "Then he does something I find remarkable. He says he will stand on his watchtower and wait to see what God will answer him. He complains, and then he stays put for the reply." },
-            { "q": { "book": "Habakkuk", "chapter": 2, "verse": 3 } },
-            { "p": "There is a contradiction in that verse that is not a mistake. Though it tarry, wait for it — so it will be late. Because it will surely come, it will not tarry — so it will not be late." },
-            { "p": "Both are true, and they are true from different positions. From where Habakkuk stands it is unbearably slow. From where it was appointed, it is exactly on time." },
-            { "p": "The verse does not ask him to stop feeling the delay. It asks him to hold his experience of lateness and God's appointment together without letting go of either one." }
+            {
+              "p": "Habakkuk is a short book by a man who is furious with God and says so. He is not asking a theoretical question. He is watching his country come apart and he wants to know why the God he believes in is not doing anything about it."
+            },
+            {
+              "p": "Then he does something I find remarkable. He says he will stand on his watchtower and wait to see what God will answer him. He complains, and then he stays put for the reply."
+            },
+            {
+              "q": {
+                "book": "Habakkuk",
+                "chapter": 2,
+                "verse": 3
+              }
+            },
+            {
+              "p": "There is a contradiction in that verse that is not a mistake. Though it tarry, wait for it — so it will be late. Because it will surely come, it will not tarry — so it will not be late."
+            },
+            {
+              "p": "Both are true, and they are true from different positions. From where Habakkuk stands it is unbearably slow. From where it was appointed, it is exactly on time."
+            },
+            {
+              "p": "The verse does not ask him to stop feeling the delay. It asks him to hold his experience of lateness and God's appointment together without letting go of either one."
+            }
           ],
-          "line": { "a": "Though it tarry, wait for it.", "b": "It will not tarry." },
+          "line": {
+            "a": "Though it tarry, wait for it.",
+            "b": "It will not tarry."
+          },
           "after": [
             "You are allowed to find this slow. Habakkuk did, and God answered him rather than correcting him.",
             "What you are not asked to conclude is that slow means never."
           ],
           "prayer": "Lord, this feels late to me, and I am not going to pretend otherwise in your presence. Hold me steady between what I can see and what you have appointed. Let me wait like a man on a watchtower rather than a man walking away.",
           "addLabel": "Add what feels late",
-          "question": "Where have you started reading slow as no?"
+          "question": "Where have you started reading slow as no?",
+          "prayerCategory": "Faith"
         },
         {
           "title": "Two More Years",
           "minutes": 4,
-          "read": { "book": "Genesis", "chapter": 40, "verse": 23, "from": 20, "to": 23 },
+          "read": {
+            "book": "Genesis",
+            "chapter": 40,
+            "verse": 23,
+            "from": 20,
+            "to": 23
+          },
           "body": [
-            { "p": "Joseph is in prison for something he did not do. He interprets a dream correctly for a fellow prisoner, and he asks for one thing in return: when you get out, remember me. Mention my name to someone." },
-            { "p": "The man gets out. Everything Joseph said would happen happens exactly as he said it." },
-            { "q": { "book": "Genesis", "chapter": 40, "verse": 23 } },
-            { "p": "The chapter ends there. The next chapter opens by telling us it was two full years." },
-            { "p": "Two years is not a literary device. It is seven hundred and thirty mornings of waking up in a prison you should not be in, having done the right thing, for a man who owed you and forgot." },
-            { "p": "Nothing in the text suggests Joseph handled this beautifully. It simply does not tell us. What it tells us is that the forgetting was real, the delay was long, and the position he was eventually given required him to be exactly where he was when the call came." }
+            {
+              "p": "Joseph is in prison for something he did not do. He interprets a dream correctly for a fellow prisoner, and he asks for one thing in return: when you get out, remember me. Mention my name to someone."
+            },
+            {
+              "p": "The man gets out. Everything Joseph said would happen happens exactly as he said it."
+            },
+            {
+              "q": {
+                "book": "Genesis",
+                "chapter": 40,
+                "verse": 23
+              }
+            },
+            {
+              "p": "The chapter ends there. The next chapter opens by telling us it was two full years."
+            },
+            {
+              "p": "Two years is not a literary device. It is seven hundred and thirty mornings of waking up in a prison you should not be in, having done the right thing, for a man who owed you and forgot."
+            },
+            {
+              "p": "Nothing in the text suggests Joseph handled this beautifully. It simply does not tell us. What it tells us is that the forgetting was real, the delay was long, and the position he was eventually given required him to be exactly where he was when the call came."
+            }
           ],
-          "line": { "a": "He forgot him.", "b": "God did not." },
+          "line": {
+            "a": "He forgot him.",
+            "b": "God did not."
+          },
           "after": [
             "Being forgotten by someone who owed you is its own particular wound, and it is worse when you did the right thing to earn the debt.",
             "The two years were not empty. They were just unexplained until much later, and Joseph lived every one of them without the explanation."
           ],
           "prayer": "Father, someone forgot me, and I have been quietly keeping the account. I am handing you the ledger. Keep me from bitterness in the long gap between what I did and what came of it, and hold me steady where you have placed me.",
           "addLabel": "Add the person you're waiting on",
-          "question": "Who owes you something you have stopped expecting?"
+          "question": "Who owes you something you have stopped expecting?",
+          "prayerCategory": "Work"
         },
         {
           "title": "Four Words After Four Hundred Years",
           "minutes": 4,
-          "read": { "book": "Exodus", "chapter": 2, "verse": 24, "from": 23, "to": 25 },
+          "read": {
+            "book": "Exodus",
+            "chapter": 2,
+            "verse": 24,
+            "from": 23,
+            "to": 25
+          },
           "body": [
-            { "p": "Israel has been in Egypt for four centuries. Generations were born into it, worked in it, and died in it without ever seeing anything else. There is no record of a prophet during that stretch. No promise renewed, no visitation, nothing." },
-            { "p": "Then a king dies, and the people groan. Not pray, in the first instance. Groan." },
-            { "q": { "book": "Exodus", "chapter": 2, "verse": 24 } },
-            { "p": "Four verbs land in two verses: God heard, God remembered, God looked, God knew. They are stacked deliberately, like someone laying out evidence." },
-            { "p": "Remembered is the strange one, because it implies a period of not remembering, which cannot be what it means. In Hebrew it is less about recall and more about acting on something long held. God moved on a promise he had been holding since Abraham." },
-            { "p": "Which means the four hundred years were not silence in the sense of absence. They were silence in the sense of a covenant being kept without commentary." }
+            {
+              "p": "Israel has been in Egypt for four centuries. Generations were born into it, worked in it, and died in it without ever seeing anything else. There is no record of a prophet during that stretch. No promise renewed, no visitation, nothing."
+            },
+            {
+              "p": "Then a king dies, and the people groan. Not pray, in the first instance. Groan."
+            },
+            {
+              "q": {
+                "book": "Exodus",
+                "chapter": 2,
+                "verse": 24
+              }
+            },
+            {
+              "p": "Four verbs land in two verses: God heard, God remembered, God looked, God knew. They are stacked deliberately, like someone laying out evidence."
+            },
+            {
+              "p": "Remembered is the strange one, because it implies a period of not remembering, which cannot be what it means. In Hebrew it is less about recall and more about acting on something long held. God moved on a promise he had been holding since Abraham."
+            },
+            {
+              "p": "Which means the four hundred years were not silence in the sense of absence. They were silence in the sense of a covenant being kept without commentary."
+            }
           ],
-          "line": { "a": "God heard. God remembered.", "b": "God looked. God knew." },
+          "line": {
+            "a": "God heard. God remembered.",
+            "b": "God looked. God knew."
+          },
           "after": [
             "The groan is what starts the chapter's engine, and a groan is not an eloquent prayer. It is the sound a person makes when words have run out.",
             "That sound was enough."
           ],
           "prayer": "God, I do not have the language for this one any more. You have heard the sound I make when I have run out of words. Remember what you have promised, look on where I actually am, and let me know that you know.",
           "addLabel": "Add what you can't put words to",
-          "question": "What have you stopped bringing to God because you cannot phrase it?"
+          "question": "What have you stopped bringing to God because you cannot phrase it?",
+          "prayerCategory": "Deliverance"
         },
         {
           "title": "He Stayed Two Days",
           "minutes": 4,
-          "read": { "book": "John", "chapter": 11, "verse": 6, "from": 1, "to": 6 },
+          "read": {
+            "book": "John",
+            "chapter": 11,
+            "verse": 6,
+            "from": 1,
+            "to": 6
+          },
           "body": [
-            { "p": "The sisters send word that Lazarus is ill. They do not ask Jesus to come; they simply tell him who is sick, and they identify him by a relationship — he whom thou lovest. They assume that is enough information." },
-            { "p": "It is. And what he does with it is not what anyone in the story expects." },
-            { "q": { "book": "John", "chapter": 11, "verse": 6 } },
-            { "p": "The hinge of that sentence is the word therefore. He loved them, therefore he stayed where he was. Not although. Therefore." },
-            { "p": "Every instinct I have wants that to be a translation problem. It is not. John has written the delay and the love into the same clause on purpose, and he has left it there for two thousand years for us to trip over." },
-            { "p": "Martha says it to his face when he finally arrives: if you had been here, my brother would not have died. She is right. That is the hard part. She is completely right, and he does not argue with her." }
+            {
+              "p": "The sisters send word that Lazarus is ill. They do not ask Jesus to come; they simply tell him who is sick, and they identify him by a relationship — he whom thou lovest. They assume that is enough information."
+            },
+            {
+              "p": "It is. And what he does with it is not what anyone in the story expects."
+            },
+            {
+              "q": {
+                "book": "John",
+                "chapter": 11,
+                "verse": 6
+              }
+            },
+            {
+              "p": "The hinge of that sentence is the word therefore. He loved them, therefore he stayed where he was. Not although. Therefore."
+            },
+            {
+              "p": "Every instinct I have wants that to be a translation problem. It is not. John has written the delay and the love into the same clause on purpose, and he has left it there for two thousand years for us to trip over."
+            },
+            {
+              "p": "Martha says it to his face when he finally arrives: if you had been here, my brother would not have died. She is right. That is the hard part. She is completely right, and he does not argue with her."
+            }
           ],
-          "line": { "a": "He loved them,", "b": "therefore he stayed." },
+          "line": {
+            "a": "He loved them,",
+            "b": "therefore he stayed."
+          },
           "after": [
             "This does not make delay painless and the text never pretends it does. Jesus weeps at the tomb of a man he is about to raise.",
             "It only rules out one conclusion: that the waiting is evidence you are not loved."
           ],
           "prayer": "Jesus, I have been reading your silence as distance. Teach me that the delay and the love are not two different things in your hands. Come when you come, and until then keep me from deciding what your quietness means about me.",
           "addLabel": "Add where God seems late",
-          "question": "What have you concluded about God's love from his timing?"
+          "question": "What have you concluded about God's love from his timing?",
+          "prayerCategory": "Grief"
         },
         {
           "title": "Her Hap Was To Light",
           "minutes": 3,
-          "read": { "book": "Ruth", "chapter": 2, "verse": 3, "from": 1, "to": 4 },
+          "read": {
+            "book": "Ruth",
+            "chapter": 2,
+            "verse": 3,
+            "from": 1,
+            "to": 4
+          },
           "body": [
-            { "p": "Ruth is a widow supporting an older widow in a country that is not hers. She goes out to glean, which means walking behind the harvesters and picking up whatever they drop. It is the legal provision for people with nothing, and it is as undignified as it sounds." },
-            { "p": "She has to choose a field. She does not know the owners. She picks one." },
-            { "q": { "book": "Ruth", "chapter": 2, "verse": 3 } },
-            { "p": "Her hap was to light on. Her chance. The narrator writes it as luck, flatly, with no halo on it — and then spends the rest of the book showing you that this field is the hinge on which a family line turns, and eventually a king, and eventually the genealogy in Matthew chapter one." },
-            { "p": "The writer knew exactly what he was doing. He gives you the moment as Ruth experienced it — an arbitrary choice on a hard morning — and lets you find out later what it was." },
-            { "p": "She did not feel providence. She felt tired, and she picked a field." }
+            {
+              "p": "Ruth is a widow supporting an older widow in a country that is not hers. She goes out to glean, which means walking behind the harvesters and picking up whatever they drop. It is the legal provision for people with nothing, and it is as undignified as it sounds."
+            },
+            {
+              "p": "She has to choose a field. She does not know the owners. She picks one."
+            },
+            {
+              "q": {
+                "book": "Ruth",
+                "chapter": 2,
+                "verse": 3
+              }
+            },
+            {
+              "p": "Her hap was to light on. Her chance. The narrator writes it as luck, flatly, with no halo on it — and then spends the rest of the book showing you that this field is the hinge on which a family line turns, and eventually a king, and eventually the genealogy in Matthew chapter one."
+            },
+            {
+              "p": "The writer knew exactly what he was doing. He gives you the moment as Ruth experienced it — an arbitrary choice on a hard morning — and lets you find out later what it was."
+            },
+            {
+              "p": "She did not feel providence. She felt tired, and she picked a field."
+            }
           ],
-          "line": { "a": "She felt luck.", "b": "It was a lineage." },
+          "line": {
+            "a": "She felt luck.",
+            "b": "It was a lineage."
+          },
           "after": [
             "You are unlikely to recognise the important day while you are inside it. It will feel like an ordinary decision made without enough information.",
             "Keep going out to the field."
           ],
           "prayer": "Lord, most of my choices are made tired and without enough information, and I cannot tell which ones matter. Work through the ordinary ones. Let me be faithful in the field I picked this morning even though it feels like nothing.",
           "addLabel": "Add today's ordinary decision",
-          "question": "What are you doing that feels too small to count?"
+          "question": "What are you doing that feels too small to count?",
+          "prayerCategory": "Purpose"
         },
         {
           "title": "How Long",
           "minutes": 3,
-          "read": { "book": "Psalms", "chapter": 13, "verse": 1, "from": 1, "to": 6 },
+          "read": {
+            "book": "Psalms",
+            "chapter": 13,
+            "verse": 1,
+            "from": 1,
+            "to": 6
+          },
           "body": [
-            { "p": "Psalm 13 is six verses long. It is the shortest complete emotional journey in the Bible, and it begins with a man asking God how long four times in two verses." },
-            { "q": { "book": "Psalms", "chapter": 13, "verse": 1 } },
-            { "p": "For ever is an accusation. He does not soften it, and nobody edited it out. The songbook of Israel opens this psalm by permitting a worshipper to tell God to his face that this has gone on too long." },
-            { "p": "Then verse five turns without warning: but I have trusted in thy mercy. There is no new information in between. Nothing has been resolved. The enemy is still there, the sleeplessness is still there." },
-            { "p": "What has happened is that he has said the whole complaint out loud, in God's direction, and having said it he finds he is still standing on something." },
-            { "p": "The complaint did not disqualify the trust. It cleared the ground for it." }
+            {
+              "p": "Psalm 13 is six verses long. It is the shortest complete emotional journey in the Bible, and it begins with a man asking God how long four times in two verses."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 13,
+                "verse": 1
+              }
+            },
+            {
+              "p": "For ever is an accusation. He does not soften it, and nobody edited it out. The songbook of Israel opens this psalm by permitting a worshipper to tell God to his face that this has gone on too long."
+            },
+            {
+              "p": "Then verse five turns without warning: but I have trusted in thy mercy. There is no new information in between. Nothing has been resolved. The enemy is still there, the sleeplessness is still there."
+            },
+            {
+              "p": "What has happened is that he has said the whole complaint out loud, in God's direction, and having said it he finds he is still standing on something."
+            },
+            {
+              "p": "The complaint did not disqualify the trust. It cleared the ground for it."
+            }
           ],
-          "line": { "a": "How long, O Lord?", "b": "But I have trusted." },
+          "line": {
+            "a": "How long, O Lord?",
+            "b": "But I have trusted."
+          },
           "after": [
             "Six verses. Four accusations and one 'but'. The 'but' is only load-bearing because the accusations were honest.",
             "Prayer that has been pre-edited for tone is not more spiritual. It is just quieter."
           ],
           "prayer": "Lord, how long. I am saying it because your own songbook taught me I am allowed to. And having said it, I am still here, and still yours, and still trusting your mercy with nothing new to go on.",
           "addLabel": "Add what has gone on too long",
-          "question": "What would you say to God if you stopped editing it?"
+          "question": "What would you say to God if you stopped editing it?",
+          "prayerCategory": "Mental Health"
         },
         {
           "title": "They Shall Walk",
           "minutes": 3,
-          "read": { "book": "Isaiah", "chapter": 40, "verse": 31, "from": 28, "to": 31 },
+          "read": {
+            "book": "Isaiah",
+            "chapter": 40,
+            "verse": 31,
+            "from": 28,
+            "to": 31
+          },
           "body": [
-            { "p": "This is the verse people put on gym walls, and they usually stop at the eagles. Read the whole line and notice the order it goes in." },
-            { "q": { "book": "Isaiah", "chapter": 40, "verse": 31 } },
-            { "p": "Mount up with wings. Run. Walk. That is descending order, and it is descending on purpose. If you were writing an inspirational poster you would end on the eagles." },
-            { "p": "Isaiah ends on walking, and he attaches the strangest promise to it: and not faint. Not shall run and not be weary — that comes earlier. The final clause is about the person who is no longer soaring or running, who is just putting one foot down after the other." },
-            { "p": "That is the hardest of the three and he knows it. Anyone can be carried through a crisis on adrenaline. Sustaining an unremarkable walk through year four of something is a different order of grace." },
-            { "p": "The eagles are for the day it lifts. The walking is for all the other days, and the promise covers those too." }
+            {
+              "p": "This is the verse people put on gym walls, and they usually stop at the eagles. Read the whole line and notice the order it goes in."
+            },
+            {
+              "q": {
+                "book": "Isaiah",
+                "chapter": 40,
+                "verse": 31
+              }
+            },
+            {
+              "p": "Mount up with wings. Run. Walk. That is descending order, and it is descending on purpose. If you were writing an inspirational poster you would end on the eagles."
+            },
+            {
+              "p": "Isaiah ends on walking, and he attaches the strangest promise to it: and not faint. Not shall run and not be weary — that comes earlier. The final clause is about the person who is no longer soaring or running, who is just putting one foot down after the other."
+            },
+            {
+              "p": "That is the hardest of the three and he knows it. Anyone can be carried through a crisis on adrenaline. Sustaining an unremarkable walk through year four of something is a different order of grace."
+            },
+            {
+              "p": "The eagles are for the day it lifts. The walking is for all the other days, and the promise covers those too."
+            }
           ],
-          "line": { "a": "They shall walk,", "b": "and not faint." },
+          "line": {
+            "a": "They shall walk,",
+            "b": "and not faint."
+          },
           "after": [
             "If today is not a soaring day, you have not fallen out of the verse. You have reached the part of it that was written for you.",
             "Walking counts."
           ],
           "prayer": "God, I am not soaring and I am not running. I am walking, and some days barely. Renew my strength at the pace I am actually moving, and let me not faint in the ordinary middle of this.",
           "addLabel": "Add what you're walking through",
-          "question": "Where have you decided that walking means failing?"
+          "question": "Where have you decided that walking means failing?",
+          "prayerCategory": "Health"
         },
         {
           "title": "He Wanted A Bigger Moment",
           "minutes": 4,
-          "read": { "book": "2 Kings", "chapter": 5, "verse": 11, "from": 9, "to": 14 },
+          "read": {
+            "book": "2 Kings",
+            "chapter": 5,
+            "verse": 11,
+            "from": 9,
+            "to": 14
+          },
           "body": [
-            { "p": "Naaman is a commander of an army and a leper. He arrives at Elisha's door with horses, chariots and a small fortune, expecting the encounter his position warrants." },
-            { "p": "Elisha does not come out. He sends a servant with a message: go and wash seven times in the Jordan." },
-            { "q": { "book": "2 Kings", "chapter": 5, "verse": 11 } },
-            { "p": "Behold, I thought. That is the whole problem in three words, and it is unusually honest of the text to record it. He had a picture of how his healing would look. The prophet standing there, a hand moving over the place, the name of God called out loud." },
-            { "p": "What he got was an errand, delivered second-hand, involving a river he considered inferior to the ones back home. His servants have to talk him into it, and their argument is devastating: if he had asked you to do something great, would you not have done it?" },
-            { "p": "He goes down. Seven times, which means six times coming up out of the water unchanged, with the men watching." }
+            {
+              "p": "Naaman is a commander of an army and a leper. He arrives at Elisha's door with horses, chariots and a small fortune, expecting the encounter his position warrants."
+            },
+            {
+              "p": "Elisha does not come out. He sends a servant with a message: go and wash seven times in the Jordan."
+            },
+            {
+              "q": {
+                "book": "2 Kings",
+                "chapter": 5,
+                "verse": 11
+              }
+            },
+            {
+              "p": "Behold, I thought. That is the whole problem in three words, and it is unusually honest of the text to record it. He had a picture of how his healing would look. The prophet standing there, a hand moving over the place, the name of God called out loud."
+            },
+            {
+              "p": "What he got was an errand, delivered second-hand, involving a river he considered inferior to the ones back home. His servants have to talk him into it, and their argument is devastating: if he had asked you to do something great, would you not have done it?"
+            },
+            {
+              "p": "He goes down. Seven times, which means six times coming up out of the water unchanged, with the men watching."
+            }
           ],
-          "line": { "a": "Behold, I thought.", "b": "Then he went down." },
+          "line": {
+            "a": "Behold, I thought.",
+            "b": "Then he went down."
+          },
           "after": [
             "Sometimes the delay is not God's. It is the distance between the answer offered and the answer we had pictured.",
             "The seventh time was the same river as the first."
           ],
           "prayer": "Lord, I have been holding out for the version of this I imagined, and refusing the one in front of me. Show me where my picture is the obstacle. Give me the humility to go down into the ordinary water.",
           "addLabel": "Add the answer you didn't want",
-          "question": "What has God offered that you rejected for being too small?"
+          "question": "What has God offered that you rejected for being too small?",
+          "prayerCategory": "Faith"
         },
         {
           "title": "In The City, Doing Nothing",
           "minutes": 3,
-          "read": { "book": "Acts", "chapter": 1, "verse": 4, "from": 4, "to": 8 },
+          "read": {
+            "book": "Acts",
+            "chapter": 1,
+            "verse": 4,
+            "from": 4,
+            "to": 8
+          },
           "body": [
-            { "p": "The resurrection has happened. The disciples have seen him, eaten with him, been commissioned by him. Every reason to move is now in place, and the whole book that follows is about movement." },
-            { "p": "And the first instruction of the book of Acts is to stay put." },
-            { "q": { "book": "Acts", "chapter": 1, "verse": 4 } },
-            { "p": "Wait for the promise. That is what they do for roughly ten days — in a room, in a city, with the most urgent news in human history and explicit orders not to go anywhere with it yet." },
-            { "p": "Luke tells us what they did with the time. They prayed, they stayed together, and they attended to one piece of unfinished business among themselves. That is it. No campaign, no strategy document." },
-            { "p": "The waiting was not a pause before the mission. It was the first act of obedience the mission required, and everything after it depended on them getting that part right." }
+            {
+              "p": "The resurrection has happened. The disciples have seen him, eaten with him, been commissioned by him. Every reason to move is now in place, and the whole book that follows is about movement."
+            },
+            {
+              "p": "And the first instruction of the book of Acts is to stay put."
+            },
+            {
+              "q": {
+                "book": "Acts",
+                "chapter": 1,
+                "verse": 4
+              }
+            },
+            {
+              "p": "Wait for the promise. That is what they do for roughly ten days — in a room, in a city, with the most urgent news in human history and explicit orders not to go anywhere with it yet."
+            },
+            {
+              "p": "Luke tells us what they did with the time. They prayed, they stayed together, and they attended to one piece of unfinished business among themselves. That is it. No campaign, no strategy document."
+            },
+            {
+              "p": "The waiting was not a pause before the mission. It was the first act of obedience the mission required, and everything after it depended on them getting that part right."
+            }
           ],
-          "line": { "a": "They had the news.", "b": "They were told to wait." },
+          "line": {
+            "a": "They had the news.",
+            "b": "They were told to wait."
+          },
           "after": [
             "Some seasons of stillness are not God withholding the work. They are the work, and moving early would cost you the thing you are moving with.",
             "Ten days in a room, and then the whole world."
           ],
           "prayer": "Father, I am ready to move and you have not said go. Keep me in the room. Let me use this stillness for prayer and for putting things right with people, instead of burning it on impatience.",
           "addLabel": "Add what you're eager to start",
-          "question": "What are you about to start early?"
+          "question": "What are you about to start early?",
+          "prayerCategory": "Purpose"
         },
         {
           "title": "Quietly",
           "minutes": 3,
-          "read": { "book": "Lamentations", "chapter": 3, "verse": 26, "from": 22, "to": 26 },
+          "read": {
+            "book": "Lamentations",
+            "chapter": 3,
+            "verse": 26,
+            "from": 22,
+            "to": 26
+          },
           "body": [
-            { "p": "Lamentations is a funeral song for a destroyed city, written by someone who watched it happen. It is five chapters of grief with almost no relief in it." },
-            { "p": "The exception sits in the middle of chapter three, and it is famous — his mercies are new every morning. What is less quoted is the line that follows a few verses later." },
-            { "q": { "book": "Lamentations", "chapter": 3, "verse": 26 } },
-            { "p": "Quietly wait. Not passively, and not silently in the sense of having no feelings — this is a book of loud feelings. Quietly in the sense of without frantic motion." },
-            { "p": "The man writing this has every reason to be doing something. His city is rubble. And he has concluded, from inside the rubble, that hoping and quietly waiting is a good thing rather than a wasted thing." },
-            { "p": "That conclusion is worth more coming from him than it would be from someone comfortable." }
+            {
+              "p": "Lamentations is a funeral song for a destroyed city, written by someone who watched it happen. It is five chapters of grief with almost no relief in it."
+            },
+            {
+              "p": "The exception sits in the middle of chapter three, and it is famous — his mercies are new every morning. What is less quoted is the line that follows a few verses later."
+            },
+            {
+              "q": {
+                "book": "Lamentations",
+                "chapter": 3,
+                "verse": 26
+              }
+            },
+            {
+              "p": "Quietly wait. Not passively, and not silently in the sense of having no feelings — this is a book of loud feelings. Quietly in the sense of without frantic motion."
+            },
+            {
+              "p": "The man writing this has every reason to be doing something. His city is rubble. And he has concluded, from inside the rubble, that hoping and quietly waiting is a good thing rather than a wasted thing."
+            },
+            {
+              "p": "That conclusion is worth more coming from him than it would be from someone comfortable."
+            }
           ],
-          "line": { "a": "It is good that a man", "b": "should quietly wait." },
+          "line": {
+            "a": "It is good that a man",
+            "b": "should quietly wait."
+          },
           "after": [
             "There is a difference between quiet waiting and numb waiting. One is aimed at God. The other has simply stopped.",
             "He wrote this in the ruins, which is the only place it could have been proved."
           ],
           "prayer": "Lord, calm the frantic part of me that thinks stillness is neglect. Let my waiting be quiet and aimed at you, not numb and aimed at nothing. Your mercies are new this morning and I am taking today's.",
           "addLabel": "Add what you're hoping for",
-          "question": "Is your waiting quiet, or has it just gone numb?"
+          "question": "Is your waiting quiet, or has it just gone numb?",
+          "prayerCategory": "Spiritual Life"
         },
         {
           "title": "Now Let Thy Servant Depart",
           "minutes": 4,
-          "read": { "book": "Luke", "chapter": 2, "verse": 29, "from": 27, "to": 32 },
+          "read": {
+            "book": "Luke",
+            "chapter": 2,
+            "verse": 29,
+            "from": 27,
+            "to": 32
+          },
           "body": [
-            { "p": "We started this fortnight with Simeon in the temple, waiting for something he had been promised he would live to see. This is the day it happens." },
-            { "p": "A poor couple comes in with a baby and the cheaper of the two permitted offerings, which tells you their income. Nothing about the scene announces itself. Simeon takes the child in his arms." },
-            { "q": { "book": "Luke", "chapter": 2, "verse": 29 } },
-            { "p": "Lord, now lettest thou thy servant depart in peace. He is not asking to die. He is saying that the thing which held him at his post has been delivered, and he can stand down." },
-            { "p": "The word Luke uses is the one for releasing someone from duty. Simeon has understood his whole long wait as a watch he was keeping, and he is now formally asking to be relieved of it." },
-            { "p": "He held it. That is the detail I cannot get past. He did not see it from a distance or hear about it from someone else. He got to put his arms around it." }
+            {
+              "p": "We started this fortnight with Simeon in the temple, waiting for something he had been promised he would live to see. This is the day it happens."
+            },
+            {
+              "p": "A poor couple comes in with a baby and the cheaper of the two permitted offerings, which tells you their income. Nothing about the scene announces itself. Simeon takes the child in his arms."
+            },
+            {
+              "q": {
+                "book": "Luke",
+                "chapter": 2,
+                "verse": 29
+              }
+            },
+            {
+              "p": "Lord, now lettest thou thy servant depart in peace. He is not asking to die. He is saying that the thing which held him at his post has been delivered, and he can stand down."
+            },
+            {
+              "p": "The word Luke uses is the one for releasing someone from duty. Simeon has understood his whole long wait as a watch he was keeping, and he is now formally asking to be relieved of it."
+            },
+            {
+              "p": "He held it. That is the detail I cannot get past. He did not see it from a distance or hear about it from someone else. He got to put his arms around it."
+            }
           ],
-          "line": { "a": "He did not just see it.", "b": "He held it." },
+          "line": {
+            "a": "He did not just see it.",
+            "b": "He held it."
+          },
           "after": [
             "Not every wait ends like this, and the Bible is honest enough elsewhere to say so. But some do, and they end quietly, in a room with nobody important in it.",
             "It arrived carried by strangers who could only afford two birds."
           ],
           "prayer": "Father, keep me at my post. And when the thing comes — carried in by people I do not recognise, looking smaller than I imagined — give me the eyes to know it, and the arms to hold it, and the peace of a servant released.",
           "addLabel": "Add what you're still watching for",
-          "question": "Would you recognise it if it arrived looking ordinary?"
+          "question": "Would you recognise it if it arrived looking ordinary?",
+          "prayerCategory": "Thanksgiving"
         }
       ]
     },
@@ -308,296 +674,660 @@
         {
           "title": "The Weight Was Never The Problem",
           "minutes": 4,
-          "read": { "book": "Matthew", "chapter": 11, "verse": 28, "from": 28, "to": 30 },
+          "read": {
+            "book": "Matthew",
+            "chapter": 11,
+            "verse": 28,
+            "from": 28,
+            "to": 30
+          },
           "body": [
-            { "p": "There is a way of carrying something heavy badly, and anyone who has ever moved a wardrobe knows it. The weight is not what breaks your back. The angle is." },
-            { "q": { "book": "Matthew", "chapter": 11, "verse": 28 } },
-            { "p": "The invitation is to people who labour and are heavy laden, which is a specific description. Not people in crisis. People carrying something ordinary for a long time." },
-            { "p": "And what he offers is not the removal of the load. He offers a yoke, which is a piece of farm equipment for pulling. He is proposing that you keep working." },
-            { "p": "But a yoke is built for two animals, and the whole craft of making one is distributing weight so the beam sits where the shoulders can take it. A badly made yoke will destroy an ox carrying a light load. A well made one lets it pull all day." },
-            { "p": "He says his is easy, and the word means well fitted. Not light. Fitted." }
+            {
+              "p": "There is a way of carrying something heavy badly, and anyone who has ever moved a wardrobe knows it. The weight is not what breaks your back. The angle is."
+            },
+            {
+              "q": {
+                "book": "Matthew",
+                "chapter": 11,
+                "verse": 28
+              }
+            },
+            {
+              "p": "The invitation is to people who labour and are heavy laden, which is a specific description. Not people in crisis. People carrying something ordinary for a long time."
+            },
+            {
+              "p": "And what he offers is not the removal of the load. He offers a yoke, which is a piece of farm equipment for pulling. He is proposing that you keep working."
+            },
+            {
+              "p": "But a yoke is built for two animals, and the whole craft of making one is distributing weight so the beam sits where the shoulders can take it. A badly made yoke will destroy an ox carrying a light load. A well made one lets it pull all day."
+            },
+            {
+              "p": "He says his is easy, and the word means well fitted. Not light. Fitted."
+            }
           ],
-          "line": { "a": "He did not offer to take the load.", "b": "He offered to take the other side." },
+          "line": {
+            "a": "He did not offer to take the load.",
+            "b": "He offered to take the other side."
+          },
           "after": [
             "Most of what exhausts us is not the size of the thing. It is carrying it at an angle we were never built for, alone, at a pace nobody set for us.",
             "The offer is a better harness and company in it."
           ],
           "prayer": "Jesus, I have been pulling this at the wrong angle for a long time and calling the exhaustion faithfulness. Take the other side of it. Set the pace, and let me learn how you carry things.",
           "addLabel": "Add what you're pulling",
-          "question": "Are you carrying something heavy, or carrying it badly?"
+          "question": "Are you carrying something heavy, or carrying it badly?",
+          "prayerCategory": "Mental Health"
         },
         {
           "title": "Because He Careth",
           "minutes": 3,
-          "read": { "book": "1 Peter", "chapter": 5, "verse": 7, "from": 5, "to": 7 },
+          "read": {
+            "book": "1 Peter",
+            "chapter": 5,
+            "verse": 7,
+            "from": 5,
+            "to": 7
+          },
           "body": [
-            { "p": "This verse gets quoted so often that the second half has gone soft, and the second half is the argument." },
-            { "q": { "book": "1 Peter", "chapter": 5, "verse": 7 } },
-            { "p": "Cast all your care upon him — that is the instruction. For he careth for you — that is the reason, and without it the instruction is just advice." },
-            { "p": "Peter does not say cast your care on God because worry is unproductive, which is true and useless. He does not say cast it because God is powerful, which would make God capable but not necessarily interested." },
-            { "p": "He says do it because God cares about you. The transfer works because there is somebody on the other end who wants it." },
-            { "p": "Notice too what precedes it: humble yourselves. Peter puts casting your care in the same breath as humility, which suggests he thinks carrying everything yourself is a form of pride. That is an uncomfortable idea and I think he meant it to be." }
+            {
+              "p": "This verse gets quoted so often that the second half has gone soft, and the second half is the argument."
+            },
+            {
+              "q": {
+                "book": "1 Peter",
+                "chapter": 5,
+                "verse": 7
+              }
+            },
+            {
+              "p": "Cast all your care upon him — that is the instruction. For he careth for you — that is the reason, and without it the instruction is just advice."
+            },
+            {
+              "p": "Peter does not say cast your care on God because worry is unproductive, which is true and useless. He does not say cast it because God is powerful, which would make God capable but not necessarily interested."
+            },
+            {
+              "p": "He says do it because God cares about you. The transfer works because there is somebody on the other end who wants it."
+            },
+            {
+              "p": "Notice too what precedes it: humble yourselves. Peter puts casting your care in the same breath as humility, which suggests he thinks carrying everything yourself is a form of pride. That is an uncomfortable idea and I think he meant it to be."
+            }
           ],
-          "line": { "a": "Not because worry is useless.", "b": "Because he cares." },
+          "line": {
+            "a": "Not because worry is useless.",
+            "b": "Because he cares."
+          },
           "after": [
             "Handing something over requires believing the person taking it wants it. Most of us fail at the second part, not the first.",
             "He is not tolerating your concerns. He is interested in them."
           ],
           "prayer": "Father, I have been holding this because somewhere underneath I am not sure you want it. Convince me otherwise. You care for me — not the tidy version of me, this one — and I am handing it across.",
           "addLabel": "Add what you're holding back",
-          "question": "What do you not quite believe God is interested in?"
+          "question": "What do you not quite believe God is interested in?",
+          "prayerCategory": "Mental Health"
         },
         {
           "title": "Thou Wilt Surely Wear Away",
           "minutes": 4,
-          "read": { "book": "Exodus", "chapter": 18, "verse": 18, "from": 13, "to": 24 },
+          "read": {
+            "book": "Exodus",
+            "chapter": 18,
+            "verse": 18,
+            "from": 13,
+            "to": 24
+          },
           "body": [
-            { "p": "Moses is judging Israel. He sits from morning to evening and the people stand in front of him all day, and he does this because he is the one God speaks to and there is genuinely nobody else qualified." },
-            { "p": "His father-in-law watches for one day and tells him to stop." },
-            { "q": { "book": "Exodus", "chapter": 18, "verse": 18 } },
-            { "p": "Thou wilt surely wear away. It is a phrase for cloth, or stone — something that does not break suddenly but thins until it is gone. Jethro is not describing a crisis. He is describing erosion." },
-            { "p": "And notice what he says will wear away: both thou, and this people that is with thee. Moses doing everything was not only costing Moses. It was costing everyone standing in that queue all day." },
-            { "p": "The solution is unremarkable. Find capable people. Give them the smaller matters. Keep the hard ones. Moses, who spoke with God face to face, took organisational advice from his wife's father and implemented it the same week." }
+            {
+              "p": "Moses is judging Israel. He sits from morning to evening and the people stand in front of him all day, and he does this because he is the one God speaks to and there is genuinely nobody else qualified."
+            },
+            {
+              "p": "His father-in-law watches for one day and tells him to stop."
+            },
+            {
+              "q": {
+                "book": "Exodus",
+                "chapter": 18,
+                "verse": 18
+              }
+            },
+            {
+              "p": "Thou wilt surely wear away. It is a phrase for cloth, or stone — something that does not break suddenly but thins until it is gone. Jethro is not describing a crisis. He is describing erosion."
+            },
+            {
+              "p": "And notice what he says will wear away: both thou, and this people that is with thee. Moses doing everything was not only costing Moses. It was costing everyone standing in that queue all day."
+            },
+            {
+              "p": "The solution is unremarkable. Find capable people. Give them the smaller matters. Keep the hard ones. Moses, who spoke with God face to face, took organisational advice from his wife's father and implemented it the same week."
+            }
           ],
-          "line": { "a": "It was not a crisis.", "b": "It was erosion." },
+          "line": {
+            "a": "It was not a crisis.",
+            "b": "It was erosion."
+          },
           "after": [
             "Being the only one who can do it is sometimes true and almost never sustainable, and the people waiting are paying for it too.",
             "The fix was delegation. God did not send a miracle for something a reorganisation could solve."
           ],
           "prayer": "Lord, show me what I am doing that somebody else could do, and where my refusing to share it is costing more than my doing it is worth. Give me the humility to take ordinary advice.",
           "addLabel": "Add what you need to hand off",
-          "question": "What are you doing alone that is wearing you thin?"
+          "question": "What are you doing alone that is wearing you thin?",
+          "prayerCategory": "Work"
         },
         {
           "title": "Arise And Eat",
           "minutes": 4,
-          "read": { "book": "1 Kings", "chapter": 19, "verse": 7, "from": 3, "to": 8 },
+          "read": {
+            "book": "1 Kings",
+            "chapter": 19,
+            "verse": 7,
+            "from": 3,
+            "to": 8
+          },
           "body": [
-            { "p": "Elijah has just called down fire in front of the whole nation, and days later he is sitting under a tree in the desert asking God to let him die. Both of those are in the same week." },
-            { "p": "What God does about it is the part I keep returning to. There is no rebuke. There is no reminder of the fire. An angel touches him and tells him to eat, and he eats and sleeps, and then the angel comes back and does it again." },
-            { "q": { "book": "1 Kings", "chapter": 19, "verse": 7 } },
-            { "p": "The journey is too great for thee. It is not a correction, it is an observation, and it is on Elijah's side. God agrees with him that this is too much." },
-            { "p": "Then food, and sleep, twice, before a single word of theology. The conversation about what Elijah is doing there happens later, on the mountain, after he has eaten and rested." },
-            { "p": "God treated the exhaustion as exhaustion. He did not treat it as a spiritual failure that needed correcting first." }
+            {
+              "p": "Elijah has just called down fire in front of the whole nation, and days later he is sitting under a tree in the desert asking God to let him die. Both of those are in the same week."
+            },
+            {
+              "p": "What God does about it is the part I keep returning to. There is no rebuke. There is no reminder of the fire. An angel touches him and tells him to eat, and he eats and sleeps, and then the angel comes back and does it again."
+            },
+            {
+              "q": {
+                "book": "1 Kings",
+                "chapter": 19,
+                "verse": 7
+              }
+            },
+            {
+              "p": "The journey is too great for thee. It is not a correction, it is an observation, and it is on Elijah's side. God agrees with him that this is too much."
+            },
+            {
+              "p": "Then food, and sleep, twice, before a single word of theology. The conversation about what Elijah is doing there happens later, on the mountain, after he has eaten and rested."
+            },
+            {
+              "p": "God treated the exhaustion as exhaustion. He did not treat it as a spiritual failure that needed correcting first."
+            }
           ],
-          "line": { "a": "Food first.", "b": "Then the mountain." },
+          "line": {
+            "a": "Food first.",
+            "b": "Then the mountain."
+          },
           "after": [
             "Some of what you are calling a crisis of faith is a shortage of sleep and food, and it is not less holy to fix it that way.",
             "The angel came twice. Once was not enough and God knew it would not be."
           ],
           "prayer": "God, you know the difference between a soul in trouble and a body that has not rested. Feed me and let me sleep. Meet me at the level I am actually at, and let the mountain wait until I can climb it.",
           "addLabel": "Add what's depleted you",
-          "question": "What have you been treating as a spiritual problem?"
+          "question": "What have you been treating as a spiritual problem?",
+          "prayerCategory": "Health"
         },
         {
           "title": "Rest A While",
           "minutes": 3,
-          "read": { "book": "Mark", "chapter": 6, "verse": 31, "from": 30, "to": 32 },
+          "read": {
+            "book": "Mark",
+            "chapter": 6,
+            "verse": 31,
+            "from": 30,
+            "to": 32
+          },
           "body": [
-            { "p": "The apostles come back from being sent out and start telling Jesus everything that happened. The reporting is enthusiastic. The ministry has gone well." },
-            { "p": "And Mark adds a detail that dates the scene precisely for anyone who has ever had a job: there were so many coming and going that they had no leisure so much as to eat." },
-            { "q": { "book": "Mark", "chapter": 6, "verse": 31 } },
-            { "p": "Come ye yourselves apart. He does not tell them to push through while the momentum is good, which is exactly what a growing work tempts you to do." },
-            { "p": "It is worth noticing when this happens. Not after a failure — after a success. The instinct after a good run is to run again immediately, and he interrupts it." },
-            { "p": "The rest does not go to plan, incidentally. The crowd works out where the boat is going and gets there first. But he still called for it, and calling for it was right even though it was interrupted." }
+            {
+              "p": "The apostles come back from being sent out and start telling Jesus everything that happened. The reporting is enthusiastic. The ministry has gone well."
+            },
+            {
+              "p": "And Mark adds a detail that dates the scene precisely for anyone who has ever had a job: there were so many coming and going that they had no leisure so much as to eat."
+            },
+            {
+              "q": {
+                "book": "Mark",
+                "chapter": 6,
+                "verse": 31
+              }
+            },
+            {
+              "p": "Come ye yourselves apart. He does not tell them to push through while the momentum is good, which is exactly what a growing work tempts you to do."
+            },
+            {
+              "p": "It is worth noticing when this happens. Not after a failure — after a success. The instinct after a good run is to run again immediately, and he interrupts it."
+            },
+            {
+              "p": "The rest does not go to plan, incidentally. The crowd works out where the boat is going and gets there first. But he still called for it, and calling for it was right even though it was interrupted."
+            }
           ],
-          "line": { "a": "Not after the failure.", "b": "After the success." },
+          "line": {
+            "a": "Not after the failure.",
+            "b": "After the success."
+          },
           "after": [
             "The dangerous moment for your rest is not when things collapse. It is when things are going well enough to justify skipping it.",
             "He said come apart even knowing the crowd would follow."
           ],
           "prayer": "Jesus, the work is going well and that is exactly why I have stopped stopping. Call me apart. Let me take the rest even when the momentum argues against it, and let me not resent the interruptions when they come.",
           "addLabel": "Add what you'd stop for a day",
-          "question": "What success is currently costing you your rest?"
+          "question": "What success is currently costing you your rest?",
+          "prayerCategory": "Health"
         },
         {
           "title": "He Giveth His Beloved Sleep",
           "minutes": 3,
-          "read": { "book": "Psalms", "chapter": 127, "verse": 2, "from": 1, "to": 2 },
+          "read": {
+            "book": "Psalms",
+            "chapter": 127,
+            "verse": 2,
+            "from": 1,
+            "to": 2
+          },
           "body": [
-            { "p": "This psalm opens by saying that if the Lord does not build the house, the builders work for nothing, and that if he does not keep the city the watchman may as well go home." },
-            { "p": "Then it gets specific about the hours." },
-            { "q": { "book": "Psalms", "chapter": 127, "verse": 2 } },
-            { "p": "Rising early, sitting up late, eating the bread of sorrows — that last phrase is the one that lands. Food eaten anxiously. Meals taken standing up while worrying." },
-            { "p": "The psalm calls it vain. Not wicked, not lazy in reverse — vain, meaning empty, meaning it does not produce what you are extending yourself to produce." },
-            { "p": "And the alternative offered is not a better technique. It is sleep, given as a gift, to people described as beloved. The rest is evidence of the relationship rather than a reward for finishing." }
+            {
+              "p": "This psalm opens by saying that if the Lord does not build the house, the builders work for nothing, and that if he does not keep the city the watchman may as well go home."
+            },
+            {
+              "p": "Then it gets specific about the hours."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 127,
+                "verse": 2
+              }
+            },
+            {
+              "p": "Rising early, sitting up late, eating the bread of sorrows — that last phrase is the one that lands. Food eaten anxiously. Meals taken standing up while worrying."
+            },
+            {
+              "p": "The psalm calls it vain. Not wicked, not lazy in reverse — vain, meaning empty, meaning it does not produce what you are extending yourself to produce."
+            },
+            {
+              "p": "And the alternative offered is not a better technique. It is sleep, given as a gift, to people described as beloved. The rest is evidence of the relationship rather than a reward for finishing."
+            }
           ],
-          "line": { "a": "The extra hours were empty.", "b": "The sleep was the gift." },
+          "line": {
+            "a": "The extra hours were empty.",
+            "b": "The sleep was the gift."
+          },
           "after": [
             "There is work that must be done and this psalm is not against it. It is against the specific hours you add out of fear that God will not cover the gap.",
             "You are not the one keeping the city."
           ],
           "prayer": "Lord, I keep adding hours at the end of the day to cover a gap I do not trust you with. Let me put it down and sleep. Build the house yourself tonight, because I cannot and never could.",
           "addLabel": "Add the fear that keeps you up",
-          "question": "Which of your hours are being worked out of fear?"
+          "question": "Which of your hours are being worked out of fear?",
+          "prayerCategory": "Mental Health"
         },
         {
           "title": "Careful And Troubled",
           "minutes": 4,
-          "read": { "book": "Luke", "chapter": 10, "verse": 41, "from": 38, "to": 42 },
+          "read": {
+            "book": "Luke",
+            "chapter": 10,
+            "verse": 41,
+            "from": 38,
+            "to": 42
+          },
           "body": [
-            { "p": "Martha is hosting, and she is doing it properly. Jesus has arrived with a group and somebody has to feed them, and that somebody is her while her sister sits down." },
-            { "p": "Her complaint is entirely reasonable and she takes it straight to him. Do you not care. Tell her to help me." },
-            { "q": { "book": "Luke", "chapter": 10, "verse": 41 } },
-            { "p": "He says her name twice, which in that culture is a softening, not a scolding. Martha, Martha. And then: careful and troubled about many things." },
-            { "p": "Careful in the older sense — full of care, anxious. He does not say the meal does not matter or that hospitality is unspiritual. He says she is troubled about many things, and one thing is needful." },
-            { "p": "The problem was never the serving. It was that the serving had multiplied into many things until it crowded out the one person she was serving it for, who was sitting in her house, available, for a limited time." }
+            {
+              "p": "Martha is hosting, and she is doing it properly. Jesus has arrived with a group and somebody has to feed them, and that somebody is her while her sister sits down."
+            },
+            {
+              "p": "Her complaint is entirely reasonable and she takes it straight to him. Do you not care. Tell her to help me."
+            },
+            {
+              "q": {
+                "book": "Luke",
+                "chapter": 10,
+                "verse": 41
+              }
+            },
+            {
+              "p": "He says her name twice, which in that culture is a softening, not a scolding. Martha, Martha. And then: careful and troubled about many things."
+            },
+            {
+              "p": "Careful in the older sense — full of care, anxious. He does not say the meal does not matter or that hospitality is unspiritual. He says she is troubled about many things, and one thing is needful."
+            },
+            {
+              "p": "The problem was never the serving. It was that the serving had multiplied into many things until it crowded out the one person she was serving it for, who was sitting in her house, available, for a limited time."
+            }
           ],
-          "line": { "a": "The work was not wrong.", "b": "It had multiplied." },
+          "line": {
+            "a": "The work was not wrong.",
+            "b": "It had multiplied."
+          },
           "after": [
             "Busyness rarely arrives as one large wrong decision. It arrives as many small right ones that were each individually defensible.",
             "He was in the house. That was the part that would not be there tomorrow."
           ],
           "prayer": "Jesus, I am troubled about many things and most of them are good things, which is why I have not put any of them down. Show me the one that is needful today. Let me sit down in my own house.",
           "addLabel": "Add the many things",
-          "question": "What good thing has crowded out the needful one?"
+          "question": "What good thing has crowded out the needful one?",
+          "prayerCategory": "Daily Prayer"
         },
         {
           "title": "Take No Thought For The Morrow",
           "minutes": 4,
-          "read": { "book": "Matthew", "chapter": 6, "verse": 34, "from": 25, "to": 34 },
+          "read": {
+            "book": "Matthew",
+            "chapter": 6,
+            "verse": 34,
+            "from": 25,
+            "to": 34
+          },
           "body": [
-            { "p": "This is the passage about the birds and the lilies, and it is often read as a gentle nature poem. It is not. It is a hard argument delivered to people who were genuinely poor and had real reason to be afraid of running out." },
-            { "q": { "book": "Matthew", "chapter": 6, "verse": 34 } },
-            { "p": "Take no thought for the morrow. The phrase in older English does not mean stop planning — it means stop being anxious about. Jesus is not against sowing and reaping; he uses farming as the illustration." },
-            { "p": "What he ends on is the strange clause: sufficient unto the day is the evil thereof. Today has enough trouble in it already." },
-            { "p": "That is not comfort in the usual sense. He is not saying it will be fine. He is conceding that each day has its own share of difficulty, and pointing out that borrowing tomorrow's on top of today's does not distribute the load, it doubles it." },
-            { "p": "You will get the grace for Thursday on Thursday. Trying to feel it on Tuesday is why Tuesday is unbearable." }
+            {
+              "p": "This is the passage about the birds and the lilies, and it is often read as a gentle nature poem. It is not. It is a hard argument delivered to people who were genuinely poor and had real reason to be afraid of running out."
+            },
+            {
+              "q": {
+                "book": "Matthew",
+                "chapter": 6,
+                "verse": 34
+              }
+            },
+            {
+              "p": "Take no thought for the morrow. The phrase in older English does not mean stop planning — it means stop being anxious about. Jesus is not against sowing and reaping; he uses farming as the illustration."
+            },
+            {
+              "p": "What he ends on is the strange clause: sufficient unto the day is the evil thereof. Today has enough trouble in it already."
+            },
+            {
+              "p": "That is not comfort in the usual sense. He is not saying it will be fine. He is conceding that each day has its own share of difficulty, and pointing out that borrowing tomorrow's on top of today's does not distribute the load, it doubles it."
+            },
+            {
+              "p": "You will get the grace for Thursday on Thursday. Trying to feel it on Tuesday is why Tuesday is unbearable."
+            }
           ],
-          "line": { "a": "Today has enough in it.", "b": "You cannot spend Thursday's grace on Tuesday." },
+          "line": {
+            "a": "Today has enough in it.",
+            "b": "You cannot spend Thursday's grace on Tuesday."
+          },
           "after": [
             "This is the least sentimental verse about anxiety in the Bible. It does not promise an easy week. It rations the difficulty to one day at a time.",
             "That rationing is the mercy."
           ],
           "prayer": "Father, I have been carrying next month today and wondering why today is so heavy. Give me what I need for the hours in front of me, and let tomorrow keep its own trouble until I get there with your help.",
           "addLabel": "Add tomorrow's worry",
-          "question": "Which day's trouble are you carrying that has not arrived?"
+          "question": "Which day's trouble are you carrying that has not arrived?",
+          "prayerCategory": "Finance"
         },
         {
           "title": "Be Careful For Nothing",
           "minutes": 3,
-          "read": { "book": "Philippians", "chapter": 4, "verse": 6, "from": 4, "to": 7 },
+          "read": {
+            "book": "Philippians",
+            "chapter": 4,
+            "verse": 6,
+            "from": 4,
+            "to": 7
+          },
           "body": [
-            { "p": "Paul writes this from prison, which is worth holding onto while reading it, because the instruction is otherwise easy to resent." },
-            { "q": { "book": "Philippians", "chapter": 4, "verse": 6 } },
-            { "p": "Be careful for nothing — again, full of care, anxious. But he does not stop at the prohibition, which would be cruel. He replaces it with a procedure: prayer, supplication, thanksgiving, and let your requests be made known." },
-            { "p": "Made known is a curious phrase given that God knows already. It is not for God's information. It is the act of stating the thing rather than carrying it as an unshaped dread." },
-            { "p": "And thanksgiving sits in the middle of the list, not at the end as a polite sign-off. Something about naming what has already been given changes how the next request comes out." },
-            { "p": "What he promises is not the outcome. It is a peace that passes understanding — which by definition will not make sense given the circumstances, and which he says will guard you, like a garrison." }
+            {
+              "p": "Paul writes this from prison, which is worth holding onto while reading it, because the instruction is otherwise easy to resent."
+            },
+            {
+              "q": {
+                "book": "Philippians",
+                "chapter": 4,
+                "verse": 6
+              }
+            },
+            {
+              "p": "Be careful for nothing — again, full of care, anxious. But he does not stop at the prohibition, which would be cruel. He replaces it with a procedure: prayer, supplication, thanksgiving, and let your requests be made known."
+            },
+            {
+              "p": "Made known is a curious phrase given that God knows already. It is not for God's information. It is the act of stating the thing rather than carrying it as an unshaped dread."
+            },
+            {
+              "p": "And thanksgiving sits in the middle of the list, not at the end as a polite sign-off. Something about naming what has already been given changes how the next request comes out."
+            },
+            {
+              "p": "What he promises is not the outcome. It is a peace that passes understanding — which by definition will not make sense given the circumstances, and which he says will guard you, like a garrison."
+            }
           ],
-          "line": { "a": "He does not promise the outcome.", "b": "He promises the garrison." },
+          "line": {
+            "a": "He does not promise the outcome.",
+            "b": "He promises the garrison."
+          },
           "after": [
             "Anxiety is usually shapeless. The procedure here forces it into words, and words can be handed over in a way that a fog cannot.",
             "Written by a man in a cell who had every reason to be anxious and had found something else."
           ],
           "prayer": "Father, here is the request, stated plainly instead of circled all night. Thank you for what you have already done, which I keep forgetting when I am afraid. Guard my heart with a peace I will not be able to explain.",
           "addLabel": "Add the request, plainly",
-          "question": "Can you say the worry in one clear sentence?"
+          "question": "Can you say the worry in one clear sentence?",
+          "prayerCategory": "Mental Health"
         },
         {
           "title": "Bear Ye One Another's Burdens",
           "minutes": 4,
-          "read": { "book": "Galatians", "chapter": 6, "verse": 2, "from": 1, "to": 5 },
+          "read": {
+            "book": "Galatians",
+            "chapter": 6,
+            "verse": 2,
+            "from": 1,
+            "to": 5
+          },
           "body": [
-            { "p": "Three verses apart, Paul appears to contradict himself, and generations of readers have noticed." },
-            { "q": { "book": "Galatians", "chapter": 6, "verse": 2 } },
-            { "p": "Then in verse five: every man shall bear his own burden. Which is it." },
-            { "p": "It is two different words. The first is a crushing weight, the kind that is too much for one person by definition. The second is the word for a soldier's pack — the load you are issued and expected to carry." },
-            { "p": "So the instruction is not confused. Your own pack is yours; nobody can walk your road for you. But when something falls on a person that no single person is built to lift, that is when the others come." },
-            { "p": "Most of us get this exactly backwards. We ask for help with the pack, which nobody can carry, and we refuse help with the crushing thing because we have decided it is our own to manage." }
+            {
+              "p": "Three verses apart, Paul appears to contradict himself, and generations of readers have noticed."
+            },
+            {
+              "q": {
+                "book": "Galatians",
+                "chapter": 6,
+                "verse": 2
+              }
+            },
+            {
+              "p": "Then in verse five: every man shall bear his own burden. Which is it."
+            },
+            {
+              "p": "It is two different words. The first is a crushing weight, the kind that is too much for one person by definition. The second is the word for a soldier's pack — the load you are issued and expected to carry."
+            },
+            {
+              "p": "So the instruction is not confused. Your own pack is yours; nobody can walk your road for you. But when something falls on a person that no single person is built to lift, that is when the others come."
+            },
+            {
+              "p": "Most of us get this exactly backwards. We ask for help with the pack, which nobody can carry, and we refuse help with the crushing thing because we have decided it is our own to manage."
+            }
           ],
-          "line": { "a": "Your pack is yours.", "b": "The crushing thing is not." },
+          "line": {
+            "a": "Your pack is yours.",
+            "b": "The crushing thing is not."
+          },
           "after": [
             "Knowing which of the two you are holding is most of the wisdom here, and you are usually the worst judge of it.",
             "Ask someone who has watched you this year."
           ],
           "prayer": "Lord, give me the honesty to know which of these I am carrying. Where it is my own pack, strengthen me for it. Where it is a crushing thing, break my pride enough to let somebody help.",
           "addLabel": "Add what you won't ask help for",
-          "question": "What are you refusing help with because you think it is yours?"
+          "question": "What are you refusing help with because you think it is yours?",
+          "prayerCategory": "Relationships"
         },
         {
           "title": "In The Sixth Hour",
           "minutes": 3,
-          "read": { "book": "John", "chapter": 4, "verse": 6, "from": 5, "to": 10 },
+          "read": {
+            "book": "John",
+            "chapter": 4,
+            "verse": 6,
+            "from": 5,
+            "to": 10
+          },
           "body": [
-            { "p": "John gives an unusual detail before the conversation at the well starts, and it is easy to read past on the way to the theology." },
-            { "q": { "book": "John", "chapter": 4, "verse": 6 } },
-            { "p": "Jesus, being wearied with his journey, sat thus on the well. The word is the ordinary one for tired from walking. He sat down because he had been walking since morning in the heat and he needed to." },
-            { "p": "It is about noon. His disciples have gone into town for food. He is on his own, tired, thirsty, with no bucket, which is why the conversation begins with him asking a stranger for a drink." },
-            { "p": "One of the most consequential conversations in the gospels starts because he was too tired to keep walking and had to sit somewhere." },
-            { "p": "I do not think that is incidental. He did not push through to a better location. He stopped where his body said stop, and that turned out to be exactly the place." }
+            {
+              "p": "John gives an unusual detail before the conversation at the well starts, and it is easy to read past on the way to the theology."
+            },
+            {
+              "q": {
+                "book": "John",
+                "chapter": 4,
+                "verse": 6
+              }
+            },
+            {
+              "p": "Jesus, being wearied with his journey, sat thus on the well. The word is the ordinary one for tired from walking. He sat down because he had been walking since morning in the heat and he needed to."
+            },
+            {
+              "p": "It is about noon. His disciples have gone into town for food. He is on his own, tired, thirsty, with no bucket, which is why the conversation begins with him asking a stranger for a drink."
+            },
+            {
+              "p": "One of the most consequential conversations in the gospels starts because he was too tired to keep walking and had to sit somewhere."
+            },
+            {
+              "p": "I do not think that is incidental. He did not push through to a better location. He stopped where his body said stop, and that turned out to be exactly the place."
+            }
           ],
-          "line": { "a": "He stopped because he was tired.", "b": "That was the appointment." },
+          "line": {
+            "a": "He stopped because he was tired.",
+            "b": "That was the appointment."
+          },
           "after": [
             "There is a quiet permission in this. The Son of God sat down in the middle of the day because he had had enough walking.",
             "The woman arrived at the well he was already sitting on."
           ],
           "prayer": "Jesus, you know what it is to be tired in the middle of the day. Let me stop when I need to without treating it as failure, and let me be present to whoever is in front of me when I do.",
           "addLabel": "Add where you need to sit down",
-          "question": "Where has your body been telling you to stop?"
+          "question": "Where has your body been telling you to stop?",
+          "prayerCategory": "Health"
         },
         {
           "title": "My Grace Is Sufficient",
           "minutes": 4,
-          "read": { "book": "2 Corinthians", "chapter": 12, "verse": 9, "from": 7, "to": 10 },
+          "read": {
+            "book": "2 Corinthians",
+            "chapter": 12,
+            "verse": 9,
+            "from": 7,
+            "to": 10
+          },
           "body": [
-            { "p": "Paul has something he calls a thorn in the flesh and he never tells us what it is, which has frustrated readers for two thousand years and is probably deliberate." },
-            { "p": "He asked three times for it to be taken away. Three is the number you use when you have stopped hoping and started negotiating." },
-            { "q": { "book": "2 Corinthians", "chapter": 12, "verse": 9 } },
-            { "p": "The answer is no. It is a kind no, with a reason attached, but the thorn stays and Paul writes this letter with it still in place." },
-            { "p": "Sufficient is not a generous word. It means enough, exactly enough, and nothing spare. He is being told he will have what he needs to keep going and not a measure more." },
-            { "p": "And then the reason: strength made perfect in weakness. Not despite the weakness — through it, in the place where he is not able." }
+            {
+              "p": "Paul has something he calls a thorn in the flesh and he never tells us what it is, which has frustrated readers for two thousand years and is probably deliberate."
+            },
+            {
+              "p": "He asked three times for it to be taken away. Three is the number you use when you have stopped hoping and started negotiating."
+            },
+            {
+              "q": {
+                "book": "2 Corinthians",
+                "chapter": 12,
+                "verse": 9
+              }
+            },
+            {
+              "p": "The answer is no. It is a kind no, with a reason attached, but the thorn stays and Paul writes this letter with it still in place."
+            },
+            {
+              "p": "Sufficient is not a generous word. It means enough, exactly enough, and nothing spare. He is being told he will have what he needs to keep going and not a measure more."
+            },
+            {
+              "p": "And then the reason: strength made perfect in weakness. Not despite the weakness — through it, in the place where he is not able."
+            }
           ],
-          "line": { "a": "The thorn stayed.", "b": "The grace was enough." },
+          "line": {
+            "a": "The thorn stayed.",
+            "b": "The grace was enough."
+          },
           "after": [
             "This is the passage people reach for when the answer has been no, and it earns that because Paul did not get what he asked for either.",
             "Enough is not the same as easy. It is the promise that you will not run out."
           ],
           "prayer": "Lord, I have asked more than three times and it is still here. If it is staying, then let your grace be genuinely sufficient — not a phrase I repeat, but something I feel holding me up in the place I am weakest.",
           "addLabel": "Add what hasn't been taken away",
-          "question": "What have you asked for three times?"
+          "question": "What have you asked for three times?",
+          "prayerCategory": "Faith"
         },
         {
           "title": "The Cattle On A Thousand Hills",
           "minutes": 3,
-          "read": { "book": "Psalms", "chapter": 50, "verse": 10, "from": 9, "to": 15 },
+          "read": {
+            "book": "Psalms",
+            "chapter": 50,
+            "verse": 10,
+            "from": 9,
+            "to": 15
+          },
           "body": [
-            { "p": "God is speaking in this psalm and he is addressing people who have been bringing sacrifices faithfully and have quietly started to believe he needs them." },
-            { "q": { "book": "Psalms", "chapter": 50, "verse": 10 } },
-            { "p": "Every beast of the forest is mine, and the cattle upon a thousand hills. If I were hungry, he says a verse later, I would not tell thee." },
-            { "p": "It is close to sarcasm, and it is aimed at a particular kind of religious anxiety — the sense that the whole arrangement depends on your contribution and would collapse without it." },
-            { "p": "And then, having dismantled that, he says something surprising. Call upon me in the day of trouble. Having established that he needs nothing from them, he asks them to ask him for things." },
-            { "p": "The relationship is not a supply chain running towards God. It runs the other way, and always did." }
+            {
+              "p": "God is speaking in this psalm and he is addressing people who have been bringing sacrifices faithfully and have quietly started to believe he needs them."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 50,
+                "verse": 10
+              }
+            },
+            {
+              "p": "Every beast of the forest is mine, and the cattle upon a thousand hills. If I were hungry, he says a verse later, I would not tell thee."
+            },
+            {
+              "p": "It is close to sarcasm, and it is aimed at a particular kind of religious anxiety — the sense that the whole arrangement depends on your contribution and would collapse without it."
+            },
+            {
+              "p": "And then, having dismantled that, he says something surprising. Call upon me in the day of trouble. Having established that he needs nothing from them, he asks them to ask him for things."
+            },
+            {
+              "p": "The relationship is not a supply chain running towards God. It runs the other way, and always did."
+            }
           ],
-          "line": { "a": "If he were hungry,", "b": "he would not tell you." },
+          "line": {
+            "a": "If he were hungry,",
+            "b": "he would not tell you."
+          },
           "after": [
             "A great deal of exhaustion in religious life comes from an unexamined belief that God is depending on you.",
             "He owns the hills. Call on him in the day of trouble."
           ],
           "prayer": "God, I have been serving you as though the whole thing rests on my shoulders, and I am tired in a way that suggests I believed it. You need nothing from me. Let me call on you today instead of carrying you.",
           "addLabel": "Add what you thought depended on you",
-          "question": "Where have you started believing God needs you?"
+          "question": "Where have you started believing God needs you?",
+          "prayerCategory": "Ministry"
         },
         {
           "title": "There Remaineth A Rest",
           "minutes": 4,
-          "read": { "book": "Hebrews", "chapter": 4, "verse": 9, "from": 9, "to": 11 },
+          "read": {
+            "book": "Hebrews",
+            "chapter": 4,
+            "verse": 9,
+            "from": 9,
+            "to": 11
+          },
           "body": [
-            { "p": "We finish the fortnight where the argument has been going. Hebrews takes the sabbath, which was a day, and says it was always pointing at something larger." },
-            { "q": { "book": "Hebrews", "chapter": 4, "verse": 9 } },
-            { "p": "There remaineth therefore a rest to the people of God. Remaineth — it is still outstanding, still owed, not yet fully collected." },
-            { "p": "And then the next verse defines it in a way that is easy to miss: he that is entered into his rest, he also hath ceased from his own works, as God did from his." },
-            { "p": "Ceased from his own works. The rest being described is not primarily a nap. It is the end of trying to establish yourself by output — the specific exhaustion of a person who must keep producing in order to be acceptable." },
-            { "p": "Then verse eleven, which is one of the strangest sentences in the New Testament: let us labour therefore to enter into that rest. Work hard at stopping. He knows how difficult this is." }
+            {
+              "p": "We finish the fortnight where the argument has been going. Hebrews takes the sabbath, which was a day, and says it was always pointing at something larger."
+            },
+            {
+              "q": {
+                "book": "Hebrews",
+                "chapter": 4,
+                "verse": 9
+              }
+            },
+            {
+              "p": "There remaineth therefore a rest to the people of God. Remaineth — it is still outstanding, still owed, not yet fully collected."
+            },
+            {
+              "p": "And then the next verse defines it in a way that is easy to miss: he that is entered into his rest, he also hath ceased from his own works, as God did from his."
+            },
+            {
+              "p": "Ceased from his own works. The rest being described is not primarily a nap. It is the end of trying to establish yourself by output — the specific exhaustion of a person who must keep producing in order to be acceptable."
+            },
+            {
+              "p": "Then verse eleven, which is one of the strangest sentences in the New Testament: let us labour therefore to enter into that rest. Work hard at stopping. He knows how difficult this is."
+            }
           ],
-          "line": { "a": "Labour therefore", "b": "to enter into that rest." },
+          "line": {
+            "a": "Labour therefore",
+            "b": "to enter into that rest."
+          },
           "after": [
             "You may have to work at receiving this, which sounds absurd until you have tried to stop justifying your existence for a single afternoon.",
             "It remains. It has not expired because you have not taken it yet."
           ],
           "prayer": "Father, I have been working to be acceptable rather than resting because I already am. Teach me to cease from my own works. Whatever it takes to enter that rest, help me do it, even if the doing feels like more effort at first.",
           "addLabel": "Add what you're trying to prove",
-          "question": "What are you producing in order to be acceptable?"
+          "question": "What are you producing in order to be acceptable?",
+          "prayerCategory": "Spiritual Life"
         }
       ]
     }

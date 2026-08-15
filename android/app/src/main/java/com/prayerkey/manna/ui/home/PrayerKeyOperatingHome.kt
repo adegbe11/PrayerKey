@@ -91,6 +91,24 @@ fun PrayerKeyOperatingHome(
         written?.let { writtenNext = com.prayerkey.manna.data.Devotionals.after(context, it) }
     }
 
+    /* Today, assembled from one day rather than four rotations that never met.
+       The devotional is the spine: its passage is the day's reading and its
+       subject chooses the day's prayer. */
+    val prayerTopics = remember { com.prayerkey.manna.data.LocalPrayerTopics.load(context) }
+    val plan = remember(written, prayerTopics, today) {
+        written?.let { com.prayerkey.manna.data.planFor(it, prayerTopics, today) }
+    }
+    var todayVerse by remember(plan) { mutableStateOf<VerseCard?>(null) }
+    LaunchedEffect(plan) {
+        val reading = plan?.reading ?: return@LaunchedEffect
+        val text = com.prayerkey.manna.data.OfflineBible(context)
+            .chapter(reading.book, reading.chapter)
+            .firstOrNull { it.verse == reading.verse }?.text
+        if (text != null) {
+            todayVerse = VerseCard(reading.ref.label, "KJV", text, "")
+        }
+    }
+
     if (devotionalOpen) {
         Dialog(
             onDismissRequest = { devotionalOpen = false },
@@ -140,9 +158,9 @@ fun PrayerKeyOperatingHome(
         QuickActions(onOpenPrayer, onOpenBible, onOpenJournal, onOpenChurch)
 
         Section("TODAY") {
-            VerseCard(onOpenWord)
+            VerseCard(todayVerse, onOpenWord)
             Spacer(Modifier.height(12.dp))
-            PrayerNowCard(onOpenPrayer)
+            PrayerNowCard(plan?.prayer, onOpenPrayer)
         }
 
         EmergencyCard(onOpenPrayer)
@@ -267,9 +285,21 @@ fun PrayerKeyOperatingHome(
     }
 }
 
-@Composable private fun VerseCard(open: () -> Unit) {
+/**
+ * The day's verse.
+ *
+ * It used to be Matthew 7:7, hardcoded, on every day of the year — a card
+ * headed TODAY that had never once been about today. It now shows the verse
+ * the day's devotional is built on, resolved from the KJV asset, so the verse,
+ * the reading and the writing are the same passage.
+ *
+ * Falls back to the fixed verse only until the day has loaded, so the card is
+ * never empty on a cold start.
+ */
+@Composable private fun VerseCard(today: VerseCard?, open: () -> Unit) {
     val context = LocalContext.current
-    val card = remember { VerseCard("Matthew 7:7", "KJV", "Ask, and it will be given to you; seek, and you will find; knock, and the door will be opened to you.", "") }
+    val card = today
+        ?: remember { VerseCard("Matthew 7:7", "KJV", "Ask, and it will be given to you; seek, and you will find; knock, and the door will be opened to you.", "") }
     Surface(
         Modifier.fillMaxWidth().clickable(onClick = open),
         shape = RoundedCornerShape(30.dp), color = Pk.DeepDark,
@@ -316,9 +346,18 @@ fun PrayerKeyOperatingHome(
     }
 }
 
-@Composable private fun PrayerNowCard(open: () -> Unit) {
+/**
+ * The day's prayer.
+ *
+ * This paragraph was hardcoded and identical on every day of the year. It now
+ * shows one of the 543 written prayers, chosen from the category the day's
+ * devotional is about — so the reading, the writing and the prayer are about
+ * the same thing rather than three unrelated things sharing a date.
+ */
+@Composable private fun PrayerNowCard(topic: com.prayerkey.manna.data.PrayerTopic?, open: () -> Unit) {
     val context = LocalContext.current
-    val words = "Lord, according to Your Word, order my steps today. Let this day be a blessing to me. Give me wisdom for every decision, peace in every pressure, favour in the work of my hands, and protection wherever I go. Keep my heart close to You and let my life bring hope to someone today. In Jesus’ name, Amen."
+    val words = topic?.prayer
+        ?: "Lord, according to Your Word, order my steps today. Let this day be a blessing to me. Give me wisdom for every decision, peace in every pressure, favour in the work of my hands, and protection wherever I go. Keep my heart close to You and let my life bring hope to someone today. In Jesus’ name, Amen."
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(30.dp), color = Pk.DeepDark, shadowElevation = 5.dp) {
         Box(Modifier.fillMaxWidth().height(520.dp)) {
             Image(painterResource(R.drawable.today_prayer_violet), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
@@ -716,44 +755,18 @@ private fun hubTint(hub: Hub): Color = when (hub) {
 
 private fun labelStyle() = androidx.compose.ui.text.TextStyle(fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.5.sp)
 
+/**
+ * What a programme card opens.
+ *
+ * This used to be an unconditional `return` followed by thirty-five lines of
+ * per-feature copy that could never run — a whole second screen, complete with
+ * an "OPEN <FEATURE>" button wired to an empty lambda, that no user has ever
+ * seen. Deleted rather than revived: [DiscoveryExperienceScreen] is the screen
+ * these actually open, and two rival implementations is how the dead one got
+ * there in the first place.
+ */
 @Composable private fun FeatureDestination(feature: Feature, onClose: () -> Unit, openFull: () -> Unit) {
     DiscoveryExperienceScreen(feature.title, feature.detail, feature.icon, onClose, openFull)
-    return
-    val content = when (feature.title) {
-        "Declarations" -> "I am guided by God's wisdom. I am strengthened for today's work. Fear will not govern my decisions. The grace of God is sufficient for me."
-        "Prayer points" -> "Begin with worship. Thank God for His faithfulness. Ask for mercy and cleansing. Present the situation plainly. Pray the promise of Scripture. Finish with thanksgiving."
-        "Prayer times" -> "Morning — surrender the day. Midday — return your attention to God. Evening — give thanks and review. Midnight — stand in prayer with focus."
-        "Fasting" -> "Choose the purpose, duration, start time, end time, Scripture focus, and safe meal plan before beginning. Keep prayer—not hunger—as the centre."
-        "Memory verse" -> "Read it aloud three times. Hide one phrase. Recite it. Write it from memory. Review tomorrow before unlocking the next verse."
-        "Dreams" -> "Record what you remember before interpreting it: people, places, words, emotions, colours, and what happened immediately before waking."
-        "Answered" -> "Move a prayer here when the answer becomes clear. Record the date, what changed, and the testimony you want to remember."
-        "Prayer wall" -> "Read one request slowly. Pray before reacting. Mark it prayed only after you have genuinely stood with that person."
-        else -> feature.detail + ". This space keeps your progress, history, and next faithful step together."
-    }
-    Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
-        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClose) { Icon(Icons.Outlined.Close, "Close", tint = Pk.Charcoal) }
-                Text("PRAYERKEY", Modifier.weight(1f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.6.sp, color = Pk.Oxblood)
-            }
-            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)) {
-                Surface(shape = CircleShape, color = Pk.Oxblood.copy(alpha = .09f)) { Icon(feature.icon, null, Modifier.padding(16.dp).size(30.dp), tint = Pk.Oxblood) }
-                Text(feature.title, Modifier.padding(top = 22.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 36.sp, lineHeight = 42.sp, color = Pk.Charcoal)
-                Text(feature.detail.uppercase(), Modifier.padding(top = 9.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.GoldDeep)
-                HorizontalDivider(Modifier.padding(vertical = 24.dp), color = Pk.Hair)
-                Text(content, fontFamily = com.prayerkey.manna.ui.theme.BookSerif, fontSize = 20.sp, lineHeight = 31.sp, color = Pk.Charcoal)
-                Surface(Modifier.fillMaxWidth().padding(top = 28.dp), shape = RoundedCornerShape(22.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
-                    Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.CheckCircleOutline, null, tint = Pk.Oxblood)
-                        Text("Your activity here is saved privately on this device.", Modifier.padding(start = 13.dp), fontFamily = UtilitySans, fontSize = 12.sp, lineHeight = 18.sp, color = Pk.Muted)
-                    }
-                }
-            }
-            Button(openFull, Modifier.fillMaxWidth().padding(22.dp).height(56.dp), shape = RoundedCornerShape(17.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
-                Text("OPEN ${feature.title.uppercase()}", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .7.sp)
-            }
-        }
-    }
 }
 
 private fun fixedFeatures() = listOf(

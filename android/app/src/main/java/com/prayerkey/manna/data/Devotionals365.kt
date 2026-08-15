@@ -71,6 +71,8 @@ data class Devotional(
     val line: DevoLine,
     val after: List<String>,
     val prayer: String,
+    /** Which part of the prayer library this day should draw from. */
+    val prayerCategory: String,
     val addLabel: String,
     val question: String,
 ) {
@@ -160,6 +162,7 @@ object Devotionals {
                         (0 until a.length()).map { a.getString(it) }
                     },
                     prayer = o.getString("prayer"),
+                    prayerCategory = o.getString("prayerCategory"),
                     addLabel = o.getString("addLabel"),
                     question = o.getString("question"),
                 )
@@ -167,6 +170,55 @@ object Devotionals {
         }
         return out
     }
+}
+
+/**
+ * The day, assembled — one reading, one prayer, one question, all about the
+ * same thing.
+ *
+ * Before this, Today ran four independent rotations. The passage came from
+ * `epochDay mod 365`, the devotional from a different formula, the prayer from
+ * a third and the quote from a fourth, so on a single morning the app offered
+ * Revelation 2, a devotional about Simeon in Luke 2, a prayer about diabetes
+ * and an unrelated quote — four strangers sharing a date. Each rotated
+ * perfectly well and none of them knew the others existed.
+ *
+ * The devotional is the spine because it is the only part that was *written*
+ * about a specific passage; everything else can be chosen to match it. So the
+ * day's reading is the devotional's reading, and the day's prayer is drawn
+ * from the part of the library the devotional is actually about.
+ *
+ * Matching is by category rather than by a hand-picked prayer per day: 23
+ * categories across 543 prayers cover every theme the writing goes near, and it
+ * keeps working as the remaining days are written without anyone maintaining a
+ * lookup table of 365 slugs.
+ */
+data class TodayPlan(
+    val devotional: Devotional,
+    /** The prayer for today, chosen to match [devotional]. */
+    val prayer: PrayerTopic?,
+) {
+    val reading: DevoReading get() = devotional.reading
+    /** What Today should call the day's Bible reading. */
+    val readingLabel: String get() = "${reading.book} ${reading.chapter}"
+}
+
+/**
+ * Builds the day.
+ *
+ * [topics] may be empty on a cold start, in which case there is simply no
+ * prayer rather than a wrong one.
+ */
+fun planFor(devotional: Devotional, topics: List<PrayerTopic>, date: LocalDate): TodayPlan {
+    val pool = topics.filter { it.category.equals(devotional.prayerCategory, ignoreCase = true) }
+        .ifEmpty { topics }
+    val prayer = pool.takeIf { it.isNotEmpty() }?.let {
+        /* Stable for the date so everyone praying together gets the same one,
+           and stepped rather than sequential so a category with six prayers
+           does not serve them in the same order every time it comes round. */
+        it[Math.floorMod(date.toEpochDay() * 7, it.size.toLong()).toInt()]
+    }
+    return TodayPlan(devotional, prayer)
 }
 
 /**
