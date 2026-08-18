@@ -33,6 +33,8 @@ import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 private data class FaithDay(
     val title: String,
@@ -83,13 +85,16 @@ internal fun FaithProgrammeMachine(title: String, onClose: () -> Unit) {
     var openDay by remember { mutableStateOf<Int?>(null) }
     var done by remember { mutableStateOf(prefs.getStringSet("done", emptySet()).orEmpty().mapNotNull(String::toIntOrNull).toSet()) }
     var hour by remember { mutableIntStateOf(prefs.getInt("hour", if (title == "Midnight prayer") 0 else 6)) }
+    var startedOn by remember { mutableStateOf(LocalDate.parse(prefs.getString("started_on", LocalDate.now().toString()))) }
+    var lastCompletedOn by remember { mutableStateOf(prefs.getString("last_completed_on", "").orEmpty()) }
 
     openDay?.let { day ->
         val base = spec.content[(day - 1) % spec.content.size]
         val personalised = if (selected.isBlank()) base else base.copy(closing = "Father, concerning $selected: ${base.closing}")
         FaithProgrammeDay(spec, day, personalised, onBack = { openDay = null }) {
             done = done + day
-            prefs.edit().putStringSet("done", done.map(Int::toString).toSet()).apply()
+            lastCompletedOn = LocalDate.now().toString()
+            prefs.edit().putStringSet("done", done.map(Int::toString).toSet()).putString("last_completed_on", lastCompletedOn).apply()
             openDay = null
         }
         return
@@ -99,12 +104,14 @@ internal fun FaithProgrammeMachine(title: String, onClose: () -> Unit) {
         ProgrammeSetup(spec, selected, hour, onSelect = { selected = it }, onHour = { hour = it }, onClose = onClose) {
             if (selected.isNotBlank()) {
                 started = true
-                prefs.edit().putString("selected", selected).putInt("hour", hour).putBoolean("started", true).apply()
+                startedOn = LocalDate.now()
+                lastCompletedOn = ""
+                prefs.edit().putString("selected", selected).putInt("hour", hour).putBoolean("started", true).putString("started_on", startedOn.toString()).putString("last_completed_on", "").apply()
                 ReminderReceiver.schedule(context, hour, 0, true)
             }
         }
     } else {
-        ProgrammeHome(spec, selected, done, onClose, onReset = {
+        ProgrammeHome(spec, selected, done, startedOn, lastCompletedOn, onClose, onReset = {
             prefs.edit().clear().apply(); selected = ""; done = emptySet(); started = false
         }) { openDay = it }
     }
@@ -221,8 +228,10 @@ private fun programmeArt(title: String): Int = when (title) {
 }
 
 @Composable
-private fun ProgrammeHome(spec: FaithProgramme, selected: String, done: Set<Int>, onClose: () -> Unit, onReset: () -> Unit, onDay: (Int) -> Unit) {
+private fun ProgrammeHome(spec: FaithProgramme, selected: String, done: Set<Int>, startedOn: LocalDate, lastCompletedOn: String, onClose: () -> Unit, onReset: () -> Unit, onDay: (Int) -> Unit) {
     val next = (done.size + 1).coerceAtMost(spec.days)
+    val calendarDay = (ChronoUnit.DAYS.between(startedOn, LocalDate.now()).toInt() + 1).coerceIn(1, spec.days)
+    val availableToday = done.size < spec.days && next <= calendarDay && lastCompletedOn != LocalDate.now().toString()
     Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
             ProgrammeBar(onClose, spec.title)
@@ -237,7 +246,7 @@ private fun ProgrammeHome(spec: FaithProgramme, selected: String, done: Set<Int>
                 }
                 Text("YOUR JOURNEY", Modifier.padding(top = 28.dp, bottom = 12.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.3.sp, color = Pk.Charcoal)
                 (1..spec.days).forEach { day ->
-                    val locked = day > done.size + 1
+                    val locked = day !in done && (day != next || !availableToday)
                     val complete = day in done
                     Surface(Modifier.fillMaxWidth().padding(bottom = 9.dp).clickable(enabled = !locked) { onDay(day) }, shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
                         Row(Modifier.padding(17.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -315,4 +324,3 @@ private fun FaithProgrammeDay(spec: FaithProgramme, day: Int, content: FaithDay,
         )
     }
 }
-

@@ -2,6 +2,11 @@ package com.prayerkey.manna.ui.home
 
 import android.app.TimePickerDialog
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
+import android.view.HapticFeedbackConstants
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +43,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,41 +63,48 @@ import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.BibleVerse
 import com.prayerkey.manna.data.OfflineBible
 import com.prayerkey.manna.reminder.ReminderReceiver
+import com.prayerkey.manna.share.ChallengeBadgeRenderer
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
-private data class ReadingPlan(val id: String, val title: String, val detail: String, val chapters: Int, val minutes: Int)
+private data class ReadingPlan(val id: String, val title: String, val detail: String, val chapters: Int, val minutes: Int, val days: Int)
 private data class BiblePortion(val lane: String, val book: String, val chapter: Int)
 
 private val biblePlans = listOf(
-    ReadingPlan("blended", "Blended", "Old Testament, New Testament and one Psalm each day.", 4, 14),
-    ReadingPlan("gospels", "The Gospels", "Walk slowly through the life and teaching of Jesus.", 2, 9),
-    ReadingPlan("new_testament", "New Testament", "Read from Matthew to Revelation in ninety days.", 3, 12),
-    ReadingPlan("slow", "One chapter a day", "Five quiet minutes. Built for people beginning again.", 1, 5),
+    ReadingPlan("mindset", "7-day mindset shift", "One five-minute chapter each day to renew your thinking.", 1, 5, 7),
+    ReadingPlan("blended", "Whole Bible", "Read the Old Testament, New Testament and Psalms together.", 3, 14, 365),
+    ReadingPlan("gospels", "The Gospels", "Read the life and teaching of Jesus from Matthew to John.", 1, 9, 89),
+    ReadingPlan("new_testament", "New Testament", "Read from Matthew to Revelation in ninety days.", 3, 12, 90),
+    ReadingPlan("slow", "One chapter a day", "Read one clear chapter each day.", 1, 5, 365),
 )
 
-private val blendedDays = listOf(
-    listOf(BiblePortion("OLD TESTAMENT", "Genesis", 1), BiblePortion("NEW TESTAMENT", "Matthew", 1), BiblePortion("PSALM", "Psalms", 1)),
-    listOf(BiblePortion("OLD TESTAMENT", "Genesis", 2), BiblePortion("NEW TESTAMENT", "Matthew", 2), BiblePortion("PSALM", "Psalms", 2)),
-    listOf(BiblePortion("OLD TESTAMENT", "Genesis", 3), BiblePortion("NEW TESTAMENT", "Matthew", 3), BiblePortion("PSALM", "Psalms", 3)),
-    listOf(BiblePortion("OLD TESTAMENT", "Genesis", 4), BiblePortion("NEW TESTAMENT", "Matthew", 4), BiblePortion("PSALM", "Psalms", 4)),
-    listOf(BiblePortion("OLD TESTAMENT", "Genesis", 5), BiblePortion("NEW TESTAMENT", "Matthew", 5), BiblePortion("PSALM", "Psalms", 5)),
-    listOf(BiblePortion("OLD TESTAMENT", "Genesis", 6), BiblePortion("NEW TESTAMENT", "Matthew", 6), BiblePortion("PSALM", "Psalms", 6)),
-    listOf(BiblePortion("OLD TESTAMENT", "Genesis", 7), BiblePortion("NEW TESTAMENT", "Matthew", 7), BiblePortion("PSALM", "Psalms", 7)),
-)
+private val oldBooks = listOf("Genesis" to 50, "Exodus" to 40, "Leviticus" to 27, "Numbers" to 36, "Deuteronomy" to 34, "Joshua" to 24, "Judges" to 21, "Ruth" to 4, "1 Samuel" to 31, "2 Samuel" to 24, "1 Kings" to 22, "2 Kings" to 25, "1 Chronicles" to 29, "2 Chronicles" to 36, "Ezra" to 10, "Nehemiah" to 13, "Esther" to 10, "Job" to 42, "Psalms" to 150, "Proverbs" to 31, "Ecclesiastes" to 12, "Song of Solomon" to 8, "Isaiah" to 66, "Jeremiah" to 52, "Lamentations" to 5, "Ezekiel" to 48, "Daniel" to 12, "Hosea" to 14, "Joel" to 3, "Amos" to 9, "Obadiah" to 1, "Jonah" to 4, "Micah" to 7, "Nahum" to 3, "Habakkuk" to 3, "Zephaniah" to 3, "Haggai" to 2, "Zechariah" to 14, "Malachi" to 4)
+private val gospelBooks = listOf("Matthew" to 28, "Mark" to 16, "Luke" to 24, "John" to 21)
+private val newBooks = gospelBooks + listOf("Acts" to 28, "Romans" to 16, "1 Corinthians" to 16, "2 Corinthians" to 13, "Galatians" to 6, "Ephesians" to 6, "Philippians" to 4, "Colossians" to 4, "1 Thessalonians" to 5, "2 Thessalonians" to 3, "1 Timothy" to 6, "2 Timothy" to 4, "Titus" to 3, "Philemon" to 1, "Hebrews" to 13, "James" to 5, "1 Peter" to 5, "2 Peter" to 3, "1 John" to 5, "2 John" to 1, "3 John" to 1, "Jude" to 1, "Revelation" to 22)
+
+private fun chapterAt(books: List<Pair<String, Int>>, offset: Int, lane: String): BiblePortion {
+    var remaining = offset.mod(books.sumOf { it.second })
+    books.forEach { (book, chapters) ->
+        if (remaining < chapters) return BiblePortion(lane, book, remaining + 1)
+        remaining -= chapters
+    }
+    return BiblePortion(lane, books.first().first, 1)
+}
 
 private fun portionsFor(plan: String, day: Int): List<BiblePortion> {
-    val base = blendedDays[(day - 1) % blendedDays.size]
     return when (plan) {
-        "gospels" -> listOf(BiblePortion("GOSPEL", "Matthew", day.coerceAtMost(28)))
-        "new_testament" -> listOf(BiblePortion("NEW TESTAMENT", "Matthew", day.coerceAtMost(28)))
-        "slow" -> listOf(base.first())
-        else -> base
+        "mindset" -> listOf(listOf(BiblePortion("RENEW YOUR MIND", "Romans", 12), BiblePortion("PEACE", "Philippians", 4), BiblePortion("WISDOM", "James", 1), BiblePortion("COURAGE", "Joshua", 1), BiblePortion("TRUST", "Proverbs", 3), BiblePortion("IDENTITY", "Ephesians", 1), BiblePortion("HOPE", "Psalms", 42))[(day - 1).mod(7)])
+        "gospels" -> listOf(chapterAt(gospelBooks, day - 1, "GOSPEL"))
+        "new_testament" -> (0..2).map { chapterAt(newBooks, (day - 1) * 3 + it, "NEW TESTAMENT") }
+        "slow" -> listOf(chapterAt(oldBooks + newBooks, day - 1, "BIBLE"))
+        else -> listOf(chapterAt(oldBooks, day - 1, "OLD TESTAMENT"), chapterAt(newBooks, day - 1, "NEW TESTAMENT"), BiblePortion("PSALM", "Psalms", ((day - 1) % 150) + 1))
     }
 }
 
@@ -104,7 +118,8 @@ internal fun BibleChallengeMachine(onClose: () -> Unit) {
     var planId by remember { mutableStateOf(prefs.getString("plan", "blended").orEmpty()) }
     var hour by remember { mutableIntStateOf(prefs.getInt("hour", 6)) }
     var minute by remember { mutableIntStateOf(prefs.getInt("minute", 30)) }
-    var group by remember { mutableStateOf(prefs.getString("group", "alone").orEmpty()) }
+    var startedOn by remember { mutableStateOf(LocalDate.parse(prefs.getString("started_on", LocalDate.now().toString()))) }
+    var lastCompletedOn by remember { mutableStateOf(prefs.getString("last_completed_on", "").orEmpty()) }
     var completedDays by remember {
         mutableStateOf(prefs.getStringSet("completed", emptySet()).orEmpty().mapNotNull(String::toIntOrNull).toSet())
     }
@@ -114,7 +129,8 @@ internal fun BibleChallengeMachine(onClose: () -> Unit) {
     readerDay?.let { day ->
         BibleChallengeReader(day, plan, portionsFor(plan.id, day), onBack = { readerDay = null }) {
             completedDays = completedDays + day
-            prefs.edit().putStringSet("completed", completedDays.map(Int::toString).toSet()).apply()
+            lastCompletedOn = LocalDate.now().toString()
+            prefs.edit().putStringSet("completed", completedDays.map(Int::toString).toSet()).putString("last_completed_on", lastCompletedOn).apply()
             readerDay = null
         }
         return
@@ -126,24 +142,31 @@ internal fun BibleChallengeMachine(onClose: () -> Unit) {
             plan = plan,
             hour = hour,
             minute = minute,
-            group = group,
             onPlan = { planId = it },
             onTime = { TimePickerDialog(context, { _, h, m -> hour = h; minute = m }, hour, minute, false).show() },
-            onGroup = { group = it },
             onBack = { if (step > 0) step-- else onClose() },
             onClose = onClose,
             onContinue = {
-                if (step < 3) step++ else {
+                if (step < 2) step++ else {
                     active = true
                     completedDays = emptySet()
+                    startedOn = LocalDate.now()
+                    lastCompletedOn = ""
                     prefs.edit().putBoolean("active", true).putString("plan", planId).putInt("hour", hour)
-                        .putInt("minute", minute).putString("group", group).putStringSet("completed", emptySet()).apply()
+                        .putInt("minute", minute).putString("started_on", startedOn.toString()).putString("last_completed_on", "").putStringSet("completed", emptySet()).apply()
                     ReminderReceiver.schedule(context, hour, minute, true)
                 }
             },
         )
     } else {
-        BibleChallengeLanding(plan, hour, minute, group, completedDays, onClose) { readerDay = it }
+        BibleChallengeLanding(plan, hour, minute, completedDays, startedOn, lastCompletedOn, onClose, onUseGrace = {
+            val month = java.time.YearMonth.now().toString()
+            if (prefs.getString("grace_month", "") != month) {
+                val missed = completedDays.size + 1
+                completedDays = completedDays + missed
+                prefs.edit().putStringSet("completed", completedDays.map(Int::toString).toSet()).putString("grace_month", month).apply()
+            }
+        }) { readerDay = it }
     }
 }
 
@@ -153,10 +176,8 @@ private fun BibleChallengeSetup(
     plan: ReadingPlan,
     hour: Int,
     minute: Int,
-    group: String,
     onPlan: (String) -> Unit,
     onTime: () -> Unit,
-    onGroup: (String) -> Unit,
     onBack: () -> Unit,
     onClose: () -> Unit,
     onContinue: () -> Unit,
@@ -168,7 +189,7 @@ private fun BibleChallengeSetup(
                     Icon(Icons.Outlined.ArrowBackIosNew, "Back", tint = Pk.Crisp, modifier = Modifier.size(15.dp))
                 }
                 Row(Modifier.weight(1f).padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    repeat(4) { index -> Box(Modifier.weight(1f).height(3.dp).clip(CircleShape).background(if (index <= step) Pk.Crisp else Pk.Crisp.copy(alpha = .18f))) }
+                    repeat(3) { index -> Box(Modifier.weight(1f).height(3.dp).clip(CircleShape).background(if (index <= step) Pk.Crisp else Pk.Crisp.copy(alpha = .18f))) }
                 }
                 IconButton(onClick = onClose, modifier = Modifier.size(36.dp)) { Icon(Icons.Outlined.Close, "Close", tint = Pk.Crisp) }
             }
@@ -185,7 +206,6 @@ private fun BibleChallengeSetup(
                                     .clickable { onPlan(option.id) }.padding(17.dp),
                             ) {
                                 Text(option.title, color = if (selected) Pk.Oxblood else Pk.Crisp, fontFamily = UtilitySans, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                                Text(option.detail, color = if (selected) Pk.Charcoal.copy(alpha = .62f) else Pk.Crisp.copy(alpha = .55f), fontFamily = UtilitySans, fontSize = 13.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 6.dp))
                                 Text("${option.chapters} CHAPTER${if (option.chapters > 1) "S" else ""}  ·  ${option.minutes} MIN", color = if (selected) Pk.Oxblood else Pk.GoldLight, fontFamily = UtilitySans, fontSize = 8.sp, letterSpacing = 1.sp, modifier = Modifier.padding(top = 10.dp))
                             }
                         }
@@ -209,32 +229,14 @@ private fun BibleChallengeSetup(
                             Text("KJV · available offline", color = Pk.Crisp, fontFamily = BookSerif, fontSize = 20.sp, modifier = Modifier.padding(top = 8.dp))
                         }
                     }
-                    2 -> {
-                        BibleSetupHeading("Who are you reading with?", "Accountability can be quiet. Choose what feels honest.")
-                        listOf(
-                            "church" to ("My church" to "Read alongside your church community."),
-                            "cohort" to ("An open group" to "Begin with people following the same plan."),
-                            "alone" to ("On my own" to "Keep this plan private. You can change later."),
-                        ).forEach { (id, copy) ->
-                            val selected = group == id
-                            Column(
-                                Modifier.fillMaxWidth().padding(top = 10.dp).clip(RoundedCornerShape(18.dp))
-                                    .background(if (selected) Pk.Crisp else Pk.Crisp.copy(alpha = .09f))
-                                    .clickable { onGroup(id) }.padding(18.dp),
-                            ) {
-                                Text(copy.first, color = if (selected) Pk.Oxblood else Pk.Crisp, fontFamily = UtilitySans, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                                Text(copy.second, color = if (selected) Pk.Charcoal.copy(alpha = .62f) else Pk.Crisp.copy(alpha = .5f), fontFamily = UtilitySans, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
-                            }
-                        }
-                    }
                     else -> {
-                        BibleSetupHeading("Ninety days. Then decide again.", "This is one clear window, not a promise you must carry for a year.")
+                        BibleSetupHeading("Your plan is ready.", "Finish today's reading before tomorrow's reading opens.")
                         Column(Modifier.fillMaxWidth().padding(top = 25.dp).clip(RoundedCornerShape(20.dp)).background(Pk.Gold.copy(alpha = .12f)).padding(20.dp)) {
-                            Text("YOUR FIRST WINDOW", color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.2.sp)
+                            Text("YOUR READING PLAN", color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.2.sp)
                             Text(plan.title, color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 28.sp, modifier = Modifier.padding(top = 9.dp))
                             Text("${timeLabelBible(hour, minute)}  ·  KJV  ·  ${plan.minutes} MIN", color = Pk.Crisp.copy(alpha = .6f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = .8.sp, modifier = Modifier.padding(top = 12.dp))
                         }
-                        Text("Miss a day and continue with the next portion. PrayerKey never turns Scripture into debt.", color = Pk.Crisp.copy(alpha = .58f), fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 20.dp))
+                        Text("You can read one day at a time. Your progress is saved on this phone.", color = Pk.Crisp.copy(alpha = .58f), fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 20.dp))
                     }
                 }
             }
@@ -244,7 +246,7 @@ private fun BibleChallengeSetup(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 18.dp).height(56.dp),
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Pk.Crisp, contentColor = Pk.Oxblood),
-            ) { Text(if (step == 3) "Begin day 1" else "Continue", fontFamily = UtilitySans, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }
+            ) { Text(if (step == 2) "Begin day 1" else "Continue", fontFamily = UtilitySans, fontSize = 15.sp, fontWeight = FontWeight.SemiBold) }
         }
     }
 }
@@ -252,7 +254,6 @@ private fun BibleChallengeSetup(
 @Composable
 private fun BibleSetupHeading(title: String, subtitle: String) {
     Text(title, color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 35.sp, lineHeight = 39.sp, modifier = Modifier.padding(top = 18.dp))
-    Text(subtitle, color = Pk.Crisp.copy(alpha = .57f), fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 12.dp, bottom = 12.dp))
 }
 
 @Composable
@@ -260,12 +261,20 @@ private fun BibleChallengeLanding(
     plan: ReadingPlan,
     hour: Int,
     minute: Int,
-    group: String,
     completed: Set<Int>,
+    startDate: LocalDate,
+    lastCompletedOn: String,
     onClose: () -> Unit,
+    onUseGrace: () -> Unit,
     onRead: (Int) -> Unit,
 ) {
-    val day = (completed.size + 1).coerceAtMost(90)
+    val context = LocalContext.current
+    val nextDay = completed.size + 1
+    val calendarDay = (ChronoUnit.DAYS.between(startDate, LocalDate.now()).toInt() + 1).coerceIn(1, plan.days)
+    val day = nextDay.coerceAtMost(plan.days)
+    val finished = completed.size >= plan.days
+    val availableToday = !finished && nextDay <= calendarDay && lastCompletedOn != LocalDate.now().toString()
+    val missedDay = calendarDay > nextDay
     val portions = portionsFor(plan.id, day)
     Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
         Column(Modifier.fillMaxSize().navigationBarsPadding()) {
@@ -280,15 +289,15 @@ private fun BibleChallengeLanding(
                         Text(timeLabelBible(hour, minute), color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 9.sp, modifier = Modifier.padding(start = 5.dp))
                     }
                 }
-                Text("${plan.title.uppercase(Locale.getDefault())}  ·  WINDOW 1 OF 4", color = Pk.GoldLight.copy(alpha = .7f), fontFamily = UtilitySans, fontSize = 8.sp, letterSpacing = 1.2.sp, modifier = Modifier.padding(top = 22.dp))
-                Text("Day $day of ninety.", color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 35.sp, modifier = Modifier.padding(top = 8.dp))
+                Text(plan.title.uppercase(Locale.getDefault()), color = Pk.GoldLight.copy(alpha = .7f), fontFamily = UtilitySans, fontSize = 8.sp, letterSpacing = 1.2.sp, modifier = Modifier.padding(top = 22.dp))
+                Text(if (finished) "Plan complete." else "Day $day of ${plan.days}.", color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 35.sp, modifier = Modifier.padding(top = 8.dp))
                 Row(Modifier.padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(28.dp)) {
                     BibleStat((completed.size * plan.chapters).toString(), "CHAPTERS")
-                    BibleStat("${(completed.size / 90f * 100).toInt()}%", "OF WINDOW")
-                    BibleStat(if (group == "alone") "1" else "63", "READ TODAY")
+                    BibleStat("${(completed.size / plan.days.toFloat() * 100).toInt()}%", "COMPLETE")
+                    BibleStat((plan.days - completed.size).coerceAtLeast(0).toString(), "DAYS LEFT")
                 }
                 LinearProgressIndicator(
-                    progress = { completed.size / 90f },
+                    progress = { completed.size / plan.days.toFloat() },
                     modifier = Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 12.dp).height(3.dp).clip(CircleShape),
                     color = Pk.Gold,
                     trackColor = Pk.Crisp.copy(alpha = .16f),
@@ -296,11 +305,21 @@ private fun BibleChallengeLanding(
             }
 
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+                if (finished) Button(
+                    onClick = { ChallengeBadgeRenderer.share(context, plan.title, "${plan.days} days completed") },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp).height(54.dp),
+                    shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.VioletDeep),
+                ) { Text("Share my unlocked badge", fontWeight = FontWeight.Bold) }
+                if (missedDay) Surface(
+                    onClick = onUseGrace,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp),
+                    shape = RoundedCornerShape(20.dp), color = Pk.GoldWash,
+                ) { Column(Modifier.padding(18.dp)) { Text("GRACE KEY", color = Pk.GoldDeep, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold); Text("Life happened. Protect this month’s streak and continue without shame.", color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 24.sp, modifier = Modifier.padding(top = 7.dp)); Text("USE MY MONTHLY KEY", color = Pk.Oxblood, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 11.dp)) } }
                 Column(
                     Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(top = 16.dp).clip(RoundedCornerShape(22.dp))
-                        .background(Pk.Sunken).clickable { onRead(day) }.padding(20.dp),
+                        .background(Pk.Sunken).clickable(enabled = availableToday) { onRead(day) }.padding(20.dp),
                 ) {
-                    Text("TODAY  ·  DAY $day  ·  ${plan.minutes} MIN", color = Pk.GoldDeep, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.2.sp)
+                    Text(if (finished) "PLAN COMPLETE" else if (availableToday) "TODAY  ·  DAY $day  ·  ${plan.minutes} MIN" else "DAY $day OPENS TOMORROW", color = Pk.GoldDeep, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.2.sp)
                     portions.forEach { portion ->
                         Row(Modifier.padding(top = 14.dp), verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(7.dp).clip(CircleShape).background(if (portion.lane == "OLD TESTAMENT") Pk.Gold else Pk.Oxblood))
@@ -314,17 +333,17 @@ private fun BibleChallengeLanding(
                         BibleMeta("${portions.size} PORTIONS"); BibleMeta("READ OR LISTEN"); BibleMeta("KJV")
                     }
                     HorizontalDivider(color = Pk.Hair, modifier = Modifier.padding(top = 16.dp, bottom = 14.dp))
-                    Text("Open today's portion  →", color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                    Text(if (finished) "Every reading is complete" else if (availableToday) "Open today's reading  →" else "Come back tomorrow", color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
 
-                Text("This window", color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 21.sp, modifier = Modifier.padding(horizontal = 20.dp).padding(top = 28.dp, bottom = 10.dp))
+                Text("Your progress", color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 21.sp, modifier = Modifier.padding(horizontal = 20.dp).padding(top = 28.dp, bottom = 10.dp))
                 Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp).clip(RoundedCornerShape(20.dp)).background(Pk.Sunken).padding(19.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(58.dp).clip(CircleShape).background(Pk.Oxblood.copy(alpha = .08f)), contentAlignment = Alignment.Center) {
                         Text("$day", color = Pk.Oxblood, fontFamily = DisplaySerif, fontSize = 23.sp)
                     }
                     Column(Modifier.padding(start = 16.dp)) {
-                        Text("${90 - completed.size} days left", color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 20.sp)
-                        Text("Renew the plan at day 90.", color = Pk.Muted, fontFamily = UtilitySans, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                        Text("${(plan.days - completed.size).coerceAtLeast(0)} days left", color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 20.sp)
+                        Text("Started ${startDate.month.name.lowercase().replaceFirstChar(Char::uppercase)} ${startDate.dayOfMonth}.", color = Pk.Muted, fontFamily = UtilitySans, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
                     }
                 }
 
@@ -359,9 +378,27 @@ private fun BibleChallengeReader(
     onComplete: () -> Unit,
 ) {
     val context = LocalContext.current
+    val view = LocalView.current
     var selected by remember(day) { mutableIntStateOf(0) }
     var opened by remember(day) { mutableStateOf(setOf(0)) }
     var verses by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
+    var speaking by remember { mutableStateOf(false) }
+    var spokenIndex by remember { mutableIntStateOf(-1) }
+    var ttsReady by remember { mutableStateOf(false) }
+    val tts = remember { TextToSpeech(context) { status -> ttsReady = status == TextToSpeech.SUCCESS } }
+    DisposableEffect(Unit) { onDispose { tts.stop(); tts.shutdown() } }
+    LaunchedEffect(ttsReady) { if (ttsReady) { tts.language = Locale.US; tts.setSpeechRate(.86f); tts.setPitch(.92f) } }
+    LaunchedEffect(speaking, spokenIndex, verses) {
+        if (speaking && ttsReady && spokenIndex in verses.indices) {
+            val index = spokenIndex
+            tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                override fun onStart(utteranceId: String?) = Unit
+                override fun onError(utteranceId: String?) = onDone(utteranceId)
+                override fun onDone(utteranceId: String?) { Handler(Looper.getMainLooper()).post { if (index < verses.lastIndex) spokenIndex = index + 1 else speaking = false } }
+            })
+            tts.speak("Verse ${verses[index].verse}. ${verses[index].text}", TextToSpeech.QUEUE_FLUSH, null, "bible-$day-$selected-$index")
+        }
+    }
     val portion = portions[selected]
     LaunchedEffect(portion.book, portion.chapter) {
         verses = withContext(Dispatchers.IO) { OfflineBible(context).chapter(portion.book, portion.chapter) }
@@ -372,7 +409,7 @@ private fun BibleChallengeReader(
             Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBackIosNew, "Plan", tint = Pk.Charcoal, modifier = Modifier.size(15.dp)) }
                 Text("DAY $day  ·  ${plan.title.uppercase(Locale.getDefault())}", color = Pk.Faint, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.1.sp, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-                IconButton(onClick = {}) { Icon(Icons.Outlined.Headphones, "Listen", tint = Pk.Oxblood, modifier = Modifier.size(19.dp)) }
+                IconButton(onClick = { if (speaking) { speaking = false; tts.stop() } else if (verses.isNotEmpty()) { spokenIndex = 0; speaking = true } }) { Icon(Icons.Outlined.Headphones, if (speaking) "Stop listening" else "Listen", tint = if (speaking) Pk.GoldDeep else Pk.Oxblood, modifier = Modifier.size(19.dp)) }
             }
 
             Row(Modifier.fillMaxWidth().padding(horizontal = 18.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -394,25 +431,28 @@ private fun BibleChallengeReader(
 
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)) {
                 Text("${portion.book} ${portion.chapter}", color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 33.sp, modifier = Modifier.padding(top = 24.dp))
+                Surface(Modifier.fillMaxWidth().padding(top = 14.dp), shape = RoundedCornerShape(16.dp), color = Pk.GoldWash) {
+                    Column(Modifier.padding(15.dp)) { Text("WHAT’S HAPPENING HERE", color = Pk.GoldDeep, fontSize = 8.sp, letterSpacing = 1.1.sp, fontWeight = FontWeight.Bold); Text(contextKey(portion.book, portion.chapter), color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 15.sp, lineHeight = 22.sp, modifier = Modifier.padding(top = 6.dp)) }
+                }
                 if (verses.isEmpty()) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 24.dp).height(2.dp), color = Pk.Oxblood, trackColor = Pk.Hair)
                 } else {
-                    verses.forEach { verse ->
-                        Text(
+                    verses.forEachIndexed { index, verse ->
+                        Surface(color = if (speaking && index == spokenIndex) Pk.Oxblood.copy(alpha = .08f) else Color.Transparent, shape = RoundedCornerShape(10.dp)) { Text(
                             "${verse.verse}  ${verse.text}",
                             color = Pk.Charcoal,
                             fontFamily = BookSerif,
                             fontSize = 19.sp,
                             lineHeight = 31.sp,
-                            modifier = Modifier.padding(top = if (verse.verse == 1) 20.dp else 12.dp),
-                        )
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 6.dp).padding(top = if (verse.verse == 1) 14.dp else 6.dp),
+                        ) }
                     }
                 }
                 Spacer(Modifier.height(28.dp))
             }
 
             Button(
-                onClick = onComplete,
+                onClick = { view.performHapticFeedback(HapticFeedbackConstants.CONFIRM); onComplete() },
                 enabled = opened.size == portions.size,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp).height(56.dp),
                 shape = RoundedCornerShape(18.dp),
@@ -422,6 +462,15 @@ private fun BibleChallengeReader(
             }
         }
     }
+}
+
+private fun contextKey(book: String, chapter: Int): String = when (book) {
+    "Genesis" -> "This is the beginning of God’s covenant story and the world in which His promises unfold. Notice what this chapter reveals about God, people, and trust."
+    "Psalms" -> "This is a prayer written from real human experience—joy, fear, grief, or confidence. Read it as words you can honestly bring to God today."
+    "Proverbs" -> "This chapter gathers practical wisdom for ordinary decisions and relationships. Look for one sentence you can practise before the day ends."
+    "Matthew", "Mark", "Luke", "John" -> "You are reading the life and teaching of Jesus. Watch what He does, what He says, and how people respond to Him."
+    "Acts" -> "The early church is learning to follow the risen Jesus through the Holy Spirit. This chapter shows faith becoming public action and community."
+    else -> "This chapter belongs to the Bible’s larger story of creation, covenant, rescue, and restoration. Read for what it reveals about God and the faithful response He invites."
 }
 
 private fun timeLabelBible(hour: Int, minute: Int): String {

@@ -48,10 +48,29 @@ class DevotionalsTest {
         return chapters[chapter - 1]
     }
 
+    /**
+     * The year is twelve Keys, one per calendar month, and each Key numbers its
+     * own days from 1. Global numbering was the old shape and would now be
+     * meaningless: day 1 exists twelve times, once per Key.
+     */
     @Test
-    fun `the year parses and is numbered without gaps`() {
+    fun `each Key numbers its days from one without gaps`() {
         assertTrue("no devotionals were parsed", days.isNotEmpty())
-        days.forEachIndexed { i, d -> assertEquals(i + 1, d.day) }
+        days.groupBy { it.month }.forEach { (month, inKey) ->
+            val numbers = inKey.map { it.day }
+            assertEquals("Key for month $month is not sequential", (1..inKey.size).toList(), numbers)
+            assertTrue("month $month is out of range", month in 1..12)
+            assertTrue("month $month has no Key name", inKey.first().series.isNotBlank())
+            assertTrue("month $month has no theme", inKey.first().theme.isNotBlank())
+            assertTrue(
+                "month $month claims ${inKey.first().seriesOf} slots",
+                inKey.first().seriesOf in 28..31,
+            )
+            assertTrue(
+                "month $month has more written days than it has calendar slots",
+                inKey.size <= inKey.first().seriesOf,
+            )
+        }
     }
 
     @Test

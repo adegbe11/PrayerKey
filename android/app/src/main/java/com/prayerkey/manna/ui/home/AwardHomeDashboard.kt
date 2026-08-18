@@ -338,7 +338,6 @@ private fun DailyPathRow(icon: androidx.compose.ui.graphics.vector.ImageVector, 
         Icon(icon, null, tint = cs.primary, modifier = Modifier.size(21.dp))
         Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
             Text(title, color = cs.onSurface, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-            Text(detail, color = cs.onSurface.copy(alpha = .55f), fontSize = 11.5.sp, modifier = Modifier.padding(top = 2.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Icon(Icons.Outlined.ChevronRight, "Open $title", tint = cs.onSurface.copy(alpha = .32f), modifier = Modifier.size(19.dp))
     }

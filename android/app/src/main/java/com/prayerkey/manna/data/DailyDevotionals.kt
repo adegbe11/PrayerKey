@@ -89,7 +89,13 @@ fun dailyPrayerFor(date: LocalDate, topics: List<PrayerTopic>): DailyPrayer {
         ref = topic.scripture.firstOrNull()?.first ?: passageFor(date).reference,
         title = topic.title,
         verse = topic.scripture.firstOrNull()?.second ?: "",
-        prayer = topic.prayer,
+        prayer = buildString {
+            append("Father, thank You for the gift of this morning and for the breath in my body. I place this new day in Your hands. ")
+            append("Go before me, order my steps, guard my thoughts, and let my words and choices honour You.\n\n")
+            append(topic.prayer)
+            append("\n\nAs I leave this prayer, keep me aware of Your presence. Give me wisdom for every decision, strength for every responsibility, and kindness for every person I meet. ")
+            append("Protect my home and everyone connected to me. Let me recognise Your help, obey Your direction, and return tonight with gratitude. In Jesus' name, Amen.")
+        },
     )
 }
 

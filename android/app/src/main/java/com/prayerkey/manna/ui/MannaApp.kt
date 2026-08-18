@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoAwesome
-import androidx.compose.material.icons.outlined.Book
-import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Church
 import androidx.compose.material3.Icon
@@ -82,10 +82,10 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
     val destinations = remember {
         listOf(
             Destination("Home", Icons.Outlined.Home),
-            Destination("Bible", Icons.Outlined.Book),
+            Destination("Bible", Icons.Outlined.MenuBook),
             Destination("Pray", Icons.Outlined.AutoAwesome),
             Destination("Church", Icons.Outlined.Church),
-            Destination("Journal", Icons.Outlined.BookmarkBorder),
+            Destination("Journal", Icons.Outlined.EditNote),
         )
     }
     var selected by remember { mutableIntStateOf(0) }
@@ -156,6 +156,17 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                     )
                     com.prayerkey.manna.reminder.ReminderReceiver.schedule(
                         context, preferences.reminderHour, preferences.reminderMinute, true,
+                    )
+                }
+            } else if (!preferences.accountReady) {
+                com.prayerkey.manna.ui.screens.AccountEntryScreen { name, email, kind ->
+                    viewModel.updatePreferences(
+                        preferences.copy(
+                            name = name.ifBlank { preferences.name },
+                            accountReady = true,
+                            accountEmail = email,
+                            accountKind = kind,
+                        ),
                     )
                 }
             } else if (showProfile) {
@@ -273,7 +284,7 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
         }
 
         // no dock during onboarding — the first screen stays undistracted
-        if (hydrated && preferences.onboarded) {
+        if (hydrated && preferences.onboarded && !showProfile) {
             Box(Modifier.align(Alignment.BottomCenter)) {
                 com.prayerkey.manna.ui.components.MannaDock(
                     items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon) },

@@ -49,6 +49,7 @@ import com.prayerkey.manna.ui.theme.GiltLine
 import com.prayerkey.manna.ui.theme.Ivory
 import com.prayerkey.manna.ui.theme.Electric
 import com.prayerkey.manna.ui.theme.UtilitySans
+import com.prayerkey.manna.ui.theme.NightFill
 
 data class DockItem(val label: String, val icon: ImageVector)
 
@@ -74,12 +75,12 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
            as white, because the theme says so. */
         Surface(
             shape = RoundedCornerShape(31.dp),
-            color = Color(0xFF1A0A2E),
+            color = Color.Transparent,
             border = BorderStroke(0.6.dp, GiltLine.copy(alpha = .48f)),
             shadowElevation = 24.dp,
         ) {
             Row(
-                Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 8.dp),
+                Modifier.fillMaxWidth().background(NightFill).padding(horizontal = 6.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {

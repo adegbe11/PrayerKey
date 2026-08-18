@@ -48,6 +48,8 @@ class ReminderReceiver : BroadcastReceiver() {
         if (Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             NotificationManagerCompat.from(context).notify(1001, notification)
         }
+        val prefs = com.prayerkey.manna.data.MannaStore(context.applicationContext).preferences()
+        schedule(context, prefs.reminderHour, prefs.reminderMinute, prefs.reminderEnabled)
     }
 
     companion object {
@@ -62,7 +64,7 @@ class ReminderReceiver : BroadcastReceiver() {
                 set(Calendar.HOUR_OF_DAY, hour); set(Calendar.MINUTE, minute); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
                 if (timeInMillis <= System.currentTimeMillis()) add(Calendar.DAY_OF_YEAR, 1)
             }
-            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, time.timeInMillis, AlarmManager.INTERVAL_DAY, pending)
+            alarm.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time.timeInMillis, pending)
         }
     }
 }

@@ -59,9 +59,14 @@ data class DevoLine(val first: String, val second: String) {
 }
 
 data class Devotional(
-    /** 1..365 */
+    /** Day within its Key — 1..31. */
     val day: Int,
+    /** The Key this day belongs to: "The Key of Beginnings". */
     val series: String,
+    /** What the Key is for: "Setting holy habits". */
+    val theme: String,
+    /** Calendar month the Key owns, 1..12. */
+    val month: Int,
     val seriesDay: Int,
     val seriesOf: Int,
     val title: String,
@@ -76,7 +81,7 @@ data class Devotional(
     val addLabel: String,
     val question: String,
 ) {
-    val seriesLabel: String get() = "$series · DAY $seriesDay OF $seriesOf"
+    val seriesLabel: String get() = "${series.uppercase()} · DAY $seriesDay OF $seriesOf"
 }
 
 /**
@@ -97,18 +102,36 @@ object Devotionals {
         }
 
     /**
-     * Today's devotional.
+     * Today's devotional, by the calendar.
      *
-     * Walks the written year rather than the calendar year: day 1 of the plan
-     * is the day you start, so somebody joining in November does not begin at
-     * number 318. [size] is whatever has actually been written so far, so the
-     * app is correct while the year is still being filled in.
+     * The year is twelve Keys, one per month, and a Key only makes sense on its
+     * own month — January is Beginnings for everybody or it is Beginnings for
+     * nobody. That replaces the old walk-from-install-date, which would have
+     * handed somebody The Key of Joy in February.
+     *
+     * Within the month the day of the month selects the day. While a Key is
+     * still being written, its written days cycle rather than the screen going
+     * blank — and [coverage] is what tells the truth about that.
      */
     suspend fun forDate(context: Context, date: LocalDate, startedOn: LocalDate?): Devotional? {
         val days = all(context)
         if (days.isEmpty()) return null
-        val since = startedOn?.let { java.time.temporal.ChronoUnit.DAYS.between(it, date) } ?: 0L
-        return days[Math.floorMod(since, days.size.toLong()).toInt()]
+        val thisKey = days.filter { it.month == date.monthValue }
+        if (thisKey.isEmpty()) {
+            // this Key is not written yet; fall back to whatever is written
+            return days[(date.dayOfYear - 1).mod(days.size)]
+        }
+        return thisKey.firstOrNull { it.day == date.dayOfMonth }
+            ?: thisKey[(date.dayOfMonth - 1).mod(thisKey.size)]
+    }
+
+    /** Written days against calendar slots, per Key. Honest progress. */
+    suspend fun coverage(context: Context): List<Triple<Int, String, Pair<Int, Int>>> {
+        val days = all(context)
+        return (1..12).map { m ->
+            val inMonth = days.filter { it.month == m }
+            Triple(m, inMonth.firstOrNull()?.series ?: "", inMonth.size to (inMonth.firstOrNull()?.seriesOf ?: 0))
+        }
     }
 
     /** The day after [day], for the "tomorrow" card. Wraps at the end. */
@@ -121,20 +144,25 @@ object Devotionals {
     internal fun parse(json: String): List<Devotional> {
         val root = JSONObject(json)
         val out = mutableListOf<Devotional>()
-        val series = root.getJSONArray("series")
-        for (s in 0 until series.length()) {
-            val group = series.getJSONObject(s)
-            val name = group.getString("name")
-            val days = group.getJSONArray("days")
+        val keys = root.getJSONArray("keys")
+        for (k in 0 until keys.length()) {
+            val key = keys.getJSONObject(k)
+            val name = key.getString("name")
+            val theme = key.getString("theme")
+            val month = key.getInt("month")
+            val slots = key.getInt("days")
+            val days = key.getJSONArray("written")
             for (d in 0 until days.length()) {
                 val o = days.getJSONObject(d)
                 val read = o.getJSONObject("read")
                 val body = o.getJSONArray("body")
                 out += Devotional(
-                    day = out.size + 1,
+                    day = o.optInt("day", d + 1),
                     series = name,
-                    seriesDay = d + 1,
-                    seriesOf = days.length(),
+                    theme = theme,
+                    month = month,
+                    seriesDay = o.optInt("day", d + 1),
+                    seriesOf = slots,
                     title = o.getString("title"),
                     minutes = o.getInt("minutes"),
                     reading = DevoReading(

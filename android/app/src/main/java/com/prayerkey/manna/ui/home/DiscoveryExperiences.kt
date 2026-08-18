@@ -104,9 +104,12 @@ private fun experience(title: String): Experience = when (title) {
         BibleChallengeMachine(onClose)
         return
     }
+    if (title in setOf("Start a fast", "Daniel fast", "Full fast", "Partial fast", "Esther fast", "Timed fast", "First fruits", "Church-wide fast", "Fasting record")) {
+        FastingChallengeMachine(onClose)
+        return
+    }
     val faithMachine = when (title) {
         "Prayer points" -> "Prayer points"
-        "Start a fast", "Daniel fast", "Full fast", "Partial fast", "Esther fast", "Timed fast", "First fruits", "Church-wide fast", "Fasting record" -> "Fasting"
         "Memory verse" -> "Memory verse"
         "Midnight prayer", "Three watches", "Night vigil" -> "Midnight prayer"
         "Warfare prayer", "Imprecatory Psalms" -> "Warfare prayer"

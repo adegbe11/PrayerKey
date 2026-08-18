@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.verticalScroll
@@ -125,7 +126,13 @@ fun BibleScreen(
 
     fun runSearch(value: String) {
         scope.launch {
-            val term = value.ifBlank { "peace" }
+            val term = value.trim()
+            if (term.isBlank()) {
+                loading = true
+                shown = bible.pullDeck().map { RemoteVerse(it.reference, it.text, "KJV") }
+                loading = false
+                return@launch
+            }
             val kjv = bible.search(term, 10)
             // INSTANT: offline results render immediately in every version —
             // the chosen translation streams in and replaces them when ready
@@ -319,7 +326,7 @@ fun BibleScreen(
                                     }
                                     Text(item.name, color = if (active) Color.White.copy(.7f) else Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 2.dp))
                                 }
-                                if (active) Text("✓", color = Gold, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                                if (active) Icon(Icons.Outlined.Check, "Selected", tint = Gold, modifier = Modifier.size(19.dp))
                             }
                         }
                     }
@@ -1184,6 +1191,7 @@ fun ProfileScreen(
     onRestoreArchive: (String) -> Unit,
     onBack: () -> Unit, onUpdate: (UserPrefs) -> Unit,
 ) {
+    androidx.activity.compose.BackHandler(onBack = onBack)
     val context = LocalContext.current
     var confirmRestore by remember { mutableStateOf(false) }
     val restoreArchive = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -1198,16 +1206,17 @@ fun ProfileScreen(
             ReminderReceiver.schedule(context, next.reminderHour, next.reminderMinute, true)
         }
     }
-    Column(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp).padding(top = 20.dp, bottom = 42.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, "Back") }
-            Text("You", fontFamily = BookSerif, fontSize = 32.sp)
+    Column(Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding()) {
+        Row(Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) { Icon(Icons.Outlined.ArrowBack, "Back", tint = Pk.Charcoal) }
+            Text("You", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 31.sp, color = Pk.Charcoal)
         }
-        OutlinedTextField(prefs.name, { onUpdate(prefs.copy(name = it)) }, label = { Text("Your name") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 16.dp), shape = RoundedCornerShape(16.dp))
-        Surface(Modifier.fillMaxWidth().padding(vertical = 18.dp), color = Night, shape = RoundedCornerShape(26.dp)) {
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp).padding(bottom = Pk.NavClearance)) {
+        OutlinedTextField(prefs.name, { onUpdate(prefs.copy(name = it)) }, placeholder = { Text("Your name") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White, focusedBorderColor = Pk.Oxblood, unfocusedBorderColor = Pk.Hair))
+        Box(Modifier.fillMaxWidth().padding(vertical = 18.dp).clip(R.card).background(NightFill).border(0.7.dp, Pk.GoldLight.copy(alpha = .28f), R.card)) {
             Row(Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { Text(streak.toString(), color = Color.White, fontFamily = BookSerif, fontSize = 48.sp); Text("day streak", color = Color.White.copy(.7f)) }
-                Column(horizontalAlignment = Alignment.End) { Text(savedCount.toString(), color = Gold, fontSize = 30.sp); Text("words saved", color = Color.White.copy(.7f)) }
+                Column(horizontalAlignment = Alignment.End) { Text(savedCount.toString(), color = Pk.GoldLight, fontFamily = DisplaySerif, fontSize = 30.sp); Text("words saved", color = Color.White.copy(.7f)) }
             }
         }
         /* ── Theme ──────────────────────────────────────────────────────
@@ -1242,26 +1251,27 @@ fun ProfileScreen(
         SettingRow("Reduce motion", if (prefs.reduceMotion) "On" else "Off") {
             Switch(prefs.reduceMotion, onCheckedChange = { onUpdate(prefs.copy(reduceMotion = it)) })
         }
-        SettingRow("Lock Journey", "Require your device PIN, pattern, or biometrics") {
+        SettingRow("Lock journal", "Use your device lock") {
             Switch(prefs.journalLock, onCheckedChange = { onUpdate(prefs.copy(journalLock = it)) })
         }
-        SettingRow("Conceal entry previews", "Hide private writing in the timeline") {
+        SettingRow("Hide journal previews", "Keep private writing hidden") {
             Switch(prefs.concealJournalPreviews, onCheckedChange = { onUpdate(prefs.copy(concealJournalPreviews = it)) })
         }
-        SettingRow("Offline listening voices", "Manage downloaded voices for Scripture and prayer", onClick = {
+        SettingRow("Offline voices", "Manage Bible and prayer voices", onClick = {
             runCatching { context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)) }
                 .recoverCatching { context.startActivity(Intent("com.android.settings.TTS_SETTINGS")) }
         }) { Icon(Icons.Outlined.RecordVoiceOver, null, tint = Gold) }
-        SettingRow("Book of Remembrance", "Create my private ${java.time.LocalDate.now().year} PDF", onClick = {
+        SettingRow("Year in review", "Create my ${java.time.LocalDate.now().year} PDF", onClick = {
             com.prayerkey.manna.share.RemembranceBook.share(context, prefs.name, entries, sermons, prayers, saved)
         }) { Icon(Icons.Outlined.AutoStories, null, tint = Gold) }
-        SettingRow("Export private archive", "Portable JSON - You own your data", onClick = {
+        SettingRow("Export my data", "Save a private backup", onClick = {
             com.prayerkey.manna.share.JourneyArchive.share(context, entries, sermons, prayers, saved, memory, formation)
         }) { Icon(Icons.Outlined.FileDownload, null, tint = Electric) }
-        SettingRow("Restore private archive", "Replace this device's Journey from backup", onClick = { confirmRestore = true }) {
+        SettingRow("Restore my data", "Choose a saved backup", onClick = { confirmRestore = true }) {
             Icon(Icons.Outlined.Restore, null, tint = Muted)
         }
-        SettingRow("About MANNA", "Free · No ads") { Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted) }
+        SettingRow("About PrayerKey", "Free · No ads") { Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted) }
+    }
     }
     if (confirmRestore) AlertDialog(
         onDismissRequest = { confirmRestore = false },
@@ -1274,9 +1284,22 @@ fun ProfileScreen(
 
 @Composable
 private fun SettingRow(label: String, value: String, onClick: () -> Unit = {}, action: @Composable () -> Unit) {
-    Row(Modifier.fillMaxWidth().height(64.dp).clickable(onClick = onClick).border(0.5.dp, Hairline).padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(1f)) { Text(label); Text(value, color = Muted, fontSize = 11.sp) }
-        action()
+    Surface(
+        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+        shape = R.card,
+        color = Color.White,
+        border = BorderStroke(1.dp, Pk.Hair),
+    ) {
+        Row(
+            Modifier.fillMaxWidth().defaultMinSize(minHeight = 64.dp).clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(label, color = Pk.Charcoal, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                if (value.isNotBlank()) Text(value, color = Pk.Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp))
+            }
+            action()
+        }
     }
 }
 
@@ -1356,14 +1379,9 @@ private fun ThemeSetting(prefs: UserPrefs, onUpdate: (UserPrefs) -> Unit) {
                 }
             }
         }
-        Text(
-            APP_THEMES.firstOrNull { it.id == prefs.themeId }?.note.orEmpty(),
-            color = cs.onBackground.copy(alpha = .55f), fontSize = 12.sp,
-            modifier = Modifier.padding(top = 10.dp),
-        )
         SettingRow(
             "Match my phone",
-            if (prefs.followSystemTheme) "Light and dark follow the system" else "Always the theme I chose",
+            if (prefs.followSystemTheme) "On" else "Off",
         ) {
             Switch(
                 prefs.followSystemTheme,

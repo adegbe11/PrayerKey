@@ -15,9 +15,9 @@ import java.time.LocalTime
  */
 object R {
     /** Big surfaces: cards, sheets, the verse deck. */
-    val card = RoundedCornerShape(28.dp)
+    val card = RoundedCornerShape(Pk.CardRadius)
     /** Things you touch: buttons, fields, chips with square-ish ends. */
-    val control = RoundedCornerShape(20.dp)
+    val control = RoundedCornerShape(Pk.ButtonRadius)
     /** Small inline tags. */
     val tag = RoundedCornerShape(15.dp)
     /** Fully round. */
@@ -37,8 +37,8 @@ object Space {
 val InkSoft = Color(0xFF222222)
 
 /** Unselected chips: ambient tint, no wireframe border. */
-val ChipFill = Color(0xFFF2EBE0)
-val ChipFillSelected = Color(0xFFF0DDD8)
+val ChipFill = Pk.Charcoal.copy(alpha = .055f)
+val ChipFillSelected = Pk.Oxblood.copy(alpha = .10f)
 
 /**
  * The canvas is never flat white. It carries a barely-there wash that

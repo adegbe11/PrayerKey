@@ -1,0 +1,143 @@
+package com.prayerkey.manna.ui.home
+
+import android.content.Context
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.prayerkey.manna.data.*
+import com.prayerkey.manna.ui.theme.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+@Composable
+internal fun DailyRhythmExperience(moment: String, onClose: () -> Unit, onComplete: () -> Unit) {
+    val today = remember { LocalDate.now() }
+    val devotional = remember(today) { devotionalFor(today) }
+    val passage = remember(today) { passageFor(today) }
+    DailyRhythmPage(moment, today, devotional, passage, onClose, onComplete)
+}
+
+@Composable
+private fun DailyRhythmPage(
+    moment: String,
+    date: LocalDate,
+    devotional: DailyDevotional,
+    passage: DailyPassage,
+    onClose: () -> Unit,
+    onComplete: () -> Unit,
+) {
+    BackHandler(onBack = onClose)
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("daily_rhythm_notes", Context.MODE_PRIVATE) }
+    var topics by remember { mutableStateOf<List<PrayerTopic>>(emptyList()) }
+    var verses by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
+    var note by remember(moment, date) { mutableStateOf(prefs.getString("${date}_$moment", "").orEmpty()) }
+    LaunchedEffect(Unit) { topics = withContext(Dispatchers.IO) { LocalPrayerTopics.load(context) } }
+    LaunchedEffect(passage.book, passage.chapter) {
+        verses = withContext(Dispatchers.IO) { OfflineBible(context).chapter(passage.book, passage.chapter) }
+    }
+    val prayer = remember(date, topics) { dailyPrayerFor(date, topics) }
+    val title = when (moment) {
+        "morning" -> "Morning prayer"
+        "devotional" -> "Daily devotional"
+        "bible" -> "Today's Bible reading"
+        "reflection" -> "Guided reflection"
+        else -> "Evening prayer"
+    }
+    val subtitle = date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.getDefault())).uppercase(Locale.getDefault())
+
+    Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onClose) { Icon(Icons.Outlined.ArrowBackIosNew, "Back", tint = Pk.Charcoal, modifier = Modifier.size(16.dp)) }
+                Text("PRAYERKEY", Modifier.weight(1f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.5.sp, color = Pk.Oxblood)
+            }
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)) {
+                Text(subtitle, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.2.sp, color = Pk.Muted, modifier = Modifier.padding(top = 10.dp))
+                Text(title, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 35.sp, lineHeight = 40.sp, color = Pk.Charcoal, modifier = Modifier.padding(top = 8.dp))
+                when (moment) {
+                    "morning" -> {
+                        ScriptureBlock(prayer.ref, prayer.verse)
+                        RhythmHeading("PRAY FOR TODAY")
+                        Text(prayer.prayer, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 29.sp, color = Pk.Charcoal)
+                    }
+                    "devotional" -> {
+                        ScriptureBlock(devotional.reference, devotional.opening)
+                        RhythmHeading("TODAY'S MESSAGE")
+                        devotional.reading.forEach { paragraph ->
+                            Text(paragraph, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 29.sp, color = Pk.Charcoal, modifier = Modifier.padding(bottom = 14.dp))
+                        }
+                        RhythmHeading("PRAY")
+                        Text(devotional.prayer, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 19.sp, lineHeight = 29.sp, color = Pk.Charcoal)
+                        RhythmHeading("LIVE IT")
+                        Text(devotional.practice, fontFamily = DisplaySerif, fontSize = 22.sp, lineHeight = 29.sp, color = Pk.Charcoal)
+                    }
+                    "bible" -> {
+                        ScriptureBlock(passage.reference, "Read the whole chapter slowly. Notice one sentence you want to carry into the day.")
+                        verses.forEach { verse ->
+                            Text("${verse.verse}  ${verse.text}", fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 30.sp, color = Pk.Charcoal, modifier = Modifier.padding(top = 12.dp))
+                        }
+                    }
+                    "reflection" -> {
+                        ScriptureBlock(devotional.reference, devotional.opening)
+                        RhythmHeading("THINK ABOUT THIS")
+                        Text(devotional.reflectionQuestion, fontFamily = DisplaySerif, fontSize = 24.sp, lineHeight = 31.sp, color = Pk.Charcoal)
+                        RhythmHeading("DO THIS TODAY")
+                        Text(devotional.practice, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 28.sp, color = Pk.Charcoal)
+                        RhythmNote(note) { note = it; prefs.edit().putString("${date}_$moment", it).apply() }
+                    }
+                    else -> {
+                        ScriptureBlock("Psalm 92:2", "It is good to proclaim Your faithful love in the morning and Your faithfulness at night.")
+                        RhythmHeading("LOOK BACK WITH GOD")
+                        listOf("Where did you notice God's help today?", "What burden do you need to release before sleep?", "Who needs your prayer tonight?").forEachIndexed { index, prompt ->
+                            Text("${index + 1}.  $prompt", fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 28.sp, color = Pk.Charcoal, modifier = Modifier.padding(top = 14.dp))
+                        }
+                        RhythmHeading("EVENING PRAYER")
+                        Text("Father, thank You for carrying me through this day. Forgive what was wrong, heal what was painful, and receive what was good. I release every unfinished matter into Your hands. Watch over my home, renew my body and mind, and give me peaceful sleep. Prepare me to meet tomorrow with faith. In Jesus' name, Amen.", fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 19.sp, lineHeight = 29.sp, color = Pk.Charcoal)
+                        RhythmNote(note) { note = it; prefs.edit().putString("${date}_$moment", it).apply() }
+                    }
+                }
+                Spacer(Modifier.height(28.dp))
+            }
+            Button(onClick = onComplete, modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
+                Text("COMPLETE THIS MOMENT", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .8.sp)
+            }
+        }
+    }
+}
+
+@Composable private fun ScriptureBlock(reference: String, text: String) {
+    Surface(Modifier.fillMaxWidth().padding(top = 24.dp), shape = RoundedCornerShape(22.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Pk.Hair)) {
+        Column(Modifier.padding(20.dp)) {
+            Text(reference.uppercase(Locale.getDefault()), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, letterSpacing = 1.2.sp, color = Pk.Oxblood)
+            Text(text, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 19.sp, lineHeight = 28.sp, color = Pk.Charcoal, modifier = Modifier.padding(top = 10.dp))
+        }
+    }
+}
+
+@Composable private fun RhythmHeading(text: String) { Text(text, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, letterSpacing = 1.3.sp, color = Pk.Oxblood, modifier = Modifier.padding(top = 26.dp, bottom = 10.dp)) }
+
+@Composable private fun RhythmNote(value: String, onChange: (String) -> Unit) {
+    RhythmHeading("WRITE WHAT YOU WANT TO REMEMBER")
+    BasicTextField(value, onChange, textStyle = TextStyle(fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, color = Pk.Charcoal), modifier = Modifier.fillMaxWidth().height(110.dp).background(Color.White, RoundedCornerShape(18.dp)).padding(16.dp), decorationBox = { field -> Box { if (value.isBlank()) Text("Write here...", fontFamily = BookSerif, fontSize = 17.sp, color = Pk.Muted); field() } })
+}

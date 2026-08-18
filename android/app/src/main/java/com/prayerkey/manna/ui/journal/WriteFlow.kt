@@ -641,7 +641,7 @@ fun WriteSheet(
     if (voiceDisclosure) AlertDialog(
         onDismissRequest = { voiceDisclosure = false },
         title = { Text("Use voice journaling?") },
-        text = { Text("Your phone's speech-recognition service may process audio online. MANNA does not receive or store the recording; only the returned words are placed in this private entry.") },
+        text = { Text("Your phone's speech-recognition service may process audio online. PrayerKey does not receive or store the recording. Only the returned words are placed in this entry.") },
         confirmButton = { TextButton(onClick = {
             voiceDisclosure = false
             voiceInput.launch(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {

@@ -25,7 +25,7 @@ object Pk {
     /* ── the six ─────────────────────────────────────────────────────── */
 
     /** The page. Warm, never #FFFFFF — clinical white is the tell of a default theme. */
-    val Cream = Color(0xFFF5F5F7)
+    val Cream = Color(0xFFF6F5F9)
 
     /** Crisp text used directly on oxblood and midnight surfaces. */
     val Crisp = Color(0xFFFFFFFF)
@@ -40,8 +40,8 @@ object Pk {
     val Oxblood = Color(0xFF6200ED)
 
     /** Brighter top edge and deeper pressed state for brand surfaces. */
-    val VioletLit = Color(0xFF6F18F2)
-    val VioletDeep = Color(0xFF4401B2)
+    val VioletLit = Color(0xFF7A1FFF)
+    val VioletDeep = Color(0xFF4A00B8)
 
     /** Hairlines, the streak, today. Used sparingly — gold stops reading as
      *  metal the moment it fills an area. */
@@ -51,7 +51,7 @@ object Pk {
     val GoldDeep = Color(0xFF6F5528)
 
     /** Done, complete, answered. The only green in the app. */
-    val Sage = Color(0xFF5C02D8)
+    val Sage = Color(0xFF0A7346)
 
     /** Invitations, and the nav at rest. */
     val Blush = Color(0xFFEFD5A8)
@@ -91,9 +91,9 @@ object Pk {
     /* ── shape ───────────────────────────────────────────────────────── */
 
     /** One radius for every card in the app. */
-    val CardRadius = 16.dp
-    val ButtonRadius = 12.dp
-    val NavRadius = 30.dp
+    val CardRadius = 26.dp
+    val ButtonRadius = 14.dp
+    val NavRadius = 34.dp
     val CardBorder = 1.dp
 
     /* ── an 8pt scale, so no gap is chosen by eye ─────────────────────── */
@@ -108,7 +108,7 @@ object Pk {
     val S8 = 32.dp
 
     /** Screen horizontal padding. */
-    val Gutter = 22.dp
+    val Gutter = 18.dp
 
     /** Between one section and the next. */
     val SectionGap = 30.dp

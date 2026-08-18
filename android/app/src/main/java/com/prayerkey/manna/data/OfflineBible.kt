@@ -44,6 +44,17 @@ class OfflineBible(private val context: Context) {
         verses().filter { it.book == book && it.chapter == chapter }
     }
 
+    /**
+     * Every verse in the bundled KJV, shuffled for the pull-card experience.
+     *
+     * Keep this separate from [search]: a blank search used to fall back to
+     * the first few matches for "peace", which made Pull look like a whole
+     * Bible deck while it was actually cycling through ten verses.
+     */
+    suspend fun pullDeck(): List<BibleVerse> = withContext(Dispatchers.IO) {
+        verses().shuffled()
+    }
+
     suspend fun related(source: BibleVerse, limit: Int = 5): List<BibleVerse> = withContext(Dispatchers.Default) {
         val stop = setOf("that", "this", "with", "from", "have", "will", "your", "shall", "unto", "they", "them", "were", "when", "what", "there", "their", "which", "into", "upon")
         val themes = Regex("[A-Za-z]{4,}").findAll(source.text.lowercase()).map { it.value }.filterNot(stop::contains).toSet()

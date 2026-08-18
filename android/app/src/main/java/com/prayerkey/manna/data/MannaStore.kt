@@ -26,6 +26,9 @@ data class UserPrefs(
     val reduceMotion: Boolean = false,
     val translation: String = "KJV",
     val onboarded: Boolean = false,
+    val accountReady: Boolean = false,
+    val accountEmail: String = "",
+    val accountKind: String = "private",
     val sermonLanguage: String = "en-US",
     val themeId: String = DEFAULT_THEME_ID,
     /** Let the phone decide light or dark; the theme supplies the accent. */
@@ -42,6 +45,14 @@ data class UserPrefs(
 data class SermonVerse(val reference: String, val text: String, val detectedAt: Long)
 data class SermonSession(val id: Long, val title: String, val startedAt: Long, val endedAt: Long?, val verses: List<SermonVerse>)
 data class JournalPrayer(val id: Long, val title: String, val request: String, val prayer: String, val scriptureRef: String?, val createdAt: Long)
+data class PrayerSession(
+    val id: Long,
+    val challenge: String,
+    val focus: String,
+    val day: Int,
+    val minutes: Int,
+    val prayedAt: Long,
+)
 
 enum class PrayerStage(val key: String, val label: String) {
     Praying("praying", "Praying"),
@@ -111,7 +122,7 @@ data class SermonNote(
     val refined: Boolean = false,
 )
 
-class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 13) {
+class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 14) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""CREATE TABLE saved_words (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -132,9 +143,11 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         // table, and onUpgrade never ran to add it.
         createJournalEntries(db)
         createSermonNotes(db)
+        createPrayerSessions(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 14) createPrayerSessions(db)
         if (oldVersion < 13) {
             listOf(
                 "ALTER TABLE sermon_notes ADD COLUMN audio_path TEXT NOT NULL DEFAULT ''",
@@ -187,7 +200,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     /** A phone with a newer/foreign schema must never crash the app —
      *  rebuild the database instead of throwing (default behaviour). */
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        listOf("saved_words", "app_state", "memory_verses", "sermon_sessions", "sermon_verses", "prayer_journal", "journal_entries", "sermon_notes")
+        listOf("saved_words", "app_state", "memory_verses", "sermon_sessions", "sermon_verses", "prayer_journal", "journal_entries", "sermon_notes", "prayer_sessions")
             .forEach { table -> runCatching { db.execSQL("DROP TABLE IF EXISTS $table") } }
         onCreate(db)
     }
@@ -252,6 +265,40 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
             refined INTEGER NOT NULL DEFAULT 0
         )""")
     }
+
+    private fun createPrayerSessions(db: SQLiteDatabase) {
+        db.execSQL("""CREATE TABLE IF NOT EXISTS prayer_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            challenge TEXT NOT NULL,
+            focus TEXT NOT NULL,
+            challenge_day INTEGER NOT NULL,
+            minutes INTEGER NOT NULL,
+            prayed_at INTEGER NOT NULL
+        )""")
+        db.execSQL("CREATE INDEX IF NOT EXISTS prayer_sessions_date ON prayer_sessions(prayed_at DESC)")
+    }
+
+    fun logPrayerSession(challenge: String, focus: String, day: Int, minutes: Int): Long =
+        writableDatabase.insert("prayer_sessions", null, ContentValues().apply {
+            put("challenge", challenge)
+            put("focus", focus.trim())
+            put("challenge_day", day)
+            put("minutes", minutes.coerceAtLeast(1))
+            put("prayed_at", System.currentTimeMillis())
+        })
+
+    fun prayerSessions(limit: Int = 100): List<PrayerSession> = readableDatabase.query(
+        "prayer_sessions", null, null, null, null, null, "prayed_at DESC", limit.toString()
+    ).use { cursor -> buildList {
+        while (cursor.moveToNext()) add(PrayerSession(
+            id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
+            challenge = cursor.getString(cursor.getColumnIndexOrThrow("challenge")),
+            focus = cursor.getString(cursor.getColumnIndexOrThrow("focus")),
+            day = cursor.getInt(cursor.getColumnIndexOrThrow("challenge_day")),
+            minutes = cursor.getInt(cursor.getColumnIndexOrThrow("minutes")),
+            prayedAt = cursor.getLong(cursor.getColumnIndexOrThrow("prayed_at")),
+        ))
+    } }
 
     /** Lists are stored newline-joined — no JSON dependency needed. */
     private fun join(items: List<String>) = items.joinToString("\n")
@@ -540,6 +587,9 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         reduceMotion = state("reduce_motion") == "true",
         translation = state("translation") ?: "KJV",
         onboarded = state("onboarded") == "true",
+        accountReady = state("account_ready") == "true",
+        accountEmail = state("account_email") ?: "",
+        accountKind = state("account_kind") ?: "private",
         sermonLanguage = state("sermon_language") ?: "en-US",
         journalLock = state("journal_lock") == "true",
         concealJournalPreviews = state("journal_conceal") == "true",
@@ -556,6 +606,9 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         putState("reminder_minute", prefs.reminderMinute.toString()); putState("reminder_enabled", prefs.reminderEnabled.toString())
         putState("reduce_motion", prefs.reduceMotion.toString()); putState("translation", prefs.translation)
         putState("onboarded", prefs.onboarded.toString())
+        putState("account_ready", prefs.accountReady.toString())
+        putState("account_email", prefs.accountEmail)
+        putState("account_kind", prefs.accountKind)
         putState("sermon_language", prefs.sermonLanguage)
         putState("journal_lock", prefs.journalLock.toString()); putState("journal_conceal", prefs.concealJournalPreviews.toString())
         putState("reader_size", prefs.readerTextSize.toString()); putState("reader_ribbon", prefs.readerRibbon.orEmpty())

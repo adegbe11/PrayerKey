@@ -24,25 +24,25 @@ import androidx.compose.ui.unit.dp
  */
 fun Modifier.premiumCard(
     shape: RoundedCornerShape = R.card,
-    fill: Brush = Brush.verticalGradient(listOf(Pk.Cream, Pk.Sunken)),
+    fill: Brush = Brush.verticalGradient(listOf(Color.White, Color(0xFFFBFAFD))),
     lift: Boolean = true,
 ): Modifier = this
     // wide, soft — the lift
-    .then(if (lift) Modifier.shadow(18.dp, shape, spotColor = Night.copy(alpha = .16f), ambientColor = Night.copy(alpha = .05f)) else Modifier)
+    .then(if (lift) Modifier.shadow(16.dp, shape, spotColor = Night.copy(alpha = .13f), ambientColor = Night.copy(alpha = .035f)) else Modifier)
     // tight, close — the edge
-    .shadow(3.dp, shape, spotColor = Night.copy(alpha = .16f), ambientColor = Color.Transparent)
+    .shadow(2.dp, shape, spotColor = Night.copy(alpha = .10f), ambientColor = Color.Transparent)
     .clip(shape)
     .background(fill)
     .topHighlight(shape)
 
 /** Warm paper, for scripture and prayer. */
-val PaperFill = Brush.verticalGradient(listOf(Pk.Cream, Pk.Sunken))
+val PaperFill = Brush.verticalGradient(listOf(Color.White, Color(0xFFFBFAFD)))
 
 /** The sacred layer. */
-val NightFill = Brush.verticalGradient(listOf(Pk.Charcoal, Pk.Charcoal))
+val NightFill = Brush.verticalGradient(listOf(Pk.VioletLit, Pk.Oxblood, Pk.VioletDeep))
 
 /** A gold-leaf wash, for anything answered or kept. */
-val GoldFill = Brush.verticalGradient(listOf(Pk.Cream, Pk.Sunken))
+val GoldFill = Brush.verticalGradient(listOf(Color.White, Pk.Gold.copy(alpha = .08f)))
 
 /**
  * The one-pixel catch of light along a surface's upper edge. This is the

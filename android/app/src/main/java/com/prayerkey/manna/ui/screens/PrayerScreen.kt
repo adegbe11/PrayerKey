@@ -42,14 +42,6 @@ private val PrayViolet = Color(0xFF6200ED)
 private val PrayInk = Color(0xFF1A0A2E)
 private val PrayMuted = Color(0xFF6E6477)
 
-private data class PrayStarter(val question: String, val request: String)
-private val prayStarters = listOf(
-    PrayStarter("How can I surrender my worries to God?", "I feel worried and need help surrendering what I cannot control."),
-    PrayStarter("What does Scripture say about new beginnings?", "I need a new beginning. Help me pray with hope and wisdom."),
-    PrayStarter("Pray with me for my family", "Please help me pray for peace, protection, and unity in my family."),
-    PrayStarter("I need direction for a decision", "I have an important decision to make and need God's wisdom and direction."),
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrayerScreen(
@@ -107,24 +99,11 @@ fun PrayerScreen(
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 120.dp)) {
                 if (generated == null) {
-                    Text("A simple invitation", Modifier.padding(top = 31.dp), color = PrayInk, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                    Text("What's on your heart?", Modifier.padding(top = 31.dp), color = PrayInk, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 38.sp)
                     Text(
-                        "Bring whatever is on your heart. It may be a burden, a decision, a question about Scripture, or simply a desire to draw near to God. PrayerKey will help you form an honest, Bible-grounded prayer and a faithful next step.",
-                        Modifier.padding(top = 20.dp), color = PrayInk.copy(.88f), fontFamily = UtilitySans, fontSize = 21.sp, lineHeight = 31.sp,
+                        "Share what you’re facing, carrying, or hoping for. PrayerKey will help you turn it into a personal, Bible-grounded prayer.",
+                        Modifier.padding(top = 12.dp, bottom = 26.dp), color = PrayMuted, fontFamily = UtilitySans, fontStyle = FontStyle.Italic, fontSize = 16.sp, lineHeight = 24.sp,
                     )
-                    Text("What would you like us to pray about?", Modifier.padding(top = 24.dp), color = PrayInk, fontFamily = UtilitySans, fontSize = 22.sp, lineHeight = 30.sp)
-                    Row(Modifier.horizontalScroll(rememberScrollState()).padding(top = 27.dp, bottom = 26.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        prayStarters.forEachIndexed { index, starter ->
-                            Surface(onClick = { request = starter.request }, modifier = Modifier.width(174.dp).height(176.dp), shape = RoundedCornerShape(20.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayGold.copy(.28f))) {
-                                Column(Modifier.padding(18.dp)) {
-                                    Text("0${index + 1}", color = PrayGold.copy(.68f), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold, fontSize = 27.sp)
-                                    Spacer(Modifier.weight(1f))
-                                    Text(starter.question, color = PrayInk, fontFamily = UtilitySans, fontSize = 17.sp, lineHeight = 23.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
-                                    Text("→", Modifier.align(Alignment.End), color = PrayGold, fontSize = 24.sp)
-                                }
-                            }
-                        }
-                    }
                     PrayerComposer(request, loading, { request = it }) {
                         if (request.isNotBlank() && !loading) scope.launch {
                             loading = true; error = null

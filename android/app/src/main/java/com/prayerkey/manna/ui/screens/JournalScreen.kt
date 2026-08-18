@@ -35,6 +35,13 @@ import androidx.compose.material.icons.outlined.GraphicEq
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.ChevronLeft
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.WbSunny
+import androidx.compose.material.icons.outlined.LocalFireDepartment
+import androidx.compose.material.icons.outlined.Cloud
+import androidx.compose.material.icons.outlined.WaterDrop
+import androidx.compose.material.icons.outlined.SelfImprovement
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -64,6 +71,8 @@ import com.prayerkey.manna.data.SavedWord
 import com.prayerkey.manna.data.JourneyInsight
 import com.prayerkey.manna.data.JourneyInsights
 import com.prayerkey.manna.data.PrayerStage
+import com.prayerkey.manna.data.MannaStore
+import com.prayerkey.manna.share.AnsweredPrayerCardRenderer
 import com.prayerkey.manna.data.FormationState
 import com.prayerkey.manna.model.VerseCard
 import com.prayerkey.manna.ui.theme.*
@@ -71,11 +80,21 @@ import java.text.DateFormat
 import java.time.LocalDate
 import java.util.Date
 
-/* Mood vocabulary — emoji stored as the key */
+private data class JournalMood(val key: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 private val MOODS = listOf(
-    "🙏" to "Praying", "😊" to "Grateful", "✨" to "Hopeful",
-    "🔥" to "Faith", "😔" to "Heavy", "😭" to "Broken",
+    JournalMood("praying", "Praying", Icons.Outlined.SelfImprovement),
+    JournalMood("grateful", "Grateful", Icons.Outlined.Favorite),
+    JournalMood("hopeful", "Hopeful", Icons.Outlined.WbSunny),
+    JournalMood("faith", "Faith", Icons.Outlined.LocalFireDepartment),
+    JournalMood("heavy", "Heavy", Icons.Outlined.Cloud),
+    JournalMood("broken", "Broken", Icons.Outlined.WaterDrop),
 )
+
+private fun moodLabel(raw: String): String = MOODS.firstOrNull { it.key == raw }?.label ?: when (raw) {
+    "🙏" -> "Praying"; "😊" -> "Grateful"; "✨" -> "Hopeful"
+    "🔥" -> "Faith"; "😔" -> "Heavy"; "😭" -> "Broken"
+    else -> "Reflection"
+}
 
 private enum class JournalTab { Journey, Practices, Saved, Answered }
 private enum class JourneyView(val label: String) { Entries("Entries"), Calendar("Calendar"), Memories("Memories") }
@@ -121,7 +140,7 @@ fun JournalScreen(
                 Text("Unlock with your device security to read or write entries.", color = Muted, fontSize = 12.5.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 7.dp))
                 Button(onClick = {
                     val manager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-                    manager.createConfirmDeviceCredentialIntent("Unlock MANNA Journal", "Your private journal stays behind your device lock")?.let(unlock::launch)
+                    manager.createConfirmDeviceCredentialIntent("Unlock PrayerKey Journal", "Your journal is protected by your device lock")?.let(unlock::launch)
                         ?: run { unlocked = true }
                 }, modifier = Modifier.padding(top = 20.dp)) { Text("Unlock Journal") }
             }
@@ -187,7 +206,7 @@ fun JournalScreen(
                     entries = entries, streak = journalStreak, query = query,
                     onQuery = { query = it }, onEdit = { viewing = it },
                     onAnswer = { reviewingPrayer = it },
-                    onWelcomeTap = { chosen = null; writing = true },
+                    onWelcomeTap = { chosen = null; picking = true },
                     insight = journeyInsight,
                     concealPreviews = concealPreviews,
                 )
@@ -215,7 +234,7 @@ fun JournalScreen(
                     Modifier.size(58.dp)
                         .shadow(5.dp, CircleShape, spotColor = Color.Black.copy(alpha = .16f))
                         .clip(CircleShape).background(accent)
-                        .clickable { chosen = null; writing = true },
+                        .clickable { chosen = null; picking = true },
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -336,14 +355,23 @@ private fun JournalTimeline(
 ) {
     var view by remember { mutableStateOf(JourneyView.Entries) }
     var selectedTag by remember { mutableStateOf<String?>(null) }
+    var selectedCollection by remember { mutableStateOf<String?>(null) }
     var searchOpen by remember { mutableStateOf(false) }
     val today = LocalDate.now().toEpochDay()
     val memory = remember(entries) {
         entries.firstOrNull { it.entryDay == today - 365 } ?: entries.firstOrNull { it.entryDay == today - 30 }
     }
-    val shown = remember(entries, query, selectedTag) {
+    val shown = remember(entries, query, selectedTag, selectedCollection) {
         entries.filter {
-            (selectedTag == null || selectedTag in it.tags) && (query.isBlank() ||
+            val inCollection = when (selectedCollection) {
+                "prayers" -> it.isPrayer
+                "answered" -> it.answeredAt != null
+                "thanksgiving" -> it.gratitude.isNotBlank() || it.journal.equals("Gratitude", true)
+                "dreams" -> it.journal.equals("Dreams", true)
+                "sermon notes" -> it.source == "sermon"
+                else -> true
+            }
+            inCollection && (selectedTag == null || selectedTag in it.tags) && (query.isBlank() ||
             it.title.contains(query, true) || it.body.contains(query, true) || it.gratitude.contains(query, true) ||
                 (it.verseRef ?: "").contains(query, true) || it.tags.any { tag -> tag.contains(query, true) } ||
                 it.journal.contains(query, true) || it.location.contains(query, true))
@@ -363,8 +391,24 @@ private fun JournalTimeline(
             memory = memory,
             onWrite = onWelcomeTap,
             onOpen = onEdit,
-            onCollection = { collection -> selectedTag = collection },
+            onCollection = { collection -> selectedCollection = collection },
         )
+
+        if (entries.isEmpty()) return
+
+        selectedCollection?.let { collection ->
+            Surface(
+                onClick = { selectedCollection = null },
+                shape = RoundedCornerShape(99.dp),
+                color = Pk.Oxblood.copy(alpha = .08f),
+                modifier = Modifier.padding(top = 16.dp),
+            ) {
+                Row(Modifier.padding(horizontal = 13.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(collection.replaceFirstChar(Char::uppercase), color = Pk.Oxblood, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                    Icon(Icons.Outlined.Close, "Show all pages", tint = Pk.Oxblood, modifier = Modifier.padding(start = 7.dp).size(14.dp))
+                }
+            }
+        }
 
         Row(Modifier.fillMaxWidth().padding(top = 18.dp), verticalAlignment = Alignment.CenterVertically) {
             Surface(shape = RoundedCornerShape(16.dp), color = AppleGray, modifier = Modifier.weight(1f)) {
@@ -428,9 +472,9 @@ private fun JournalOverview(
     entries: List<JournalEntry>, streak: Int, memory: JournalEntry?,
     onWrite: () -> Unit, onOpen: (JournalEntry) -> Unit, onCollection: (String?) -> Unit,
 ) {
-    val violet = Color(0xFF6200ED)
-    val ink = Color(0xFF1A0A2E)
-    val muted = Color(0xFF6E6E73)
+    val violet = Pk.Oxblood
+    val ink = Pk.Charcoal
+    val muted = Pk.Muted
     val latest = entries.maxByOrNull { it.updatedAt }
     val collections = listOf(
         JournalCollection("Prayers", entries.count { it.isPrayer }, Icons.Outlined.FavoriteBorder, violet),
@@ -448,7 +492,6 @@ private fun JournalOverview(
             Column(Modifier.padding(24.dp)) {
                 Text("TODAY'S PAGE", color = Color.White.copy(alpha = .70f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.5.sp)
                 Text("What do you want to remember?", color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 27.sp, lineHeight = 32.sp, modifier = Modifier.padding(top = 10.dp))
-                Text("Write freely. PrayerKey saves the page privately on this device.", color = Color.White.copy(alpha = .76f), fontFamily = BookSerif, fontSize = 14.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 8.dp))
                 Surface(shape = RoundedCornerShape(99.dp), color = Color.White, modifier = Modifier.padding(top = 20.dp)) {
                     Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.Create, null, tint = violet, modifier = Modifier.size(17.dp))
@@ -457,6 +500,8 @@ private fun JournalOverview(
                 }
             }
         }
+
+        if (entries.isEmpty()) return@Column
 
         Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
@@ -491,7 +536,7 @@ private fun JournalOverview(
                 Column(Modifier.padding(18.dp)) {
                     Text(entry.title.ifBlank { "Your latest page" }, color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 19.sp)
                     Text(entry.body, color = muted, fontFamily = BookSerif, fontSize = 13.sp, lineHeight = 20.sp, maxLines = 2, modifier = Modifier.padding(top = 6.dp))
-                    Text("OPEN PAGE  →", color = violet, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = .8.sp, modifier = Modifier.padding(top = 12.dp))
+                    Text("OPEN PAGE", color = violet, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = .8.sp, modifier = Modifier.padding(top = 12.dp))
                 }
             }
         }
@@ -644,9 +689,9 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
                     Text(entry.journal.uppercase(), color = Gold, fontSize = 9.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold)
                     Text(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(Date(entry.createdAt)), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp))
                 }
-                if (entry.favorite) Text("★", color = Gold, fontSize = 20.sp)
+                if (entry.favorite) Icon(Icons.Outlined.Favorite, "Favourite", tint = Gold, modifier = Modifier.size(20.dp))
             }
-            Text(entry.title.ifBlank { MOODS.firstOrNull { it.first == entry.mood }?.second ?: "Journal entry" }, fontFamily = BookSerif, fontSize = 28.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 18.dp))
+            Text(entry.title.ifBlank { moodLabel(entry.mood) }, fontFamily = BookSerif, fontSize = 28.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 18.dp))
             Text(entry.body, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 16.dp))
             if (entry.gratitude.isNotBlank()) Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFEAF5EC), modifier = Modifier.fillMaxWidth().padding(top = 18.dp)) { Text("Grateful for · ${entry.gratitude}", color = Color(0xFF257345), fontSize = 13.sp, modifier = Modifier.padding(14.dp)) }
             entry.verseRef?.let { ref -> Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFF4EDDC), modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) { Column(Modifier.padding(14.dp)) { Text(ref, color = Gold, fontWeight = FontWeight.Bold); entry.verseText?.let { Text(it, fontFamily = BookSerif, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 6.dp)) } } } }
@@ -660,7 +705,7 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
             }
             if (entry.tags.isNotEmpty() || entry.location.isNotBlank() || entry.weather.isNotBlank()) Text(buildList { addAll(entry.tags.map { "#$it" }); if (entry.location.isNotBlank()) add("⌖ ${entry.location}"); if (entry.weather.isNotBlank()) add(entry.weather) }.joinToString("  "), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 14.dp))
             Row(Modifier.fillMaxWidth().padding(top = 24.dp), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                OutlinedButton(onClick = { showReflection = true }, modifier = Modifier.weight(1f)) { Text("Go deeper") }
+                OutlinedButton(onClick = { showReflection = true }, modifier = Modifier.weight(1f)) { Text("Reflect") }
                 OutlinedButton(onClick = {
                     val text = buildString { if (entry.title.isNotBlank()) appendLine(entry.title); appendLine(entry.body); if (entry.gratitude.isNotBlank()) appendLine("Grateful for: ${entry.gratitude}"); entry.verseRef?.let { appendLine(it) } }
                     context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text) }, "Share this entry"))
@@ -672,7 +717,7 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
     if (showReflection) AlertDialog(
         onDismissRequest = { showReflection = false },
         title = { Text("Reflect deeper", fontFamily = BookSerif) },
-        text = { Column { Text("ON-DEVICE REFLECTION", color = Gold, fontSize = 9.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold); Text(reflection.suggestedTitle, fontFamily = BookSerif, fontSize = 20.sp, modifier = Modifier.padding(top = 7.dp)); Text(reflection.highlight, color = Muted, fontSize = 12.5.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 8.dp)); reflection.questions.forEach { Text("•  $it", fontSize = 13.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 10.dp)) }; Text("Generated only from this entry on your device—not divine guidance.", color = Muted, fontSize = 9.5.sp, modifier = Modifier.padding(top = 14.dp)) } },
+        text = { Column { Text("PRIVATE REFLECTION", color = Gold, fontSize = 9.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold); Text(reflection.suggestedTitle, fontFamily = BookSerif, fontSize = 20.sp, modifier = Modifier.padding(top = 7.dp)); Text(reflection.highlight, color = Muted, fontSize = 12.5.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 8.dp)); reflection.questions.forEach { Text("•  $it", fontSize = 13.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 10.dp)) }; Text("This reflection uses only words from this entry.", color = Muted, fontSize = 9.5.sp, modifier = Modifier.padding(top = 14.dp)) } },
         confirmButton = { TextButton(onClick = { showReflection = false }) { Text("Done") } },
     )
 }
@@ -729,6 +774,11 @@ private fun JournalMark() {
 
 @Composable
 private fun EntryCard(entry: JournalEntry, conceal: Boolean = false, onAnswer: () -> Unit, onClick: () -> Unit) {
+    val context = LocalContext.current
+    val prayerStore = remember { MannaStore(context.applicationContext) }
+    var prayedCount by remember(entry.id) {
+        mutableIntStateOf(prayerStore.prayerSessions(500).count { it.challenge == "Prayer ledger" && it.focus == entry.body })
+    }
     val answered = entry.answeredAt != null
     Surface(
         onClick = onClick,
@@ -742,7 +792,7 @@ private fun EntryCard(entry: JournalEntry, conceal: Boolean = false, onAnswer: (
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(7.dp).background(if (answered) Gold else Color(0xFF8A7350), CircleShape))
                 Spacer(Modifier.width(9.dp))
-                Text(MOODS.firstOrNull { it.first == entry.mood }?.second ?: "Reflection", color = Muted, fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, letterSpacing = .4.sp)
+                Text(moodLabel(entry.mood), color = Muted, fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, letterSpacing = .4.sp)
                 // where this page came from, so a moment traces back to itself
                 originGlyph(entry.source)?.let { glyph ->
                     Spacer(Modifier.width(7.dp))
@@ -801,6 +851,14 @@ private fun EntryCard(entry: JournalEntry, conceal: Boolean = false, onAnswer: (
                         Text("Review prayer", color = Electric, fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
+                Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.End) {
+                    TextButton(onClick = {
+                        prayerStore.logPrayerSession("Prayer ledger", entry.body, 0, 1)
+                        prayedCount++
+                    }) {
+                        Text(if (prayedCount == 0) "Prayed" else "Prayed · $prayedCount", color = Electric, fontWeight = FontWeight.SemiBold)
+                    }
+                }
                 if (entry.nextAction.isNotBlank()) {
                     Text("Next: ${entry.nextAction}", color = InkSoft, fontSize = 11.5.sp, lineHeight = 17.sp, modifier = Modifier.padding(top = 8.dp))
                 }
@@ -841,13 +899,13 @@ private fun EntryComposer(
             Column {
                 Text("How is your heart?", color = Muted, fontSize = 12.sp)
                 Row(Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    MOODS.forEach { (emoji, _) ->
+                    MOODS.forEach { option ->
                         Box(
                             Modifier.size(38.dp).clip(CircleShape)
-                                .background(if (mood == emoji) Color(0xFFE7EDFF) else Color.Transparent)
-                                .clickable { mood = emoji },
+                                .background(if (mood == option.key) MaterialTheme.colorScheme.primary.copy(alpha = .10f) else Color.Transparent)
+                                .clickable { mood = option.key },
                             contentAlignment = Alignment.Center,
-                        ) { Text(emoji, fontSize = 19.sp) }
+                        ) { Icon(option.icon, option.label, tint = if (mood == option.key) MaterialTheme.colorScheme.primary else Muted, modifier = Modifier.size(20.dp)) }
                     }
                 }
                 OutlinedTextField(
@@ -892,6 +950,7 @@ private fun EntryComposer(
 /** Everything God answered, whichever screen it was asked on. */
 @Composable
 private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, onEdit: (JournalEntry) -> Unit) {
+    val context = LocalContext.current
     if (entries.isEmpty() && words.isEmpty()) {
         Column(Modifier.fillMaxWidth().padding(top = 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Nothing marked answered yet", fontWeight = FontWeight.SemiBold)
@@ -903,7 +962,13 @@ private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, on
         contentPadding = PaddingValues(top = 14.dp, bottom = 130.dp),
     ) {
         items(entries, key = { "entry-${it.id}" }) { entry ->
-            EntryCard(entry, onAnswer = {}) { onEdit(entry) }
+            Column {
+                EntryCard(entry, onAnswer = {}) { onEdit(entry) }
+                TextButton(
+                    onClick = { AnsweredPrayerCardRenderer.share(context, entry.body, entry.testimony.orEmpty(), entry.answeredAt ?: entry.updatedAt) },
+                    modifier = Modifier.align(Alignment.End),
+                ) { Text("Share answer") }
+            }
         }
         items(words, key = { "word-${it.id}" }) { word ->
             Surface(shape = RoundedCornerShape(22.dp), color = Color(0xFFF1F8F3), border = BorderStroke(1.dp, Hairline)) {
@@ -911,6 +976,10 @@ private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, on
                     Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
                     Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
                     word.testimony?.let { Text("“$it”", color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
+                    TextButton(
+                        onClick = { AnsweredPrayerCardRenderer.share(context, word.verse, word.testimony.orEmpty(), word.answeredAt ?: word.savedAt) },
+                        modifier = Modifier.align(Alignment.End),
+                    ) { Text("Share answer") }
                 }
             }
         }

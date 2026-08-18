@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -68,6 +69,9 @@ import com.prayerkey.manna.ui.theme.InkSoft
 import com.prayerkey.manna.ui.theme.Muted
 import com.prayerkey.manna.ui.theme.NightFill
 import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.theme.Pk
+import com.prayerkey.manna.ui.theme.DisplaySerif
+import com.prayerkey.manna.ui.theme.UtilitySans
 
 private val Ivory = Color(0xFFF6F0E1)
 
@@ -96,21 +100,21 @@ private fun heavy(vararg parts: Pair<String, Boolean>): AnnotatedString = buildA
 @Composable
 fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: (Int) -> Unit) {
     val stories = listOf(
-        Triple(com.prayerkey.manna.R.drawable.onboarding_read_v2, "Read the Bible", "Read any book, chapter, or verse."),
-        Triple(com.prayerkey.manna.R.drawable.onboarding_audio_v2, "Listen to the Bible", "Hear Scripture wherever you are."),
-        Triple(com.prayerkey.manna.R.drawable.onboarding_pray_v2, "Pray Every Day", "Use daily prayers and powerful prayer points."),
-        Triple(com.prayerkey.manna.R.drawable.onboarding_church, "Record Church Messages", "See sermons turn into clear notes as they are preached."),
-        Triple(com.prayerkey.manna.R.drawable.onboarding_journal, "Keep Your Journal", "Save prayers, thoughts, sermon notes, and answered prayers."),
+        Triple(com.prayerkey.manna.R.drawable.onboarding_read_v3, "Read the Bible", "Read any book, chapter, or verse."),
+        Triple(com.prayerkey.manna.R.drawable.onboarding_audio_v3, "Listen to the Bible", "Hear Scripture wherever you are."),
+        Triple(com.prayerkey.manna.R.drawable.onboarding_pray_v3, "Pray Every Day", "Use daily prayers and powerful prayer points."),
+        Triple(com.prayerkey.manna.R.drawable.onboarding_church_v3, "Record Church Messages", "See sermons turn into clear notes as they are preached."),
+        Triple(com.prayerkey.manna.R.drawable.onboarding_journal_v3, "Keep Your Journal", "Save prayers, thoughts, sermon notes, and answered prayers."),
     )
 
     Column(
-        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+        Modifier.fillMaxSize().background(NightFill)
             .padding(horizontal = 28.dp),
     ) {
         Spacer(Modifier.height(18.dp))
         Text(
             "PRAYERKEY",
-            color = MaterialTheme.colorScheme.primary,
+            color = Pk.GoldLight,
             fontFamily = BookSerif,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -134,26 +138,53 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
         label = "onboarding-promise",
     ) { page ->
             val (world, title, message) = stories[page]
-            Column(Modifier.fillMaxSize()) {
-                Box(Modifier.fillMaxWidth().weight(1f)) {
+            Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+                Box(Modifier.fillMaxWidth().aspectRatio(1f)) {
                     EditorialOnboardingImage(world)
+                    Box(
+                        Modifier.fillMaxSize().background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    Pk.Oxblood.copy(alpha = .14f),
+                                    Pk.Oxblood.copy(alpha = .28f),
+                                    Pk.DeepDark.copy(alpha = .94f),
+                                ),
+                            ),
+                        ),
+                    )
+                    Column(Modifier.align(Alignment.BottomStart).padding(24.dp)) {
+                        Text(
+                            title,
+                            color = Color.White,
+                            fontFamily = DisplaySerif,
+                            fontSize = 30.sp,
+                            lineHeight = 34.sp,
+                            letterSpacing = (-.5).sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            message,
+                            color = Color.White.copy(alpha = .78f),
+                            fontFamily = UtilitySans,
+                            fontSize = 14.sp,
+                            lineHeight = 20.sp,
+                            modifier = Modifier.padding(top = 7.dp),
+                        )
+                    }
                 }
-                Text(
-                    title,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 29.sp,
-                    lineHeight = 35.sp,
-                    letterSpacing = (-.7).sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 22.dp),
-                )
-                Text(
-                    message,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = .72f),
-                    fontSize = 16.sp,
-                    lineHeight = 23.sp,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 20.dp),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    stories.indices.forEach { index ->
+                        Box(
+                            Modifier.padding(horizontal = 4.dp)
+                                .size(if (index == page) 9.dp else 7.dp)
+                                .clip(CircleShape)
+                                .background(if (index == page) Pk.GoldLight else Color.White.copy(alpha = .28f)),
+                        )
+                    }
+                }
             }
         }
 
@@ -162,11 +193,11 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
             Box(
                 Modifier.fillMaxWidth().height(56.dp)
                     .shadow(6.dp, R.pill, spotColor = Color.Black.copy(alpha = .16f))
-                    .clip(R.pill).background(MaterialTheme.colorScheme.primary)
+                    .clip(R.pill).background(Color.White)
                     .clickable(onClick = onDone),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("Start PrayerKey", color = MaterialTheme.colorScheme.onPrimary, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text("Start PrayerKey", color = Pk.Oxblood, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         }
         if (step != stories.lastIndex) Spacer(Modifier.height(56.dp))
@@ -184,9 +215,9 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
 private fun EditorialOnboardingImage(imageRes: Int) {
     Box(
         modifier = Modifier.fillMaxSize()
-            .shadow(10.dp, RoundedCornerShape(28.dp), spotColor = Color.Black.copy(alpha = .18f))
-            .clip(RoundedCornerShape(28.dp))
-            .border(1.dp, MaterialTheme.colorScheme.onBackground.copy(alpha = .08f), RoundedCornerShape(28.dp)),
+            .shadow(16.dp, R.card, spotColor = Pk.Oxblood.copy(alpha = .24f))
+            .clip(R.card)
+            .border(1.dp, Color.White.copy(alpha = .20f), R.card),
     ) {
         Image(
             painter = painterResource(imageRes),

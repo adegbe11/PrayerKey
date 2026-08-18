@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.sp
    pure #FFFFFF canvas, #1D1D1F ink, #86868B secondary, #F5F5F7 fills. */
 val Ink = Color(0xFF1A0A2E)
 val Muted = Color(0xBD1A0A2E)
-val Canvas = Color(0xFFF5F5F7)
-val AppleGray = Color(0xFFF5F5F7)
+val Canvas = Color(0xFFF6F5F9)
+val AppleGray = Color(0xFFF6F5F9)
 val Ivory = Color(0xFFFFFFFF)
 val Night = Color(0xFF1A0A2E)
 val Gold = Color(0xFFC9A26D)
@@ -114,7 +114,7 @@ fun MannaTheme(
         tertiary = Pk.Gold, onTertiary = Pk.Charcoal,
         tertiaryContainer = Pk.Gold.copy(alpha = .14f), onTertiaryContainer = Pk.Charcoal,
         background = Pk.Cream, onBackground = Pk.Charcoal,
-        surface = Pk.Cream, onSurface = Pk.Charcoal,
+        surface = Pk.Sunken, onSurface = Pk.Charcoal,
         surfaceVariant = Pk.Sunken, onSurfaceVariant = Pk.Muted,
         inverseSurface = Pk.DeepDark, inverseOnSurface = Pk.Crisp,
         inversePrimary = Pk.Blush,

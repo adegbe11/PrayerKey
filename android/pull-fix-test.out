@@ -1,0 +1,72 @@
+Starting a Gradle Daemon, 1 busy and 5 stopped Daemons could not be reused, use --status for details
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:compileDebugUnitTestKotlin
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes UP-TO-DATE
+
+> Task :app:testDebugUnitTest
+
+DevotionalsTest > the year parses and is numbered without gaps FAILED
+    org.json.JSONException at DevotionalsTest.kt:27
+
+DevotionalsTest > no reading range runs off the end of its chapter FAILED
+    org.json.JSONException at DevotionalsTest.kt:27
+
+DevotionalsTest > every day is actually written FAILED
+    org.json.JSONException at DevotionalsTest.kt:27
+
+DevotionalsTest > no devotional repeats another FAILED
+    org.json.JSONException at DevotionalsTest.kt:27
+
+DevotionalsTest > every scripture reference exists in the bible we ship FAILED
+    org.json.JSONException at DevotionalsTest.kt:27
+
+TodayPlanTest > the reading is the devotional's own passage FAILED
+    org.json.JSONException at TodayPlanTest.kt:26
+
+TodayPlanTest > every written day names a category the library actually has FAILED
+    org.json.JSONException at TodayPlanTest.kt:26
+
+TodayPlanTest > the same day gives everyone the same prayer FAILED
+    org.json.JSONException at TodayPlanTest.kt:26
+
+TodayPlanTest > no topics yields no prayer rather than a crash FAILED
+    org.json.JSONException at TodayPlanTest.kt:26
+
+TodayPlanTest > the day's prayer matches what the day is about FAILED
+    org.json.JSONException at TodayPlanTest.kt:26
+
+> Task :app:testDebugUnitTest FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/Collins%20Asein/prayerkeydesk/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+24 actionable tasks: 4 executed, 20 up-to-date

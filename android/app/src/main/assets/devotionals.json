@@ -1,11 +1,751 @@
 {
-  "version": 1,
+  "version": 2,
   "note": "Scripture is never stored here. Every reference is resolved against the KJV asset at read time, so a devotional cannot quote a verse that does not exist.",
-  "series": [
+  "keys": [
     {
-      "name": "THE WAITING SEASON",
-      "days": [
+      "month": 1,
+      "days": 31,
+      "name": "The Key of Beginnings",
+      "theme": "Setting holy habits",
+      "written": []
+    },
+    {
+      "month": 2,
+      "days": 29,
+      "name": "The Key of Love",
+      "theme": "Healing relationships and self-worth",
+      "written": []
+    },
+    {
+      "month": 3,
+      "days": 31,
+      "name": "The Key of Stillness",
+      "theme": "Overcoming anxiety and noise",
+      "written": [
         {
+          "day": 1,
+          "title": "The Weight Was Never The Problem",
+          "minutes": 4,
+          "read": {
+            "book": "Matthew",
+            "chapter": 11,
+            "verse": 28,
+            "from": 28,
+            "to": 30
+          },
+          "body": [
+            {
+              "p": "There is a way of carrying something heavy badly, and anyone who has ever moved a wardrobe knows it. The weight is not what breaks your back. The angle is."
+            },
+            {
+              "q": {
+                "book": "Matthew",
+                "chapter": 11,
+                "verse": 28
+              }
+            },
+            {
+              "p": "The invitation is to people who labour and are heavy laden, which is a specific description. Not people in crisis. People carrying something ordinary for a long time."
+            },
+            {
+              "p": "And what he offers is not the removal of the load. He offers a yoke, which is a piece of farm equipment for pulling. He is proposing that you keep working."
+            },
+            {
+              "p": "But a yoke is built for two animals, and the whole craft of making one is distributing weight so the beam sits where the shoulders can take it. A badly made yoke will destroy an ox carrying a light load. A well made one lets it pull all day."
+            },
+            {
+              "p": "He says his is easy, and the word means well fitted. Not light. Fitted."
+            }
+          ],
+          "line": {
+            "a": "He did not offer to take the load.",
+            "b": "He offered to take the other side."
+          },
+          "after": [
+            "Most of what exhausts us is not the size of the thing. It is carrying it at an angle we were never built for, alone, at a pace nobody set for us.",
+            "The offer is a better harness and company in it."
+          ],
+          "prayer": "Jesus, I have been pulling this at the wrong angle for a long time and calling the exhaustion faithfulness. Take the other side of it. Set the pace, and let me learn how you carry things.",
+          "addLabel": "Add what you're pulling",
+          "question": "Are you carrying something heavy, or carrying it badly?",
+          "prayerCategory": "Mental Health"
+        },
+        {
+          "day": 2,
+          "title": "Because He Careth",
+          "minutes": 3,
+          "read": {
+            "book": "1 Peter",
+            "chapter": 5,
+            "verse": 7,
+            "from": 5,
+            "to": 7
+          },
+          "body": [
+            {
+              "p": "This verse gets quoted so often that the second half has gone soft, and the second half is the argument."
+            },
+            {
+              "q": {
+                "book": "1 Peter",
+                "chapter": 5,
+                "verse": 7
+              }
+            },
+            {
+              "p": "Cast all your care upon him — that is the instruction. For he careth for you — that is the reason, and without it the instruction is just advice."
+            },
+            {
+              "p": "Peter does not say cast your care on God because worry is unproductive, which is true and useless. He does not say cast it because God is powerful, which would make God capable but not necessarily interested."
+            },
+            {
+              "p": "He says do it because God cares about you. The transfer works because there is somebody on the other end who wants it."
+            },
+            {
+              "p": "Notice too what precedes it: humble yourselves. Peter puts casting your care in the same breath as humility, which suggests he thinks carrying everything yourself is a form of pride. That is an uncomfortable idea and I think he meant it to be."
+            }
+          ],
+          "line": {
+            "a": "Not because worry is useless.",
+            "b": "Because he cares."
+          },
+          "after": [
+            "Handing something over requires believing the person taking it wants it. Most of us fail at the second part, not the first.",
+            "He is not tolerating your concerns. He is interested in them."
+          ],
+          "prayer": "Father, I have been holding this because somewhere underneath I am not sure you want it. Convince me otherwise. You care for me — not the tidy version of me, this one — and I am handing it across.",
+          "addLabel": "Add what you're holding back",
+          "question": "What do you not quite believe God is interested in?",
+          "prayerCategory": "Mental Health"
+        },
+        {
+          "day": 3,
+          "title": "Thou Wilt Surely Wear Away",
+          "minutes": 4,
+          "read": {
+            "book": "Exodus",
+            "chapter": 18,
+            "verse": 18,
+            "from": 13,
+            "to": 24
+          },
+          "body": [
+            {
+              "p": "Moses is judging Israel. He sits from morning to evening and the people stand in front of him all day, and he does this because he is the one God speaks to and there is genuinely nobody else qualified."
+            },
+            {
+              "p": "His father-in-law watches for one day and tells him to stop."
+            },
+            {
+              "q": {
+                "book": "Exodus",
+                "chapter": 18,
+                "verse": 18
+              }
+            },
+            {
+              "p": "Thou wilt surely wear away. It is a phrase for cloth, or stone — something that does not break suddenly but thins until it is gone. Jethro is not describing a crisis. He is describing erosion."
+            },
+            {
+              "p": "And notice what he says will wear away: both thou, and this people that is with thee. Moses doing everything was not only costing Moses. It was costing everyone standing in that queue all day."
+            },
+            {
+              "p": "The solution is unremarkable. Find capable people. Give them the smaller matters. Keep the hard ones. Moses, who spoke with God face to face, took organisational advice from his wife's father and implemented it the same week."
+            }
+          ],
+          "line": {
+            "a": "It was not a crisis.",
+            "b": "It was erosion."
+          },
+          "after": [
+            "Being the only one who can do it is sometimes true and almost never sustainable, and the people waiting are paying for it too.",
+            "The fix was delegation. God did not send a miracle for something a reorganisation could solve."
+          ],
+          "prayer": "Lord, show me what I am doing that somebody else could do, and where my refusing to share it is costing more than my doing it is worth. Give me the humility to take ordinary advice.",
+          "addLabel": "Add what you need to hand off",
+          "question": "What are you doing alone that is wearing you thin?",
+          "prayerCategory": "Work"
+        },
+        {
+          "day": 4,
+          "title": "Arise And Eat",
+          "minutes": 4,
+          "read": {
+            "book": "1 Kings",
+            "chapter": 19,
+            "verse": 7,
+            "from": 3,
+            "to": 8
+          },
+          "body": [
+            {
+              "p": "Elijah has just called down fire in front of the whole nation, and days later he is sitting under a tree in the desert asking God to let him die. Both of those are in the same week."
+            },
+            {
+              "p": "What God does about it is the part I keep returning to. There is no rebuke. There is no reminder of the fire. An angel touches him and tells him to eat, and he eats and sleeps, and then the angel comes back and does it again."
+            },
+            {
+              "q": {
+                "book": "1 Kings",
+                "chapter": 19,
+                "verse": 7
+              }
+            },
+            {
+              "p": "The journey is too great for thee. It is not a correction, it is an observation, and it is on Elijah's side. God agrees with him that this is too much."
+            },
+            {
+              "p": "Then food, and sleep, twice, before a single word of theology. The conversation about what Elijah is doing there happens later, on the mountain, after he has eaten and rested."
+            },
+            {
+              "p": "God treated the exhaustion as exhaustion. He did not treat it as a spiritual failure that needed correcting first."
+            }
+          ],
+          "line": {
+            "a": "Food first.",
+            "b": "Then the mountain."
+          },
+          "after": [
+            "Some of what you are calling a crisis of faith is a shortage of sleep and food, and it is not less holy to fix it that way.",
+            "The angel came twice. Once was not enough and God knew it would not be."
+          ],
+          "prayer": "God, you know the difference between a soul in trouble and a body that has not rested. Feed me and let me sleep. Meet me at the level I am actually at, and let the mountain wait until I can climb it.",
+          "addLabel": "Add what's depleted you",
+          "question": "What have you been treating as a spiritual problem?",
+          "prayerCategory": "Health"
+        },
+        {
+          "day": 5,
+          "title": "Rest A While",
+          "minutes": 3,
+          "read": {
+            "book": "Mark",
+            "chapter": 6,
+            "verse": 31,
+            "from": 30,
+            "to": 32
+          },
+          "body": [
+            {
+              "p": "The apostles come back from being sent out and start telling Jesus everything that happened. The reporting is enthusiastic. The ministry has gone well."
+            },
+            {
+              "p": "And Mark adds a detail that dates the scene precisely for anyone who has ever had a job: there were so many coming and going that they had no leisure so much as to eat."
+            },
+            {
+              "q": {
+                "book": "Mark",
+                "chapter": 6,
+                "verse": 31
+              }
+            },
+            {
+              "p": "Come ye yourselves apart. He does not tell them to push through while the momentum is good, which is exactly what a growing work tempts you to do."
+            },
+            {
+              "p": "It is worth noticing when this happens. Not after a failure — after a success. The instinct after a good run is to run again immediately, and he interrupts it."
+            },
+            {
+              "p": "The rest does not go to plan, incidentally. The crowd works out where the boat is going and gets there first. But he still called for it, and calling for it was right even though it was interrupted."
+            }
+          ],
+          "line": {
+            "a": "Not after the failure.",
+            "b": "After the success."
+          },
+          "after": [
+            "The dangerous moment for your rest is not when things collapse. It is when things are going well enough to justify skipping it.",
+            "He said come apart even knowing the crowd would follow."
+          ],
+          "prayer": "Jesus, the work is going well and that is exactly why I have stopped stopping. Call me apart. Let me take the rest even when the momentum argues against it, and let me not resent the interruptions when they come.",
+          "addLabel": "Add what you'd stop for a day",
+          "question": "What success is currently costing you your rest?",
+          "prayerCategory": "Health"
+        },
+        {
+          "day": 6,
+          "title": "He Giveth His Beloved Sleep",
+          "minutes": 3,
+          "read": {
+            "book": "Psalms",
+            "chapter": 127,
+            "verse": 2,
+            "from": 1,
+            "to": 2
+          },
+          "body": [
+            {
+              "p": "This psalm opens by saying that if the Lord does not build the house, the builders work for nothing, and that if he does not keep the city the watchman may as well go home."
+            },
+            {
+              "p": "Then it gets specific about the hours."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 127,
+                "verse": 2
+              }
+            },
+            {
+              "p": "Rising early, sitting up late, eating the bread of sorrows — that last phrase is the one that lands. Food eaten anxiously. Meals taken standing up while worrying."
+            },
+            {
+              "p": "The psalm calls it vain. Not wicked, not lazy in reverse — vain, meaning empty, meaning it does not produce what you are extending yourself to produce."
+            },
+            {
+              "p": "And the alternative offered is not a better technique. It is sleep, given as a gift, to people described as beloved. The rest is evidence of the relationship rather than a reward for finishing."
+            }
+          ],
+          "line": {
+            "a": "The extra hours were empty.",
+            "b": "The sleep was the gift."
+          },
+          "after": [
+            "There is work that must be done and this psalm is not against it. It is against the specific hours you add out of fear that God will not cover the gap.",
+            "You are not the one keeping the city."
+          ],
+          "prayer": "Lord, I keep adding hours at the end of the day to cover a gap I do not trust you with. Let me put it down and sleep. Build the house yourself tonight, because I cannot and never could.",
+          "addLabel": "Add the fear that keeps you up",
+          "question": "Which of your hours are being worked out of fear?",
+          "prayerCategory": "Mental Health"
+        },
+        {
+          "day": 7,
+          "title": "Careful And Troubled",
+          "minutes": 4,
+          "read": {
+            "book": "Luke",
+            "chapter": 10,
+            "verse": 41,
+            "from": 38,
+            "to": 42
+          },
+          "body": [
+            {
+              "p": "Martha is hosting, and she is doing it properly. Jesus has arrived with a group and somebody has to feed them, and that somebody is her while her sister sits down."
+            },
+            {
+              "p": "Her complaint is entirely reasonable and she takes it straight to him. Do you not care. Tell her to help me."
+            },
+            {
+              "q": {
+                "book": "Luke",
+                "chapter": 10,
+                "verse": 41
+              }
+            },
+            {
+              "p": "He says her name twice, which in that culture is a softening, not a scolding. Martha, Martha. And then: careful and troubled about many things."
+            },
+            {
+              "p": "Careful in the older sense — full of care, anxious. He does not say the meal does not matter or that hospitality is unspiritual. He says she is troubled about many things, and one thing is needful."
+            },
+            {
+              "p": "The problem was never the serving. It was that the serving had multiplied into many things until it crowded out the one person she was serving it for, who was sitting in her house, available, for a limited time."
+            }
+          ],
+          "line": {
+            "a": "The work was not wrong.",
+            "b": "It had multiplied."
+          },
+          "after": [
+            "Busyness rarely arrives as one large wrong decision. It arrives as many small right ones that were each individually defensible.",
+            "He was in the house. That was the part that would not be there tomorrow."
+          ],
+          "prayer": "Jesus, I am troubled about many things and most of them are good things, which is why I have not put any of them down. Show me the one that is needful today. Let me sit down in my own house.",
+          "addLabel": "Add the many things",
+          "question": "What good thing has crowded out the needful one?",
+          "prayerCategory": "Daily Prayer"
+        },
+        {
+          "day": 8,
+          "title": "Take No Thought For The Morrow",
+          "minutes": 4,
+          "read": {
+            "book": "Matthew",
+            "chapter": 6,
+            "verse": 34,
+            "from": 25,
+            "to": 34
+          },
+          "body": [
+            {
+              "p": "This is the passage about the birds and the lilies, and it is often read as a gentle nature poem. It is not. It is a hard argument delivered to people who were genuinely poor and had real reason to be afraid of running out."
+            },
+            {
+              "q": {
+                "book": "Matthew",
+                "chapter": 6,
+                "verse": 34
+              }
+            },
+            {
+              "p": "Take no thought for the morrow. The phrase in older English does not mean stop planning — it means stop being anxious about. Jesus is not against sowing and reaping; he uses farming as the illustration."
+            },
+            {
+              "p": "What he ends on is the strange clause: sufficient unto the day is the evil thereof. Today has enough trouble in it already."
+            },
+            {
+              "p": "That is not comfort in the usual sense. He is not saying it will be fine. He is conceding that each day has its own share of difficulty, and pointing out that borrowing tomorrow's on top of today's does not distribute the load, it doubles it."
+            },
+            {
+              "p": "You will get the grace for Thursday on Thursday. Trying to feel it on Tuesday is why Tuesday is unbearable."
+            }
+          ],
+          "line": {
+            "a": "Today has enough in it.",
+            "b": "You cannot spend Thursday's grace on Tuesday."
+          },
+          "after": [
+            "This is the least sentimental verse about anxiety in the Bible. It does not promise an easy week. It rations the difficulty to one day at a time.",
+            "That rationing is the mercy."
+          ],
+          "prayer": "Father, I have been carrying next month today and wondering why today is so heavy. Give me what I need for the hours in front of me, and let tomorrow keep its own trouble until I get there with your help.",
+          "addLabel": "Add tomorrow's worry",
+          "question": "Which day's trouble are you carrying that has not arrived?",
+          "prayerCategory": "Finance"
+        },
+        {
+          "day": 9,
+          "title": "Be Careful For Nothing",
+          "minutes": 3,
+          "read": {
+            "book": "Philippians",
+            "chapter": 4,
+            "verse": 6,
+            "from": 4,
+            "to": 7
+          },
+          "body": [
+            {
+              "p": "Paul writes this from prison, which is worth holding onto while reading it, because the instruction is otherwise easy to resent."
+            },
+            {
+              "q": {
+                "book": "Philippians",
+                "chapter": 4,
+                "verse": 6
+              }
+            },
+            {
+              "p": "Be careful for nothing — again, full of care, anxious. But he does not stop at the prohibition, which would be cruel. He replaces it with a procedure: prayer, supplication, thanksgiving, and let your requests be made known."
+            },
+            {
+              "p": "Made known is a curious phrase given that God knows already. It is not for God's information. It is the act of stating the thing rather than carrying it as an unshaped dread."
+            },
+            {
+              "p": "And thanksgiving sits in the middle of the list, not at the end as a polite sign-off. Something about naming what has already been given changes how the next request comes out."
+            },
+            {
+              "p": "What he promises is not the outcome. It is a peace that passes understanding — which by definition will not make sense given the circumstances, and which he says will guard you, like a garrison."
+            }
+          ],
+          "line": {
+            "a": "He does not promise the outcome.",
+            "b": "He promises the garrison."
+          },
+          "after": [
+            "Anxiety is usually shapeless. The procedure here forces it into words, and words can be handed over in a way that a fog cannot.",
+            "Written by a man in a cell who had every reason to be anxious and had found something else."
+          ],
+          "prayer": "Father, here is the request, stated plainly instead of circled all night. Thank you for what you have already done, which I keep forgetting when I am afraid. Guard my heart with a peace I will not be able to explain.",
+          "addLabel": "Add the request, plainly",
+          "question": "Can you say the worry in one clear sentence?",
+          "prayerCategory": "Mental Health"
+        },
+        {
+          "day": 10,
+          "title": "Bear Ye One Another's Burdens",
+          "minutes": 4,
+          "read": {
+            "book": "Galatians",
+            "chapter": 6,
+            "verse": 2,
+            "from": 1,
+            "to": 5
+          },
+          "body": [
+            {
+              "p": "Three verses apart, Paul appears to contradict himself, and generations of readers have noticed."
+            },
+            {
+              "q": {
+                "book": "Galatians",
+                "chapter": 6,
+                "verse": 2
+              }
+            },
+            {
+              "p": "Then in verse five: every man shall bear his own burden. Which is it."
+            },
+            {
+              "p": "It is two different words. The first is a crushing weight, the kind that is too much for one person by definition. The second is the word for a soldier's pack — the load you are issued and expected to carry."
+            },
+            {
+              "p": "So the instruction is not confused. Your own pack is yours; nobody can walk your road for you. But when something falls on a person that no single person is built to lift, that is when the others come."
+            },
+            {
+              "p": "Most of us get this exactly backwards. We ask for help with the pack, which nobody can carry, and we refuse help with the crushing thing because we have decided it is our own to manage."
+            }
+          ],
+          "line": {
+            "a": "Your pack is yours.",
+            "b": "The crushing thing is not."
+          },
+          "after": [
+            "Knowing which of the two you are holding is most of the wisdom here, and you are usually the worst judge of it.",
+            "Ask someone who has watched you this year."
+          ],
+          "prayer": "Lord, give me the honesty to know which of these I am carrying. Where it is my own pack, strengthen me for it. Where it is a crushing thing, break my pride enough to let somebody help.",
+          "addLabel": "Add what you won't ask help for",
+          "question": "What are you refusing help with because you think it is yours?",
+          "prayerCategory": "Relationships"
+        },
+        {
+          "day": 11,
+          "title": "In The Sixth Hour",
+          "minutes": 3,
+          "read": {
+            "book": "John",
+            "chapter": 4,
+            "verse": 6,
+            "from": 5,
+            "to": 10
+          },
+          "body": [
+            {
+              "p": "John gives an unusual detail before the conversation at the well starts, and it is easy to read past on the way to the theology."
+            },
+            {
+              "q": {
+                "book": "John",
+                "chapter": 4,
+                "verse": 6
+              }
+            },
+            {
+              "p": "Jesus, being wearied with his journey, sat thus on the well. The word is the ordinary one for tired from walking. He sat down because he had been walking since morning in the heat and he needed to."
+            },
+            {
+              "p": "It is about noon. His disciples have gone into town for food. He is on his own, tired, thirsty, with no bucket, which is why the conversation begins with him asking a stranger for a drink."
+            },
+            {
+              "p": "One of the most consequential conversations in the gospels starts because he was too tired to keep walking and had to sit somewhere."
+            },
+            {
+              "p": "I do not think that is incidental. He did not push through to a better location. He stopped where his body said stop, and that turned out to be exactly the place."
+            }
+          ],
+          "line": {
+            "a": "He stopped because he was tired.",
+            "b": "That was the appointment."
+          },
+          "after": [
+            "There is a quiet permission in this. The Son of God sat down in the middle of the day because he had had enough walking.",
+            "The woman arrived at the well he was already sitting on."
+          ],
+          "prayer": "Jesus, you know what it is to be tired in the middle of the day. Let me stop when I need to without treating it as failure, and let me be present to whoever is in front of me when I do.",
+          "addLabel": "Add where you need to sit down",
+          "question": "Where has your body been telling you to stop?",
+          "prayerCategory": "Health"
+        },
+        {
+          "day": 12,
+          "title": "My Grace Is Sufficient",
+          "minutes": 4,
+          "read": {
+            "book": "2 Corinthians",
+            "chapter": 12,
+            "verse": 9,
+            "from": 7,
+            "to": 10
+          },
+          "body": [
+            {
+              "p": "Paul has something he calls a thorn in the flesh and he never tells us what it is, which has frustrated readers for two thousand years and is probably deliberate."
+            },
+            {
+              "p": "He asked three times for it to be taken away. Three is the number you use when you have stopped hoping and started negotiating."
+            },
+            {
+              "q": {
+                "book": "2 Corinthians",
+                "chapter": 12,
+                "verse": 9
+              }
+            },
+            {
+              "p": "The answer is no. It is a kind no, with a reason attached, but the thorn stays and Paul writes this letter with it still in place."
+            },
+            {
+              "p": "Sufficient is not a generous word. It means enough, exactly enough, and nothing spare. He is being told he will have what he needs to keep going and not a measure more."
+            },
+            {
+              "p": "And then the reason: strength made perfect in weakness. Not despite the weakness — through it, in the place where he is not able."
+            }
+          ],
+          "line": {
+            "a": "The thorn stayed.",
+            "b": "The grace was enough."
+          },
+          "after": [
+            "This is the passage people reach for when the answer has been no, and it earns that because Paul did not get what he asked for either.",
+            "Enough is not the same as easy. It is the promise that you will not run out."
+          ],
+          "prayer": "Lord, I have asked more than three times and it is still here. If it is staying, then let your grace be genuinely sufficient — not a phrase I repeat, but something I feel holding me up in the place I am weakest.",
+          "addLabel": "Add what hasn't been taken away",
+          "question": "What have you asked for three times?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 13,
+          "title": "The Cattle On A Thousand Hills",
+          "minutes": 3,
+          "read": {
+            "book": "Psalms",
+            "chapter": 50,
+            "verse": 10,
+            "from": 9,
+            "to": 15
+          },
+          "body": [
+            {
+              "p": "God is speaking in this psalm and he is addressing people who have been bringing sacrifices faithfully and have quietly started to believe he needs them."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 50,
+                "verse": 10
+              }
+            },
+            {
+              "p": "Every beast of the forest is mine, and the cattle upon a thousand hills. If I were hungry, he says a verse later, I would not tell thee."
+            },
+            {
+              "p": "It is close to sarcasm, and it is aimed at a particular kind of religious anxiety — the sense that the whole arrangement depends on your contribution and would collapse without it."
+            },
+            {
+              "p": "And then, having dismantled that, he says something surprising. Call upon me in the day of trouble. Having established that he needs nothing from them, he asks them to ask him for things."
+            },
+            {
+              "p": "The relationship is not a supply chain running towards God. It runs the other way, and always did."
+            }
+          ],
+          "line": {
+            "a": "If he were hungry,",
+            "b": "he would not tell you."
+          },
+          "after": [
+            "A great deal of exhaustion in religious life comes from an unexamined belief that God is depending on you.",
+            "He owns the hills. Call on him in the day of trouble."
+          ],
+          "prayer": "God, I have been serving you as though the whole thing rests on my shoulders, and I am tired in a way that suggests I believed it. You need nothing from me. Let me call on you today instead of carrying you.",
+          "addLabel": "Add what you thought depended on you",
+          "question": "Where have you started believing God needs you?",
+          "prayerCategory": "Ministry"
+        },
+        {
+          "day": 14,
+          "title": "There Remaineth A Rest",
+          "minutes": 4,
+          "read": {
+            "book": "Hebrews",
+            "chapter": 4,
+            "verse": 9,
+            "from": 9,
+            "to": 11
+          },
+          "body": [
+            {
+              "p": "We finish the fortnight where the argument has been going. Hebrews takes the sabbath, which was a day, and says it was always pointing at something larger."
+            },
+            {
+              "q": {
+                "book": "Hebrews",
+                "chapter": 4,
+                "verse": 9
+              }
+            },
+            {
+              "p": "There remaineth therefore a rest to the people of God. Remaineth — it is still outstanding, still owed, not yet fully collected."
+            },
+            {
+              "p": "And then the next verse defines it in a way that is easy to miss: he that is entered into his rest, he also hath ceased from his own works, as God did from his."
+            },
+            {
+              "p": "Ceased from his own works. The rest being described is not primarily a nap. It is the end of trying to establish yourself by output — the specific exhaustion of a person who must keep producing in order to be acceptable."
+            },
+            {
+              "p": "Then verse eleven, which is one of the strangest sentences in the New Testament: let us labour therefore to enter into that rest. Work hard at stopping. He knows how difficult this is."
+            }
+          ],
+          "line": {
+            "a": "Labour therefore",
+            "b": "to enter into that rest."
+          },
+          "after": [
+            "You may have to work at receiving this, which sounds absurd until you have tried to stop justifying your existence for a single afternoon.",
+            "It remains. It has not expired because you have not taken it yet."
+          ],
+          "prayer": "Father, I have been working to be acceptable rather than resting because I already am. Teach me to cease from my own works. Whatever it takes to enter that rest, help me do it, even if the doing feels like more effort at first.",
+          "addLabel": "Add what you're trying to prove",
+          "question": "What are you producing in order to be acceptable?",
+          "prayerCategory": "Spiritual Life"
+        }
+      ]
+    },
+    {
+      "month": 4,
+      "days": 30,
+      "name": "The Key of Renewal",
+      "theme": "Fresh starts and spiritual growth",
+      "written": []
+    },
+    {
+      "month": 5,
+      "days": 31,
+      "name": "The Key of Purpose",
+      "theme": "Discovering your daily calling",
+      "written": []
+    },
+    {
+      "month": 6,
+      "days": 30,
+      "name": "The Key of Strength",
+      "theme": "Finding courage in hard times",
+      "written": []
+    },
+    {
+      "month": 7,
+      "days": 31,
+      "name": "The Key of Devotion",
+      "theme": "Deepening your prayer life",
+      "written": []
+    },
+    {
+      "month": 8,
+      "days": 31,
+      "name": "The Key of Wisdom",
+      "theme": "Making faithful choices",
+      "written": []
+    },
+    {
+      "month": 9,
+      "days": 30,
+      "name": "The Key of Grace",
+      "theme": "Forgiving yourself and others",
+      "written": []
+    },
+    {
+      "month": 10,
+      "days": 31,
+      "name": "The Key of Endurance",
+      "theme": "Staying patient through trials",
+      "written": [
+        {
+          "day": 1,
           "title": "The Room He Painted Yellow",
           "minutes": 4,
           "read": {
@@ -56,6 +796,7 @@
           "prayerCategory": "Family"
         },
         {
+          "day": 2,
           "title": "What Hannah Said On The Way Home",
           "minutes": 4,
           "read": {
@@ -103,6 +844,7 @@
           "prayerCategory": "Family"
         },
         {
+          "day": 3,
           "title": "The Man Who Kept Opening The Window",
           "minutes": 3,
           "read": {
@@ -150,6 +892,7 @@
           "prayerCategory": "Faith"
         },
         {
+          "day": 4,
           "title": "It Will Not Lie",
           "minutes": 3,
           "read": {
@@ -197,6 +940,7 @@
           "prayerCategory": "Faith"
         },
         {
+          "day": 5,
           "title": "Two More Years",
           "minutes": 4,
           "read": {
@@ -244,6 +988,7 @@
           "prayerCategory": "Work"
         },
         {
+          "day": 6,
           "title": "Four Words After Four Hundred Years",
           "minutes": 4,
           "read": {
@@ -291,6 +1036,7 @@
           "prayerCategory": "Deliverance"
         },
         {
+          "day": 7,
           "title": "He Stayed Two Days",
           "minutes": 4,
           "read": {
@@ -338,6 +1084,7 @@
           "prayerCategory": "Grief"
         },
         {
+          "day": 8,
           "title": "Her Hap Was To Light",
           "minutes": 3,
           "read": {
@@ -385,6 +1132,7 @@
           "prayerCategory": "Purpose"
         },
         {
+          "day": 9,
           "title": "How Long",
           "minutes": 3,
           "read": {
@@ -432,6 +1180,7 @@
           "prayerCategory": "Mental Health"
         },
         {
+          "day": 10,
           "title": "They Shall Walk",
           "minutes": 3,
           "read": {
@@ -479,6 +1228,7 @@
           "prayerCategory": "Health"
         },
         {
+          "day": 11,
           "title": "He Wanted A Bigger Moment",
           "minutes": 4,
           "read": {
@@ -526,6 +1276,7 @@
           "prayerCategory": "Faith"
         },
         {
+          "day": 12,
           "title": "In The City, Doing Nothing",
           "minutes": 3,
           "read": {
@@ -573,6 +1324,7 @@
           "prayerCategory": "Purpose"
         },
         {
+          "day": 13,
           "title": "Quietly",
           "minutes": 3,
           "read": {
@@ -620,6 +1372,7 @@
           "prayerCategory": "Spiritual Life"
         },
         {
+          "day": 14,
           "title": "Now Let Thy Servant Depart",
           "minutes": 4,
           "read": {
@@ -669,667 +1422,18 @@
       ]
     },
     {
-      "name": "WHAT YOU CARRY",
-      "days": [
-        {
-          "title": "The Weight Was Never The Problem",
-          "minutes": 4,
-          "read": {
-            "book": "Matthew",
-            "chapter": 11,
-            "verse": 28,
-            "from": 28,
-            "to": 30
-          },
-          "body": [
-            {
-              "p": "There is a way of carrying something heavy badly, and anyone who has ever moved a wardrobe knows it. The weight is not what breaks your back. The angle is."
-            },
-            {
-              "q": {
-                "book": "Matthew",
-                "chapter": 11,
-                "verse": 28
-              }
-            },
-            {
-              "p": "The invitation is to people who labour and are heavy laden, which is a specific description. Not people in crisis. People carrying something ordinary for a long time."
-            },
-            {
-              "p": "And what he offers is not the removal of the load. He offers a yoke, which is a piece of farm equipment for pulling. He is proposing that you keep working."
-            },
-            {
-              "p": "But a yoke is built for two animals, and the whole craft of making one is distributing weight so the beam sits where the shoulders can take it. A badly made yoke will destroy an ox carrying a light load. A well made one lets it pull all day."
-            },
-            {
-              "p": "He says his is easy, and the word means well fitted. Not light. Fitted."
-            }
-          ],
-          "line": {
-            "a": "He did not offer to take the load.",
-            "b": "He offered to take the other side."
-          },
-          "after": [
-            "Most of what exhausts us is not the size of the thing. It is carrying it at an angle we were never built for, alone, at a pace nobody set for us.",
-            "The offer is a better harness and company in it."
-          ],
-          "prayer": "Jesus, I have been pulling this at the wrong angle for a long time and calling the exhaustion faithfulness. Take the other side of it. Set the pace, and let me learn how you carry things.",
-          "addLabel": "Add what you're pulling",
-          "question": "Are you carrying something heavy, or carrying it badly?",
-          "prayerCategory": "Mental Health"
-        },
-        {
-          "title": "Because He Careth",
-          "minutes": 3,
-          "read": {
-            "book": "1 Peter",
-            "chapter": 5,
-            "verse": 7,
-            "from": 5,
-            "to": 7
-          },
-          "body": [
-            {
-              "p": "This verse gets quoted so often that the second half has gone soft, and the second half is the argument."
-            },
-            {
-              "q": {
-                "book": "1 Peter",
-                "chapter": 5,
-                "verse": 7
-              }
-            },
-            {
-              "p": "Cast all your care upon him — that is the instruction. For he careth for you — that is the reason, and without it the instruction is just advice."
-            },
-            {
-              "p": "Peter does not say cast your care on God because worry is unproductive, which is true and useless. He does not say cast it because God is powerful, which would make God capable but not necessarily interested."
-            },
-            {
-              "p": "He says do it because God cares about you. The transfer works because there is somebody on the other end who wants it."
-            },
-            {
-              "p": "Notice too what precedes it: humble yourselves. Peter puts casting your care in the same breath as humility, which suggests he thinks carrying everything yourself is a form of pride. That is an uncomfortable idea and I think he meant it to be."
-            }
-          ],
-          "line": {
-            "a": "Not because worry is useless.",
-            "b": "Because he cares."
-          },
-          "after": [
-            "Handing something over requires believing the person taking it wants it. Most of us fail at the second part, not the first.",
-            "He is not tolerating your concerns. He is interested in them."
-          ],
-          "prayer": "Father, I have been holding this because somewhere underneath I am not sure you want it. Convince me otherwise. You care for me — not the tidy version of me, this one — and I am handing it across.",
-          "addLabel": "Add what you're holding back",
-          "question": "What do you not quite believe God is interested in?",
-          "prayerCategory": "Mental Health"
-        },
-        {
-          "title": "Thou Wilt Surely Wear Away",
-          "minutes": 4,
-          "read": {
-            "book": "Exodus",
-            "chapter": 18,
-            "verse": 18,
-            "from": 13,
-            "to": 24
-          },
-          "body": [
-            {
-              "p": "Moses is judging Israel. He sits from morning to evening and the people stand in front of him all day, and he does this because he is the one God speaks to and there is genuinely nobody else qualified."
-            },
-            {
-              "p": "His father-in-law watches for one day and tells him to stop."
-            },
-            {
-              "q": {
-                "book": "Exodus",
-                "chapter": 18,
-                "verse": 18
-              }
-            },
-            {
-              "p": "Thou wilt surely wear away. It is a phrase for cloth, or stone — something that does not break suddenly but thins until it is gone. Jethro is not describing a crisis. He is describing erosion."
-            },
-            {
-              "p": "And notice what he says will wear away: both thou, and this people that is with thee. Moses doing everything was not only costing Moses. It was costing everyone standing in that queue all day."
-            },
-            {
-              "p": "The solution is unremarkable. Find capable people. Give them the smaller matters. Keep the hard ones. Moses, who spoke with God face to face, took organisational advice from his wife's father and implemented it the same week."
-            }
-          ],
-          "line": {
-            "a": "It was not a crisis.",
-            "b": "It was erosion."
-          },
-          "after": [
-            "Being the only one who can do it is sometimes true and almost never sustainable, and the people waiting are paying for it too.",
-            "The fix was delegation. God did not send a miracle for something a reorganisation could solve."
-          ],
-          "prayer": "Lord, show me what I am doing that somebody else could do, and where my refusing to share it is costing more than my doing it is worth. Give me the humility to take ordinary advice.",
-          "addLabel": "Add what you need to hand off",
-          "question": "What are you doing alone that is wearing you thin?",
-          "prayerCategory": "Work"
-        },
-        {
-          "title": "Arise And Eat",
-          "minutes": 4,
-          "read": {
-            "book": "1 Kings",
-            "chapter": 19,
-            "verse": 7,
-            "from": 3,
-            "to": 8
-          },
-          "body": [
-            {
-              "p": "Elijah has just called down fire in front of the whole nation, and days later he is sitting under a tree in the desert asking God to let him die. Both of those are in the same week."
-            },
-            {
-              "p": "What God does about it is the part I keep returning to. There is no rebuke. There is no reminder of the fire. An angel touches him and tells him to eat, and he eats and sleeps, and then the angel comes back and does it again."
-            },
-            {
-              "q": {
-                "book": "1 Kings",
-                "chapter": 19,
-                "verse": 7
-              }
-            },
-            {
-              "p": "The journey is too great for thee. It is not a correction, it is an observation, and it is on Elijah's side. God agrees with him that this is too much."
-            },
-            {
-              "p": "Then food, and sleep, twice, before a single word of theology. The conversation about what Elijah is doing there happens later, on the mountain, after he has eaten and rested."
-            },
-            {
-              "p": "God treated the exhaustion as exhaustion. He did not treat it as a spiritual failure that needed correcting first."
-            }
-          ],
-          "line": {
-            "a": "Food first.",
-            "b": "Then the mountain."
-          },
-          "after": [
-            "Some of what you are calling a crisis of faith is a shortage of sleep and food, and it is not less holy to fix it that way.",
-            "The angel came twice. Once was not enough and God knew it would not be."
-          ],
-          "prayer": "God, you know the difference between a soul in trouble and a body that has not rested. Feed me and let me sleep. Meet me at the level I am actually at, and let the mountain wait until I can climb it.",
-          "addLabel": "Add what's depleted you",
-          "question": "What have you been treating as a spiritual problem?",
-          "prayerCategory": "Health"
-        },
-        {
-          "title": "Rest A While",
-          "minutes": 3,
-          "read": {
-            "book": "Mark",
-            "chapter": 6,
-            "verse": 31,
-            "from": 30,
-            "to": 32
-          },
-          "body": [
-            {
-              "p": "The apostles come back from being sent out and start telling Jesus everything that happened. The reporting is enthusiastic. The ministry has gone well."
-            },
-            {
-              "p": "And Mark adds a detail that dates the scene precisely for anyone who has ever had a job: there were so many coming and going that they had no leisure so much as to eat."
-            },
-            {
-              "q": {
-                "book": "Mark",
-                "chapter": 6,
-                "verse": 31
-              }
-            },
-            {
-              "p": "Come ye yourselves apart. He does not tell them to push through while the momentum is good, which is exactly what a growing work tempts you to do."
-            },
-            {
-              "p": "It is worth noticing when this happens. Not after a failure — after a success. The instinct after a good run is to run again immediately, and he interrupts it."
-            },
-            {
-              "p": "The rest does not go to plan, incidentally. The crowd works out where the boat is going and gets there first. But he still called for it, and calling for it was right even though it was interrupted."
-            }
-          ],
-          "line": {
-            "a": "Not after the failure.",
-            "b": "After the success."
-          },
-          "after": [
-            "The dangerous moment for your rest is not when things collapse. It is when things are going well enough to justify skipping it.",
-            "He said come apart even knowing the crowd would follow."
-          ],
-          "prayer": "Jesus, the work is going well and that is exactly why I have stopped stopping. Call me apart. Let me take the rest even when the momentum argues against it, and let me not resent the interruptions when they come.",
-          "addLabel": "Add what you'd stop for a day",
-          "question": "What success is currently costing you your rest?",
-          "prayerCategory": "Health"
-        },
-        {
-          "title": "He Giveth His Beloved Sleep",
-          "minutes": 3,
-          "read": {
-            "book": "Psalms",
-            "chapter": 127,
-            "verse": 2,
-            "from": 1,
-            "to": 2
-          },
-          "body": [
-            {
-              "p": "This psalm opens by saying that if the Lord does not build the house, the builders work for nothing, and that if he does not keep the city the watchman may as well go home."
-            },
-            {
-              "p": "Then it gets specific about the hours."
-            },
-            {
-              "q": {
-                "book": "Psalms",
-                "chapter": 127,
-                "verse": 2
-              }
-            },
-            {
-              "p": "Rising early, sitting up late, eating the bread of sorrows — that last phrase is the one that lands. Food eaten anxiously. Meals taken standing up while worrying."
-            },
-            {
-              "p": "The psalm calls it vain. Not wicked, not lazy in reverse — vain, meaning empty, meaning it does not produce what you are extending yourself to produce."
-            },
-            {
-              "p": "And the alternative offered is not a better technique. It is sleep, given as a gift, to people described as beloved. The rest is evidence of the relationship rather than a reward for finishing."
-            }
-          ],
-          "line": {
-            "a": "The extra hours were empty.",
-            "b": "The sleep was the gift."
-          },
-          "after": [
-            "There is work that must be done and this psalm is not against it. It is against the specific hours you add out of fear that God will not cover the gap.",
-            "You are not the one keeping the city."
-          ],
-          "prayer": "Lord, I keep adding hours at the end of the day to cover a gap I do not trust you with. Let me put it down and sleep. Build the house yourself tonight, because I cannot and never could.",
-          "addLabel": "Add the fear that keeps you up",
-          "question": "Which of your hours are being worked out of fear?",
-          "prayerCategory": "Mental Health"
-        },
-        {
-          "title": "Careful And Troubled",
-          "minutes": 4,
-          "read": {
-            "book": "Luke",
-            "chapter": 10,
-            "verse": 41,
-            "from": 38,
-            "to": 42
-          },
-          "body": [
-            {
-              "p": "Martha is hosting, and she is doing it properly. Jesus has arrived with a group and somebody has to feed them, and that somebody is her while her sister sits down."
-            },
-            {
-              "p": "Her complaint is entirely reasonable and she takes it straight to him. Do you not care. Tell her to help me."
-            },
-            {
-              "q": {
-                "book": "Luke",
-                "chapter": 10,
-                "verse": 41
-              }
-            },
-            {
-              "p": "He says her name twice, which in that culture is a softening, not a scolding. Martha, Martha. And then: careful and troubled about many things."
-            },
-            {
-              "p": "Careful in the older sense — full of care, anxious. He does not say the meal does not matter or that hospitality is unspiritual. He says she is troubled about many things, and one thing is needful."
-            },
-            {
-              "p": "The problem was never the serving. It was that the serving had multiplied into many things until it crowded out the one person she was serving it for, who was sitting in her house, available, for a limited time."
-            }
-          ],
-          "line": {
-            "a": "The work was not wrong.",
-            "b": "It had multiplied."
-          },
-          "after": [
-            "Busyness rarely arrives as one large wrong decision. It arrives as many small right ones that were each individually defensible.",
-            "He was in the house. That was the part that would not be there tomorrow."
-          ],
-          "prayer": "Jesus, I am troubled about many things and most of them are good things, which is why I have not put any of them down. Show me the one that is needful today. Let me sit down in my own house.",
-          "addLabel": "Add the many things",
-          "question": "What good thing has crowded out the needful one?",
-          "prayerCategory": "Daily Prayer"
-        },
-        {
-          "title": "Take No Thought For The Morrow",
-          "minutes": 4,
-          "read": {
-            "book": "Matthew",
-            "chapter": 6,
-            "verse": 34,
-            "from": 25,
-            "to": 34
-          },
-          "body": [
-            {
-              "p": "This is the passage about the birds and the lilies, and it is often read as a gentle nature poem. It is not. It is a hard argument delivered to people who were genuinely poor and had real reason to be afraid of running out."
-            },
-            {
-              "q": {
-                "book": "Matthew",
-                "chapter": 6,
-                "verse": 34
-              }
-            },
-            {
-              "p": "Take no thought for the morrow. The phrase in older English does not mean stop planning — it means stop being anxious about. Jesus is not against sowing and reaping; he uses farming as the illustration."
-            },
-            {
-              "p": "What he ends on is the strange clause: sufficient unto the day is the evil thereof. Today has enough trouble in it already."
-            },
-            {
-              "p": "That is not comfort in the usual sense. He is not saying it will be fine. He is conceding that each day has its own share of difficulty, and pointing out that borrowing tomorrow's on top of today's does not distribute the load, it doubles it."
-            },
-            {
-              "p": "You will get the grace for Thursday on Thursday. Trying to feel it on Tuesday is why Tuesday is unbearable."
-            }
-          ],
-          "line": {
-            "a": "Today has enough in it.",
-            "b": "You cannot spend Thursday's grace on Tuesday."
-          },
-          "after": [
-            "This is the least sentimental verse about anxiety in the Bible. It does not promise an easy week. It rations the difficulty to one day at a time.",
-            "That rationing is the mercy."
-          ],
-          "prayer": "Father, I have been carrying next month today and wondering why today is so heavy. Give me what I need for the hours in front of me, and let tomorrow keep its own trouble until I get there with your help.",
-          "addLabel": "Add tomorrow's worry",
-          "question": "Which day's trouble are you carrying that has not arrived?",
-          "prayerCategory": "Finance"
-        },
-        {
-          "title": "Be Careful For Nothing",
-          "minutes": 3,
-          "read": {
-            "book": "Philippians",
-            "chapter": 4,
-            "verse": 6,
-            "from": 4,
-            "to": 7
-          },
-          "body": [
-            {
-              "p": "Paul writes this from prison, which is worth holding onto while reading it, because the instruction is otherwise easy to resent."
-            },
-            {
-              "q": {
-                "book": "Philippians",
-                "chapter": 4,
-                "verse": 6
-              }
-            },
-            {
-              "p": "Be careful for nothing — again, full of care, anxious. But he does not stop at the prohibition, which would be cruel. He replaces it with a procedure: prayer, supplication, thanksgiving, and let your requests be made known."
-            },
-            {
-              "p": "Made known is a curious phrase given that God knows already. It is not for God's information. It is the act of stating the thing rather than carrying it as an unshaped dread."
-            },
-            {
-              "p": "And thanksgiving sits in the middle of the list, not at the end as a polite sign-off. Something about naming what has already been given changes how the next request comes out."
-            },
-            {
-              "p": "What he promises is not the outcome. It is a peace that passes understanding — which by definition will not make sense given the circumstances, and which he says will guard you, like a garrison."
-            }
-          ],
-          "line": {
-            "a": "He does not promise the outcome.",
-            "b": "He promises the garrison."
-          },
-          "after": [
-            "Anxiety is usually shapeless. The procedure here forces it into words, and words can be handed over in a way that a fog cannot.",
-            "Written by a man in a cell who had every reason to be anxious and had found something else."
-          ],
-          "prayer": "Father, here is the request, stated plainly instead of circled all night. Thank you for what you have already done, which I keep forgetting when I am afraid. Guard my heart with a peace I will not be able to explain.",
-          "addLabel": "Add the request, plainly",
-          "question": "Can you say the worry in one clear sentence?",
-          "prayerCategory": "Mental Health"
-        },
-        {
-          "title": "Bear Ye One Another's Burdens",
-          "minutes": 4,
-          "read": {
-            "book": "Galatians",
-            "chapter": 6,
-            "verse": 2,
-            "from": 1,
-            "to": 5
-          },
-          "body": [
-            {
-              "p": "Three verses apart, Paul appears to contradict himself, and generations of readers have noticed."
-            },
-            {
-              "q": {
-                "book": "Galatians",
-                "chapter": 6,
-                "verse": 2
-              }
-            },
-            {
-              "p": "Then in verse five: every man shall bear his own burden. Which is it."
-            },
-            {
-              "p": "It is two different words. The first is a crushing weight, the kind that is too much for one person by definition. The second is the word for a soldier's pack — the load you are issued and expected to carry."
-            },
-            {
-              "p": "So the instruction is not confused. Your own pack is yours; nobody can walk your road for you. But when something falls on a person that no single person is built to lift, that is when the others come."
-            },
-            {
-              "p": "Most of us get this exactly backwards. We ask for help with the pack, which nobody can carry, and we refuse help with the crushing thing because we have decided it is our own to manage."
-            }
-          ],
-          "line": {
-            "a": "Your pack is yours.",
-            "b": "The crushing thing is not."
-          },
-          "after": [
-            "Knowing which of the two you are holding is most of the wisdom here, and you are usually the worst judge of it.",
-            "Ask someone who has watched you this year."
-          ],
-          "prayer": "Lord, give me the honesty to know which of these I am carrying. Where it is my own pack, strengthen me for it. Where it is a crushing thing, break my pride enough to let somebody help.",
-          "addLabel": "Add what you won't ask help for",
-          "question": "What are you refusing help with because you think it is yours?",
-          "prayerCategory": "Relationships"
-        },
-        {
-          "title": "In The Sixth Hour",
-          "minutes": 3,
-          "read": {
-            "book": "John",
-            "chapter": 4,
-            "verse": 6,
-            "from": 5,
-            "to": 10
-          },
-          "body": [
-            {
-              "p": "John gives an unusual detail before the conversation at the well starts, and it is easy to read past on the way to the theology."
-            },
-            {
-              "q": {
-                "book": "John",
-                "chapter": 4,
-                "verse": 6
-              }
-            },
-            {
-              "p": "Jesus, being wearied with his journey, sat thus on the well. The word is the ordinary one for tired from walking. He sat down because he had been walking since morning in the heat and he needed to."
-            },
-            {
-              "p": "It is about noon. His disciples have gone into town for food. He is on his own, tired, thirsty, with no bucket, which is why the conversation begins with him asking a stranger for a drink."
-            },
-            {
-              "p": "One of the most consequential conversations in the gospels starts because he was too tired to keep walking and had to sit somewhere."
-            },
-            {
-              "p": "I do not think that is incidental. He did not push through to a better location. He stopped where his body said stop, and that turned out to be exactly the place."
-            }
-          ],
-          "line": {
-            "a": "He stopped because he was tired.",
-            "b": "That was the appointment."
-          },
-          "after": [
-            "There is a quiet permission in this. The Son of God sat down in the middle of the day because he had had enough walking.",
-            "The woman arrived at the well he was already sitting on."
-          ],
-          "prayer": "Jesus, you know what it is to be tired in the middle of the day. Let me stop when I need to without treating it as failure, and let me be present to whoever is in front of me when I do.",
-          "addLabel": "Add where you need to sit down",
-          "question": "Where has your body been telling you to stop?",
-          "prayerCategory": "Health"
-        },
-        {
-          "title": "My Grace Is Sufficient",
-          "minutes": 4,
-          "read": {
-            "book": "2 Corinthians",
-            "chapter": 12,
-            "verse": 9,
-            "from": 7,
-            "to": 10
-          },
-          "body": [
-            {
-              "p": "Paul has something he calls a thorn in the flesh and he never tells us what it is, which has frustrated readers for two thousand years and is probably deliberate."
-            },
-            {
-              "p": "He asked three times for it to be taken away. Three is the number you use when you have stopped hoping and started negotiating."
-            },
-            {
-              "q": {
-                "book": "2 Corinthians",
-                "chapter": 12,
-                "verse": 9
-              }
-            },
-            {
-              "p": "The answer is no. It is a kind no, with a reason attached, but the thorn stays and Paul writes this letter with it still in place."
-            },
-            {
-              "p": "Sufficient is not a generous word. It means enough, exactly enough, and nothing spare. He is being told he will have what he needs to keep going and not a measure more."
-            },
-            {
-              "p": "And then the reason: strength made perfect in weakness. Not despite the weakness — through it, in the place where he is not able."
-            }
-          ],
-          "line": {
-            "a": "The thorn stayed.",
-            "b": "The grace was enough."
-          },
-          "after": [
-            "This is the passage people reach for when the answer has been no, and it earns that because Paul did not get what he asked for either.",
-            "Enough is not the same as easy. It is the promise that you will not run out."
-          ],
-          "prayer": "Lord, I have asked more than three times and it is still here. If it is staying, then let your grace be genuinely sufficient — not a phrase I repeat, but something I feel holding me up in the place I am weakest.",
-          "addLabel": "Add what hasn't been taken away",
-          "question": "What have you asked for three times?",
-          "prayerCategory": "Faith"
-        },
-        {
-          "title": "The Cattle On A Thousand Hills",
-          "minutes": 3,
-          "read": {
-            "book": "Psalms",
-            "chapter": 50,
-            "verse": 10,
-            "from": 9,
-            "to": 15
-          },
-          "body": [
-            {
-              "p": "God is speaking in this psalm and he is addressing people who have been bringing sacrifices faithfully and have quietly started to believe he needs them."
-            },
-            {
-              "q": {
-                "book": "Psalms",
-                "chapter": 50,
-                "verse": 10
-              }
-            },
-            {
-              "p": "Every beast of the forest is mine, and the cattle upon a thousand hills. If I were hungry, he says a verse later, I would not tell thee."
-            },
-            {
-              "p": "It is close to sarcasm, and it is aimed at a particular kind of religious anxiety — the sense that the whole arrangement depends on your contribution and would collapse without it."
-            },
-            {
-              "p": "And then, having dismantled that, he says something surprising. Call upon me in the day of trouble. Having established that he needs nothing from them, he asks them to ask him for things."
-            },
-            {
-              "p": "The relationship is not a supply chain running towards God. It runs the other way, and always did."
-            }
-          ],
-          "line": {
-            "a": "If he were hungry,",
-            "b": "he would not tell you."
-          },
-          "after": [
-            "A great deal of exhaustion in religious life comes from an unexamined belief that God is depending on you.",
-            "He owns the hills. Call on him in the day of trouble."
-          ],
-          "prayer": "God, I have been serving you as though the whole thing rests on my shoulders, and I am tired in a way that suggests I believed it. You need nothing from me. Let me call on you today instead of carrying you.",
-          "addLabel": "Add what you thought depended on you",
-          "question": "Where have you started believing God needs you?",
-          "prayerCategory": "Ministry"
-        },
-        {
-          "title": "There Remaineth A Rest",
-          "minutes": 4,
-          "read": {
-            "book": "Hebrews",
-            "chapter": 4,
-            "verse": 9,
-            "from": 9,
-            "to": 11
-          },
-          "body": [
-            {
-              "p": "We finish the fortnight where the argument has been going. Hebrews takes the sabbath, which was a day, and says it was always pointing at something larger."
-            },
-            {
-              "q": {
-                "book": "Hebrews",
-                "chapter": 4,
-                "verse": 9
-              }
-            },
-            {
-              "p": "There remaineth therefore a rest to the people of God. Remaineth — it is still outstanding, still owed, not yet fully collected."
-            },
-            {
-              "p": "And then the next verse defines it in a way that is easy to miss: he that is entered into his rest, he also hath ceased from his own works, as God did from his."
-            },
-            {
-              "p": "Ceased from his own works. The rest being described is not primarily a nap. It is the end of trying to establish yourself by output — the specific exhaustion of a person who must keep producing in order to be acceptable."
-            },
-            {
-              "p": "Then verse eleven, which is one of the strangest sentences in the New Testament: let us labour therefore to enter into that rest. Work hard at stopping. He knows how difficult this is."
-            }
-          ],
-          "line": {
-            "a": "Labour therefore",
-            "b": "to enter into that rest."
-          },
-          "after": [
-            "You may have to work at receiving this, which sounds absurd until you have tried to stop justifying your existence for a single afternoon.",
-            "It remains. It has not expired because you have not taken it yet."
-          ],
-          "prayer": "Father, I have been working to be acceptable rather than resting because I already am. Teach me to cease from my own works. Whatever it takes to enter that rest, help me do it, even if the doing feels like more effort at first.",
-          "addLabel": "Add what you're trying to prove",
-          "question": "What are you producing in order to be acceptable?",
-          "prayerCategory": "Spiritual Life"
-        }
-      ]
+      "month": 11,
+      "days": 30,
+      "name": "The Key of Gratitude",
+      "theme": "Counting blessings every day",
+      "written": []
+    },
+    {
+      "month": 12,
+      "days": 31,
+      "name": "The Key of Joy",
+      "theme": "Celebrating hope and community",
+      "written": []
     }
   ]
 }

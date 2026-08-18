@@ -55,7 +55,7 @@ fun PkHeader(
 ) {
     Column(
         Modifier.fillMaxWidth()
-            .background(Pk.Oxblood)
+            .background(NightFill)
             .statusBarsPadding()
             .padding(start = Pk.Gutter, end = Pk.Gutter, top = 18.dp),
     ) {
