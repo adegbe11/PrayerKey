@@ -589,6 +589,930 @@
           "addLabel": "Add a first work to return to",
           "question": "What did you do at the beginning that you have quietly stopped doing?",
           "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 13,
+          "title": "Shut Thy Door",
+          "minutes": 3,
+          "read": {
+            "book": "Matthew",
+            "chapter": 6,
+            "verse": 6,
+            "from": 5,
+            "to": 8
+          },
+          "body": [
+            {
+              "p": "Jesus has just described people who pray standing in the synagogue and on street corners, and he says something blunt about them: they have their reward. Not that they get nothing. That they get exactly what they were praying for, which was to be seen."
+            },
+            {
+              "q": {
+                "book": "Matthew",
+                "chapter": 6,
+                "verse": 6
+              }
+            },
+            {
+              "p": "Enter into thy closet. The word is a storeroom — the small windowless room at the back where a household kept its supplies. It was chosen because it was the one room in a first-century house with a door and nothing interesting in it."
+            },
+            {
+              "p": "And shut thy door. That instruction is not about secrecy so much as about removing the audience, including the imagined one."
+            },
+            {
+              "p": "Most of us do not pray on street corners. We do something subtler: we pray while half-composing how we would describe the prayer. The door is for that."
+            },
+            {
+              "p": "What he promises the person behind it is not a better prayer. It is a Father who is there in secret, which is to say a relationship that does not require a witness to be real."
+            }
+          ],
+          "line": {
+            "a": "The door is not for secrecy.",
+            "b": "It is for removing the audience."
+          },
+          "after": [
+            "A storeroom was the least spiritual room in the house. That is probably why he picked it.",
+            "Find your version of it, and shut the door on the version of yourself that is watching."
+          ],
+          "prayer": "Father, I have prayed with one eye on how it sounded. Take me into the room with the door and meet me there, where there is nothing to perform and no one to impress.",
+          "addLabel": "Add where you'll pray",
+          "question": "Who are you still performing for when you pray alone?",
+          "prayerCategory": "Daily Prayer"
+        },
+        {
+          "day": 14,
+          "title": "By Taking Heed",
+          "minutes": 3,
+          "read": {
+            "book": "Psalms",
+            "chapter": 119,
+            "verse": 9,
+            "from": 9,
+            "to": 11
+          },
+          "body": [
+            {
+              "p": "The question in this verse is asked by someone young enough to have a lot of life in front of him and honest enough to know he cannot navigate it on instinct."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 119,
+                "verse": 9
+              }
+            },
+            {
+              "p": "Wherewithal shall a young man cleanse his way? The answer given is unglamorous: by taking heed thereto according to thy word."
+            },
+            {
+              "p": "Taking heed is a watchman word. It means paying attention on purpose, keeping your eye on something that would drift if you stopped looking."
+            },
+            {
+              "p": "Notice what the answer is not. It is not a single decisive experience, or a feeling, or a resolve made in a hard moment. It is sustained attention to a text."
+            },
+            {
+              "p": "Two verses later he adds the practice that makes it possible: thy word have I hid in mine heart. Hidden, in advance, before it was needed. You cannot take heed to something you have not stored."
+            }
+          ],
+          "line": {
+            "a": "Not one decisive moment.",
+            "b": "Sustained attention to a text."
+          },
+          "after": [
+            "A life does not usually go wrong at a crossroads. It drifts, in small increments, in the direction nobody was watching.",
+            "Taking heed is simply the decision to keep looking."
+          ],
+          "prayer": "Lord, keep my eyes on Your Word rather than on my own instincts. Hide it in me now, before the day I need it, and teach me to pay attention on purpose.",
+          "addLabel": "Add what you'll store now",
+          "question": "Where has your life drifted because nobody was watching that part?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 15,
+          "title": "Both Men Heard It",
+          "minutes": 4,
+          "read": {
+            "book": "Matthew",
+            "chapter": 7,
+            "verse": 24,
+            "from": 24,
+            "to": 27
+          },
+          "body": [
+            {
+              "p": "The Sermon on the Mount ends with two builders, and the detail everybody remembers is the rock and the sand. The detail worth noticing is that both men heard the same sermon."
+            },
+            {
+              "q": {
+                "book": "Matthew",
+                "chapter": 7,
+                "verse": 24
+              }
+            },
+            {
+              "p": "Whosoever heareth these sayings of mine, and doeth them. The difference between the two houses is not information. It is not sincerity either. It is one verb."
+            },
+            {
+              "p": "And the houses look identical until the weather comes. Jesus is careful about this: the rain, the floods and the winds beat on both. The foundation is invisible in fair conditions and decisive in bad ones."
+            },
+            {
+              "p": "Which means you cannot tell, on a calm Tuesday, which kind of hearer you are. The two look the same from the outside and feel the same from the inside."
+            },
+            {
+              "p": "The only way to know is to check whether hearing has turned into doing anywhere in particular, this week, in something you could name."
+            }
+          ],
+          "line": {
+            "a": "Both men heard the sermon.",
+            "b": "One of them did it."
+          },
+          "after": [
+            "Agreeing with a truth produces a warm feeling that is very easy to mistake for obedience.",
+            "Name one thing you heard recently and have not done. That is where the foundation is being poured or not poured."
+          ],
+          "prayer": "Lord, I have heard a great deal and done less. Show me one thing I already know and have not obeyed, and give me the will to do it this week.",
+          "addLabel": "Add what you'll actually do",
+          "question": "What have you agreed with but never acted on?",
+          "prayerCategory": "Purpose"
+        },
+        {
+          "day": 16,
+          "title": "When Thou Sittest In Thine House",
+          "minutes": 3,
+          "read": {
+            "book": "Deuteronomy",
+            "chapter": 6,
+            "verse": 7,
+            "from": 4,
+            "to": 9
+          },
+          "body": [
+            {
+              "p": "Moses is giving Israel the words they are to build a national life on, and having stated them, he immediately becomes practical about where they are to be said."
+            },
+            {
+              "q": {
+                "book": "Deuteronomy",
+                "chapter": 6,
+                "verse": 7
+              }
+            },
+            {
+              "p": "When thou sittest in thine house, and when thou walkest by the way, and when thou liest down, and when thou risest up."
+            },
+            {
+              "p": "That is a list of four ordinary domestic moments, and between them they cover most of a day. Sitting, travelling, going to bed, getting up."
+            },
+            {
+              "p": "There is no religious hour in the list. No festival, no assembly, no priest. The instruction locates the words of God in the parts of life that have no ceremony attached to them at all."
+            },
+            {
+              "p": "And the verse before it puts them first in the heart of the person speaking. You cannot talk about them by the way if they are not already in you when you set out."
+            }
+          ],
+          "line": {
+            "a": "No festival. No assembly.",
+            "b": "Sitting, walking, lying down, rising."
+          },
+          "after": [
+            "Faith that only exists in the religious hour is not being transmitted to anyone, least of all to the people who live with you.",
+            "Pick one of the four. Start there."
+          ],
+          "prayer": "Father, let Your words be in my heart first, and then in the ordinary hours — the kitchen, the commute, the last thing at night. Make my faith audible where there is no ceremony.",
+          "addLabel": "Add one ordinary moment",
+          "question": "Which four hours of your day never hear anything about God?",
+          "prayerCategory": "Family"
+        },
+        {
+          "day": 17,
+          "title": "He Did Not Know Who Was Calling",
+          "minutes": 4,
+          "read": {
+            "book": "1 Samuel",
+            "chapter": 3,
+            "verse": 10,
+            "from": 1,
+            "to": 10
+          },
+          "body": [
+            {
+              "p": "The chapter opens with a line that explains everything after it: the word of the Lord was precious in those days, and there was no open vision. Precious meaning rare."
+            },
+            {
+              "p": "So when God calls Samuel by name, the boy assumes it is Eli. Three times. He is not being slow; he has never heard this before and has no category for it."
+            },
+            {
+              "q": {
+                "book": "1 Samuel",
+                "chapter": 3,
+                "verse": 10
+              }
+            },
+            {
+              "p": "What changes is not Samuel's hearing. It is that an old man tells him what to say if it happens again, and gives him one sentence: Speak, Lord; for thy servant heareth."
+            },
+            {
+              "p": "Two things are worth taking from that. The first is that recognising God's voice is learned, usually from somebody further along who has heard it before."
+            },
+            {
+              "p": "The second is that the sentence Eli teaches him is a posture, not a technique. It puts God in the position of speaking and Samuel in the position of listening, and it commits to the listening before the content arrives."
+            }
+          ],
+          "line": {
+            "a": "He heard it three times.",
+            "b": "He had no category for it."
+          },
+          "after": [
+            "If you have never been sure whether God has spoken to you, that is not evidence against you. Samuel had the same problem in the same room as the ark.",
+            "Learn the sentence. Say it before you know what the answer will be."
+          ],
+          "prayer": "Speak, Lord, for Your servant is listening. I commit to the listening before I know what You will say, and I ask You to teach me Your voice.",
+          "addLabel": "Add what you're listening for",
+          "question": "Have you committed to obey before you know the content?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 18,
+          "title": "And I Knew It Not",
+          "minutes": 3,
+          "read": {
+            "book": "Genesis",
+            "chapter": 28,
+            "verse": 16,
+            "from": 10,
+            "to": 17
+          },
+          "body": [
+            {
+              "p": "Jacob is running. He has deceived his father, defrauded his brother, and left home with nothing. He stops at nightfall in an unremarkable place, uses a stone for a pillow, and sleeps."
+            },
+            {
+              "q": {
+                "book": "Genesis",
+                "chapter": 28,
+                "verse": 16
+              }
+            },
+            {
+              "p": "Surely the Lord is in this place; and I knew it not."
+            },
+            {
+              "p": "He had already slept there. The ladder, the angels and the promise arrive at a location he had chosen for no reason except that the sun had gone down."
+            },
+            {
+              "p": "And the thing he says on waking is not about the vision. It is about his own not-knowing. God had been present in a place Jacob had assessed as nowhere."
+            },
+            {
+              "p": "He marks it with the stone he had been sleeping on. Same stone. He does not import anything; he sets upright the thing that was already there."
+            }
+          ],
+          "line": {
+            "a": "The Lord was in this place.",
+            "b": "And I knew it not."
+          },
+          "after": [
+            "The places we file as nowhere — the commute, the ward, the year that went wrong — are not vacated by God because we have written them off.",
+            "Set up the stone you already have."
+          ],
+          "prayer": "Lord, I have decided that certain parts of my life are nowhere. Open my eyes where I have already stopped looking, and let me find that You were there before I noticed.",
+          "addLabel": "Add the place you wrote off",
+          "question": "Which part of your life have you assumed God has no interest in?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 19,
+          "title": "Sitteth Down First",
+          "minutes": 3,
+          "read": {
+            "book": "Luke",
+            "chapter": 14,
+            "verse": 28,
+            "from": 27,
+            "to": 30
+          },
+          "body": [
+            {
+              "p": "Jesus is talking to a large crowd that is following him enthusiastically, and instead of consolidating the enthusiasm he tries to slow it down."
+            },
+            {
+              "q": {
+                "book": "Luke",
+                "chapter": 14,
+                "verse": 28
+              }
+            },
+            {
+              "p": "Which of you, intending to build a tower, sitteth not down first, and counteth the cost."
+            },
+            {
+              "p": "Sitteth down first. Before the enthusiasm becomes a foundation, there is a chair and a calculation."
+            },
+            {
+              "p": "There is also a quiet mercy in being told to sit down. The crowd was moving and he stopped them. Nobody in that moment was told they were unwelcome; they were told to work out what following would cost before the enthusiasm made the decision for them."
+            },
+            {
+              "p": "And the failure he describes is not collapse. It is an unfinished tower with people walking past it — everyone that beholdeth it begins to mock him, saying, this man began to build and was not able to finish."
+            },
+            {
+              "p": "That is a particular kind of loss. Not a project that failed, a project abandoned at a visible height. It is what a January resolution looks like in March."
+            }
+          ],
+          "line": {
+            "a": "Before the enthusiasm,",
+            "b": "there is a chair and a calculation."
+          },
+          "after": [
+            "Deciding what you can actually sustain is not a lack of faith. It is the thing he told the crowd to do before following him.",
+            "Build a shorter tower and finish it."
+          ],
+          "prayer": "Lord, save me from beginning what I have not counted. Show me what I can carry all year rather than what I can carry all week, and let me finish what I start.",
+          "addLabel": "Add what you can sustain",
+          "question": "What have you begun this month that you cannot sustain?",
+          "prayerCategory": "Purpose"
+        },
+        {
+          "day": 20,
+          "title": "Let Us Rise Up And Build",
+          "minutes": 3,
+          "read": {
+            "book": "Nehemiah",
+            "chapter": 2,
+            "verse": 18,
+            "from": 11,
+            "to": 18
+          },
+          "body": [
+            {
+              "p": "Nehemiah arrives in Jerusalem and does nothing for three days. Then he goes out at night, alone, on one animal, and inspects the broken wall without telling anybody what he is doing."
+            },
+            {
+              "p": "Only after he has seen the whole ruin himself does he speak to the people."
+            },
+            {
+              "q": {
+                "book": "Nehemiah",
+                "chapter": 2,
+                "verse": 18
+              }
+            },
+            {
+              "p": "And they said, Let us rise up and build. So they strengthened their hands for this good work."
+            },
+            {
+              "p": "The order is worth keeping. Silence, then a night ride round the actual damage, then a plain account of it, then the call — and the response comes immediately because the people can tell he has seen it."
+            },
+            {
+              "p": "Vision that has not looked at the rubble does not move anyone. Nehemiah knew the size of the job before he asked anyone to join him in it."
+            }
+          ],
+          "line": {
+            "a": "He rode round the ruin first.",
+            "b": "Then he said, let us build."
+          },
+          "after": [
+            "Before you rebuild anything — a marriage, a habit, a faith — go and look at the actual state of it in the dark, on your own, without softening it.",
+            "Then rise up and build. In that order."
+          ],
+          "prayer": "Father, give me the courage to look honestly at what is broken before I announce that I am fixing it. Then strengthen my hands for the work.",
+          "addLabel": "Add what needs rebuilding",
+          "question": "What are you rebuilding without having looked at the damage?",
+          "prayerCategory": "Purpose"
+        },
+        {
+          "day": 21,
+          "title": "Day And Night",
+          "minutes": 3,
+          "read": {
+            "book": "Psalms",
+            "chapter": 1,
+            "verse": 2,
+            "from": 1,
+            "to": 3
+          },
+          "body": [
+            {
+              "p": "The first psalm describes a blessed person by two things: where he does not stand, and what he does with his attention."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 1,
+                "verse": 2
+              }
+            },
+            {
+              "p": "In his law doth he meditate day and night. The Hebrew word for meditate is used elsewhere of a lion growling over prey and of a dove murmuring. It is a low continuous sound, not silent contemplation."
+            },
+            {
+              "p": "So the picture is of someone muttering a text to himself through the day, turning it over, saying it under his breath."
+            },
+            {
+              "p": "And the tree that follows is planted by rivers — not near water, planted by it, deliberately positioned. Its fruit comes in season and its leaf does not wither, which is a description of consistency rather than intensity."
+            },
+            {
+              "p": "Nothing here is dramatic. A man with a phrase in his mouth all day becomes a tree that does not dry out."
+            }
+          ],
+          "line": {
+            "a": "Not silent contemplation.",
+            "b": "A phrase in your mouth all day."
+          },
+          "after": [
+            "You are already meditating on something. Most of us run a low continuous commentary of worry or grievance without ever calling it that.",
+            "Change the text. The mechanism is already installed."
+          ],
+          "prayer": "Lord, my mind is already turning something over all day. Let it be Your Word. Plant me where the water is and keep my leaf from withering.",
+          "addLabel": "Add the phrase you'll carry",
+          "question": "What are you already meditating on without meaning to?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 22,
+          "title": "Heartily, As To The Lord",
+          "minutes": 3,
+          "read": {
+            "book": "Colossians",
+            "chapter": 3,
+            "verse": 23,
+            "from": 22,
+            "to": 24
+          },
+          "body": [
+            {
+              "p": "Paul is writing to slaves, which makes this one of the most uncomfortable passages in the letter and also one of the most radical."
+            },
+            {
+              "q": {
+                "book": "Colossians",
+                "chapter": 3,
+                "verse": 23
+              }
+            },
+            {
+              "p": "Whatsoever ye do, do it heartily, as to the Lord, and not unto men."
+            },
+            {
+              "p": "Whatsoever is doing a lot of work. He is not describing religious activity. He is describing tasks that were, by any measure, unchosen and unrewarded."
+            },
+            {
+              "p": "He also names the payer. Ye serve the Lord Christ, he writes in the next verse, to people who served somebody else all day and were paid by nobody. The wage is not withheld; it is simply issued by a different house."
+            },
+            {
+              "p": "And he relocates the audience. The work is unchanged; the person it is done for changes. That is the only variable Paul adjusts, and he treats it as sufficient."
+            },
+            {
+              "p": "Heartily is literally from the soul. It is the opposite of doing something at the minimum acceptable standard because nobody who matters is looking."
+            }
+          ],
+          "line": {
+            "a": "The work does not change.",
+            "b": "The person it is done for does."
+          },
+          "after": [
+            "Most of a life is unglamorous and unwitnessed. This verse says that is not a lower category of existence.",
+            "Do today's ordinary thing as though it were handed in to God, because it is."
+          ],
+          "prayer": "Lord, I have been doing my work at the standard the watching person requires. Let me do it from the soul, as to You, in the hours nobody is assessing.",
+          "addLabel": "Add today's ordinary work",
+          "question": "Which task are you doing at the minimum because nobody checks?",
+          "prayerCategory": "Work"
+        },
+        {
+          "day": 23,
+          "title": "If We Faint Not",
+          "minutes": 3,
+          "read": {
+            "book": "Galatians",
+            "chapter": 6,
+            "verse": 9,
+            "from": 7,
+            "to": 10
+          },
+          "body": [
+            {
+              "p": "Three weeks into a new pattern is where the arithmetic starts to feel wrong. You have put in more than you have got back, and the ledger is visible."
+            },
+            {
+              "q": {
+                "book": "Galatians",
+                "chapter": 6,
+                "verse": 9
+              }
+            },
+            {
+              "p": "Let us not be weary in well doing: for in due season we shall reap, if we faint not."
+            },
+            {
+              "p": "There are two conditions in that sentence and they are easy to blur. Due season is the first — the harvest has a date and the date is not ours to set."
+            },
+            {
+              "p": "Paul is writing to people who had begun well and were being pulled elsewhere, which is why the verse is set among instructions about sowing. Sowing is the least rewarding stage of farming. Nothing about the act itself tells you whether it worked."
+            },
+            {
+              "p": "If we faint not is the second. The word means to lose heart, to slacken, to give out. Paul is not warning about failure. He is warning about quietly easing off."
+            },
+            {
+              "p": "Which tells you what the danger actually is at this point in a habit. Not collapse. Attrition."
+            }
+          ],
+          "line": {
+            "a": "The danger is not collapse.",
+            "b": "It is easing off."
+          },
+          "after": [
+            "Sowing and reaping are separated by a season, and the gap is not evidence that the sowing failed. It is what a season is.",
+            "Do not decide the harvest is not coming while you are standing in the field in February."
+          ],
+          "prayer": "Father, I am tired of putting in more than I can see coming back. Keep me from quietly easing off. I will sow again today and leave the season to You.",
+          "addLabel": "Add what you'll keep sowing",
+          "question": "Where are you easing off rather than stopping?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 24,
+          "title": "Two Minds",
+          "minutes": 3,
+          "read": {
+            "book": "James",
+            "chapter": 1,
+            "verse": 8,
+            "from": 5,
+            "to": 8
+          },
+          "body": [
+            {
+              "p": "James is describing someone asking God for wisdom, which is a good thing to ask for, and he attaches an unexpected warning to it."
+            },
+            {
+              "q": {
+                "book": "James",
+                "chapter": 1,
+                "verse": 8
+              }
+            },
+            {
+              "p": "A double minded man is unstable in all his ways. The word is literally two-souled, and it appears to have been coined for this letter."
+            },
+            {
+              "p": "The image before it is a wave driven with the wind and tossed — not a wave that is sinking, a wave that is going wherever the last gust sent it."
+            },
+            {
+              "p": "What makes this bracing is the phrase in all his ways. Two-mindedness about one thing does not stay in its lane. It leaks into everything, because a person who has not settled the central question cannot settle the smaller ones either."
+            },
+            {
+              "p": "The remedy in the passage is not more effort. It is asking in faith — settling whose you are, and then asking from that position."
+            }
+          ],
+          "line": {
+            "a": "Not a wave that is sinking.",
+            "b": "A wave going wherever the wind sent it."
+          },
+          "after": [
+            "Instability is usually downstream of an unsettled question rather than of weak character.",
+            "Settle the central thing. The smaller decisions get much easier once it is settled."
+          ],
+          "prayer": "Lord, I have been two-minded and calling it open-mindedness. Settle me. Let me ask You in faith rather than drifting with whatever moved me most recently.",
+          "addLabel": "Add the question to settle",
+          "question": "What central question have you left open?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 25,
+          "title": "Teach Us To Number Them",
+          "minutes": 3,
+          "read": {
+            "book": "Psalms",
+            "chapter": 90,
+            "verse": 12,
+            "from": 9,
+            "to": 12
+          },
+          "body": [
+            {
+              "p": "This is the oldest psalm in the collection, attributed to Moses, and it is unsparing about how short a life is. Our years are spent as a tale that is told."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 90,
+                "verse": 12
+              }
+            },
+            {
+              "p": "So teach us to number our days, that we may apply our hearts unto wisdom."
+            },
+            {
+              "p": "Numbering is an odd request. He does not ask for more days, or for the days to be easier. He asks to be taught to count what he has."
+            },
+            {
+              "p": "And the reason given is entirely practical: that we may apply our hearts unto wisdom. Counting is not for melancholy. It is so that the heart gets applied to something worth applying it to."
+            },
+            {
+              "p": "A person who thinks time is unlimited postpones. A person who has counted spends differently, and the psalm treats that as a skill to be taught rather than a mood to be caught."
+            }
+          ],
+          "line": {
+            "a": "He does not ask for more days.",
+            "b": "He asks to be taught to count them."
+          },
+          "after": [
+            "You will not drift into a well-spent year. Nobody has.",
+            "Count the weeks that are actually left in this season, and let the number decide something."
+          ],
+          "prayer": "Teach me to number my days, Lord. Not to frighten me, but so that I stop postponing what I already know matters, and apply my heart to what is worth it.",
+          "addLabel": "Add what you're postponing",
+          "question": "What would you change if you counted the weeks?",
+          "prayerCategory": "Purpose"
+        },
+        {
+          "day": 26,
+          "title": "Lay Aside The Weight",
+          "minutes": 4,
+          "read": {
+            "book": "Hebrews",
+            "chapter": 12,
+            "verse": 1,
+            "from": 1,
+            "to": 3
+          },
+          "body": [
+            {
+              "p": "The chapter before this is the long list of people who lived by faith and mostly did not receive what was promised. Chapter twelve begins by putting the reader inside the same race."
+            },
+            {
+              "q": {
+                "book": "Hebrews",
+                "chapter": 12,
+                "verse": 1
+              }
+            },
+            {
+              "p": "Let us lay aside every weight, and the sin which doth so easily beset us, and let us run with patience."
+            },
+            {
+              "p": "Two things are laid aside and they are not the same thing. There is sin, and there is weight — and weight is not described as sinful. It is described as heavy."
+            },
+            {
+              "p": "A runner strips off what is merely extra. Not wicked, not shameful. Extra. Commitments, possessions, arguments, subscriptions to other people's opinions of you."
+            },
+            {
+              "p": "And then, having stripped, run with patience — a phrase that sounds contradictory until you notice the race is described as the one set before us, not the one we would have chosen."
+            }
+          ],
+          "line": {
+            "a": "Sin, and weight.",
+            "b": "Weight is not sinful. It is heavy."
+          },
+          "after": [
+            "Some of what is slowing you down this year is not wrong. It is simply extra, and it is still slowing you down.",
+            "Name one weight. Put it down. It does not have to be a sin to be laid aside."
+          ],
+          "prayer": "Lord, show me the difference between what is sinful and what is merely extra, and give me the freedom to put down things that are not wrong but are not mine to carry.",
+          "addLabel": "Add a weight to lay down",
+          "question": "What is not wrong, but is slowing you down?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 27,
+          "title": "Shall Ye Not Know It",
+          "minutes": 3,
+          "read": {
+            "book": "Isaiah",
+            "chapter": 43,
+            "verse": 19,
+            "from": 18,
+            "to": 21
+          },
+          "body": [
+            {
+              "p": "Isaiah is speaking to people in exile, to whom the past was better and the present is a desert, and the promise he brings has a question buried in the middle of it."
+            },
+            {
+              "q": {
+                "book": "Isaiah",
+                "chapter": 43,
+                "verse": 19
+              }
+            },
+            {
+              "p": "Behold, I will do a new thing; now it shall spring forth; shall ye not know it?"
+            },
+            {
+              "p": "That question is not decorative. He is asking whether they will recognise it, and the answer is genuinely in doubt — because the verse before says forget the former things, and people looking backwards do not see forwards."
+            },
+            {
+              "p": "The new thing is described as springing forth, which is what a seed does. Small, low, easy to walk past."
+            },
+            {
+              "p": "And the location is the wilderness. He does not promise to take them somewhere better and then act. He promises a road in the place they are already standing."
+            }
+          ],
+          "line": {
+            "a": "It shall spring forth.",
+            "b": "Shall ye not know it?"
+          },
+          "after": [
+            "A new thing that arrives small in a hard place is very easy to miss if you are still comparing everything to the old thing.",
+            "Look down. Springing forth starts at ground level."
+          ],
+          "prayer": "Lord, I have been looking backwards and calling it faithfulness. Open my eyes to the small new thing already springing up in the dry place I am standing in.",
+          "addLabel": "Add what might be springing up",
+          "question": "What are you missing because you are comparing it to before?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 28,
+          "title": "Forgetting Those Things Which Are Behind",
+          "minutes": 3,
+          "read": {
+            "book": "Philippians",
+            "chapter": 3,
+            "verse": 13,
+            "from": 12,
+            "to": 14
+          },
+          "body": [
+            {
+              "p": "Paul has just listed his credentials and then written them off. What follows is the only sentence in his letters where he says explicitly that he has not arrived."
+            },
+            {
+              "q": {
+                "book": "Philippians",
+                "chapter": 3,
+                "verse": 13
+              }
+            },
+            {
+              "p": "This one thing I do: forgetting those things which are behind, and reaching forth unto those things which are before."
+            },
+            {
+              "p": "Forgetting here cannot mean amnesia. He remembers his past well enough to have catalogued it three verses earlier. It means refusing to let it set the terms of what comes next."
+            },
+            {
+              "p": "And what is behind includes the good parts. Paul is not only laying down his failures; he is laying down a résumé that would have impressed anyone in the room."
+            },
+            {
+              "p": "This one thing I do. After a life of that size, the summary is a single sentence with one verb in it."
+            }
+          ],
+          "line": {
+            "a": "He is not only laying down failure.",
+            "b": "He is laying down his résumé."
+          },
+          "after": [
+            "The past that most often stops people is not shame. It is a season that went well, held up as the standard everything since has failed to match.",
+            "One thing. Reaching forward. That is the whole instruction."
+          ],
+          "prayer": "Father, I keep measuring today against a version of my life that is finished. Help me lay down what is behind — the failures and the successes — and reach forward.",
+          "addLabel": "Add what you're laying down",
+          "question": "Which past season are you still measuring yourself against?",
+          "prayerCategory": "Purpose"
+        },
+        {
+          "day": 29,
+          "title": "A Time To Every Purpose",
+          "minutes": 3,
+          "read": {
+            "book": "Ecclesiastes",
+            "chapter": 3,
+            "verse": 1,
+            "from": 1,
+            "to": 8
+          },
+          "body": [
+            {
+              "p": "The list that follows this verse is famous and is usually read as poetry about life's variety. Read in context it is doing something harder than that."
+            },
+            {
+              "q": {
+                "book": "Ecclesiastes",
+                "chapter": 3,
+                "verse": 1
+              }
+            },
+            {
+              "p": "To every thing there is a season, and a time to every purpose under the heaven."
+            },
+            {
+              "p": "The pairs that follow are not all pleasant. A time to kill, a time to break down, a time to lose, a time to cast away. The Preacher is not describing a balanced life; he is describing one you do not control."
+            },
+            {
+              "p": "Which lands strangely in the middle of a month about building habits. A habit is an attempt to impose regularity on time. Ecclesiastes says the seasons are already appointed and not by you."
+            },
+            {
+              "p": "Both are true, and holding them together is the discipline. Build the practice. Hold the timetable loosely. The season you are actually in may not be the one you planned for."
+            }
+          ],
+          "line": {
+            "a": "Build the practice.",
+            "b": "Hold the timetable loosely."
+          },
+          "after": [
+            "A rigid plan meeting an unexpected season usually breaks the person rather than the plan.",
+            "Ask what season you are actually in, and let the practice fit it rather than fighting it."
+          ],
+          "prayer": "Lord, You appoint the seasons and I do not. Let me keep building faithfully while holding my plans loosely, and give me the honesty to see which season I am actually in.",
+          "addLabel": "Add the season you're in",
+          "question": "Are you building for the season you are in or the one you wanted?",
+          "prayerCategory": "Purpose"
+        },
+        {
+          "day": 30,
+          "title": "He Withdrew Himself",
+          "minutes": 3,
+          "read": {
+            "book": "Luke",
+            "chapter": 5,
+            "verse": 16,
+            "from": 12,
+            "to": 16
+          },
+          "body": [
+            {
+              "p": "A leper has been cleansed, the news has spread, and Luke says great multitudes came together to hear and be healed. The demand is at its highest point so far in the gospel."
+            },
+            {
+              "q": {
+                "book": "Luke",
+                "chapter": 5,
+                "verse": 16
+              }
+            },
+            {
+              "p": "And he withdrew himself into the wilderness, and prayed."
+            },
+            {
+              "p": "The tense in Greek is continuous — he was withdrawing, repeatedly, as a practice. Luke is not reporting one afternoon. He is describing what Jesus habitually did when the crowds grew."
+            },
+            {
+              "p": "Luke has already shown us what the pressure looked like. Men were tearing a roof apart to get to him; a whole city had gathered at a door the chapter before. Against that, withdrawing looks almost irresponsible, and he did it anyway."
+            },
+            {
+              "p": "Which is the opposite of the instinct. Growing demand normally produces more availability, not less."
+            },
+            {
+              "p": "There is no note that anyone was turned away permanently or that the ministry suffered. The withdrawing is presented as ordinary, unexplained and repeated, in the same breath as the multitudes."
+            }
+          ],
+          "line": {
+            "a": "The crowds grew.",
+            "b": "He kept withdrawing."
+          },
+          "after": [
+            "If you only get alone with God when nothing is happening, the busiest seasons of your life will be the least accompanied.",
+            "He did it when it was least convenient, and did it often enough that Luke used a continuous tense."
+          ],
+          "prayer": "Jesus, teach me to withdraw when the demand is highest rather than when it finally slackens. Make it a habit rather than a rescue.",
+          "addLabel": "Add when you'll withdraw",
+          "question": "Do you get alone with God only when life goes quiet?",
+          "prayerCategory": "Daily Prayer"
+        },
+        {
+          "day": 31,
+          "title": "He That Began It Will Finish It",
+          "minutes": 4,
+          "read": {
+            "book": "Philippians",
+            "chapter": 1,
+            "verse": 6,
+            "from": 3,
+            "to": 6
+          },
+          "body": [
+            {
+              "p": "A month of beginnings ends here, and by the last day of January most people have already broken something they meant to keep. That is the ordinary arithmetic of resolutions and it is worth naming."
+            },
+            {
+              "q": {
+                "book": "Philippians",
+                "chapter": 1,
+                "verse": 6
+              }
+            },
+            {
+              "p": "Being confident of this very thing, that he which hath begun a good work in you will perform it until the day of Jesus Christ."
+            },
+            {
+              "p": "Note who the subject is. Paul is not confident in the Philippians. He is confident in the one who began the work, which takes the weight of the sentence off them entirely."
+            },
+            {
+              "p": "The month opened in Genesis with a beginning that was not ours. It closes with a completion that is not ours either. Between those two facts sits everything we have tried to build this month."
+            },
+            {
+              "p": "Which does not make the habits pointless. It makes them a response rather than a foundation. You are not holding this together. You are keeping step with someone who is."
+            }
+          ],
+          "line": {
+            "a": "He is not confident in them.",
+            "b": "He is confident in the one who began."
+          },
+          "after": [
+            "If January went well, it was not your discipline that started it. If January went badly, your discipline is not what will finish it.",
+            "The good work has an author and a completion date, and neither of them is you."
+          ],
+          "prayer": "Father, You began this work and You will finish it. Where I have kept my word this month, thank You. Where I have broken it, hold me anyway, and lead me into February.",
+          "addLabel": "Add what you're handing back",
+          "question": "Are you holding this together, or keeping step with someone who is?",
+          "prayerCategory": "Faith"
         }
       ]
     },

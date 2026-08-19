@@ -104,9 +104,6 @@ fun VersePullDeck(
     val scope = rememberCoroutineScope()
 
     var index by remember(verses) { mutableIntStateOf(0) }
-    var pulls by remember { mutableIntStateOf(0) }
-    var lastPullAt by remember { mutableLongStateOf(0L) }
-    var stillMode by remember { mutableStateOf(false) }
     var velocity by remember { mutableFloatStateOf(0f) }
     var lastMoveAt by remember { mutableLongStateOf(0L) }
     // PERF: live thumb tracking is plain state (no coroutine per touch
@@ -121,11 +118,9 @@ fun VersePullDeck(
     var chrome by remember { mutableStateOf(true) }
     val offsetValue = if (animating) anim.value else dragY
 
-    LaunchedEffect(index, stillMode) { chrome = true }
+    LaunchedEffect(index) { chrome = true }
 
-    val current = if (stillMode)
-        RemoteVerse("Psalm 46:10", "Be still, and know that I am God.", "KJV")
-    else verses[index % verses.size]
+    val current = verses[index % verses.size]
     val next = verses[(index + 1) % verses.size]
 
     LaunchedEffect(current) { onCurrentChanged(current) }
@@ -135,21 +130,13 @@ fun VersePullDeck(
     val pullP = progress.coerceAtLeast(0f)
     val saveP = (-progress).coerceAtLeast(0f)
 
-    fun advance(rushed: Boolean) {
-        pulls++
-        if (stillMode) stillMode = false
-        else if (rushed && pulls % 10 == 0) stillMode = true
-        else index++
-    }
+    fun advance() { index++ }
 
     fun flingNext() = scope.launch {
-        val now = System.currentTimeMillis()
-        val rushed = now - lastPullAt < 1400
-        lastPullAt = now
         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
         animating = true; anim.snapTo(dragY)
         anim.animateTo(screenH * 1.15f, tween(220))
-        advance(rushed)
+        advance()
         dragY = 0f; anim.snapTo(0f); animating = false
     }
 
@@ -158,13 +145,13 @@ fun VersePullDeck(
         onSave(current)
         animating = true; anim.snapTo(dragY)
         anim.animateTo(-screenH * 1.15f, tween(220))
-        advance(rushed = false)
+        advance()
         dragY = 0f; anim.snapTo(0f); animating = false
     }
 
     Box(
         Modifier.fillMaxSize()
-            .pointerInput(verses, stillMode) {
+            .pointerInput(verses) {
                 detectDragGestures(
                     onDragEnd = {
                         val v = velocity; val y = dragY
@@ -189,7 +176,7 @@ fun VersePullDeck(
             },
     ) {
         /* back card — waits in the Z-stack, grows as the front leaves */
-        if (!stillMode) WorldFace(
+        WorldFace(
             verse = next, front = false, reduceMotion = reduceMotion,
             modifier = Modifier.fillMaxSize().graphicsLayer {
                 val take = abs(progress)
@@ -201,7 +188,7 @@ fun VersePullDeck(
         /* front card — full-bleed, rides the thumb straight down */
         Box(Modifier.fillMaxSize().graphicsLayer { translationY = offsetValue }) {
             WorldFace(
-                verse = current, front = true, reduceMotion = reduceMotion, still = stillMode,
+                verse = current, front = true, reduceMotion = reduceMotion,
                 modifier = Modifier.fillMaxSize().clickable {
                     onOpen(current)
                 },
@@ -273,22 +260,16 @@ private fun WorldFace(
     verse: RemoteVerse,
     front: Boolean,
     reduceMotion: Boolean,
-    still: Boolean = false,
     modifier: Modifier,
 ) {
-    // "Be still" keeps the quiet night card; every other verse gets a world
-    if (still) {
-        VerseFace(verse = verse, dimmed = !front, still = true, modifier = modifier)
-    } else {
-        com.prayerkey.manna.ui.worlds.WorldVerseFace(
-            reference = verse.reference,
-            text = verse.text,
-            translation = verse.translation,
-            front = front,
-            reduceMotion = reduceMotion,
-            modifier = modifier,
-        )
-    }
+    com.prayerkey.manna.ui.worlds.WorldVerseFace(
+        reference = verse.reference,
+        text = verse.text,
+        translation = verse.translation,
+        front = front,
+        reduceMotion = reduceMotion,
+        modifier = modifier,
+    )
 }
 
 @Composable
