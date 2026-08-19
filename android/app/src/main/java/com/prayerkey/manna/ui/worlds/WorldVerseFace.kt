@@ -52,7 +52,8 @@ fun WorldVerseFace(
     front: Boolean,
     reduceMotion: Boolean,
     modifier: Modifier = Modifier,
-    bottomPadding: Dp = 210.dp,
+    topPadding: Dp = 230.dp,
+    bottomPadding: Dp = 225.dp,
 ) {
     val world = remember(reference, text) { WorldPicker.forVerse(reference, text) }
     val artwork = remember(reference) {
@@ -76,7 +77,7 @@ fun WorldVerseFace(
 
         Column(
             Modifier.fillMaxSize().padding(horizontal = 54.dp)
-                .padding(top = 230.dp, bottom = bottomPadding.coerceAtLeast(225.dp)),
+                .padding(top = topPadding, bottom = bottomPadding),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

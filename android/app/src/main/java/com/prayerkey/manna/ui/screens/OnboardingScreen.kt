@@ -49,7 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.model.DailyVerses
+import com.prayerkey.manna.model.VerseCard
 import com.prayerkey.manna.ui.theme.Canvas
 import com.prayerkey.manna.ui.theme.Gold
 import com.prayerkey.manna.ui.theme.Muted
@@ -105,7 +105,14 @@ fun OnboardingScreen(onDone: () -> Unit) {
 private fun PullToLearn(onPulled: () -> Unit, onSkip: () -> Unit) {
     val view = LocalView.current
     val density = LocalDensity.current
-    val card = remember { DailyVerses.first() }
+    val card = remember {
+        VerseCard(
+            reference = "Jeremiah 33:3",
+            translation = "ESV",
+            verse = "Call to me and I will answer you, and will tell you great and hidden things that you have not known.",
+            receivedBy = "",
+        )
+    }
 
     var dragY by remember { mutableFloatStateOf(0f) }
     var revealed by remember { mutableStateOf(false) }
@@ -130,7 +137,7 @@ private fun PullToLearn(onPulled: () -> Unit, onSkip: () -> Unit) {
             Modifier.fillMaxSize().padding(horizontal = 14.dp)
                 // the card has to clear the reveal copy AND the button, or
                 // it lands on top of them
-                .padding(top = 60.dp, bottom = if (revealed) 250.dp else 150.dp)
+                .padding(top = 60.dp, bottom = if (revealed) 170.dp else 150.dp)
                 .offset { IntOffset(0, (dragY.coerceAtLeast(0f) * .16f).roundToInt()) }
                 .clip(R.card)
                 .pointerInput(revealed) {
@@ -155,7 +162,8 @@ private fun PullToLearn(onPulled: () -> Unit, onSkip: () -> Unit) {
                     translation = card.translation,
                     front = true,
                     reduceMotion = false,
-                    bottomPadding = 40.dp,
+                    topPadding = 70.dp,
+                    bottomPadding = 70.dp,
                 )
             } else {
                 CardBackFace()
@@ -175,19 +183,11 @@ private fun PullToLearn(onPulled: () -> Unit, onSkip: () -> Unit) {
                 }
             }
             AnimatedVisibility(revealed, enter = fadeIn()) {
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        "This is yours to carry today.",
-                        fontFamily = BookSerif, fontSize = 22.sp,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(Modifier.height(20.dp))
-                    com.prayerkey.manna.ui.components.PkButton(
-                        label = "Continue",
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onPulled,
-                    )
-                }
+                com.prayerkey.manna.ui.components.PkButton(
+                    label = "Continue",
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onPulled,
+                )
             }
         }
     }

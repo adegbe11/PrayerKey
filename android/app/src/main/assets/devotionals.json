@@ -4528,7 +4528,1565 @@
       "days": 30,
       "name": "The Key of Renewal",
       "theme": "Fresh starts and spiritual growth",
-      "written": []
+      "written": [
+        {
+          "day": 1,
+          "title": "Old Things Are Passed Away",
+          "minutes": 3,
+          "read": {
+            "book": "2 Corinthians",
+            "chapter": 5,
+            "verse": 17,
+            "from": 16,
+            "to": 18
+          },
+          "body": [
+            {
+              "p": "April opens on the most quoted verse about starting again, and it is usually read as a description of how somebody feels. It is not. It is a statement about status."
+            },
+            {
+              "q": {
+                "book": "2 Corinthians",
+                "chapter": 5,
+                "verse": 17
+              }
+            },
+            {
+              "p": "If any man be in Christ, he is a new creature: old things are passed away; behold, all things are become new."
+            },
+            {
+              "p": "The tense is done. Passed away, become new — both completed. Paul is not describing a process he hopes will start; he is reporting something that has already happened to a person who may not feel any different this morning."
+            },
+            {
+              "p": "And the verse before it explains what changed: henceforth know we no man after the flesh. He is talking about how people are now to be assessed."
+            },
+            {
+              "p": "That includes you. The old assessment — the history, the reputation, the private list of what you have been — is the thing declared out of date."
+            },
+            {
+              "p": "Behold is an instruction to look. Not to feel, not to summon anything. To look at what is already true."
+            }
+          ],
+          "line": {
+            "a": "Not a description of how you feel.",
+            "b": "A statement about your status."
+          },
+          "after": [
+            "Most people wait to feel new before they will believe they are. The verse works the other way round.",
+            "The old assessment is out of date. Stop consulting it."
+          ],
+          "prayer": "Father, I keep assessing myself by a record You have declared finished. Help me look at what is already true rather than waiting to feel it.",
+          "addLabel": "Add the old assessment",
+          "question": "Which version of yourself are you still consulting?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 2,
+          "title": "A Heart Of Flesh",
+          "minutes": 3,
+          "read": {
+            "book": "Ezekiel",
+            "chapter": 36,
+            "verse": 26,
+            "from": 25,
+            "to": 27
+          },
+          "body": [
+            {
+              "p": "Ezekiel is speaking to people in exile whose problem was never information. They had the law, the prophets and the history, and none of it had worked."
+            },
+            {
+              "q": {
+                "book": "Ezekiel",
+                "chapter": 36,
+                "verse": 26
+              }
+            },
+            {
+              "p": "A new heart also will I give you, and a new spirit will I put within you: and I will take away the stony heart out of your flesh, and I will give you an heart of flesh."
+            },
+            {
+              "p": "Every verb in that sentence belongs to God. Give, put, take away, give again. There is no instruction to the hearer anywhere in it."
+            },
+            {
+              "p": "That is unusual and deliberate. The passage is not asking them to try harder with the heart they have; it is announcing a transplant."
+            },
+            {
+              "p": "A stony heart is not a wicked heart so much as an unresponsive one — the condition of someone who has stopped being able to feel about things they still believe."
+            },
+            {
+              "p": "And the replacement is flesh, which is softer and more easily hurt. The cure for numbness is not toughness."
+            }
+          ],
+          "line": {
+            "a": "Not try harder with this heart.",
+            "b": "A transplant."
+          },
+          "after": [
+            "If you have gone numb about God rather than hostile, this is the passage that names it and does not scold you for it.",
+            "Every verb here is His. Ask for the operation."
+          ],
+          "prayer": "Lord, my heart has gone stony — not rebellious, just unresponsive. Take it out. Give me a heart of flesh, even though flesh feels more.",
+          "addLabel": "Add where you've gone numb",
+          "question": "Where have you stopped feeling about something you still believe?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 3,
+          "title": "By The Renewing Of Your Mind",
+          "minutes": 4,
+          "read": {
+            "book": "Romans",
+            "chapter": 12,
+            "verse": 2,
+            "from": 1,
+            "to": 2
+          },
+          "body": [
+            {
+              "p": "Paul has spent eleven chapters on doctrine. Chapter twelve begins the practical section, and the first instruction is about the mind rather than behaviour."
+            },
+            {
+              "q": {
+                "book": "Romans",
+                "chapter": 12,
+                "verse": 2
+              }
+            },
+            {
+              "p": "Be not conformed to this world: but be ye transformed by the renewing of your mind."
+            },
+            {
+              "p": "Conformed is a word about being pressed into an external shape, the way a mould works. It happens by default and requires no decision from you at all."
+            },
+            {
+              "p": "Transformed is a different image entirely — the word behind it is the one used of the transfiguration. It is change that works outward from inside."
+            },
+            {
+              "p": "And the mechanism named is the renewing of the mind, which is not the same as learning more. Renewing is making new again, restoring something that has worn."
+            },
+            {
+              "p": "The purpose clause at the end is worth noticing: that ye may prove what is that good, and acceptable, and perfect, will of God."
+            },
+            {
+              "p": "Discernment is downstream of a renewed mind. People who cannot tell what God wants are often not short of information; they are being pressed into a shape by something they have stopped noticing."
+            }
+          ],
+          "line": {
+            "a": "Conforming needs no decision.",
+            "b": "Transforming works outward."
+          },
+          "after": [
+            "You are being shaped by whatever you soak in, and the shaping is silent. That is what conformed means.",
+            "Renewal is not more input. It is different input, repeated."
+          ],
+          "prayer": "Lord, I am being quietly pressed into a shape I did not choose. Renew my mind — not with more information, but with Yours — until I can tell what You actually want.",
+          "addLabel": "Add what's shaping you",
+          "question": "What is shaping you that you have stopped noticing?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 4,
+          "title": "New Every Morning",
+          "minutes": 3,
+          "read": {
+            "book": "Lamentations",
+            "chapter": 3,
+            "verse": 23,
+            "from": 21,
+            "to": 24
+          },
+          "body": [
+            {
+              "p": "This line appears in a hymn, which is where most people meet it, and it comes from a book of ruins. Jerusalem is destroyed and the writer has watched it happen."
+            },
+            {
+              "q": {
+                "book": "Lamentations",
+                "chapter": 3,
+                "verse": 23
+              }
+            },
+            {
+              "p": "They are new every morning: great is thy faithfulness."
+            },
+            {
+              "p": "The verse before names what is new — his compassions fail not — and the verse before that explains why he is able to say it at all: this I recall to my mind, therefore have I hope."
+            },
+            {
+              "p": "Recall to my mind is an act of will. He is not describing a feeling that arrived; he is describing a decision to remember something in the middle of a situation that argues against it."
+            },
+            {
+              "p": "New every morning is also a limit. Yesterday's supply is not available today, and today's is not stockpiled for next week."
+            },
+            {
+              "p": "Which is inconvenient for anyone who would rather be resourced in advance, and is the same arrangement as the manna."
+            }
+          ],
+          "line": {
+            "a": "Not a feeling that arrived.",
+            "b": "Something he decided to remember."
+          },
+          "after": [
+            "The mercy is daily rather than delivered in bulk, which means the relationship stays daily too.",
+            "Written by a man looking at rubble, which is the only reason it carries any weight."
+          ],
+          "prayer": "Lord, I recall this to mind deliberately, because my circumstances are arguing the other way. Your compassions are new this morning. Give me today's portion.",
+          "addLabel": "Add what you'll recall",
+          "question": "What do you need to recall to mind on purpose today?",
+          "prayerCategory": "Grief"
+        },
+        {
+          "day": 5,
+          "title": "Create In Me A Clean Heart",
+          "minutes": 4,
+          "read": {
+            "book": "Psalms",
+            "chapter": 51,
+            "verse": 10,
+            "from": 9,
+            "to": 12
+          },
+          "body": [
+            {
+              "p": "David wrote this after Bathsheba and after Nathan confronted him, which means it is a prayer written by a man with no defence left."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 51,
+                "verse": 10
+              }
+            },
+            {
+              "p": "Create in me a clean heart, O God; and renew a right spirit within me."
+            },
+            {
+              "p": "Create is the strong word — bara, the verb used in Genesis 1 for making something out of nothing. He does not ask for the heart to be cleaned. He asks for one to be made."
+            },
+            {
+              "p": "That is an admission. Cleaning implies there is something serviceable underneath. Creating implies there is not."
+            },
+            {
+              "p": "And what he asks for next is the part people miss: restore unto me the joy of thy salvation. Not the salvation — he does not think he has lost that. The joy of it."
+            },
+            {
+              "p": "Sin does not usually remove someone's faith. It removes the gladness from it, and leaves them going through motions they still believe in."
+            },
+            {
+              "p": "He asks for the gladness back by name."
+            }
+          ],
+          "line": {
+            "a": "Not cleaned.",
+            "b": "Made."
+          },
+          "after": [
+            "The prayer of a man with no defence is the most useful prayer in the psalms, because it does not attempt any.",
+            "If your faith has gone joyless rather than absent, ask for what he asked for."
+          ],
+          "prayer": "God, do not clean this heart. Make me a new one. And restore the joy — I have kept believing and lost the gladness, and I want it back.",
+          "addLabel": "Add what you've lost the joy of",
+          "question": "Have you kept the faith and lost the gladness?",
+          "prayerCategory": "Salvation"
+        },
+        {
+          "day": 6,
+          "title": "Come Now, And Let Us Reason",
+          "minutes": 3,
+          "read": {
+            "book": "Isaiah",
+            "chapter": 1,
+            "verse": 18,
+            "from": 16,
+            "to": 18
+          },
+          "body": [
+            {
+              "p": "The chapter before this verse is brutal. God says he is weary of their sacrifices, that their hands are full of blood, and that he will hide his eyes when they pray."
+            },
+            {
+              "p": "Then, without transition, an invitation."
+            },
+            {
+              "q": {
+                "book": "Isaiah",
+                "chapter": 1,
+                "verse": 18
+              }
+            },
+            {
+              "p": "Come now, and let us reason together, saith the Lord: though your sins be as scarlet, they shall be as white as snow."
+            },
+            {
+              "p": "Let us reason together is a legal phrase — it means let us argue this out, settle the case. God invites the guilty party to the table rather than sentencing them from the bench."
+            },
+            {
+              "p": "Scarlet in the ancient world was a fast dye. It was chosen as the image precisely because it did not come out, and everyone hearing it knew that."
+            },
+            {
+              "p": "So the claim is not that the stain is small. It is that a permanent dye is being removed, which is the whole point of using that colour."
+            }
+          ],
+          "line": {
+            "a": "Scarlet was chosen",
+            "b": "because it did not come out."
+          },
+          "after": [
+            "The invitation arrives immediately after the harshest paragraph, from the offended party, unprompted.",
+            "Nothing in the chapter suggests they had improved. Come now."
+          ],
+          "prayer": "Lord, You invite me to argue it out rather than sentencing me. I come with the thing that will not wash out, and I am asking You to do what only You can.",
+          "addLabel": "Add the stain you carry",
+          "question": "What have you decided is permanent about you?",
+          "prayerCategory": "Salvation"
+        },
+        {
+          "day": 7,
+          "title": "Except A Man Be Born Again",
+          "minutes": 4,
+          "read": {
+            "book": "John",
+            "chapter": 3,
+            "verse": 3,
+            "from": 1,
+            "to": 8
+          },
+          "body": [
+            {
+              "p": "Nicodemus comes at night, which John mentions for a reason. He is a Pharisee and a ruler of the Jews, and he opens with a compliment: we know that thou art a teacher come from God."
+            },
+            {
+              "p": "Jesus does not respond to the compliment at all."
+            },
+            {
+              "q": {
+                "book": "John",
+                "chapter": 3,
+                "verse": 3
+              }
+            },
+            {
+              "p": "Except a man be born again, he cannot see the kingdom of God."
+            },
+            {
+              "p": "To a man whose entire standing rested on lineage, learning and observance, this is the most disruptive sentence available. Birth is the one thing nobody arranges for themselves."
+            },
+            {
+              "p": "Nicodemus takes it literally and asks the obvious question about entering his mother's womb, and the question is not stupid. He is pressing on exactly the right problem: how does an adult start again from the beginning?"
+            },
+            {
+              "p": "The answer given is the wind. It bloweth where it listeth, and thou hearest the sound thereof, but canst not tell whence it cometh."
+            },
+            {
+              "p": "You do not organise your own birth. You can only notice that something has happened to you."
+            }
+          ],
+          "line": {
+            "a": "Birth is the one thing",
+            "b": "nobody arranges for themselves."
+          },
+          "after": [
+            "Every religion offers improvement. This offers a second birth, which is a different category and cannot be worked toward.",
+            "Nicodemus came with credentials. Jesus told him he needed to be born."
+          ],
+          "prayer": "Lord, I have been improving myself when what I needed was a birth I cannot arrange. Do in me what only You can do, and let me hear the sound of it.",
+          "addLabel": "Add what you've been improving",
+          "question": "Are you trying to improve where you need to be born?",
+          "prayerCategory": "Salvation"
+        },
+        {
+          "day": 8,
+          "title": "Not By Works Of Righteousness",
+          "minutes": 3,
+          "read": {
+            "book": "Titus",
+            "chapter": 3,
+            "verse": 5,
+            "from": 3,
+            "to": 7
+          },
+          "body": [
+            {
+              "p": "Paul begins this passage with a description of the readers before conversion, and he includes himself in it: we ourselves also were sometimes foolish, disobedient, deceived, serving divers lusts."
+            },
+            {
+              "q": {
+                "book": "Titus",
+                "chapter": 3,
+                "verse": 5
+              }
+            },
+            {
+              "p": "Not by works of righteousness which we have done, but according to his mercy he saved us, by the washing of regeneration, and renewing of the Holy Ghost."
+            },
+            {
+              "p": "The negative comes first and it is emphatic. Not by works of righteousness which we have done — Paul closes that door before opening the other one."
+            },
+            {
+              "p": "Washing and renewing sit side by side and do different jobs. Washing deals with what is on you. Renewing deals with what you are."
+            },
+            {
+              "p": "A person can be forgiven and unchanged, which is the condition of a great many discouraged believers who keep returning to the same failure and cannot understand why the forgiveness has not fixed it."
+            },
+            {
+              "p": "Paul's answer is that forgiveness was never meant to. The renewing is a separate work of the Spirit, and it is ongoing."
+            }
+          ],
+          "line": {
+            "a": "Washing deals with what is on you.",
+            "b": "Renewing deals with what you are."
+          },
+          "after": [
+            "If you are forgiven and still stuck, you are not a failed Christian. You are asking one gift to do another gift's work.",
+            "Ask for the renewing by name."
+          ],
+          "prayer": "Father, thank You for washing me. Now renew me — I have been forgiven for the same thing many times and I am asking You to change what I am, not only what I have done.",
+          "addLabel": "Add what keeps returning",
+          "question": "Are you asking forgiveness to do renewal's job?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 9,
+          "title": "The Spirit Of Your Mind",
+          "minutes": 3,
+          "read": {
+            "book": "Ephesians",
+            "chapter": 4,
+            "verse": 23,
+            "from": 22,
+            "to": 24
+          },
+          "body": [
+            {
+              "p": "Paul gives three instructions in three verses, and the order is easy to reverse in practice."
+            },
+            {
+              "p": "Put off the old man. Be renewed in the spirit of your mind. Put on the new man."
+            },
+            {
+              "q": {
+                "book": "Ephesians",
+                "chapter": 4,
+                "verse": 23
+              }
+            },
+            {
+              "p": "The renewing sits in the middle, between the two changes of clothes, and it is the only one of the three that is passive in the Greek."
+            },
+            {
+              "p": "Most people attempt the first and third and skip the middle. They stop a behaviour and start a better one, and wonder why the old thing keeps returning."
+            },
+            {
+              "p": "The spirit of your mind is an odd phrase — not the mind's content but its disposition, the attitude underneath the thoughts."
+            },
+            {
+              "p": "Behaviour change without that is a wardrobe change on an unchanged person, and Paul's clothing metaphor is precise enough to make the point on its own."
+            }
+          ],
+          "line": {
+            "a": "Put off. Be renewed. Put on.",
+            "b": "Most people skip the middle."
+          },
+          "after": [
+            "Stopping something and starting something else is management. Between them there is meant to be a change of disposition.",
+            "That middle verb is the one you cannot do to yourself, which is probably why it gets skipped."
+          ],
+          "prayer": "Lord, I have changed my behaviour and left my disposition alone. Renew the spirit of my mind, and let the new man be something I am rather than something I perform.",
+          "addLabel": "Add what keeps coming back",
+          "question": "Have you changed your behaviour without changing your disposition?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 10,
+          "title": "Renewed In Knowledge",
+          "minutes": 3,
+          "read": {
+            "book": "Colossians",
+            "chapter": 3,
+            "verse": 10,
+            "from": 9,
+            "to": 11
+          },
+          "body": [
+            {
+              "p": "Colossians runs the same clothing image as Ephesians, and adds a detail about what the new man is being renewed toward."
+            },
+            {
+              "q": {
+                "book": "Colossians",
+                "chapter": 3,
+                "verse": 10
+              }
+            },
+            {
+              "p": "And have put on the new man, which is renewed in knowledge after the image of him that created him."
+            },
+            {
+              "p": "After the image of him that created him. The pattern is not a better version of you as decided by you. It is the original design, and it is a person."
+            },
+            {
+              "p": "Renewed in knowledge is the mechanism, and knowledge here means the personal kind — knowing someone, not knowing about a subject."
+            },
+            {
+              "p": "So growth in this verse is not the accumulation of religious information. It is being reshaped by increasing familiarity with a person you are being made to resemble."
+            },
+            {
+              "p": "The verse after it removes every category people use to rank each other — Greek nor Jew, circumcision nor uncircumcision, Barbarian, Scythian, bond nor free — because those distinctions belong to the old clothes."
+            }
+          ],
+          "line": {
+            "a": "Not a better version of you.",
+            "b": "The original design."
+          },
+          "after": [
+            "You are not being renewed toward your own best idea of yourself. That is a smaller target and a more exhausting one.",
+            "Knowing him is the mechanism. Familiarity does the reshaping."
+          ],
+          "prayer": "Lord, I have been trying to become my own best version. Renew me toward Yours instead, and let knowing You be what changes me.",
+          "addLabel": "Add who you're trying to become",
+          "question": "Whose image are you actually being shaped toward?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 11,
+          "title": "The Years The Locust Hath Eaten",
+          "minutes": 4,
+          "read": {
+            "book": "Joel",
+            "chapter": 2,
+            "verse": 25,
+            "from": 23,
+            "to": 26
+          },
+          "body": [
+            {
+              "p": "Joel's prophecy is set after a locust plague that had stripped the country bare — the vine dried up, the fig tree languished, the seed rotten under the clods."
+            },
+            {
+              "q": {
+                "book": "Joel",
+                "chapter": 2,
+                "verse": 25
+              }
+            },
+            {
+              "p": "And I will restore to you the years that the locust hath eaten."
+            },
+            {
+              "p": "Years, not fields. The loss being addressed is time, which is the one thing that cannot be given back in the ordinary sense."
+            },
+            {
+              "p": "And God does not say he will explain the years or redeem the lesson from them. He says restore, which is a word about replacing what was taken."
+            },
+            {
+              "p": "Note also who is speaking about the locusts: my great army which I sent among you. He does not distance himself from the disaster in order to promise the recovery."
+            },
+            {
+              "p": "The promise that follows is unglamorous and physical — ye shall eat in plenty, and be satisfied, and praise the name of the Lord your God."
+            },
+            {
+              "p": "Restoration in Joel looks like an ordinary full table after years of not having one."
+            }
+          ],
+          "line": {
+            "a": "Years, not fields.",
+            "b": "The one thing that cannot be given back."
+          },
+          "after": [
+            "Everyone past a certain age has years they would describe as eaten. Illness, addiction, a marriage that took a decade to end.",
+            "He does not offer to explain them. He offers to restore them."
+          ],
+          "prayer": "Lord, I have years I would call wasted and I cannot get them back. You said restore. I am holding You to it, and I am asking for an ordinary full table.",
+          "addLabel": "Add the years you lost",
+          "question": "Which years would you call eaten?",
+          "prayerCategory": "Grief"
+        },
+        {
+          "day": 12,
+          "title": "Like The Eagle's",
+          "minutes": 3,
+          "read": {
+            "book": "Psalms",
+            "chapter": 103,
+            "verse": 5,
+            "from": 2,
+            "to": 5
+          },
+          "body": [
+            {
+              "p": "Psalm 103 is a list of things not to forget, and David addresses it to himself: bless the Lord, O my soul, and forget not all his benefits."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 103,
+                "verse": 5
+              }
+            },
+            {
+              "p": "Who satisfieth thy mouth with good things; so that thy youth is renewed like the eagle's."
+            },
+            {
+              "p": "The eagle image comes from the bird's moult. An eagle loses and regrows its feathers, and for a period it is neither what it was nor what it will be."
+            },
+            {
+              "p": "Renewal in this picture is not a return to a previous condition. It is a shedding, and the shedding is the part nobody enjoys."
+            },
+            {
+              "p": "The benefits listed before it are worth reading slowly — forgiveth all thine iniquities, healeth all thy diseases, redeemeth thy life from destruction, crowneth thee with lovingkindness."
+            },
+            {
+              "p": "And the instruction attached to the whole list is forget not, which tells you what usually happens to it."
+            }
+          ],
+          "line": {
+            "a": "Not a return to what you were.",
+            "b": "A shedding, and then flight."
+          },
+          "after": [
+            "If you are in a season of feeling half-formed and less capable than you used to be, the moult is the picture the psalm offers.",
+            "Bless the Lord, O my soul. He is talking to himself. You may need to."
+          ],
+          "prayer": "Lord, I feel half-formed — past what I was and not yet what I will be. Renew my strength like the eagle's, and carry me through the moult.",
+          "addLabel": "Add what you're shedding",
+          "question": "What are you between at the moment?",
+          "prayerCategory": "Health"
+        },
+        {
+          "day": 13,
+          "title": "Beauty For Ashes",
+          "minutes": 4,
+          "read": {
+            "book": "Isaiah",
+            "chapter": 61,
+            "verse": 3,
+            "from": 1,
+            "to": 3
+          },
+          "body": [
+            {
+              "p": "Jesus read the opening of this chapter aloud in the synagogue at Nazareth, stopped mid-sentence, sat down and said it was fulfilled that day."
+            },
+            {
+              "q": {
+                "book": "Isaiah",
+                "chapter": 61,
+                "verse": 3
+              }
+            },
+            {
+              "p": "To give unto them beauty for ashes, the oil of joy for mourning, the garment of praise for the spirit of heaviness."
+            },
+            {
+              "p": "Three exchanges, and each one takes a mourning custom and reverses it. Ashes on the head, no oil, torn clothing — that was what grief looked like publicly in that culture."
+            },
+            {
+              "p": "So this is not an abstract promise about feeling better. It is a description of somebody being visibly re-dressed, item by item, in front of the people who had watched them mourn."
+            },
+            {
+              "p": "The last line names the purpose: that they might be called trees of righteousness, the planting of the Lord, that he might be glorified."
+            },
+            {
+              "p": "Trees are slow. Even in a verse about exchange, the outcome is something that takes years to become visible."
+            }
+          ],
+          "line": {
+            "a": "Not an abstract promise.",
+            "b": "Being re-dressed, item by item."
+          },
+          "after": [
+            "Ashes were worn where people could see them. So is the exchange.",
+            "The result is a tree, which is not a quick outcome. Restoration and speed are different promises."
+          ],
+          "prayer": "Lord, I have worn this grief publicly for a long time. Take the ashes and give me beauty, take the heaviness and give me praise — and grow something slow and rooted out of it.",
+          "addLabel": "Add what you're still wearing",
+          "question": "What grief are you still visibly dressed in?",
+          "prayerCategory": "Grief"
+        },
+        {
+          "day": 14,
+          "title": "He Made It Again",
+          "minutes": 4,
+          "read": {
+            "book": "Jeremiah",
+            "chapter": 18,
+            "verse": 4,
+            "from": 1,
+            "to": 6
+          },
+          "body": [
+            {
+              "p": "God sends Jeremiah to a potter's house rather than giving him a message directly, which is unusual. He is told to go and watch someone work."
+            },
+            {
+              "q": {
+                "book": "Jeremiah",
+                "chapter": 18,
+                "verse": 4
+              }
+            },
+            {
+              "p": "And the vessel that he made of clay was marred in the hand of the potter: so he made it again another vessel, as seemed good to the potter to make it."
+            },
+            {
+              "p": "Marred in the hand of the potter. The failure happens while the clay is being held, not after it has been abandoned on a shelf."
+            },
+            {
+              "p": "And the response is not to discard it. He made it again — same clay, same hands, different vessel."
+            },
+            {
+              "p": "That last clause matters. It is not remade into what it was going to be. It becomes another vessel, as seemed good to the potter."
+            },
+            {
+              "p": "Which is a harder comfort than the version usually preached. You are not thrown away. You may also not end up as the thing you had planned to be."
+            }
+          ],
+          "line": {
+            "a": "Same clay. Same hands.",
+            "b": "A different vessel."
+          },
+          "after": [
+            "The marring happened in his hands. Nothing about it took the potter by surprise or removed the clay from his grip.",
+            "He made it again. He did not make it the same."
+          ],
+          "prayer": "Lord, what I was going to be got marred, and it happened while I was in Your hands. Make me again — even if what You make is not what I had planned.",
+          "addLabel": "Add the plan that got marred",
+          "question": "Can you accept being remade into something other than your plan?",
+          "prayerCategory": "Purpose"
+        },
+        {
+          "day": 15,
+          "title": "He Purgeth It",
+          "minutes": 4,
+          "read": {
+            "book": "John",
+            "chapter": 15,
+            "verse": 2,
+            "from": 1,
+            "to": 5
+          },
+          "body": [
+            {
+              "p": "Jesus describes his Father as a husbandman, and then says something about vine work that most readers would rather not hear."
+            },
+            {
+              "q": {
+                "book": "John",
+                "chapter": 15,
+                "verse": 2
+              }
+            },
+            {
+              "p": "Every branch in me that beareth not fruit he taketh away: and every branch that beareth fruit, he purgeth it, that it may bring forth more fruit."
+            },
+            {
+              "p": "Two branches, two treatments, and the second is the surprising one. The branch that is working gets cut."
+            },
+            {
+              "p": "Purgeth is pruning — the removal of growth that is alive and healthy but is drawing energy away from fruit. A vine left unpruned produces a great deal of leaf and very little else."
+            },
+            {
+              "p": "So the presence of cutting in your life is not evidence of failure, and it is not necessarily discipline. In this passage it is what happens to the branches that are already producing."
+            },
+            {
+              "p": "The stated purpose is more fruit, and the timing is not the branch's decision. No vine has ever understood the pruning while it was happening."
+            }
+          ],
+          "line": {
+            "a": "The branch that is working",
+            "b": "is the one that gets cut."
+          },
+          "after": [
+            "Losing something good is the hardest kind of loss to interpret, because there is nothing to repent of.",
+            "Sometimes it is not correction. It is a gardener with a purpose you were not consulted about."
+          ],
+          "prayer": "Father, You have taken away things that were not wrong, and I have been trying to work out what I did. Help me trust the husbandman, and bear more where You have cut.",
+          "addLabel": "Add what was cut away",
+          "question": "What good thing have you lost that you cannot explain?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 16,
+          "title": "New Wine, New Bottles",
+          "minutes": 3,
+          "read": {
+            "book": "Mark",
+            "chapter": 2,
+            "verse": 22,
+            "from": 21,
+            "to": 22
+          },
+          "body": [
+            {
+              "p": "Jesus is being asked why his disciples do not fast like everybody else, and he answers with two pieces of household advice about cloth and wineskins."
+            },
+            {
+              "q": {
+                "book": "Mark",
+                "chapter": 2,
+                "verse": 22
+              }
+            },
+            {
+              "p": "No man putteth new wine into old bottles: else the new wine doth burst the bottles, and the wine is spilled, and the bottles will be marred."
+            },
+            {
+              "p": "The bottles are skins. A new skin is supple and stretches as fermentation produces gas; an old one has already stretched to its limit and hardened there."
+            },
+            {
+              "p": "So the problem is not that the old skin is dirty or defective. It worked perfectly for the wine it was made for. It simply has no give left."
+            },
+            {
+              "p": "And notice what is lost when the fit is wrong: both. The wine is spilled and the bottles are marred. Forcing new work into old structures damages the work and the structure together."
+            },
+            {
+              "p": "Which is why renewal so often requires changing an arrangement that was, in its own season, genuinely good."
+            }
+          ],
+          "line": {
+            "a": "The old skin is not defective.",
+            "b": "It has no give left."
+          },
+          "after": [
+            "People resisting change are usually not resisting the wine. They are protecting a skin that once held something well.",
+            "You may need a new arrangement, not a better attitude to the old one."
+          ],
+          "prayer": "Lord, I am trying to hold what You are doing now inside a structure that has already set. Show me what needs to change, and give me courage to change it.",
+          "addLabel": "Add what has no give left",
+          "question": "What arrangement in your life has hardened?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 17,
+          "title": "Nevertheless I Live",
+          "minutes": 4,
+          "read": {
+            "book": "Galatians",
+            "chapter": 2,
+            "verse": 20,
+            "from": 19,
+            "to": 21
+          },
+          "body": [
+            {
+              "p": "Paul writes this in the middle of an argument about whether Gentile believers must keep the law, and it is the most personal sentence in the letter."
+            },
+            {
+              "q": {
+                "book": "Galatians",
+                "chapter": 2,
+                "verse": 20
+              }
+            },
+            {
+              "p": "I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me."
+            },
+            {
+              "p": "The sentence contradicts itself three times in a row, and the contradictions are the point. Crucified, nevertheless living. Living, yet not I."
+            },
+            {
+              "p": "He is describing a self that has been ended and a self that continues, and refusing to resolve the tension in either direction."
+            },
+            {
+              "p": "Then it becomes concrete: the life which I now live in the flesh I live by the faith of the Son of God. In the flesh — an actual ordinary life, with a body and a diary and opponents in Galatia."
+            },
+            {
+              "p": "And the reason given at the end is personal rather than doctrinal: who loved me, and gave himself for me. Not loved us. Me."
+            },
+            {
+              "p": "A renewed life in Paul's account is not a better person. It is a different occupant."
+            }
+          ],
+          "line": {
+            "a": "Not a better person.",
+            "b": "A different occupant."
+          },
+          "after": [
+            "This is the verse people quote when they mean self-improvement, and it is describing something closer to a change of tenancy.",
+            "Loved me, and gave himself for me. Paul narrowed it deliberately."
+          ],
+          "prayer": "Lord Jesus, I have been trying to be a better version of myself. Live in me instead. You loved me and gave Yourself for me, and I want that to be the life I actually live today.",
+          "addLabel": "Add what you're trying to improve",
+          "question": "Are you seeking improvement or a different occupant?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 18,
+          "title": "I Acknowledged My Sin",
+          "minutes": 3,
+          "read": {
+            "book": "Psalms",
+            "chapter": 32,
+            "verse": 5,
+            "from": 3,
+            "to": 5
+          },
+          "body": [
+            {
+              "p": "David describes the physical cost of not saying something out loud, and he is unusually specific about it."
+            },
+            {
+              "p": "When I kept silence, my bones waxed old through my roaring all the day long. Day and night thy hand was heavy upon me: my moisture is turned into the drought of summer."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 32,
+                "verse": 5
+              }
+            },
+            {
+              "p": "I acknowledged my sin unto thee, and mine iniquity have I not hid. I said, I will confess my transgressions unto the Lord; and thou forgavest the iniquity of my sin."
+            },
+            {
+              "p": "Read the sequence carefully. I said I will confess — and the forgiveness arrives in the same breath, before the confession is even reported as finished."
+            },
+            {
+              "p": "The relief is attached to the decision, not to the completeness of the account."
+            },
+            {
+              "p": "And the silence he describes was not peaceful. Keeping something hidden was the loud condition; confession is what made him quiet."
+            }
+          ],
+          "line": {
+            "a": "Keeping silence was the loud part.",
+            "b": "Confession is what made him quiet."
+          },
+          "after": [
+            "The energy spent maintaining an unsaid thing is enormous, and it is usually invisible until it stops.",
+            "He was forgiven at the point of deciding to speak."
+          ],
+          "prayer": "Lord, I have been carrying something unsaid and it is costing me more than the saying would. I acknowledge it now. Thank You that You forgive at the point of turning.",
+          "addLabel": "Add what you've kept silent",
+          "question": "What are you spending energy not saying?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 19,
+          "title": "Faithful And Just To Forgive",
+          "minutes": 3,
+          "read": {
+            "book": "1 John",
+            "chapter": 1,
+            "verse": 9,
+            "from": 8,
+            "to": 10
+          },
+          "body": [
+            {
+              "p": "John writes this to Christians rather than to outsiders, which changes how the verse should be read. It is maintenance language, not entry language."
+            },
+            {
+              "q": {
+                "book": "1 John",
+                "chapter": 1,
+                "verse": 9
+              }
+            },
+            {
+              "p": "If we confess our sins, he is faithful and just to forgive us our sins, and to cleanse us from all unrighteousness."
+            },
+            {
+              "p": "Faithful and just is a strange pairing to attach to forgiveness. Merciful would be expected. Just is not."
+            },
+            {
+              "p": "But justice is the right word if the debt has already been paid by somebody else. Refusing to forgive at that point would be the injustice."
+            },
+            {
+              "p": "Which removes the anxiety from confession. You are not petitioning an undecided judge, hoping to catch him in a good mood."
+            },
+            {
+              "p": "And two verbs are promised, not one. Forgive deals with the record. Cleanse deals with the residue — the sense of being dirty that often outlives the pardon."
+            }
+          ],
+          "line": {
+            "a": "Not merciful to forgive.",
+            "b": "Faithful and just."
+          },
+          "after": [
+            "Many people confess repeatedly for the same thing because they received the forgiveness and never asked for the cleansing.",
+            "Both verbs are in the verse. Ask for both."
+          ],
+          "prayer": "Father, You are faithful and just, so I am not begging an undecided judge. Forgive what I have done, and cleanse the residue that keeps making me feel unclean.",
+          "addLabel": "Add what still feels unclean",
+          "question": "Have you received forgiveness but not cleansing?",
+          "prayerCategory": "Salvation"
+        },
+        {
+          "day": 20,
+          "title": "If We Follow On",
+          "minutes": 3,
+          "read": {
+            "book": "Hosea",
+            "chapter": 6,
+            "verse": 3,
+            "from": 1,
+            "to": 3
+          },
+          "body": [
+            {
+              "p": "Israel is speaking here, and the speech is a little too smooth — come, let us return, he hath torn and he will heal us. The chapter afterwards suggests God found the repentance shallow."
+            },
+            {
+              "p": "But one line inside it is worth taking on its own terms."
+            },
+            {
+              "q": {
+                "book": "Hosea",
+                "chapter": 6,
+                "verse": 3
+              }
+            },
+            {
+              "p": "Then shall we know, if we follow on to know the Lord."
+            },
+            {
+              "p": "Follow on is the phrase. Knowing God in this sentence is not an event that happens to you; it is the result of continuing after the first instalment."
+            },
+            {
+              "p": "And the image given is weather: his going forth is prepared as the morning, and he shall come unto us as the rain, as the latter and former rain unto the earth."
+            },
+            {
+              "p": "Two rains, months apart. The former rain softened ground for planting and the latter swelled the grain before harvest, and a farmer needed both."
+            },
+            {
+              "p": "Whoever wrote this understood that the God who came in the spring is the one you are still waiting for in the autumn."
+            }
+          ],
+          "line": {
+            "a": "Not an event.",
+            "b": "The result of following on."
+          },
+          "after": [
+            "Most people who say God has gone quiet are describing the gap between the former rain and the latter one.",
+            "Follow on. The knowing is downstream of the continuing."
+          ],
+          "prayer": "Lord, I received something real once and I have been living off it. Let me follow on to know You, and send the latter rain as well as the former.",
+          "addLabel": "Add what you're waiting for",
+          "question": "Are you living off an instalment you received long ago?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 21,
+          "title": "Falleth Seven Times",
+          "minutes": 3,
+          "read": {
+            "book": "Proverbs",
+            "chapter": 24,
+            "verse": 16,
+            "from": 15,
+            "to": 16
+          },
+          "body": [
+            {
+              "p": "This proverb is about the difference between two men, and the difference is not that one of them stays upright."
+            },
+            {
+              "q": {
+                "book": "Proverbs",
+                "chapter": 24,
+                "verse": 16
+              }
+            },
+            {
+              "p": "For a just man falleth seven times, and riseth up again: but the wicked shall fall into mischief."
+            },
+            {
+              "p": "The just man falls seven times. Seven is the number of completeness in Hebrew, so this is not an allowance for the occasional lapse — it is a description of a full quota of falling."
+            },
+            {
+              "p": "What distinguishes him is the second verb. He rises."
+            },
+            {
+              "p": "Which reframes the question most people carry about their own spiritual life. The measure offered is not how few times you have fallen but whether you have got up on each occasion."
+            },
+            {
+              "p": "And there is a quiet realism in the arithmetic. Nobody counts to seven who was expecting one."
+            }
+          ],
+          "line": {
+            "a": "The difference is not staying up.",
+            "b": "It is getting up."
+          },
+          "after": [
+            "A person who has fallen six times and risen six times is, by this proverb, a just man having a hard year.",
+            "The counting is not the enemy's. It is in scripture, and it goes to seven."
+          ],
+          "prayer": "Lord, I have fallen more times than I want to admit and I have been treating each one as final. Give me the grace to rise again today, and count me among the just.",
+          "addLabel": "Add where you fell",
+          "question": "Are you measuring your falls or your risings?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 22,
+          "title": "The Second Time",
+          "minutes": 4,
+          "read": {
+            "book": "Jonah",
+            "chapter": 3,
+            "verse": 1,
+            "from": 1,
+            "to": 3
+          },
+          "body": [
+            {
+              "p": "Jonah has already been given this commission once. He ran in the opposite direction, was thrown overboard, and spent three days somewhere nobody would describe as a second chance."
+            },
+            {
+              "q": {
+                "book": "Jonah",
+                "chapter": 3,
+                "verse": 1
+              }
+            },
+            {
+              "p": "And the word of the Lord came unto Jonah the second time, saying, Arise, go unto Nineveh."
+            },
+            {
+              "p": "The second time. The narrator records it plainly, without any comment on whether Jonah deserved it."
+            },
+            {
+              "p": "And the commission is identical. Not a smaller city, not a demoted role, not a probationary assignment. The same instruction, word for word from chapter one."
+            },
+            {
+              "p": "Which is worth sitting with, because it is not how most institutions treat someone who has failed publicly and expensively."
+            },
+            {
+              "p": "Jonah then goes, preaches, and the city repents — and chapter four reveals he is still the same difficult, resentful man he was at the start. God used him anyway, and then kept arguing with him afterwards."
+            }
+          ],
+          "line": {
+            "a": "The same commission.",
+            "b": "Word for word."
+          },
+          "after": [
+            "The second word is not a reduced word. That is the detail the book insists on.",
+            "He was not fixed first. He was sent again and dealt with afterwards."
+          ],
+          "prayer": "Lord, I assumed my failure had permanently changed what You would ask of me. Speak to me a second time, and give me the grace to go this time.",
+          "addLabel": "Add what you ran from",
+          "question": "What do you assume God will never ask you again?",
+          "prayerCategory": "Purpose"
+        },
+        {
+          "day": 23,
+          "title": "There Fell From His Eyes",
+          "minutes": 3,
+          "read": {
+            "book": "Acts",
+            "chapter": 9,
+            "verse": 18,
+            "from": 17,
+            "to": 20
+          },
+          "body": [
+            {
+              "p": "Saul has been blind for three days, sitting in a house on Straight Street, neither eating nor drinking. Ananias has been sent to him and has objected, reasonably, that this man arrests people like him."
+            },
+            {
+              "q": {
+                "book": "Acts",
+                "chapter": 9,
+                "verse": 18
+              }
+            },
+            {
+              "p": "And immediately there fell from his eyes as it had been scales: and he received sight forthwith, and arose, and was baptized."
+            },
+            {
+              "p": "As it had been scales. Luke, a doctor, reaches for an approximation — whatever came off was physical enough to describe and unlike anything he had a word for."
+            },
+            {
+              "p": "But the blindness had a purpose. Saul was a man who had read the scriptures with total confidence and total accuracy about the wrong conclusion."
+            },
+            {
+              "p": "Three days without sight is a strange gift to give someone whose problem was that he was certain."
+            },
+            {
+              "p": "The first thing he does with the restored eyes is get baptized. The second is to start preaching the opposite of what he had come to Damascus to enforce."
+            }
+          ],
+          "line": {
+            "a": "His problem was not ignorance.",
+            "b": "It was certainty."
+          },
+          "after": [
+            "Some renewals begin with being unable to see for a while, and they are not usually experienced as kindness at the time.",
+            "The man who most needed to be wrong was the one most sure he was right."
+          ],
+          "prayer": "Lord, I have been confident and wrong before and I did not know it. Take the scales off, even if it means a season of not being able to see clearly.",
+          "addLabel": "Add where you might be certain and wrong",
+          "question": "What are you completely sure about?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 24,
+          "title": "Day By Day",
+          "minutes": 3,
+          "read": {
+            "book": "2 Corinthians",
+            "chapter": 4,
+            "verse": 16,
+            "from": 16,
+            "to": 18
+          },
+          "body": [
+            {
+              "p": "Paul has just listed what he has endured — troubled on every side, perplexed, persecuted, cast down — and then says something that would sound like denial from anyone with an easier life."
+            },
+            {
+              "q": {
+                "book": "2 Corinthians",
+                "chapter": 4,
+                "verse": 16
+              }
+            },
+            {
+              "p": "Though our outward man perish, yet the inward man is renewed day by day."
+            },
+            {
+              "p": "Two processes running simultaneously in opposite directions. He does not pretend the first is not happening. Perish is a strong word and he chose it."
+            },
+            {
+              "p": "Day by day is the phrase that carries the weight. The renewal is not a single restoration but a daily one, running at roughly the same rate as the decline."
+            },
+            {
+              "p": "Which means on any given morning you may feel no net improvement at all, and the verse would still be true."
+            },
+            {
+              "p": "He calls the affliction light and momentary two verses later, and he is comparing it to something rather than measuring it in itself."
+            }
+          ],
+          "line": {
+            "a": "Two processes.",
+            "b": "Opposite directions."
+          },
+          "after": [
+            "Ageing, illness and tiredness are not signs that the renewal has stopped. Paul has both running at once.",
+            "Day by day means today's renewal does not carry over. Ask again in the morning."
+          ],
+          "prayer": "Father, my outward man is wearing out and I feel it. Renew the inward man today — not as a repair of the outward one, but as its own daily work.",
+          "addLabel": "Add what is wearing out",
+          "question": "Are you reading decline as evidence that God has stopped?",
+          "prayerCategory": "Health"
+        },
+        {
+          "day": 25,
+          "title": "Out Of The Horrible Pit",
+          "minutes": 3,
+          "read": {
+            "book": "Psalms",
+            "chapter": 40,
+            "verse": 2,
+            "from": 1,
+            "to": 3
+          },
+          "body": [
+            {
+              "p": "The psalm opens with waiting — I waited patiently for the Lord — and the Hebrew is emphatic, closer to waiting I waited. Then the rescue is described in four movements."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 40,
+                "verse": 2
+              }
+            },
+            {
+              "p": "He brought me up also out of an horrible pit, out of the miry clay, and set my feet upon a rock, and established my goings."
+            },
+            {
+              "p": "Brought up, out of the clay, feet on rock, goings established. The last one is the least dramatic and the most useful."
+            },
+            {
+              "p": "Being lifted out is not the same as being able to walk. Established my goings is about the ordinary business of getting somewhere afterwards, which is where many rescues quietly fail."
+            },
+            {
+              "p": "Miry clay is the detail that dates this to real experience. A pit you can climb; clay is what makes climbing pointless."
+            },
+            {
+              "p": "And what follows is a new song in my mouth. The song is given after the feet are steady, not instead of them."
+            }
+          ],
+          "line": {
+            "a": "Being lifted out",
+            "b": "is not the same as being able to walk."
+          },
+          "after": [
+            "If you have been rescued from something and still cannot get moving, that is a recognised stage and it has its own verb in this psalm.",
+            "Ask for established goings, not only for rescue."
+          ],
+          "prayer": "Lord, You brought me out and I still cannot seem to walk. Set my feet on rock and establish my goings, and put a new song in my mouth when they are steady.",
+          "addLabel": "Add where you can't get moving",
+          "question": "Have you been rescued but not yet steadied?",
+          "prayerCategory": "Deliverance"
+        },
+        {
+          "day": 26,
+          "title": "Before They Spring Forth",
+          "minutes": 3,
+          "read": {
+            "book": "Isaiah",
+            "chapter": 42,
+            "verse": 9,
+            "from": 8,
+            "to": 9
+          },
+          "body": [
+            {
+              "p": "Isaiah is making a case for God against idols, and the argument he uses is about time rather than power."
+            },
+            {
+              "q": {
+                "book": "Isaiah",
+                "chapter": 42,
+                "verse": 9
+              }
+            },
+            {
+              "p": "Behold, the former things are come to pass, and new things do I declare: before they spring forth I tell you of them."
+            },
+            {
+              "p": "The evidence offered is track record. The former things are come to pass — check them, they happened. On that basis, hear the new ones."
+            },
+            {
+              "p": "Before they spring forth I tell you of them. The telling comes first, which means there is always a period of holding a declaration with nothing visible to support it."
+            },
+            {
+              "p": "That gap is where most faith is actually lived, and it is not a defect in the arrangement. It is the arrangement."
+            },
+            {
+              "p": "An idol, by contrast, can only comment on what has already happened. Isaiah's whole case is that anyone can do that."
+            }
+          ],
+          "line": {
+            "a": "The telling comes first.",
+            "b": "The springing forth comes later."
+          },
+          "after": [
+            "If God has said something to you that has not materialised, the sequence in this verse is the normal one.",
+            "Check the former things. They are the reason to keep holding the new ones."
+          ],
+          "prayer": "Lord, You have told me things that have not sprung forth yet. Remind me of the former things that did, and give me the patience to hold the new ones in the meantime.",
+          "addLabel": "Add what you're still holding",
+          "question": "What has God said that has not appeared yet?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 27,
+          "title": "I Make All Things New",
+          "minutes": 4,
+          "read": {
+            "book": "Revelation",
+            "chapter": 21,
+            "verse": 5,
+            "from": 3,
+            "to": 5
+          },
+          "body": [
+            {
+              "p": "This is one of the few places in Revelation where God speaks directly, and what he says is five words long."
+            },
+            {
+              "q": {
+                "book": "Revelation",
+                "chapter": 21,
+                "verse": 5
+              }
+            },
+            {
+              "p": "Behold, I make all things new."
+            },
+            {
+              "p": "Not all new things. All things new — the same things, renewed. It is the difference between a replacement and a restoration, and John's grammar is doing that deliberately."
+            },
+            {
+              "p": "The verse before describes what goes: no more death, neither sorrow, nor crying, neither shall there be any more pain, for the former things are passed away."
+            },
+            {
+              "p": "And in the middle of it, God wipes away tears with his own hand, which is a very small gesture in a book full of enormous ones."
+            },
+            {
+              "p": "Then he tells John to write, because these words are true and faithful. The instruction to write suggests somebody was going to need it in a form they could re-read."
+            },
+            {
+              "p": "A month about renewal ends here on purpose. Every renewal before this one is partial and is a rehearsal for the one that is not."
+            }
+          ],
+          "line": {
+            "a": "Not all new things.",
+            "b": "All things new."
+          },
+          "after": [
+            "Everything renewed in April will wear out again. That is not cynicism; it is why this verse is in the Bible.",
+            "He wipes the tears personally. Whoever wrote that had thought about what comfort actually looks like."
+          ],
+          "prayer": "Lord, every renewal I receive here wears out eventually. Thank You that You are making all things new, and that You will do the wiping Yourself.",
+          "addLabel": "Add what you long to see made new",
+          "question": "What are you waiting for God to make new?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 28,
+          "title": "It Is God Which Worketh In You",
+          "minutes": 3,
+          "read": {
+            "book": "Philippians",
+            "chapter": 2,
+            "verse": 13,
+            "from": 12,
+            "to": 13
+          },
+          "body": [
+            {
+              "p": "These two verses are usually quoted separately and they contradict each other if you do that."
+            },
+            {
+              "p": "Work out your own salvation with fear and trembling — that is verse twelve, and it sounds like everything depends on effort."
+            },
+            {
+              "q": {
+                "book": "Philippians",
+                "chapter": 2,
+                "verse": 13
+              }
+            },
+            {
+              "p": "For it is God which worketh in you both to will and to do of his good pleasure."
+            },
+            {
+              "p": "The for at the beginning joins them. You work out because God works in — the effort is evidence of the other thing, not a substitute for it."
+            },
+            {
+              "p": "And what God is said to produce is both to will and to do. The wanting as well as the doing."
+            },
+            {
+              "p": "That is the part worth holding onto in a month about renewal. If you have found yourself wanting to change — even faintly, even inconsistently — that desire is itself reported here as something God is working."
+            },
+            {
+              "p": "Nobody generates their own appetite for God. Its presence is already evidence of something at work."
+            }
+          ],
+          "line": {
+            "a": "You work out",
+            "b": "because He works in."
+          },
+          "after": [
+            "The desire you have to be different did not originate with you. Paul says God produces the willing as well as the doing.",
+            "Treat the wanting as evidence rather than as pressure."
+          ],
+          "prayer": "Father, thank You that even my wanting to change is Your work in me. Keep working the willing and the doing, and let my effort be a response rather than a performance.",
+          "addLabel": "Add what you want to change",
+          "question": "Where has God already given you the wanting?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 29,
+          "title": "Grow In Grace",
+          "minutes": 3,
+          "read": {
+            "book": "2 Peter",
+            "chapter": 3,
+            "verse": 18,
+            "from": 17,
+            "to": 18
+          },
+          "body": [
+            {
+              "p": "Peter's second letter ends with a single instruction, and it is the last thing he wrote."
+            },
+            {
+              "q": {
+                "book": "2 Peter",
+                "chapter": 3,
+                "verse": 18
+              }
+            },
+            {
+              "p": "But grow in grace, and in the knowledge of our Lord and Saviour Jesus Christ."
+            },
+            {
+              "p": "Grow is the verb, and growth is not something anybody does by deciding to. A person can create conditions for it and cannot perform it."
+            },
+            {
+              "p": "In grace is where the growing happens. Not toward grace, as though it were the goal — inside it, as the medium."
+            },
+            {
+              "p": "Which rules out the most common form of Christian striving: attempting to grow in order to be accepted. Peter has the acceptance as the soil rather than the harvest."
+            },
+            {
+              "p": "And the verse before warns about being led away with the error of the wicked and falling from your own stedfastness, which tells you what the alternative to growing is. Not staying still. Drifting."
+            }
+          ],
+          "line": {
+            "a": "Not toward grace.",
+            "b": "Inside it."
+          },
+          "after": [
+            "Growth cannot be forced and can be starved. Most of what you can do about it is about conditions.",
+            "The alternative to growing is not standing still. Peter says it is being led away."
+          ],
+          "prayer": "Lord, I have tried to grow in order to be accepted. Let me grow inside the grace I already have, and keep me from drifting while I think I am standing still.",
+          "addLabel": "Add the conditions you'll set",
+          "question": "Are you growing in grace or trying to earn it?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 30,
+          "title": "Let Us Go On",
+          "minutes": 4,
+          "read": {
+            "book": "Hebrews",
+            "chapter": 6,
+            "verse": 1,
+            "from": 1,
+            "to": 3
+          },
+          "body": [
+            {
+              "p": "The writer has just told his readers they need milk rather than meat, and are unskilful in the word of righteousness. Then, instead of taking them back to the beginning, he does the opposite."
+            },
+            {
+              "q": {
+                "book": "Hebrews",
+                "chapter": 6,
+                "verse": 1
+              }
+            },
+            {
+              "p": "Therefore leaving the principles of the doctrine of Christ, let us go on unto perfection; not laying again the foundation of repentance from dead works, and of faith toward God."
+            },
+            {
+              "p": "Not laying again the foundation. He names the basics — repentance, faith, baptisms, laying on of hands, resurrection, eternal judgement — and declines to rebuild them."
+            },
+            {
+              "p": "A foundation relaid every year is not a deeper foundation. It is a building site."
+            },
+            {
+              "p": "And that is the danger for anyone who has spent a month on renewal. It is possible to keep starting, sincerely, and never to go on."
+            },
+            {
+              "p": "Let us go on unto perfection. The word is maturity, completeness — arriving at what something was made to be rather than achieving flawlessness."
+            },
+            {
+              "p": "April ends by refusing to begin again. Everything laid this month was laid so that something could be built on it."
+            }
+          ],
+          "line": {
+            "a": "A foundation relaid every year",
+            "b": "is a building site."
+          },
+          "after": [
+            "Repeated fresh starts can be a way of avoiding the harder work of going on from where you already are.",
+            "Do not lay it again. Build."
+          ],
+          "prayer": "Lord, I am good at starting and I have laid this foundation more than once. Let me go on from here instead of beginning again, and build something that lasts.",
+          "addLabel": "Add what you'll build on",
+          "question": "Are you starting again to avoid going on?",
+          "prayerCategory": "Purpose"
+        }
+      ]
     },
     {
       "month": 5,
