@@ -1521,7 +1521,1457 @@
       "days": 29,
       "name": "The Key of Love",
       "theme": "Healing relationships and self-worth",
-      "written": []
+      "written": [
+        {
+          "day": 1,
+          "title": "Somebody Loved First",
+          "minutes": 3,
+          "read": {
+            "book": "1 John",
+            "chapter": 4,
+            "verse": 19,
+            "from": 16,
+            "to": 19
+          },
+          "body": [
+            {
+              "p": "A month about love usually starts by asking people to produce some. Be kinder. Forgive faster. Try harder with the person you find difficult. Most of us have been given that instruction often enough to know it does not generate anything."
+            },
+            {
+              "q": {
+                "book": "1 John",
+                "chapter": 4,
+                "verse": 19
+              }
+            },
+            {
+              "p": "We love him, because he first loved us. The sentence has a direction, and the direction is the whole doctrine."
+            },
+            {
+              "p": "John does not command love here. He explains where it comes from, which is somewhere other than the person being asked to show it."
+            },
+            {
+              "p": "That matters practically. If love originates in you, then running out of it is a character failure and the only remedy is effort. If it originates elsewhere, running out is a supply problem, and the remedy is to go back to the source."
+            },
+            {
+              "p": "Most people trying to love a difficult person are attempting to manufacture something they were meant to pass on."
+            }
+          ],
+          "line": {
+            "a": "You are not the source.",
+            "b": "You are the second link."
+          },
+          "after": [
+            "This month will ask hard things of you about people. None of it starts with your reserves.",
+            "Receive first. Everything after that is overflow rather than output."
+          ],
+          "prayer": "Father, I have been trying to produce love out of an empty tank and calling the exhaustion failure. Let me receive from You first, and love people out of what You have given rather than what I can generate.",
+          "addLabel": "Add who is hard to love",
+          "question": "Are you manufacturing love or passing it on?",
+          "prayerCategory": "Relationships"
+        },
+        {
+          "day": 2,
+          "title": "Fearfully, And Wonderfully",
+          "minutes": 4,
+          "read": {
+            "book": "Psalms",
+            "chapter": 139,
+            "verse": 14,
+            "from": 13,
+            "to": 16
+          },
+          "body": [
+            {
+              "p": "There is a kind of self-dislike that has learned to sound like humility. It says small things about itself and calls it not being proud, and it is very hard to argue with because it looks like a virtue."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 139,
+                "verse": 14
+              }
+            },
+            {
+              "p": "I will praise thee; for I am fearfully and wonderfully made."
+            },
+            {
+              "p": "Notice who is being praised. The verse is not a compliment to David. It is worship, and the thing being worshipped is God's workmanship."
+            },
+            {
+              "p": "Which is why the self-dislike does not survive contact with it. To say I am nothing much is not modesty about yourself; it is a review of somebody else's work."
+            },
+            {
+              "p": "The psalm goes further than most of us are comfortable with. Covered in my mother's womb. Written in thy book. In continuance fashioned, when as yet there was none of them."
+            },
+            {
+              "p": "You were not assembled at speed out of leftover parts. Whatever you have concluded about your worth, it was reached without consulting the person who made you."
+            }
+          ],
+          "line": {
+            "a": "Not modesty about yourself.",
+            "b": "A review of someone else's work."
+          },
+          "after": [
+            "Self-worth in this psalm is not achieved and it is not earned. It is inherited from the fact of being made deliberately.",
+            "Praise Him for it. That is the only posture the verse offers."
+          ],
+          "prayer": "Lord, I have said small things about myself and called it humility. Teach me to see Your workmanship where I have only seen my faults, and to praise You for how I was made.",
+          "addLabel": "Add what you believe about yourself",
+          "question": "What have you concluded about your worth without consulting God?",
+          "prayerCategory": "Mental Health"
+        },
+        {
+          "day": 3,
+          "title": "Suffereth Long",
+          "minutes": 4,
+          "read": {
+            "book": "1 Corinthians",
+            "chapter": 13,
+            "verse": 4,
+            "from": 4,
+            "to": 7
+          },
+          "body": [
+            {
+              "p": "This chapter is read at weddings, which has quietly softened it. Paul wrote it to a church that was suing each other, splitting into factions and competing over spiritual gifts."
+            },
+            {
+              "q": {
+                "book": "1 Corinthians",
+                "chapter": 13,
+                "verse": 4
+              }
+            },
+            {
+              "p": "Charity suffereth long, and is kind. The first word describes waiting under something without retaliating. The second describes being actively good to the person you are waiting under."
+            },
+            {
+              "p": "Read the list that follows and notice how much of it is negative. Envieth not. Vaunteth not. Is not puffed up. Doth not behave itself unseemly. Seeketh not her own. Is not easily provoked."
+            },
+            {
+              "p": "More than half of the definition is things love does not do. That is a strange way to describe an emotion, and a very useful way to describe a practice."
+            },
+            {
+              "p": "You cannot make yourself feel patient. You can decline to retaliate today, which is what suffering long actually consists of."
+            }
+          ],
+          "line": {
+            "a": "Half the definition",
+            "b": "is things love does not do."
+          },
+          "after": [
+            "If love were a feeling, this chapter would be describing something you cannot be commanded to produce.",
+            "Most of it is restraint, and restraint is available to you this afternoon."
+          ],
+          "prayer": "Lord, I cannot feel my way into patience with this person. Help me instead not to retaliate, not to keep score, not to say the accurate wounding thing — and let that be love until the feeling follows.",
+          "addLabel": "Add who you're waiting under",
+          "question": "Which item on Paul's list are you failing today?",
+          "prayerCategory": "Relationships"
+        },
+        {
+          "day": 4,
+          "title": "A Great Way Off",
+          "minutes": 4,
+          "read": {
+            "book": "Luke",
+            "chapter": 15,
+            "verse": 20,
+            "from": 17,
+            "to": 24
+          },
+          "body": [
+            {
+              "p": "The son has rehearsed a speech. He has it word for word — I am no more worthy to be called thy son, make me as one of thy hired servants — and it is a good speech, honest and appropriately ashamed."
+            },
+            {
+              "q": {
+                "book": "Luke",
+                "chapter": 15,
+                "verse": 20
+              }
+            },
+            {
+              "p": "But when he was yet a great way off, his father saw him."
+            },
+            {
+              "p": "Saw him first. Which means the father had been looking down that road, habitually, for long enough to recognise a silhouette at distance."
+            },
+            {
+              "p": "And then the father runs. In that culture an older man gathering his robes and running was undignified, and Jesus puts it in on purpose."
+            },
+            {
+              "p": "The son gets through about half his speech. The father interrupts him with instructions about a robe and a ring and shoes — not one of which the son asked for, all of which restore him as a son rather than hire him as a servant."
+            },
+            {
+              "p": "The speech was not wrong. It was simply answering a question the father had never been asking."
+            }
+          ],
+          "line": {
+            "a": "He had the speech ready.",
+            "b": "He never finished it."
+          },
+          "after": [
+            "Some of us have been rehearsing an apology for years and have never come up the road to deliver it.",
+            "He is already looking. He will interrupt you."
+          ],
+          "prayer": "Father, I have been rehearsing what I would say to You instead of coming home. I am coming. Interrupt me with mercy before I finish explaining myself.",
+          "addLabel": "Add what you've been rehearsing",
+          "question": "What speech have you been preparing instead of coming home?",
+          "prayerCategory": "Salvation"
+        },
+        {
+          "day": 5,
+          "title": "As I Have Loved You",
+          "minutes": 3,
+          "read": {
+            "book": "John",
+            "chapter": 13,
+            "verse": 34,
+            "from": 33,
+            "to": 35
+          },
+          "body": [
+            {
+              "p": "He calls it a new commandment, which is odd. Loving one another was already in the law — Leviticus had said love thy neighbour as thyself centuries earlier."
+            },
+            {
+              "q": {
+                "book": "John",
+                "chapter": 13,
+                "verse": 34
+              }
+            },
+            {
+              "p": "What is new is the standard. Not as thyself. As I have loved you."
+            },
+            {
+              "p": "And he says it in a room where he has just washed their feet, including the feet of the man who is about to sell him, an hour or so before he is arrested."
+            },
+            {
+              "p": "So the measure is not an abstraction. They had watched it that evening, in a basin, on the floor."
+            },
+            {
+              "p": "It is a harder commandment than the old one, and also a clearer one. Loving your neighbour as yourself requires you to work out what you would want. Loving as he loved requires you to remember what he did."
+            }
+          ],
+          "line": {
+            "a": "Not as yourself.",
+            "b": "As I have loved you."
+          },
+          "after": [
+            "The new standard is higher, but it is also more concrete. You are not guessing at a level.",
+            "Ask what he did in the room that night, and do the equivalent for one person this week."
+          ],
+          "prayer": "Jesus, You set the measure by kneeling in front of men who would fail You that night. Give me the humility to love at that level with somebody I would rather not serve.",
+          "addLabel": "Add who needs washing",
+          "question": "What would loving them as he loved you look like this week?",
+          "prayerCategory": "Relationships"
+        },
+        {
+          "day": 6,
+          "title": "Go Yet, Love Her",
+          "minutes": 4,
+          "read": {
+            "book": "Hosea",
+            "chapter": 3,
+            "verse": 1,
+            "from": 1,
+            "to": 3
+          },
+          "body": [
+            {
+              "p": "Hosea is the most uncomfortable book in the prophets because the prophet is not given a sermon to preach. He is given a marriage to live, and it is a marriage that keeps failing publicly."
+            },
+            {
+              "q": {
+                "book": "Hosea",
+                "chapter": 3,
+                "verse": 1
+              }
+            },
+            {
+              "p": "Go yet. Two words carrying an entire second act. He has already done this once, and he is being sent again."
+            },
+            {
+              "p": "And the instruction is not go and rebuke her, or go and be reconciled if she has changed. It is love her, stated as an action he is to perform toward someone who is currently in another man's house."
+            },
+            {
+              "p": "The next verse is stranger still. He buys her back — fifteen pieces of silver and a quantity of barley, which is roughly the price of a slave, scraped together in cash and grain."
+            },
+            {
+              "p": "God says the whole arrangement is a picture: according to the love of the Lord toward the children of Israel, who look to other gods."
+            }
+          ],
+          "line": {
+            "a": "Not go and rebuke her.",
+            "b": "Go yet, love her."
+          },
+          "after": [
+            "This is not a passage about staying in danger, and it has been misused that way. It is about what God's love costs Him.",
+            "He went yet. He is still going yet, in your direction, having done it before."
+          ],
+          "prayer": "Lord, I do not deserve a second sending and You have sent Yourself again. Thank You for a love that goes yet, and let me be honest about how much it has cost You.",
+          "addLabel": "Add where you've wandered",
+          "question": "Where has God come after you more than once?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 7,
+          "title": "They Seemed But A Few Days",
+          "minutes": 3,
+          "read": {
+            "book": "Genesis",
+            "chapter": 29,
+            "verse": 20,
+            "from": 18,
+            "to": 20
+          },
+          "body": [
+            {
+              "p": "Jacob agrees to work seven years for Rachel. Seven years is a long time to be paid nothing, in a foreign country, for an uncle who will later cheat him."
+            },
+            {
+              "q": {
+                "book": "Genesis",
+                "chapter": 29,
+                "verse": 20
+              }
+            },
+            {
+              "p": "And they seemed unto him but a few days, for the love he had to her."
+            },
+            {
+              "p": "That is not a statement about how time works. Seven years took seven years. It is a statement about what love does to the experience of cost."
+            },
+            {
+              "p": "Most of what we call sacrifice in relationships is really accounting — a private tally of what has been given and what has come back. The tally is usually accurate and it is always corrosive."
+            },
+            {
+              "p": "Jacob is not keeping one. The years are real, the labour is real, and he is not adding them up."
+            },
+            {
+              "p": "The verse is placed just before the deception that costs him seven more. He works those too."
+            }
+          ],
+          "line": {
+            "a": "Seven years took seven years.",
+            "b": "He was not counting them."
+          },
+          "after": [
+            "The question is not whether you are giving more than you receive. In most seasons of most relationships, somebody is.",
+            "The question is whether you are keeping the ledger."
+          ],
+          "prayer": "Father, I have been keeping an accurate and quietly bitter account of what I have given. Take the ledger. Let me serve without counting the years.",
+          "addLabel": "Add the ledger you're keeping",
+          "question": "Who are you keeping a private tally against?",
+          "prayerCategory": "Marriage"
+        },
+        {
+          "day": 8,
+          "title": "Whither Thou Goest",
+          "minutes": 4,
+          "read": {
+            "book": "Ruth",
+            "chapter": 1,
+            "verse": 16,
+            "from": 14,
+            "to": 18
+          },
+          "body": [
+            {
+              "p": "Naomi has lost her husband and both sons, and she does the decent thing: she releases her daughters-in-law. Go back to your mothers, find husbands, do not tie your life to mine."
+            },
+            {
+              "p": "Orpah goes, and the text does not blame her. She is doing exactly what she was told."
+            },
+            {
+              "q": {
+                "book": "Ruth",
+                "chapter": 1,
+                "verse": 16
+              }
+            },
+            {
+              "p": "Ruth is a Moabite. She is committing to a bitter widow, an unfamiliar country, a foreign God and no visible future, and the language she uses is covenant language."
+            },
+            {
+              "p": "Where thou lodgest. Thy people. Thy God. Where thou diest, will I die. It escalates from address to identity to death, in one breath."
+            },
+            {
+              "p": "Naomi's response is recorded plainly: when she saw that she was stedfastly minded to go with her, then she left speaking unto her. She stopped arguing. There are commitments that end a conversation."
+            }
+          ],
+          "line": {
+            "a": "She was released.",
+            "b": "She stayed anyway."
+          },
+          "after": [
+            "Loyalty that only holds while it is convenient is not loyalty; it is agreement. Ruth shows up when the sensible advice is to leave.",
+            "Somebody near you has been released by everyone. Go back."
+          ],
+          "prayer": "Lord, make me the kind of person who stays when leaving would be understandable. Show me who has been quietly released by everyone else, and send me to them.",
+          "addLabel": "Add who you'll stay with",
+          "question": "Who has everyone else reasonably walked away from?",
+          "prayerCategory": "Relationships"
+        },
+        {
+          "day": 9,
+          "title": "Knit With The Soul",
+          "minutes": 3,
+          "read": {
+            "book": "1 Samuel",
+            "chapter": 18,
+            "verse": 1,
+            "from": 1,
+            "to": 4
+          },
+          "body": [
+            {
+              "p": "David has just killed Goliath, and the person with the most to lose from it is Jonathan. He is the king's son and the natural heir, and the crowd is already singing that David has killed more than his father."
+            },
+            {
+              "q": {
+                "book": "1 Samuel",
+                "chapter": 18,
+                "verse": 1
+              }
+            },
+            {
+              "p": "The soul of Jonathan was knit with the soul of David. Knit is a weaving word — two things bound so that pulling one moves the other."
+            },
+            {
+              "p": "And then he does something with his clothes. He strips off his robe, his garments, his sword, his bow and his girdle, and gives them to David."
+            },
+            {
+              "p": "Those are not gifts. That is the wardrobe of a crown prince, and handing it to the man the country is singing about is an abdication performed in public."
+            },
+            {
+              "p": "Jonathan loved the person who cost him the throne, and the text records no bitterness about it anywhere in the chapters that follow."
+            }
+          ],
+          "line": {
+            "a": "He had the most to lose.",
+            "b": "He handed over the robe."
+          },
+          "after": [
+            "Rivalry is the ordinary response to somebody who is gaining what you wanted. Jonathan is in scripture partly to show it is not the only one.",
+            "There is somebody whose rise has cost you something. Bless them out loud."
+          ],
+          "prayer": "Father, deal with the rivalry in me toward the person who is getting what I wanted. Let me love them honestly rather than tolerating them politely.",
+          "addLabel": "Add who you'll bless",
+          "question": "Whose success has quietly cost you something?",
+          "prayerCategory": "Relationships"
+        },
+        {
+          "day": 10,
+          "title": "Tenderhearted",
+          "minutes": 3,
+          "read": {
+            "book": "Ephesians",
+            "chapter": 4,
+            "verse": 32,
+            "from": 29,
+            "to": 32
+          },
+          "body": [
+            {
+              "p": "Paul has spent the previous verses listing what to put away: bitterness, wrath, anger, clamour, evil speaking, malice. It is a precise list and most of it describes how people talk."
+            },
+            {
+              "q": {
+                "book": "Ephesians",
+                "chapter": 4,
+                "verse": 32
+              }
+            },
+            {
+              "p": "Be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ's sake hath forgiven you."
+            },
+            {
+              "p": "Tenderhearted is the word that stands out. It is a physical term — well-disposed in the gut — and it names something that bitterness slowly removes."
+            },
+            {
+              "p": "You can be technically forgiving and completely hard. Most long-running family arrangements run on exactly that: no active hostility, and no tenderness left either."
+            },
+            {
+              "p": "And the standard at the end is not proportional. Not forgive as much as they deserve. As God for Christ's sake hath forgiven you, which is a debt nobody in the sentence can calculate."
+            }
+          ],
+          "line": {
+            "a": "You can forgive",
+            "b": "and stay hard."
+          },
+          "after": [
+            "Hardness is the settlement most families reach when forgiveness has been declared but never felt.",
+            "Ask for tenderness back. It is a slower repair than forgiveness and a more thorough one."
+          ],
+          "prayer": "Lord, I have forgiven this person and I am still hard toward them. Give me back a soft heart, not because they have earned it but because You have not withheld one from me.",
+          "addLabel": "Add who you've hardened toward",
+          "question": "Who have you forgiven without softening?",
+          "prayerCategory": "Family"
+        },
+        {
+          "day": 11,
+          "title": "While We Were Yet",
+          "minutes": 3,
+          "read": {
+            "book": "Romans",
+            "chapter": 5,
+            "verse": 8,
+            "from": 6,
+            "to": 10
+          },
+          "body": [
+            {
+              "p": "Paul is building an argument about assurance, and he does it by fixing the timing of the cross rather than its meaning."
+            },
+            {
+              "q": {
+                "book": "Romans",
+                "chapter": 5,
+                "verse": 8
+              }
+            },
+            {
+              "p": "While we were yet sinners, Christ died for us."
+            },
+            {
+              "p": "The word yet is doing everything. Not after we repented. Not once we had shown promise. While — during, in the middle of, at the time when nothing had improved."
+            },
+            {
+              "p": "Which settles a question most people carry quietly: whether God's affection is a response to progress."
+            },
+            {
+              "p": "Paul frames it as a demonstration — God commendeth his love toward us. It is exhibited, put on display, at the least deserving moment available, so that the moment can never be used as evidence against you."
+            },
+            {
+              "p": "If He loved you then, the case for Him loving you now does not rest on how this week has gone."
+            }
+          ],
+          "line": {
+            "a": "Not after we improved.",
+            "b": "While we were yet."
+          },
+          "after": [
+            "Most self-condemnation is an argument that God's love is conditional on a trajectory.",
+            "The cross happened at the low point on purpose. It was dated deliberately."
+          ],
+          "prayer": "Father, I keep trying to earn back something that was given while I was at my worst. Settle it in me: You loved me then, and this week has not changed the arrangement.",
+          "addLabel": "Add what you're trying to earn back",
+          "question": "Do you believe God's love is responding to your progress?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 12,
+          "title": "Many Waters",
+          "minutes": 3,
+          "read": {
+            "book": "Song of Solomon",
+            "chapter": 8,
+            "verse": 7,
+            "from": 6,
+            "to": 7
+          },
+          "body": [
+            {
+              "p": "The Song is a love poem and it is unembarrassed about being one. Near the end it stops describing and makes a claim."
+            },
+            {
+              "q": {
+                "book": "Song of Solomon",
+                "chapter": 8,
+                "verse": 7
+              }
+            },
+            {
+              "p": "Many waters cannot quench love, neither can the floods drown it."
+            },
+            {
+              "p": "The verse before compares it to a seal, to death, to the grave, to coals of fire — a most vehement flame. This is not sentimental language. It is language about things that do not let go."
+            },
+            {
+              "p": "And then the strangest line: if a man would give all the substance of his house for love, it would utterly be contemned. Offering to buy it is not merely refused. It is despised."
+            },
+            {
+              "p": "Which means love in this poem cannot be purchased and cannot be extinguished, and those two facts belong together. Whatever cannot be bought cannot be drowned either."
+            }
+          ],
+          "line": {
+            "a": "It cannot be bought.",
+            "b": "So it cannot be drowned."
+          },
+          "after": [
+            "Marriages and friendships go through water. The poem does not deny the flood; it denies the flood's power to finish the thing.",
+            "Whatever you are in the middle of, waters and quenching are different verbs."
+          ],
+          "prayer": "Lord, the water has been high for a long time in this relationship. Let me believe that many waters cannot quench what You have joined, and hold on through the flood.",
+          "addLabel": "Add the relationship in flood",
+          "question": "What are you assuming the flood has already finished?",
+          "prayerCategory": "Marriage"
+        },
+        {
+          "day": 13,
+          "title": "The Third Time",
+          "minutes": 4,
+          "read": {
+            "book": "John",
+            "chapter": 21,
+            "verse": 17,
+            "from": 15,
+            "to": 17
+          },
+          "body": [
+            {
+              "p": "Peter denied him three times beside a fire of coals. In this chapter there is another fire of coals on a beach, and John mentions it deliberately."
+            },
+            {
+              "q": {
+                "book": "John",
+                "chapter": 21,
+                "verse": 17
+              }
+            },
+            {
+              "p": "Peter was grieved because he said unto him the third time, Lovest thou me?"
+            },
+            {
+              "p": "Three questions for three denials. Jesus does not raise the denials once. He does not require an account of that night, or an explanation, or a promise it will not happen again."
+            },
+            {
+              "p": "He asks one question about affection, three times, and after each answer gives Peter work: feed my lambs, feed my sheep, feed my sheep."
+            },
+            {
+              "p": "That is the restoration. Not a lecture, not a probation, not a reduced role. The same commission, issued in the place where the failure happened, over a fire that would have smelled exactly like the one in the courtyard."
+            },
+            {
+              "p": "Being grieved was part of it. Jesus let him feel it and then handed him sheep anyway."
+            }
+          ],
+          "line": {
+            "a": "Three questions.",
+            "b": "Three denials."
+          },
+          "after": [
+            "Restoration in this passage is not the removal of the memory. Peter never stops knowing what he did.",
+            "It is being given the work back, by the person you failed, in the place you failed."
+          ],
+          "prayer": "Jesus, You know all things. You know that I love You, and You know exactly how I have failed. Restore me the way You restored him — not with a lecture, but with work to do.",
+          "addLabel": "Add where you failed",
+          "question": "Do you believe you can be trusted with the work again?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 14,
+          "title": "She Loved Much",
+          "minutes": 4,
+          "read": {
+            "book": "Luke",
+            "chapter": 7,
+            "verse": 47,
+            "from": 44,
+            "to": 48
+          },
+          "body": [
+            {
+              "p": "A woman with a bad reputation comes into a Pharisee's dinner uninvited and begins washing Jesus' feet with her tears. The host says nothing out loud, but Jesus answers what he is thinking."
+            },
+            {
+              "p": "He points out what the host did not do. No water for the feet. No kiss. No oil for the head. The basic courtesies were all withheld, politely."
+            },
+            {
+              "q": {
+                "book": "Luke",
+                "chapter": 7,
+                "verse": 47
+              }
+            },
+            {
+              "p": "Her sins, which are many, are forgiven; for she loved much: but to whom little is forgiven, the same loveth little."
+            },
+            {
+              "p": "Read carefully, the logic runs the other way from how it sounds. She is not forgiven because she loved. She loves because she has grasped the size of what she was forgiven."
+            },
+            {
+              "p": "And the warning is aimed at the respectable man at the table. Little forgiven, little love — not because his debt was smaller, but because he had never counted it."
+            }
+          ],
+          "line": {
+            "a": "She did not love her way in.",
+            "b": "She had counted the debt."
+          },
+          "after": [
+            "Cold affection toward God is very often a symptom of an uncounted debt rather than of a hard heart.",
+            "The dinner host was not hostile. He was simply unmoved, and Jesus treated that as the more dangerous condition."
+          ],
+          "prayer": "Lord, I have been polite with You and unmoved. Show me the actual size of what You have forgiven me, and let the love follow the counting.",
+          "addLabel": "Add what you've never counted",
+          "question": "Has your debt to God ever been counted, or only assumed to be small?",
+          "prayerCategory": "Salvation"
+        },
+        {
+          "day": 15,
+          "title": "As Thyself",
+          "minutes": 3,
+          "read": {
+            "book": "Matthew",
+            "chapter": 22,
+            "verse": 39,
+            "from": 36,
+            "to": 40
+          },
+          "body": [
+            {
+              "p": "A lawyer asks which commandment is greatest, expecting a debate. Jesus gives him two, and the second one contains an assumption that is easy to walk past."
+            },
+            {
+              "q": {
+                "book": "Matthew",
+                "chapter": 22,
+                "verse": 39
+              }
+            },
+            {
+              "p": "Thou shalt love thy neighbour as thyself."
+            },
+            {
+              "p": "The standard for how you treat other people is how you treat yourself, and it is stated without comment, as though the second half were obviously fine."
+            },
+            {
+              "p": "For a lot of people it is not fine. If the internal voice is contemptuous and unforgiving, that measure will export accurately — impatience with your own failure becomes impatience with theirs."
+            },
+            {
+              "p": "This is not a licence for self-absorption; the commandment is aimed outward. But it does mean that how you speak to yourself at two in the morning is not a private matter."
+            },
+            {
+              "p": "It sets the exchange rate for everyone you meet."
+            }
+          ],
+          "line": {
+            "a": "How you speak to yourself",
+            "b": "is not a private matter."
+          },
+          "after": [
+            "People who cannot forgive themselves are usually generous in theory and severe in practice, and they cannot work out why.",
+            "The measure is the same instrument. Fix the instrument."
+          ],
+          "prayer": "Father, the voice I use on myself is not one I would use on anyone I loved. Change it — not so I can think more of myself, but so there is something worth exporting.",
+          "addLabel": "Add what you say to yourself",
+          "question": "Would you speak to a friend the way you speak to yourself?",
+          "prayerCategory": "Mental Health"
+        },
+        {
+          "day": 16,
+          "title": "He Will Joy Over Thee With Singing",
+          "minutes": 3,
+          "read": {
+            "book": "Zephaniah",
+            "chapter": 3,
+            "verse": 17,
+            "from": 14,
+            "to": 17
+          },
+          "body": [
+            {
+              "p": "Zephaniah is a short and largely furious book. Two and a half chapters of judgement, and then this, without much warning."
+            },
+            {
+              "q": {
+                "book": "Zephaniah",
+                "chapter": 3,
+                "verse": 17
+              }
+            },
+            {
+              "p": "He will rest in his love, he will joy over thee with singing."
+            },
+            {
+              "p": "Most people can believe God tolerates them. Some can believe He forgives them. Very few carry around a picture of God enjoying them."
+            },
+            {
+              "p": "The phrase in the middle is the one that undoes the argument. He will rest in his love — the word suggests being quiet, ceasing from something. God is described as settled about you, not still deliberating."
+            },
+            {
+              "p": "And then singing. Not speaking, not pronouncing. The prophet reaches for the least official verb available and puts it in God's mouth."
+            },
+            {
+              "p": "That is written to a people who had earned two and a half chapters of judgement, which is the only reason it is worth anything."
+            }
+          ],
+          "line": {
+            "a": "Not tolerating you.",
+            "b": "Singing over you."
+          },
+          "after": [
+            "If your picture of God's face when He thinks of you is neutral at best, this verse is a correction and not a decoration.",
+            "He is settled about you. That is what resting in his love means."
+          ],
+          "prayer": "Father, I have believed You put up with me. Teach me that You rest in Your love and rejoice over me, and let that change how I come to You today.",
+          "addLabel": "Add what you assume God feels",
+          "question": "What do you imagine God's face does when He thinks of you?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 17,
+          "title": "Graven Upon The Palms",
+          "minutes": 3,
+          "read": {
+            "book": "Isaiah",
+            "chapter": 49,
+            "verse": 16,
+            "from": 14,
+            "to": 16
+          },
+          "body": [
+            {
+              "p": "Zion has just made an accusation, and Isaiah records it without softening: the Lord hath forsaken me, and my Lord hath forgotten me."
+            },
+            {
+              "p": "God's answer begins with the strongest human bond available. Can a woman forget her sucking child? And then concedes the point — yea, they may forget."
+            },
+            {
+              "q": {
+                "book": "Isaiah",
+                "chapter": 49,
+                "verse": 16
+              }
+            },
+            {
+              "p": "Behold, I have graven thee upon the palms of my hands."
+            },
+            {
+              "p": "Graven is not written. It is cut, incised, carved into a surface that will not release it. You do not erase an engraving; you would have to remove the hand."
+            },
+            {
+              "p": "And the placement is deliberate. Palms are what you see when you open your hands to work, which means the memory is not stored somewhere and retrieved. It is in front of Him constantly."
+            },
+            {
+              "p": "Christian readers have never quite been able to read that verse without thinking about what was eventually driven through those palms."
+            }
+          ],
+          "line": {
+            "a": "Not written.",
+            "b": "Cut in."
+          },
+          "after": [
+            "The complaint that opens this passage is allowed to stand. God does not tell Zion she is wrong to feel forgotten; He tells her what is on His hands.",
+            "Being forgotten is a feeling. Being engraved is a fact."
+          ],
+          "prayer": "Lord, I have felt forgotten and I have said so. Thank You that You did not rebuke the complaint but answered it. Let me live from what is carved into Your hands.",
+          "addLabel": "Add where you feel forgotten",
+          "question": "Where have you concluded that God has forgotten you?",
+          "prayerCategory": "Mental Health"
+        },
+        {
+          "day": 18,
+          "title": "What Manner Of Love",
+          "minutes": 3,
+          "read": {
+            "book": "1 John",
+            "chapter": 3,
+            "verse": 1,
+            "from": 1,
+            "to": 3
+          },
+          "body": [
+            {
+              "p": "John writes this as an old man, decades after the events he witnessed, and the sentence still has an exclamation in it."
+            },
+            {
+              "q": {
+                "book": "1 John",
+                "chapter": 3,
+                "verse": 1
+              }
+            },
+            {
+              "p": "Behold, what manner of love the Father hath bestowed upon us, that we should be called the sons of God."
+            },
+            {
+              "p": "What manner of is an old phrase for what country is this from — the sense is of something foreign, unlike anything produced locally."
+            },
+            {
+              "p": "And the result is a name rather than a feeling. Called the sons of God. Adoption in the Roman world was a legal act that transferred inheritance and could not be reversed by the child's behaviour."
+            },
+            {
+              "p": "John then adds a clause most of us skip: therefore the world knoweth us not, because it knew him not. Being loved like this makes you slightly illegible to people who have not encountered it."
+            },
+            {
+              "p": "He is warning them that the family resemblance will not read as impressive from outside."
+            }
+          ],
+          "line": {
+            "a": "A love from another country.",
+            "b": "And a name you cannot lose."
+          },
+          "after": [
+            "Adoption language is chosen over friendship language on purpose. Friends can drift. Sons inherit.",
+            "Behold it. John's first instruction here is simply to look at it for a while."
+          ],
+          "prayer": "Father, help me stop and look at this rather than agreeing with it in passing. I am called Your child. Let that be the thing I am most certain of today.",
+          "addLabel": "Add what you're called",
+          "question": "Do you live as an employee of God or a child of God?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 19,
+          "title": "Greater Love Hath No Man",
+          "minutes": 3,
+          "read": {
+            "book": "John",
+            "chapter": 15,
+            "verse": 13,
+            "from": 12,
+            "to": 15
+          },
+          "body": [
+            {
+              "p": "This verse is on war memorials, which is right but incomplete. In its own setting it is said at a dinner table, hours before the speaker demonstrates it."
+            },
+            {
+              "q": {
+                "book": "John",
+                "chapter": 15,
+                "verse": 13
+              }
+            },
+            {
+              "p": "Greater love hath no man than this, that a man lay down his life for his friends."
+            },
+            {
+              "p": "The next sentence is the surprising one. Ye are my friends, if ye do whatsoever I command you — and then, two verses later, he stops calling them servants and calls them friends because he has told them everything."
+            },
+            {
+              "p": "A servant knows the task. A friend knows the reason. That is the distinction he draws, and he moves them across it deliberately on the last night."
+            },
+            {
+              "p": "Laying down a life is the headline. But the friendship it is offered inside is defined by disclosure — by being told what the master is doing and why."
+            }
+          ],
+          "line": {
+            "a": "A servant knows the task.",
+            "b": "A friend knows the reason."
+          },
+          "after": [
+            "Most of us relate to God as servants: keeping the instructions and never asking what they are for.",
+            "He has already moved you. The category changed on the last night."
+          ],
+          "prayer": "Jesus, You called Your disciples friends and told them everything. Let me stop relating to You as a servant with a task list and come as someone You have taken into Your confidence.",
+          "addLabel": "Add what you'd ask a friend",
+          "question": "Are you God's servant or God's friend in practice?",
+          "prayerCategory": "Spiritual Life"
+        },
+        {
+          "day": 20,
+          "title": "At All Times",
+          "minutes": 3,
+          "read": {
+            "book": "Proverbs",
+            "chapter": 17,
+            "verse": 17,
+            "from": 17,
+            "to": 17
+          },
+          "body": [
+            {
+              "p": "Proverbs is mostly practical and occasionally devastating in a single line. This is one of the short ones and it makes two claims."
+            },
+            {
+              "q": {
+                "book": "Proverbs",
+                "chapter": 17,
+                "verse": 17
+              }
+            },
+            {
+              "p": "A friend loveth at all times, and a brother is born for adversity."
+            },
+            {
+              "p": "At all times is the test. Not at convenient times, not during the interesting part of your trouble, not for the fortnight when everyone is rallying."
+            },
+            {
+              "p": "Most support is intense and brief. The proverb is describing the person still there in month nine, when the crisis has become a condition and nobody is asking about it any more."
+            },
+            {
+              "p": "The second half turns it around. A brother is born for adversity — the relationship exists for the hard part, not despite it."
+            },
+            {
+              "p": "Which raises an uncomfortable question, since the verse can be read as a description or as a job specification."
+            }
+          ],
+          "line": {
+            "a": "Not for the fortnight.",
+            "b": "For month nine."
+          },
+          "after": [
+            "Think of somebody whose crisis stopped being news. That is where this proverb is asking you to be.",
+            "Adversity is what the relationship was born for. It is not the interruption to it."
+          ],
+          "prayer": "Lord, make me a friend who is still there in the ninth month, when the crisis has gone quiet and everyone else has moved on. Bring one name to mind and let me act on it today.",
+          "addLabel": "Add who's in month nine",
+          "question": "Whose long trouble have you stopped asking about?",
+          "prayerCategory": "Relationships"
+        },
+        {
+          "day": 21,
+          "title": "Esau Ran To Meet Him",
+          "minutes": 4,
+          "read": {
+            "book": "Genesis",
+            "chapter": 33,
+            "verse": 4,
+            "from": 1,
+            "to": 4
+          },
+          "body": [
+            {
+              "p": "Jacob has stolen the blessing and fled. Twenty years later he is coming home and hears that Esau is riding to meet him with four hundred men, which is not a welcome party."
+            },
+            {
+              "p": "He spends the night in dread. He divides his family into groups so that if one is attacked the other might escape. He sends waves of gifts ahead. He bows to the ground seven times as he approaches."
+            },
+            {
+              "q": {
+                "book": "Genesis",
+                "chapter": 33,
+                "verse": 4
+              }
+            },
+            {
+              "p": "And Esau ran to meet him, and embraced him, and fell on his neck, and kissed him: and they wept."
+            },
+            {
+              "p": "Every part of the reunion Jacob had rehearsed turned out to be unnecessary. The gifts, the strategy, the choreographed bowing — none of it was what Esau had come for."
+            },
+            {
+              "p": "Twenty years of imagined confrontation, and the actual meeting takes one verse and four verbs, all of them physical, none of them planned."
+            }
+          ],
+          "line": {
+            "a": "He had rehearsed the confrontation",
+            "b": "for twenty years."
+          },
+          "after": [
+            "Reconciliation is often less dramatic than the version we have been carrying, and it is nearly always delayed by the version we have been carrying.",
+            "You do not know what the other person has done with those years."
+          ],
+          "prayer": "Father, I have rehearsed a confrontation for years and it has kept me away. Give me the courage to approach, and surprise me with what You have been doing in them.",
+          "addLabel": "Add who you're avoiding",
+          "question": "What reunion have you delayed by imagining it?",
+          "prayerCategory": "Family"
+        },
+        {
+          "day": 22,
+          "title": "Forbearing One Another",
+          "minutes": 3,
+          "read": {
+            "book": "Colossians",
+            "chapter": 3,
+            "verse": 13,
+            "from": 12,
+            "to": 14
+          },
+          "body": [
+            {
+              "p": "Paul is describing what the church is to put on, and he uses clothing language throughout — bowels of mercies, kindness, humbleness of mind, meekness, longsuffering."
+            },
+            {
+              "q": {
+                "book": "Colossians",
+                "chapter": 3,
+                "verse": 13
+              }
+            },
+            {
+              "p": "Forbearing one another, and forgiving one another, if any man have a quarrel against any."
+            },
+            {
+              "p": "Two separate instructions sit side by side and they are often confused. Forgiving deals with what has been done. Forbearing deals with what a person is simply like."
+            },
+            {
+              "p": "Some of what wears you down about someone is not sin and never will be. It is temperament, pace, volume, the way they tell a story. There is nothing to forgive because nothing wrong has happened."
+            },
+            {
+              "p": "Forbearance is the word for carrying that without commentary. It assumes ongoing friction as the normal condition of people living close together, rather than a problem to be solved."
+            },
+            {
+              "p": "And the clause at the end fixes the measure again: even as Christ forgave you, so also do ye."
+            }
+          ],
+          "line": {
+            "a": "Forgiving deals with what was done.",
+            "b": "Forbearing deals with what they are like."
+          },
+          "after": [
+            "Trying to forgive a personality is a category error, and it exhausts people who are genuinely trying to do the right thing.",
+            "Some things are not to be resolved. They are to be carried."
+          ],
+          "prayer": "Lord, teach me the difference between what I must forgive and what I must simply carry. Give me grace for the friction that is not sin and will not change.",
+          "addLabel": "Add the friction you'll carry",
+          "question": "What are you trying to forgive that is really just a difference?",
+          "prayerCategory": "Relationships"
+        },
+        {
+          "day": 23,
+          "title": "Charity Shall Cover",
+          "minutes": 3,
+          "read": {
+            "book": "1 Peter",
+            "chapter": 4,
+            "verse": 8,
+            "from": 7,
+            "to": 10
+          },
+          "body": [
+            {
+              "p": "Peter is writing to scattered churches under pressure, and his instruction for that situation is not strategy. It is what they are to have among themselves, above all things."
+            },
+            {
+              "q": {
+                "book": "1 Peter",
+                "chapter": 4,
+                "verse": 8
+              }
+            },
+            {
+              "p": "And above all things have fervent charity among yourselves: for charity shall cover the multitude of sins."
+            },
+            {
+              "p": "Fervent is an athletic word — stretched out, strained, at full extension. It is not a warm feeling; it is effort held at the limit."
+            },
+            {
+              "p": "And cover is not the same as excuse. It is closer to what you do with something that would shame a person if it were left in the open."
+            },
+            {
+              "p": "There is a version of honesty that is really exposure — accurate, defensible, and destructive to somebody who is already sorry."
+            },
+            {
+              "p": "Peter says a church survives pressure by covering rather than displaying, and puts it above all things, ahead of every other instruction in the paragraph."
+            }
+          ],
+          "line": {
+            "a": "Cover is not excuse.",
+            "b": "It is refusing to display."
+          },
+          "after": [
+            "The thing you know about them is probably true. That is not the question.",
+            "The question is whether telling it serves anyone but you."
+          ],
+          "prayer": "Lord, I have called exposure honesty. Give me love that covers rather than displays, and keep me from saying the accurate thing that would only wound.",
+          "addLabel": "Add what you'll cover",
+          "question": "What true thing are you about to repeat about someone?",
+          "prayerCategory": "Church"
+        },
+        {
+          "day": 24,
+          "title": "When My Father And Mother Forsake Me",
+          "minutes": 4,
+          "read": {
+            "book": "Psalms",
+            "chapter": 27,
+            "verse": 10,
+            "from": 7,
+            "to": 10
+          },
+          "body": [
+            {
+              "p": "This psalm is confident for nine verses — the Lord is my light, whom shall I fear, though an host encamp against me. Then it names the one thing the confidence had been built over."
+            },
+            {
+              "q": {
+                "book": "Psalms",
+                "chapter": 27,
+                "verse": 10
+              }
+            },
+            {
+              "p": "When my father and my mother forsake me, then the Lord will take me up."
+            },
+            {
+              "p": "The verse assumes it as a possibility rather than a hypothetical. David does not say if. He builds the sentence on when."
+            },
+            {
+              "p": "That is unusual honesty in a hymn. The relationships that are supposed to be unconditional are the ones people are most ashamed to admit have failed."
+            },
+            {
+              "p": "Take me up is a word used for gathering something in — the way you would collect a person who had been left somewhere."
+            },
+            {
+              "p": "Nothing here says the forsaking did not matter, or that God is a replacement for what was owed to you. It says only that the gathering happens after it, and by someone else."
+            }
+          ],
+          "line": {
+            "a": "He does not say if.",
+            "b": "He says when."
+          },
+          "after": [
+            "Not everyone reading this had parents who stayed. The psalm does not ask anyone to pretend otherwise.",
+            "The word is gathered. Somebody comes and collects what was left."
+          ],
+          "prayer": "Lord, You know who was meant to hold me and did not. I bring the whole of it to You. Gather me up, and heal what that absence taught me about myself.",
+          "addLabel": "Add who left",
+          "question": "What did their leaving teach you about your worth?",
+          "prayerCategory": "Family"
+        },
+        {
+          "day": 25,
+          "title": "In Honour Preferring One Another",
+          "minutes": 3,
+          "read": {
+            "book": "Romans",
+            "chapter": 12,
+            "verse": 10,
+            "from": 9,
+            "to": 13
+          },
+          "body": [
+            {
+              "p": "Paul writes a run of short instructions here with almost no connecting argument, which makes each one land on its own."
+            },
+            {
+              "q": {
+                "book": "Romans",
+                "chapter": 12,
+                "verse": 10
+              }
+            },
+            {
+              "p": "Be kindly affectioned one to another with brotherly love; in honour preferring one another."
+            },
+            {
+              "p": "The second phrase is the striking one. Preferring is a word about going first — leading the way in showing honour, getting there before the other person does."
+            },
+            {
+              "p": "It is worth noticing where Paul places this. The verse before is about love without dissimulation, and the one after is about not being slothful in business. He treats honouring people as ordinary work, sitting between sincerity and diligence rather than among the spiritual gifts."
+            },
+            {
+              "p": "So it describes a race in which the aim is to be first to esteem somebody else. That is a competitive instinct pointed in an unusual direction."
+            },
+            {
+              "p": "Most groups run the opposite race. Recognition is scarce, so people wait to be acknowledged before acknowledging, and everyone ends up waiting."
+            },
+            {
+              "p": "Paul's instruction breaks the deadlock by telling you to lose that race on purpose, repeatedly, first."
+            }
+          ],
+          "line": {
+            "a": "A race to honour.",
+            "b": "And you go first."
+          },
+          "after": [
+            "Waiting to be appreciated before appreciating is the most common and least discussed cause of coldness between people who like each other.",
+            "Go first. It costs nothing except the satisfaction of being right about who owed whom."
+          ],
+          "prayer": "Father, I have been waiting to be seen before I would see anyone else. Let me go first this week — with honour I do not owe, to someone who has not earned it.",
+          "addLabel": "Add who you'll honour first",
+          "question": "Who are you waiting to be acknowledged by?",
+          "prayerCategory": "Relationships"
+        },
+        {
+          "day": 26,
+          "title": "Love Your Enemies",
+          "minutes": 4,
+          "read": {
+            "book": "Matthew",
+            "chapter": 5,
+            "verse": 44,
+            "from": 43,
+            "to": 48
+          },
+          "body": [
+            {
+              "p": "This is the hardest sentence Jesus ever spoke to ordinary people, and it is worth noticing how practical he makes it."
+            },
+            {
+              "q": {
+                "book": "Matthew",
+                "chapter": 5,
+                "verse": 44
+              }
+            },
+            {
+              "p": "Love your enemies, bless them that curse you, do good to them that hate you, and pray for them which despitefully use you."
+            },
+            {
+              "p": "Four verbs, and not one of them is a feeling. Love, bless, do good, pray. Every item is something you can perform this week without any change in how you feel about the person."
+            },
+            {
+              "p": "The reason he gives is family resemblance: that ye may be the children of your Father which is in heaven, who sends rain on the just and the unjust."
+            },
+            {
+              "p": "God's kindness is not distributed on merit and never has been. The weather is the evidence."
+            },
+            {
+              "p": "Praying for someone is the item most people skip, and it is the one that changes the person praying. It is very difficult to keep a settled contempt for somebody you are genuinely asking God to bless."
+            }
+          ],
+          "line": {
+            "a": "Four verbs.",
+            "b": "Not one of them is a feeling."
+          },
+          "after": [
+            "He does not ask you to feel warmly toward them. He asks you to act, and to pray, and lets the rest follow or not.",
+            "Start with the prayer. It is the one that works on you."
+          ],
+          "prayer": "Father, You send rain on people who curse You. I am naming the person I resent, and I am asking You to bless them — not because I feel it, but because You told me to.",
+          "addLabel": "Add who you resent",
+          "question": "Could you pray honestly for their good today?",
+          "prayerCategory": "Deliverance"
+        },
+        {
+          "day": 27,
+          "title": "Perfect Love Casteth Out Fear",
+          "minutes": 3,
+          "read": {
+            "book": "1 John",
+            "chapter": 4,
+            "verse": 18,
+            "from": 17,
+            "to": 19
+          },
+          "body": [
+            {
+              "p": "John has been writing about confidence in the day of judgement, and he makes a claim about the relationship between two things most people carry at once."
+            },
+            {
+              "q": {
+                "book": "1 John",
+                "chapter": 4,
+                "verse": 18
+              }
+            },
+            {
+              "p": "There is no fear in love; but perfect love casteth out fear: because fear hath torment."
+            },
+            {
+              "p": "Casteth out is a forceful phrase — the same kind of word used of driving something from a house. The two do not negotiate; one displaces the other."
+            },
+            {
+              "p": "And the clause at the end names the mechanism. Fear hath torment, and the word means punishment. The fear John is describing is specifically the fear of being punished."
+            },
+            {
+              "p": "Which is why love drives it out rather than courage doing so. You cannot brave your way past the suspicion that God is holding something against you. You can only be convinced otherwise."
+            },
+            {
+              "p": "He that feareth is not made perfect in love — not a rebuke, a diagnosis. Where fear remains, love has not finished its work."
+            }
+          ],
+          "line": {
+            "a": "Not driven out by courage.",
+            "b": "Driven out by love."
+          },
+          "after": [
+            "Anxiety before God is not usually a failure of nerve. It is an unfinished conviction about how He feels toward you.",
+            "The remedy is not to try harder to be unafraid."
+          ],
+          "prayer": "Father, my fear of You is really a fear of punishment. Finish Your work in me. Let Your love drive out what my willpower has never managed to argue away.",
+          "addLabel": "Add what you fear from God",
+          "question": "Are you afraid of God, or afraid of being punished?",
+          "prayerCategory": "Mental Health"
+        },
+        {
+          "day": 28,
+          "title": "With An Everlasting Love",
+          "minutes": 3,
+          "read": {
+            "book": "Jeremiah",
+            "chapter": 31,
+            "verse": 3,
+            "from": 1,
+            "to": 4
+          },
+          "body": [
+            {
+              "p": "Jeremiah is the prophet of the exile, and most of his book is loss. This chapter is the exception, and the verse is placed among people who have every reason to think the relationship is over."
+            },
+            {
+              "q": {
+                "book": "Jeremiah",
+                "chapter": 31,
+                "verse": 3
+              }
+            },
+            {
+              "p": "Yea, I have loved thee with an everlasting love: therefore with lovingkindness have I drawn thee."
+            },
+            {
+              "p": "Everlasting runs in both directions. It has no start date, which means there was no point at which God began — no moment when you qualified, and therefore no moment when you could stop qualifying."
+            },
+            {
+              "p": "Therefore is the hinge. Because the love is everlasting, the drawing happens. The pull you feel toward God is downstream of a decision made before you existed."
+            },
+            {
+              "p": "And lovingkindness is the covenant word, the one used of loyal love that keeps its commitments when the other party has not."
+            },
+            {
+              "p": "Two verses later He is talking about vineyards being planted again. The love comes first; the rebuilding follows it."
+            }
+          ],
+          "line": {
+            "a": "It has no start date.",
+            "b": "So it has no conditions."
+          },
+          "after": [
+            "If God's love began at some point because of something, it could end at some point because of something.",
+            "Everlasting removes both ends of that sentence."
+          ],
+          "prayer": "Lord, You loved me before there was any of me to love, and You have drawn me with kindness rather than force. Settle that in me where I still suspect I am on probation.",
+          "addLabel": "Add where you feel on probation",
+          "question": "When do you think God started loving you?",
+          "prayerCategory": "Faith"
+        },
+        {
+          "day": 29,
+          "title": "Nor Anything Else",
+          "minutes": 4,
+          "read": {
+            "book": "Romans",
+            "chapter": 8,
+            "verse": 39,
+            "from": 35,
+            "to": 39
+          },
+          "body": [
+            {
+              "p": "Paul ends the chapter with a list, and the list is not rhetorical. Tribulation, distress, persecution, famine, nakedness, peril, sword — he had experienced most of them personally by the time he wrote it."
+            },
+            {
+              "q": {
+                "book": "Romans",
+                "chapter": 8,
+                "verse": 39
+              }
+            },
+            {
+              "p": "Nor height, nor depth, nor any other creature, shall be able to separate us from the love of God, which is in Christ Jesus our Lord."
+            },
+            {
+              "p": "He goes through the categories methodically. Death and life. Angels and principalities. Things present and things to come. Height and depth. Then, having run out, he adds a catch-all: nor any other creature."
+            },
+            {
+              "p": "That last phrase exists because Paul knew his list could not be complete. Somebody would eventually face a thing he had not named, and he closes the gap in advance."
+            },
+            {
+              "p": "Note also what is absent. He never says these things will not happen. Verse thirty-six quotes a psalm about being killed all the day long."
+            },
+            {
+              "p": "The promise is not protection from the list. It is that nothing on the list, named or unnamed, can get between you and the love."
+            }
+          ],
+          "line": {
+            "a": "He does not promise the list will not come.",
+            "b": "He promises it cannot separate you."
+          },
+          "after": [
+            "A month about love ends here on purpose. Everything else in February can be lost — relationships, reputation, the way you feel about yourself.",
+            "The one thing on this page that cannot be taken is the last verse of Romans 8."
+          ],
+          "prayer": "Father, I have feared that something would eventually separate me from You. Paul could not name it and neither can I. Hold me in the love that nothing on any list can reach.",
+          "addLabel": "Add what you fear could separate you",
+          "question": "What are you afraid would finally separate you from God?",
+          "prayerCategory": "Faith"
+        }
+      ]
     },
     {
       "month": 3,
