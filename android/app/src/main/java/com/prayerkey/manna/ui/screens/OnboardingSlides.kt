@@ -100,11 +100,16 @@ private fun heavy(vararg parts: Pair<String, Boolean>): AnnotatedString = buildA
 @Composable
 fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: (Int) -> Unit) {
     val stories = listOf(
-        Triple(com.prayerkey.manna.R.drawable.onboarding_read_v3, "Read the Bible", "Read any book, chapter, or verse."),
-        Triple(com.prayerkey.manna.R.drawable.onboarding_audio_v3, "Listen to the Bible", "Hear Scripture wherever you are."),
-        Triple(com.prayerkey.manna.R.drawable.onboarding_pray_v3, "Pray Every Day", "Use daily prayers and powerful prayer points."),
-        Triple(com.prayerkey.manna.R.drawable.onboarding_church_v3, "Record Church Messages", "See sermons turn into clear notes as they are preached."),
-        Triple(com.prayerkey.manna.R.drawable.onboarding_journal_v3, "Keep Your Journal", "Save prayers, thoughts, sermon notes, and answered prayers."),
+        Triple(
+            com.prayerkey.manna.R.drawable.onboarding_pray_v3,
+            "Pray what is on your heart",
+            "Begin with one honest sentence. PrayerKey helps you shape it into a personal, Bible-grounded prayer.",
+        ),
+        Triple(
+            com.prayerkey.manna.R.drawable.onboarding_journal_v3,
+            "Keep your walk with God",
+            "Prayers, journal entries and sermon notes stay together — privately on this device.",
+        ),
     )
 
     Column(
@@ -112,14 +117,26 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
             .padding(horizontal = 28.dp),
     ) {
         Spacer(Modifier.height(18.dp))
-        Text(
-            "PRAYERKEY",
-            color = Pk.GoldLight,
-            fontFamily = BookSerif,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 3.2.sp,
-        )
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "PRAYERKEY",
+                color = Pk.GoldLight,
+                fontFamily = BookSerif,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 3.2.sp,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                "Skip",
+                color = Color.White.copy(alpha = .72f),
+                fontFamily = UtilitySans,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clip(R.pill).clickable(onClick = onSkip)
+                    .padding(horizontal = 14.dp, vertical = 9.dp),
+            )
+        }
         Spacer(Modifier.height(18.dp))
 
         AnimatedContent(
@@ -139,7 +156,7 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
     ) { page ->
             val (world, title, message) = stories[page]
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
-                Box(Modifier.fillMaxWidth().aspectRatio(1f)) {
+                Box(Modifier.fillMaxWidth().aspectRatio(.94f)) {
                     EditorialOnboardingImage(world)
                     Box(
                         Modifier.fillMaxSize().background(
@@ -157,8 +174,8 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
                             title,
                             color = Color.White,
                             fontFamily = DisplaySerif,
-                            fontSize = 30.sp,
-                            lineHeight = 34.sp,
+                            fontSize = 31.sp,
+                            lineHeight = 35.sp,
                             letterSpacing = (-.5).sp,
                             fontWeight = FontWeight.Bold,
                         )
@@ -166,8 +183,8 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
                             message,
                             color = Color.White.copy(alpha = .78f),
                             fontFamily = UtilitySans,
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp,
+                            fontSize = 14.5.sp,
+                            lineHeight = 21.sp,
                             modifier = Modifier.padding(top = 7.dp),
                         )
                     }
@@ -189,18 +206,36 @@ fun OnboardingSlides(onSkip: () -> Unit, onDone: () -> Unit, step: Int, onStep: 
         }
 
         Spacer(Modifier.height(18.dp))
-        AnimatedVisibility(step == stories.lastIndex, enter = fadeIn(tween(600))) {
+        if (step == stories.lastIndex) {
+            Text(
+                "No account required · Your private writing stays yours",
+                color = Color.White.copy(alpha = .60f),
+                fontFamily = UtilitySans,
+                fontSize = 11.5.sp,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 12.dp),
+            )
             Box(
-                Modifier.fillMaxWidth().height(56.dp)
-                    .shadow(6.dp, R.pill, spotColor = Color.Black.copy(alpha = .16f))
+                Modifier.fillMaxWidth().height(58.dp)
+                    .shadow(8.dp, R.pill, spotColor = Color.Black.copy(alpha = .20f))
                     .clip(R.pill).background(Color.White)
                     .clickable(onClick = onDone),
                 contentAlignment = Alignment.Center,
             ) {
                 Text("Start PrayerKey", color = Pk.Oxblood, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
+        } else {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Box(
+                    Modifier.size(58.dp).shadow(8.dp, CircleShape, spotColor = Color.Black.copy(alpha = .22f))
+                        .clip(CircleShape).background(Pk.Oxblood)
+                        .border(1.dp, Pk.GoldLight.copy(alpha = .55f), CircleShape)
+                        .clickable { onStep(step + 1) },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(Icons.Outlined.ArrowForward, "Next", tint = Color.White, modifier = Modifier.size(23.dp))
+                }
+            }
         }
-        if (step != stories.lastIndex) Spacer(Modifier.height(56.dp))
         Spacer(Modifier.height(28.dp))
     }
 }

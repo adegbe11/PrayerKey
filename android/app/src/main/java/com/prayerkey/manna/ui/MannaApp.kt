@@ -152,10 +152,12 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                        lives in Profile, and defaulting it off would switch
                        off the only thing that brings anyone back tomorrow. */
                     viewModel.updatePreferences(
-                        preferences.copy(onboarded = true, reminderEnabled = true),
-                    )
-                    com.prayerkey.manna.reminder.ReminderReceiver.schedule(
-                        context, preferences.reminderHour, preferences.reminderMinute, true,
+                        preferences.copy(
+                            onboarded = true,
+                            accountReady = true,
+                            accountKind = "private",
+                            reminderEnabled = false,
+                        ),
                     )
                 }
             } else if (!preferences.accountReady) {

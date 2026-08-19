@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Icon
@@ -77,35 +78,23 @@ private val Ivory = Color(0xFFF6F0E1)
 @Composable
 fun OnboardingScreen(onDone: () -> Unit) {
     var opening by remember { mutableStateOf(true) }
-    var openingStage by remember { mutableIntStateOf(0) }
     var step by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
-        delay(1450)
-        repeat(22) { index ->
-            openingStage = index + 1
-            delay(145)
-        }
-        delay(1450)
+        delay(1100)
         opening = false
     }
 
-    LaunchedEffect(opening, step) {
-        if (!opening && step < 4) {
-            delay(2700)
-            step += 1
-        }
-    }
-
     if (opening) {
-        LaunchPrelude(openingStage)
+        LaunchPrelude(22)
         return
     }
 
-    OnboardingSlides(
-        step = step,
-        onStep = { step = it },
-        onSkip = { step = 4 },
+    if (step == 0) PullToLearn(onPulled = { step = 1 }, onSkip = onDone)
+    else OnboardingSlides(
+        step = step - 1,
+        onStep = { step = it + 1 },
+        onSkip = onDone,
         onDone = onDone,
     )
 }
@@ -113,7 +102,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
 /* ─────────────────────── 1. the gesture itself ─────────────────────── */
 
 @Composable
-private fun PullToLearn(onPulled: () -> Unit) {
+private fun PullToLearn(onPulled: () -> Unit, onSkip: () -> Unit) {
     val view = LocalView.current
     val density = LocalDensity.current
     val card = remember { DailyVerses.first() }
@@ -128,7 +117,15 @@ private fun PullToLearn(onPulled: () -> Unit) {
         label = "onboard-pull",
     )
 
-    Box(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background)) {
+    Box(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background).statusBarsPadding()) {
+        Text(
+            "Skip",
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground.copy(alpha = .62f),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 13.sp,
+            modifier = Modifier.align(Alignment.TopEnd).padding(top = 12.dp, end = 22.dp)
+                .clip(R.pill).clickable(onClick = onSkip).padding(horizontal = 14.dp, vertical = 9.dp),
+        )
         Box(
             Modifier.fillMaxSize().padding(horizontal = 14.dp)
                 // the card has to clear the reveal copy AND the button, or
@@ -174,13 +171,13 @@ private fun PullToLearn(onPulled: () -> Unit) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Outlined.KeyboardArrowDown, null, tint = Gold, modifier = Modifier.size(26.dp))
                     Spacer(Modifier.height(6.dp))
-                    Text("Pull it down", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    Text("Pull down to receive a word", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                 }
             }
             AnimatedVisibility(revealed, enter = fadeIn()) {
                 Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        "That is the whole app.",
+                        "This is yours to carry today.",
                         fontFamily = BookSerif, fontSize = 22.sp,
                         textAlign = TextAlign.Center,
                     )
@@ -208,7 +205,7 @@ private fun CardBackFace() {
                 )
             }
             Spacer(Modifier.height(16.dp))
-            com.prayerkey.manna.ui.theme.StampedGold("MANNA", size = 14.sp, tracking = 5.sp)
+            com.prayerkey.manna.ui.theme.StampedGold("PRAYERKEY", size = 14.sp, tracking = 3.8.sp)
         }
     }
 }
