@@ -176,8 +176,28 @@ fun ChurchScreen(
         val audio = SermonService.audioPath.value
         SermonService.stop(context)
         if (transcript.isBlank()) {
+            /* A service still happened. Discarding it because the recogniser
+               produced nothing threw away the recording, the duration and any
+               references caught — nothing reached the archive or the journal,
+               and the audio was left on disk with no note pointing at it.
+               The note is saved with its audio, so it appears where every other
+               sermon appears and "Improve this transcript" can turn it into
+               text afterwards using the larger model. */
+            val note = SermonArranger.Note(
+                title = "Sermon · ${todayLabel()}",
+                scriptures = refs,
+                points = emptyList(),
+                quotes = emptyList(),
+                takeaway = "",
+                transcript = "",
+            )
+            onSaveNote(note, minutes, audio)
             stage = Stage.Ready
-            Toast.makeText(context, "No words were transcribed. Audio backup kept.", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                context,
+                "Saved to your sermon notes. Open it to turn the recording into text.",
+                Toast.LENGTH_LONG,
+            ).show()
             return
         }
         arranged = SermonArranger.arrange(transcript, refs, language).also { onSaveNote(it, minutes, audio) }
