@@ -724,42 +724,73 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
                     Icon(Icons.Outlined.CalendarToday, null, tint = Pk.Oxblood, modifier = Modifier.size(21.dp))
                 }
             }
-            LinearProgressIndicator(progress = { completed.size.toFloat() / items.size }, modifier = Modifier.fillMaxWidth().height(4.dp), color = Pk.Oxblood, trackColor = Pk.Oxblood.copy(alpha = .08f))
-            items.forEachIndexed { index, item ->
+            LinearProgressIndicator(
+                progress = { completed.size.toFloat() / items.size },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).height(6.dp).clip(RoundedCornerShape(3.dp)),
+                color = Pk.Oxblood,
+                trackColor = Pk.Oxblood.copy(alpha = .10f),
+                gapSize = 0.dp,
+                drawStopIndicator = {},
+            )
+            Spacer(Modifier.height(6.dp))
+            items.forEach { item ->
                 val identity = item.first
                 val icon = item.second.first
-                val destination = item.second.second
                 val done = identity.first in completed
-                Row(Modifier.fillMaxWidth().clickable { openMoment = identity.first }.padding(horizontal = 20.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Box(Modifier.size(43.dp).clip(RoundedCornerShape(13.dp)).background(if (done) Pk.Oxblood else Pk.Oxblood.copy(alpha = .08f)), contentAlignment = Alignment.Center) {
-                        Icon(icon, null, tint = if (done) Color.White else Pk.Oxblood, modifier = Modifier.size(21.dp))
-                    }
-                    /* The name of the thing leads; the prayer supports it.
-                       Only `identity.second` was drawn, so the card was five
-                       prayer sentences and nothing told you what tapping one
-                       did — "Search my heart and lead me" gives no clue it
-                       opens prayer and reflection. The name was in the data
-                       the whole time and simply was not rendered. */
-                    Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
-                        Text(
-                            identity.third,
-                            fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold,
-                            fontSize = 15.sp,
-                            color = if (done) Pk.Muted else Pk.Charcoal,
+
+                /* One line, its own soft container, no divider.
+                   Two lines per row put ten lines of text in this card and made
+                   "Open my eyes to understand Your Word" wrap mid-phrase; the
+                   hairline dividers turned it into a settings list. The prayer
+                   is not lost — it belongs inside the moment, which is where
+                   you read it. The row only has to say what it is. */
+                Row(
+                    Modifier.fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(if (done) Pk.Oxblood.copy(alpha = .045f) else Color.White)
+                        .clickable { openMoment = identity.first }
+                        .padding(horizontal = 10.dp, vertical = 11.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(
+                        Modifier.size(46.dp).clip(RoundedCornerShape(15.dp))
+                            .background(
+                                if (done) {
+                                    Brush.linearGradient(listOf(Pk.VioletLit, Pk.Oxblood))
+                                } else {
+                                    Brush.linearGradient(
+                                        listOf(Pk.Oxblood.copy(alpha = .13f), Pk.Oxblood.copy(alpha = .06f)),
+                                    )
+                                },
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            icon, null,
+                            tint = if (done) Color.White else Pk.Oxblood,
+                            modifier = Modifier.size(22.dp),
                         )
-                        Text(
-                            identity.second,
-                            fontFamily = BookSerif, fontStyle = FontStyle.Italic,
-                            fontSize = 13.sp, lineHeight = 18.sp, color = Pk.Muted,
-                            modifier = Modifier.padding(top = 2.dp),
-                        )
                     }
-                    Box(Modifier.size(30.dp).clip(CircleShape).border(1.5.dp, if (done) Pk.Oxblood else Pk.Muted.copy(alpha = .45f), CircleShape), contentAlignment = Alignment.Center) {
-                        if (done) Icon(Icons.Outlined.Check, null, tint = Pk.Oxblood, modifier = Modifier.size(17.dp))
+                    Text(
+                        identity.third,
+                        fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold,
+                        fontSize = 15.5.sp,
+                        color = if (done) Pk.Muted else Pk.Charcoal,
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f).padding(horizontal = 14.dp),
+                    )
+                    Box(
+                        Modifier.size(28.dp).clip(CircleShape)
+                            .background(if (done) Pk.Oxblood.copy(alpha = .10f) else Color.Transparent)
+                            .border(1.6.dp, if (done) Pk.Oxblood else Pk.Muted.copy(alpha = .34f), CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (done) Icon(Icons.Outlined.Check, null, tint = Pk.Oxblood, modifier = Modifier.size(16.dp))
                     }
                 }
-                if (index < items.lastIndex) HorizontalDivider(Modifier.padding(start = 77.dp), color = Pk.Hair)
             }
+            Spacer(Modifier.height(8.dp))
         }
     }
     Surface(onClick = history, modifier = Modifier.fillMaxWidth().padding(top = 12.dp), shape = RoundedCornerShape(20.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
