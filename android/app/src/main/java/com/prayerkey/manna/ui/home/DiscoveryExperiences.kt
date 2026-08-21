@@ -108,11 +108,14 @@ private fun experience(title: String): Experience = when (title) {
         FastingChallengeMachine(onClose)
         return
     }
+    if (title in setOf("Warfare prayer", "Imprecatory Psalms")) {
+        WarfarePrayerScreen(onClose)
+        return
+    }
     val faithMachine = when (title) {
         "Prayer points" -> "Prayer points"
         "Memory verse" -> "Memory verse"
         "Midnight prayer", "Three watches", "Night vigil" -> "Midnight prayer"
-        "Warfare prayer", "Imprecatory Psalms" -> "Warfare prayer"
         "Declarations" -> "Declarations"
         else -> null
     }
@@ -169,7 +172,7 @@ private fun experience(title: String): Experience = when (title) {
                     label = { Text(spec.prompt) }, shape = RoundedCornerShape(18.dp),
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Pk.Oxblood, focusedLabelColor = Pk.Oxblood),
                 )
-                Text("Saved privately on this device", Modifier.padding(top = 9.dp, bottom = 22.dp), fontFamily = UtilitySans, fontSize = 10.sp, color = Pk.Muted)
+                Spacer(Modifier.height(22.dp))
             }
             confirmation?.let {
                 Text(it, Modifier.fillMaxWidth().padding(horizontal = 22.dp), color = Pk.Sage,

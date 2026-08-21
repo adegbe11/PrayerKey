@@ -110,7 +110,6 @@ private fun portionsFor(plan: String, day: Int): List<BiblePortion> {
 
 @Composable
 internal fun BibleChallengeMachine(onClose: () -> Unit) {
-    BackHandler(onBack = onClose)
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("bible_challenge_machine", Context.MODE_PRIVATE) }
     var active by remember { mutableStateOf(prefs.getBoolean("active", false)) }
@@ -124,6 +123,14 @@ internal fun BibleChallengeMachine(onClose: () -> Unit) {
         mutableStateOf(prefs.getStringSet("completed", emptySet()).orEmpty().mapNotNull(String::toIntOrNull).toSet())
     }
     var readerDay by remember { mutableStateOf<Int?>(null) }
+
+    BackHandler {
+        when {
+            readerDay != null -> readerDay = null
+            !active && step > 0 -> step--
+            else -> onClose()
+        }
+    }
     val plan = biblePlans.firstOrNull { it.id == planId } ?: biblePlans.first()
 
     readerDay?.let { day ->
@@ -236,7 +243,6 @@ private fun BibleChallengeSetup(
                             Text(plan.title, color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 28.sp, modifier = Modifier.padding(top = 9.dp))
                             Text("${timeLabelBible(hour, minute)}  ·  KJV  ·  ${plan.minutes} MIN", color = Pk.Crisp.copy(alpha = .6f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = .8.sp, modifier = Modifier.padding(top = 12.dp))
                         }
-                        Text("You can read one day at a time. Your progress is saved on this phone.", color = Pk.Crisp.copy(alpha = .58f), fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 20.dp))
                     }
                 }
             }

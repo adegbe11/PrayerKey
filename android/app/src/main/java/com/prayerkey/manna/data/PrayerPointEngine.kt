@@ -114,6 +114,40 @@ object PrayerPointEngine {
      * failure in a new place.
      */
     fun pointsFor(topic: PrayerTopic, day: Int): List<String> {
+        return pointsForCount(topic, day, POINTS_PER_DAY)
+    }
+
+    /**
+     * A prayer session uses the words written for this situation. It is never
+     * padded to an impressive-looking number with generic sentence banks.
+     */
+    fun sessionPointsFor(topic: PrayerTopic): List<String> {
+        val written = prayerSentences(topic.prayer)
+        return written.ifEmpty { listOf(topic.prayer.trim()) }
+    }
+
+    private fun prayerSentences(prayer: String): List<String> = prayer
+        .replace(Regex("(?i)\\s*in Jesus'?s? name,?\\s*amen\\.?\\s*$"), "")
+        .trim()
+        .split(Regex("(?<=[.!?])\\s+"))
+        .map(String::trim)
+        .filter { it.length > 12 }
+        .mapIndexed { index, sentence ->
+            val addressed = sentence.matches(Regex("(?i)^(father|lord|god|jesus|holy spirit|heavenly father|almighty god|most high god|faithful god|righteous judge|prince of peace|good shepherd)[, ].*"))
+            val firstPersonPrayer = sentence.contains(Regex("(?i)\\b(I|me|my|we|us|our)\\b"))
+            when {
+                addressed || firstPersonPrayer -> sentence
+                index == 0 -> "Father, $sentence"
+                else -> "Lord, $sentence"
+            }.trimEnd('.') + "."
+        }
+        .distinctBy(String::lowercase)
+        .let { points ->
+            if (points.isEmpty()) points else points.dropLast(1) +
+                (points.last().trimEnd('.') + ". In Jesus' name, Amen.")
+        }
+
+    private fun pointsForCount(topic: PrayerTopic, day: Int, required: Int): List<String> {
         val n = day.coerceAtLeast(1)
         val out = mutableListOf<String>()
 
@@ -139,18 +173,19 @@ object PrayerPointEngine {
            bank, every line of which carries this situation's own subject. */
         val filled = out.distinct().toMutableList()
         var pass = 1
-        while (filled.size < POINTS_PER_DAY && pass < 40) {
+        while (filled.size < required && pass < 60) {
             standingPoints(topic, n + pass, 12).forEach {
-                if (filled.size < POINTS_PER_DAY && it !in filled) filled += it
+                if (filled.size < required && it !in filled) filled += it
             }
-            if (filled.size < POINTS_PER_DAY) {
+            if (filled.size < required) {
                 (rotate(PRAISE, n + pass, 3, seed) + rotate(COVERING, n + pass, 3, seed)).forEach {
-                    if (filled.size < POINTS_PER_DAY && it !in filled) filled += it
+                    if (filled.size < required && it !in filled) filled += it
                 }
             }
             pass++
         }
-        return filled.take(POINTS_PER_DAY).map(::seal)
+        check(filled.size >= required) { "Prayer session did not produce $required distinct points" }
+        return filled.take(required).map(::seal)
     }
 
     /** How many distinct petitions a situation's own prayer yields. */
@@ -267,19 +302,43 @@ object PrayerPointEngine {
             "Father, turn $what into a testimony that others will hear",
             "Let every fear attached to $what lose its grip on me",
             "Lord, do a work in $what that I could not do for myself",
+            "Father, expose every lie that has grown around $what",
+            "Give me courage to obey You while I face $what",
+            "Let no shame connected to $what drive me away from Your presence",
+            "Father, send wise and faithful help concerning $what",
+            "Keep my words truthful and gracious as I deal with $what",
+            "Lord, preserve my faith while the answer concerning $what unfolds",
+            "Give me discernment to know what action to take concerning $what",
+            "Father, protect everyone affected by $what",
+            "Let Your truth have the final word over $what",
+            "Lord, restore what has been damaged through $what",
+            "Teach me to forgive without pretending that $what did not hurt",
+            "Father, lead me toward peace and wholeness beyond $what",
         ) else listOf(
-            "Father, let Your hand rest upon $what",
+            "Father, let Your hand rest upon everything concerning $what",
             "Lord, order every step concerning $what",
-            "Let Your favour go before me in $what",
-            "Father, do for me in $what what no effort of mine can do",
+            "Let Your favour go before me in everything concerning $what",
+            "Father, do what no effort of mine can do concerning $what",
             "Let Your wisdom govern every decision concerning $what",
-            "Lord, let $what become a testimony in my mouth",
+            "Lord, give me a testimony concerning $what",
             "Father, remove every obstacle standing in the way of $what",
-            "Lord, let Your timing rather than my impatience rule $what",
-            "Father, provide everything that $what requires",
+            "Lord, let Your timing rather than my impatience govern everything concerning $what",
+            "Father, provide everything I need concerning $what",
             "Let Your peace guard my heart concerning $what",
             "Lord, let nothing hidden in $what take me by surprise",
             "Father, be glorified in the outcome of $what",
+            "Give me patience to follow Your process concerning $what",
+            "Father, keep my motives pure as I pursue $what",
+            "Let integrity mark every step I take concerning $what",
+            "Lord, connect me with wise people who can help with $what",
+            "Give me courage to act when You make the next step clear in $what",
+            "Father, close every door in $what that would draw me away from You",
+            "Let my character grow while I wait concerning $what",
+            "Lord, teach me to steward every opportunity connected to $what",
+            "Keep me from comparison and fear as I walk through $what",
+            "Father, let my words and choices honor You concerning $what",
+            "Give me strength to remain faithful in the ordinary work of $what",
+            "Lord, let the fruit of $what become a blessing to other people",
         )
         return rotate(bank, day, count)
     }
@@ -287,7 +346,9 @@ object PrayerPointEngine {
     /** "Prayer for Kidney Disease" -> "kidney disease". */
     internal fun subject(topic: PrayerTopic): String =
         topic.title
-            .replace(Regex("""(?i)^\s*(a\s+)?prayer\s+(for|against|during|before|after|over|when)\s+"""), "")
+            .replace(Regex("""(?i)^\s*(a\s+)?prayer\s+(for|of|to|against|during|before|after|over|when|about|in|on|at|upon|concerning)\s+"""), "")
+            .replace(Regex("""(?i)^\s*(a\s+)?prayer\s+based\s+on\s+"""), "")
+            .replace(Regex("""(?i)^\s*(a\s+)?prayer\s+while\s+"""), "")
             .replace(Regex("""(?i)^\s*prayer\s*[:\-]\s*"""), "")
             .replace(Regex("""(?i)^(my|the|your)\s+"""), "")
             .trim()

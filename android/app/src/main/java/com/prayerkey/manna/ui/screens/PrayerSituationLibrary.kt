@@ -64,7 +64,6 @@ fun PrayerSituationLibrary(
             IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBack, "Back") }
             Column(Modifier.weight(1f).padding(start = 6.dp)) {
                 Text("Prayer situations", fontFamily = DisplaySerif, fontSize = 29.sp, fontWeight = FontWeight.Bold)
-                Text("Choose what you need prayer for", color = cs.onBackground.copy(.58f), fontSize = 13.sp)
             }
         }
         OutlinedTextField(

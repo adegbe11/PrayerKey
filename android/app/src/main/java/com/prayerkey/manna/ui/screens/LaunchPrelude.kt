@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.ui.theme.BookSerif
+import com.prayerkey.manna.ui.theme.Pk
+import androidx.compose.ui.graphics.Color
 
 private val scriptureLines = listOf(
     listOf("Ask,", "and", "it", "will"),
@@ -37,21 +39,20 @@ private val scriptureLines = listOf(
  */
 @Composable
 fun LaunchPrelude(stage: Int) {
-    val cs = MaterialTheme.colorScheme
     AnimatedContent(
         targetState = stage == 0,
         transitionSpec = { fadeIn(tween(520)) togetherWith fadeOut(tween(360)) },
         label = "opening-scene",
     ) { showingBrand ->
         Column(
-            Modifier.fillMaxSize().background(cs.background).padding(horizontal = 26.dp),
+            Modifier.fillMaxSize().background(Pk.Oxblood).padding(horizontal = 26.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (showingBrand) {
                 Text(
                     "PRAYERKEY",
-                    color = cs.onBackground,
+                    color = Pk.GoldLight,
                     fontFamily = BookSerif,
                     fontSize = 34.sp,
                     fontWeight = FontWeight.Bold,
@@ -72,7 +73,7 @@ fun LaunchPrelude(stage: Int) {
                             ) {
                                 Text(
                                     word,
-                                    color = cs.onBackground,
+                                    color = Color.White,
                                     fontFamily = BookSerif,
                                     fontSize = 28.sp,
                                     lineHeight = 38.sp,
@@ -88,7 +89,7 @@ fun LaunchPrelude(stage: Int) {
                 ) {
                     Text(
                         "MATTHEW 7:7",
-                        color = cs.primary,
+                        color = Pk.GoldLight,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 2.6.sp,

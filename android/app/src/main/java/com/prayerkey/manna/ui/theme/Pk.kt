@@ -25,16 +25,16 @@ object Pk {
     /* ── the six ─────────────────────────────────────────────────────── */
 
     /** The page. Warm, never #FFFFFF — clinical white is the tell of a default theme. */
-    val Cream = Color(0xFFF6F5F9)
+    val Cream = Color(0xFFF5F5F7)
 
     /** Crisp text used directly on oxblood and midnight surfaces. */
     val Crisp = Color(0xFFFFFFFF)
 
     /** Midnight canvas: a near-black oxblood, never pure black. */
-    val DeepDark = Color(0xFF1A0A2E)
+    val DeepDark = Color(0xFF160022)
 
     /** Ink, and the floating nav. Not #000000: black is harsh to read against. */
-    val Charcoal = Color(0xFF1A0A2E)
+    val Charcoal = Color(0xFF1D1D1F)
 
     /** Masthead, primary buttons, eyebrows. 14.3:1 on cream. */
     val Oxblood = Color(0xFF6200ED)
@@ -45,16 +45,16 @@ object Pk {
 
     /** Hairlines, the streak, today. Used sparingly — gold stops reading as
      *  metal the moment it fills an area. */
-    val Gold = Color(0xFFC9A26D)
-    val GoldLight = Color(0xFFEFD5A8)
+    val Gold = Color(0xFFB07C1F)
+    val GoldLight = Color(0xFFE8C98C)
     /** Accessible gold ink for use on white surfaces. */
-    val GoldDeep = Color(0xFF6F5528)
+    val GoldDeep = Color(0xFF70501A)
 
     /** Done, complete, answered. The only green in the app. */
     val Sage = Color(0xFF0A7346)
 
     /** Invitations, and the nav at rest. */
-    val Blush = Color(0xFFEFD5A8)
+    val Blush = Color(0xFFE8C98C)
 
     /* ── derived, not new colours ────────────────────────────────────── */
 
@@ -68,7 +68,7 @@ object Pk {
      * measures **3.5:1** and fails AA for body text. The muted look survives
      * the correction; illegibility was never part of the aesthetic.
      */
-    val Muted = Charcoal.copy(alpha = .74f)
+    val Muted = Color(0xFF6E6E73)
 
     /**
      * The quietest legible tier — section labels.
@@ -77,7 +77,7 @@ object Pk {
      * pretending to be a label. Still visibly softer than [Muted], so the
      * hierarchy holds without dropping below the floor.
      */
-    val Faint = Charcoal.copy(alpha = .66f)
+    val Faint = Color(0xFF6E6E73)
 
     /** The only border in the app. */
     val Hair = Charcoal.copy(alpha = .10f)
@@ -91,9 +91,9 @@ object Pk {
     /* ── shape ───────────────────────────────────────────────────────── */
 
     /** One radius for every card in the app. */
-    val CardRadius = 26.dp
-    val ButtonRadius = 14.dp
-    val NavRadius = 34.dp
+    val CardRadius = 28.dp
+    val ButtonRadius = 18.dp
+    val NavRadius = 32.dp
     val CardBorder = 1.dp
 
     /* ── an 8pt scale, so no gap is chosen by eye ─────────────────────── */

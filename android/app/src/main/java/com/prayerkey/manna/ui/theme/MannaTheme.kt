@@ -2,6 +2,7 @@ package com.prayerkey.manna.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -11,17 +12,19 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
 
 /* Apple-white premium system:
    pure #FFFFFF canvas, #1D1D1F ink, #86868B secondary, #F5F5F7 fills. */
-val Ink = Color(0xFF1A0A2E)
-val Muted = Color(0xBD1A0A2E)
-val Canvas = Color(0xFFF6F5F9)
-val AppleGray = Color(0xFFF6F5F9)
+val Ink = Color(0xFF1D1D1F)
+val Muted = Color(0xFF6E6E73)
+val Canvas = Color(0xFFF5F5F7)
+val AppleGray = Color(0xFFF5F5F7)
 val Ivory = Color(0xFFFFFFFF)
-val Night = Color(0xFF1A0A2E)
-val Gold = Color(0xFFC9A26D)
-val GiltLine = Color(0xFFC9A26D)
+val Night = Color(0xFF160022)
+val Gold = Color(0xFFB07C1F)
+val GiltLine = Color(0xFFB07C1F)
 /** Historic name retained for call sites; it now means the one primary action. */
 val Electric = Color(0xFF6200ED)
 val Hairline = Color(0x1A1A0A2E)
@@ -85,6 +88,14 @@ private val MannaType = Typography(
     ),
 )
 
+private val PrayerKeyShapes = Shapes(
+    extraSmall = RoundedCornerShape(10.dp),
+    small = RoundedCornerShape(14.dp),
+    medium = RoundedCornerShape(20.dp),
+    large = RoundedCornerShape(28.dp),
+    extraLarge = RoundedCornerShape(34.dp),
+)
+
 @Composable
 fun MannaTheme(
     theme: com.prayerkey.manna.data.AppTheme = com.prayerkey.manna.data.APP_THEMES.first(),
@@ -124,7 +135,7 @@ fun MannaTheme(
         error = Pk.Oxblood, onError = Pk.Crisp,
         errorContainer = Pk.Blush, onErrorContainer = Pk.Oxblood,
     )
-    MaterialTheme(colorScheme = scheme, typography = MannaType, content = content)
+    MaterialTheme(colorScheme = scheme, typography = MannaType, shapes = PrayerKeyShapes, content = content)
 }
 
 @Composable

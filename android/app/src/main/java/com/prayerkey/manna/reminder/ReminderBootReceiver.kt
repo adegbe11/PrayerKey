@@ -12,6 +12,7 @@ class ReminderBootReceiver : BroadcastReceiver() {
             intent?.action != Intent.ACTION_MY_PACKAGE_REPLACED
         ) return
         val prefs = MannaStore(context.applicationContext).preferences()
+        ReminderReceiver.scheduleDailySuite(context, prefs.reminderEnabled)
         ReminderReceiver.schedule(context, prefs.reminderHour, prefs.reminderMinute, prefs.reminderEnabled)
     }
 }

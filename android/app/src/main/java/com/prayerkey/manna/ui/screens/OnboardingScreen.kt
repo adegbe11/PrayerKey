@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.screens
 
 import android.view.HapticFeedbackConstants
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -76,7 +77,7 @@ private val Ivory = Color(0xFFF6F0E1)
  * reminder, which is the only thing that brings anyone back tomorrow.
  */
 @Composable
-fun OnboardingScreen(onDone: () -> Unit) {
+fun OnboardingScreen(onDone: (remindersEnabled: Boolean, hour: Int) -> Unit) {
     var opening by remember { mutableStateOf(true) }
     var step by remember { mutableIntStateOf(0) }
 
@@ -90,13 +91,18 @@ fun OnboardingScreen(onDone: () -> Unit) {
         return
     }
 
-    if (step == 0) PullToLearn(onPulled = { step = 1 }, onSkip = onDone)
-    else OnboardingSlides(
-        step = step - 1,
-        onStep = { step = it + 1 },
-        onSkip = onDone,
-        onDone = onDone,
-    )
+    BackHandler(enabled = step > 0) { step-- }
+
+    when (step) {
+        0 -> PullToLearn(onPulled = { step = 1 }, onSkip = { onDone(false, 7) })
+        1 -> OnboardingSlides(
+            step = 0,
+            onStep = {},
+            onSkip = { onDone(false, 7) },
+            onDone = { step = 2 },
+        )
+        else -> ReminderStep(onDone)
+    }
 }
 
 /* ─────────────────────── 1. the gesture itself ─────────────────────── */
@@ -240,7 +246,7 @@ private fun ReminderStep(onDone: (Boolean, Int) -> Unit) {
                     Modifier.size(54.dp).clip(R.pill)
                         .background(
                             if (on) NightFill
-                            else Brush.verticalGradient(listOf(Color(0xFFF0F0F3), Color(0xFFF0F0F3))),
+                            else androidx.compose.ui.graphics.SolidColor(Color(0xFFF0F0F3)),
                         )
                         .clickable { hour = h },
                     contentAlignment = Alignment.Center,

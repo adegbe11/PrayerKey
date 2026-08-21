@@ -18,6 +18,44 @@ import java.io.File
  */
 class PrayerPointEngineTest {
 
+    @Test
+    fun `every prayer card has a unique title`() {
+        val duplicates = topics.groupingBy { it.title }.eachCount().filterValues { it > 1 }
+        assertTrue("duplicate prayer titles: $duplicates", duplicates.isEmpty())
+    }
+
+    @Test
+    fun `prayers avoid unsafe outcome guarantees`() {
+        val guarantees = Regex(
+            "(?i)(cancel every debt and replace it with abundance|" +
+                "I will rise from this stronger|aircraft perform perfectly|" +
+                "develop every organ, every system perfectly|baby develop perfectly)",
+        )
+        topics.forEach { topic ->
+            assertTrue(
+                "'${topic.title}' contains an outcome guarantee: ${topic.prayer}",
+                !guarantees.containsMatchIn(topic.prayer),
+            )
+        }
+    }
+
+    @Test
+    fun `canonical prayer session contains only distinct written prayer sentences`() {
+        val topic = topics.first { it.title.contains("salvation", true) }
+        val points = PrayerPointEngine.sessionPointsFor(topic)
+        assertTrue(points.isNotEmpty())
+        assertEquals(points.size, points.distinct().size)
+        assertTrue(points.size < 40)
+    }
+
+    @Test
+    fun `prayer title is never inserted into a prayer point as the subject`() {
+        val repentance = topics.first { it.title.equals("Prayer of Repentance", true) }
+        val points = PrayerPointEngine.sessionPointsFor(repentance)
+        assertTrue(points.none { it.contains("prayer of repentance", true) })
+        assertTrue(points.none { it.contains("concerning repentance", true) })
+    }
+
     private val topics: List<PrayerTopic> by lazy {
         val root = JSONObject(File("src/main/assets/prayer-topics.json").readText())
             .getJSONArray("topics")

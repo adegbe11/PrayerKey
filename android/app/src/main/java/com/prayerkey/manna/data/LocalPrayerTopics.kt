@@ -39,7 +39,7 @@ object LocalPrayerTopics {
             slug = item.getString("slug"),
             title = item.getString("title"),
             category = item.getString("category"),
-            prayer = item.optString("prayer"),
+            prayer = editorialPrayer(item.optString("prayer")),
             scripture = buildList {
                 for (i in 0 until scripture.length()) {
                     scripture.optJSONObject(i)?.let {
@@ -51,5 +51,27 @@ object LocalPrayerTopics {
                 for (i in 0 until points.length()) add(points.optString(i))
             },
         )
+    }
+
+    /** Removes outcome guarantees and fundraising-style clichés from legacy copy. */
+    private fun editorialPrayer(source: String): String {
+        val edits = linkedMapOf(
+            "Cancel every debt and replace it with abundance." to "Give me discipline, honest counsel, and a workable path out of debt.",
+            "Bring unexpected income and supernatural provision." to "Provide honest opportunities, sufficient income, and wisdom for every decision.",
+            "Let people be drawn to help me without knowing why — because Your hand is on my life." to "Grant me favour with people whose help is honest, wise, and timely.",
+            "I trust that they are with You." to "I entrust them to Your mercy.",
+            "Regulate what doctors cannot fully control." to "Give my clinicians wisdom and help me manage this condition faithfully.",
+            "supernatural intervention where medicine reaches its limit" to "effective treatment, wise care, and healing according to Your mercy",
+            "I will rise from this stronger." to "Give me courage and patience throughout recovery.",
+            "Let every setback become a setup for a greater testimony." to "Keep disappointment from ruling my heart when recovery is difficult.",
+            "unexpected money, promotions, divine connections, and opportunities that only You can arrange" to "honest work, wise counsel, disciplined choices, and a sustainable way forward",
+            "supernatural debt cancellation" to "freedom from debt",
+            "supernatural, tangible relief" to "real and lasting relief",
+            "By Your stripes I am healed." to "I place my hope in Your mercy and healing.",
+            "I believe and receive it." to "I ask with faith and entrust the outcome to You.",
+            "Let this baby develop perfectly — every organ, every system, every cell." to "Guard this baby through every stage of development — every organ, every system, every cell.",
+            "Guard against any complication." to "Protect this pregnancy and guide every medical decision.",
+        )
+        return edits.entries.fold(source) { prayer, edit -> prayer.replace(edit.key, edit.value) }
     }
 }

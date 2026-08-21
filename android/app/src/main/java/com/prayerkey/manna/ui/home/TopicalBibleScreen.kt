@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -58,13 +59,13 @@ internal fun TopicalBibleScreen(onClose: () -> Unit) {
     var topic by remember { mutableStateOf<String?>(null) }
     var query by remember { mutableStateOf("") }
     val back = { when { topic != null -> topic = null; group != null -> group = null; else -> onClose() } }
+    BackHandler { back() }
     Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = back) { Icon(if (group == null && topic == null) Icons.Outlined.Close else Icons.Outlined.ArrowBack, "Back") }
                 Column(Modifier.weight(1f)) {
                     Text(topic ?: group?.title ?: "Topical Bible Verses", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = if (topic == null) 25.sp else 23.sp, color = Pk.Charcoal)
-                    Text(when { topic != null -> "Scripture for this subject"; group != null -> "Choose a topic"; else -> "Verses by subject and mood" }, fontSize = 11.sp, color = Pk.Muted)
                 }
             }
             when {

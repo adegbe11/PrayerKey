@@ -162,7 +162,7 @@ fun PrayerSessionScreen(
                 }
             } else {
                 val active = prayerSections[section]
-                Text(String.format("%02d:%02d", remaining / 60, remaining % 60), Modifier.align(Alignment.CenterHorizontally), fontFamily = DisplaySerif, fontSize = 58.sp, fontWeight = FontWeight.Bold, color = Pk.Oxblood)
+                Text(String.format(java.util.Locale.US, "%02d:%02d", remaining / 60, remaining % 60), Modifier.align(Alignment.CenterHorizontally), fontFamily = DisplaySerif, fontSize = 58.sp, fontWeight = FontWeight.Bold, color = Pk.Oxblood)
                 LinearProgressIndicator({ 1f - remaining.toFloat() / (minutes * 60).coerceAtLeast(1) }, Modifier.fillMaxWidth().padding(top = 14.dp).height(5.dp), color = Pk.Oxblood, trackColor = Pk.Oxblood.copy(alpha = .1f))
                 Surface(Modifier.fillMaxWidth().padding(top = 30.dp), shape = RoundedCornerShape(30.dp), color = Pk.DeepDark) {
                     Column(Modifier.padding(26.dp)) {
@@ -213,7 +213,6 @@ fun PrayerCalendarScreen(onClose: () -> Unit) {
             }
         }
         Text("Your prayer history", Modifier.padding(top = 30.dp, bottom = 8.dp), fontFamily = DisplaySerif, fontSize = 23.sp, fontWeight = FontWeight.Bold, color = Pk.Charcoal)
-        if (records.isEmpty()) Text("Your completed prayer sessions will appear here.", Modifier.padding(top = 18.dp), color = Pk.Muted)
         grouped.toSortedMap(compareByDescending { it }).forEach { (date, sessions) ->
             Surface(Modifier.fillMaxWidth().padding(top = 12.dp), shape = RoundedCornerShape(22.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
                 Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {

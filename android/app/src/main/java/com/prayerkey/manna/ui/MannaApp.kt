@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui
 
+import com.prayerkey.manna.ui.theme.glassSource
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -53,7 +54,11 @@ import com.prayerkey.manna.ui.theme.Muted
 private data class Destination(val label: String, val icon: ImageVector)
 
 @Composable
-fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
+fun MannaApp(
+    onThemeChange: (String, Boolean) -> Unit = { _, _ -> },
+    notificationRoute: String? = null,
+    onNotificationRouteConsumed: () -> Unit = {},
+) {
     val viewModel: AppViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val saved by viewModel.saved.collectAsState()
     val streak by viewModel.streak.collectAsState()
@@ -71,6 +76,12 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
     val context = LocalContext.current
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     LaunchedEffect(hydrated, preferences.onboarded, preferences.reminderEnabled) {
+        if (hydrated && preferences.onboarded) {
+            com.prayerkey.manna.reminder.ReminderReceiver.scheduleDailySuite(context, preferences.reminderEnabled)
+            com.prayerkey.manna.reminder.ReminderReceiver.schedule(
+                context, preferences.reminderHour, preferences.reminderMinute, preferences.reminderEnabled,
+            )
+        }
         if (hydrated && preferences.onboarded && preferences.reminderEnabled &&
             android.os.Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
@@ -89,8 +100,25 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
         )
     }
     var selected by remember { mutableIntStateOf(0) }
+    var homeAction by remember { mutableStateOf<String?>(null) }
     var verseIndex by remember { mutableIntStateOf(0) }
     var showProfile by remember { androidx.compose.runtime.mutableStateOf(false) }
+    LaunchedEffect(notificationRoute, hydrated, preferences.onboarded) {
+        if (!hydrated || !preferences.onboarded || notificationRoute == null) return@LaunchedEffect
+        when (notificationRoute) {
+            "bible" -> selected = 1
+            "prayer" -> selected = 2
+            "church" -> selected = 3
+            "journal" -> selected = 4
+            "devotional", "fasting", "prayer_challenge", "midnight", "warfare" -> {
+                selected = 0
+                homeAction = notificationRoute
+            }
+            else -> selected = 0
+        }
+        showProfile = false
+        onNotificationRouteConsumed()
+    }
     val journeyInsight = remember(entries, sermonNotes, journal, saved) {
         com.prayerkey.manna.data.JourneyInsights.build(entries, sermonNotes, journal, saved)
     }
@@ -138,15 +166,23 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
        Tinder card that stops short of the edge is just a card. Screens that
        scroll add their own bottom clearance (Pk.NavClearance); screens that are
        a single full-bleed card simply run underneath it. */
+    /* What the dock is allowed to see. Recorded from the content layer only —
+       putting the chrome in here would make the glass sample itself, and a
+       panel that samples its own output smears a little more every frame. */
+    val backdrop = com.prayerkey.manna.ui.theme.rememberGlassBackdrop()
+
     Box(
         Modifier.fillMaxSize()
             .background(androidx.compose.material3.MaterialTheme.colorScheme.background),
     ) {
-        Box(Modifier.fillMaxSize()) {
+        Box(
+            Modifier.fillMaxSize()
+                .glassSource(backdrop),
+        ) {
             if (!hydrated) {
                 com.prayerkey.manna.ui.screens.LaunchPrelude(stage = 0)
             } else if (!preferences.onboarded) {
-                com.prayerkey.manna.ui.screens.OnboardingScreen {
+                com.prayerkey.manna.ui.screens.OnboardingScreen { remindersEnabled, reminderHour ->
                     /* The reminder used to be set here, at the one moment
                        people say yes. It is still on by default — the setting
                        lives in Profile, and defaulting it off would switch
@@ -156,7 +192,9 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                             onboarded = true,
                             accountReady = true,
                             accountKind = "private",
-                            reminderEnabled = false,
+                            reminderEnabled = remindersEnabled,
+                            reminderHour = reminderHour,
+                            reminderMinute = 0,
                         ),
                     )
                 }
@@ -229,6 +267,8 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                                 )
                             },
                             onSettings = { showProfile = true },
+                            initialAction = homeAction,
+                            onInitialActionConsumed = { homeAction = null },
                         )
                     }
                     1 -> BibleScreen(
@@ -291,6 +331,7 @@ fun MannaApp(onThemeChange: (String, Boolean) -> Unit = { _, _ -> }) {
                 com.prayerkey.manna.ui.components.MannaDock(
                     items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon) },
                     selected = selected,
+                    backdrop = backdrop,
                     onSelect = { selected = it },
                 )
             }

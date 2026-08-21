@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.Role
@@ -87,7 +88,7 @@ fun PkChip(
                 else Modifier,
             )
             .clip(R.pill)
-            .background(if (selected) NightFill else Brush.verticalGradient(listOf(ChipFill, ChipFill)))
+            .background(if (selected) NightFill else SolidColor(ChipFill))
             .topHighlight(R.pill, strength = if (selected) .22f else .7f)
             .semantics(mergeDescendants = true) {
                 contentDescription = label
@@ -108,7 +109,7 @@ fun PkChip(
     }
 }
 
-/** Primary action: glossy gradient, layered shadow, press scale, no ripple. */
+/** Primary action: solid brand material, restrained depth, press scale, no ripple. */
 @Composable
 fun PkButton(
     label: String,
@@ -124,7 +125,7 @@ fun PkButton(
 ) {
     val view = LocalView.current
     val cs = androidx.compose.material3.MaterialTheme.colorScheme
-    val paint = fill ?: Brush.verticalGradient(listOf(cs.primary, cs.primary))
+    val paint = fill ?: SolidColor(cs.primary)
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val press by animateFloatAsState(
@@ -144,9 +145,7 @@ fun PkButton(
             .clip(R.control)
             .background(
                 if (enabled) paint
-                else Brush.verticalGradient(
-                    listOf(cs.onSurface.copy(alpha = .16f), cs.onSurface.copy(alpha = .10f)),
-                ),
+                else SolidColor(cs.onSurface.copy(alpha = .12f)),
             )
             .topHighlight(R.control, strength = if (enabled) .42f else .2f)
             .semantics(mergeDescendants = true) {

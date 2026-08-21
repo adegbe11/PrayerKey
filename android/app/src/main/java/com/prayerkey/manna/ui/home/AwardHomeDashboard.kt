@@ -113,6 +113,8 @@ fun AwardHomeDashboard(
     onOpenChallenge: (Challenge) -> Unit,
     onToggleChallenge: (Challenge) -> Unit,
     onSettings: () -> Unit,
+    initialAction: String? = null,
+    onInitialActionConsumed: () -> Unit = {},
 ) {
     PrayerKeyOperatingHome(
         streak = streak,
@@ -131,6 +133,8 @@ fun AwardHomeDashboard(
         onKeepPrayer = onKeepPrayer,
         onKeepReflection = onKeepReflection,
         onSettings = onSettings,
+        initialAction = initialAction,
+        onInitialActionConsumed = onInitialActionConsumed,
     )
 }
 

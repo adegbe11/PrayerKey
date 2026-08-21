@@ -34,13 +34,13 @@ import com.prayerkey.manna.ui.theme.UtilitySans
 import java.util.Locale
 import kotlinx.coroutines.launch
 
-private val PrayBlack = Color(0xFFF5F5F7)
-private val PrayPanel = Color(0xFFFFFFFF)
-private val PrayLine = Color(0xFFE1DCE8)
-private val PrayGold = Color(0xFF6F5528)
-private val PrayViolet = Color(0xFF6200ED)
-private val PrayInk = Color(0xFF1A0A2E)
-private val PrayMuted = Color(0xFF6E6477)
+private val PrayBlack = Pk.Cream
+private val PrayPanel = Pk.Sunken
+private val PrayLine = Pk.Hair
+private val PrayGold = Pk.GoldDeep
+private val PrayViolet = Pk.Oxblood
+private val PrayInk = Pk.Charcoal
+private val PrayMuted = Pk.Muted
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,7 +95,6 @@ fun PrayerScreen(
                 Text("PRAYERKEY", Modifier.weight(1f), color = PrayInk, fontFamily = UtilitySans, fontSize = 25.sp, fontWeight = FontWeight.Bold)
                 RoundAction(Icons.Outlined.AutoStories, "Prayer decks") { deckOpen = true }
                 Spacer(Modifier.width(9.dp))
-                RoundAction(Icons.Outlined.History, "Saved prayers") { if (journal.isNotEmpty()) request = journal.first().request }
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 120.dp)) {
                 if (generated == null) {
@@ -117,7 +116,7 @@ fun PrayerScreen(
                     if (journal.isNotEmpty()) {
                         Text("PRAYERS YOU KEPT", Modifier.padding(top = 31.dp, bottom = 10.dp), color = PrayMuted, fontSize = 10.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold)
                         journal.take(3).forEach { saved ->
-                            Surface(onClick = { request = saved.request }, modifier = Modifier.fillMaxWidth().padding(bottom = 9.dp), shape = RoundedCornerShape(17.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine)) {
+                            Surface(onClick = { request = saved.request }, modifier = Modifier.fillMaxWidth().padding(bottom = 9.dp), shape = RoundedCornerShape(22.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine), shadowElevation = 2.dp) {
                                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Outlined.BookmarkBorder, null, tint = PrayGold)
                                     Column(Modifier.weight(1f).padding(start = 13.dp)) { Text(saved.title, color = PrayInk, fontFamily = BookSerif, fontSize = 17.sp); saved.scriptureRef?.let { Text(it, color = PrayMuted, fontSize = 11.sp) } }
@@ -148,7 +147,7 @@ fun PrayerScreen(
 }
 
 @Composable private fun PrayerComposer(value: String, loading: Boolean, onChange: (String) -> Unit, onSend: () -> Unit) {
-    Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(27.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine)) {
+    Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine), shadowElevation = 4.dp) {
         Column(Modifier.padding(18.dp)) {
             androidx.compose.foundation.text.BasicTextField(value, onChange, Modifier.fillMaxWidth().heightIn(min = 88.dp), textStyle = androidx.compose.ui.text.TextStyle(color = PrayInk, fontFamily = UtilitySans, fontSize = 18.sp, lineHeight = 27.sp), decorationBox = { inner -> Box { if (value.isBlank()) Text("Tell God what is on your heart…", color = PrayMuted, fontSize = 18.sp); inner() } })
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -165,7 +164,7 @@ fun PrayerScreen(
 @Composable private fun GeneratedPrayerView(prayer: GeneratedPrayer, speechReady: Boolean, onListen: () -> Unit, onSave: () -> Unit, onAgain: () -> Unit) {
     Text("A prayer for you", Modifier.padding(top = 34.dp), color = PrayGold, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
     Text(prayer.title, Modifier.padding(top = 10.dp), color = PrayInk, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 34.sp, lineHeight = 39.sp)
-    prayer.verses.firstOrNull()?.let { (ref, verse) -> Surface(Modifier.fillMaxWidth().padding(top = 24.dp), shape = RoundedCornerShape(20.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine)) { Column(Modifier.padding(20.dp)) { Text(ref.uppercase(), color = PrayGold, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.1.sp); Text("“$verse”", Modifier.padding(top = 8.dp), color = PrayInk, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 27.sp) } } }
+    prayer.verses.firstOrNull()?.let { (ref, verse) -> Surface(Modifier.fillMaxWidth().padding(top = 24.dp), shape = RoundedCornerShape(24.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine), shadowElevation = 2.dp) { Column(Modifier.padding(20.dp)) { Text(ref.uppercase(), color = PrayGold, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.1.sp); Text("“$verse”", Modifier.padding(top = 8.dp), color = PrayInk, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 27.sp) } } }
     Text(prayer.prayer, Modifier.padding(top = 25.dp), color = PrayInk.copy(.9f), fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 31.sp)
     if (prayer.encouragement.isNotBlank()) Text(prayer.encouragement, Modifier.padding(top = 20.dp), color = PrayMuted, fontSize = 14.sp, lineHeight = 22.sp)
     Row(Modifier.fillMaxWidth().padding(top = 28.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {

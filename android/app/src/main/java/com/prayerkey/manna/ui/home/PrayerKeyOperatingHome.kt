@@ -71,6 +71,8 @@ fun PrayerKeyOperatingHome(
     /** Devotional -> journal. The day's question, and the answer written to it. */
     onKeepReflection: (String, String) -> Unit,
     onSettings: () -> Unit,
+    initialAction: String? = null,
+    onInitialActionConsumed: () -> Unit = {},
 ) {
     val today = remember { LocalDate.now() }
     val dailyDevotional = remember(today) { devotionalFor(today) }
@@ -81,6 +83,18 @@ fun PrayerKeyOperatingHome(
     var morningPrayerOpen by rememberSaveable { mutableStateOf(false) }
     var prayerSessionOpen by rememberSaveable { mutableStateOf(false) }
     var prayerCalendarOpen by rememberSaveable { mutableStateOf(false) }
+    var selectedFeature by remember { mutableStateOf<Feature?>(null) }
+
+    LaunchedEffect(initialAction) {
+        when (initialAction) {
+            "devotional" -> devotionalOpen = true
+            "fasting" -> selectedFeature = Feature("Start a fast", "", Icons.Outlined.WaterDrop, Hub.PRAY)
+            "prayer_challenge" -> selectedFeature = Feature("Prayer challenge", "", Icons.Outlined.LocalFireDepartment, Hub.PRAY)
+            "midnight" -> selectedFeature = Feature("Midnight prayer", "", Icons.Outlined.DarkMode, Hub.PRAY)
+            "warfare" -> selectedFeature = Feature("Warfare prayer", "", Icons.Outlined.Shield, Hub.PRAY)
+        }
+        if (initialAction != null) onInitialActionConsumed()
+    }
 
     /* The written year walks from the day you started, not from 1 January, so
        somebody installing in November gets day 1 rather than day 318. */
@@ -185,7 +199,6 @@ fun PrayerKeyOperatingHome(
             properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
         ) { PrayerCalendarScreen { prayerCalendarOpen = false } }
     }
-    var selectedFeature by remember { mutableStateOf<Feature?>(null) }
     /* Six of these have finished screens already built. They were opening a
        placeholder instead, which is the difference between a feature that works
        and a card that lies. Routed to the real thing. */
@@ -201,7 +214,7 @@ fun PrayerKeyOperatingHome(
         }
     }
     selectedFeature?.let { feature ->
-        Dialog(onDismissRequest = { selectedFeature = null }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Dialog(onDismissRequest = { selectedFeature = null }, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
             FeatureDestination(feature, onKeep = onKeepPrayer, onClose = { selectedFeature = null }) { }
         }
     }
@@ -277,22 +290,39 @@ fun PrayerKeyOperatingHome(
 }
 
 @Composable private fun Header(date: LocalDate, streak: Int, settings: () -> Unit) {
-    Box(Modifier.fillMaxWidth().height(88.dp).padding(horizontal = 14.dp)) {
-        IconButton(settings, Modifier.align(Alignment.CenterStart)) {
-            Icon(Icons.Outlined.Menu, "Open settings", tint = Pk.Charcoal, modifier = Modifier.size(27.dp))
+    Box(Modifier.fillMaxWidth().height(74.dp).padding(horizontal = 20.dp)) {
+        Surface(
+            onClick = settings,
+            modifier = Modifier.align(Alignment.CenterStart).size(36.dp),
+            shape = CircleShape,
+            color = Color.White.copy(alpha = .78f),
+            border = BorderStroke(.6.dp, Color.White),
+            shadowElevation = 6.dp,
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(Icons.Outlined.Menu, "Open settings", tint = Pk.Charcoal, modifier = Modifier.size(18.dp))
+            }
         }
         Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("PRAYERKEY", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 23.sp, letterSpacing = 1.4.sp, color = Pk.Charcoal)
-            Text(date.format(DateTimeFormatter.ofPattern("EEEE, MMM d")), Modifier.padding(top = 3.dp), fontFamily = UtilitySans, fontSize = 10.sp, color = Pk.Muted)
+            Text("PRAYERKEY", fontFamily = DisplaySerif, fontWeight = FontWeight.Normal, fontSize = 24.sp, letterSpacing = 1.45.sp, color = Pk.Charcoal)
+            Text(date.format(DateTimeFormatter.ofPattern("EEEE, MMM d")), Modifier.padding(top = 5.dp), fontFamily = UtilitySans, fontSize = 12.sp, color = Pk.Muted)
         }
-        IconButton(settings, Modifier.align(Alignment.CenterEnd)) {
+        Surface(
+            onClick = settings,
+            modifier = Modifier.align(Alignment.CenterEnd).size(36.dp),
+            shape = CircleShape,
+            color = Color.White.copy(alpha = .78f),
+            border = BorderStroke(.6.dp, Color.White),
+            shadowElevation = 6.dp,
+        ) {
             BadgedBox(
+                modifier = Modifier.padding(9.dp),
                 badge = {
                     if (streak > 0) Badge(containerColor = Pk.Oxblood, contentColor = Color.White) {
                         Text(streak.coerceAtMost(99).toString(), fontSize = 8.sp)
                     }
                 },
-            ) { Icon(Icons.Outlined.NotificationsNone, "Prayer reminders", tint = Pk.Charcoal, modifier = Modifier.size(27.dp)) }
+            ) { Icon(Icons.Outlined.NotificationsNone, "Prayer reminders", tint = Pk.Charcoal, modifier = Modifier.size(18.dp)) }
         }
     }
 }
@@ -322,7 +352,6 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
         HomeShortcut("Warfare", Icons.Outlined.Shield) { open(Feature("Warfare prayer", "Scripture-led prayer sets", Icons.Outlined.Shield, Hub.PRAY)) },
         HomeShortcut("Answered", Icons.Outlined.CheckCircle, open = ledger),
         HomeShortcut("Church", Icons.Outlined.Church, open = church),
-        HomeShortcut("Places", Icons.Outlined.Place) { open(Feature("The Holy Land", "Jerusalem, Bethlehem and Galilee", Icons.Outlined.Place, Hub.BIBLE)) },
     )
     Row(
         Modifier.fillMaxWidth().horizontalScroll(shortcutScroll).padding(start = 18.dp, end = 18.dp, bottom = 16.dp),
@@ -334,12 +363,17 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Surface(
-                        Modifier.size(72.dp), shape = CircleShape, color = Color.White,
-                        border = BorderStroke(1.5.dp, Pk.Oxblood.copy(alpha = .18f)), shadowElevation = 2.dp,
+                    Box(
+                        Modifier.size(70.dp).border(2.2.dp, Pk.Oxblood.copy(alpha = .10f), CircleShape),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(item.icon, null, tint = Pk.Oxblood, modifier = Modifier.size(29.dp))
+                        Surface(
+                            Modifier.size(62.dp), shape = CircleShape, color = Color.White.copy(alpha = .82f),
+                            border = BorderStroke(.7.dp, Color.White), shadowElevation = 4.dp,
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(item.icon, null, tint = Pk.Oxblood, modifier = Modifier.size(27.dp))
+                            }
                         }
                     }
                     item.badge?.let { badge ->
@@ -362,7 +396,7 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
 
 @Composable private fun HeroRail(title: String, open: () -> Unit) {
     Box(
-        Modifier.fillMaxWidth().height(430.dp).clickable(onClick = open)
+        Modifier.fillMaxWidth().height(470.dp).clickable(onClick = open)
     ) {
         Image(
             painterResource(R.drawable.prayerkey_hero_dawn), null,
@@ -383,11 +417,10 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
                 Icon(Icons.Outlined.PlayArrow, "Open today's devotional", Modifier.padding(19.dp).size(30.dp), tint = Pk.Oxblood)
         }
         Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 22.dp, vertical = 24.dp)) {
-            Surface(shape = RoundedCornerShape(8.dp), color = Color.White.copy(alpha = .16f)) {
+            Surface(shape = CircleShape, color = Color.White.copy(alpha = .16f), border = BorderStroke(.5.dp, Color.White.copy(alpha = .24f))) {
                 Text("TODAY'S DEVOTIONAL", Modifier.padding(horizontal = 10.dp, vertical = 6.dp), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp, color = Color.White)
             }
             Text(title, Modifier.padding(top = 12.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 34.sp, lineHeight = 38.sp, color = Color.White)
-            Text("Scripture • reflection • prayer", Modifier.padding(top = 7.dp), fontFamily = UtilitySans, fontSize = 13.sp, color = Color.White.copy(alpha = .78f))
             Row(Modifier.fillMaxWidth().padding(top = 17.dp), verticalAlignment = Alignment.CenterVertically) {
                 repeat(4) { Box(Modifier.padding(end = 6.dp).size(if (it == 0) 20.dp else 6.dp, 6.dp).background(if (it == 0) Pk.GoldLight else Color.White.copy(alpha = .38f), CircleShape)) }
                 Spacer(Modifier.weight(1f))
@@ -523,7 +556,6 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
             Icon(Icons.Outlined.Bolt, null, tint = Pk.GoldLight, modifier = Modifier.size(28.dp))
             Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
                 Text("I NEED PRAYER NOW", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.White)
-                Text("Start a private guided prayer", fontFamily = UtilitySans, fontSize = 12.sp, color = Color.White.copy(alpha = .76f))
             }
             Icon(Icons.Outlined.ArrowForward, null, tint = Color.White)
         }
@@ -669,11 +701,11 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
         openMoment = null
     }
     val items = listOf(
-        Triple("morning", "Morning prayer", "Begin the day with God") to Pair(Icons.Outlined.WbSunny, morningPrayer),
-        Triple("devotional", "Daily devotional", "Scripture · reflection · prayer") to Pair(Icons.Outlined.AutoStories, devotional),
-        Triple("bible", "Read today's Bible", "Continue your reading journey") to Pair(Icons.Outlined.MenuBook, bible),
-        Triple("reflection", "Guided reflection", "Notice what God is teaching") to Pair(Icons.Outlined.EditNote, reflection),
-        Triple("evening", "Evening prayer", "Review the day with gratitude") to Pair(Icons.Outlined.NightsStay, eveningPrayer),
+        Triple("morning", "Father, order my steps today", "Morning prayer") to Pair(Icons.Outlined.WbSunny, morningPrayer),
+        Triple("devotional", "Lord, speak through Your Word", "Daily devotional") to Pair(Icons.Outlined.AutoStories, devotional),
+        Triple("bible", "Open my eyes to understand Your Word", "Bible reading") to Pair(Icons.Outlined.MenuBook, bible),
+        Triple("reflection", "Search my heart and lead me", "Prayer and reflection") to Pair(Icons.Outlined.EditNote, reflection),
+        Triple("evening", "Father, I return this day to You", "Evening prayer") to Pair(Icons.Outlined.NightsStay, eveningPrayer),
     )
     openMoment?.let { moment ->
         Dialog(onDismissRequest = { openMoment = null }, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
@@ -778,7 +810,6 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
             Row(Modifier.fillMaxWidth().padding(22.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Your remembrance book", fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, color = Pk.Charcoal)
-                    Text("Keep what God is doing", fontFamily = UtilitySans, fontSize = 12.sp, color = Pk.Muted)
                 }
                 Icon(Icons.Outlined.AutoStories, null, tint = Pk.Oxblood)
             }
@@ -855,7 +886,6 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(originals.title.uppercase(), Modifier.weight(1f), style = labelStyle(), color = Pk.Oxblood)
-            Text("3 ORIGINALS", fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = .8.sp, color = Pk.Muted)
         }
         Column(Modifier.padding(horizontal = 22.dp), verticalArrangement = Arrangement.spacedBy(11.dp)) {
             originals.items.forEachIndexed { index, item -> OriginalProgrammeCard(item, index) { go(item) } }
@@ -902,11 +932,11 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
             Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(close) { Icon(Icons.Outlined.Close, "Close", tint = Pk.Charcoal) }
                 Text("PRAYERKEY", Modifier.weight(1f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.5.sp, color = Pk.Oxblood)
-                Text("${category.items.size}", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, color = Pk.Muted)
+                Spacer(Modifier.width(48.dp))
             }
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 22.dp, vertical = 12.dp)) {
                 Text(category.title, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 36.sp, color = Pk.Charcoal)
-                Text("Choose where you want to begin.", Modifier.padding(top = 7.dp, bottom = 22.dp), fontFamily = UtilitySans, fontSize = 13.sp, color = Pk.Muted)
+                Spacer(Modifier.height(22.dp))
                 DiscoveryGrid(category.items) { feature -> close(); go(feature) }
                 Spacer(Modifier.height(24.dp))
             }
@@ -1091,7 +1121,11 @@ private fun labelStyle() = androidx.compose.ui.text.TextStyle(fontFamily = Utili
     onClose: () -> Unit,
     openFull: () -> Unit,
 ) {
-    DiscoveryExperienceScreen(feature.title, feature.detail, feature.icon, onKeep, onClose, openFull)
+    if (feature.title == "Prayer points") {
+        com.prayerkey.manna.ui.screens.PrayerPointsScreen(onClose)
+    } else {
+        DiscoveryExperienceScreen(feature.title, feature.detail, feature.icon, onKeep, onClose, openFull)
+    }
 }
 
 /**
@@ -1141,10 +1175,6 @@ private fun programmeCategories() = listOf(
     )),
     ProgrammeCategory("Keep", listOf(
         Feature("Journal", "Write your walk with God", Icons.Outlined.EditNote, Hub.JOURNAL),
-        Feature("Answered", "Remember His faithfulness", Icons.Outlined.CheckCircle, Hub.JOURNAL),
-        Feature("Testimonies", "Tell what God did", Icons.Outlined.RecordVoiceOver, Hub.JOURNAL),
-        Feature("Thanksgiving", "Name the goodness", Icons.Outlined.Celebration, Hub.JOURNAL),
-        Feature("Dreams", "Record, pray and discern", Icons.Outlined.Nightlight, Hub.JOURNAL),
     )),
     ProgrammeCategory("Church", listOf(
         Feature("Live sermon", "Capture audio and live notes", Icons.Outlined.MicNone, Hub.CHURCH),
@@ -1153,7 +1183,5 @@ private fun programmeCategories() = listOf(
 )
 
 private fun conditionalFeatures(today: LocalDate): List<Feature> = buildList {
-    if (LocalTime.now().hour >= 21) add(Feature("Midnight watch", "The watch is open", Icons.Outlined.DarkMode, Hub.PRAY))
-    if (today.dayOfWeek.value == 7 || today.dayOfWeek.value == 1) add(Feature("New sermon", "Sunday continues", Icons.Outlined.GraphicEq, Hub.CHURCH))
     if (today.dayOfMonth == 1) add(Feature("First fruits", "Begin the month with God", Icons.Outlined.Spa, Hub.PRAY))
 }

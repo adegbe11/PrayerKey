@@ -100,10 +100,10 @@ private fun DailyRhythmPage(
                     }
                     "reflection" -> {
                         ScriptureBlock(devotional.reference, devotional.opening)
-                        RhythmHeading("THINK ABOUT THIS")
-                        Text(devotional.reflectionQuestion, fontFamily = DisplaySerif, fontSize = 24.sp, lineHeight = 31.sp, color = Pk.Charcoal)
-                        RhythmHeading("DO THIS TODAY")
-                        Text(devotional.practice, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 28.sp, color = Pk.Charcoal)
+                        RhythmHeading("PRAYER FOR UNDERSTANDING")
+                        Text("Father, search my heart in the light of Your Word. Correct what is wrong in me, strengthen what is weak, and give me grace to obey what You reveal. Let Your truth shape my thoughts, my words, and my decisions today. In Jesus' name, Amen.", fontFamily = DisplaySerif, fontSize = 22.sp, lineHeight = 31.sp, color = Pk.Charcoal)
+                        RhythmHeading("PERSONAL PRAYER")
+                        Text("Lord, concerning this word—${devotional.reflectionQuestion.trimEnd('?', '.')}—give me understanding and lead me in the way that pleases You. In Jesus' name, Amen.", fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 28.sp, color = Pk.Charcoal)
                         RhythmNote(note) { note = it; prefs.edit().putString("${date}_$moment", it).apply() }
                     }
                     else -> {
@@ -120,7 +120,7 @@ private fun DailyRhythmPage(
                 Spacer(Modifier.height(28.dp))
             }
             Button(onClick = onComplete, modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
-                Text("COMPLETE THIS MOMENT", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .8.sp)
+                Text("AMEN · COMPLETE", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .8.sp)
             }
         }
     }

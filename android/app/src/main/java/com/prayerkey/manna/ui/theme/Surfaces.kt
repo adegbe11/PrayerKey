@@ -11,6 +11,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 
 /**
@@ -24,7 +25,7 @@ import androidx.compose.ui.unit.dp
  */
 fun Modifier.premiumCard(
     shape: RoundedCornerShape = R.card,
-    fill: Brush = Brush.verticalGradient(listOf(Color.White, Color(0xFFFBFAFD))),
+    fill: Brush = SolidColor(Color.White),
     lift: Boolean = true,
 ): Modifier = this
     // wide, soft — the lift
@@ -36,13 +37,13 @@ fun Modifier.premiumCard(
     .topHighlight(shape)
 
 /** Warm paper, for scripture and prayer. */
-val PaperFill = Brush.verticalGradient(listOf(Color.White, Color(0xFFFBFAFD)))
+val PaperFill: Brush = SolidColor(Color.White)
 
 /** The sacred layer. */
-val NightFill = Brush.verticalGradient(listOf(Pk.VioletLit, Pk.Oxblood, Pk.VioletDeep))
+val NightFill: Brush = SolidColor(Pk.Oxblood)
 
 /** A gold-leaf wash, for anything answered or kept. */
-val GoldFill = Brush.verticalGradient(listOf(Color.White, Pk.Gold.copy(alpha = .08f)))
+val GoldFill: Brush = SolidColor(Color.White)
 
 /**
  * The one-pixel catch of light along a surface's upper edge. This is the
@@ -54,11 +55,7 @@ fun Modifier.topHighlight(
 ): Modifier = this
     .border(
         width = 0.7.dp,
-        brush = Brush.verticalGradient(
-            0f to Color.White.copy(alpha = strength),
-            .45f to Color.White.copy(alpha = strength * .18f),
-            1f to Color.Black.copy(alpha = .045f),
-        ),
+        brush = SolidColor(Color.White.copy(alpha = strength * .5f)),
         shape = shape,
     )
 
@@ -66,11 +63,7 @@ fun Modifier.topHighlight(
 fun Modifier.goldEdge(shape: RoundedCornerShape = R.card): Modifier = this
     .border(
         width = 0.8.dp,
-        brush = Brush.verticalGradient(
-            0f to GiltLine.copy(alpha = .75f),
-            .5f to GiltLine.copy(alpha = .25f),
-            1f to Color.White.copy(alpha = .05f),
-        ),
+        brush = SolidColor(GiltLine.copy(alpha = .42f)),
         shape = shape,
     )
 
@@ -96,7 +89,7 @@ fun Modifier.bloom(color: Color = Gold, alpha: Float = .10f): Modifier =
 fun Modifier.glassPill(): Modifier = this
     .shadow(9.dp, R.pill, spotColor = Night.copy(alpha = .12f))
     .clip(R.pill)
-    .background(Brush.verticalGradient(listOf(Pk.Cream, Pk.Sunken)))
+    .background(SolidColor(Pk.Sunken.copy(alpha = .94f)))
     .topHighlight(R.pill, strength = .9f)
 
 @Suppress("unused")

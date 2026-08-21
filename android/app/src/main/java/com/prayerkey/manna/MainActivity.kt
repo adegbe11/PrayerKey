@@ -18,10 +18,14 @@ import com.prayerkey.manna.ui.MannaApp
 import com.prayerkey.manna.ui.screens.LaunchPrelude
 import com.prayerkey.manna.ui.theme.MannaTheme
 import kotlinx.coroutines.delay
+import android.content.Intent
 
 class MainActivity : ComponentActivity() {
+    private var notificationRoute by mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        notificationRoute = intent?.getStringExtra("prayerkey_destination")
         WindowCompat.setDecorFitsSystemWindows(window, true)
         setContent {
             // Never open the database before the first frame. The launch
@@ -37,10 +41,15 @@ class MainActivity : ComponentActivity() {
 
             val resolvedTheme = resolveTheme(themeId, followSystem, isSystemInDarkTheme())
             SideEffect {
+                val barColor = if (appReady) {
+                    android.graphics.Color.rgb(34, 34, 34)
+                } else {
+                    android.graphics.Color.rgb(98, 0, 237)
+                }
                 @Suppress("DEPRECATION")
-                window.statusBarColor = android.graphics.Color.rgb(34, 34, 34)
+                window.statusBarColor = barColor
                 @Suppress("DEPRECATION")
-                window.navigationBarColor = android.graphics.Color.rgb(34, 34, 34)
+                window.navigationBarColor = barColor
                 WindowCompat.getInsetsController(window, window.decorView).apply {
                     isAppearanceLightStatusBars = false
                     isAppearanceLightNavigationBars = false
@@ -51,11 +60,19 @@ class MainActivity : ComponentActivity() {
                 if (appReady) {
                     MannaApp(
                         onThemeChange = { id, follow -> themeId = id; followSystem = follow },
+                        notificationRoute = notificationRoute,
+                        onNotificationRouteConsumed = { notificationRoute = null },
                     )
                 } else {
                     LaunchPrelude(stage = 0)
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        notificationRoute = intent.getStringExtra("prayerkey_destination")
     }
 }

@@ -3,12 +3,12 @@ package com.prayerkey.manna.ui.screens
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
-import android.os.PowerManager
 import android.provider.Settings
 import android.content.pm.PackageManager
 import android.view.HapticFeedbackConstants
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -106,6 +106,11 @@ fun ChurchScreen(
     var openNote by remember { mutableStateOf<SermonNote?>(null) }
     var pickLanguage by remember { mutableStateOf(false) }
 
+    BackHandler(enabled = stage == Stage.Note) {
+        arranged = null
+        stage = Stage.Ready
+    }
+
     // the service outlives this screen — pick the stage back up on return
     LaunchedEffect(listening) {
         if (listening) stage = Stage.Listening
@@ -129,16 +134,6 @@ fun ChurchScreen(
     fun record() {
         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
         SermonService.setLanguage(language)
-        val power = context.getSystemService(PowerManager::class.java)
-        if (!power.isIgnoringBatteryOptimizations(context.packageName)) {
-            Toast.makeText(context, "Allow PrayerKey to run during the full sermon, then tap Start again.", Toast.LENGTH_LONG).show()
-            runCatching {
-                context.startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).setData(Uri.parse("package:${context.packageName}")))
-            }.recoverCatching {
-                context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-            }
-            return
-        }
         if (android.os.Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS)

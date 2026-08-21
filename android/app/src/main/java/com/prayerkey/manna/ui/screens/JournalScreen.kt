@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.BackHandler
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -161,6 +162,10 @@ fun JournalScreen(
     var answeringEntry by remember { mutableStateOf<JournalEntry?>(null) }
     var reviewingPrayer by remember { mutableStateOf<JournalEntry?>(null) }
     var libraryOpen by remember { mutableStateOf(false) }
+
+    BackHandler(enabled = tab != JournalTab.Journey) {
+        tab = JournalTab.Journey
+    }
 
     Box(Modifier.fillMaxSize().background(dayWash())) {
         /* An empty journal is the whole screen, edge to edge — the sky the

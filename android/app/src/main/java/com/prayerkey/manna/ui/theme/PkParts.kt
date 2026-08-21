@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -75,6 +76,7 @@ fun PkCard(
     content: @Composable () -> Unit,
 ) = Box(
     modifier
+        .shadow(8.dp, RoundedCornerShape(Pk.CardRadius), ambientColor = Pk.Charcoal.copy(alpha = .05f), spotColor = Pk.Charcoal.copy(alpha = .10f))
         .clip(RoundedCornerShape(Pk.CardRadius))
         .background(Pk.Sunken)
         .border(Pk.CardBorder, borderColor, RoundedCornerShape(Pk.CardRadius)),

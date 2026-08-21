@@ -88,11 +88,12 @@ private val fastChoices = listOf(
                 Surface(Modifier.fillMaxWidth().padding(top = 14.dp), shape = RoundedCornerShape(20.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Pk.Hair)) {
                     Column(Modifier.padding(18.dp)) {
                         Text("HOUR $hour", color = Pk.GoldDeep, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold)
-                        Text(if (hour < 4) "Prepare your heart and drink water." else "Your body may feel the fast now. Slow down, drink water, and let hunger turn your attention toward God.", fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 25.sp, modifier = Modifier.padding(top = 8.dp))
+                        Text("PRAYER FOR THIS HOUR", color = Pk.Oxblood, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
+                        Text(fastingPrayer(hour), fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 26.sp, modifier = Modifier.padding(top = 9.dp))
                     }
                 }
                 Button(onClick = { rescueOpen = true }, Modifier.fillMaxWidth().padding(top = 18.dp).height(60.dp), shape = RoundedCornerShape(20.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.VioletDeep)) {
-                    Icon(Icons.Outlined.Bolt, null); Spacer(Modifier.width(9.dp)); Text("I feel like quitting", fontWeight = FontWeight.Bold)
+                    Icon(Icons.Outlined.Bolt, null); Spacer(Modifier.width(9.dp)); Text("Pray for strength", fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.weight(1f))
                 if (remaining == 0L) Button(onClick = { startedAt = 0L; prefs.edit().remove("started_at").apply() }, Modifier.fillMaxWidth().height(56.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) { Icon(Icons.Outlined.Check, null); Spacer(Modifier.width(8.dp)); Text("Complete fast") }
@@ -108,11 +109,20 @@ private val fastChoices = listOf(
     val prayer = "Father, meet me in this moment of weakness. Let this hunger remind me that You are my true strength. Steady my body, clear my mind, and help me finish this fast wisely and faithfully. Give me grace for the next minute. Amen."
     DisposableEffect(Unit) { onDispose { tts?.stop(); tts?.shutdown() } }
     AlertDialog(onDismissRequest = onClose, title = { Text("One minute with God", fontFamily = DisplaySerif) }, text = { Text(prayer, fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 27.sp) }, confirmButton = {
-        TextButton(onClick = { tts = TextToSpeech(context) { status -> if (status == TextToSpeech.SUCCESS) { tts?.language = Locale.US; tts?.setSpeechRate(.84f); tts?.speak(prayer, TextToSpeech.QUEUE_FLUSH, null, "hunger-rescue") } } }) { Text("Play encouragement") }
+        TextButton(onClick = { tts = TextToSpeech(context) { status -> if (status == TextToSpeech.SUCCESS) { tts?.language = Locale.US; tts?.setSpeechRate(.84f); tts?.speak(prayer, TextToSpeech.QUEUE_FLUSH, null, "hunger-rescue") } } }) { Text("Listen to prayer") }
     }, dismissButton = { TextButton(onClick = onClose) { Text("Close") } })
 }
 
 private fun formatRemaining(ms: Long): String {
     val totalMinutes = ms / 60_000L; val hours = totalMinutes / 60; val minutes = totalMinutes % 60
     return "%02d:%02d".format(Locale.US, hours, minutes)
+}
+
+private fun fastingPrayer(hour: Int): String = when {
+    hour < 4 -> "Father, I set apart this time for You. Purify my motives, quiet every distraction, and let this fast draw me nearer to Your presence. Give me grace to seek You with sincerity and faith. In Jesus' name, Amen."
+    hour < 8 -> "Lord, as my body feels hunger, awaken a deeper hunger for Your Word and Your presence. Strengthen me to continue wisely, and let every appetite come under the rule of Your Spirit. In Jesus' name, Amen."
+    hour < 12 -> "Father, search me and cleanse me. Reveal every habit, attitude, and desire that competes with Your will. Create in me a clean heart and renew a steadfast spirit within me. In Jesus' name, Amen."
+    hour < 24 -> "Lord, receive this fast as an act of worship. Hear the petitions I bring before You, grant me wisdom, and establish Your purpose in every matter committed to You. In Jesus' name, Amen."
+    hour < 48 -> "Mighty God, renew my strength as I wait upon You. Preserve my body, steady my mind, and keep my spirit attentive to Your voice. Let Your grace be sufficient for me. In Jesus' name, Amen."
+    else -> "Father, carry me faithfully to the end of this fast. Let every prayer offered in these hours rise before You, and let the fruit be repentance, clarity, obedience, and lasting transformation. In Jesus' name, Amen."
 }

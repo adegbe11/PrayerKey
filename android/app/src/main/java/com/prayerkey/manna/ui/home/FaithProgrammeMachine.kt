@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.home
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -57,13 +58,13 @@ private data class FaithProgramme(
 )
 
 private val coreDays = listOf(
-    FaithDay("Begin with surrender", "Psalm 37:5", "Commit your way to the Lord; trust in him, and he will act.", "Prayer begins by placing the outcome in God's hands.", listOf("Thank God for His faithfulness", "Name the need plainly", "Surrender the result to God"), "Father, I entrust this matter to You. Order my steps and let Your will be done."),
-    FaithDay("Ask with confidence", "Hebrews 4:16", "Let us approach the throne of grace with boldness, so that we may receive mercy.", "Bold prayer is confidence in God's mercy, not confidence in our performance.", listOf("Ask for mercy", "Pray the promise aloud", "Wait quietly for one minute"), "Lord, I come because You invited me. Give me mercy and help for today."),
-    FaithDay("Stand on the Word", "Isaiah 55:11", "My word that comes from my mouth will not return to me empty.", "Our feelings change; God's character and truth remain steady.", listOf("Read the verse twice", "Turn it into a personal prayer", "Write one sentence of faith"), "Let Your Word accomplish Your purpose in me and in this situation."),
-    FaithDay("Pray without fear", "Philippians 4:6–7", "In everything, through prayer and petition with thanksgiving, present your requests to God.", "Thanksgiving interrupts panic and reminds the heart who is holding it.", listOf("Name the fear", "Give thanks for three things", "Ask for guarding peace"), "God of peace, guard my heart and mind in Christ Jesus."),
-    FaithDay("Wait with strength", "Isaiah 40:31", "Those who trust in the Lord will renew their strength.", "Waiting with God is active trust, not wasted time.", listOf("Release your deadline", "Ask for today's strength", "Choose one faithful action"), "Renew my strength, Lord. Keep me faithful while I wait."),
-    FaithDay("Walk in obedience", "James 1:22", "Be doers of the word and not hearers only.", "A prayer journey becomes fruitful when truth becomes practice.", listOf("Recall what God showed you", "Choose one act of obedience", "Set a time to do it"), "Give me grace to obey quickly, humbly, and completely."),
-    FaithDay("Finish with praise", "Psalm 126:3", "The Lord has done great things for us; we are joyful.", "Praise remembers what God has done and prepares us to keep trusting.", listOf("Review the journey", "Record one change", "Praise God aloud"), "Thank You for carrying me. Keep this work alive in me beyond this programme."),
+    FaithDay("Begin with surrender", "Psalm 37:5", "Commit your way to the Lord; trust in him, and he will act.", "", listOf("Father, I thank You because You have remained faithful through every season.", "Lord, I bring this need before You plainly; nothing about it is hidden from Your sight.", "I surrender the outcome, the timing, and every fear attached to it into Your hands."), "Father, I entrust this matter to You. Order my steps and let Your will be done. In Jesus' name, Amen."),
+    FaithDay("Ask with confidence", "Hebrews 4:16", "Let us approach the throne of grace with boldness, so that we may receive mercy.", "", listOf("Merciful Father, look upon me with compassion and answer me according to Your lovingkindness.", "Lord, fulfil Your Word in my life and let Your truth prevail over every contrary report.", "Give me grace to wait without fear, bitterness, or unbelief."), "Lord, I come because You invited me. Give me mercy and help for today. In Jesus' name, Amen."),
+    FaithDay("Stand on the Word", "Isaiah 55:11", "My word that comes from my mouth will not return to me empty.", "", listOf("Father, establish Your written Word as the final authority over this situation.", "Let every promise You have spoken produce its appointed fruit in my life.", "Strengthen my faith so that my words and choices agree with Your truth."), "Let Your Word accomplish Your purpose in me and in this situation. In Jesus' name, Amen."),
+    FaithDay("Pray without fear", "Philippians 4:6–7", "In everything, through prayer and petition with thanksgiving, present your requests to God.", "", listOf("Father, I reject fear and place every anxious thought under the authority of Jesus Christ.", "Thank You for Your presence, Your mercy, and the help You have already provided.", "Let Your peace guard my heart and mind against panic, confusion, and despair."), "God of peace, guard my heart and mind in Christ Jesus. Amen."),
+    FaithDay("Wait with strength", "Isaiah 40:31", "Those who trust in the Lord will renew their strength.", "", listOf("Father, I release every deadline I have allowed to become greater than my trust in You.", "Renew my strength for today's responsibilities and keep discouragement far from me.", "Show me the faithful action I should take while I wait for Your answer."), "Renew my strength, Lord. Keep me faithful while I wait. In Jesus' name, Amen."),
+    FaithDay("Walk in obedience", "James 1:22", "Be doers of the word and not hearers only.", "", listOf("Holy Spirit, remind me clearly of every truth You have shown me.", "Give me courage to obey without delay, excuse, or compromise.", "Order my time and my steps so that good intentions become faithful action."), "Give me grace to obey quickly, humbly, and completely. In Jesus' name, Amen."),
+    FaithDay("Finish with praise", "Psalm 126:3", "The Lord has done great things for us; we are joyful.", "", listOf("Father, thank You for every change You have begun in me during this journey.", "I praise You for prayers answered, strength supplied, and mercy renewed.", "Preserve the fruit of this time with You and keep my heart steadfast."), "Thank You for carrying me. Keep this work alive in me beyond this programme. In Jesus' name, Amen."),
 )
 
 private fun programme(name: String): FaithProgramme = when (name) {
@@ -87,6 +88,10 @@ internal fun FaithProgrammeMachine(title: String, onClose: () -> Unit) {
     var hour by remember { mutableIntStateOf(prefs.getInt("hour", if (title == "Midnight prayer") 0 else 6)) }
     var startedOn by remember { mutableStateOf(LocalDate.parse(prefs.getString("started_on", LocalDate.now().toString()))) }
     var lastCompletedOn by remember { mutableStateOf(prefs.getString("last_completed_on", "").orEmpty()) }
+
+    BackHandler {
+        if (openDay != null) openDay = null else onClose()
+    }
 
     openDay?.let { day ->
         val base = spec.content[(day - 1) % spec.content.size]
@@ -278,9 +283,7 @@ private fun FaithProgrammeDay(spec: FaithProgramme, day: Int, content: FaithDay,
                 Text(content.reference.uppercase(), Modifier.padding(top = 24.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.2.sp, color = Pk.Oxblood)
                 Text("“${content.scripture}”", Modifier.padding(top = 10.dp), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 22.sp, lineHeight = 32.sp, color = Pk.Charcoal)
                 HorizontalDivider(Modifier.padding(vertical = 24.dp), color = Pk.Hair)
-                Text("REFLECTION", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.GoldDeep)
-                Text(content.reflection, Modifier.padding(top = 10.dp), fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 28.sp, color = Pk.Charcoal)
-                Text("PRAY THESE POINTS", Modifier.padding(top = 28.dp, bottom = 8.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.GoldDeep)
+                Text("PRAY THESE PRAYERS", Modifier.padding(bottom = 8.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.GoldDeep)
                 content.actions.forEachIndexed { index, action ->
                     Surface(Modifier.fillMaxWidth().padding(top = 9.dp).clickable { checked = if (index in checked) checked - index else checked + index }, shape = RoundedCornerShape(17.dp), color = Color.White, border = BorderStroke(1.dp, if (index in checked) Pk.Sage else Pk.Hair)) {
                         Row(Modifier.padding(17.dp), verticalAlignment = Alignment.CenterVertically) {

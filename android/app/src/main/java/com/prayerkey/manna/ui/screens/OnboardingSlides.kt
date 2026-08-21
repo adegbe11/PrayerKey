@@ -22,9 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AutoStories
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -128,22 +124,12 @@ fun OnboardingSlides(
                     .border(1.dp, Color.White.copy(alpha = .85f), RoundedCornerShape(34.dp)),
             ) {
                 Image(
-                    painter = painterResource(R.drawable.onboarding_real_woman),
-                    contentDescription = "A woman reading on a tablet",
+                    painter = painterResource(R.drawable.onboarding_manna_woman),
+                    contentDescription = "A woman listening peacefully through headphones",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
                 )
-                Box(
-                    Modifier.fillMaxSize().background(
-                        Brush.verticalGradient(
-                            listOf(
-                                Color(0x267A20D6),
-                                Color.Transparent,
-                                Color(0x88410B64),
-                            ),
-                        ),
-                    ),
-                )
+                Box(Modifier.fillMaxSize().background(Pk.Oxblood.copy(alpha = .14f)))
 
                 actions.forEachIndexed { index, action ->
                     Box(
@@ -179,72 +165,12 @@ fun OnboardingSlides(
                         }
                     }
                 }
-
-                // A native PrayerKey face floats over the photographed tablet.
-                Box(
-                    Modifier.align(Alignment.BottomCenter).padding(bottom = 22.dp)
-                        .fillMaxWidth(.62f).height(112.dp)
-                        .shadow(18.dp, RoundedCornerShape(22.dp), spotColor = Color.Black.copy(alpha = .28f))
-                        .clip(RoundedCornerShape(22.dp))
-                        .background(Color(0xE61A0926))
-                        .border(1.dp, Color.White.copy(alpha = .30f), RoundedCornerShape(22.dp)),
-                ) {
-                    Column(
-                        Modifier.fillMaxSize().padding(15.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                Modifier.size(27.dp).clip(CircleShape)
-                                    .background(Pk.GoldLight.copy(alpha = .18f)),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(
-                                    Icons.Outlined.AutoStories,
-                                    contentDescription = null,
-                                    tint = Pk.GoldLight,
-                                    modifier = Modifier.size(15.dp),
-                                )
-                            }
-                            Text(
-                                "PRAYERKEY",
-                                color = Color.White,
-                                fontSize = 9.sp,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.7.sp,
-                                modifier = Modifier.padding(start = 8.dp),
-                            )
-                        }
-                        Text(
-                            "Call to me and I will answer you.",
-                            color = Color.White,
-                            fontFamily = BookSerif,
-                            fontSize = 14.sp,
-                            lineHeight = 18.sp,
-                        )
-                        Text(
-                            "JEREMIAH 33:3",
-                            color = Pk.GoldLight,
-                            fontSize = 8.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.4.sp,
-                        )
-                    }
-                }
             }
 
             com.prayerkey.manna.ui.components.PkButton(
                 label = "Continue",
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 22.dp),
                 onClick = onDone,
-            )
-            Text(
-                "Your walk. One peaceful place.",
-                color = Color(0xFF6E6E73),
-                fontFamily = UtilitySans,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 22.dp),
             )
         }
     }

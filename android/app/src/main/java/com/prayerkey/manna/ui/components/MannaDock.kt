@@ -49,7 +49,9 @@ import com.prayerkey.manna.ui.theme.GiltLine
 import com.prayerkey.manna.ui.theme.Ivory
 import com.prayerkey.manna.ui.theme.Electric
 import com.prayerkey.manna.ui.theme.UtilitySans
-import com.prayerkey.manna.ui.theme.NightFill
+import com.prayerkey.manna.ui.theme.GlassBackdrop
+import com.prayerkey.manna.ui.theme.Pk
+import com.prayerkey.manna.ui.theme.liquidGlass
 
 data class DockItem(val label: String, val icon: ImageVector)
 
@@ -62,7 +64,12 @@ data class DockItem(val label: String, val icon: ImageVector)
  * pill with a gold glyph. Names remain available to screen readers.
  */
 @Composable
-fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
+fun MannaDock(
+    items: List<DockItem>,
+    selected: Int,
+    backdrop: GlassBackdrop? = null,
+    onSelect: (Int) -> Unit,
+) {
     val view = LocalView.current
     val cs = androidx.compose.material3.MaterialTheme.colorScheme
     Box(
@@ -73,14 +80,34 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
            white bar under a midnight screen cut the immersion off an inch
            from the bottom of the phone; on a light theme this still reads
            as white, because the theme says so. */
+        /* Glass rather than a painted capsule. It was Pk.Oxblood at 93%, which
+           is a violet slab — it looked the same over a photograph as over an
+           empty page, because it never sampled either. With a backdrop it
+           refracts what is actually underneath it, and the tint drops to a
+           trace so the content shows through rather than being restated. */
+        val dockShape = RoundedCornerShape(31.dp)
         Surface(
-            shape = RoundedCornerShape(31.dp),
+            shape = dockShape,
             color = Color.Transparent,
-            border = BorderStroke(0.6.dp, GiltLine.copy(alpha = .48f)),
-            shadowElevation = 24.dp,
+            border = BorderStroke(0.8.dp, Color.White.copy(alpha = .34f)),
+            shadowElevation = 18.dp,
         ) {
             Row(
-                Modifier.fillMaxWidth().background(NightFill).padding(horizontal = 6.dp, vertical = 8.dp),
+                Modifier.fillMaxWidth()
+                    .then(
+                        if (backdrop != null) {
+                            Modifier.liquidGlass(
+                                backdrop = backdrop,
+                                shape = dockShape,
+                                blurRadius = 30.dp,
+                                lens = 1.10f,
+                                tint = Pk.Oxblood.copy(alpha = .34f),
+                            )
+                        } else {
+                            Modifier.background(Pk.Oxblood.copy(alpha = .93f))
+                        },
+                    )
+                    .padding(start = 6.dp, end = 6.dp, top = 11.dp, bottom = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -116,7 +143,7 @@ fun MannaDock(items: List<DockItem>, selected: Int, onSelect: (Int) -> Unit) {
                                     onSelect(index)
                                 }
                             }
-                            .padding(top = 7.dp, bottom = 7.dp),
+                            .padding(top = 2.dp, bottom = 2.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Icon(

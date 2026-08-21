@@ -90,6 +90,8 @@ private data class ChallengeReading(
     val points: List<String>,
 )
 
+private const val CHALLENGE_POINT_COUNT = 10
+
 private val readings = listOf(
     ChallengeReading("Ask plainly", "James 4:2", "You do not have, because you do not ask.", listOf(
         "Father, I bring this need to You plainly, without fear or performance.",
@@ -128,9 +130,23 @@ private val readings = listOf(
     )),
 )
 
+private val journeyTitles = listOf(
+    "Come before God", "Begin with thanksgiving", "Stand on God's Word", "Ask with faith",
+    "Surrender the outcome", "Receive God's peace", "Pray without fear", "Listen for wisdom",
+    "Obey the next instruction", "Trust God's timing", "Pray for renewed strength", "Reject discouragement",
+    "Remember God's faithfulness", "Bring every concern to God", "Ask for mercy", "Pray for divine help",
+    "Guard your heart", "Speak God's promises", "Wait with confidence", "Give thanks in advance",
+    "Choose faith again", "Pray for open doors", "Ask for discernment", "Release every burden",
+    "Pray for those beside you", "Stand firm in hope", "Ask God to restore", "Pray for complete peace",
+    "Trust what God is doing", "Remain faithful today", "Pray with perseverance", "Refuse every lie",
+    "Ask for fresh grace", "Remember the testimony", "Commit the future to God", "Rest in God's presence",
+    "Praise before the answer", "Seal it with thanksgiving", "Prepare to testify", "Finish in faith",
+)
+
+private fun challengeDayTitle(day: Int): String = journeyTitles[(day - 1).coerceIn(0, journeyTitles.lastIndex)]
+
 @Composable
 internal fun PrayerChallengeMachine(onClose: () -> Unit) {
-    BackHandler(onBack = onClose)
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("prayer_challenge_machine", Context.MODE_PRIVATE) }
     val store = remember { MannaStore(context.applicationContext) }
@@ -138,7 +154,8 @@ internal fun PrayerChallengeMachine(onClose: () -> Unit) {
     val topics = remember { LocalPrayerTopics.load(context) }
     var active by remember { mutableStateOf(prefs.getBoolean("active", false)) }
     var step by remember { mutableIntStateOf(0) }
-    var situation by remember { mutableStateOf(prefs.getString("situation", "Healing").orEmpty()) }
+    val defaultSituation = topics.firstOrNull()?.slug ?: "personal-prayer"
+    var situation by remember { mutableStateOf(prefs.getString("situation", defaultSituation).orEmpty()) }
     var focus by remember { mutableStateOf(prefs.getString("focus", "").orEmpty()) }
     var duration by remember { mutableIntStateOf(prefs.getInt("duration", 21)) }
     var hour by remember { mutableIntStateOf(prefs.getInt("hour", 6)) }
@@ -147,13 +164,21 @@ internal fun PrayerChallengeMachine(onClose: () -> Unit) {
         mutableStateOf(prefs.getStringSet("done", emptySet()).orEmpty().mapNotNull(String::toIntOrNull).toSet())
     }
     var openDay by remember { mutableStateOf<Int?>(null) }
+
+    BackHandler {
+        when {
+            openDay != null -> openDay = null
+            !active && step > 0 -> step--
+            else -> onClose()
+        }
+    }
     var startedOn by remember { mutableStateOf(prefs.getString("started_on", null)?.let(LocalDate::parse)) }
     var lastCompletedOn by remember { mutableStateOf(prefs.getString("last_completed_on", "").orEmpty()) }
 
     val topic = topics.firstOrNull { it.slug == situation || it.title == situation }
         ?: topics.firstOrNull()
         ?: PrayerTopic("personal-prayer", situation, "Personal", "Father, I place $situation before You. Lead me by Your Word and let Your will be done.", emptyList(), emptyList())
-    val prayerFocus = focus.ifBlank { topic.title.removePrefix("Prayer for ") }
+    val prayerFocus = focus.ifBlank { challengeTopicLabel(topic.title) }
 
     openDay?.let { day ->
         ChallengeDayPage(
@@ -218,6 +243,13 @@ internal fun PrayerChallengeMachine(onClose: () -> Unit) {
             sessions = sessions,
             onClose = onClose,
             onOpenDay = { openDay = it },
+            onEndChallenge = {
+                active = false
+                step = 0
+                done = emptySet()
+                prefs.edit().clear().apply()
+                ReminderReceiver.schedule(context, hour, minute, false)
+            },
         )
     }
 }
@@ -287,7 +319,7 @@ private fun ChallengeSetup(
                         }
                     }
                     1 -> {
-                        SetupHeading("Name it plainly.", "A private sentence is enough. PrayerKey will carry it through every day.")
+                        SetupHeading("Who or what are you praying for?", "Add a private detail, or leave this blank to use the selected prayer programme.")
                         BasicTextField(
                             value = focus,
                             onValueChange = onFocus,
@@ -303,10 +335,10 @@ private fun ChallengeSetup(
                         )
                     }
                     2 -> {
-                        SetupHeading("How long will you keep watch?", "Choose a rhythm you can honour faithfully.")
+                        SetupHeading("Choose your prayer journey.", "Select the number of days you can return to faithfully.")
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(2),
-                            modifier = Modifier.fillMaxWidth().height(240.dp).padding(top = 24.dp),
+                            modifier = Modifier.fillMaxWidth().weight(1f).padding(top = 24.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                             verticalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
@@ -324,7 +356,7 @@ private fun ChallengeSetup(
                         }
                     }
                     else -> {
-                        SetupHeading("Choose your prayer hour.", "One reminder each day. Nothing else.")
+                        SetupHeading("When would you like to pray?", "Choose a daily reminder. You can change or turn it off later.")
                         Box(
                             Modifier.fillMaxWidth().padding(top = 26.dp).clip(RoundedCornerShape(20.dp))
                                 .background(Pk.Crisp.copy(alpha = .1f)).clickable(onClick = onTime).padding(22.dp),
@@ -358,7 +390,10 @@ private fun ChallengeSetup(
 
 @Composable
 private fun SetupHeading(title: String, subtitle: String) {
-    Text(title, color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 35.sp, lineHeight = 39.sp, fontWeight = FontWeight.Normal, modifier = Modifier.padding(top = 18.dp))
+    Column(modifier = Modifier.padding(top = 18.dp)) {
+        Text(title, color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 35.sp, lineHeight = 39.sp, fontWeight = FontWeight.Normal)
+        Text(subtitle, color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 10.dp))
+    }
 }
 
 @Composable
@@ -373,8 +408,9 @@ private fun ChallengeLanding(
     sessions: List<PrayerSession>,
     onClose: () -> Unit,
     onOpenDay: (Int) -> Unit,
+    onEndChallenge: () -> Unit,
 ) {
-    val next = done.size + 1
+    val next = (1..duration).firstOrNull { it !in done } ?: duration
     val calendarDay = (ChronoUnit.DAYS.between(startDate, LocalDate.now()).toInt() + 1).coerceIn(1, duration)
     val current = next.coerceAtMost(duration)
     val finished = done.size >= duration
@@ -415,9 +451,9 @@ private fun ChallengeLanding(
                         .background(Pk.Sunken).clickable(enabled = availableToday) { onOpenDay(current) }.padding(20.dp),
                 ) {
                     Text(if (finished) "CHALLENGE COMPLETE" else if (availableToday) "TODAY  ·  DAY $current" else "DAY $current OPENS TOMORROW", color = Pk.GoldDeep, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.3.sp)
-                    Text(reading.title, color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 25.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 10.dp))
+                    Text(challengeDayTitle(current), color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 25.sp, lineHeight = 30.sp, modifier = Modifier.padding(top = 10.dp))
                     Row(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                        MetaPill("30 POINTS"); MetaPill("15 MIN"); MetaPill(timeLabel(hour, minute))
+                        MetaPill("$CHALLENGE_POINT_COUNT POINTS"); MetaPill("10–15 MIN"); MetaPill(timeLabel(hour, minute))
                     }
                     HorizontalDivider(color = Pk.Hair, modifier = Modifier.padding(top = 16.dp, bottom = 14.dp))
                     Text(if (availableToday) "Open today's prayer  →" else if (finished) "Every day completed" else "Return tomorrow for the next day", color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
@@ -476,6 +512,16 @@ private fun ChallengeLanding(
                     }
                 }
             }
+            item {
+                Text(
+                    "End or change this challenge",
+                    color = Pk.Faint,
+                    fontFamily = UtilitySans,
+                    fontSize = 12.sp,
+                    modifier = Modifier.fillMaxWidth().clickable(onClick = onEndChallenge).padding(horizontal = 22.dp, vertical = 24.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                )
+            }
         }
     }
 }
@@ -505,28 +551,28 @@ private fun ChallengeDayPage(
     onComplete: (Int) -> Unit,
 ) {
     val reading = readings[(day - 1) % readings.size]
-    val points = remember(topic.slug, day) { PrayerPointEngine.pointsFor(topic, day) }
+    val points = remember(topic.slug, day) { PrayerPointEngine.pointsFor(topic, day).take(CHALLENGE_POINT_COUNT) }
     val scripture = topic.scripture.getOrNull((day - 1).mod(topic.scripture.size.coerceAtLeast(1)))
         ?: (reading.reference to reading.verse)
-    var checked by remember(day) { mutableStateOf<Set<Int>>(emptySet()) }
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("prayer_challenge_machine", Context.MODE_PRIVATE) }
-    var note by remember(day) { mutableStateOf(prefs.getString("note_$day", "").orEmpty()) }
-    var secondsLeft by remember(day) { mutableIntStateOf(15 * 60) }
-    var timerRunning by remember(day) { mutableStateOf(false) }
-    var ambientOn by remember(day) { mutableStateOf(true) }
-    val ambientPlayer = remember { AmbientPrayerPlayer() }
-    DisposableEffect(ambientOn, timerRunning) {
-        if (ambientOn && timerRunning) ambientPlayer.start() else ambientPlayer.stop()
-        onDispose { ambientPlayer.stop() }
+    var checked by remember(day) {
+        mutableStateOf(prefs.getStringSet("checked_$day", emptySet()).orEmpty().mapNotNull(String::toIntOrNull).toSet())
     }
+    var note by remember(day) { mutableStateOf(prefs.getString("note_$day", "").orEmpty()) }
+    val sessionSeconds = CHALLENGE_POINT_COUNT * 60
+    var secondsLeft by remember(day) {
+        mutableIntStateOf(prefs.getInt("seconds_$day", sessionSeconds).coerceIn(0, sessionSeconds))
+    }
+    var timerRunning by remember(day) { mutableStateOf(false) }
     LaunchedEffect(timerRunning, secondsLeft) {
         if (timerRunning && secondsLeft > 0) {
             delay(1_000)
             secondsLeft--
+            prefs.edit().putInt("seconds_$day", secondsLeft).apply()
         } else if (secondsLeft == 0) timerRunning = false
     }
-    val elapsedSeconds = 15 * 60 - secondsLeft
+    val elapsedSeconds = sessionSeconds - secondsLeft
     val guidedPoint = if (points.isEmpty()) 0 else (elapsedSeconds / 60).coerceAtMost(points.lastIndex)
     Surface(Modifier.fillMaxSize(), color = Pk.DeepDark) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
@@ -537,16 +583,16 @@ private fun ChallengeDayPage(
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp)) {
                 Text("FOR ${focus.uppercase(Locale.getDefault())}", color = Pk.GoldLight.copy(alpha = .7f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.2.sp, modifier = Modifier.padding(top = 14.dp))
-                Text(reading.title, color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 36.sp, lineHeight = 40.sp, modifier = Modifier.padding(top = 9.dp))
-                Text("${timeLabel(hour, minute)}  ·  30 POINTS  ·  15 MIN", color = Pk.Crisp.copy(alpha = .48f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = .8.sp, modifier = Modifier.padding(top = 13.dp))
+                Text(challengeDayTitle(day), color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 36.sp, lineHeight = 40.sp, modifier = Modifier.padding(top = 9.dp))
+                Text("${timeLabel(hour, minute)}  ·  $CHALLENGE_POINT_COUNT PRAYERS  ·  10 MIN", color = Pk.Crisp.copy(alpha = .48f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = .8.sp, modifier = Modifier.padding(top = 13.dp))
 
                 Column(Modifier.fillMaxWidth().padding(top = 24.dp).clip(RoundedCornerShape(18.dp)).background(Pk.Gold.copy(alpha = .1f)).padding(18.dp)) {
                     Text("“${scripture.second}”", color = Pk.Crisp.copy(alpha = .92f), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 27.sp)
                     Text(scripture.first.uppercase(Locale.getDefault()), color = Pk.GoldLight.copy(alpha = .68f), fontFamily = UtilitySans, fontSize = 8.sp, letterSpacing = 1.2.sp, modifier = Modifier.padding(top = 11.dp))
                 }
 
-                Text("WHAT THIS MEANS", color = Pk.GoldLight.copy(alpha = .72f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp))
-                Text("God's Word gives you a firm place to stand while you pray about $focus. Read it slowly, believe what it says about God, and let it guide your words today.", color = Pk.Crisp.copy(alpha = .78f), fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(top = 9.dp))
+                Text("OPENING PRAYER", color = Pk.GoldLight.copy(alpha = .72f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp))
+                Text("Father, I stand upon Your Word in ${scripture.first}. Let its truth take root in my heart and govern every prayer I offer concerning $focus. Give me faith to pray, wisdom to obey, and grace to trust Your perfect will. In Jesus' name, Amen.", color = Pk.Crisp.copy(alpha = .78f), fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(top = 9.dp))
 
                 Text("TODAY'S PRAYER", color = Pk.GoldLight.copy(alpha = .72f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 28.dp, bottom = 5.dp))
                 Column(
@@ -555,9 +601,6 @@ private fun ChallengeDayPage(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("GUIDED PRAYER · MINUTE ${guidedPoint + 1}", color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.1.sp, modifier = Modifier.weight(1f))
-                        IconButton(onClick = { ambientOn = !ambientOn }, modifier = Modifier.size(34.dp)) {
-                            Icon(if (ambientOn) Icons.Outlined.MusicNote else Icons.Outlined.MusicOff, if (ambientOn) "Turn music off" else "Turn music on", tint = Pk.GoldLight, modifier = Modifier.size(18.dp))
-                        }
                     }
                     AnimatedContent(
                         targetState = guidedPoint,
@@ -572,12 +615,14 @@ private fun ChallengeDayPage(
                         color = Pk.GoldLight,
                         trackColor = Pk.Crisp.copy(alpha = .12f),
                     )
-                    Text(if (timerRunning) "The next prayer point will appear automatically." else "Start the timer to begin guided prayer.", color = Pk.Crisp.copy(alpha = .48f), fontFamily = UtilitySans, fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
                 }
                 points.forEachIndexed { index, point ->
                     val selected = index in checked
                     Row(
-                        Modifier.fillMaxWidth().clickable { checked = if (selected) checked - index else checked + index }.padding(vertical = 16.dp),
+                        Modifier.fillMaxWidth().clickable {
+                            checked = if (selected) checked - index else checked + index
+                            prefs.edit().putStringSet("checked_$day", checked.map(Int::toString).toSet()).apply()
+                        }.padding(vertical = 16.dp),
                         verticalAlignment = Alignment.Top,
                     ) {
                         Text("${index + 1}", color = Pk.Crisp.copy(alpha = .3f), fontFamily = UtilitySans, fontSize = 10.sp, modifier = Modifier.padding(top = 5.dp).width(24.dp))
@@ -593,12 +638,12 @@ private fun ChallengeDayPage(
                 Text(topic.prayer, color = Pk.GoldLight, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 9.dp))
 
                 Text("TODAY'S DECLARATION", color = Pk.GoldLight.copy(alpha = .72f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.3.sp, modifier = Modifier.padding(top = 26.dp))
-                Text("God is with me concerning $focus. I will pray, obey His Word, and walk through this day without surrendering to fear.", color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 21.sp, lineHeight = 29.sp, modifier = Modifier.padding(top = 9.dp))
+                Text("The Lord hears me as I pray for $focus. His Word will guide me, His peace will guard me, and His will shall be established.", color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 21.sp, lineHeight = 29.sp, modifier = Modifier.padding(top = 9.dp))
 
                 Row(
                     Modifier.fillMaxWidth().padding(top = 26.dp).clip(RoundedCornerShape(18.dp)).background(Pk.Crisp.copy(alpha = .08f))
                         .clickable {
-                            if (secondsLeft == 0) secondsLeft = 15 * 60
+                            if (secondsLeft == 0) secondsLeft = sessionSeconds
                             timerRunning = !timerRunning
                         }.padding(18.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -622,7 +667,10 @@ private fun ChallengeDayPage(
             }
 
             Button(
-                onClick = { onComplete((elapsedSeconds / 60).coerceAtLeast(1)) },
+                onClick = {
+                    prefs.edit().remove("checked_$day").remove("seconds_$day").apply()
+                    onComplete((elapsedSeconds / 60).coerceAtLeast(1))
+                },
                 enabled = checked.size == points.size,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp).height(56.dp),
                 shape = RoundedCornerShape(18.dp),
@@ -633,6 +681,11 @@ private fun ChallengeDayPage(
         }
     }
 }
+
+private fun challengeTopicLabel(title: String): String = title
+    .replace(Regex("(?i)^\\s*(a\\s+)?prayer\\s+(for|of|to|against|during|before|after|over|when|about|in|on|at|upon|concerning)\\s+"), "")
+    .trim()
+    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
 private fun timeLabel(hour: Int, minute: Int): String {
     val h = if (hour % 12 == 0) 12 else hour % 12

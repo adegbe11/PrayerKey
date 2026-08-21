@@ -3,6 +3,7 @@ package com.prayerkey.manna.ui.theme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import java.time.LocalTime
 
@@ -46,16 +47,11 @@ val ChipFillSelected = Pk.Oxblood.copy(alpha = .10f)
  * lit rather than printed. Kept under 4% alpha; it should register as
  * atmosphere, not colour.
  */
-fun dayWash(hour: Int = LocalTime.now().hour): Brush = Brush.verticalGradient(
-    listOf(Pk.Cream, Pk.Sunken, Pk.Cream),
-)
+fun dayWash(hour: Int = LocalTime.now().hour): Brush = SolidColor(Pk.Cream)
 
 /** A soft ambient shadow colour — never black, always the ink at low alpha. */
 val SoftShadow = Night.copy(alpha = .22f)
 
 /** Fade applied to the right edge of a horizontal carousel, so a cut-off
  *  item reads as "keep swiping" rather than "clipped by accident". */
-fun edgeFade(background: Color = Pk.Cream): Brush = Brush.horizontalGradient(
-    0f to background.copy(alpha = 0f),
-    1f to background,
-)
+fun edgeFade(background: Color = Pk.Cream): Brush = SolidColor(background)
