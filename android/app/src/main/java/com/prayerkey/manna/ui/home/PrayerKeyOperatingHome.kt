@@ -43,6 +43,8 @@ import com.prayerkey.manna.share.CardShareRenderer
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import androidx.compose.ui.text.font.FontStyle
 import com.prayerkey.manna.ui.theme.BookSerif
+import com.prayerkey.manna.ui.theme.litSurface
+import com.prayerkey.manna.ui.theme.litTile
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import java.time.LocalDate
@@ -714,7 +716,12 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
             DailyRhythmExperience(moment, onClose = { openMoment = null }, onComplete = { finish(moment) })
         }
     }
-    Surface(shape = RoundedCornerShape(28.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair), shadowElevation = 2.dp) {
+    /* A lit surface, not a flat white rectangle. Gradient face, bright inner
+       hairline where the light lands, bounce along the base, warm and cool
+       fringes down the sides, one diagonal specular. */
+    val cardShape = RoundedCornerShape(28.dp)
+    Surface(shape = cardShape, color = Color.Transparent, shadowElevation = 14.dp) {
+        Box(Modifier.litSurface(cardShape)) {
         Column(Modifier.padding(vertical = 8.dp)) {
             Row(Modifier.padding(horizontal = 20.dp, vertical = 15.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
@@ -728,7 +735,7 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
                 progress = { completed.size.toFloat() / items.size },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).height(6.dp).clip(RoundedCornerShape(3.dp)),
                 color = Pk.Oxblood,
-                trackColor = Pk.Oxblood.copy(alpha = .10f),
+                trackColor = Pk.Charcoal.copy(alpha = .08f),
                 gapSize = 0.dp,
                 drawStopIndicator = {},
             )
@@ -736,7 +743,16 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
             items.forEach { item ->
                 val identity = item.first
                 val icon = item.second.first
+                val destination = item.second.second
                 val done = identity.first in completed
+
+                /* Devotional and Bible have real screens, and this panel is
+                   already handed them — `{ devotionalOpen = true }` opens the
+                   written year. The row ignored them and opened the rhythm's
+                   own copy, which renders the retired templated devotional, so
+                   the hero and this row showed different content for the same
+                   day. Rows with a real destination now go there. */
+                val hasOwnScreen = identity.first == "devotional" || identity.first == "bible"
 
                 /* One line, its own soft container, no divider.
                    Two lines per row put ten lines of text in this card and made
@@ -749,21 +765,29 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
                         .padding(horizontal = 12.dp, vertical = 4.dp)
                         .clip(RoundedCornerShape(18.dp))
                         .background(if (done) Pk.Oxblood.copy(alpha = .045f) else Color.White)
-                        .clickable { openMoment = identity.first }
+                        .clickable {
+                            if (hasOwnScreen) {
+                                completed = completed + identity.first
+                                prefs.edit().putStringSet(dateKey, completed).apply()
+                                destination()
+                            } else {
+                                openMoment = identity.first
+                            }
+                        }
                         .padding(horizontal = 10.dp, vertical = 11.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    val tileShape = RoundedCornerShape(15.dp)
                     Box(
-                        Modifier.size(46.dp).clip(RoundedCornerShape(15.dp))
-                            .background(
-                                if (done) {
-                                    Brush.linearGradient(listOf(Pk.VioletLit, Pk.Oxblood))
-                                } else {
-                                    Brush.linearGradient(
-                                        listOf(Pk.Oxblood.copy(alpha = .13f), Pk.Oxblood.copy(alpha = .06f)),
-                                    )
-                                },
-                            ),
+                        Modifier.size(46.dp)
+                            .shadow(
+                                elevation = if (done) 10.dp else 2.dp,
+                                shape = tileShape,
+                                ambientColor = Pk.Oxblood,
+                                spotColor = Pk.Oxblood,
+                            )
+                            .clip(tileShape)
+                            .litTile(tileShape, done),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -781,7 +805,15 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
                         modifier = Modifier.weight(1f).padding(horizontal = 14.dp),
                     )
                     Box(
-                        Modifier.size(28.dp).clip(CircleShape)
+                        Modifier.size(28.dp)
+                            .then(
+                                if (done) {
+                                    Modifier.shadow(8.dp, CircleShape, ambientColor = Pk.Oxblood, spotColor = Pk.Oxblood)
+                                } else {
+                                    Modifier
+                                },
+                            )
+                            .clip(CircleShape)
                             .background(if (done) Pk.Oxblood.copy(alpha = .10f) else Color.Transparent)
                             .border(1.6.dp, if (done) Pk.Oxblood else Pk.Muted.copy(alpha = .34f), CircleShape),
                         contentAlignment = Alignment.Center,
@@ -791,6 +823,7 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
                 }
             }
             Spacer(Modifier.height(8.dp))
+        }
         }
     }
     Surface(onClick = history, modifier = Modifier.fillMaxWidth().padding(top = 12.dp), shape = RoundedCornerShape(20.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {

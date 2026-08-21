@@ -241,3 +241,92 @@ private fun ContentDrawScope.drawGlassEdge(size: Size, path: Path) {
         )
     }
 }
+
+/**
+ * A lit surface — an opaque card that still has a material.
+ *
+ * The reference card is not flat white. It is a gradient, with a bright inner
+ * hairline along the top where light lands, a dimmer one along the base where
+ * it bounces, a warm fringe down one side and a cool one down the other, and a
+ * single diagonal specular sweeping across the face. Those five things are the
+ * whole difference between a card that looks pressed out of paper and one that
+ * looks like a physical object.
+ *
+ * This is not [liquidGlass]. Glass shows you what is behind it; a card does
+ * not. It only has to catch the light.
+ */
+fun Modifier.litSurface(
+    shape: Shape,
+    base: Color = Color.White,
+): Modifier = drawWithContent {
+    val outline = shape.createOutline(size, LayoutDirection.Ltr, this)
+    val path = Path().apply { addOutline(outline) }
+
+    clipPath(path) {
+        // the face, brighter at the top-left corner the light comes from
+        drawRect(
+            Brush.linearGradient(
+                0f to base,
+                1f to base.copy(alpha = .82f).compositeOverWhite(),
+            ),
+        )
+        // one specular band, running across the face
+        drawRect(
+            Brush.linearGradient(
+                0f to Color.Transparent,
+                .34f to Color.White.copy(alpha = .55f),
+                .52f to Color.Transparent,
+                start = Offset(0f, size.height),
+                end = Offset(size.width, 0f),
+            ),
+        )
+    }
+    drawGlassEdge(size, path)
+    drawContent()
+}
+
+/** Cards sit on a light page, so a translucent white reads as this. */
+private fun Color.compositeOverWhite(): Color {
+    val a = alpha
+    fun mix(c: Float) = c * a + 1f * (1f - a)
+    return Color(mix(red), mix(green), mix(blue), 1f)
+}
+
+/**
+ * The icon tile on a rhythm row.
+ *
+ * Flat fills read as stickers. This gives the tile the same lit top edge the
+ * card has, a tint pooling at its base, and — when the step is done — a violet
+ * glow underneath, which is what makes a completed row legible from across the
+ * screen rather than only on inspection.
+ */
+fun Modifier.litTile(shape: Shape, done: Boolean): Modifier = drawWithContent {
+    val outline = shape.createOutline(size, LayoutDirection.Ltr, this)
+    val path = Path().apply { addOutline(outline) }
+    clipPath(path) {
+        drawRect(
+            if (done) {
+                Brush.linearGradient(listOf(Pk.VioletLit, Pk.Oxblood))
+            } else {
+                Brush.linearGradient(
+                    listOf(Pk.Oxblood.copy(alpha = .13f), Pk.Oxblood.copy(alpha = .05f)),
+                )
+            },
+        )
+        // light entering the top face
+        drawRect(
+            Brush.verticalGradient(
+                0f to Color.White.copy(alpha = if (done) .40f else .85f),
+                .34f to Color.Transparent,
+            ),
+        )
+        // the tint settling at the base
+        drawRect(
+            Brush.verticalGradient(
+                .62f to Color.Transparent,
+                1f to Pk.Oxblood.copy(alpha = if (done) .30f else .14f),
+            ),
+        )
+    }
+    drawContent()
+}
