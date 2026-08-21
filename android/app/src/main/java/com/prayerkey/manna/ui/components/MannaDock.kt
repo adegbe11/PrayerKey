@@ -101,7 +101,7 @@ fun MannaDock(
                                 shape = dockShape,
                                 blurRadius = 30.dp,
                                 lens = 1.10f,
-                                tint = Pk.Oxblood.copy(alpha = .34f),
+                                tint = Pk.Oxblood.copy(alpha = .82f),
                             )
                         } else {
                             Modifier.background(Pk.Oxblood.copy(alpha = .93f))

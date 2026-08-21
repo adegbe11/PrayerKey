@@ -171,23 +171,26 @@ fun Modifier.liquidGlass(
 
                 if (tint.alpha > 0f) drawRect(tint)
 
-                /* The body of the glass: brighter where light enters, dimmer
-                   where it leaves. Without this the pane has no thickness. */
+                /* The body, kept light. An earlier version washed white over
+                   the whole pane at 20%, which turned a brand-violet dock into
+                   a pale lilac one — the colour value never changed, but it
+                   stopped reading as the brand. Glass is meant to be tinted by
+                   what it is made of, not bleached. */
                 drawRect(
                     Brush.linearGradient(
-                        0f to Color.White.copy(alpha = .20f),
-                        .5f to Color.White.copy(alpha = .05f),
-                        1f to Color.White.copy(alpha = .12f),
+                        0f to Color.White.copy(alpha = .10f),
+                        .5f to Color.Transparent,
+                        1f to Color.White.copy(alpha = .05f),
                     ),
                 )
 
-                // one specular, upper left, where the light is
+                // one specular, upper left, tight enough to stay a highlight
                 drawRect(
                     Brush.radialGradient(
-                        0f to Color.White.copy(alpha = .38f),
+                        0f to Color.White.copy(alpha = .22f),
                         1f to Color.Transparent,
-                        center = Offset(size.width * .3f, size.height * .16f),
-                        radius = size.minDimension * 1.1f,
+                        center = Offset(size.width * .3f, size.height * .14f),
+                        radius = size.minDimension * .75f,
                     ),
                 )
             }
