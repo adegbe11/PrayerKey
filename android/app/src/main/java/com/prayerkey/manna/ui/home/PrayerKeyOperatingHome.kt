@@ -41,6 +41,8 @@ import com.prayerkey.manna.R
 import com.prayerkey.manna.model.VerseCard
 import com.prayerkey.manna.share.CardShareRenderer
 import com.prayerkey.manna.ui.theme.DisplaySerif
+import androidx.compose.ui.text.font.FontStyle
+import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import java.time.LocalDate
@@ -732,8 +734,25 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
                     Box(Modifier.size(43.dp).clip(RoundedCornerShape(13.dp)).background(if (done) Pk.Oxblood else Pk.Oxblood.copy(alpha = .08f)), contentAlignment = Alignment.Center) {
                         Icon(icon, null, tint = if (done) Color.White else Pk.Oxblood, modifier = Modifier.size(21.dp))
                     }
+                    /* The name of the thing leads; the prayer supports it.
+                       Only `identity.second` was drawn, so the card was five
+                       prayer sentences and nothing told you what tapping one
+                       did — "Search my heart and lead me" gives no clue it
+                       opens prayer and reflection. The name was in the data
+                       the whole time and simply was not rendered. */
                     Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
-                        Text(identity.second, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Pk.Charcoal)
+                        Text(
+                            identity.third,
+                            fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold,
+                            fontSize = 15.sp,
+                            color = if (done) Pk.Muted else Pk.Charcoal,
+                        )
+                        Text(
+                            identity.second,
+                            fontFamily = BookSerif, fontStyle = FontStyle.Italic,
+                            fontSize = 13.sp, lineHeight = 18.sp, color = Pk.Muted,
+                            modifier = Modifier.padding(top = 2.dp),
+                        )
                     }
                     Box(Modifier.size(30.dp).clip(CircleShape).border(1.5.dp, if (done) Pk.Oxblood else Pk.Muted.copy(alpha = .45f), CircleShape), contentAlignment = Alignment.Center) {
                         if (done) Icon(Icons.Outlined.Check, null, tint = Pk.Oxblood, modifier = Modifier.size(17.dp))
