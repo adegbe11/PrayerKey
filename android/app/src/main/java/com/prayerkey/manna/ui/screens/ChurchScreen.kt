@@ -493,6 +493,24 @@ private fun ReadyView(
 
 /* ────────────────────────── LISTENING ────────────────────────── */
 
+/**
+ * Listening.
+ *
+ * This screen used to carry a title, a 52sp timer, a waveform, a status line,
+ * a "LIVE TRANSCRIPT" label, the transcript inside its own card, a "LISTENING
+ * FOR SCRIPTURE" label, a list of caught references and a full-width button —
+ * nine things stacked above the one thing the user is here to watch.
+ *
+ * Live Transcribe shows the words and a thin bar. That is the right answer,
+ * and not because it is fashionable: during a sermon the phone is at arm's
+ * length or face-down on a knee, and anything that is not the text is noise
+ * you cannot read anyway.
+ *
+ * So: the transcript fills the screen and follows itself down. Everything else
+ * is one bar at the bottom — a live dot, the elapsed time, the count of verses
+ * caught, and stop. The references are not lost; they are on the note
+ * afterwards, which is where anybody actually reads them.
+ */
 @Composable
 private fun ListeningView(
     startedAt: Long,
@@ -508,70 +526,89 @@ private fun ListeningView(
     }
     val secs = if (startedAt == 0L) 0 else ((now - startedAt) / 1000L).toInt().coerceAtLeast(0)
 
-    Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState())
-            .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 120.dp),
-    ) {
-        Text("Listening", fontFamily = BookSerif, fontSize = 32.sp)
+    val scroll = rememberScrollState()
+    // follow the words down, the way a transcript should
+    LaunchedEffect(chunks.size, partial) { scroll.animateScrollTo(scroll.maxValue) }
 
-        Column(Modifier.fillMaxWidth().padding(top = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                "%02d:%02d".format(secs / 60, secs % 60),
-                fontSize = 52.sp, fontWeight = FontWeight.Light, color = Ink,
-            )
-            Wave(active = true, modifier = Modifier.padding(vertical = 26.dp))
-            Text(
-                captureStatus,
-                color = if (captureStatus.startsWith("Live")) MaterialTheme.colorScheme.primary else Muted,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(bottom = 14.dp),
-            )
-        }
+    val cs = MaterialTheme.colorScheme
 
-        Text("LIVE TRANSCRIPT", color = MaterialTheme.colorScheme.primary, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.6.sp, modifier = Modifier.padding(bottom = 10.dp))
+    Column(Modifier.fillMaxSize()) {
+
         Column(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
-                .background(MaterialTheme.colorScheme.surface).padding(18.dp),
+            Modifier.weight(1f).fillMaxWidth().verticalScroll(scroll)
+                .padding(horizontal = 24.dp).padding(top = 28.dp, bottom = 16.dp),
         ) {
             if (chunks.isEmpty() && partial.isBlank()) {
-                Text("Listening…", color = Muted, fontFamily = BookSerif, fontSize = 18.sp)
+                Text(
+                    if (captureStatus.contains("unavailable")) {
+                        "Recording. Captions are off — the words can be added afterwards."
+                    } else {
+                        "Listening…"
+                    },
+                    color = Muted, fontFamily = BookSerif, fontSize = 21.sp, lineHeight = 31.sp,
+                )
             } else {
-                chunks.takeLast(12).forEach { chunk ->
-                    Text(chunk, color = Ink, fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 27.sp, modifier = Modifier.padding(bottom = 9.dp))
+                /* One flowing body rather than a stack of separate blocks. A
+                   transcript is continuous speech; breaking it into cards
+                   implies boundaries the speaker never made. */
+                chunks.takeLast(40).forEach { chunk ->
+                    Text(
+                        chunk,
+                        color = Ink, fontFamily = BookSerif,
+                        fontSize = 22.sp, lineHeight = 33.sp,
+                        modifier = Modifier.padding(bottom = 12.dp),
+                    )
                 }
-                if (partial.isNotBlank()) Text(
-                    partial, color = Muted, fontFamily = BookSerif,
-                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                    fontSize = 17.sp, lineHeight = 25.sp,
+                if (partial.isNotBlank()) {
+                    Text(
+                        partial,
+                        color = Muted, fontFamily = BookSerif,
+                        fontSize = 22.sp, lineHeight = 33.sp,
+                    )
+                }
+            }
+        }
+
+        /* The only chrome. */
+        Row(
+            Modifier.fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 108.dp, top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val pulse by rememberInfiniteTransition(label = "rec").animateFloat(
+                initialValue = .35f, targetValue = 1f,
+                animationSpec = infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Reverse),
+                label = "rec-dot",
+            )
+            Box(
+                Modifier.size(9.dp).clip(CircleShape)
+                    .background(cs.primary.copy(alpha = pulse)),
+            )
+            Text(
+                "%02d:%02d".format(secs / 60, secs % 60),
+                color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(start = 10.dp),
+            )
+            if (caught.isNotEmpty()) {
+                Text(
+                    "· ${caught.size} verse${if (caught.size == 1) "" else "s"}",
+                    color = Muted, fontSize = 13.sp,
+                    modifier = Modifier.padding(start = 6.dp),
                 )
             }
-        }
-
-        Text(
-            if (caught.isEmpty()) "LISTENING FOR SCRIPTURE" else "CAUGHT SO FAR",
-            color = Muted, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp,
-            modifier = Modifier.padding(top = 22.dp, bottom = 12.dp),
-        )
-        caught.reversed().forEach { hit ->
-            Box(Modifier.fillMaxWidth().padding(bottom = 10.dp).premiumCard(lift = false)) {
-                Row(Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(hit.reference, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, modifier = Modifier.weight(1f))
-                    Text(clockLabel(hit.atMillis), color = Muted, fontSize = 11.sp)
-                }
-            }
-        }
-
-        Box(
-            Modifier.fillMaxWidth().padding(top = 22.dp).height(56.dp)
-                .shadow(14.dp, R.control, spotColor = SoftShadow)
-                .clip(R.control).background(NightGloss).clickable(onClick = onEnd),
-            contentAlignment = Alignment.Center,
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.Stop, null, tint = Gold, modifier = Modifier.size(19.dp))
-                Spacer(Modifier.width(9.dp))
-                Text("Service ended · Arrange my notes", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            Spacer(Modifier.weight(1f))
+            Row(
+                Modifier.clip(R.pill).background(cs.primary).clickable(onClick = onEnd)
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Outlined.Stop, null, tint = Color.White, modifier = Modifier.size(17.dp))
+                Text(
+                    "Stop",
+                    color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.5.sp,
+                    modifier = Modifier.padding(start = 7.dp),
+                )
             }
         }
     }
