@@ -180,18 +180,23 @@ fun DailyPrayerSession(
                     }
                 },
         ) {
-            // the movement underneath, so the pull reveals rather than blanks
+            /* The movement underneath, revealed by the pull.
+               It starts fully transparent, not at 35% as PullDeck's does: that
+               deck's cards paint an opaque background, so the waiting one is
+               hidden behind the front one. These are words on a shared ground,
+               so any alpha at rest prints the next movement straight through
+               the current one and both become unreadable. */
             movements.getOrNull(index + 1)?.let { next ->
-                MovementBody(
+                PullBody(
                     next,
                     Modifier.fillMaxSize().graphicsLayer {
                         val grow = .94f + (.06f * pull)
-                        scaleX = grow; scaleY = grow; alpha = .35f + (.5f * pull)
+                        scaleX = grow; scaleY = grow; alpha = pull * pull
                     },
                 )
             }
 
-            MovementBody(
+            PullBody(
                 movements[index],
                 Modifier.fillMaxSize().graphicsLayer {
                     translationY = offset
@@ -214,7 +219,7 @@ fun DailyPrayerSession(
 
 /** The one movement being prayed. Nothing on this layer but words. */
 @Composable
-private fun MovementBody(movement: PrayerPull, modifier: Modifier) {
+private fun PullBody(movement: PrayerPull, modifier: Modifier) {
     Box(modifier.padding(horizontal = 30.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.Start) {
             Text(
