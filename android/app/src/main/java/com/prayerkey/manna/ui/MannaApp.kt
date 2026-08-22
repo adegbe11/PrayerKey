@@ -106,7 +106,7 @@ fun MannaApp(
     LaunchedEffect(notificationRoute, hydrated, preferences.onboarded) {
         if (!hydrated || !preferences.onboarded || notificationRoute == null) return@LaunchedEffect
         when (notificationRoute) {
-            "bible" -> selected = 1
+            "bible" -> { selected = 0; homeAction = "bible_session" }
             /* The prayer reminder no longer lands on the Prayer tab. That tab
                is a library of 543 topics with a dock underneath it, so the
                notification used to end in a browsing decision — which is where

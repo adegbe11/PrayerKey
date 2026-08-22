@@ -61,8 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.data.PRAYER_PULLS
-import com.prayerkey.manna.data.PrayerPull
+import com.prayerkey.manna.data.BibleReading
 import com.prayerkey.manna.data.PrayerPulls
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
@@ -88,16 +87,90 @@ import kotlin.math.abs
  * the pull feels identical to the rest of the app without putting the working
  * deck at risk.
  */
+/** One pull: a small label, the words, and a reference when there is one. */
+data class PullItem(val label: String, val text: String, val reference: String? = null)
+
+/** The day's ten pulls of prayer. */
 @Composable
 fun DailyPrayerSession(
     session: PrayerPulls,
-    /** Where to open — the resume position from PrayerPullsStore. */
     startAt: Int = 0,
-    /** Fires with the number of movements prayed, every time it advances. */
+    onProgress: (Int) -> Unit = {},
+    onClose: () -> Unit,
+) = PullSession(
+    title = session.title,
+    items = session.movements.map { PullItem(it.kind.label, it.text, it.reference) },
+    headline = "Amen.",
+    closing = "You prayed all ten.",
+    verb = "prayed",
+    startAt = startAt,
+    onProgress = onProgress,
+    onClose = onClose,
+)
+
+/** The day's chapter, in pulls. */
+@Composable
+fun DailyBibleSession(
+    reading: BibleReading,
+    startAt: Int = 0,
+    onProgress: (Int) -> Unit = {},
+    onClose: () -> Unit,
+) = PullSession(
+    title = reading.title,
+    items = reading.pulls.map { PullItem("READ", it.text, it.reference) },
+    headline = "Read.",
+    closing = "You read the whole chapter.",
+    verb = "read",
+    startAt = startAt,
+    onProgress = onProgress,
+    onClose = onClose,
+)
+
+/**
+ * The ground, while the chapter is still being read off disk.
+ *
+ * A Dialog whose content is null occupies no space, and every tap then counts
+ * as a tap outside it, so the reader's first tap dismissed the screen instead
+ * of turning the page. It must always fill.
+ */
+@Composable
+fun PullSessionLoading(title: String) {
+    Box(Modifier.fillMaxSize().background(nightBrush()), contentAlignment = Alignment.Center) {
+        Text(
+            title.uppercase(),
+            fontFamily = UtilitySans,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 3.sp,
+            color = Color.White.copy(alpha = .5f),
+        )
+    }
+}
+
+/**
+ * The deck both sessions are.
+ *
+ * Prayer and scripture differ in what they say and not in how they are pulled,
+ * so they share this rather than each owning a near-copy that would drift
+ * apart the first time one of them was tuned.
+ */
+@Composable
+fun PullSession(
+    title: String,
+    items: List<PullItem>,
+    /** The word the finished deck ends on. */
+    headline: String,
+    /** The line under it. */
+    closing: String,
+    /** What the reader just did, for the hint at the bottom. */
+    verb: String,
+    /** Where to open — the resume position from PullsProgress. */
+    startAt: Int = 0,
+    /** Fires with the number of pulls done, every time it advances. */
     onProgress: (Int) -> Unit = {},
     onClose: () -> Unit,
 ) {
-    val movements = session.movements
+    val movements = items
     if (movements.isEmpty()) return
 
     val view = LocalView.current
@@ -105,8 +178,8 @@ fun DailyPrayerSession(
     val screenH = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
     val scope = rememberCoroutineScope()
 
-    var index by remember(session.date) { mutableIntStateOf(startAt.coerceIn(0, movements.lastIndex)) }
-    var done by remember(session.date) { mutableStateOf(false) }
+    var index by remember(title) { mutableIntStateOf(startAt.coerceIn(0, movements.lastIndex)) }
+    var done by remember(title) { mutableStateOf(false) }
     var dragY by remember { mutableFloatStateOf(0f) }
     var velocity by remember { mutableFloatStateOf(0f) }
     var lastMoveAt by remember { mutableLongStateOf(0L) }
@@ -124,7 +197,7 @@ fun DailyPrayerSession(
             anim.snapTo(dragY)
             anim.animateTo(screenH * 1.15f, tween(230))
             if (index >= movements.lastIndex) {
-                onProgress(PRAYER_PULLS)
+                onProgress(movements.size)
                 done = true
             } else {
                 index++
@@ -142,7 +215,7 @@ fun DailyPrayerSession(
 
     Box(Modifier.fillMaxSize().background(nightBrush())) {
         if (done) {
-            SessionComplete(session, onClose = onClose, again = { index = 0; done = false })
+            SessionComplete(title, headline, closing, onClose = onClose, again = { index = 0; done = false })
             return@Box
         }
 
@@ -152,12 +225,12 @@ fun DailyPrayerSession(
         Box(
             Modifier
                 .fillMaxSize()
-                .pointerInput(session.date) {
+                .pointerInput(title) {
                     detectTapGestures { at ->
                         if (at.x > size.width * .45f) advance() else back()
                     }
                 }
-                .pointerInput(session.date) {
+                .pointerInput(title) {
                     detectDragGestures(
                         onDragEnd = {
                             if (dragY > threshold * .55f || velocity > 2.4f) advance()
@@ -206,24 +279,24 @@ fun DailyPrayerSession(
         }
 
         SessionChrome(
-            session = session,
+            title = title,
             at = index,
             total = movements.size,
             pull = pull,
             onClose = onClose,
         )
 
-        PullHint(index + 1, movements.size, pull, Modifier.align(Alignment.BottomCenter))
+        PullHint(index + 1, movements.size, verb, pull, Modifier.align(Alignment.BottomCenter))
     }
 }
 
 /** The one movement being prayed. Nothing on this layer but words. */
 @Composable
-private fun PullBody(movement: PrayerPull, modifier: Modifier) {
+private fun PullBody(movement: PullItem, modifier: Modifier) {
     Box(modifier.padding(horizontal = 30.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.Start) {
             Text(
-                movement.kind.label,
+                movement.label,
                 fontFamily = UtilitySans,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
@@ -257,7 +330,7 @@ private fun PullBody(movement: PrayerPull, modifier: Modifier) {
 /** Ten segments, a close, and the day's title. That is the entire interface. */
 @Composable
 private fun SessionChrome(
-    session: PrayerPulls,
+    title: String,
     at: Int,
     total: Int,
     pull: Float,
@@ -309,7 +382,7 @@ private fun SessionChrome(
             ) { Icon(Icons.Outlined.Close, "Close", tint = Color.White, modifier = Modifier.size(17.dp)) }
             Spacer(Modifier.width(14.dp))
             Text(
-                session.title.uppercase(),
+                title.uppercase(),
                 fontFamily = UtilitySans,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -328,7 +401,7 @@ private fun SessionChrome(
  * the gesture has been learned and a permanent hint is just furniture.
  */
 @Composable
-private fun PullHint(at: Int, total: Int, pull: Float, modifier: Modifier) {
+private fun PullHint(at: Int, total: Int, verb: String, pull: Float, modifier: Modifier) {
     Column(
         modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 34.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -341,7 +414,7 @@ private fun PullHint(at: Int, total: Int, pull: Float, modifier: Modifier) {
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                "Pull down when you have prayed it",
+                "Pull down when you have $verb it",
                 fontFamily = UtilitySans,
                 fontSize = 12.sp,
                 color = Color.White.copy(alpha = .5f - (pull * .5f)),
@@ -361,11 +434,11 @@ private fun PullHint(at: Int, total: Int, pull: Float, modifier: Modifier) {
 
 /** After the tenth pull. One statement, then out of the way. */
 @Composable
-private fun SessionComplete(session: PrayerPulls, onClose: () -> Unit, again: () -> Unit) {
+private fun SessionComplete(title: String, headline: String, closing: String, onClose: () -> Unit, again: () -> Unit) {
     Box(Modifier.fillMaxSize().padding(horizontal = 34.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                "Amen.",
+                headline,
                 fontFamily = DisplaySerif,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 56.sp,
@@ -373,7 +446,7 @@ private fun SessionComplete(session: PrayerPulls, onClose: () -> Unit, again: ()
             )
             Spacer(Modifier.height(18.dp))
             Text(
-                "You prayed all ten.",
+                closing,
                 fontFamily = UtilitySans,
                 fontSize = 15.sp,
                 color = Color.White.copy(alpha = .72f),
@@ -381,7 +454,7 @@ private fun SessionComplete(session: PrayerPulls, onClose: () -> Unit, again: ()
             )
             Spacer(Modifier.height(6.dp))
             Text(
-                session.title,
+                title,
                 fontFamily = UtilitySans,
                 fontSize = 12.sp,
                 letterSpacing = 1.2.sp,
@@ -406,7 +479,7 @@ private fun SessionComplete(session: PrayerPulls, onClose: () -> Unit, again: ()
             }
             Spacer(Modifier.height(16.dp))
             Text(
-                "Pray it again",
+                "Do it again",
                 fontFamily = UtilitySans,
                 fontSize = 13.sp,
                 color = Color.White.copy(alpha = .55f),

@@ -87,6 +87,7 @@ fun PrayerKeyOperatingHome(
     /* The ten-pull daily session. Separate from prayerSessionOpen above,
        which is the timed guided journey — different thing, same word. */
     var todayPullsOpen by rememberSaveable { mutableStateOf(false) }
+    var biblePullsOpen by rememberSaveable { mutableStateOf(false) }
     var prayerCalendarOpen by rememberSaveable { mutableStateOf(false) }
     var selectedFeature by remember { mutableStateOf<Feature?>(null) }
 
@@ -94,6 +95,7 @@ fun PrayerKeyOperatingHome(
         when (initialAction) {
             "devotional" -> devotionalOpen = true
             "prayer_session" -> todayPullsOpen = true
+            "bible_session" -> biblePullsOpen = true
             "fasting" -> selectedFeature = Feature("Start a fast", "", Icons.Outlined.WaterDrop, Hub.PRAY)
             "prayer_challenge" -> selectedFeature = Feature("Prayer challenge", "", Icons.Outlined.LocalFireDepartment, Hub.PRAY)
             "midnight" -> selectedFeature = Feature("Midnight prayer", "", Icons.Outlined.DarkMode, Hub.PRAY)
@@ -135,9 +137,11 @@ fun PrayerKeyOperatingHome(
     /* Read rather than remembered: the session is usually prayed from the
        notification, so Home is recomposed after the fact and a cached value
        would show 0/10 for a morning that is already done. */
-    var todayPulled by remember(today) { mutableIntStateOf(0) }
-    LaunchedEffect(todayPullsOpen) {
-        todayPulled = com.prayerkey.manna.data.PrayerPullsStore.progress(context, today)
+    var todayBadgeText by remember(today) { mutableStateOf<String?>(null) }
+    var readBadgeText by remember(today) { mutableStateOf<String?>(null) }
+    LaunchedEffect(todayPullsOpen, biblePullsOpen) {
+        todayBadgeText = com.prayerkey.manna.data.PullsProgress.Prayer.badge(context, today)
+        readBadgeText = com.prayerkey.manna.data.PullsProgress.Bible.badge(context, today)
     }
     val morningPrayer = remember(prayerTopics, today) { com.prayerkey.manna.data.dailyPrayerFor(today, prayerTopics) }
     var todayVerse by remember(plan) { mutableStateOf<VerseCard?>(null) }
@@ -220,10 +224,39 @@ fun PrayerKeyOperatingHome(
         ) {
             com.prayerkey.manna.ui.session.DailyPrayerSession(
                 session = session,
-                startAt = remember { com.prayerkey.manna.data.PrayerPullsStore.resumeAt(context) },
-                onProgress = { at -> com.prayerkey.manna.data.PrayerPullsStore.record(context, at) },
+                startAt = remember { com.prayerkey.manna.data.PullsProgress.Prayer.resumeAt(context) },
+                onProgress = { at -> com.prayerkey.manna.data.PullsProgress.Prayer.record(context, at, session.size) },
                 onClose = { todayPullsOpen = false },
             )
+        }
+    }
+    if (biblePullsOpen) {
+        /* The chapter is cut here, from the same reading the devotional names,
+           so the pulls and the day's prayer are about one subject. */
+        var reading by remember(plan) { mutableStateOf<com.prayerkey.manna.data.BibleReading?>(null) }
+        LaunchedEffect(plan) {
+            val where = plan?.reading ?: return@LaunchedEffect
+            val verses = com.prayerkey.manna.data.OfflineBible(context)
+                .chapter(where.book, where.chapter)
+            reading = com.prayerkey.manna.data.readingFrom(where.book, where.chapter, verses)
+        }
+        Dialog(
+            onDismissRequest = { biblePullsOpen = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            val chapter = reading
+            if (chapter == null) {
+                com.prayerkey.manna.ui.session.PullSessionLoading(plan?.readingLabel.orEmpty())
+            } else {
+                com.prayerkey.manna.ui.session.DailyBibleSession(
+                    reading = chapter,
+                    startAt = remember { com.prayerkey.manna.data.PullsProgress.Bible.resumeAt(context) },
+                    onProgress = { at ->
+                        com.prayerkey.manna.data.PullsProgress.Bible.record(context, at, chapter.size)
+                    },
+                    onClose = { biblePullsOpen = false },
+                )
+            }
         }
     }
     if (prayerCalendarOpen) {
@@ -261,8 +294,10 @@ fun PrayerKeyOperatingHome(
         Header(today, streak, onSettings)
         ShortcutRail(
             streak = streak,
-            todayBadge = todayPulled.takeIf { it > 0 }?.let { "$it/10" },
+            todayBadge = todayBadgeText,
             todayPulls = { todayPullsOpen = true },
+            readBadge = readBadgeText,
+            biblePulls = { biblePullsOpen = true },
             prayNow = onOpenPrayer,
             ledger = onOpenJournal,
             bible = onOpenBible,
@@ -369,6 +404,9 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
     /** How many of today's ten pulls are prayed, shown on the badge. */
     todayBadge: String?,
     todayPulls: () -> Unit,
+    /** The same, for the day's chapter. */
+    readBadge: String?,
+    biblePulls: () -> Unit,
     prayNow: () -> Unit,
     ledger: () -> Unit,
     bible: () -> Unit,
@@ -380,6 +418,7 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
     val shortcutScroll = remember { androidx.compose.foundation.ScrollState(0) }
     val shortcuts = listOf(
         HomeShortcut("Today", Icons.Outlined.WbSunny, todayBadge, open = todayPulls),
+        HomeShortcut("Read", Icons.Outlined.AutoStories, readBadge, open = biblePulls),
         HomeShortcut("Pray now", Icons.Outlined.Bolt, open = prayNow),
         HomeShortcut("My prayers", Icons.Outlined.FactCheck, open = ledger),
         HomeShortcut("Prayer points", Icons.Outlined.FormatListBulleted) { open(Feature("Prayer points", "Pray by situation", Icons.Outlined.FormatListBulleted, Hub.PRAY)) },

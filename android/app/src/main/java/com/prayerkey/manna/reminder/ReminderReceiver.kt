@@ -15,7 +15,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.prayerkey.manna.MainActivity
 import com.prayerkey.manna.R
-import com.prayerkey.manna.data.PrayerPullsStore
+import com.prayerkey.manna.data.PullsProgress
 import java.time.LocalDate
 import java.util.Calendar
 
@@ -32,10 +32,12 @@ class ReminderReceiver : BroadcastReceiver() {
            the reader's own morning, and only one of the two gets opened. */
         val message = when (kind) {
             ReminderKind.CALENDAR -> calendarMessage(LocalDate.now())!!
-            ReminderKind.PRAYER -> PrayerPullsStore.notificationLine(context)
+            ReminderKind.PRAYER -> PullsProgress.Prayer.notificationLine(context)
+            ReminderKind.BIBLE -> PullsProgress.Bible.notificationLine(context)
             else -> kind.message
         }
-        val headline = if (kind == ReminderKind.CALENDAR || kind == ReminderKind.PRAYER) message.first else kind.title
+        val stateful = kind == ReminderKind.CALENDAR || kind == ReminderKind.PRAYER || kind == ReminderKind.BIBLE
+        val headline = if (stateful) message.first else kind.title
         val openIntent = Intent(context, MainActivity::class.java).apply {
             putExtra(DESTINATION, kind.destination)
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
