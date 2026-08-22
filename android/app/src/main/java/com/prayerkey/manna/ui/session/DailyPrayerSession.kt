@@ -1,0 +1,430 @@
+package com.prayerkey.manna.ui.session
+
+import android.view.HapticFeedbackConstants
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.prayerkey.manna.data.PRAYER_PULLS
+import com.prayerkey.manna.data.PrayerPull
+import com.prayerkey.manna.data.PrayerPulls
+import com.prayerkey.manna.ui.theme.DisplaySerif
+import com.prayerkey.manna.ui.theme.Pk
+import com.prayerkey.manna.ui.theme.UtilitySans
+import kotlinx.coroutines.launch
+import kotlin.math.abs
+
+/**
+ * The prayer session: one screen, ten pulls, nothing else on it.
+ *
+ * There is no dock, no tab bar and no back arrow, because everything of that
+ * kind is an invitation to be somewhere else. The competitor we looked at puts
+ * a music toggle, a track picker and two volume sliders between a person and
+ * the first word of their prayer. That is the whole difference — this screen
+ * has one job and offers exactly one thing to do.
+ *
+ * The gesture is written here rather than borrowed from
+ * [com.prayerkey.manna.ui.components.PullDeck], which was the plan until I read
+ * it: that deck wraps forever (`index % size`), treats an upward swipe as
+ * "keep", and starts at zero. A session must end, must not be saveable
+ * halfway, and must open where you stopped — four changes to a component three
+ * other screens depend on. The tuned constants are copied across unchanged, so
+ * the pull feels identical to the rest of the app without putting the working
+ * deck at risk.
+ */
+@Composable
+fun DailyPrayerSession(
+    session: PrayerPulls,
+    /** Where to open — the resume position from PrayerPullsStore. */
+    startAt: Int = 0,
+    /** Fires with the number of movements prayed, every time it advances. */
+    onProgress: (Int) -> Unit = {},
+    onClose: () -> Unit,
+) {
+    val movements = session.movements
+    if (movements.isEmpty()) return
+
+    val view = LocalView.current
+    val density = LocalDensity.current
+    val screenH = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
+    val scope = rememberCoroutineScope()
+
+    var index by remember(session.date) { mutableIntStateOf(startAt.coerceIn(0, movements.lastIndex)) }
+    var done by remember(session.date) { mutableStateOf(false) }
+    var dragY by remember { mutableFloatStateOf(0f) }
+    var velocity by remember { mutableFloatStateOf(0f) }
+    var lastMoveAt by remember { mutableLongStateOf(0L) }
+    val anim = remember { Animatable(0f) }
+    var animating by remember { mutableStateOf(false) }
+    val offset = if (animating) anim.value else dragY
+
+    LaunchedEffect(index) { onProgress(index) }
+
+    fun advance() {
+        if (animating) return
+        scope.launch {
+            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+            animating = true
+            anim.snapTo(dragY)
+            anim.animateTo(screenH * 1.15f, tween(230))
+            if (index >= movements.lastIndex) {
+                onProgress(PRAYER_PULLS)
+                done = true
+            } else {
+                index++
+            }
+            dragY = 0f
+            anim.snapTo(0f)
+            animating = false
+        }
+    }
+
+    fun back() {
+        if (animating || index == 0) return
+        index--
+    }
+
+    Box(Modifier.fillMaxSize().background(nightBrush())) {
+        if (done) {
+            SessionComplete(session, onClose = onClose, again = { index = 0; done = false })
+            return@Box
+        }
+
+        val threshold = screenH * .18f
+        val pull = (offset / threshold).coerceIn(0f, 1f)
+
+        Box(
+            Modifier
+                .fillMaxSize()
+                .pointerInput(session.date) {
+                    detectTapGestures { at ->
+                        if (at.x > size.width * .45f) advance() else back()
+                    }
+                }
+                .pointerInput(session.date) {
+                    detectDragGestures(
+                        onDragEnd = {
+                            if (dragY > threshold * .55f || velocity > 2.4f) advance()
+                            else scope.launch {
+                                animating = true
+                                anim.snapTo(dragY)
+                                anim.animateTo(0f, spring(dampingRatio = .62f, stiffness = Spring.StiffnessMedium))
+                                dragY = 0f
+                                animating = false
+                            }
+                        },
+                    ) { change, amount ->
+                        change.consume()
+                        val now = System.currentTimeMillis()
+                        val dt = (now - lastMoveAt).coerceAtLeast(1)
+                        velocity = amount.y / dt * 16f
+                        lastMoveAt = now
+                        // downward only: a prayer has one direction
+                        dragY = (dragY + amount.y).coerceAtLeast(0f)
+                    }
+                },
+        ) {
+            // the movement underneath, so the pull reveals rather than blanks
+            movements.getOrNull(index + 1)?.let { next ->
+                MovementBody(
+                    next,
+                    Modifier.fillMaxSize().graphicsLayer {
+                        val grow = .94f + (.06f * pull)
+                        scaleX = grow; scaleY = grow; alpha = .35f + (.5f * pull)
+                    },
+                )
+            }
+
+            MovementBody(
+                movements[index],
+                Modifier.fillMaxSize().graphicsLayer {
+                    translationY = offset
+                    alpha = 1f - (pull * .35f)
+                },
+            )
+        }
+
+        SessionChrome(
+            session = session,
+            at = index,
+            total = movements.size,
+            pull = pull,
+            onClose = onClose,
+        )
+
+        PullHint(index + 1, movements.size, pull, Modifier.align(Alignment.BottomCenter))
+    }
+}
+
+/** The one movement being prayed. Nothing on this layer but words. */
+@Composable
+private fun MovementBody(movement: PrayerPull, modifier: Modifier) {
+    Box(modifier.padding(horizontal = 30.dp), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.Start) {
+            Text(
+                movement.kind.label,
+                fontFamily = UtilitySans,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 3.2.sp,
+                color = Pk.GoldLight.copy(alpha = .85f),
+            )
+            Spacer(Modifier.height(20.dp))
+            Text(
+                movement.text,
+                fontFamily = DisplaySerif,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = if (movement.text.length > 190) 25.sp else 30.sp,
+                lineHeight = if (movement.text.length > 190) 36.sp else 42.sp,
+                color = Color.White,
+            )
+            movement.reference?.let { ref ->
+                Spacer(Modifier.height(22.dp))
+                Text(
+                    ref.uppercase(),
+                    fontFamily = UtilitySans,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 2.4.sp,
+                    color = Color.White.copy(alpha = .58f),
+                )
+            }
+        }
+    }
+}
+
+/** Ten segments, a close, and the day's title. That is the entire interface. */
+@Composable
+private fun SessionChrome(
+    session: PrayerPulls,
+    at: Int,
+    total: Int,
+    pull: Float,
+    onClose: () -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 18.dp)) {
+        Row(
+            Modifier.fillMaxWidth().padding(top = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            repeat(total) { i ->
+                val fill = when {
+                    i < at -> 1f
+                    i == at -> pull.coerceAtLeast(.001f)
+                    else -> 0f
+                }
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .height(3.dp)
+                        .clip(RoundedCornerShape(99.dp))
+                        .background(Color.White.copy(alpha = .22f)),
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth(if (i == at) .35f + (.65f * fill) else fill)
+                            .height(3.dp)
+                            .clip(RoundedCornerShape(99.dp))
+                            .background(Color.White),
+                    )
+                }
+            }
+        }
+        Row(
+            Modifier.fillMaxWidth().padding(top = 18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = .12f))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClose,
+                    ),
+                contentAlignment = Alignment.Center,
+            ) { Icon(Icons.Outlined.Close, "Close", tint = Color.White, modifier = Modifier.size(17.dp)) }
+            Spacer(Modifier.width(14.dp))
+            Text(
+                session.title.uppercase(),
+                fontFamily = UtilitySans,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 2.6.sp,
+                color = Color.White.copy(alpha = .62f),
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+/**
+ * The only instruction on the screen, and it retires itself.
+ *
+ * It shows on the first two movements and then goes, because by the third pull
+ * the gesture has been learned and a permanent hint is just furniture.
+ */
+@Composable
+private fun PullHint(at: Int, total: Int, pull: Float, modifier: Modifier) {
+    Column(
+        modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 34.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        if (at <= 2) {
+            Icon(
+                Icons.Outlined.KeyboardArrowDown, null,
+                tint = Color.White.copy(alpha = .5f - (pull * .5f)),
+                modifier = Modifier.size(22.dp).graphicsLayer { translationY = pull * 14f },
+            )
+            Spacer(Modifier.height(2.dp))
+            Text(
+                "Pull down when you have prayed it",
+                fontFamily = UtilitySans,
+                fontSize = 12.sp,
+                color = Color.White.copy(alpha = .5f - (pull * .5f)),
+            )
+            Spacer(Modifier.height(12.dp))
+        }
+        Text(
+            "$at / $total",
+            fontFamily = UtilitySans,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            letterSpacing = 1.4.sp,
+            color = Color.White.copy(alpha = .42f),
+        )
+    }
+}
+
+/** After the tenth pull. One statement, then out of the way. */
+@Composable
+private fun SessionComplete(session: PrayerPulls, onClose: () -> Unit, again: () -> Unit) {
+    Box(Modifier.fillMaxSize().padding(horizontal = 34.dp), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                "Amen.",
+                fontFamily = DisplaySerif,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 56.sp,
+                color = Color.White,
+            )
+            Spacer(Modifier.height(18.dp))
+            Text(
+                "You prayed all ten.",
+                fontFamily = UtilitySans,
+                fontSize = 15.sp,
+                color = Color.White.copy(alpha = .72f),
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                session.title,
+                fontFamily = UtilitySans,
+                fontSize = 12.sp,
+                letterSpacing = 1.2.sp,
+                color = Pk.GoldLight.copy(alpha = .8f),
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(44.dp))
+            Box(
+                Modifier
+                    .clip(RoundedCornerShape(99.dp))
+                    .background(Color.White)
+                    .clickable(onClick = onClose)
+                    .padding(horizontal = 44.dp, vertical = 15.dp),
+            ) {
+                Text(
+                    "Done",
+                    fontFamily = UtilitySans,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Pk.Charcoal,
+                )
+            }
+            Spacer(Modifier.height(16.dp))
+            Text(
+                "Pray it again",
+                fontFamily = UtilitySans,
+                fontSize = 13.sp,
+                color = Color.White.copy(alpha = .55f),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(99.dp))
+                    .clickable(onClick = again)
+                    .padding(horizontal = 18.dp, vertical = 8.dp),
+            )
+        }
+    }
+}
+
+/**
+ * The ground the words sit on.
+ *
+ * Brand oxblood, unchanged — deepened at the corners rather than tinted, so it
+ * reads as the same purple the rest of the app uses, lit from behind.
+ */
+private fun nightBrush(): Brush = Brush.linearGradient(
+    0f to Pk.DeepDark,
+    .42f to Pk.VioletDeep,
+    .72f to Pk.Oxblood,
+    1f to Pk.DeepDark,
+    start = Offset(0f, 0f),
+    end = Offset(900f, 2400f),
+)

@@ -107,7 +107,11 @@ fun MannaApp(
         if (!hydrated || !preferences.onboarded || notificationRoute == null) return@LaunchedEffect
         when (notificationRoute) {
             "bible" -> selected = 1
-            "prayer" -> selected = 2
+            /* The prayer reminder no longer lands on the Prayer tab. That tab
+               is a library of 543 topics with a dock underneath it, so the
+               notification used to end in a browsing decision — which is where
+               people leave. It opens the day's ten pulls directly instead. */
+            "prayer" -> { selected = 0; homeAction = "prayer_session" }
             "church" -> selected = 3
             "journal" -> selected = 4
             "devotional", "fasting", "prayer_challenge", "midnight", "warfare" -> {

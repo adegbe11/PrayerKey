@@ -84,12 +84,16 @@ fun PrayerKeyOperatingHome(
     var emergencyPrayerOpen by rememberSaveable { mutableStateOf(false) }
     var morningPrayerOpen by rememberSaveable { mutableStateOf(false) }
     var prayerSessionOpen by rememberSaveable { mutableStateOf(false) }
+    /* The ten-pull daily session. Separate from prayerSessionOpen above,
+       which is the timed guided journey — different thing, same word. */
+    var todayPullsOpen by rememberSaveable { mutableStateOf(false) }
     var prayerCalendarOpen by rememberSaveable { mutableStateOf(false) }
     var selectedFeature by remember { mutableStateOf<Feature?>(null) }
 
     LaunchedEffect(initialAction) {
         when (initialAction) {
             "devotional" -> devotionalOpen = true
+            "prayer_session" -> todayPullsOpen = true
             "fasting" -> selectedFeature = Feature("Start a fast", "", Icons.Outlined.WaterDrop, Hub.PRAY)
             "prayer_challenge" -> selectedFeature = Feature("Prayer challenge", "", Icons.Outlined.LocalFireDepartment, Hub.PRAY)
             "midnight" -> selectedFeature = Feature("Midnight prayer", "", Icons.Outlined.DarkMode, Hub.PRAY)
@@ -127,6 +131,13 @@ fun PrayerKeyOperatingHome(
     }
     val plan = remember(written, prayerTopics, today) {
         written?.let { com.prayerkey.manna.data.planFor(it, prayerTopics, today) }
+    }
+    /* Read rather than remembered: the session is usually prayed from the
+       notification, so Home is recomposed after the fact and a cached value
+       would show 0/10 for a morning that is already done. */
+    var todayPulled by remember(today) { mutableIntStateOf(0) }
+    LaunchedEffect(todayPullsOpen) {
+        todayPulled = com.prayerkey.manna.data.PrayerPullsStore.progress(context, today)
     }
     val morningPrayer = remember(prayerTopics, today) { com.prayerkey.manna.data.dailyPrayerFor(today, prayerTopics) }
     var todayVerse by remember(plan) { mutableStateOf<VerseCard?>(null) }
@@ -195,6 +206,26 @@ fun PrayerKeyOperatingHome(
             )
         }
     }
+    if (todayPullsOpen) {
+        /* Resolved here rather than inside the screen so the session is built
+           from the same TodayPlan the rest of Today is built from — the pulls
+           and the day's reading are about one subject or the feature is just
+           another rotation. */
+        val session = remember(plan, today) {
+            com.prayerkey.manna.data.pullsFor(today, plan?.prayer, plan?.readingLabel)
+        }
+        Dialog(
+            onDismissRequest = { todayPullsOpen = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            com.prayerkey.manna.ui.session.DailyPrayerSession(
+                session = session,
+                startAt = remember { com.prayerkey.manna.data.PrayerPullsStore.resumeAt(context) },
+                onProgress = { at -> com.prayerkey.manna.data.PrayerPullsStore.record(context, at) },
+                onClose = { todayPullsOpen = false },
+            )
+        }
+    }
     if (prayerCalendarOpen) {
         Dialog(
             onDismissRequest = { prayerCalendarOpen = false },
@@ -230,6 +261,8 @@ fun PrayerKeyOperatingHome(
         Header(today, streak, onSettings)
         ShortcutRail(
             streak = streak,
+            todayBadge = todayPulled.takeIf { it > 0 }?.let { "$it/10" },
+            todayPulls = { todayPullsOpen = true },
             prayNow = onOpenPrayer,
             ledger = onOpenJournal,
             bible = onOpenBible,
@@ -333,6 +366,9 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
 
 @Composable private fun ShortcutRail(
     streak: Int,
+    /** How many of today's ten pulls are prayed, shown on the badge. */
+    todayBadge: String?,
+    todayPulls: () -> Unit,
     prayNow: () -> Unit,
     ledger: () -> Unit,
     bible: () -> Unit,
@@ -343,6 +379,7 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
     // could restore this rail halfway across after process recreation.
     val shortcutScroll = remember { androidx.compose.foundation.ScrollState(0) }
     val shortcuts = listOf(
+        HomeShortcut("Today", Icons.Outlined.WbSunny, todayBadge, open = todayPulls),
         HomeShortcut("Pray now", Icons.Outlined.Bolt, open = prayNow),
         HomeShortcut("My prayers", Icons.Outlined.FactCheck, open = ledger),
         HomeShortcut("Prayer points", Icons.Outlined.FormatListBulleted) { open(Feature("Prayer points", "Pray by situation", Icons.Outlined.FormatListBulleted, Hub.PRAY)) },

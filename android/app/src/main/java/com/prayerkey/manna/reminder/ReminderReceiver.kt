@@ -15,6 +15,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.prayerkey.manna.MainActivity
 import com.prayerkey.manna.R
+import com.prayerkey.manna.data.PrayerPullsStore
 import java.time.LocalDate
 import java.util.Calendar
 
@@ -26,7 +27,15 @@ class ReminderReceiver : BroadcastReceiver() {
             return
         }
         createChannels(context)
-        val message = if (kind == ReminderKind.CALENDAR) calendarMessage(LocalDate.now())!! else kind.message
+        /* The prayer reminder names where you stopped. "Your prayer is ready"
+           is an advertisement for the app; "You stopped at six" is a fact about
+           the reader's own morning, and only one of the two gets opened. */
+        val message = when (kind) {
+            ReminderKind.CALENDAR -> calendarMessage(LocalDate.now())!!
+            ReminderKind.PRAYER -> PrayerPullsStore.notificationLine(context)
+            else -> kind.message
+        }
+        val headline = if (kind == ReminderKind.CALENDAR || kind == ReminderKind.PRAYER) message.first else kind.title
         val openIntent = Intent(context, MainActivity::class.java).apply {
             putExtra(DESTINATION, kind.destination)
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -38,7 +47,7 @@ class ReminderReceiver : BroadcastReceiver() {
         val notification = NotificationCompat.Builder(context, kind.channel)
             .setSmallIcon(R.drawable.ic_notification)
             .setColor(0xFF6200ED.toInt())
-            .setContentTitle(if (kind == ReminderKind.CALENDAR) message.first else kind.title)
+            .setContentTitle(headline)
             .setContentText(if (kind == ReminderKind.CALENDAR) message.second else message.second)
             .setStyle(NotificationCompat.BigTextStyle().bigText(if (kind == ReminderKind.CALENDAR) message.second else message.second))
             .setContentIntent(open)
