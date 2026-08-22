@@ -1,5 +1,6 @@
 package com.prayerkey.manna
 
+import com.prayerkey.manna.ui.church.SermonPunctuation
 import com.prayerkey.manna.ui.church.SermonPunctuation.polish
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -61,5 +62,26 @@ class SermonPunctuationTest {
 
     @Test fun `existing punctuation is not doubled`() {
         assertTrue(!polish("god is good.").endsWith(".."))
+    }
+
+    @Test fun `a short interrogative opening is a question`() {
+        assertEquals("Who do you say that I am?", SermonPunctuation.close("Who do you say that I am"))
+    }
+
+    @Test fun `a long one is a subordinate clause, not a question`() {
+        val listing = "When you are in trouble, when the money is gone, " +
+            "when the doctor has spoken, God is still God"
+        assertEquals("$listing.", SermonPunctuation.close(listing))
+    }
+
+    @Test fun `a trailing comma never becomes a comma and a full stop`() {
+        assertEquals("But by me.", SermonPunctuation.close("But by me,"))
+    }
+
+    @Test fun `capitalise leaves punctuation alone`() {
+        assertEquals(
+            "No man cometh, unto the Father.",
+            SermonPunctuation.capitalise("No man cometh, unto the father."),
+        )
     }
 }

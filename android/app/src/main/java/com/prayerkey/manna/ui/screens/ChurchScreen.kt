@@ -170,7 +170,7 @@ fun ChurchScreen(
         stage = Stage.Arranging
         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
         minutes = SermonService.elapsedMinutes()
-        val transcript = SermonService.transcript()
+        val transcript = SermonService.transcript(context)
         val refs = caught.map { it.reference }
         // read before stop() clears it — the note needs it to be re-transcribed later
         val audio = SermonService.audioPath.value

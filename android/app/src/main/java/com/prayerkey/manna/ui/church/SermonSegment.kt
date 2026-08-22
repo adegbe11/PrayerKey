@@ -13,8 +13,8 @@ object SermonCleanup {
      * possible tell that a machine wrote it. [SermonPunctuation] handles the
      * inside of the sentence.
      */
-    fun clean(segments: List<SermonSegment>): String = segments.mapNotNull { segment ->
+    fun clean(context: android.content.Context, segments: List<SermonSegment>): String = segments.mapNotNull { segment ->
         val cleaned = segment.text.replace(fillers, "").replace(repeated, "$1").trim()
-        cleaned.takeIf { it.isNotBlank() }?.let(SermonPunctuation::polish)
+        cleaned.takeIf { it.isNotBlank() }?.let { SermonPunctuator.punctuate(context, it) }
     }.joinToString(" ")
 }

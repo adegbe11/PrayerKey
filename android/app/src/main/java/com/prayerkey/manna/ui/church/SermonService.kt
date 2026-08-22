@@ -176,7 +176,7 @@ class SermonService : Service() {
         fun setLanguage(tag: String) { _language.value = tag }
 
         /** Chunks joined with a separator the arranger treats as a full stop. */
-        fun transcript(): String = SermonCleanup.clean(_segments.value)
+        fun transcript(context: Context): String = SermonCleanup.clean(context, _segments.value)
 
         fun elapsedMinutes(): Int {
             val started = _startedAt.value

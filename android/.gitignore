@@ -7,3 +7,6 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# fetched by the fetchSherpaOnnx task, not committed
+app/libs/*.aar

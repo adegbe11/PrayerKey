@@ -75,6 +75,28 @@ android {
     }
 
     packaging.resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+
+    /*
+     * One APK per architecture.
+     *
+     * sherpa-onnx's native library is 24 MB on arm64 and there is one for every
+     * ABI, so a single universal APK is 182 MB of which a given phone can use a
+     * quarter. Play's app bundle splits this automatically; these splits make
+     * the same true of a local build, and make the real per-device size visible
+     * rather than hidden behind a number nobody ships.
+     *
+     * x86_64 is here for the emulator only.
+     */
+    splits.abi {
+        isEnable = true
+        reset()
+        include("arm64-v8a", "armeabi-v7a", "x86_64")
+        isUniversalApk = false
+    }
+
+    /* The ONNX model must reach the device as a file, not a deflated stream —
+       onnxruntime memory-maps it. */
+    androidResources.noCompress += "onnx"
 }
 
 dependencies {
@@ -97,6 +119,11 @@ dependencies {
         exclude(group = "org.json", module = "json")
     }
     implementation("com.alphacephei:vosk-android:0.3.47")
+
+    /* sherpa-onnx, for punctuation. Not on Maven Central — the project ships
+       an .aar on its GitHub releases, fetched by `fetchSherpaOnnx` below and
+       kept out of git, because a 38 MB binary does not belong in a repository. */
+    implementation(files("libs/sherpa-onnx-1.13.6.aar"))
     implementation("androidx.work:work-runtime-ktx:2.10.1")
 
     testImplementation("junit:junit:4.13.2")
@@ -111,3 +138,38 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+
+/**
+ * Fetches the sherpa-onnx Android library.
+ *
+ * It is not published to Maven Central; the project releases a prebuilt .aar
+ * on GitHub. Committing 38 MB of native binary would bloat every clone of this
+ * repository forever, so it is downloaded once into app/libs and gitignored.
+ *
+ * The static-link build is the one taken: it folds onnxruntime into a single
+ * .so instead of shipping it beside, which is smaller and removes a load-order
+ * problem on older devices.
+ */
+val sherpaVersion = "1.13.6"
+val sherpaAar = layout.projectDirectory.file("libs/sherpa-onnx-$sherpaVersion.aar").asFile
+
+val fetchSherpaOnnx by tasks.registering {
+    outputs.file(sherpaAar)
+    onlyIf { !sherpaAar.exists() }
+    doLast {
+        sherpaAar.parentFile.mkdirs()
+        val url = "https://github.com/k2-fsa/sherpa-onnx/releases/download/" +
+            "v$sherpaVersion/sherpa-onnx-static-link-onnxruntime-$sherpaVersion.aar"
+        logger.lifecycle("Fetching sherpa-onnx $sherpaVersion ...")
+        // uri() is Gradle's own helper; a bare java.net.URL does not resolve
+        // here, because `java` in a Kotlin DSL script is the java extension.
+        uri(url).toURL().openStream().use { input ->
+            sherpaAar.outputStream().use { input.copyTo(it) }
+        }
+        require(sherpaAar.length() > 30_000_000) {
+            "sherpa-onnx download was cut short at ${sherpaAar.length() / 1_048_576} MB"
+        }
+    }
+}
+
+tasks.named("preBuild") { dependsOn(fetchSherpaOnnx) }

@@ -82,29 +82,71 @@ object SermonPunctuation {
         var text = utterance.trim().lowercase()
         if (text.isBlank()) return ""
 
-        // "i" standing alone, and its contractions
-        text = text.replace(Regex("""\bi\b"""), "I")
-        text = text.replace(Regex("""\bi'(m|ll|ve|d)\b"""), "I'$1")
-
-        // names, longest first so "holy spirit" wins before "spirit"
-        (DIVINE + NAMES + BOOKS).sortedByDescending { it.length }.forEach { name ->
-            text = text.replace(Regex("""\b${Regex.escape(name)}\b""")) { match ->
-                match.value.split(' ').joinToString(" ") { word ->
-                    word.replaceFirstChar { it.uppercase() }
-                }
-            }
-        }
+        text = capitalise(text)
 
         // a comma where the speaker took a breath
         MARKERS.forEach { marker ->
             text = text.replace(Regex("""^($marker)\s+""", RegexOption.IGNORE_CASE), "$1, ")
         }
 
-        val first = text.substringBefore(' ').lowercase().trim(',')
-        val ending = if (first in INTERROGATIVE) "?" else "."
+        return close(text.replaceFirstChar { it.uppercase() })
+    }
 
-        text = text.replaceFirstChar { it.uppercase() }
-        return if (text.last() in ".!?") text else text + ending
+    /**
+     * The names and the "I", without touching anything else.
+     *
+     * Split out for [SermonPunctuator]: when the model has punctuated a
+     * sentence, its commas and capitals must survive, so the rest of [polish]
+     * — which lowercases first and inserts its own breath comma — cannot run.
+     * What the model does not know is the canon, and this is that half.
+     */
+    fun capitalise(input: String): String {
+        var text = input.replace(Regex("""\bi\b"""), "I")
+        text = text.replace(Regex("""\bi'(m|ll|ve|d)\b"""), "I'$1")
+        // longest first, so "holy spirit" wins before "spirit"
+        (DIVINE + NAMES + BOOKS).sortedByDescending { it.length }.forEach { name ->
+            text = text.replace(Regex("""\b${Regex.escape(name)}\b""", RegexOption.IGNORE_CASE)) { match ->
+                match.value.split(' ').joinToString(" ") { word ->
+                    word.replaceFirstChar { it.uppercase() }
+                }
+            }
+        }
+        return text
+    }
+
+    /**
+     * Ends the utterance, and decides between a full stop and a question mark.
+     *
+     * The punctuation model does not produce question marks. Every one of these
+     * came back as a statement:
+     *
+     *     who do you say that i am  ->  Who do you say that I am.
+     *
+     * So the rule stays, and it applies even after the model has run — but not
+     * on the first word alone, which is what it used to do. That version turned
+     *
+     *     when you are in trouble, when the money is gone, God is still God
+     *
+     * into a question, because "when" opens the list. Length is what separates
+     * the two: a sentence that opens with an interrogative and then runs past a
+     * dozen words has almost always opened a subordinate clause, not asked
+     * anything. Short and interrogative is a question.
+     */
+    fun close(input: String): String {
+        // a trailing comma is the model hedging at the end of a phrase; it is
+        // never how a sentence ends, and appending to it would give ",."
+        val text = input.trim().trimEnd(',', ';', ' ')
+        if (text.isEmpty()) return ""
+        val body = text.trimEnd('.', '!', '?')
+        return body + if (asksSomething(body)) "?" else "."
+    }
+
+    private const val QUESTION_WORDS = 12
+
+    private fun asksSomething(text: String): Boolean {
+        val words = text.split(Regex("""\s+"""))
+        if (words.size > QUESTION_WORDS) return false
+        return words.first().lowercase().trim(',', '"') in INTERROGATIVE
     }
 
     /** Whole transcript, one utterance at a time. */
