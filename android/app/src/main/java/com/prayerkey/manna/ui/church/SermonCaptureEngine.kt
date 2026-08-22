@@ -25,6 +25,7 @@ class SermonCaptureEngine(
     private var muxer: MediaMuxer? = null
     private var track = -1
     private var muxerStarted = false
+    private var capture: Thread? = null
     private var samples = 0L
     private var segmentStart = 0L
     private var recognizer: Recognizer? = null
@@ -46,12 +47,23 @@ class SermonCaptureEngine(
         SermonSessionStore.write(audioFile, startedAt, "recording", segments)
         audioRecord?.startRecording()
         onStatus(if (recognizer == null) "Recording safely · live model unavailable" else "Listening · recording safely")
-        thread(name = "sermon-capture", isDaemon = true) { captureLoop(startedAt) }
+        capture = thread(name = "sermon-capture", isDaemon = true) { captureLoop(startedAt) }
     }
 
     fun stop(startedAt: Long) {
         if (!running.compareAndSet(true, false)) return
+
+        /* Wait for the capture thread before touching the encoder.
+           Without this it kept calling queueInputBuffer while stop() was
+           already tearing the MediaCodec down, and the thread died with
+           "queueInputBuffer() is valid only at Executing states; currently
+           during stop()". Clearing `running` is not enough on its own — the
+           thread can be blocked inside a 3200-byte read at that moment and
+           feeds one more buffer after it returns. Stopping the microphone
+           first unblocks that read, and the join makes the ordering certain. */
         runCatching { audioRecord?.stop() }
+        runCatching { capture?.join(1_500) }
+        capture = null
         runCatching { audioRecord?.release() }; audioRecord = null
         drainEncoder(endOfStream = true)
         runCatching { codec?.stop() }; runCatching { codec?.release() }; codec = null
@@ -111,6 +123,8 @@ class SermonCaptureEngine(
     }
 
     private fun feedEncoder(bytes: ByteArray, count: Int) {
+        // the encoder is gone the moment stop() runs; never queue into it after
+        if (!running.get()) return
         var offset = 0
         while (offset < count) {
             val index = codec?.dequeueInputBuffer(10_000) ?: -1

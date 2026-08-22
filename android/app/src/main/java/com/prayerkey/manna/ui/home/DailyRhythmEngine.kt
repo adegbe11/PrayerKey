@@ -32,16 +32,14 @@ import java.util.Locale
 @Composable
 internal fun DailyRhythmExperience(moment: String, onClose: () -> Unit, onComplete: () -> Unit) {
     val today = remember { LocalDate.now() }
-    val devotional = remember(today) { devotionalFor(today) }
     val passage = remember(today) { passageFor(today) }
-    DailyRhythmPage(moment, today, devotional, passage, onClose, onComplete)
+    DailyRhythmPage(moment, today, passage, onClose, onComplete)
 }
 
 @Composable
 private fun DailyRhythmPage(
     moment: String,
     date: LocalDate,
-    devotional: DailyDevotional,
     passage: DailyPassage,
     onClose: () -> Unit,
     onComplete: () -> Unit,
@@ -81,29 +79,12 @@ private fun DailyRhythmPage(
                         RhythmHeading("PRAY FOR TODAY")
                         Text(prayer.prayer, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 29.sp, color = Pk.Charcoal)
                     }
-                    "devotional" -> {
-                        ScriptureBlock(devotional.reference, devotional.opening)
-                        RhythmHeading("TODAY'S MESSAGE")
-                        devotional.reading.forEach { paragraph ->
-                            Text(paragraph, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 29.sp, color = Pk.Charcoal, modifier = Modifier.padding(bottom = 14.dp))
-                        }
-                        RhythmHeading("PRAY")
-                        Text(devotional.prayer, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 19.sp, lineHeight = 29.sp, color = Pk.Charcoal)
-                        RhythmHeading("LIVE IT")
-                        Text(devotional.practice, fontFamily = DisplaySerif, fontSize = 22.sp, lineHeight = 29.sp, color = Pk.Charcoal)
-                    }
-                    "bible" -> {
-                        ScriptureBlock(passage.reference, "Read the whole chapter slowly. Notice one sentence you want to carry into the day.")
-                        verses.forEach { verse ->
-                            Text("${verse.verse}  ${verse.text}", fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 30.sp, color = Pk.Charcoal, modifier = Modifier.padding(top = 12.dp))
-                        }
-                    }
                     "reflection" -> {
-                        ScriptureBlock(devotional.reference, devotional.opening)
+                        ScriptureBlock(passage.reference, passage.introduction)
                         RhythmHeading("PRAYER FOR UNDERSTANDING")
                         Text("Father, search my heart in the light of Your Word. Correct what is wrong in me, strengthen what is weak, and give me grace to obey what You reveal. Let Your truth shape my thoughts, my words, and my decisions today. In Jesus' name, Amen.", fontFamily = DisplaySerif, fontSize = 22.sp, lineHeight = 31.sp, color = Pk.Charcoal)
                         RhythmHeading("PERSONAL PRAYER")
-                        Text("Lord, concerning this word—${devotional.reflectionQuestion.trimEnd('?', '.')}—give me understanding and lead me in the way that pleases You. In Jesus' name, Amen.", fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 28.sp, color = Pk.Charcoal)
+                        Text("Lord, concerning ${passage.reference}—show me what You are saying and lead me in the way that pleases You. In Jesus' name, Amen.", fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 28.sp, color = Pk.Charcoal)
                         RhythmNote(note) { note = it; prefs.edit().putString("${date}_$moment", it).apply() }
                     }
                     else -> {

@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.Challenge
 import com.prayerkey.manna.data.Devotion
-import com.prayerkey.manna.data.devotionalFor
 import com.prayerkey.manna.data.passageFor
 import com.prayerkey.manna.R
 import com.prayerkey.manna.model.VerseCard
@@ -79,7 +78,6 @@ fun PrayerKeyOperatingHome(
     onInitialActionConsumed: () -> Unit = {},
 ) {
     val today = remember { LocalDate.now() }
-    val dailyDevotional = remember(today) { devotionalFor(today) }
     val dailyPassage = remember(today) { passageFor(today) }
     var devotionalOpen by rememberSaveable { mutableStateOf(false) }
     var topicalBibleOpen by rememberSaveable { mutableStateOf(false) }
@@ -238,7 +236,7 @@ fun PrayerKeyOperatingHome(
             church = onOpenChurch,
             open = go,
         )
-        HeroRail(written?.title ?: dailyDevotional.title) { devotionalOpen = true }
+        HeroRail(written?.title.orEmpty()) { devotionalOpen = true }
 
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
             TodayRhythmPanel(
