@@ -72,7 +72,6 @@ class SermonCaptureEngine(
         runCatching { recognizer?.close() }; recognizer = null
         runCatching { model?.close() }; model = null
         SermonSessionStore.write(audioFile, startedAt, "complete", segments)
-        SermonUploadWorker.enqueue(app, SermonSessionStore.metadataFor(audioFile).absolutePath)
         onStatus("Recording saved")
     }
 

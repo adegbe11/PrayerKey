@@ -970,7 +970,12 @@ private fun clockLabel(millis: Long): String =
 private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: () -> Unit) {
     androidx.compose.material3.ModalBottomSheet(onDismissRequest = onClose, containerColor = Canvas) {
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 30.dp)) {
-            Text("What language is the service in?", fontFamily = BookSerif, fontSize = 24.sp)
+            Text("Where is the service?", fontFamily = BookSerif, fontSize = 24.sp)
+            Text(
+                "Captions are English only for now. Choosing your region does not " +
+                    "change the listening — it tells the notes which turns of phrase to expect.",
+                fontSize = 13.sp, color = Muted, modifier = Modifier.padding(top = 6.dp, bottom = 14.dp),
+            )
             androidx.compose.foundation.lazy.LazyColumn(
                 Modifier.heightIn(max = 420.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),

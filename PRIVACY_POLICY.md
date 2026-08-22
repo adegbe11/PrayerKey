@@ -1,6 +1,6 @@
 # PrayerKey Privacy Policy
 
-Last updated: August 19, 2026
+Last updated: August 22, 2026
 
 PrayerKey is designed for private prayer, Bible reading, journaling, fasting, and church notes.
 
@@ -11,6 +11,20 @@ Prayer requests, journal entries, saved Scripture, challenge progress, reminder 
 ## Microphone
 
 Microphone access is used only when the user starts sermon capture or another voice feature. PrayerKey does not activate the microphone without a user action. Android displays a foreground-service notification while long-form sermon capture is active.
+
+## Sermon recordings and captions
+
+Sermon capture writes an audio file and a transcript to PrayerKey's private
+storage on the device. Neither is uploaded. Captions are produced by a speech
+model that runs entirely on the device, so no audio is sent anywhere to be
+transcribed, and capture works with no internet connection.
+
+The speech model itself is downloaded once, on request, from the Vosk project's
+public model host. That download carries no personal information — it is the
+same file for every user, and the app asks before fetching it.
+
+Recordings stay until deleted. Deleting a sermon note deletes its audio with it,
+and uninstalling PrayerKey removes both.
 
 ## Notifications
 

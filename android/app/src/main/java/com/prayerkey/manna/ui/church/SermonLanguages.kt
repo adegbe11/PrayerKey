@@ -1,13 +1,22 @@
 package com.prayerkey.manna.ui.church
 
 /**
- * Languages the service can be captured in.
+ * The Englishes the service can be captured in.
  *
- * The recogniser is the device's own, so the real limit is which packs the
- * phone has installed — Android ships a lot and downloads more on demand.
- * [SermonArranger.hasCuesFor] says which of these also get the sharper,
- * signpost-aware arranging; the rest still get a full transcript, the
- * scriptures and a note built from the language-agnostic core.
+ * This list held 31 languages — Yorùbá, Hausa, Español, 中文 and the rest —
+ * and none of them worked. Captions come from the bundled Vosk model, which
+ * is an English model; `SermonService.setLanguage` writes to a flow the
+ * capture path never reads, so choosing Igbo produced English guesses at Igbo
+ * speech. A picker that silently does nothing is worse than no picker, and a
+ * church whose service is not in English would have found that out in the
+ * middle of a sermon.
+ *
+ * What is left is true. One model decodes all of these — the accents differ,
+ * the language does not — and the tag still tells [SermonArranger] which
+ * signposts to look for when it builds the note.
+ *
+ * The other languages come back when a model for them ships, and not before.
+ * sherpa-onnx has them; that is the migration this is waiting on.
  */
 data class SermonLanguage(val tag: String, val label: String)
 
@@ -17,32 +26,12 @@ val SERMON_LANGUAGES = listOf(
     SermonLanguage("en-NG", "English (Nigeria)"),
     SermonLanguage("en-ZA", "English (South Africa)"),
     SermonLanguage("en-IN", "English (India)"),
-    SermonLanguage("es-ES", "Español"),
-    SermonLanguage("es-MX", "Español (México)"),
-    SermonLanguage("pt-BR", "Português (Brasil)"),
-    SermonLanguage("fr-FR", "Français"),
-    SermonLanguage("de-DE", "Deutsch"),
-    SermonLanguage("it-IT", "Italiano"),
-    SermonLanguage("nl-NL", "Nederlands"),
-    SermonLanguage("pl-PL", "Polski"),
-    SermonLanguage("ro-RO", "Română"),
-    SermonLanguage("ru-RU", "Русский"),
-    SermonLanguage("uk-UA", "Українська"),
-    SermonLanguage("sw-KE", "Kiswahili"),
-    SermonLanguage("am-ET", "አማርኛ"),
-    SermonLanguage("yo-NG", "Yorùbá"),
-    SermonLanguage("ig-NG", "Igbo"),
-    SermonLanguage("ha-NG", "Hausa"),
-    SermonLanguage("zu-ZA", "isiZulu"),
-    SermonLanguage("af-ZA", "Afrikaans"),
-    SermonLanguage("hi-IN", "हिन्दी"),
-    SermonLanguage("ta-IN", "தமிழ்"),
-    SermonLanguage("ml-IN", "മലയാളം"),
-    SermonLanguage("tl-PH", "Filipino"),
-    SermonLanguage("id-ID", "Bahasa Indonesia"),
-    SermonLanguage("ko-KR", "한국어"),
-    SermonLanguage("zh-CN", "中文"),
-    SermonLanguage("ar-EG", "العربية"),
+    SermonLanguage("en-GH", "English (Ghana)"),
+    SermonLanguage("en-KE", "English (Kenya)"),
+    SermonLanguage("en-CA", "English (Canada)"),
+    SermonLanguage("en-AU", "English (Australia)"),
+    SermonLanguage("en-PH", "English (Philippines)"),
+    SermonLanguage("en-CB", "English (Caribbean)"),
 )
 
 fun sermonLanguageLabel(tag: String): String =

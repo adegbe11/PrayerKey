@@ -366,8 +366,28 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         }
     }
 
+    /**
+     * Deletes the note and the recording it was made from.
+     *
+     * The row used to be the only thing removed, so every deleted sermon left
+     * its .m4a and metadata sitting in private storage — invisible, unplayable,
+     * and permanent. An hour of service is several megabytes; a year of Sundays
+     * is a phone quietly filling up with audio the user believes they deleted.
+     *
+     * The path is read before the row goes, because afterwards there is no way
+     * left to find the file.
+     */
     fun deleteSermonNote(id: Long) {
+        val audio = readableDatabase.query(
+            "sermon_notes", arrayOf("audio_path"), "id = ?",
+            arrayOf(id.toString()), null, null, null,
+        ).use { if (it.moveToFirst()) it.getString(0).orEmpty() else "" }
         writableDatabase.delete("sermon_notes", "id = ?", arrayOf(id.toString()))
+        if (audio.isBlank()) return
+        val file = java.io.File(audio)
+        runCatching { file.delete() }
+        // the transcript written beside it, same stem
+        runCatching { java.io.File(file.parentFile, file.nameWithoutExtension + ".json").delete() }
     }
 
     fun addJournalEntry(

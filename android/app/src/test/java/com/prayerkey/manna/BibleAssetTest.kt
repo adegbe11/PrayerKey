@@ -80,20 +80,38 @@ class BibleAssetTest {
     }
 
     /**
-     * The KJV has 31,102 verses. This asset has 31,101.
+     * The KJV has 31,102 verses, and so does this asset.
      *
-     * One verse is still missing and I have not located it — the spot checks
-     * above all pass, so it is in a chapter whose length I cannot verify from
-     * memory, and guessing at scripture is not acceptable. The assertion is
-     * pinned at the real number so the gap stays visible rather than being
-     * quietly forgotten, and it will fail the moment the last verse is
-     * restored, which is the point at which it should be changed to 31_102.
+     * It was short by one for a long time and I could not find it by spot
+     * check, because a missing verse leaves no gap: verses are stored as a
+     * positional array, so losing one silently renumbers every verse after it
+     * for the rest of the chapter. Mark 7 had been running one low since 7:12
+     * without anything looking wrong.
+     *
+     * It was found by diffing this asset against the web app's copy and then
+     * against the published per-book totals: Mark 7:11 — the Corban saying —
+     * was absent, which is why 7:12 opens mid-argument with "And ye suffer him
+     * no more" and no statement of what "ye say".
+     *
+     * Pinned exactly. A count that drifts in either direction is a corrupted
+     * Bible, and this is the cheapest possible way to notice.
      */
     @Test
-    fun `the known verse shortfall has not grown`() {
+    fun `the asset holds the whole KJV`() {
         val total = books.values.sumOf { chapters -> chapters.sum() }
-        assertEquals("the asset lost or gained verses", 31_101, total)
-        assertTrue("still one short of the KJV's 31,102", total < 31_102)
+        assertEquals("the asset lost or gained verses", 31_102, total)
+    }
+
+    /** The verse whose absence renumbered the rest of Mark 7. */
+    @Test
+    fun `Mark 7 verse 11 is the Corban saying`() {
+        val root = JSONArray(File("src/main/assets/kjv.json").readText())
+        val mark = (0 until root.length()).map { root.getJSONObject(it) }
+            .first { it.getString("name") == "Mark" }
+        val chapter = mark.getJSONArray("chapters").getJSONArray(6)
+        assertEquals(37, chapter.length())
+        assertTrue(chapter.getString(10), chapter.getString(10).contains("Corban"))
+        assertTrue(chapter.getString(11).startsWith("And ye suffer him no more"))
     }
 
     @Test
