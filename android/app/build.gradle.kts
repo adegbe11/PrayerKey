@@ -15,10 +15,6 @@ android {
         versionCode = 17
         versionName = "3.0.0"
 
-        val sermonSocketUrl = providers.gradleProperty("SERMON_SOCKET_URL")
-            .orElse(providers.environmentVariable("SERMON_SOCKET_URL"))
-            .orElse("https://www.prayerkey.com")
-        buildConfigField("String", "SERMON_SOCKET_URL", "\"${sermonSocketUrl.get()}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -115,9 +111,6 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("io.socket:socket.io-client:2.1.1") {
-        exclude(group = "org.json", module = "json")
-    }
     implementation("com.alphacephei:vosk-android:0.3.47")
 
     /* sherpa-onnx, for punctuation. Not on Maven Central — the project ships

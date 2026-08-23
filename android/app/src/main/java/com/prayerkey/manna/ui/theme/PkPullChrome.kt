@@ -284,8 +284,12 @@ fun PullCoach(text: String, modifier: Modifier = Modifier) {
 
     Text(
         text.uppercase(),
-        color = Pk.Cream.copy(alpha = .5f),
+        color = Pk.Charcoal.copy(alpha = .82f),
         style = PkText.Meta.copy(fontSize = 10.sp, letterSpacing = 2.sp),
-        modifier = modifier.graphicsLayer { this.alpha = alpha.value },
+        modifier = modifier
+            .graphicsLayer { this.alpha = alpha.value }
+            .clip(RoundedCornerShape(99.dp))
+            .background(Pk.Cream.copy(alpha = .88f))
+            .padding(horizontal = 14.dp, vertical = 7.dp),
     )
 }

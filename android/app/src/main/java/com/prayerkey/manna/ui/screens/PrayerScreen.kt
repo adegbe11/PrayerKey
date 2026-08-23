@@ -112,6 +112,37 @@ fun PrayerScreen(
                             loading = false
                         }
                     }
+                    Text(
+                        "You can begin with one honest sentence. Your words stay private unless you choose to keep the prayer.",
+                        Modifier.padding(top = 20.dp),
+                        color = PrayMuted,
+                        fontFamily = UtilitySans,
+                        fontSize = 13.sp,
+                        lineHeight = 20.sp,
+                    )
+                    Text(
+                        "BEGIN WITH",
+                        Modifier.padding(top = 28.dp, bottom = 10.dp),
+                        color = PrayMuted, fontFamily = UtilitySans,
+                        fontSize = 10.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold,
+                    )
+                    Row(
+                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(9.dp),
+                    ) {
+                        listOf("My family", "Healing", "A decision", "Peace today").forEach { prompt ->
+                            Surface(
+                                onClick = { request = "Please help me pray for ${prompt.lowercase()}." },
+                                shape = RoundedCornerShape(99.dp), color = PrayPanel,
+                                border = BorderStroke(1.dp, PrayLine),
+                            ) {
+                                Text(
+                                    prompt, Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                                    color = PrayInk, fontSize = 12.sp, fontWeight = FontWeight.Medium,
+                                )
+                            }
+                        }
+                    }
                     error?.let { Text(it, Modifier.padding(top = 12.dp), color = Color(0xFFFF9B9B), fontSize = 12.sp) }
                     if (journal.isNotEmpty()) {
                         Text("PRAYERS YOU KEPT", Modifier.padding(top = 31.dp, bottom = 10.dp), color = PrayMuted, fontSize = 10.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold)

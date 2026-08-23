@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -503,10 +504,46 @@ private fun JournalOverview(
                         Text("WRITE TODAY", color = violet, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = .9.sp, modifier = Modifier.padding(start = 8.dp))
                     }
                 }
+                if (entries.isEmpty()) {
+                    Text(
+                        "A quiet place for prayers, gratitude, questions, and the moments you do not want to lose.",
+                        color = Color.White.copy(alpha = .76f),
+                        fontFamily = UtilitySans,
+                        fontSize = 12.5.sp,
+                        lineHeight = 19.sp,
+                        modifier = Modifier.padding(top = 18.dp),
+                    )
+                }
             }
         }
 
-        if (entries.isEmpty()) return@Column
+        if (entries.isEmpty()) {
+            Text(
+                "A SMALL BEGINNING",
+                color = muted, fontFamily = UtilitySans, fontWeight = FontWeight.Bold,
+                fontSize = 10.sp, letterSpacing = 1.4.sp,
+                modifier = Modifier.padding(top = 24.dp, bottom = 10.dp),
+            )
+            listOf(
+                "One thing I am grateful for today",
+                "A prayer I do not want to forget",
+                "What God may be teaching me",
+            ).forEach { prompt ->
+                Surface(
+                    onClick = onWrite,
+                    shape = RoundedCornerShape(18.dp), color = Color.White,
+                    border = BorderStroke(1.dp, violet.copy(alpha = .12f)),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                ) {
+                    Row(Modifier.padding(horizontal = 15.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.EditNote, null, tint = violet, modifier = Modifier.size(19.dp))
+                        Text(prompt, Modifier.weight(1f).padding(start = 11.dp), color = ink, fontSize = 12.5.sp)
+                        Icon(Icons.Outlined.ChevronRight, null, tint = muted, modifier = Modifier.size(17.dp))
+                    }
+                }
+            }
+            return@Column
+        }
 
         Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {

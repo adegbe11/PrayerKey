@@ -138,6 +138,7 @@ class SermonService : Service() {
             .setContentTitle("Taking your notes")
             .setContentText(if (caught == 0) "Listening for scripture" else "$caught scriptures caught")
             .setSmallIcon(R.drawable.ic_notification)
+            .setColor(0xFF6200ED.toInt())
             .setContentIntent(open)
             .setOngoing(true)
             .setUsesChronometer(true)

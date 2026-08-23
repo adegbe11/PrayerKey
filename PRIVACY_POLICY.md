@@ -30,13 +30,31 @@ and uninstalling PrayerKey removes both.
 
 Notifications are optional. Users can decline them during onboarding or disable them in PrayerKey or Android settings. Notification taps may open the relevant Bible, prayer, devotional, journal, fasting, or church screen.
 
-## Network access
+## What is sent to PrayerKey's servers
 
-Some Bible, prayer, and church features may use PrayerKey services when an internet connection is available. Core Bible reading, bundled prayers, and local journal data remain available offline. Network providers may process technical connection information under their own policies.
+Most of PrayerKey works with no internet connection at all. The Bible, the
+devotionals, the bundled prayers, the journal, fasting, reminders and sermon
+capture are entirely on the device.
+
+Three things are sent, and only when the user asks for them:
+
+- **Written prayer requests.** When a prayer is generated from something the
+  user has typed, that text and any moods selected are sent to PrayerKey to
+  produce the prayer. This text can be personal. It is used to answer that one
+  request and is not used to build a profile, and it is not sold.
+- **Bible searches.** Search words are sent so results can be returned.
+- **Verse lookups in translations other than the bundled King James Version.**
+  These go to the third-party service bible-api.com, which receives the verse
+  reference being looked up and nothing else.
+
+Nothing is sent automatically and nothing is sent in the background. No audio,
+no journal entry, no saved prayer and no sermon note ever leaves the device.
+Network providers may process technical connection information under their own
+policies.
 
 ## Data sharing and exports
 
-PrayerKey shares content only when the user chooses an Android share or export action. Exported files leave PrayerKey's private storage and are controlled by the destination selected by the user.
+Beyond the requests described above, PrayerKey shares content only when the user chooses an Android share or export action. Exported files leave PrayerKey's private storage and are controlled by the destination selected by the user.
 
 ## Deletion
 

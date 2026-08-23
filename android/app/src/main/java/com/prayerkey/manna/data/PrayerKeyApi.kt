@@ -90,11 +90,6 @@ object PrayerKeyApi {
         )
     }
 
-    suspend fun detectVerse(transcript: String): DetectedVerse = withContext(Dispatchers.IO) {
-        val json = request("/api/detect-verses", "POST", JSONObject().put("transcript", transcript))
-        DetectedVerse(json.optBoolean("detected"), json.optString("ref"), json.optString("text"), json.optDouble("confidence"))
-    }
-
     suspend fun prayerTopics(): List<PrayerTopic> = withContext(Dispatchers.IO) {
         val topics = request("/api/prayer/topics", "GET").getJSONArray("topics")
         buildList {

@@ -391,7 +391,7 @@ private fun ReadyView(
     onStart: () -> Unit,
 ) {
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+        Modifier.fillMaxSize().statusBarsPadding().verticalScroll(rememberScrollState())
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 120.dp),
     ) {
         val cs = MaterialTheme.colorScheme
@@ -464,6 +464,24 @@ private fun ReadyView(
                     modifier = Modifier.padding(top = 14.dp),
                 )
             }
+        }
+
+        if (notes.isEmpty()) {
+            Text(
+                "Listen without losing the moment",
+                color = cs.onBackground,
+                fontFamily = DisplaySerif,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 30.dp),
+            )
+            Text(
+                "PrayerKey records the message, follows the transcript, and gathers every scripture reference into one sermon note.",
+                color = cs.onBackground.copy(alpha = .62f),
+                fontSize = 13.5.sp,
+                lineHeight = 20.sp,
+                modifier = Modifier.padding(top = 8.dp),
+            )
         }
 
         if (notes.isNotEmpty()) {

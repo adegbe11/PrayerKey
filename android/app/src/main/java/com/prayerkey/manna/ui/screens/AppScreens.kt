@@ -1194,6 +1194,7 @@ fun ProfileScreen(
     androidx.activity.compose.BackHandler(onBack = onBack)
     val context = LocalContext.current
     var confirmRestore by remember { mutableStateOf(false) }
+    var showAbout by remember { mutableStateOf(false) }
     val restoreArchive = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
             runCatching { context.contentResolver.openInputStream(it)?.bufferedReader()?.use { reader -> reader.readText() } }
@@ -1248,13 +1249,19 @@ fun ProfileScreen(
                 }
             }
         }
-        SettingRow("Reduce motion", if (prefs.reduceMotion) "On" else "Off") {
+        SettingRow("Reduce motion", if (prefs.reduceMotion) "On" else "Off", onClick = {
+            onUpdate(prefs.copy(reduceMotion = !prefs.reduceMotion))
+        }) {
             Switch(prefs.reduceMotion, onCheckedChange = { onUpdate(prefs.copy(reduceMotion = it)) })
         }
-        SettingRow("Lock journal", "Use your device lock") {
+        SettingRow("Lock journal", "Use your device lock", onClick = {
+            onUpdate(prefs.copy(journalLock = !prefs.journalLock))
+        }) {
             Switch(prefs.journalLock, onCheckedChange = { onUpdate(prefs.copy(journalLock = it)) })
         }
-        SettingRow("Hide journal previews", "Keep private writing hidden") {
+        SettingRow("Hide journal previews", "Keep private writing hidden", onClick = {
+            onUpdate(prefs.copy(concealJournalPreviews = !prefs.concealJournalPreviews))
+        }) {
             Switch(prefs.concealJournalPreviews, onCheckedChange = { onUpdate(prefs.copy(concealJournalPreviews = it)) })
         }
         SettingRow("Offline voices", "Manage Bible and prayer voices", onClick = {
@@ -1270,7 +1277,9 @@ fun ProfileScreen(
         SettingRow("Restore my data", "Choose a saved backup", onClick = { confirmRestore = true }) {
             Icon(Icons.Outlined.Restore, null, tint = Muted)
         }
-        SettingRow("About PrayerKey", "Free · No ads") { Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted) }
+        SettingRow("About PrayerKey", "Free · No ads", onClick = { showAbout = true }) {
+            Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted)
+        }
     }
     }
     if (confirmRestore) AlertDialog(
@@ -1279,6 +1288,18 @@ fun ProfileScreen(
         text = { Text("This replaces the current Journey, prayers, sermon notes, saved words, and memory progress on this device. Export the current archive first if you may need it.") },
         confirmButton = { TextButton(onClick = { confirmRestore = false; restoreArchive.launch(arrayOf("application/json", "text/plain")) }) { Text("Choose archive") } },
         dismissButton = { TextButton(onClick = { confirmRestore = false }) { Text("Cancel") } },
+    )
+    if (showAbout) AlertDialog(
+        onDismissRequest = { showAbout = false },
+        icon = { Icon(Icons.Outlined.AutoStories, null, tint = Pk.Oxblood) },
+        title = { Text("PrayerKey", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold) },
+        text = {
+            Text(
+                "A private daily place for Scripture, prayer, church notes, and remembrance. PrayerKey is free, has no ads, and keeps your personal journey on this device.",
+                color = Pk.Muted, lineHeight = 21.sp,
+            )
+        },
+        confirmButton = { TextButton(onClick = { showAbout = false }) { Text("Done") } },
     )
 }
 

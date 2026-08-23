@@ -24,12 +24,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import android.content.Intent
 import android.Manifest
 import android.content.pm.PackageManager
@@ -103,6 +105,17 @@ fun MannaApp(
     var homeAction by remember { mutableStateOf<String?>(null) }
     var verseIndex by remember { mutableIntStateOf(0) }
     var showProfile by remember { androidx.compose.runtime.mutableStateOf(false) }
+    val rootView = LocalView.current
+    SideEffect {
+        val window = (rootView.context as? android.app.Activity)?.window
+        val lightSystemChrome = selected != 1
+        window?.let {
+            androidx.core.view.WindowCompat.getInsetsController(it, rootView).apply {
+                isAppearanceLightStatusBars = lightSystemChrome
+                isAppearanceLightNavigationBars = lightSystemChrome
+            }
+        }
+    }
     LaunchedEffect(notificationRoute, hydrated, preferences.onboarded) {
         if (!hydrated || !preferences.onboarded || notificationRoute == null) return@LaunchedEffect
         when (notificationRoute) {
@@ -181,6 +194,9 @@ fun MannaApp(
     ) {
         Box(
             Modifier.fillMaxSize()
+                .padding(
+                    bottom = if (hydrated && preferences.onboarded && !showProfile) 88.dp else 0.dp,
+                )
                 .glassSource(backdrop),
         ) {
             if (!hydrated) {
@@ -335,7 +351,11 @@ fun MannaApp(
                 com.prayerkey.manna.ui.components.MannaDock(
                     items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon) },
                     selected = selected,
-                    backdrop = backdrop,
+                    // The sampled backdrop could retain a stale crop while
+                    // switching tabs, which visibly pushed dock items off the
+                    // sides on Pray and Journal. The dock already owns a
+                    // translucent theme fill, so keep its geometry stable.
+                    backdrop = null,
                     onSelect = { selected = it },
                 )
             }

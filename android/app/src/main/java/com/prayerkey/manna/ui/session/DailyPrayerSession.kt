@@ -12,6 +12,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -35,6 +37,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -57,6 +61,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -66,6 +72,7 @@ import com.prayerkey.manna.data.PrayerPulls
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
+import com.prayerkey.manna.R
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -135,14 +142,86 @@ fun DailyBibleSession(
  */
 @Composable
 fun PullSessionLoading(title: String) {
-    Box(Modifier.fillMaxSize().background(nightBrush()), contentAlignment = Alignment.Center) {
-        Text(
-            title.uppercase(),
-            fontFamily = UtilitySans,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 3.sp,
-            color = Color.White.copy(alpha = .5f),
+    val reveal = remember { Animatable(1f) }
+    val light = remember { Animatable(.35f) }
+    LaunchedEffect(Unit) {
+        launch { reveal.animateTo(1.06f, tween(4800)) }
+        launch { light.animateTo(.78f, tween(1800)) }
+    }
+
+    Box(Modifier.fillMaxSize().background(Pk.DeepDark)) {
+        Image(
+            painterResource(R.drawable.verse_card_dawn),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize().graphicsLayer {
+                scaleX = reveal.value
+                scaleY = reveal.value
+            },
+            contentScale = ContentScale.Crop,
+        )
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    listOf(
+                        Pk.DeepDark.copy(alpha = .42f),
+                        Pk.VioletDeep.copy(alpha = .12f),
+                        Pk.DeepDark.copy(alpha = .74f),
+                    ),
+                ),
+            ),
+        )
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.radialGradient(
+                    colors = listOf(Pk.GoldLight.copy(alpha = light.value * .22f), Color.Transparent),
+                    center = Offset(180f, 310f),
+                    radius = 720f,
+                ),
+            ),
+        )
+
+        Column(
+            Modifier.align(Alignment.Center).fillMaxWidth().padding(horizontal = 38.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                "THE WORD IS OPENING",
+                fontFamily = UtilitySans,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 3.2.sp,
+                color = Pk.GoldLight,
+            )
+            Spacer(Modifier.height(18.dp))
+            Text(
+                title,
+                fontFamily = DisplaySerif,
+                fontSize = 43.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(20.dp))
+            Box(
+                Modifier.width(52.dp).height(2.dp)
+                    .background(Pk.GoldLight.copy(alpha = .72f), RoundedCornerShape(99.dp)),
+            )
+            Spacer(Modifier.height(18.dp))
+            Text(
+                "Preparing today’s chapter",
+                fontFamily = UtilitySans,
+                fontSize = 12.sp,
+                letterSpacing = .5.sp,
+                color = Color.White.copy(alpha = .72f),
+            )
+        }
+
+        LinearProgressIndicator(
+            modifier = Modifier.align(Alignment.BottomCenter)
+                .navigationBarsPadding().padding(horizontal = 74.dp, vertical = 42.dp)
+                .fillMaxWidth().height(2.dp).clip(RoundedCornerShape(99.dp)),
+            color = Pk.GoldLight,
+            trackColor = Color.White.copy(alpha = .18f),
         )
     }
 }
@@ -172,6 +251,7 @@ fun PullSession(
 ) {
     val movements = items
     if (movements.isEmpty()) return
+    val isBible = verb == "read"
 
     val view = LocalView.current
     val density = LocalDensity.current
@@ -213,9 +293,15 @@ fun PullSession(
         index--
     }
 
-    Box(Modifier.fillMaxSize().background(nightBrush())) {
+    Box(Modifier.fillMaxSize().background(Pk.DeepDark)) {
+        SessionGround(isBible)
         if (done) {
-            SessionComplete(title, headline, closing, onClose = onClose, again = { index = 0; done = false })
+            SessionComplete(
+                title, headline, closing,
+                isBible = isBible,
+                onClose = onClose,
+                again = { index = 0; done = false },
+            )
             return@Box
         }
 
@@ -262,7 +348,8 @@ fun PullSession(
             movements.getOrNull(index + 1)?.let { next ->
                 PullBody(
                     next,
-                    Modifier.fillMaxSize().graphicsLayer {
+                    isBible = isBible,
+                    modifier = Modifier.fillMaxSize().graphicsLayer {
                         val grow = .94f + (.06f * pull)
                         scaleX = grow; scaleY = grow; alpha = pull * pull
                     },
@@ -271,7 +358,8 @@ fun PullSession(
 
             PullBody(
                 movements[index],
-                Modifier.fillMaxSize().graphicsLayer {
+                isBible = isBible,
+                modifier = Modifier.fillMaxSize().graphicsLayer {
                     translationY = offset
                     alpha = 1f - (pull * .35f)
                 },
@@ -283,34 +371,52 @@ fun PullSession(
             at = index,
             total = movements.size,
             pull = pull,
+            isBible = isBible,
             onClose = onClose,
         )
 
-        PullHint(index + 1, movements.size, verb, pull, Modifier.align(Alignment.BottomCenter))
+        PullHint(index + 1, movements.size, verb, pull, isBible, Modifier.align(Alignment.BottomCenter))
     }
 }
 
 /** The one movement being prayed. Nothing on this layer but words. */
 @Composable
-private fun PullBody(movement: PullItem, modifier: Modifier) {
-    Box(modifier.padding(horizontal = 30.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.Start) {
+private fun PullBody(movement: PullItem, isBible: Boolean, modifier: Modifier) {
+    Box(modifier, contentAlignment = Alignment.Center) {
+        Column(
+            Modifier.fillMaxWidth().padding(
+                start = if (isBible) 54.dp else 30.dp,
+                end = if (isBible) 54.dp else 30.dp,
+                top = if (isBible) 185.dp else 190.dp,
+                bottom = if (isBible) 245.dp else 230.dp,
+            ),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            if (isBible) {
+                Box(
+                    Modifier.width(42.dp).height(3.dp)
+                        .clip(RoundedCornerShape(99.dp))
+                        .background(Pk.GoldDeep.copy(alpha = .62f)),
+                )
+                Spacer(Modifier.height(20.dp))
+            }
             Text(
                 movement.label,
                 fontFamily = UtilitySans,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 3.2.sp,
-                color = Pk.GoldLight.copy(alpha = .85f),
+                color = if (isBible) Pk.Oxblood else Pk.GoldLight,
             )
             Spacer(Modifier.height(20.dp))
             Text(
                 movement.text,
                 fontFamily = DisplaySerif,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = if (movement.text.length > 190) 25.sp else 30.sp,
-                lineHeight = if (movement.text.length > 190) 36.sp else 42.sp,
-                color = Color.White,
+                fontSize = if (movement.text.length > 190) 23.sp else 29.sp,
+                lineHeight = if (movement.text.length > 190) 33.sp else 40.sp,
+                color = if (isBible) Pk.Charcoal else Color.White,
             )
             movement.reference?.let { ref ->
                 Spacer(Modifier.height(22.dp))
@@ -320,10 +426,53 @@ private fun PullBody(movement: PullItem, modifier: Modifier) {
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
                     letterSpacing = 2.4.sp,
-                    color = Color.White.copy(alpha = .58f),
+                    color = if (isBible) Pk.Oxblood.copy(alpha = .72f) else Color.White.copy(alpha = .66f),
+                )
+            }
+            if (isBible) {
+                Spacer(Modifier.height(24.dp))
+                Box(
+                    Modifier.fillMaxWidth().height(1.dp)
+                        .background(Pk.GoldDeep.copy(alpha = .18f)),
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SessionGround(isBible: Boolean) {
+    Image(
+        painterResource(if (isBible) R.drawable.verse_card_botanical else R.drawable.today_prayer_violet),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop,
+    )
+    if (isBible) {
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    listOf(
+                        Pk.DeepDark.copy(alpha = .68f),
+                        Color.Transparent,
+                        Color.Transparent,
+                        Pk.DeepDark.copy(alpha = .52f),
+                    ),
+                ),
+            ),
+        )
+    } else {
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    listOf(
+                        Pk.DeepDark.copy(alpha = .56f),
+                        Pk.DeepDark.copy(alpha = .18f),
+                        Pk.DeepDark.copy(alpha = .70f),
+                    ),
+                ),
+            ),
+        )
     }
 }
 
@@ -334,6 +483,7 @@ private fun SessionChrome(
     at: Int,
     total: Int,
     pull: Float,
+    isBible: Boolean,
     onClose: () -> Unit,
 ) {
     Column(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 18.dp)) {
@@ -372,7 +522,11 @@ private fun SessionChrome(
                 Modifier
                     .size(34.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = .12f))
+                    .background(if (isBible) Pk.VioletDeep.copy(alpha = .92f) else Color.White.copy(alpha = .12f))
+                    .then(
+                        if (isBible) Modifier.border(1.dp, Pk.GoldLight.copy(alpha = .54f), CircleShape)
+                        else Modifier
+                    )
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
@@ -401,42 +555,111 @@ private fun SessionChrome(
  * the gesture has been learned and a permanent hint is just furniture.
  */
 @Composable
-private fun PullHint(at: Int, total: Int, verb: String, pull: Float, modifier: Modifier) {
+private fun PullHint(at: Int, total: Int, verb: String, pull: Float, isBible: Boolean, modifier: Modifier) {
     Column(
-        modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 34.dp),
+        modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if (at <= 2) {
-            Icon(
-                Icons.Outlined.KeyboardArrowDown, null,
-                tint = Color.White.copy(alpha = .5f - (pull * .5f)),
-                modifier = Modifier.size(22.dp).graphicsLayer { translationY = pull * 14f },
-            )
-            Spacer(Modifier.height(2.dp))
+        if (isBible) {
+            Column(
+                Modifier
+                    .shadow(12.dp, RoundedCornerShape(22.dp), spotColor = Color.Black.copy(alpha = .28f))
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(Pk.VioletDeep.copy(alpha = .94f))
+                    .border(1.dp, Pk.GoldLight.copy(alpha = .32f), RoundedCornerShape(22.dp))
+                    .padding(horizontal = 22.dp, vertical = 11.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (at <= 2) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Outlined.KeyboardArrowDown, null,
+                            tint = Pk.GoldLight.copy(alpha = 1f - pull),
+                            modifier = Modifier.size(18.dp).graphicsLayer { translationY = pull * 10f },
+                        )
+                        Spacer(Modifier.width(7.dp))
+                        Text(
+                            "Pull down when you have $verb it",
+                            fontFamily = UtilitySans,
+                            fontSize = 11.sp,
+                            color = Color.White.copy(alpha = .88f - (pull * .5f)),
+                        )
+                    }
+                    Spacer(Modifier.height(5.dp))
+                }
+                Text(
+                    "$at  /  $total",
+                    fontFamily = UtilitySans,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.8.sp,
+                    color = Pk.GoldLight,
+                )
+            }
+        } else {
+            if (at <= 2) {
+                Icon(
+                    Icons.Outlined.KeyboardArrowDown, null,
+                    tint = Color.White.copy(alpha = .5f - (pull * .5f)),
+                    modifier = Modifier.size(22.dp).graphicsLayer { translationY = pull * 14f },
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "Pull down when you have $verb it",
+                    fontFamily = UtilitySans,
+                    fontSize = 12.sp,
+                    color = Color.White.copy(alpha = .5f - (pull * .5f)),
+                )
+                Spacer(Modifier.height(12.dp))
+            }
             Text(
-                "Pull down when you have $verb it",
+                "$at / $total",
                 fontFamily = UtilitySans,
                 fontSize = 12.sp,
-                color = Color.White.copy(alpha = .5f - (pull * .5f)),
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 1.4.sp,
+                color = Color.White.copy(alpha = .56f),
             )
-            Spacer(Modifier.height(12.dp))
         }
-        Text(
-            "$at / $total",
-            fontFamily = UtilitySans,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 1.4.sp,
-            color = Color.White.copy(alpha = .42f),
-        )
     }
 }
 
 /** After the tenth pull. One statement, then out of the way. */
 @Composable
-private fun SessionComplete(title: String, headline: String, closing: String, onClose: () -> Unit, again: () -> Unit) {
-    Box(Modifier.fillMaxSize().padding(horizontal = 34.dp), contentAlignment = Alignment.Center) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+private fun SessionComplete(
+    title: String,
+    headline: String,
+    closing: String,
+    isBible: Boolean,
+    onClose: () -> Unit,
+    again: () -> Unit,
+) {
+    Box(Modifier.fillMaxSize().padding(horizontal = 28.dp), contentAlignment = Alignment.Center) {
+        Column(
+            Modifier
+                .then(
+                    if (isBible) {
+                        Modifier
+                            .shadow(28.dp, RoundedCornerShape(36.dp), spotColor = Pk.Oxblood.copy(alpha = .44f))
+                            .clip(RoundedCornerShape(36.dp))
+                            .background(Pk.VioletDeep)
+                            .border(1.dp, Pk.GoldLight.copy(alpha = .42f), RoundedCornerShape(36.dp))
+                            .padding(horizontal = 30.dp, vertical = 48.dp)
+                    } else Modifier.padding(horizontal = 6.dp)
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            if (isBible) {
+                Text(
+                    "CHAPTER COMPLETE",
+                    fontFamily = UtilitySans,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 2.4.sp,
+                    color = Pk.GoldLight,
+                )
+                Spacer(Modifier.height(18.dp))
+            }
             Text(
                 headline,
                 fontFamily = DisplaySerif,
@@ -458,14 +681,14 @@ private fun SessionComplete(title: String, headline: String, closing: String, on
                 fontFamily = UtilitySans,
                 fontSize = 12.sp,
                 letterSpacing = 1.2.sp,
-                color = Pk.GoldLight.copy(alpha = .8f),
+                color = Pk.GoldLight,
                 textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(44.dp))
             Box(
                 Modifier
                     .clip(RoundedCornerShape(99.dp))
-                    .background(Color.White)
+                    .background(if (isBible) Pk.Cream else Color.White)
                     .clickable(onClick = onClose)
                     .padding(horizontal = 44.dp, vertical = 15.dp),
             ) {

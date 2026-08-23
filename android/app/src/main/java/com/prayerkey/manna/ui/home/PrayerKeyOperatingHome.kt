@@ -77,7 +77,19 @@ fun PrayerKeyOperatingHome(
     initialAction: String? = null,
     onInitialActionConsumed: () -> Unit = {},
 ) {
-    val today = remember { LocalDate.now() }
+    /* Keep an already-open Home screen honest across midnight. Without this,
+       date-keyed content changed on the next app launch but could show
+       yesterday's prayer and chapter while the app remained in memory. */
+    var today by remember { mutableStateOf(LocalDate.now()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            val now = java.time.ZonedDateTime.now()
+            val nextMidnight = now.toLocalDate().plusDays(1).atStartOfDay(now.zone)
+            val wait = java.time.Duration.between(now, nextMidnight).toMillis().coerceAtLeast(1_000L)
+            kotlinx.coroutines.delay(wait)
+            today = LocalDate.now()
+        }
+    }
     val dailyPassage = remember(today) { passageFor(today) }
     var devotionalOpen by rememberSaveable { mutableStateOf(false) }
     var topicalBibleOpen by rememberSaveable { mutableStateOf(false) }
@@ -293,16 +305,12 @@ fun PrayerKeyOperatingHome(
     ) {
         Header(today, streak, onSettings)
         ShortcutRail(
-            streak = streak,
             todayBadge = todayBadgeText,
             todayPulls = { todayPullsOpen = true },
             readBadge = readBadgeText,
             biblePulls = { biblePullsOpen = true },
             prayNow = onOpenPrayer,
             ledger = onOpenJournal,
-            bible = onOpenBible,
-            church = onOpenChurch,
-            open = go,
         )
         HeroRail(written?.title.orEmpty()) { devotionalOpen = true }
 
@@ -397,10 +405,15 @@ fun PrayerKeyOperatingHome(
     }
 }
 
-private data class HomeShortcut(val label: String, val icon: ImageVector, val badge: String? = null, val open: () -> Unit)
+private data class HomeShortcut(
+    val label: String,
+    val icon: ImageVector,
+    val image: Int,
+    val badge: String? = null,
+    val open: () -> Unit,
+)
 
 @Composable private fun ShortcutRail(
-    streak: Int,
     /** How many of today's ten pulls are prayed, shown on the badge. */
     todayBadge: String?,
     todayPulls: () -> Unit,
@@ -409,66 +422,77 @@ private data class HomeShortcut(val label: String, val icon: ImageVector, val ba
     biblePulls: () -> Unit,
     prayNow: () -> Unit,
     ledger: () -> Unit,
-    bible: () -> Unit,
-    church: () -> Unit,
-    open: (Feature) -> Unit,
 ) {
-    // Shortcuts always open at the urgent first action. A saveable scroll state
-    // could restore this rail halfway across after process recreation.
-    val shortcutScroll = remember { androidx.compose.foundation.ScrollState(0) }
     val shortcuts = listOf(
-        HomeShortcut("Today", Icons.Outlined.WbSunny, todayBadge, open = todayPulls),
-        HomeShortcut("Read", Icons.Outlined.AutoStories, readBadge, open = biblePulls),
-        HomeShortcut("Pray now", Icons.Outlined.Bolt, open = prayNow),
-        HomeShortcut("My prayers", Icons.Outlined.FactCheck, open = ledger),
-        HomeShortcut("Prayer points", Icons.Outlined.FormatListBulleted) { open(Feature("Prayer points", "Pray by situation", Icons.Outlined.FormatListBulleted, Hub.PRAY)) },
-        HomeShortcut("Prayer challenge", Icons.Outlined.LocalFireDepartment, if (streak > 0) "DAY $streak" else null) { open(Feature("Prayer challenge", "One guided day at a time", Icons.Outlined.LocalFireDepartment, Hub.PRAY)) },
-        HomeShortcut("Midnight", Icons.Outlined.DarkMode) { open(Feature("Midnight prayer", "Take the night watch", Icons.Outlined.DarkMode, Hub.PRAY)) },
-        HomeShortcut("Fasting", Icons.Outlined.WaterDrop) { open(Feature("Start a fast", "Choose a focus and a safe rhythm", Icons.Outlined.WaterDrop, Hub.PRAY)) },
-        HomeShortcut("Bible", Icons.Outlined.MenuBook, open = bible),
-        HomeShortcut("Audio", Icons.Outlined.Headphones) { open(Feature("Audio Bible", "Listen chapter by chapter", Icons.Outlined.Headphones, Hub.BIBLE)) },
-        HomeShortcut("Warfare", Icons.Outlined.Shield) { open(Feature("Warfare prayer", "Scripture-led prayer sets", Icons.Outlined.Shield, Hub.PRAY)) },
-        HomeShortcut("Answered", Icons.Outlined.CheckCircle, open = ledger),
-        HomeShortcut("Church", Icons.Outlined.Church, open = church),
+        HomeShortcut("Today", Icons.Outlined.WbSunny, R.drawable.prayerkey_hero_dawn, todayBadge, todayPulls),
+        HomeShortcut("Read", Icons.Outlined.AutoStories, R.drawable.onboarding_read_v3, readBadge, biblePulls),
+        HomeShortcut("Pray now", Icons.Outlined.Bolt, R.drawable.onboarding_pray_v3, open = prayNow),
+        HomeShortcut("My prayers", Icons.Outlined.FactCheck, R.drawable.onboarding_journal_v3, open = ledger),
     )
     Row(
-        Modifier.fillMaxWidth().horizontalScroll(shortcutScroll).padding(start = 18.dp, end = 18.dp, bottom = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
+        Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp).padding(bottom = 14.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         shortcuts.forEach { item ->
-            Column(
-                Modifier.width(76.dp).clickable(onClick = item.open),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            CircularImageShortcut(item)
+        }
+    }
+}
+
+@Composable
+private fun CircularImageShortcut(item: HomeShortcut) {
+    Column(
+        Modifier.width(88.dp).clickable(onClick = item.open),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Box(
+                Modifier.size(80.dp)
+                    .shadow(5.dp, CircleShape, spotColor = Pk.Oxblood.copy(alpha = .22f))
+                    .background(Pk.Oxblood, CircleShape)
+                    .padding(3.dp)
+                    .background(Pk.Cream, CircleShape)
+                    .padding(3.dp)
+                    .clip(CircleShape),
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Box(
-                        Modifier.size(70.dp).border(2.2.dp, Pk.Oxblood.copy(alpha = .10f), CircleShape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Surface(
-                            Modifier.size(62.dp), shape = CircleShape, color = Color.White.copy(alpha = .82f),
-                            border = BorderStroke(.7.dp, Color.White), shadowElevation = 4.dp,
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(item.icon, null, tint = Pk.Oxblood, modifier = Modifier.size(27.dp))
-                            }
-                        }
-                    }
-                    item.badge?.let { badge ->
-                        Surface(
-                            Modifier.align(Alignment.TopEnd), shape = RoundedCornerShape(99.dp),
-                            color = Pk.Oxblood, border = BorderStroke(1.dp, Pk.Cream),
-                        ) { Text(badge, Modifier.padding(horizontal = 6.dp, vertical = 3.dp), color = Color.White, fontSize = 7.sp, fontWeight = FontWeight.Bold) }
-                    }
-                }
-                Text(
-                    item.label, Modifier.padding(top = 7.dp),
-                    fontFamily = UtilitySans, fontSize = 10.sp, lineHeight = 12.sp,
-                    fontWeight = FontWeight.Medium, color = Pk.Charcoal,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2,
+                Image(
+                    painterResource(item.image), item.label,
+                    Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
                 )
+                Box(Modifier.fillMaxSize().background(Pk.Oxblood.copy(alpha = .10f)))
+                Surface(
+                    Modifier.align(Alignment.BottomStart).padding(5.dp),
+                    shape = CircleShape,
+                    color = Color.White.copy(alpha = .92f),
+                ) {
+                    Icon(
+                        item.icon, null, tint = Pk.Oxblood,
+                        modifier = Modifier.padding(4.dp).size(13.dp),
+                    )
+                }
+            }
+            item.badge?.let { badge ->
+                Surface(
+                    Modifier.align(Alignment.TopEnd),
+                    shape = RoundedCornerShape(99.dp),
+                    color = Pk.Oxblood,
+                    border = BorderStroke(1.5.dp, Pk.Cream),
+                ) {
+                    Text(
+                        badge, Modifier.padding(horizontal = 5.dp, vertical = 3.dp),
+                        color = Color.White, fontFamily = UtilitySans,
+                        fontSize = 7.sp, fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
+        Text(
+            item.label, Modifier.padding(top = 7.dp),
+            fontFamily = UtilitySans, fontSize = 10.sp,
+            fontWeight = FontWeight.Medium, color = Pk.Charcoal,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            maxLines = 1,
+        )
     }
 }
 
