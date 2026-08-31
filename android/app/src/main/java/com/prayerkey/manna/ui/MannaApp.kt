@@ -195,7 +195,7 @@ fun MannaApp(
         Box(
             Modifier.fillMaxSize()
                 .padding(
-                    bottom = if (hydrated && preferences.onboarded && !showProfile) 88.dp else 0.dp,
+                    bottom = if (hydrated && preferences.onboarded && preferences.accountReady && !showProfile) 88.dp else 0.dp,
                 )
                 .glassSource(backdrop),
         ) {
@@ -210,8 +210,8 @@ fun MannaApp(
                     viewModel.updatePreferences(
                         preferences.copy(
                             onboarded = true,
-                            accountReady = true,
-                            accountKind = "private",
+                            accountReady = false,
+                            accountKind = "pending",
                             reminderEnabled = remindersEnabled,
                             reminderHour = reminderHour,
                             reminderMinute = 0,
@@ -346,7 +346,7 @@ fun MannaApp(
         }
 
         // no dock during onboarding — the first screen stays undistracted
-        if (hydrated && preferences.onboarded && !showProfile) {
+        if (hydrated && preferences.onboarded && preferences.accountReady && !showProfile) {
             Box(Modifier.align(Alignment.BottomCenter)) {
                 com.prayerkey.manna.ui.components.MannaDock(
                     items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon) },

@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.setValue
 import androidx.core.view.WindowCompat
 import com.prayerkey.manna.data.DEFAULT_THEME_ID
@@ -17,7 +18,6 @@ import com.prayerkey.manna.data.resolveTheme
 import com.prayerkey.manna.ui.MannaApp
 import com.prayerkey.manna.ui.screens.LaunchPrelude
 import com.prayerkey.manna.ui.theme.MannaTheme
-import kotlinx.coroutines.delay
 import android.content.Intent
 
 class MainActivity : ComponentActivity() {
@@ -35,7 +35,11 @@ class MainActivity : ComponentActivity() {
             var followSystem by remember { mutableStateOf(true) }
             var appReady by remember { mutableStateOf(false) }
             LaunchedEffect(Unit) {
-                delay(850)
+                // Let the lightweight branded prelude draw once, then compose
+                // the application. The former fixed 850 ms delay made every
+                // launch feel slow even on a fast phone and delayed handling
+                // notification deep links for no functional reason.
+                withFrameNanos { }
                 appReady = true
             }
 

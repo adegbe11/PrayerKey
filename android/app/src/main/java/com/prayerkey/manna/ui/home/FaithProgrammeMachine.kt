@@ -249,7 +249,7 @@ private fun ProgrammeHome(spec: FaithProgramme, selected: String, done: Set<Int>
                         LinearProgressIndicator(progress = { done.size.toFloat() / spec.days }, Modifier.fillMaxWidth().padding(top = 10.dp).height(6.dp), color = Pk.GoldLight, trackColor = Pk.Crisp.copy(alpha = .18f))
                     }
                 }
-                Text("YOUR JOURNEY", Modifier.padding(top = 28.dp, bottom = 12.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.3.sp, color = Pk.Charcoal)
+                Text("Your days", Modifier.padding(top = 28.dp, bottom = 12.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = Pk.Charcoal)
                 (1..spec.days).forEach { day ->
                     val locked = day !in done && (day != next || !availableToday)
                     val complete = day in done
@@ -266,7 +266,7 @@ private fun ProgrammeHome(spec: FaithProgramme, selected: String, done: Set<Int>
                         }
                     }
                 }
-                TextButton(onClick = onReset, modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 16.dp)) { Text("CHANGE PROGRAMME", color = Pk.Muted, fontSize = 10.sp, letterSpacing = 1.sp) }
+                TextButton(onClick = onReset, modifier = Modifier.align(Alignment.CenterHorizontally).padding(vertical = 16.dp)) { Text("Choose another programme", color = Pk.Muted, fontSize = 13.sp) }
             }
         }
     }
@@ -283,7 +283,7 @@ private fun FaithProgrammeDay(spec: FaithProgramme, day: Int, content: FaithDay,
                 Text(content.reference.uppercase(), Modifier.padding(top = 24.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.2.sp, color = Pk.Oxblood)
                 Text("“${content.scripture}”", Modifier.padding(top = 10.dp), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 22.sp, lineHeight = 32.sp, color = Pk.Charcoal)
                 HorizontalDivider(Modifier.padding(vertical = 24.dp), color = Pk.Hair)
-                Text("PRAY THESE PRAYERS", Modifier.padding(bottom = 8.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.GoldDeep)
+                Text("Pray through each point", Modifier.padding(bottom = 8.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.GoldDeep)
                 content.actions.forEachIndexed { index, action ->
                     Surface(Modifier.fillMaxWidth().padding(top = 9.dp).clickable { checked = if (index in checked) checked - index else checked + index }, shape = RoundedCornerShape(17.dp), color = Color.White, border = BorderStroke(1.dp, if (index in checked) Pk.Sage else Pk.Hair)) {
                         Row(Modifier.padding(17.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -297,8 +297,8 @@ private fun FaithProgrammeDay(spec: FaithProgramme, day: Int, content: FaithDay,
                 }
                 Spacer(Modifier.height(22.dp))
             }
-            Button(onComplete, enabled = checked.size == content.actions.size, modifier = Modifier.fillMaxWidth().padding(20.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
-                Text("COMPLETE DAY $day", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .8.sp)
+            Button(onComplete, enabled = checked.isNotEmpty(), modifier = Modifier.fillMaxWidth().padding(20.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
+                Text(if (checked.isNotEmpty()) "Finish day $day" else "Pray at least one point", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 14.sp)
             }
         }
     }

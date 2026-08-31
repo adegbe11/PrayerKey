@@ -1,0 +1,747 @@
+{
+  "version": 2,
+  "note": "Named challenges. Each day is READ, REFLECT, PRAY, and a block for the house - the shape used by the plans people finish. Kept near 120 words: YouVersion's own guidance to publishers is that engagement falls away past 400, and their most-completed plans sit around a hundred. The prayer is written out rather than given as points, because a point is an instruction you still have to compose at six in the morning. Scripture is a reference only, resolved from the bundled KJV, so nothing here can misquote it.",
+  "challenges": [
+    {
+      "id": "three-days-before-a-decision",
+      "title": "Three Days Before a Decision",
+      "days": 3,
+      "promise": "Three days to stop, ask, and know what to do next.",
+      "cover": "discovery_cover_1",
+      "written": [
+        {
+          "day": 1,
+          "title": "Say it out loud",
+          "read": {
+            "book": "Psalms",
+            "chapter": 25,
+            "verse": 4,
+            "from": 4,
+            "to": 5
+          },
+          "reflection": "Most decisions are not hard because the answer is hidden. They are hard because we already suspect the answer and want a different one.\n\nBefore asking God to show you, say plainly what you are deciding and what you are hoping He says.",
+          "prayer": "Father, this is the decision in front of me. I say it to You honestly, including the answer I am hoping for. Show me Your ways. Teach me Your paths. I would rather be led than be right. In Jesus' name, Amen.",
+          "question": "What answer are you hoping God gives you?",
+          "familyQuestion": "What is one decision our house is facing?",
+          "familyPrayer": "Lord, lead this house. Where we disagree, give us patience. Where we are unsure, go before us."
+        },
+        {
+          "day": 2,
+          "title": "Ask for wisdom, not a sign",
+          "read": {
+            "book": "James",
+            "chapter": 1,
+            "verse": 5,
+            "from": 5,
+            "to": 6
+          },
+          "reflection": "God promises wisdom generously and without reproach - He does not make you feel foolish for asking.\n\nHe does not promise signs. Wisdom usually arrives as clarity about what matters, not as a message written across the sky.",
+          "prayer": "Lord, I have been waiting for a sign when You have offered me wisdom. Give it generously, as You promised. Make plain what actually matters here, and steady me enough to act on it. In Jesus' name, Amen.",
+          "question": "If no sign comes, what does wisdom already say?",
+          "familyQuestion": "Who could we ask for honest advice this week?",
+          "familyPrayer": "God, give this house wisdom, and the humility to take counsel from people who love us."
+        },
+        {
+          "day": 3,
+          "title": "Take the next step",
+          "read": {
+            "book": "Proverbs",
+            "chapter": 3,
+            "verse": 5,
+            "from": 5,
+            "to": 6
+          },
+          "reflection": "He shall direct thy paths - a path is walked, not studied. Direction usually comes to people already moving.\n\nYou will not see the whole road. You are not meant to. Decide the next step and take it.",
+          "prayer": "Father, I trust You with what I cannot see. I stop leaning on my own understanding and I take the next step. Direct my path, and keep me from calling my fear caution. In Jesus' name, Amen.",
+          "question": "What is the one next step, and when will you take it?",
+          "familyQuestion": "What is our first step, and who does it?",
+          "familyPrayer": "Lord, we commit this decision to You. Go ahead of us and make the way clear."
+        }
+      ]
+    },
+    {
+      "id": "standing-against-fear",
+      "title": "Standing Against Fear",
+      "days": 7,
+      "promise": "Seven days for the thing that wakes you at three in the morning.",
+      "cover": "discovery_cover_5",
+      "written": [
+        {
+          "day": 1,
+          "title": "Name it",
+          "read": {
+            "book": "Psalms",
+            "chapter": 56,
+            "verse": 3
+          },
+          "reflection": "David does not claim to be unafraid. What time I am afraid - he assumes there will be such a time.\n\nUnnamed fear stays large by staying vague. Say the actual thing today, in words.",
+          "prayer": "Father, this is what I am afraid of, and I am saying it plainly instead of circling it. Take the shapeless dread and let me see what is actually there. What time I am afraid, I will trust in You. In Jesus' name, Amen.",
+          "question": "What exactly are you afraid of? Not the area - the thing.",
+          "familyQuestion": "What is one thing our house is worried about?",
+          "familyPrayer": "Lord, we name our fears in this house rather than hiding them. Meet us in each one."
+        },
+        {
+          "day": 2,
+          "title": "Where it came from",
+          "read": {
+            "book": "2 Timothy",
+            "chapter": 1,
+            "verse": 7
+          },
+          "reflection": "Paul writes to a frightened young man and starts with the source: God did not give you this.\n\nFear can feel so much like discernment that we obey it as wisdom. Some caution is worth hearing. Most dread is not.",
+          "prayer": "Lord, this spirit of fear did not come from You, and I stop treating it as though it did. Give me power, love and a sound mind in the exact place where I am shaking. In Jesus' name, Amen.",
+          "question": "Is this fear telling you something useful, or just something loud?",
+          "familyQuestion": "Where has fear been making our decisions?",
+          "familyPrayer": "God, take fear out of the driver's seat in this home. Give us sound minds."
+        },
+        {
+          "day": 3,
+          "title": "I am with thee",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 41,
+            "verse": 10
+          },
+          "reflection": "The reason given is not that the situation is smaller than it looks. It is that God is present in it.\n\nHe does not promise the thing will not happen. He promises to be there if it does.",
+          "prayer": "Father, You are with me in this - not watching from somewhere else. Strengthen me, help me, uphold me. Where I have wanted escape more than Your presence, forgive me. In Jesus' name, Amen.",
+          "question": "If the thing you fear happened, what would still be true?",
+          "familyQuestion": "When has God been with this family in something hard?",
+          "familyPrayer": "Lord, thank You that You have never left this house. Be with us again."
+        },
+        {
+          "day": 4,
+          "title": "The fear of people",
+          "read": {
+            "book": "Proverbs",
+            "chapter": 29,
+            "verse": 25
+          },
+          "reflection": "A snare is not a wall. It does not stop you - it catches you while you keep walking.\n\nYou find out later how much of your life was arranged around what somebody might think.",
+          "prayer": "Lord, free me from needing the approval of people who are not carrying my burden. Show me the decision I made only to avoid being thought badly of. I put my trust in You, and I am safe there. In Jesus' name, Amen.",
+          "question": "Whose opinion has been deciding things for you?",
+          "familyQuestion": "Are we doing anything only because of what people would say?",
+          "familyPrayer": "God, let this house answer to You and not to the opinions of the street."
+        },
+        {
+          "day": 5,
+          "title": "Tomorrow",
+          "read": {
+            "book": "Matthew",
+            "chapter": 6,
+            "verse": 34,
+            "from": 33,
+            "to": 34
+          },
+          "reflection": "Jesus does not say tomorrow will be fine. He says it will have its own trouble, and today has enough already.\n\nAnxiety is mostly living in a day God has not given you grace for yet. The grace arrives with the day.",
+          "prayer": "Father, I give You tomorrow, because I have not been given the strength for it yet. Keep me inside today. Seek first the kingdom - reorder what I am chasing. In Jesus' name, Amen.",
+          "question": "How much of today did you spend in tomorrow?",
+          "familyQuestion": "What can we leave until tomorrow and stop carrying tonight?",
+          "familyPrayer": "Lord, give this house rest tonight. Tomorrow is Yours before it is ours."
+        },
+        {
+          "day": 6,
+          "title": "If the worst came",
+          "read": {
+            "book": "Job",
+            "chapter": 1,
+            "verse": 21
+          },
+          "reflection": "Job says this having lost everything on the same day. It is not a calm man's sentiment - it is a wrecked man's confession.\n\nThere is a strange freedom in following the fear down and finding God at the bottom of it.",
+          "prayer": "Lord, if I lost what I am afraid of losing, You would still be God. Loosen my grip on what I am holding too tightly. Blessed be Your name - I want to mean that either way. In Jesus' name, Amen.",
+          "question": "What are you afraid of losing? Who would you be without it?",
+          "familyQuestion": "What do we depend on that is not God?",
+          "familyPrayer": "Father, hold this family loosely to things and tightly to You."
+        },
+        {
+          "day": 7,
+          "title": "Love casts it out",
+          "read": {
+            "book": "1 John",
+            "chapter": 4,
+            "verse": 18
+          },
+          "reflection": "Fear is not driven out by courage. John says it is driven out by love - by being certain you are loved.\n\nSeven days will not have removed everything. But you have named it and put it where it can be dealt with.",
+          "prayer": "Father, I am loved by You. Let that go deeper than the fear goes. Whatever remains of this, I leave it here rather than carrying it out with me. In Jesus' name, Amen.",
+          "question": "What has changed in seven days, and what has not?",
+          "familyQuestion": "How can we say out loud that we love each other this week?",
+          "familyPrayer": "Lord, let love be the loudest thing in this house, louder than fear."
+        }
+      ]
+    },
+    {
+      "id": "the-midnight-watch",
+      "title": "The Midnight Watch",
+      "days": 7,
+      "promise": "Seven nights awake at the hour when nobody is watching but God.",
+      "cover": "discovery_cover_4",
+      "written": [
+        {
+          "day": 1,
+          "title": "The hour nobody wants",
+          "read": {
+            "book": "Psalms",
+            "chapter": 119,
+            "verse": 62,
+            "from": 62,
+            "to": 62
+          },
+          "reflection": "At midnight I will rise to give thanks. Nobody is watching at that hour, which is exactly what makes it worth something.\n\nYou will be tired. Come tired. That is the offering.",
+          "prayer": "Father, I am awake at an hour I would rather be asleep, and I am here on purpose. Receive this watch. Meet me in the quiet where nothing is competing for my attention. In Jesus' name, Amen.",
+          "question": "Why are you keeping this watch?",
+          "familyQuestion": "Who in this house needs covering tonight?",
+          "familyPrayer": "Lord, we keep watch over this home while it sleeps."
+        },
+        {
+          "day": 2,
+          "title": "A living sacrifice",
+          "read": {
+            "book": "Romans",
+            "chapter": 12,
+            "verse": 1,
+            "from": 1,
+            "to": 2
+          },
+          "reflection": "Paul asks for a body, not a feeling - present your bodies. Being awake when your body wants sleep is a small version of exactly that.\n\nDo not be conformed. The world sleeps through this hour; you are choosing not to.",
+          "prayer": "Lord, I present my body to You tonight, tired as it is. Renew my mind while the house is quiet. Do not let me be shaped by what everyone around me assumes. In Jesus' name, Amen.",
+          "question": "What part of your life have you never actually offered?",
+          "familyQuestion": "What could our family give God that costs us something?",
+          "familyPrayer": "God, take this household as an offering, not only our words."
+        },
+        {
+          "day": 3,
+          "title": "Unless the Lord keeps the house",
+          "read": {
+            "book": "Psalms",
+            "chapter": 127,
+            "verse": 1,
+            "from": 1,
+            "to": 2
+          },
+          "reflection": "Except the Lord keep the city, the watchman waketh but in vain. The psalm is not against watching - it is against watching as though everything depended on you.\n\nYou are not the security of your home. You are its intercessor.",
+          "prayer": "Father, I cannot keep this house by worrying about it. You keep it. Guard every person under this roof tonight, and the ones who are not under it. I lay down the weight of being their protection. In Jesus' name, Amen.",
+          "question": "What have you been guarding that only God can keep?",
+          "familyQuestion": "Who is not home tonight, and who prays for them?",
+          "familyPrayer": "Lord, keep this house, and keep the ones who are far from it."
+        },
+        {
+          "day": 4,
+          "title": "Paul and Silas at midnight",
+          "read": {
+            "book": "Acts",
+            "chapter": 16,
+            "verse": 25,
+            "from": 25,
+            "to": 26
+          },
+          "reflection": "Beaten, in the inner prison, feet in the stocks - and they sang. The other prisoners heard them, which is the detail that matters.\n\nThe earthquake came after the singing, not before.",
+          "prayer": "Lord, I will worship before anything changes. Let whatever is holding me be shaken. And let the people near me hear something in my mouth other than complaint. In Jesus' name, Amen.",
+          "question": "What can you thank God for before the door opens?",
+          "familyQuestion": "What are we still praising God for as a family?",
+          "familyPrayer": "Father, put a song in this house even while we wait."
+        },
+        {
+          "day": 5,
+          "title": "An open door",
+          "read": {
+            "book": "Revelation",
+            "chapter": 3,
+            "verse": 8,
+            "from": 8,
+            "to": 8
+          },
+          "reflection": "I have set before thee an open door, and no man can shut it. The commendation is for a little strength - not great strength, not impressive faith.\n\nA little, kept, is enough for the door to be opened.",
+          "prayer": "Lord, I have only a little strength, and I bring that. Open the door that no one can shut, and shut the one I keep trying to force. I will not despise the little I have. In Jesus' name, Amen.",
+          "question": "Which door have you been trying to force?",
+          "familyQuestion": "What door is our family asking God to open?",
+          "familyPrayer": "God, open what should open for this house, and close what should close."
+        },
+        {
+          "day": 6,
+          "title": "Healing",
+          "read": {
+            "book": "Psalms",
+            "chapter": 30,
+            "verse": 2,
+            "from": 2,
+            "to": 5
+          },
+          "reflection": "Weeping may endure for a night, but joy cometh in the morning. The psalm does not deny the night. It gives it a limit.\n\nYou are praying in the night part. That is not the end of the sentence.",
+          "prayer": "Father, I cry to You for healing - for this body, or for the one I am carrying. Weeping has endured for a night. Let joy come in the morning. Whatever the answer, I will still be Yours. In Jesus' name, Amen.",
+          "question": "Who are you asking God to heal tonight?",
+          "familyQuestion": "Who is sick or hurting among us?",
+          "familyPrayer": "Lord, heal what is broken in this family, in body and in heart."
+        },
+        {
+          "day": 7,
+          "title": "New every morning",
+          "read": {
+            "book": "Lamentations",
+            "chapter": 3,
+            "verse": 22,
+            "from": 22,
+            "to": 23
+          },
+          "reflection": "Written by a man watching his city burn. His mercies are new every morning is not a cheerful sentiment - it is what somebody found at the bottom.\n\nYou have kept seven nights. Finish this one in thanksgiving.",
+          "prayer": "Father, thank You for seven nights. Your mercies are new every morning, and I have needed every one of them. Let what I found in the dark stay with me in the daylight. In Jesus' name, Amen.",
+          "question": "What did you find in these seven nights?",
+          "familyQuestion": "What has God done for us this week?",
+          "familyPrayer": "Lord, we thank You as a house before the sun comes up."
+        }
+      ]
+    },
+    {
+      "id": "standing-in-scripture",
+      "title": "Standing in Scripture",
+      "days": 7,
+      "promise": "Seven days praying against fear, temptation and old patterns - never against people.",
+      "cover": "discovery_cover_6",
+      "written": [
+        {
+          "day": 1,
+          "title": "Not against flesh and blood",
+          "read": {
+            "book": "Ephesians",
+            "chapter": 6,
+            "verse": 12,
+            "from": 12,
+            "to": 12
+          },
+          "reflection": "The first thing Paul settles is who the enemy is not. Not your husband. Not your neighbour. Not the person at work.\n\nAny prayer that ends with a person destroyed has lost the plot before it started.",
+          "prayer": "Father, I name the person I have been treating as my enemy, and I release them. My fight is not with flesh and blood. Show me what is actually against me, and let me pray about that instead. In Jesus' name, Amen.",
+          "question": "Who have you been fighting who is not the enemy?",
+          "familyQuestion": "Is there anyone we have made an enemy in this house?",
+          "familyPrayer": "Lord, take enmity out of this home. Let us fight the right thing."
+        },
+        {
+          "day": 2,
+          "title": "Take it up",
+          "read": {
+            "book": "Ephesians",
+            "chapter": 6,
+            "verse": 13,
+            "from": 13,
+            "to": 13
+          },
+          "reflection": "Take unto you the whole armour. It is given, but it is not automatic - somebody has to pick it up.\n\nAnd having done all, to stand. Standing is the objective. Not advancing, not winning. Still there when it is over.",
+          "prayer": "Lord, I take up what You have given me instead of leaving it on the ground. Having done all, let me be found standing. Keep me from measuring this by how it feels. In Jesus' name, Amen.",
+          "question": "What has God given you that you have not picked up?",
+          "familyQuestion": "What has our family stopped doing that we should start again?",
+          "familyPrayer": "God, help this house stand together and not scatter."
+        },
+        {
+          "day": 3,
+          "title": "Not carnal",
+          "read": {
+            "book": "2 Corinthians",
+            "chapter": 10,
+            "verse": 4,
+            "from": 4,
+            "to": 4
+          },
+          "reflection": "The weapons of our warfare are not carnal - which means the argument you keep rehearsing in the shower is not one of them.\n\nMighty through God to the pulling down of strong holds. A strong hold is a thought that has been allowed to build.",
+          "prayer": "Father, my usual weapons are the wrong ones - the sharp reply, the withheld kindness, the case I keep building. I put them down. Pull down what has been built in me. In Jesus' name, Amen.",
+          "question": "What argument do you keep rehearsing when nobody is there?",
+          "familyQuestion": "What do we do in this house when we are angry?",
+          "familyPrayer": "Lord, teach this family to fight without wounding each other."
+        },
+        {
+          "day": 4,
+          "title": "Submit, then resist",
+          "read": {
+            "book": "James",
+            "chapter": 4,
+            "verse": 7,
+            "from": 7,
+            "to": 8
+          },
+          "reflection": "The order is not decorative. Submit yourselves therefore to God - then resist the devil, and he will flee.\n\nResistance without submission is willpower, and willpower runs out around Thursday.",
+          "prayer": "Lord, I submit to You first, before I try to resist anything. Draw near to me as I draw near to You. Let my standing come from being Yours and not from being strong. In Jesus' name, Amen.",
+          "question": "Are you resisting in your own strength again?",
+          "familyQuestion": "Where does this house need to submit rather than push harder?",
+          "familyPrayer": "Father, we yield to You before we fight anything."
+        },
+        {
+          "day": 5,
+          "title": "The sword",
+          "read": {
+            "book": "Ephesians",
+            "chapter": 6,
+            "verse": 17,
+            "from": 17,
+            "to": 17
+          },
+          "reflection": "The only weapon on the list. Everything else is armour - it protects. The word is what you actually carry into it.\n\nJesus used it in the wilderness three times and said nothing else.",
+          "prayer": "Father, put Your word in my mouth. When the accusation comes, let me answer with something written rather than something felt. Let me know it well enough to reach for it in the dark. In Jesus' name, Amen.",
+          "question": "What verse do you reach for when you are accused?",
+          "familyQuestion": "What verse should our house learn by heart?",
+          "familyPrayer": "Lord, put Your word in this family's mouth."
+        },
+        {
+          "day": 6,
+          "title": "Every thought",
+          "read": {
+            "book": "2 Corinthians",
+            "chapter": 10,
+            "verse": 5,
+            "from": 5,
+            "to": 5
+          },
+          "reflection": "Bringing into captivity every thought. Not suppressing it, not pretending it is not there - taking it captive and marching it to Christ.\n\nMost of what defeats people is not an event. It is a thought that was allowed to stay.",
+          "prayer": "Lord, this is the thought I have let live in me, and I bring it to You rather than feeding it. Cast down what exalts itself against knowing You. Give me a clean mind tonight. In Jesus' name, Amen.",
+          "question": "Which thought have you allowed to stay too long?",
+          "familyQuestion": "What do we say about ourselves in this house that is not true?",
+          "familyPrayer": "God, cleanse the words spoken over this family."
+        },
+        {
+          "day": 7,
+          "title": "Stand",
+          "read": {
+            "book": "Ephesians",
+            "chapter": 6,
+            "verse": 14,
+            "from": 14,
+            "to": 14
+          },
+          "reflection": "Stand therefore, having your loins girt about with truth. Truth first - because most of what wears people down is something untrue they have believed about themselves.\n\nSeven days. You are still standing.",
+          "prayer": "Father, gird me with truth. Where I have believed a lie about myself, replace it. I am still standing, and that is Your doing and not mine. Keep me standing tomorrow. In Jesus' name, Amen.",
+          "question": "What lie about yourself have you stopped believing this week?",
+          "familyQuestion": "What is true about this family that we should say out loud?",
+          "familyPrayer": "Lord, let truth be the thing this house stands on."
+        }
+      ]
+    },
+    {
+      "id": "fasting-and-prayer",
+      "title": "Fasting and Prayer",
+      "days": 21,
+      "promise": "Twenty-one days of going without, so that something else can be heard.",
+      "cover": "discovery_cover_3",
+      "written": [
+        {
+          "day": 1,
+          "title": "Say why you are doing this",
+          "read": {
+            "book": "Joel",
+            "chapter": 2,
+            "verse": 12,
+            "from": 12,
+            "to": 13
+          },
+          "reflection": "A fast without a reason becomes a diet by the third day. Before you go without anything, say plainly what you are asking God for.\n\nGod's invitation through Joel is to turn, not to perform. The tearing He asks for is inward.",
+          "prayer": "Father, this is what I am fasting for, and I say it out loud to You now. Keep me from turning it into a performance, in front of others or myself. Give me the strength to finish what I am starting. In Jesus' name, Amen.",
+          "question": "In one sentence, what are you asking God for?",
+          "familyQuestion": "What is our house asking God for over these three weeks?",
+          "familyPrayer": "Lord, we begin together. Hear what this family is bringing to You."
+        },
+        {
+          "day": 2,
+          "title": "Making room",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 58,
+            "verse": 6,
+            "from": 6,
+            "to": 7
+          },
+          "reflection": "Hunger is loud. That is not a failure of your fast, it is the mechanism of it.\n\nWhat you normally use to quiet yourself is gone, and everything you were quieting is now audible. Some of what surfaces will be ugly. Let it.",
+          "prayer": "Lord, whatever is surfacing in me today, I am not hiding it from You. Take the appetite I am denying and turn it into hunger for You. In Jesus' name, Amen.",
+          "question": "What got louder today when the food went quiet?",
+          "familyQuestion": "What do we reach for in this house when we are unsettled?",
+          "familyPrayer": "God, make us hungry for You and not only for comfort."
+        },
+        {
+          "day": 3,
+          "title": "Not by bread",
+          "read": {
+            "book": "Matthew",
+            "chapter": 4,
+            "verse": 4
+          },
+          "reflection": "Jesus was tempted at the end of forty days, not the beginning. The pressure came exactly where bread would have been most reasonable.\n\nHe answered with Scripture He already knew. You cannot reach in weakness for a verse you never read in strength.",
+          "prayer": "Father, feed me from Your word in the place where I am empty. When I am weakest, let what I have already read come back to me. Guard me from the reasonable-sounding shortcut. In Jesus' name, Amen.",
+          "question": "Which verse do you want in your mouth by day twenty-one?",
+          "familyQuestion": "What verse could our house learn together this month?",
+          "familyPrayer": "Lord, put Your word in our mouths before trouble comes."
+        },
+        {
+          "day": 4,
+          "title": "Nobody needs to know",
+          "read": {
+            "book": "Matthew",
+            "chapter": 6,
+            "verse": 16,
+            "from": 16,
+            "to": 18
+          },
+          "reflection": "Jesus assumes His people will fast - He says when, not if - and His only instruction is to hide it.\n\nThe reward for a fast everybody admires is the admiring. That is all of it. He is protecting you from settling for something so small.",
+          "prayer": "Father, keep this between us. Search me for the part that wants to be seen doing it. You see in secret, and that is enough. In Jesus' name, Amen.",
+          "question": "Who have you told, and why did you tell them?",
+          "familyQuestion": "How do we keep this from becoming a competition at home?",
+          "familyPrayer": "God, let nothing we do for You be done for an audience."
+        },
+        {
+          "day": 5,
+          "title": "Clean hands",
+          "read": {
+            "book": "Psalms",
+            "chapter": 51,
+            "verse": 10,
+            "from": 10,
+            "to": 12
+          },
+          "reflection": "David wrote this after being caught, not before. He does not ask for the consequences to disappear.\n\nHe asks for a clean heart and a right spirit, which is a stranger request and a braver one.",
+          "prayer": "Create in me a clean heart, God. I name what I have carried unconfessed and I put it down here. Restore to me the joy of Your salvation - I have missed it. In Jesus' name, Amen.",
+          "question": "What have you carried that you have never actually confessed?",
+          "familyQuestion": "Is there anything in this house we need to make right?",
+          "familyPrayer": "Lord, wash this home. Where we have wronged each other, help us say so."
+        },
+        {
+          "day": 6,
+          "title": "Stop feeding it",
+          "read": {
+            "book": "Romans",
+            "chapter": 13,
+            "verse": 14
+          },
+          "reflection": "Paul's phrase is practical: make no provision. Do not stock the cupboard for the thing you are praying to be free of.\n\nMost defeat is arranged in advance, quietly, by a small decision made hours earlier.",
+          "prayer": "Lord, show me the arrangement I keep pretending is innocent, and give me the courage to remove it today rather than next week. Put on me the Lord Jesus Christ where I keep falling. In Jesus' name, Amen.",
+          "question": "What have you left within reach that you keep reaching for?",
+          "familyQuestion": "What is in this house that we would be better without?",
+          "familyPrayer": "God, help this family remove what keeps tripping us up."
+        },
+        {
+          "day": 7,
+          "title": "One week. Count something.",
+          "read": {
+            "book": "Psalms",
+            "chapter": 103,
+            "verse": 2,
+            "from": 1,
+            "to": 5
+          },
+          "reflection": "A week in, the temptation is to measure the fast by whether anything has happened yet.\n\nForget not all his benefits - which means it is possible to forget them, and easy. Name five things God has already done.",
+          "prayer": "Father, I thank You for these before I ask for anything else today. Forgive me for the years I took them for granted. Keep my memory honest about how faithful You have been. In Jesus' name, Amen.",
+          "question": "Five things God has already done. Write them.",
+          "familyQuestion": "What has God done for this family that we nearly forgot?",
+          "familyPrayer": "Lord, we thank You tonight before we ask You for anything."
+        },
+        {
+          "day": 8,
+          "title": "As for my house",
+          "read": {
+            "book": "Joshua",
+            "chapter": 24,
+            "verse": 15
+          },
+          "reflection": "Joshua does not tell anyone else what to choose. He states what will happen under his own roof and lets it stand.\n\nThere is a kind of praying for your family that is really complaining about them. Today is not that.",
+          "prayer": "Father, I bring my household before You by name. Where I have blamed them for what is mine to carry, forgive me. As for me and my house, we will serve the Lord - make that true and not a slogan. In Jesus' name, Amen.",
+          "question": "What is yours to change at home, rather than theirs?",
+          "familyQuestion": "What would it look like for this house to serve God this month?",
+          "familyPrayer": "Lord, we choose You as a household, out loud, together."
+        },
+        {
+          "day": 9,
+          "title": "The answer left on the first day",
+          "read": {
+            "book": "Daniel",
+            "chapter": 10,
+            "verse": 12,
+            "from": 12,
+            "to": 13
+          },
+          "reflection": "Daniel fasted twenty-one days. The angel tells him the answer was sent from the first day - delayed in arriving, not in being given.\n\nSilence is not proof of refusal. Daniel was on day twenty-one before he knew anything at all.",
+          "prayer": "Lord, I will not read Your silence as Your refusal. Strengthen me for the part of this that is simply waiting. Let nothing in me give up before the answer arrives. In Jesus' name, Amen.",
+          "question": "What have you decided God's silence means? Is that fair?",
+          "familyQuestion": "What are we still waiting on as a family?",
+          "familyPrayer": "God, keep this house steady in the waiting."
+        },
+        {
+          "day": 10,
+          "title": "The fast He chooses",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 58,
+            "verse": 7,
+            "from": 6,
+            "to": 9
+          },
+          "reflection": "Isaiah's list is uncomfortable because none of it is spiritual in the way we use the word. Feed the hungry. House the poor. Do not hide from your own family.\n\nThe fast God chooses costs money and time, not only appetite.",
+          "prayer": "Father, show me one person this week whose need I could actually meet. Keep me from a fast that changes nothing outside my own body. Break the yoke, Lord - starting with any I helped to fasten. In Jesus' name, Amen.",
+          "question": "Who is within your reach this week, and what do they need?",
+          "familyQuestion": "Who could this house help before the fast ends?",
+          "familyPrayer": "Lord, make this family generous while we are hungry."
+        },
+        {
+          "day": 11,
+          "title": "Weak enough",
+          "read": {
+            "book": "2 Corinthians",
+            "chapter": 12,
+            "verse": 9,
+            "from": 9,
+            "to": 10
+          },
+          "reflection": "Paul asked three times for the thorn to go. God said no and explained why, which is more than most of us get.\n\nBy day eleven you are genuinely weaker. That is the condition in which this promise was written.",
+          "prayer": "Lord, Your grace is sufficient for me - I need that to be true today. Where I am weakest, be strong, and let me stop apologising for the weakness. I stop asking to be impressive and ask to be carried. In Jesus' name, Amen.",
+          "question": "Where are you weakest right now? Say it plainly.",
+          "familyQuestion": "Where does this family need help we have not asked for?",
+          "familyPrayer": "God, carry this house where we cannot carry ourselves."
+        },
+        {
+          "day": 12,
+          "title": "Show me the way",
+          "read": {
+            "book": "Psalms",
+            "chapter": 25,
+            "verse": 4,
+            "from": 4,
+            "to": 5
+          },
+          "reflection": "Much fasting is really a request for direction dressed as a request for relief.\n\nWe want the situation resolved. What we need is to know what to do next. Ask for the next step - it is usually all that is on offer, and usually enough.",
+          "prayer": "Father, show me Your ways - not the whole map, the next step. Give me the honesty to want Your direction more than my preference. Lead me in Your truth even where it costs me. In Jesus' name, Amen.",
+          "question": "What is the one decision you are waiting on?",
+          "familyQuestion": "What decision is this house waiting on God for?",
+          "familyPrayer": "Lord, direct this family's next step, and let us take it together."
+        },
+        {
+          "day": 13,
+          "title": "Forgive while you are hungry",
+          "read": {
+            "book": "Matthew",
+            "chapter": 6,
+            "verse": 14,
+            "from": 14,
+            "to": 15
+          },
+          "reflection": "Jesus places this immediately beside His teaching on prayer and fasting, which is not an accident.\n\nAn unforgiving fast is a locked door with a man knocking on the inside. Forgiveness is a decision before it is ever a feeling.",
+          "prayer": "Father, I name them before You, and I release what I have been holding. I ask You to do them good, as far as I am able to mean it. Where I want them punished more than changed, change me. In Jesus' name, Amen.",
+          "question": "Who came to mind first? That is the one.",
+          "familyQuestion": "Is there an old quarrel this house is still carrying?",
+          "familyPrayer": "Lord, let forgiveness start in this room before it goes anywhere else."
+        },
+        {
+          "day": 14,
+          "title": "Do not grow weary",
+          "read": {
+            "book": "Galatians",
+            "chapter": 6,
+            "verse": 9
+          },
+          "reflection": "Two weeks. This is where most fasts quietly end - not in a decision to stop, but in a slow loss of attention.\n\nPaul's promise has a condition: in due season we shall reap, if we faint not. Both halves are meant to hold you up.",
+          "prayer": "Father, I am tired, and I am telling You rather than pretending. Renew me for the second half of this. In due season - I will wait for Yours and stop demanding mine. In Jesus' name, Amen.",
+          "question": "What would make you stop? Name it, so you can see it coming.",
+          "familyQuestion": "How do we keep each other going for another week?",
+          "familyPrayer": "God, strengthen this house for the second half."
+        },
+        {
+          "day": 15,
+          "title": "As they fasted",
+          "read": {
+            "book": "Acts",
+            "chapter": 13,
+            "verse": 2,
+            "from": 2,
+            "to": 3
+          },
+          "reflection": "The first church fasted together, and it was in that room that the Spirit spoke about what to do next.\n\nSome things are only heard corporately. Pray for your church today - not for it to be bigger, but for it to be worth belonging to.",
+          "prayer": "Lord, give my church courage, honesty, and leaders who serve. Where I have only criticised it, make me part of the answer. Speak to us together about what You are asking of us. In Jesus' name, Amen.",
+          "question": "What has your church given you that you never thanked God for?",
+          "familyQuestion": "How could our family serve our church this month?",
+          "familyPrayer": "Father, bless our church, and make this house useful in it."
+        },
+        {
+          "day": 16,
+          "title": "Standing for somebody else",
+          "read": {
+            "book": "Esther",
+            "chapter": 4,
+            "verse": 16
+          },
+          "reflection": "Esther's fast was not for herself. Three days without food or water, for people she could have quietly outlived in the safety of a palace.\n\nGive today away. Fast for someone who does not know you are doing it.",
+          "prayer": "Father, I give today's fast to someone else, and I name them now. Do for them what they cannot arrange for themselves. If it costs me something to stand with them, I accept the cost. In Jesus' name, Amen.",
+          "question": "Who are you standing for today?",
+          "familyQuestion": "Which family outside ours should we be praying for?",
+          "familyPrayer": "Lord, we stand today for a house that is not our own."
+        },
+        {
+          "day": 17,
+          "title": "The still small voice",
+          "read": {
+            "book": "1 Kings",
+            "chapter": 19,
+            "verse": 12,
+            "from": 11,
+            "to": 13
+          },
+          "reflection": "Elijah wanted to die, and God fed him twice and let him sleep before saying a word about anything else.\n\nThen not the wind, not the earthquake, not the fire - a still small voice. We want God dramatic because dramatic is easier to notice.",
+          "prayer": "Lord, I have asked a great deal. Today I am listening. Quiet me enough to hear something that does not shout. Whatever You have already said that I ignored - say it again. In Jesus' name, Amen.",
+          "question": "What do you suspect God has already told you?",
+          "familyQuestion": "When was this house last quiet enough to listen?",
+          "familyPrayer": "God, quiet this home tonight, and speak."
+        },
+        {
+          "day": 18,
+          "title": "This kind",
+          "read": {
+            "book": "Mark",
+            "chapter": 9,
+            "verse": 29,
+            "from": 28,
+            "to": 29
+          },
+          "reflection": "The disciples could not do it and asked why in private. Jesus does not scold them - He says some things only come out by prayer and fasting.\n\nThere is a pattern in your life you have tried to break by deciding to break it.",
+          "prayer": "Father, this is the pattern I have never broken, and I bring it to You by name. I stop trying to out-discipline it and ask You to break it. Let it not survive this fast. In Jesus' name, Amen.",
+          "question": "What have you tried to fix by willpower and failed?",
+          "familyQuestion": "What pattern keeps repeating in this family?",
+          "familyPrayer": "Lord, break in this house what we have never managed to break ourselves."
+        },
+        {
+          "day": 19,
+          "title": "Dig the ditches",
+          "read": {
+            "book": "2 Kings",
+            "chapter": 3,
+            "verse": 16,
+            "from": 16,
+            "to": 17
+          },
+          "reflection": "No wind, no rain - and an instruction to fill the valley with ditches. They dug all night in a drought for water they could not see coming.\n\nWhat would you do today if you believed the answer was on its way? Faith usually looks like preparation.",
+          "prayer": "Lord, show me what to prepare for the answer I am asking for. Give me the courage to act as though You will do what You said. Fill the valley - I am digging. In Jesus' name, Amen.",
+          "question": "What would you do this week if you knew the answer was coming?",
+          "familyQuestion": "What should this house get ready for?",
+          "familyPrayer": "God, we prepare for what we cannot yet see. Come and fill it."
+        },
+        {
+          "day": 20,
+          "title": "Thanks before the answer",
+          "read": {
+            "book": "Philippians",
+            "chapter": 4,
+            "verse": 6,
+            "from": 6,
+            "to": 7
+          },
+          "reflection": "With thanksgiving is the part we skip. Paul does not say be thankful afterwards - he puts it inside the asking.\n\nThank God for what you have not yet seen. Not as a technique to make it arrive; as an admission that you trust Him with it.",
+          "prayer": "Father, I thank You in advance for what I have not yet seen. Guard my heart and mind while I wait, as You promised. Whatever the answer is, I will still be Yours when it comes. In Jesus' name, Amen.",
+          "question": "What are you willing to thank God for before it happens?",
+          "familyQuestion": "What can this house thank God for in advance?",
+          "familyPrayer": "Lord, we thank You now for what we are still waiting to see."
+        },
+        {
+          "day": 21,
+          "title": "Break it well",
+          "read": {
+            "book": "Nehemiah",
+            "chapter": 8,
+            "verse": 10
+          },
+          "reflection": "Nehemiah tells a weeping people to eat, drink, and send portions to those with nothing prepared. The fast ends in a shared meal, not a private one.\n\nEat gently - your body has been without. And do not let this be the end of the praying.",
+          "prayer": "Father, thank You for carrying me through twenty-one days. Let what began here continue after the food comes back. The joy of the Lord is my strength - let that outlast the fast. In Jesus' name, Amen.",
+          "question": "What are you keeping from these twenty-one days?",
+          "familyQuestion": "Who can we share a meal with as we finish?",
+          "familyPrayer": "Lord, we finish together and we thank You. Let this house not go back to how it was."
+        }
+      ]
+    }
+  ]
+}

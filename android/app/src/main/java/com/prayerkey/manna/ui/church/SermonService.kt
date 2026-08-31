@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class SermonService : Service() {
 
+    private var recognizer: SermonRecognizer? = null
     private var capture: SermonCaptureEngine? = null
     private var wakeLock: PowerManager.WakeLock? = null
 
@@ -58,15 +59,21 @@ class SermonService : Service() {
         _partial.value = ""
         _listening.value = true
 
-        // The previous implementation only streamed PCM to a Socket.IO server.
-        // When that server was absent (the debug build points at 10.0.2.2:3001),
-        // audio was saved but no words could ever reach the UI. Android's
-        // recognizer is the dependable first engine: it produces partial and
-        // final text directly on the device and continuously restarts between
-        // utterances for a full sermon.
-        capture = SermonCaptureEngine(
+        /* Restore the continuous Android recognizer as the primary live path.
+           This is the path that previously made Church behave like Live
+           Transcribe: partial words arrive immediately and each completed
+           utterance is appended. Vosk remains the offline fallback for phones
+           without a system speech service. */
+        val systemRecognizer = SermonRecognizer(
             context = this,
-            onSegment = { segment ->
+            language = _language.value,
+            onChunk = { text ->
+                val end = System.currentTimeMillis() - _startedAt.value
+                val segment = SermonSegment(
+                    startMs = _segments.value.lastOrNull()?.endMs ?: 0L,
+                    endMs = end.coerceAtLeast(0L),
+                    text = text,
+                )
                 _segments.value = _segments.value + segment
                 _chunks.value = _chunks.value + segment.text
                 _partial.value = ""
@@ -74,7 +81,23 @@ class SermonService : Service() {
             },
             onPartial = { _partial.value = it },
             onStatus = { _status.value = it },
-        ).also { it.start(_startedAt.value) }
+        )
+        if (systemRecognizer.available) {
+            recognizer = systemRecognizer.also { it.start() }
+        } else {
+            systemRecognizer.destroy()
+            capture = SermonCaptureEngine(
+                context = this,
+                onSegment = { segment ->
+                    _segments.value = _segments.value + segment
+                    _chunks.value = _chunks.value + segment.text
+                    _partial.value = ""
+                    harvestReferences(segment.text)
+                },
+                onPartial = { _partial.value = it },
+                onStatus = { _status.value = it },
+            ).also { it.start(_startedAt.value) }
+        }
     }
 
     /**
@@ -94,6 +117,8 @@ class SermonService : Service() {
     }
 
     private fun stopListening() {
+        recognizer?.destroy()
+        recognizer = null
         capture?.stop(_startedAt.value)
         _audioPath.value = capture?.audioFile?.absolutePath.orEmpty()
         capture = null
@@ -107,6 +132,8 @@ class SermonService : Service() {
     }
 
     override fun onDestroy() {
+        recognizer?.destroy()
+        recognizer = null
         capture?.stop(_startedAt.value)
         _audioPath.value = capture?.audioFile?.absolutePath.orEmpty()
         capture = null

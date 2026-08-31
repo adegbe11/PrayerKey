@@ -96,26 +96,45 @@ private fun experience(title: String): Experience = when (title) {
     onClose: () -> Unit,
     openHub: () -> Unit,
 ) {
-    if (title in setOf("Prayer challenge", "30 prayers for my family", "40 days before the door opens", "Back to the altar", "Thanksgiving challenge", "Church challenge")) {
-        PrayerChallengeMachine(onClose)
+    /*
+     * The named challenges replace four configurators.
+     *
+     * Every one of these titles used to open a screen that asked questions
+     * before day one - "CHOOSE YOUR FOCUS", a length, a reminder hour - and
+     * produced something with no name. A plan nobody can name is a plan nobody
+     * can recommend, and the writing inside it can never be specific, because
+     * it has to serve every combination. The prayer challenge alone had over
+     * 2,700 of them.
+     *
+     * These now open a written plan directly, or the shelf when the title is a
+     * category rather than a plan.
+     */
+    val namedChallenge = when (title) {
+        "Midnight prayer", "Three watches", "Night vigil" -> "the-midnight-watch"
+        "Warfare prayer", "Imprecatory Psalms" -> "standing-in-scripture"
+        "Start a fast", "Daniel fast", "Full fast", "Partial fast", "Esther fast",
+        "Timed fast", "First fruits", "Church-wide fast", "Fasting record" -> "fasting-and-prayer"
+        else -> null
+    }
+    if (namedChallenge != null) {
+        com.prayerkey.manna.ui.challenge.ChallengeById(namedChallenge, onClose)
+        return
+    }
+    if (title in setOf(
+            "Prayer challenge", "30 prayers for my family", "40 days before the door opens",
+            "Back to the altar", "Thanksgiving challenge", "Church challenge",
+        )
+    ) {
+        com.prayerkey.manna.ui.challenge.ChallengeShelfRoute(onClose)
         return
     }
     if (title == "Bible challenge") {
         BibleChallengeMachine(onClose)
         return
     }
-    if (title in setOf("Start a fast", "Daniel fast", "Full fast", "Partial fast", "Esther fast", "Timed fast", "First fruits", "Church-wide fast", "Fasting record")) {
-        FastingChallengeMachine(onClose)
-        return
-    }
-    if (title in setOf("Warfare prayer", "Imprecatory Psalms")) {
-        WarfarePrayerScreen(onClose)
-        return
-    }
     val faithMachine = when (title) {
         "Prayer points" -> "Prayer points"
         "Memory verse" -> "Memory verse"
-        "Midnight prayer", "Three watches", "Night vigil" -> "Midnight prayer"
         "Declarations" -> "Declarations"
         else -> null
     }

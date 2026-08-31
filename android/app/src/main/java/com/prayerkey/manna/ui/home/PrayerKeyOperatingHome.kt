@@ -53,6 +53,7 @@ import java.time.format.DateTimeFormatter
 private enum class Hub { BIBLE, PRAY, CHURCH, JOURNAL }
 private data class Feature(val title: String, val detail: String, val icon: ImageVector, val hub: Hub)
 private data class ProgrammeCategory(val title: String, val items: List<Feature>)
+private data class HomeShelfItem(val title: String, val artwork: Int, val open: () -> Unit)
 
 @Composable
 fun PrayerKeyOperatingHome(
@@ -100,7 +101,10 @@ fun PrayerKeyOperatingHome(
        which is the timed guided journey — different thing, same word. */
     var todayPullsOpen by rememberSaveable { mutableStateOf(false) }
     var biblePullsOpen by rememberSaveable { mutableStateOf(false) }
+    var challengeShelfOpen by rememberSaveable { mutableStateOf(false) }
+    var openChallengeId by rememberSaveable { mutableStateOf<String?>(null) }
     var prayerCalendarOpen by rememberSaveable { mutableStateOf(false) }
+    var exploreOpen by rememberSaveable { mutableStateOf(false) }
     var selectedFeature by remember { mutableStateOf<Feature?>(null) }
 
     LaunchedEffect(initialAction) {
@@ -271,6 +275,32 @@ fun PrayerKeyOperatingHome(
             }
         }
     }
+    if (challengeShelfOpen) {
+        Dialog(
+            onDismissRequest = { challengeShelfOpen = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            com.prayerkey.manna.ui.challenge.ChallengeShelf(
+                onOpen = { challenge -> openChallengeId = challenge.id },
+                onClose = { challengeShelfOpen = false },
+            )
+        }
+    }
+    openChallengeId?.let { id ->
+        var challenge by remember(id) { mutableStateOf<com.prayerkey.manna.data.ChallengePlan?>(null) }
+        LaunchedEffect(id) { challenge = com.prayerkey.manna.data.Challenges.byId(context, id) }
+        Dialog(
+            onDismissRequest = { openChallengeId = null },
+            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            challenge?.let { plan ->
+                com.prayerkey.manna.ui.challenge.ChallengeDayScreen(
+                    challenge = plan,
+                    onClose = { openChallengeId = null },
+                )
+            }
+        }
+    }
     if (prayerCalendarOpen) {
         Dialog(
             onDismissRequest = { prayerCalendarOpen = false },
@@ -299,6 +329,22 @@ fun PrayerKeyOperatingHome(
     val programmes = remember { programmeCategories() }
     val conditional = remember(today) { conditionalFeatures(today) }
 
+    if (exploreOpen) {
+        Dialog(
+            onDismissRequest = { exploreOpen = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            ExplorePrayerKeyScreen(
+                categories = programmes,
+                momentItems = conditional,
+                go = { feature -> exploreOpen = false; go(feature) },
+                startPrayer = { exploreOpen = false; prayerSessionOpen = true },
+                prayerHistory = { exploreOpen = false; prayerCalendarOpen = true },
+                onClose = { exploreOpen = false },
+            )
+        }
+    }
+
     Column(
         Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding()
             .verticalScroll(rememberScrollState()).padding(bottom = Pk.NavClearance)
@@ -310,19 +356,21 @@ fun PrayerKeyOperatingHome(
             readBadge = readBadgeText,
             biblePulls = { biblePullsOpen = true },
             prayNow = onOpenPrayer,
+            challenges = { challengeShelfOpen = true },
             ledger = onOpenJournal,
         )
         HeroRail(written?.title.orEmpty()) { devotionalOpen = true }
 
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
+            PrayerSessionEntry(
+                start = { prayerSessionOpen = true },
+                history = { prayerCalendarOpen = true },
+            )
+            Spacer(Modifier.height(14.dp))
             TodayRhythmPanel(
                 savedCount, journalCount, streak,
                 onOpenPrayer, { devotionalOpen = true }, onOpenBible,
                 onOpenJournal, onOpenPrayer, onOpenJournal,
-            )
-            PrayerSessionEntry(
-                start = { prayerSessionOpen = true },
-                history = { prayerCalendarOpen = true },
             )
         }
 
@@ -333,7 +381,6 @@ fun PrayerKeyOperatingHome(
         }
 
         EmergencyCard { emergencyPrayerOpen = true }
-
         TopicalBibleEntry { topicalBibleOpen = true }
 
         conditional.takeIf { it.isNotEmpty() }?.let { items ->
@@ -341,8 +388,319 @@ fun PrayerKeyOperatingHome(
         }
 
         ProgrammeLibrary(programmes, go)
-
         Section("CLOSING VERSE") { ClosingVerseCard() }
+    }
+}
+
+@Composable
+private fun HomeContentLibrary(
+    openPrayer: () -> Unit,
+    openEmergency: () -> Unit,
+    openMorning: () -> Unit,
+    openDevotional: () -> Unit,
+    openVerse: () -> Unit,
+    openBible: () -> Unit,
+    openTopical: () -> Unit,
+    openPrayerList: () -> Unit,
+    openJournal: () -> Unit,
+    openChurch: () -> Unit,
+    openFeature: (Feature) -> Unit,
+) {
+    fun feature(title: String, hub: Hub = Hub.PRAY, icon: ImageVector = Icons.Outlined.AutoAwesome) =
+        { openFeature(Feature(title, "", icon, hub)) }
+
+    Spacer(Modifier.height(8.dp))
+    HomeVisualShelf(
+        "Continue",
+        listOf(
+            HomeShelfItem("Today's prayer", R.drawable.today_prayer_violet, openPrayer),
+            HomeShelfItem("Read the Bible", R.drawable.bible_cover_red, openBible),
+            HomeShelfItem("Prayer challenge", R.drawable.discovery_cover_4, feature("Prayer challenge", icon = Icons.Outlined.LocalFireDepartment)),
+        ),
+        wide = true,
+    )
+    HomeVisualShelf(
+        "Pray now",
+        listOf(
+            HomeShelfItem("I need prayer now", R.drawable.prayerkey_hero_dawn, openEmergency),
+            HomeShelfItem("Prayer points", R.drawable.discovery_cover_2, feature("Prayer points", icon = Icons.Outlined.FormatListBulleted)),
+            HomeShelfItem("My prayer list", R.drawable.discovery_cover_1, openPrayerList),
+        ),
+    )
+    HomeVisualShelf(
+        "Prayer times",
+        listOf(
+            HomeShelfItem("Morning prayer", R.drawable.rhythm_morning, openMorning),
+            HomeShelfItem("Midnight prayer", R.drawable.rhythm_evening, feature("Midnight prayer", icon = Icons.Outlined.DarkMode)),
+            HomeShelfItem("The three watches", R.drawable.discovery_cover_3, feature("The three watches", icon = Icons.Outlined.Schedule)),
+        ),
+    )
+    HomeVisualShelf(
+        "Challenges",
+        listOf(
+            HomeShelfItem("Prayer challenge", R.drawable.discovery_cover_4, feature("Prayer challenge", icon = Icons.Outlined.LocalFireDepartment)),
+            HomeShelfItem("Bible challenge", R.drawable.discovery_cover_6, feature("Bible challenge", Hub.BIBLE, Icons.Outlined.MenuBook)),
+            HomeShelfItem("Memory verse", R.drawable.verse_card_botanical, feature("Memory verse", Hub.BIBLE, Icons.Outlined.Bookmark)),
+        ),
+    )
+    HomeVisualShelf(
+        "Bible",
+        listOf(
+            HomeShelfItem("Read the Bible", R.drawable.bible_cover_red, openBible),
+            HomeShelfItem("Audio Bible", R.drawable.discovery_cover_6, feature("Audio Bible", Hub.BIBLE, Icons.Outlined.Headphones)),
+            HomeShelfItem("Bible verses by topic", R.drawable.verse_card_oxblood, openTopical),
+            HomeShelfItem("Verse of the day", R.drawable.verse_card_botanical, openVerse),
+        ),
+    )
+    HomeVisualShelf(
+        "Fasting",
+        listOf(
+            HomeShelfItem("Start a fast", R.drawable.discovery_cover_5, feature("Start a fast", icon = Icons.Outlined.Timer)),
+            HomeShelfItem("Daniel fast", R.drawable.discovery_cover_3, feature("Daniel fast", icon = Icons.Outlined.Spa)),
+            HomeShelfItem("Esther fast", R.drawable.discovery_cover_4, feature("Esther fast", icon = Icons.Outlined.LocalFireDepartment)),
+            HomeShelfItem("Timed fast", R.drawable.rhythm_evening, feature("Timed fast", icon = Icons.Outlined.Schedule)),
+        ),
+    )
+    HomeVisualShelf(
+        "Night prayer",
+        listOf(
+            HomeShelfItem("Midnight prayer", R.drawable.rhythm_evening, feature("Midnight prayer", icon = Icons.Outlined.DarkMode)),
+            HomeShelfItem("Warfare prayers", R.drawable.discovery_cover_5, feature("Warfare prayers", icon = Icons.Outlined.Shield)),
+            HomeShelfItem("Declarations", R.drawable.discovery_cover_3, feature("Declarations", icon = Icons.Outlined.Campaign)),
+        ),
+    )
+    HomeVisualShelf(
+        "Be still",
+        listOf(
+            HomeShelfItem("Guided silence", R.drawable.rhythm_reflection, feature("Guided silence", icon = Icons.Outlined.SelfImprovement)),
+            HomeShelfItem("Lectio Divina", R.drawable.onboarding_read_v3, feature("Lectio Divina", Hub.BIBLE, Icons.Outlined.AutoStories)),
+            HomeShelfItem("The Examen", R.drawable.prayerkey_hero_dawn, feature("The Examen", icon = Icons.Outlined.FavoriteBorder)),
+        ),
+    )
+    HomeVisualShelf(
+        "Your prayer record",
+        listOf(
+            HomeShelfItem("My prayer list", R.drawable.discovery_cover_1, openPrayerList),
+            HomeShelfItem("Journal", R.drawable.onboarding_journal_v3, openJournal),
+            HomeShelfItem("Answered prayers", R.drawable.discovery_cover_4, openJournal),
+        ),
+    )
+    HomeVisualShelf(
+        "Church",
+        listOf(
+            HomeShelfItem("Live sermon", R.drawable.onboarding_church_v3, openChurch),
+            HomeShelfItem("Sermon notes", R.drawable.discovery_cover_6, openChurch),
+        ),
+    )
+    HomeVisualShelf(
+        "Every day",
+        listOf(
+            HomeShelfItem("Daily devotional", R.drawable.prayerkey_hero_dawn, openDevotional),
+            HomeShelfItem("Morning prayer", R.drawable.rhythm_morning, openMorning),
+            HomeShelfItem("Verse of the day", R.drawable.verse_card_dawn, openVerse),
+        ),
+    )
+}
+
+@Composable
+private fun HomeVisualShelf(title: String, items: List<HomeShelfItem>, wide: Boolean = false) {
+    Column(Modifier.fillMaxWidth().padding(top = 30.dp)) {
+        Text(
+            title,
+            modifier = Modifier.padding(horizontal = 22.dp),
+            fontFamily = UtilitySans,
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp,
+            color = Pk.Charcoal,
+        )
+        Row(
+            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 22.dp, vertical = 15.dp),
+            horizontalArrangement = Arrangement.spacedBy(13.dp),
+        ) {
+            items.forEach { HomeVisualCard(it, wide) }
+        }
+    }
+}
+
+@Composable
+private fun HomeVisualCard(item: HomeShelfItem, wide: Boolean) {
+    val width = if (wide) 260.dp else 178.dp
+    val height = if (wide) 164.dp else 220.dp
+    Box(
+        Modifier.width(width).height(height).clip(RoundedCornerShape(24.dp))
+            .clickable(onClick = item.open),
+    ) {
+        Image(
+            painterResource(item.artwork),
+            contentDescription = item.title,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+        )
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    listOf(Color.Black.copy(alpha = .02f), Color.Black.copy(alpha = .12f), Color.Black.copy(alpha = .84f))
+                )
+            )
+        )
+        Text(
+            item.title,
+            modifier = Modifier.align(Alignment.BottomStart).padding(18.dp),
+            fontFamily = DisplaySerif,
+            fontWeight = FontWeight.Bold,
+            fontSize = if (wide) 24.sp else 21.sp,
+            lineHeight = if (wide) 28.sp else 25.sp,
+            color = Color.White,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+private fun DailyPrayerGoal(streak: Int, startPrayer: () -> Unit) {
+    val context = LocalContext.current
+    val today = LocalDate.now()
+    val sessions = remember { PrayerJourneyStore(context).records() }
+    val prayedToday = remember(sessions, today) {
+        sessions.filter { record ->
+            java.time.Instant.ofEpochMilli(record.startedAt)
+                .atZone(java.time.ZoneId.systemDefault()).toLocalDate() == today && record.completed
+        }.sumOf { it.minutes }
+    }
+    val prefs = remember { context.getSharedPreferences("daily_prayer_goal", android.content.Context.MODE_PRIVATE) }
+    val target = remember { prefs.getInt("minutes", 10).coerceIn(5, 120) }
+    val shown = prayedToday.coerceAtMost(target)
+    val remaining = (target - prayedToday).coerceAtLeast(0)
+    val progress = (prayedToday.toFloat() / target).coerceIn(0f, 1f)
+
+    Surface(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp),
+        shape = RoundedCornerShape(28.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Pk.Hair),
+        shadowElevation = 7.dp,
+    ) {
+        Column(Modifier.padding(22.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(46.dp).clip(CircleShape).background(Pk.Oxblood.copy(alpha = .09f)), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Outlined.Timer, null, tint = Pk.Oxblood, modifier = Modifier.size(22.dp))
+                }
+                Text(
+                    if (remaining == 0) "Prayer complete" else "Pray for $target minutes",
+                    Modifier.weight(1f).padding(start = 14.dp),
+                    fontFamily = DisplaySerif,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 25.sp,
+                    color = Pk.Charcoal,
+                )
+                if (streak > 0) {
+                    Surface(shape = RoundedCornerShape(50), color = Pk.Oxblood.copy(alpha = .07f)) {
+                        Row(Modifier.padding(horizontal = 11.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Outlined.LocalFireDepartment, null, tint = Pk.Oxblood, modifier = Modifier.size(17.dp))
+                            Text("$streak", Modifier.padding(start = 4.dp), color = Pk.Oxblood, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+            }
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(6.dp).clip(RoundedCornerShape(8.dp)),
+                color = Pk.Oxblood,
+                trackColor = Pk.Oxblood.copy(alpha = .10f),
+                gapSize = 0.dp,
+                drawStopIndicator = {},
+            )
+            Row(Modifier.fillMaxWidth().padding(top = 9.dp)) {
+                Text("$shown min prayed", Modifier.weight(1f), color = Pk.Muted, fontFamily = UtilitySans, fontSize = 11.sp)
+                Text("$target min goal", color = Pk.Muted, fontFamily = UtilitySans, fontSize = 11.sp)
+            }
+            Button(
+                onClick = startPrayer,
+                modifier = Modifier.fillMaxWidth().padding(top = 17.dp).height(50.dp),
+                shape = RoundedCornerShape(17.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood, contentColor = Color.White),
+            ) {
+                Text(
+                    when {
+                        remaining == 0 -> "PRAY AGAIN"
+                        prayedToday > 0 -> "RESUME PRAYER"
+                        else -> "START PRAYER"
+                    },
+                    fontWeight = FontWeight.Bold, fontSize = 12.sp, letterSpacing = .7.sp,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ActiveChallengeCard(open: () -> Unit) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("prayer_challenge_machine", android.content.Context.MODE_PRIVATE)
+    val active = prefs.getBoolean("active", false)
+    val duration = prefs.getInt("duration", 21).coerceAtLeast(1)
+    val completed = prefs.getStringSet("done", emptySet()).orEmpty().size.coerceAtMost(duration)
+    val focus = prefs.getString("focus", "").orEmpty().ifBlank { "Prayer challenge" }
+
+    Section("ACTIVE CHALLENGE") {
+        Surface(
+            modifier = Modifier.fillMaxWidth().clickable(onClick = open),
+            shape = RoundedCornerShape(27.dp),
+            color = Pk.DeepDark,
+            shadowElevation = 6.dp,
+        ) {
+            Column(Modifier.padding(21.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Outlined.LocalFireDepartment, null, tint = Pk.GoldLight, modifier = Modifier.size(27.dp))
+                    Column(Modifier.weight(1f).padding(start = 13.dp)) {
+                        Text(if (active) focus else "Start a prayer challenge", fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 21.sp, color = Color.White, maxLines = 2)
+                        if (active) Text("Day ${(completed + 1).coerceAtMost(duration)} of $duration", Modifier.padding(top = 4.dp), color = Color.White.copy(alpha = .68f), fontSize = 12.sp)
+                    }
+                    Icon(Icons.Outlined.ArrowForward, null, tint = Pk.GoldLight)
+                }
+                if (active) {
+                    LinearProgressIndicator(
+                        progress = { completed.toFloat() / duration },
+                        modifier = Modifier.fillMaxWidth().padding(top = 17.dp).height(7.dp).clip(RoundedCornerShape(7.dp)),
+                        color = Pk.GoldLight,
+                        trackColor = Color.White.copy(alpha = .15f),
+                        gapSize = 0.dp,
+                        drawStopIndicator = {},
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ContinueCard(reading: String, openBible: () -> Unit, openHistory: () -> Unit) {
+    Section("CONTINUE") {
+        Surface(shape = RoundedCornerShape(25.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
+            Column {
+                ContinueRow(Icons.Outlined.MenuBook, "Bible", reading, openBible)
+                HorizontalDivider(color = Pk.Hair)
+                ContinueRow(Icons.Outlined.History, "Prayer history", "Your saved prayer sessions", openHistory)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ContinueRow(icon: ImageVector, title: String, detail: String, open: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clickable(onClick = open).padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(43.dp).clip(RoundedCornerShape(14.dp)).background(Pk.Oxblood.copy(alpha = .08f)), contentAlignment = Alignment.Center) {
+            Icon(icon, null, tint = Pk.Oxblood, modifier = Modifier.size(21.dp))
+        }
+        Column(Modifier.weight(1f).padding(start = 13.dp)) {
+            Text(title, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Pk.Charcoal)
+            Text(detail, Modifier.padding(top = 3.dp), fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Icon(Icons.Outlined.ChevronRight, null, tint = Pk.Muted)
     }
 }
 
@@ -421,12 +779,15 @@ private data class HomeShortcut(
     readBadge: String?,
     biblePulls: () -> Unit,
     prayNow: () -> Unit,
+    /** The named-challenge shelf. */
+    challenges: () -> Unit,
     ledger: () -> Unit,
 ) {
     val shortcuts = listOf(
         HomeShortcut("Today", Icons.Outlined.WbSunny, R.drawable.prayerkey_hero_dawn, todayBadge, todayPulls),
         HomeShortcut("Read", Icons.Outlined.AutoStories, R.drawable.onboarding_read_v3, readBadge, biblePulls),
         HomeShortcut("Pray now", Icons.Outlined.Bolt, R.drawable.onboarding_pray_v3, open = prayNow),
+        HomeShortcut("Challenges", Icons.Outlined.LocalFireDepartment, R.drawable.discovery_cover_3, open = challenges),
         HomeShortcut("My prayers", Icons.Outlined.FactCheck, R.drawable.onboarding_journal_v3, open = ledger),
     )
     Row(
@@ -666,7 +1027,7 @@ private fun CircularImageShortcut(item: HomeShortcut) {
 
 @Composable private fun TopicalBibleEntry(open: () -> Unit) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 13.dp)) {
-        Text("FIND IT IN THE WORD", style = labelStyle(), color = Pk.Charcoal, modifier = Modifier.padding(bottom = 11.dp))
+        Text("BIBLE VERSES BY TOPIC", style = labelStyle(), color = Pk.Charcoal, modifier = Modifier.padding(bottom = 11.dp))
         Box(
             Modifier.fillMaxWidth().height(236.dp)
                 .shadow(16.dp, RoundedCornerShape(27.dp), spotColor = Pk.Oxblood.copy(alpha = .24f))
@@ -698,17 +1059,15 @@ private fun CircularImageShortcut(item: HomeShortcut) {
             Column(
                 Modifier.fillMaxHeight().padding(start = 157.dp, end = 18.dp, top = 27.dp, bottom = 22.dp),
             ) {
-                Text("TOPICAL BIBLE VERSES", color = Pk.GoldLight, fontFamily = UtilitySans,
+                Text("HOLY BIBLE", color = Pk.GoldLight, fontFamily = UtilitySans,
                     fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold)
-                Text("Find the Word\nfor this moment", Modifier.padding(top = 8.dp),
+                Text("Find a verse\nfor today", Modifier.padding(top = 8.dp),
                     color = Color.White, fontFamily = DisplaySerif, fontSize = 25.sp,
                     lineHeight = 29.sp, fontWeight = FontWeight.Bold)
-                Text("Subjects · moods · everyday life", Modifier.padding(top = 7.dp),
-                    color = Color.White.copy(alpha = .68f), fontSize = 10.5.sp, maxLines = 1)
                 Spacer(Modifier.weight(1f))
                 Surface(onClick = open, shape = RoundedCornerShape(14.dp), color = Color.White) {
                     Row(Modifier.padding(horizontal = 15.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text("EXPLORE VERSES", color = Pk.Oxblood, fontSize = 10.sp,
+                        Text("OPEN", color = Pk.Oxblood, fontSize = 10.sp,
                             letterSpacing = .7.sp, fontWeight = FontWeight.Bold)
                         Icon(Icons.Outlined.ArrowForward, null, tint = Pk.Oxblood,
                             modifier = Modifier.padding(start = 6.dp).size(16.dp))
@@ -724,7 +1083,7 @@ private fun CircularImageShortcut(item: HomeShortcut) {
         Metric("OPEN PRAYERS", saved, Icons.Outlined.FavoriteBorder, pray)
         Metric("JOURNAL", journal, Icons.Outlined.EditNote, write)
         Metric("SERMONS", sermons, Icons.Outlined.GraphicEq, church)
-        Metric("PRAYING NOW", 247, Icons.Outlined.Groups, pray)
+        Metric("PRAYER WALL", 0, Icons.Outlined.Groups, pray)
     }
 }
 
@@ -733,8 +1092,7 @@ private fun CircularImageShortcut(item: HomeShortcut) {
         Column(Modifier.padding(22.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Your quiet history with God", fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, color = Color.White)
-                    Text("Every prayer matters—even while you wait.", Modifier.padding(top = 5.dp), fontFamily = UtilitySans, fontSize = 12.sp, color = Color.White.copy(alpha = .66f))
+                    Text("Prayer history", fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, color = Color.White)
                 }
                 Surface(shape = CircleShape, color = Pk.GoldLight.copy(alpha = .12f)) {
                     Icon(Icons.Outlined.FavoriteBorder, null, Modifier.padding(12.dp), tint = Pk.GoldLight)
@@ -762,32 +1120,30 @@ private fun CircularImageShortcut(item: HomeShortcut) {
 
 @Composable private fun PrayerSessionEntry(start: () -> Unit, history: () -> Unit) {
     Surface(
-        modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-        shape = RoundedCornerShape(25.dp), color = Pk.DeepDark,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(25.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Pk.Hair),
+        shadowElevation = 2.dp,
     ) {
-        Column(Modifier.padding(20.dp)) {
+        Column(Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(46.dp).clip(CircleShape).background(Color.White.copy(alpha = .1f)), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Outlined.Timer, null, tint = Pk.GoldLight)
+                Box(Modifier.size(46.dp).clip(CircleShape).background(Pk.Oxblood.copy(alpha = .08f)), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Outlined.Timer, null, tint = Pk.Oxblood)
                 }
                 Column(Modifier.weight(1f).padding(start = 14.dp)) {
-                    Text("Prayer session", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color.White)
-                    Text("Pray with guidance or use a quiet timer", Modifier.padding(top = 3.dp), fontFamily = UtilitySans, fontSize = 12.sp, color = Color.White.copy(alpha = .67f))
+                    Text("Continue praying", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Pk.Charcoal)
                 }
+                IconButton(history) { Icon(Icons.Outlined.History, "Prayer history", tint = Pk.Muted) }
             }
-            Row(Modifier.padding(top = 18.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Button(start, Modifier.weight(1f).height(50.dp), shape = RoundedCornerShape(15.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
-                    Text("START", fontWeight = FontWeight.Bold)
-                }
-                OutlinedButton(history, Modifier.weight(1f).height(50.dp), shape = RoundedCornerShape(15.dp), border = BorderStroke(1.dp, Color.White.copy(alpha = .25f)), colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)) {
-                    Text("CALENDAR", fontWeight = FontWeight.Bold)
-                }
+            Button(start, Modifier.fillMaxWidth().padding(top = 16.dp).height(50.dp), shape = RoundedCornerShape(15.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
+                Text("START PRAYER", fontWeight = FontWeight.Bold)
             }
         }
     }
 }
 
-@Composable private fun TodayRhythmPanel(
+@Composable private fun TodayRhythmPanelLegacy(
     saved: Int, journal: Int, streak: Int,
     morningPrayer: () -> Unit, devotional: () -> Unit, bible: () -> Unit,
     reflection: () -> Unit, eveningPrayer: () -> Unit, history: () -> Unit,
@@ -936,6 +1292,92 @@ private fun CircularImageShortcut(item: HomeShortcut) {
     }
 }
 
+@Composable private fun TodayRhythmPanel(
+    saved: Int, journal: Int, streak: Int,
+    morningPrayer: () -> Unit, devotional: () -> Unit, bible: () -> Unit,
+    reflection: () -> Unit, eveningPrayer: () -> Unit, history: () -> Unit,
+) {
+    val context = LocalContext.current
+    val dateKey = LocalDate.now().toString()
+    val prefs = remember { context.getSharedPreferences("today_rhythm", android.content.Context.MODE_PRIVATE) }
+    var completed by remember(dateKey) { mutableStateOf(prefs.getStringSet(dateKey, emptySet()).orEmpty()) }
+    var openMoment by remember { mutableStateOf<String?>(null) }
+    val items = listOf(
+        Triple("morning", "Father, order my steps today", "Morning prayer") to morningPrayer,
+        Triple("devotional", "Lord, speak through Your Word", "Daily devotional") to devotional,
+        Triple("bible", "Open my eyes to Your Word", "Bible reading") to bible,
+        Triple("reflection", "Search my heart and lead me", "Prayer and reflection") to reflection,
+        Triple("evening", "Father, I return this day to You", "Evening prayer") to eveningPrayer,
+    )
+    val artwork = mapOf(
+        "morning" to R.drawable.rhythm_morning,
+        "devotional" to R.drawable.prayerkey_hero_dawn,
+        "bible" to R.drawable.verse_card_botanical,
+        "reflection" to R.drawable.rhythm_reflection,
+        "evening" to R.drawable.rhythm_evening,
+    )
+    fun finish(id: String) {
+        completed = completed + id
+        prefs.edit().putStringSet(dateKey, completed).apply()
+        openMoment = null
+    }
+    openMoment?.let { moment ->
+        Dialog(onDismissRequest = { openMoment = null }, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+            DailyRhythmExperience(moment, onClose = { openMoment = null }, onComplete = { finish(moment) })
+        }
+    }
+    Column {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+            Column(Modifier.weight(1f)) {
+                Text("Today, ${LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d"))}", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 27.sp, color = Pk.Charcoal)
+                Text("${completed.size} of ${items.size} complete", Modifier.padding(top = 3.dp), fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted)
+            }
+            Text("${completed.size * 100 / items.size}%", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Pk.Oxblood)
+        }
+        LinearProgressIndicator(
+            progress = { completed.size.toFloat() / items.size },
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp).height(4.dp).clip(RoundedCornerShape(3.dp)),
+            color = Pk.Oxblood, trackColor = Pk.Charcoal.copy(alpha = .08f), gapSize = 0.dp, drawStopIndicator = {},
+        )
+        Row(Modifier.fillMaxWidth().padding(top = 16.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            items.forEach { item ->
+                val identity = item.first
+                val done = identity.first in completed
+                val hasOwnScreen = identity.first == "devotional" || identity.first == "bible"
+                Box(
+                    Modifier.width(214.dp).height(276.dp).clip(RoundedCornerShape(28.dp)).clickable {
+                        if (hasOwnScreen) {
+                            finish(identity.first)
+                            item.second()
+                        } else openMoment = identity.first
+                    },
+                ) {
+                    Image(painterResource(artwork.getValue(identity.first)), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
+                    Box(Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Color.Black.copy(alpha = .03f), Color.Transparent, Color.Black.copy(alpha = .84f)))))
+                    if (done) {
+                        Surface(Modifier.align(Alignment.TopEnd).padding(14.dp), shape = CircleShape, color = Color.White, shadowElevation = 6.dp) {
+                            Icon(Icons.Outlined.Check, null, Modifier.padding(8.dp).size(17.dp), tint = Pk.Oxblood)
+                        }
+                    }
+                    Column(Modifier.align(Alignment.BottomStart).padding(18.dp)) {
+                        Text(if (done) "COMPLETE" else "TODAY", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, letterSpacing = 1.4.sp, color = Pk.GoldLight)
+                        Text(identity.third, Modifier.padding(top = 6.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 23.sp, lineHeight = 26.sp, color = Color.White)
+                        Text(if (done) "Prayed today" else identity.second, Modifier.padding(top = 6.dp), fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 15.sp, color = Color.White.copy(alpha = .8f), maxLines = 2)
+                    }
+                }
+            }
+        }
+        Surface(onClick = history, modifier = Modifier.fillMaxWidth().padding(top = 14.dp), shape = RoundedCornerShape(20.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
+            Row(Modifier.padding(horizontal = 18.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.History, null, tint = Pk.Oxblood)
+                Text("Prayer history", Modifier.weight(1f).padding(start = 13.dp), fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Pk.Charcoal)
+                Text("$saved · $journal · ${streak.coerceAtLeast(1)} day", fontFamily = UtilitySans, fontSize = 10.sp, color = Pk.Muted)
+                Icon(Icons.Outlined.ChevronRight, null, tint = Pk.Muted)
+            }
+        }
+    }
+}
+
 @Composable private fun MomentCards(items: List<Feature>, go: (Feature) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         items.forEachIndexed { index, item ->
@@ -1029,6 +1471,76 @@ private fun CircularImageShortcut(item: HomeShortcut) {
                     Icon(item.icon, null, tint = Pk.Oxblood, modifier = Modifier.size(23.dp))
                     Text(item.title, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = Pk.Charcoal, maxLines = 2)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExplorePrayerKeyEntry(open: () -> Unit) {
+    Surface(
+        onClick = open,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 18.dp),
+        shape = RoundedCornerShape(26.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Pk.Hair),
+    ) {
+        Row(Modifier.padding(horizontal = 20.dp, vertical = 19.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(48.dp).clip(RoundedCornerShape(16.dp)).background(Pk.Oxblood.copy(alpha = .09f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Outlined.GridView, null, tint = Pk.Oxblood, modifier = Modifier.size(23.dp))
+            }
+            Text(
+                "Explore PrayerKey",
+                modifier = Modifier.weight(1f).padding(start = 15.dp),
+                fontFamily = DisplaySerif,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 21.sp,
+                color = Pk.Charcoal,
+            )
+            Icon(Icons.Outlined.ChevronRight, "Open", tint = Pk.Oxblood)
+        }
+    }
+}
+
+@Composable
+private fun ExplorePrayerKeyScreen(
+    categories: List<ProgrammeCategory>,
+    momentItems: List<Feature>,
+    go: (Feature) -> Unit,
+    startPrayer: () -> Unit,
+    prayerHistory: () -> Unit,
+    onClose: () -> Unit,
+) {
+    Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                IconButton(onClick = onClose) {
+                    Icon(Icons.Outlined.ArrowBackIosNew, "Back", tint = Pk.Charcoal, modifier = Modifier.size(18.dp))
+                }
+                Text(
+                    "Explore PrayerKey",
+                    modifier = Modifier.weight(1f),
+                    fontFamily = DisplaySerif,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 22.sp,
+                    color = Pk.Charcoal,
+                )
+                Spacer(Modifier.width(48.dp))
+            }
+            Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(bottom = 28.dp)) {
+                Column(Modifier.padding(horizontal = 22.dp, vertical = 8.dp)) {
+                    PrayerSessionEntry(start = startPrayer, history = prayerHistory)
+                }
+                momentItems.takeIf { it.isNotEmpty() }?.let { items ->
+                    Section("FOR THIS MOMENT") { MomentCards(items, go) }
+                }
+                ProgrammeLibrary(categories, go)
             }
         }
     }

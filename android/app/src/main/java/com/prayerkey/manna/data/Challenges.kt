@@ -1,0 +1,174 @@
+package com.prayerkey.manna.data
+
+import android.content.Context
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+
+/**
+ * Named challenges.
+ *
+ * What this replaces was three configurators. The prayer challenge asked four
+ * questions before day one — a topic from 543, a length from five — which is
+ * **over 2,700 possible challenges**, none of which has a name. That sounds
+ * like power and is the opposite: nothing with 2,700 variants can be given a
+ * cover, written well, recommended to a friend, or remembered. It is the same
+ * trap the devotional generator fell into, where 365 days turned out to be
+ * twelve wearing costumes.
+ *
+ * A challenge here is a fixed thing with a name, a length and one honest line
+ * about what it is for. You tap it, you tap Start, you are on day one. No
+ * questions.
+ *
+ * Every day has the same three parts — a passage, a written reflection, and
+ * points to pray aloud — because a shape learned once is a shape you stop
+ * having to learn. That is the single most copied thing about the plans people
+ * actually finish.
+ *
+ * Scripture is stored as a reference and resolved from the bundled KJV, so a
+ * verse cannot be misquoted in this file and the text cannot drift from the
+ * Bible the rest of the app reads.
+ */
+data class ChallengePlan(
+    val id: String,
+    val title: String,
+    val days: Int,
+    /** One line, on the shelf card. What this is actually for. */
+    val promise: String,
+    val cover: String,
+    val written: List<ChallengePlanDay>,
+)
+
+data class ChallengePlanDay(
+    val day: Int,
+    val title: String,
+    val read: DevoReading,
+    /** Paragraphs, split on blank lines. */
+    val reflection: List<String>,
+    /**
+     * The prayer, written out to be read aloud.
+     *
+     * This replaced a list of prayer points. A point is an instruction — you
+     * still have to compose the prayer yourself, at six in the morning, before
+     * coffee. A written prayer costs nothing to begin, which is the difference
+     * between praying and reading about praying.
+     */
+    val prayer: String,
+    val question: String,
+    /** For the house. Optional — a day may leave both blank. */
+    val familyQuestion: String,
+    val familyPrayer: String,
+) {
+    val hasFamily: Boolean get() = familyQuestion.isNotBlank() || familyPrayer.isNotBlank()
+}
+
+object Challenges {
+
+    private const val ASSET = "challenges.json"
+
+    @Volatile private var cache: List<ChallengePlan>? = null
+
+    suspend fun all(context: Context): List<ChallengePlan> = withContext(Dispatchers.IO) {
+        cache ?: parse(context).also { cache = it }
+    }
+
+    suspend fun byId(context: Context, id: String): ChallengePlan? =
+        all(context).firstOrNull { it.id == id }
+
+    /**
+     * Reads the asset.
+     *
+     * A malformed challenge is dropped rather than taking the shelf down with
+     * it — one bad entry should cost one card, not the feature.
+     */
+    private fun parse(context: Context): List<ChallengePlan> = runCatching {
+        val raw = context.applicationContext.assets.open(ASSET)
+            .bufferedReader().use { it.readText() }
+        val array = JSONObject(raw).getJSONArray("challenges")
+        buildList {
+            for (i in 0 until array.length()) {
+                val o = array.optJSONObject(i) ?: continue
+                runCatching { add(challenge(o)) }
+            }
+        }
+    }.getOrDefault(emptyList())
+
+    private fun challenge(o: JSONObject): ChallengePlan {
+        val written = o.getJSONArray("written")
+        return ChallengePlan(
+            id = o.getString("id"),
+            title = o.getString("title"),
+            days = o.getInt("days"),
+            promise = o.getString("promise"),
+            cover = o.optString("cover"),
+            written = (0 until written.length()).map { day(written.getJSONObject(it)) },
+        )
+    }
+
+    private fun day(o: JSONObject): ChallengePlanDay {
+        val read = o.getJSONObject("read")
+        return ChallengePlanDay(
+            day = o.getInt("day"),
+            title = o.getString("title"),
+            read = DevoReading(
+                book = read.getString("book"),
+                chapter = read.getInt("chapter"),
+                verse = read.getInt("verse"),
+                from = read.optInt("from", read.getInt("verse")),
+                to = read.optInt("to", read.getInt("verse")),
+            ),
+            reflection = o.getString("reflection").split("\n\n").map { it.trim() }.filter { it.isNotEmpty() },
+            prayer = o.optString("prayer"),
+            question = o.optString("question"),
+            familyQuestion = o.optString("familyQuestion"),
+            familyPrayer = o.optString("familyPrayer"),
+        )
+    }
+}
+
+/**
+ * Which day you are on, and which challenge you are in.
+ *
+ * One challenge at a time, deliberately. Two running at once is how a plan
+ * stops being a plan — the point of a named challenge is that it is the thing
+ * you are doing, not one of several things you started.
+ */
+object ChallengeProgress {
+
+    private const val FILE = "challenges"
+
+    private fun prefs(context: Context) =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+
+    /** The challenge currently running, or null. */
+    fun activeId(context: Context): String? =
+        prefs(context).getString("active", null)
+
+    /** Days completed in [id]. 0 before it starts. */
+    fun completed(context: Context, id: String): Int =
+        prefs(context).getInt("done_$id", 0)
+
+    fun start(context: Context, id: String) {
+        prefs(context).edit().putString("active", id).apply()
+    }
+
+    /**
+     * Marks a day done. Only ever moves forward, so re-reading day three of a
+     * plan you are on day nine of cannot set you back six days.
+     */
+    fun complete(context: Context, id: String, day: Int) {
+        if (day <= completed(context, id)) return
+        prefs(context).edit().putInt("done_$id", day).apply()
+    }
+
+    /** Where the challenge opens: the next unread day, or the last one. */
+    fun resumeDay(context: Context, challenge: ChallengePlan): Int =
+        (completed(context, challenge.id) + 1).coerceAtMost(challenge.days)
+
+    fun isFinished(context: Context, challenge: ChallengePlan): Boolean =
+        completed(context, challenge.id) >= challenge.days
+
+    fun abandon(context: Context) {
+        prefs(context).edit().remove("active").apply()
+    }
+}

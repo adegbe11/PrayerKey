@@ -79,30 +79,24 @@ private val Ivory = Color(0xFFF6F0E1)
 @Composable
 fun OnboardingScreen(onDone: (remindersEnabled: Boolean, hour: Int) -> Unit) {
     var opening by remember { mutableStateOf(true) }
-    var step by remember { mutableIntStateOf(0) }
+    var openingStage by remember { mutableIntStateOf(1) }
 
     LaunchedEffect(Unit) {
-        delay(1100)
+        delay(650)
+        openingStage = 2
+        delay(650)
+        openingStage = 3
+        delay(650)
+        openingStage = 4
+        delay(1050)
         opening = false
     }
 
     if (opening) {
-        LaunchPrelude(22)
+        LaunchPrelude(openingStage)
         return
     }
-
-    BackHandler(enabled = step > 0) { step-- }
-
-    when (step) {
-        0 -> PullToLearn(onPulled = { step = 1 }, onSkip = { onDone(false, 7) })
-        1 -> OnboardingSlides(
-            step = 0,
-            onStep = {},
-            onSkip = { onDone(false, 7) },
-            onDone = { step = 2 },
-        )
-        else -> ReminderStep(onDone)
-    }
+    PersonalPlanOnboarding(onDone)
 }
 
 /* ─────────────────────── 1. the gesture itself ─────────────────────── */

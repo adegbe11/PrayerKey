@@ -4,6 +4,13 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val prayerKeySupabaseUrl = providers.gradleProperty("PRAYERKEY_SUPABASE_URL")
+    .orElse(providers.environmentVariable("PRAYERKEY_SUPABASE_URL"))
+    .orElse("")
+val prayerKeySupabaseKey = providers.gradleProperty("PRAYERKEY_SUPABASE_PUBLISHABLE_KEY")
+    .orElse(providers.environmentVariable("PRAYERKEY_SUPABASE_PUBLISHABLE_KEY"))
+    .orElse("")
+
 android {
     namespace = "com.prayerkey.manna"
     compileSdk = 36
@@ -19,6 +26,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         manifestPlaceholders["usesCleartextTraffic"] = "false"
+        buildConfigField("String", "SUPABASE_URL", "\"${prayerKeySupabaseUrl.get()}\"")
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"${prayerKeySupabaseKey.get()}\"")
     }
 
     val releaseStoreFile = providers.gradleProperty("PRAYERKEY_STORE_FILE")

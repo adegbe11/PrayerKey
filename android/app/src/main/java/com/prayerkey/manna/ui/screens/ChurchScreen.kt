@@ -122,13 +122,11 @@ fun ChurchScreen(
     }
     val notifyPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
-    /* Asked once, at the only moment it matters: the first time someone presses
-       Start without the model. It was a card on the Ready screen, which put a
-       setup chore in the spot the main action belongs in and showed it to
-       people who had not asked for the feature. Recording never needed it. */
-    val captionPrefs = remember {
-        context.getSharedPreferences("church", android.content.Context.MODE_PRIVATE)
-    }
+    /* Never remember a decision to continue without captions. The old flow
+       stored `captions-asked=true` after "Just record", so every later sermon
+       silently opened as a blank recorder on that phone. Church is a live
+       transcription feature: while the model is missing, every new attempt
+       must offer the one-time install again. */
     var offerCaptions by remember { mutableStateOf(false) }
 
     fun record() {
@@ -144,21 +142,19 @@ fun ChurchScreen(
     }
 
     fun begin() {
-        val asked = captionPrefs.getBoolean("captions-asked", false)
-        if (!asked && !VoskModel.isInstalled(context, VoskModel.Kind.Live)) { offerCaptions = true; return }
+        // Android's continuous recognizer is the primary live-caption path.
+        // The service falls back to the downloaded Vosk model only on devices
+        // that do not provide a system recognizer.
         record()
     }
 
     if (offerCaptions) {
         CaptionsOffer(
             onSkip = {
-                // remembered, so it is never asked again
-                captionPrefs.edit().putBoolean("captions-asked", true).apply()
                 offerCaptions = false
                 record()
             },
             onReady = {
-                captionPrefs.edit().putBoolean("captions-asked", true).apply()
                 offerCaptions = false
                 record()
             },
@@ -437,9 +433,9 @@ private fun ReadyView(
                 Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 26.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("SERMON COMPANION", color = Ivory.copy(alpha = .60f), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                Text("LIVE SERMON NOTES", color = Ivory.copy(alpha = .60f), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 Text(
-                    "Remember every word",
+                    "Turn the sermon into notes",
                     color = Ivory, fontFamily = DisplaySerif, fontSize = 28.sp, fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp),
                 )
@@ -459,7 +455,7 @@ private fun ReadyView(
                     )
                 }
                 Text(
-                    "Start listening",
+                    "Start",
                     color = Ivory, fontSize = 16.sp, fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 14.dp),
                 )
@@ -468,7 +464,7 @@ private fun ReadyView(
 
         if (notes.isEmpty()) {
             Text(
-                "Listen without losing the moment",
+                "How it works",
                 color = cs.onBackground,
                 fontFamily = DisplaySerif,
                 fontSize = 20.sp,
@@ -476,7 +472,7 @@ private fun ReadyView(
                 modifier = Modifier.padding(top = 30.dp),
             )
             Text(
-                "PrayerKey records the message, follows the transcript, and gathers every scripture reference into one sermon note.",
+                "Place your phone near the preacher. The spoken words will appear on screen and save as sermon notes.",
                 color = cs.onBackground.copy(alpha = .62f),
                 fontSize = 13.5.sp,
                 lineHeight = 20.sp,

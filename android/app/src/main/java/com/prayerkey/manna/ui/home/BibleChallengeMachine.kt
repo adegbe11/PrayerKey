@@ -320,7 +320,7 @@ private fun BibleChallengeLanding(
                     onClick = onUseGrace,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp),
                     shape = RoundedCornerShape(20.dp), color = Pk.GoldWash,
-                ) { Column(Modifier.padding(18.dp)) { Text("GRACE KEY", color = Pk.GoldDeep, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold); Text("Life happened. Protect this month’s streak and continue without shame.", color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 24.sp, modifier = Modifier.padding(top = 7.dp)); Text("USE MY MONTHLY KEY", color = Pk.Oxblood, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 11.dp)) } }
+                ) { Column(Modifier.padding(18.dp)) { Text("MISSED A DAY?", color = Pk.GoldDeep, fontSize = 10.sp, fontWeight = FontWeight.Bold); Text("Keep your progress and continue today. You can do this once each month.", color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 24.sp, modifier = Modifier.padding(top = 7.dp)); Text("KEEP MY PROGRESS", color = Pk.Oxblood, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 11.dp)) } }
                 Column(
                     Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(top = 16.dp).clip(RoundedCornerShape(22.dp))
                         .background(Pk.Sunken).clickable(enabled = availableToday) { onRead(day) }.padding(20.dp),
@@ -438,7 +438,13 @@ private fun BibleChallengeReader(
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)) {
                 Text("${portion.book} ${portion.chapter}", color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 33.sp, modifier = Modifier.padding(top = 24.dp))
                 Surface(Modifier.fillMaxWidth().padding(top = 14.dp), shape = RoundedCornerShape(16.dp), color = Pk.GoldWash) {
-                    Column(Modifier.padding(15.dp)) { Text("WHAT’S HAPPENING HERE", color = Pk.GoldDeep, fontSize = 8.sp, letterSpacing = 1.1.sp, fontWeight = FontWeight.Bold); Text(contextKey(portion.book, portion.chapter), color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 15.sp, lineHeight = 22.sp, modifier = Modifier.padding(top = 6.dp)) }
+                    Column(Modifier.padding(15.dp)) { Text("Before you read", color = Pk.GoldDeep, fontSize = 13.sp, fontWeight = FontWeight.Bold); Text(contextKey(portion.book, portion.chapter), color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 15.sp, lineHeight = 22.sp, modifier = Modifier.padding(top = 6.dp)) }
+                }
+                Surface(Modifier.fillMaxWidth().padding(top = 12.dp), shape = RoundedCornerShape(16.dp), color = Pk.Sunken) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text("Think about this", color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text(bibleChallengePrompt(portion.book), color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 8.dp))
+                    }
                 }
                 if (verses.isEmpty()) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 24.dp).height(2.dp), color = Pk.Oxblood, trackColor = Pk.Hair)
@@ -452,6 +458,12 @@ private fun BibleChallengeReader(
                             lineHeight = 31.sp,
                             modifier = Modifier.padding(horizontal = 7.dp, vertical = 6.dp).padding(top = if (verse.verse == 1) 14.dp else 6.dp),
                         ) }
+                    }
+                }
+                Surface(Modifier.fillMaxWidth().padding(top = 18.dp), shape = RoundedCornerShape(16.dp), color = Pk.Oxblood) {
+                    Column(Modifier.padding(17.dp)) {
+                        Text("Prayer", color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text("Father, open my understanding as I read. Show me what this chapter reveals about You, correct what needs to change in me, and help me live what I learn today. Amen.", color = Pk.Crisp, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(top = 8.dp))
                     }
                 }
                 Spacer(Modifier.height(28.dp))
@@ -477,6 +489,14 @@ private fun contextKey(book: String, chapter: Int): String = when (book) {
     "Matthew", "Mark", "Luke", "John" -> "You are reading the life and teaching of Jesus. Watch what He does, what He says, and how people respond to Him."
     "Acts" -> "The early church is learning to follow the risen Jesus through the Holy Spirit. This chapter shows faith becoming public action and community."
     else -> "This chapter belongs to the Bible’s larger story of creation, covenant, rescue, and restoration. Read for what it reveals about God and the faithful response He invites."
+}
+
+private fun bibleChallengePrompt(book: String): String = when (book) {
+    "Psalms" -> "Which words in this chapter can become your own prayer today?"
+    "Proverbs" -> "What is one wise action you can practise before today ends?"
+    "Matthew", "Mark", "Luke", "John" -> "What do you notice about Jesus, and how will you respond to Him?"
+    "Acts" -> "What does this chapter show you about courageous, Spirit-led faith?"
+    else -> "What does this chapter reveal about God, and what faithful response does it invite from you?"
 }
 
 private fun timeLabelBible(hour: Int, minute: Int): String {

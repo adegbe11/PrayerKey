@@ -47,5 +47,24 @@ class FastingMilestoneReceiver : BroadcastReceiver() {
                 }
             }
         }
+
+        fun cancel(context: Context) {
+            val alarm = context.getSystemService(AlarmManager::class.java)
+            listOf(4, 8, 12, 16, 24).forEach { hour ->
+                listOf(false, true).forEach { spiritual ->
+                    val code = 3200 + hour + if (spiritual) 100 else 0
+                    val pending = PendingIntent.getBroadcast(
+                        context,
+                        code,
+                        Intent(context, FastingMilestoneReceiver::class.java),
+                        PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+                    )
+                    if (pending != null) {
+                        alarm.cancel(pending)
+                        pending.cancel()
+                    }
+                }
+            }
+        }
     }
 }
