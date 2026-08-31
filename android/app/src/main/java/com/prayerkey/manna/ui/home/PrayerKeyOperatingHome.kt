@@ -212,7 +212,14 @@ fun PrayerKeyOperatingHome(
             onDismissRequest = { morningPrayerOpen = false },
             properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
         ) {
-            com.prayerkey.manna.ui.morning.MorningPrayerScreen(onClose = { morningPrayerOpen = false })
+            /* One card, two offices. Before five it opens the morning; after
+               five, the evening. The alternative was two entry points on Home
+               for something that is one habit at two ends of a day. */
+            if (com.prayerkey.manna.data.OfficeStore.isEvening(java.time.LocalTime.now().hour)) {
+                com.prayerkey.manna.ui.morning.EveningPrayerScreen(onClose = { morningPrayerOpen = false })
+            } else {
+                com.prayerkey.manna.ui.morning.MorningPrayerScreen(onClose = { morningPrayerOpen = false })
+            }
         }
     }
     if (prayerSessionOpen) {
