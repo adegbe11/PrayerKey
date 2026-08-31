@@ -212,7 +212,7 @@ fun PrayerKeyOperatingHome(
             onDismissRequest = { morningPrayerOpen = false },
             properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
         ) {
-            DailyRhythmExperience("morning", onClose = { morningPrayerOpen = false }, onComplete = { morningPrayerOpen = false })
+            com.prayerkey.manna.ui.morning.MorningPrayerScreen(onClose = { morningPrayerOpen = false })
         }
     }
     if (prayerSessionOpen) {
