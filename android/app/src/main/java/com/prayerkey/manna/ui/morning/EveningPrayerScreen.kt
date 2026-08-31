@@ -71,7 +71,7 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
             .statusBarsPadding().padding(horizontal = 26.dp).navigationBarsPadding(),
     ) {
         Spacer(Modifier.height(10.dp))
-        RunningHead("Evening Prayer", today, palette, onClose) {
+        RunningHead("Evening Prayer", today.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d MMMM", java.util.Locale.UK)), palette, onClose) {
             Text(
                 if (night) "Day" else "Night",
                 Modifier.clickable { night = !night },

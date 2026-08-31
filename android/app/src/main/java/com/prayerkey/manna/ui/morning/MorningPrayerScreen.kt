@@ -71,7 +71,7 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
             .statusBarsPadding().padding(horizontal = 26.dp).navigationBarsPadding(),
     ) {
         Spacer(Modifier.height(10.dp))
-        RunningHead("Morning Prayer", today, palette, onClose)
+        RunningHead("Morning Prayer", today.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.UK)), palette, onClose)
         Spacer(Modifier.height(26.dp))
         OfficeTitle("Morning Prayer", palette, speaking.value) { voice.toggle(MORNING) }
         Spacer(Modifier.height(26.dp))

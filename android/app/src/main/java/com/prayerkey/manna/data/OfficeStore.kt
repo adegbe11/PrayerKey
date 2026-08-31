@@ -42,11 +42,26 @@ object OfficeStore {
     }
 
     /**
-     * Which office to open now.
+     * Which office the hour belongs to.
      *
-     * Five in the afternoon, because the evening office is written to be prayed
-     * after the day is over rather than at a clock time, and by five most
-     * people's day has stopped being ahead of them.
+     * Four offices, four windows, and no picker — the reader should open the
+     * one card and find the prayer that fits the hour they are actually in.
+     * Being asked to choose between Evening, Night and Midnight at eleven at
+     * night is the kind of decision that ends with the phone put down.
+     *
+     *   04:00  Morning    the day is ahead
+     *   17:00  Evening    the day is over, walk back through it
+     *   21:30  Night      two minutes, then sleep
+     *   00:00  Midnight   the watch
      */
-    fun isEvening(hour: Int): Boolean = hour >= 17 || hour < 4
+    enum class Office { MORNING, EVENING, NIGHT, MIDNIGHT }
+
+    fun officeFor(hour: Int, minute: Int = 0): Office = when {
+        hour < 4 -> Office.MIDNIGHT
+        hour < 17 -> Office.MORNING
+        hour < 21 || (hour == 21 && minute < 30) -> Office.EVENING
+        else -> Office.NIGHT
+    }
+
+    fun isEvening(hour: Int): Boolean = officeFor(hour) != Office.MORNING
 }

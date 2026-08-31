@@ -109,8 +109,18 @@ private fun experience(title: String): Experience = when (title) {
      * These now open a written plan directly, or the shelf when the title is a
      * category rather than a plan.
      */
+    /* Midnight prayer is the nightly office, not the seven-night challenge.
+       The Midnight Watch is still on the shelf for anybody who wants to keep
+       seven of them in a row. */
+    if (title in setOf("Midnight prayer", "Three watches", "Night vigil")) {
+        com.prayerkey.manna.ui.morning.MidnightPrayerScreen(onClose)
+        return
+    }
+    if (title == "Night prayer") {
+        com.prayerkey.manna.ui.morning.NightPrayerScreen(onClose)
+        return
+    }
     val namedChallenge = when (title) {
-        "Midnight prayer", "Three watches", "Night vigil" -> "the-midnight-watch"
         "Warfare prayer", "Imprecatory Psalms" -> "standing-in-scripture"
         "Start a fast", "Daniel fast", "Full fast", "Partial fast", "Esther fast",
         "Timed fast", "First fruits", "Church-wide fast", "Fasting record" -> "fasting-and-prayer"

@@ -212,13 +212,21 @@ fun PrayerKeyOperatingHome(
             onDismissRequest = { morningPrayerOpen = false },
             properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
         ) {
-            /* One card, two offices. Before five it opens the morning; after
-               five, the evening. The alternative was two entry points on Home
-               for something that is one habit at two ends of a day. */
-            if (com.prayerkey.manna.data.OfficeStore.isEvening(java.time.LocalTime.now().hour)) {
-                com.prayerkey.manna.ui.morning.EveningPrayerScreen(onClose = { morningPrayerOpen = false })
-            } else {
-                com.prayerkey.manna.ui.morning.MorningPrayerScreen(onClose = { morningPrayerOpen = false })
+            /* One card, four offices. The hour decides which - morning, evening,
+               night, or the midnight watch. Four entry points on Home for what
+               is one habit at four points of a day would be the clutter; being
+               asked to choose between them at eleven at night would be worse. */
+            val now = java.time.LocalTime.now()
+            val close = { morningPrayerOpen = false }
+            when (com.prayerkey.manna.data.OfficeStore.officeFor(now.hour, now.minute)) {
+                com.prayerkey.manna.data.OfficeStore.Office.MORNING ->
+                    com.prayerkey.manna.ui.morning.MorningPrayerScreen(onClose = close)
+                com.prayerkey.manna.data.OfficeStore.Office.EVENING ->
+                    com.prayerkey.manna.ui.morning.EveningPrayerScreen(onClose = close)
+                com.prayerkey.manna.data.OfficeStore.Office.NIGHT ->
+                    com.prayerkey.manna.ui.morning.NightPrayerScreen(onClose = close)
+                com.prayerkey.manna.data.OfficeStore.Office.MIDNIGHT ->
+                    com.prayerkey.manna.ui.morning.MidnightPrayerScreen(onClose = close)
             }
         }
     }
