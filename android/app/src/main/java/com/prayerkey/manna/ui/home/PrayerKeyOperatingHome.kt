@@ -378,9 +378,13 @@ fun PrayerKeyOperatingHome(
 
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
             TodayRhythmPanel(
-                savedCount, journalCount, streak,
-                { morningPrayerOpen = true }, { devotionalOpen = true }, onOpenBible,
-                onOpenJournal, { morningPrayerOpen = true }, onOpenJournal,
+                devotionalTitle = written?.title.orEmpty(),
+                readingLabel = plan?.readingLabel.orEmpty(),
+                morningPrayer = { morningPrayerOpen = true },
+                devotional = { devotionalOpen = true },
+                bible = onOpenBible,
+                eveningPrayer = { morningPrayerOpen = true },
+                calendar = { prayerCalendarOpen = true },
             )
         }
 
@@ -1296,86 +1300,164 @@ private fun CircularImageShortcut(item: HomeShortcut) {
     }
 }
 
+/**
+ * Today, as a list rather than a carousel.
+ *
+ * What this replaces was a horizontal rail of five full-bleed image tiles. It
+ * showed one and a half of them, which put Evening prayer off the right-hand
+ * edge — the one you actually want after dark — and spent five photographs
+ * saying five short words.
+ *
+ * A list answers the only question the panel exists to answer: what is left
+ * today. All of it is visible at once.
+ *
+ * The risk in a checklist is the one I named about somebody else's app: three
+ * boxes that know nothing about each other. The defence is not the shape, it
+ * is the content — every row here comes from the same day, so the devotional
+ * names its own title and the reading names its own chapter. Without those
+ * second lines this is five generic nouns that could belong to any app.
+ *
+ * Rows outside their hour are dimmed rather than hidden. Evening prayer at
+ * seven in the morning is not something to do now, but it is something to
+ * know is coming.
+ *
+ * The circle is not a control. It fills because a screen was finished, never
+ * because a ring was tapped — prayer that becomes box-ticking has lost, and a
+ * tappable checkbox is an invitation to tick it.
+ */
 @Composable private fun TodayRhythmPanel(
-    saved: Int, journal: Int, streak: Int,
-    morningPrayer: () -> Unit, devotional: () -> Unit, bible: () -> Unit,
-    reflection: () -> Unit, eveningPrayer: () -> Unit, history: () -> Unit,
+    devotionalTitle: String,
+    readingLabel: String,
+    morningPrayer: () -> Unit,
+    devotional: () -> Unit,
+    bible: () -> Unit,
+    eveningPrayer: () -> Unit,
+    calendar: () -> Unit,
 ) {
     val context = LocalContext.current
-    val dateKey = LocalDate.now().toString()
+    val today = LocalDate.now()
+    val dateKey = today.toString()
     val prefs = remember { context.getSharedPreferences("today_rhythm", android.content.Context.MODE_PRIVATE) }
     var completed by remember(dateKey) { mutableStateOf(prefs.getStringSet(dateKey, emptySet()).orEmpty()) }
-    var openMoment by remember { mutableStateOf<String?>(null) }
-    val items = listOf(
-        Triple("morning", "Father, order my steps today", "Morning prayer") to morningPrayer,
-        Triple("devotional", "Lord, speak through Your Word", "Daily devotional") to devotional,
-        Triple("bible", "Open my eyes to Your Word", "Bible reading") to bible,
-        Triple("reflection", "Search my heart and lead me", "Prayer and reflection") to reflection,
-        Triple("evening", "Father, I return this day to You", "Evening prayer") to eveningPrayer,
-    )
-    val artwork = mapOf(
-        "morning" to R.drawable.rhythm_morning,
-        "devotional" to R.drawable.prayerkey_hero_dawn,
-        "bible" to R.drawable.verse_card_botanical,
-        "reflection" to R.drawable.rhythm_reflection,
-        "evening" to R.drawable.rhythm_evening,
-    )
+    val hour = remember { java.time.LocalTime.now().hour }
+
     fun finish(id: String) {
         completed = completed + id
         prefs.edit().putStringSet(dateKey, completed).apply()
-        openMoment = null
     }
-    openMoment?.let { moment ->
-        Dialog(onDismissRequest = { openMoment = null }, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
-            DailyRhythmExperience(moment, onClose = { openMoment = null }, onComplete = { finish(moment) })
-        }
-    }
-    Column {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-            Column(Modifier.weight(1f)) {
-                Text("Today, ${LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d"))}", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 27.sp, color = Pk.Charcoal)
-                Text("${completed.size} of ${items.size} complete", Modifier.padding(top = 3.dp), fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted)
-            }
-            Text("${completed.size * 100 / items.size}%", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Pk.Oxblood)
-        }
-        LinearProgressIndicator(
-            progress = { completed.size.toFloat() / items.size },
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp).height(4.dp).clip(RoundedCornerShape(3.dp)),
-            color = Pk.Oxblood, trackColor = Pk.Charcoal.copy(alpha = .08f), gapSize = 0.dp, drawStopIndicator = {},
-        )
-        Row(Modifier.fillMaxWidth().padding(top = 16.dp).horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            items.forEach { item ->
-                val identity = item.first
-                val done = identity.first in completed
-                /* Morning and Evening now have their own screens too - the daily
-                   office. They used to open a generated card here, which put a
-                   second "Morning prayer" on Home beside the real one. */
-                val hasOwnScreen = identity.first in setOf("devotional", "bible", "morning", "evening")
+
+    val rows = listOf(
+        RhythmRow("morning", "Morning prayer", "", Icons.Outlined.WbSunny, 4..16, morningPrayer),
+        RhythmRow("devotional", "Daily devotional", devotionalTitle, Icons.Outlined.AutoStories, 0..23, devotional),
+        RhythmRow("bible", "Bible reading", readingLabel, Icons.Outlined.MenuBook, 0..23, bible),
+        RhythmRow("evening", "Evening prayer", "", Icons.Outlined.DarkMode, 17..23, eveningPrayer),
+    )
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Pk.Hair),
+        shadowElevation = 2.dp,
+    ) {
+        Column(Modifier.padding(vertical = 20.dp)) {
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 22.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    "Today, " + today.format(DateTimeFormatter.ofPattern("MMM d", java.util.Locale.UK)),
+                    Modifier.weight(1f),
+                    fontFamily = DisplaySerif,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 26.sp,
+                    color = Pk.Charcoal,
+                )
                 Box(
-                    Modifier.width(214.dp).height(276.dp).clip(RoundedCornerShape(28.dp)).clickable {
-                        if (hasOwnScreen) {
-                            finish(identity.first)
-                            item.second()
-                        } else openMoment = identity.first
-                    },
-                ) {
-                    Image(painterResource(artwork.getValue(identity.first)), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
-                    Box(Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Color.Black.copy(alpha = .03f), Color.Transparent, Color.Black.copy(alpha = .84f)))))
-                    if (done) {
-                        Surface(Modifier.align(Alignment.TopEnd).padding(14.dp), shape = CircleShape, color = Color.White, shadowElevation = 6.dp) {
-                            Icon(Icons.Outlined.Check, null, Modifier.padding(8.dp).size(17.dp), tint = Pk.Oxblood)
-                        }
-                    }
-                    Column(Modifier.align(Alignment.BottomStart).padding(18.dp)) {
-                        Text(if (done) "COMPLETE" else "TODAY", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, letterSpacing = 1.4.sp, color = Pk.GoldLight)
-                        Text(identity.third, Modifier.padding(top = 6.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 23.sp, lineHeight = 26.sp, color = Color.White)
-                        Text(if (done) "Prayed today" else identity.second, Modifier.padding(top = 6.dp), fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 15.sp, color = Color.White.copy(alpha = .8f), maxLines = 2)
-                    }
-                }
+                    Modifier.size(44.dp).clip(CircleShape)
+                        .background(Pk.Oxblood.copy(alpha = .08f))
+                        .clickable(onClick = calendar),
+                    contentAlignment = Alignment.Center,
+                ) { Icon(Icons.Outlined.CalendarToday, "Prayer calendar", tint = Pk.Oxblood, modifier = Modifier.size(19.dp)) }
+            }
+            Box(
+                Modifier.padding(horizontal = 22.dp).padding(top = 16.dp, bottom = 4.dp)
+                    .fillMaxWidth().height(2.dp).clip(RoundedCornerShape(99.dp))
+                    .background(Pk.Charcoal.copy(alpha = .07f)),
+            )
+            rows.forEach { row ->
+                RhythmEntry(
+                    row = row,
+                    done = row.id in completed,
+                    now = hour in row.hours,
+                    open = { finish(row.id); row.open() },
+                )
             }
         }
     }
 }
+
+private data class RhythmRow(
+    val id: String,
+    val title: String,
+    /** Today's own - the devotional's title, the chapter. Blank on the offices. */
+    val detail: String,
+    val icon: ImageVector,
+    val hours: IntRange,
+    val open: () -> Unit,
+)
+
+@Composable private fun RhythmEntry(row: RhythmRow, done: Boolean, now: Boolean, open: () -> Unit) {
+    /* Dimmed outside its hour, and never below the legibility floor - this is
+       a row you are meant to read and decide against, not a disabled control. */
+    val alpha = if (now || done) 1f else .45f
+    Row(
+        Modifier.fillMaxWidth().clickable(onClick = open).padding(horizontal = 22.dp, vertical = 13.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier.size(46.dp).clip(RoundedCornerShape(15.dp))
+                .background(Pk.Oxblood.copy(alpha = .10f * alpha)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(row.icon, null, tint = Pk.Oxblood.copy(alpha = alpha), modifier = Modifier.size(21.dp))
+        }
+        Column(Modifier.weight(1f).padding(start = 15.dp)) {
+            Text(
+                row.title,
+                fontFamily = UtilitySans,
+                fontSize = 16.sp,
+                fontWeight = if (now && !done) FontWeight.SemiBold else FontWeight.Normal,
+                color = Pk.Charcoal.copy(alpha = alpha),
+            )
+            if (row.detail.isNotBlank()) {
+                Text(
+                    row.detail,
+                    Modifier.padding(top = 2.dp),
+                    fontFamily = UtilitySans,
+                    fontSize = 12.5.sp,
+                    color = Pk.Muted.copy(alpha = alpha),
+                    maxLines = 1,
+                )
+            }
+        }
+        /* Not a control. It fills because a screen was finished. */
+        Box(Modifier.size(26.dp), contentAlignment = Alignment.Center) {
+            if (done) {
+                Box(
+                    Modifier.size(26.dp).clip(CircleShape).background(Pk.Oxblood),
+                    contentAlignment = Alignment.Center,
+                ) { Icon(Icons.Outlined.Check, null, tint = Color.White, modifier = Modifier.size(15.dp)) }
+            } else {
+                Box(
+                    Modifier.size(26.dp).clip(CircleShape)
+                        .border(1.5.dp, Pk.Charcoal.copy(alpha = .18f * alpha), CircleShape),
+                )
+            }
+        }
+    }
+}
+
 
 @Composable private fun MomentCards(items: List<Feature>, go: (Feature) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
