@@ -210,22 +210,14 @@ fun MannaApp(
                     viewModel.updatePreferences(
                         preferences.copy(
                             onboarded = true,
-                            accountReady = false,
-                            accountKind = "pending",
+                            /* There is no account. Onboarding used to leave
+                               these pending so the sign-up screen would show
+                               next; it does not exist any more. */
+                            accountReady = true,
+                            accountKind = "local",
                             reminderEnabled = remindersEnabled,
                             reminderHour = reminderHour,
                             reminderMinute = 0,
-                        ),
-                    )
-                }
-            } else if (!preferences.accountReady) {
-                com.prayerkey.manna.ui.screens.AccountEntryScreen { name, email, kind ->
-                    viewModel.updatePreferences(
-                        preferences.copy(
-                            name = name.ifBlank { preferences.name },
-                            accountReady = true,
-                            accountEmail = email,
-                            accountKind = kind,
                         ),
                     )
                 }

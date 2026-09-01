@@ -1347,10 +1347,10 @@ private fun CircularImageShortcut(item: HomeShortcut) {
     }
 
     val rows = listOf(
-        RhythmRow("morning", "Morning prayer", "", Icons.Outlined.WbSunny, 4..16, morningPrayer),
-        RhythmRow("devotional", "Daily devotional", devotionalTitle, Icons.Outlined.AutoStories, 0..23, devotional),
-        RhythmRow("bible", "Bible reading", readingLabel, Icons.Outlined.MenuBook, 0..23, bible),
-        RhythmRow("evening", "Evening prayer", "", Icons.Outlined.DarkMode, 17..23, eveningPrayer),
+        RhythmRow("morning", "Morning prayer", "", Icons.Outlined.WbSunny, 4..16, open = morningPrayer),
+        RhythmRow("devotional", "Daily devotional", devotionalTitle, Icons.Outlined.AutoStories, 0..23, reservesDetail = true, open = devotional),
+        RhythmRow("bible", "Bible reading", readingLabel, Icons.Outlined.MenuBook, 0..23, reservesDetail = true, open = bible),
+        RhythmRow("evening", "Evening prayer", "", Icons.Outlined.DarkMode, 17..23, open = eveningPrayer),
     )
 
     Surface(
@@ -1404,6 +1404,16 @@ private data class RhythmRow(
     val detail: String,
     val icon: ImageVector,
     val hours: IntRange,
+    /**
+     * Whether this row will have a detail once the day has loaded.
+     *
+     * The devotional and the reading are read from an asset, so for the first
+     * second they are blank. Rendering nothing and then appearing makes the
+     * card jump under the reader's thumb; rendering a placeholder puts words
+     * on screen that are not true. The line is reserved instead - empty, the
+     * right height, and filled in place when the day arrives.
+     */
+    val reservesDetail: Boolean = false,
     val open: () -> Unit,
 )
 
@@ -1411,8 +1421,12 @@ private data class RhythmRow(
     /* Dimmed outside its hour, and never below the legibility floor - this is
        a row you are meant to read and decide against, not a disabled control. */
     val alpha = if (now || done) 1f else .45f
+    /* Not tappable until it has something to open. Tapping "Bible reading"
+       before the plan resolves used to open an empty chapter. */
+    val ready = !row.reservesDetail || row.detail.isNotBlank()
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = open).padding(horizontal = 22.dp, vertical = 13.dp),
+        Modifier.fillMaxWidth().clickable(enabled = ready, onClick = open)
+            .padding(horizontal = 22.dp, vertical = 13.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -1430,14 +1444,16 @@ private data class RhythmRow(
                 fontWeight = if (now && !done) FontWeight.SemiBold else FontWeight.Normal,
                 color = Pk.Charcoal.copy(alpha = alpha),
             )
-            if (row.detail.isNotBlank()) {
+            if (row.detail.isNotBlank() || row.reservesDetail) {
                 Text(
                     row.detail,
                     Modifier.padding(top = 2.dp),
                     fontFamily = UtilitySans,
                     fontSize = 12.5.sp,
+                    lineHeight = 17.sp,
                     color = Pk.Muted.copy(alpha = alpha),
                     maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
             }
         }
