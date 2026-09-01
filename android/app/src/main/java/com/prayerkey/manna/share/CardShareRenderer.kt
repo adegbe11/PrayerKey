@@ -197,7 +197,7 @@ object CardShareRenderer {
 
         send(
             context, bitmap,
-            caption = "${card.reference} — Received on MANNA by PrayerKey",
+            caption = "${card.reference} — PrayerKey",
             chooser = "Share this word",
         )
     }
@@ -293,7 +293,7 @@ object CardShareRenderer {
     private fun footer(canvas: Canvas, paint: Paint, brandY: Float, lineY: Float, line: String) {
         paint.textSize = 28f; paint.color = Color.WHITE
         paint.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
-        canvas.drawText("MANNA", 540f, brandY, paint)
+        canvas.drawText("PRAYERKEY", 540f, brandY, paint)
         paint.typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL); paint.textSize = 21f
         canvas.drawText(line, 540f, lineY, paint)
     }

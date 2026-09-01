@@ -37,8 +37,8 @@ object RemembranceBook {
             Triple("Pages from my journey", "REFLECTION", entries.filter { it.createdAt >= start && !it.isPrayer }.map { date(it.createdAt) to it.body }),
         )
         pageNo = drawPage(document, ++pageNo, "${name.ifBlank { "My" }} Book of Remembrance", year.toString(), listOf(
-            "A YEAR HELD WITH CARE" to "This book gathers the prayers, words, sermons, gratitude, and testimonies you chose to preserve in MANNA.",
-            "THE STORY SO FAR" to "${entries.count { it.createdAt >= start }} reflections · ${prayers.count { it.createdAt >= start }} generated prayers · ${sermons.count { it.createdAt >= start }} sermon notes · ${saved.count { it.savedAt >= start }} saved words",
+            "A YEAR HELD WITH CARE" to "This book gathers the prayers, words, sermons, gratitude, and testimonies you chose to keep in PrayerKey.",
+            "THE STORY SO FAR" to "${entries.count { it.createdAt >= start }} reflections · ${prayers.count { it.createdAt >= start }} prayers · ${sermons.count { it.createdAt >= start }} sermon notes · ${saved.count { it.savedAt >= start }} saved words",
             "REMEMBER" to "This is a record of your journey, not a measurement of your worth or faithfulness.",
         ))
         groups.forEach { (title, kicker, blocks) -> blocks.chunked(4).forEach { pageNo = drawPage(document, ++pageNo, title, kicker, it) } }
@@ -59,7 +59,7 @@ object RemembranceBook {
             p.typeface = Typeface.create(Typeface.SERIF, Typeface.NORMAL); p.textSize = 23f; p.color = Color.rgb(45, 45, 48)
             wrap(body, 88).take(8).forEach { line -> c.drawText(line, 92f, y, p); y += 33f }; y += 34f
         }
-        p.typeface = Typeface.DEFAULT; p.textSize = 15f; p.color = Color.GRAY; c.drawText("MANNA · Private by design · $number", 92f, H - 65f, p)
+        p.typeface = Typeface.DEFAULT; p.textSize = 15f; p.color = Color.GRAY; c.drawText("PrayerKey · Private by design · $number", 92f, H - 65f, p)
         document.finishPage(page); return number
     }
 
@@ -85,7 +85,7 @@ object JourneyArchive {
         root.put("memory", JSONArray().apply { memory.forEach { put(JSONObject().put("reference", it.reference).put("verse", it.verse).put("stage", it.stage).put("correctCount", it.correctCount).put("nextReviewAt", it.nextReviewAt)) } })
         root.put("formation", JSONObject().put("morningWord", formation.morningWord).put("middayPrayer", formation.middayPrayer).put("eveningExamen", formation.eveningExamen).put("sabbathDay", formation.sabbathDay).put("pilgrimageId", formation.pilgrimageId).put("pilgrimageDay", formation.pilgrimageDay).put("familyNames", formation.familyNames).put("trustedPhone", formation.trustedPhone))
         val dir = File(context.cacheDir, "shared").apply { mkdirs() }; val file = File(dir, "manna-private-archive-${System.currentTimeMillis()}.json"); file.writeText(root.toString(2))
-        shareFile(context, file, "application/json", "Export my private MANNA archive")
+        shareFile(context, file, "application/json", "Export my private PrayerKey archive")
     }
 }
 

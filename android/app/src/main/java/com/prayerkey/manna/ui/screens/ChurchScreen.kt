@@ -793,7 +793,7 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
         failure = null
         if (!VoskModel.isInstalled(context, VoskModel.Kind.Studio)) {
             if (!VoskModel.install(context, VoskModel.Kind.Studio)) {
-                failure = "the model could not be downloaded"
+                failure = "the download did not finish"
                 return@launch
             }
         }
@@ -825,7 +825,7 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                     modifier = Modifier.fillMaxWidth().height(4.dp).clip(R.pill),
                 )
                 Text(
-                    "Downloading the better model · ${(f * VoskModel.Kind.Studio.megabytes).toInt()} of ${VoskModel.Kind.Studio.megabytes} MB",
+                    "Getting ready · ${(f * VoskModel.Kind.Studio.megabytes).toInt()} of ${VoskModel.Kind.Studio.megabytes} MB",
                     color = Muted, fontSize = 11.5.sp, modifier = Modifier.padding(top = 7.dp),
                 )
             }
@@ -843,7 +843,7 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                 }
                 Text(
                     failure?.let { "That did not work: $it." }
-                        ?: "Re-reads the recording with a larger model. Takes a few minutes and stays on your phone.",
+                        ?: "Listens to the recording again, more carefully. Takes a few minutes, and never leaves your phone.",
                     color = Muted, fontSize = 11.5.sp, lineHeight = 16.sp,
                     modifier = Modifier.padding(top = 7.dp),
                 )
@@ -897,9 +897,9 @@ private fun SavedNoteSheet(
                 onClick = { com.prayerkey.manna.share.MannaPack.share(context, note) },
                 modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
             ) {
-                Icon(Icons.Outlined.Share, "Share a weekly MANNA Pack")
+                Icon(Icons.Outlined.Share, "Share these Sunday notes")
                 Spacer(Modifier.width(8.dp))
-                Text("Share MANNA Pack")
+                Text("Share these notes")
             }
             Text(
                 "Includes Scripture, discussion, prayer, and one action. Your private Journey is never included.",

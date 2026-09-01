@@ -12,7 +12,7 @@ object MannaPack {
         }.ifEmpty { listOf("1. What stayed with you from this message?", "2. What might faithful action look like this week?") }
         val scripture = note.scriptures.joinToString(" · ").ifBlank { "Review the sermon passage" }
         val text = buildString {
-            appendLine("MANNA PACK")
+            appendLine("SUNDAY NOTES · PRAYERKEY")
             appendLine(note.title)
             appendLine()
             appendLine("READ")
@@ -30,12 +30,12 @@ object MannaPack {
             appendLine("ONE ACTION")
             appendLine("Choose one small, specific response and tell someone you trust.")
             appendLine()
-            appendLine("Shared from MANNA. This pack contains no private journal or prayer data.")
+            appendLine("Shared from PrayerKey. Nothing private from a journal or prayer list is included.")
         }
         context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "MANNA Pack · ${note.title}")
+            putExtra(Intent.EXTRA_SUBJECT, "Sunday notes · ${note.title}")
             putExtra(Intent.EXTRA_TEXT, text)
-        }, "Share this MANNA Pack"))
+        }, "Share these notes"))
     }
 }

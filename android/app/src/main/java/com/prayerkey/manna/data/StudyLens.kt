@@ -20,10 +20,10 @@ object StudyLens {
         val themeText = found.take(3).joinToString(", ").ifBlank { "the character of God and faithful response" }
         return listOf(
             StudyNote("SCRIPTURE", "$reference — $verse", "Bible text"),
-            StudyNote("OBSERVE", "This verse contains language connected with $themeText. Notice what the text says before deciding what it means for you.", "On-device word observation"),
-            StudyNote("CONTEXT", "Read the full chapter and notice who is speaking, who is listening, what happens before this verse, and what response follows it.", "Study practice — not generated history"),
+            StudyNote("OBSERVE", "This verse contains language connected with $themeText. Notice what the text says before deciding what it means for you.", "Words in the verse"),
+            StudyNote("CONTEXT", "Read the full chapter and notice who is speaking, who is listening, what happens before this verse, and what response follows it.", "How to read it in context"),
             StudyNote("REFLECT", "What does this reveal about God? What response does the passage invite? Where might you need wisdom from a trusted pastor or mature reader?", "Reflection questions"),
-            StudyNote("BOUNDARY", "MANNA distinguishes Bible text from observation and reflection. It does not claim this note is divine revelation or the only Christian interpretation.", "Transparency"),
+            StudyNote("BOUNDARY", "PrayerKey keeps the Bible text separate from observation and reflection. These notes are a study aid, not revelation, and not the only faithful reading.", "A word of caution"),
         )
     }
 
@@ -52,7 +52,7 @@ object StudyLens {
             )
             normalized.contains("god") || normalized.contains("jesus") -> StudyAnswer(
                 "THEOLOGICAL REFLECTION",
-                "Ask what the text explicitly says about God before adding conclusions. Compare the observation with the surrounding chapter and related passages; MANNA does not present its reflection as God's personal message to you.",
+                "Ask what the text explicitly says about God before adding conclusions. Compare the observation with the surrounding chapter and related passages; the reflection here is a study aid, not a personal word from God to you.",
                 "Guided reflection with safety boundary",
             )
             else -> StudyAnswer(

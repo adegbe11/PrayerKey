@@ -19,7 +19,6 @@ data class BibleVerse(
 }
 
 class OfflineBible(private val context: Context) {
-    @Volatile private var cached: List<BibleVerse>? = null
 
     suspend fun search(query: String, limit: Int = 30): List<BibleVerse> = withContext(Dispatchers.IO) {
         val normalized = query.trim()
@@ -71,7 +70,19 @@ class OfflineBible(private val context: Context) {
             .toList()
     }
 
-    private fun verses(): List<BibleVerse> = cached ?: synchronized(this) {
+    /**
+     * Every verse, parsed once for the life of the process.
+     *
+     * The cache used to be a field on the instance, and every screen builds its
+     * own OfflineBible - the reader, the challenge day, the devotional, the
+     * audio narrator, Today. So the whole King James Version, 4.5 MB and 31,102
+     * verses, was read off disk and parsed again on each of them. It is the
+     * single largest reason the app felt slow between screens.
+     *
+     * On the companion it is parsed on the first screen that needs it and free
+     * on every screen after.
+     */
+    private fun verses(): List<BibleVerse> = cached ?: synchronized(OfflineBible) {
         cached ?: parse().also { cached = it }
     }
 
@@ -120,4 +131,9 @@ class OfflineBible(private val context: Context) {
             }
         }
     }
+
+    companion object {
+        @Volatile private var cached: List<BibleVerse>? = null
+    }
+
 }

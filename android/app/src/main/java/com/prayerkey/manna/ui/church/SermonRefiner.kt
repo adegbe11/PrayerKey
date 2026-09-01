@@ -57,7 +57,7 @@ object SermonRefiner {
     ): Result<String> = withContext(Dispatchers.Default) {
         val app = context.applicationContext
         if (!VoskModel.isInstalled(app, VoskModel.Kind.Studio)) {
-            return@withContext Result.failure(IllegalStateException("the better model is not installed"))
+            return@withContext Result.failure(IllegalStateException("the sharper listening is not installed yet"))
         }
         if (!audio.isFile || audio.length() == 0L) {
             return@withContext Result.failure(IllegalStateException("the recording is missing"))

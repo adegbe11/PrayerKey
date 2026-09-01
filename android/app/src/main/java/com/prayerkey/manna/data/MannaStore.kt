@@ -662,7 +662,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
      * current private journey rather than creating silent duplicates. */
     fun restoreArchive(raw: String) {
         val root = JSONObject(raw)
-        require(root.optString("format").startsWith("manna-journey-v")) { "Not a MANNA journey archive" }
+        require(root.optString("format").startsWith("manna-journey-v")) { "This is not a PrayerKey backup file" }
         writableDatabase.beginTransaction()
         try {
             listOf("journal_entries", "sermon_notes", "prayer_journal", "saved_words", "memory_verses").forEach {

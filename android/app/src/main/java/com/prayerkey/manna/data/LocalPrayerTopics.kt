@@ -18,7 +18,19 @@ import org.json.JSONObject
  */
 object LocalPrayerTopics {
 
-    fun load(context: Context): List<PrayerTopic> = runCatching {
+    /**
+     * The 543 prayers, parsed once.
+     *
+     * There was no cache at all: six screens call load(), and each one read
+     * and parsed the whole asset again. Home does it on every cold start
+     * before Today can show a prayer.
+     */
+    @Volatile private var cached: List<PrayerTopic>? = null
+
+    fun load(context: Context): List<PrayerTopic> =
+        cached ?: synchronized(this) { cached ?: read(context).also { cached = it } }
+
+    private fun read(context: Context): List<PrayerTopic> = runCatching {
         val raw = context.assets.open("prayer-topics.json")
             .bufferedReader().use { it.readText() }
         parse(JSONObject(raw).getJSONArray("topics"))

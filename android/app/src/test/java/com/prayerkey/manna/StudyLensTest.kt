@@ -9,7 +9,13 @@ class StudyLensTest {
     @Test fun `source boundaries are always visible`() {
         val notes = StudyLens.notes("Philippians 4:7", "And the peace of God shall keep your hearts.")
         assertEquals("SCRIPTURE", notes.first().label)
-        assertTrue(notes.any { it.label == "BOUNDARY" && it.text.contains("does not claim") })
+        /* Pins the meaning, not the sentence. The boundary note was reworded
+           when "MANNA" and the machine-facing phrasing came out of the app;
+           what must never go is the claim that this is a study aid and not
+           revelation. */
+        val boundary = notes.first { it.label == "BOUNDARY" }.text
+        assertTrue(boundary, boundary.contains("not revelation"))
+        assertTrue(boundary, boundary.contains("not the only faithful reading"))
         assertTrue(notes.first { it.label == "OBSERVE" }.text.contains("peace"))
     }
 
