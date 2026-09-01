@@ -377,15 +377,10 @@ fun PrayerKeyOperatingHome(
         HeroRail(written?.title.orEmpty()) { devotionalOpen = true }
 
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
-            PrayerSessionEntry(
-                start = { prayerSessionOpen = true },
-                history = { prayerCalendarOpen = true },
-            )
-            Spacer(Modifier.height(14.dp))
             TodayRhythmPanel(
                 savedCount, journalCount, streak,
-                onOpenPrayer, { devotionalOpen = true }, onOpenBible,
-                onOpenJournal, onOpenPrayer, onOpenJournal,
+                { morningPrayerOpen = true }, { devotionalOpen = true }, onOpenBible,
+                onOpenJournal, { morningPrayerOpen = true }, onOpenJournal,
             )
         }
 
@@ -439,7 +434,6 @@ private fun HomeContentLibrary(
         listOf(
             HomeShelfItem("I need prayer now", R.drawable.prayerkey_hero_dawn, openEmergency),
             HomeShelfItem("Prayer points", R.drawable.discovery_cover_2, feature("Prayer points", icon = Icons.Outlined.FormatListBulleted)),
-            HomeShelfItem("My prayer list", R.drawable.discovery_cover_1, openPrayerList),
         ),
     )
     HomeVisualShelf(
@@ -481,7 +475,6 @@ private fun HomeContentLibrary(
         listOf(
             HomeShelfItem("Midnight prayer", R.drawable.rhythm_evening, feature("Midnight prayer", icon = Icons.Outlined.DarkMode)),
             HomeShelfItem("Warfare prayers", R.drawable.discovery_cover_5, feature("Warfare prayers", icon = Icons.Outlined.Shield)),
-            HomeShelfItem("Declarations", R.drawable.discovery_cover_3, feature("Declarations", icon = Icons.Outlined.Campaign)),
         ),
     )
     HomeVisualShelf(
@@ -495,7 +488,6 @@ private fun HomeContentLibrary(
     HomeVisualShelf(
         "Your prayer record",
         listOf(
-            HomeShelfItem("My prayer list", R.drawable.discovery_cover_1, openPrayerList),
             HomeShelfItem("Journal", R.drawable.onboarding_journal_v3, openJournal),
             HomeShelfItem("Answered prayers", R.drawable.discovery_cover_4, openJournal),
         ),
@@ -1168,6 +1160,10 @@ private fun CircularImageShortcut(item: HomeShortcut) {
     val prefs = remember { context.getSharedPreferences("today_rhythm", android.content.Context.MODE_PRIVATE) }
     var completed by remember(dateKey) { mutableStateOf(prefs.getStringSet(dateKey, emptySet()).orEmpty()) }
     var openMoment by remember { mutableStateOf<String?>(null) }
+    /* Morning and Evening open the daily office rather than a card of their
+       own. Two things called Morning prayer on one screen, one of which was
+       the office and one of which was a generated card, is exactly the kind of
+       duplication that makes an app feel like a menu. */
     fun finish(id: String) {
         completed = completed + id
         prefs.edit().putStringSet(dateKey, completed).apply()
@@ -1221,7 +1217,10 @@ private fun CircularImageShortcut(item: HomeShortcut) {
                    own copy, which renders the retired templated devotional, so
                    the hero and this row showed different content for the same
                    day. Rows with a real destination now go there. */
-                val hasOwnScreen = identity.first == "devotional" || identity.first == "bible"
+                /* Morning and Evening now have their own screens too - the daily
+                   office. They used to open a generated card here, which put a
+                   second "Morning prayer" on Home beside the real one. */
+                val hasOwnScreen = identity.first in setOf("devotional", "bible", "morning", "evening")
 
                 /* One line, its own soft container, no divider.
                    Two lines per row put ten lines of text in this card and made
@@ -1295,16 +1294,6 @@ private fun CircularImageShortcut(item: HomeShortcut) {
         }
         }
     }
-    Surface(onClick = history, modifier = Modifier.fillMaxWidth().padding(top = 12.dp), shape = RoundedCornerShape(20.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
-        Row(Modifier.padding(horizontal = 18.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.History, null, tint = Pk.Oxblood)
-            Column(Modifier.weight(1f).padding(start = 13.dp)) {
-                Text("Prayer history", fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Pk.Charcoal)
-                Text("$saved open · $journal entries · ${streak.coerceAtLeast(1)} day streak", Modifier.padding(top = 3.dp), fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted)
-            }
-            Icon(Icons.Outlined.ChevronRight, null, tint = Pk.Muted)
-        }
-    }
 }
 
 @Composable private fun TodayRhythmPanel(
@@ -1358,7 +1347,10 @@ private fun CircularImageShortcut(item: HomeShortcut) {
             items.forEach { item ->
                 val identity = item.first
                 val done = identity.first in completed
-                val hasOwnScreen = identity.first == "devotional" || identity.first == "bible"
+                /* Morning and Evening now have their own screens too - the daily
+                   office. They used to open a generated card here, which put a
+                   second "Morning prayer" on Home beside the real one. */
+                val hasOwnScreen = identity.first in setOf("devotional", "bible", "morning", "evening")
                 Box(
                     Modifier.width(214.dp).height(276.dp).clip(RoundedCornerShape(28.dp)).clickable {
                         if (hasOwnScreen) {
@@ -1380,14 +1372,6 @@ private fun CircularImageShortcut(item: HomeShortcut) {
                         Text(if (done) "Prayed today" else identity.second, Modifier.padding(top = 6.dp), fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 15.sp, color = Color.White.copy(alpha = .8f), maxLines = 2)
                     }
                 }
-            }
-        }
-        Surface(onClick = history, modifier = Modifier.fillMaxWidth().padding(top = 14.dp), shape = RoundedCornerShape(20.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
-            Row(Modifier.padding(horizontal = 18.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.History, null, tint = Pk.Oxblood)
-                Text("Prayer history", Modifier.weight(1f).padding(start = 13.dp), fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp, color = Pk.Charcoal)
-                Text("$saved · $journal · ${streak.coerceAtLeast(1)} day", fontFamily = UtilitySans, fontSize = 10.sp, color = Pk.Muted)
-                Icon(Icons.Outlined.ChevronRight, null, tint = Pk.Muted)
             }
         }
     }
@@ -1597,39 +1581,6 @@ private fun ExplorePrayerKeyScreen(
         }
         Column(Modifier.padding(horizontal = 22.dp), verticalArrangement = Arrangement.spacedBy(11.dp)) {
             originals.items.forEachIndexed { index, item -> OriginalProgrammeCard(item, index) { go(item) } }
-        }
-        Text("EXPLORE BY CATEGORY", Modifier.padding(start = 22.dp, top = 30.dp, bottom = 12.dp), style = labelStyle(), color = Pk.Charcoal)
-        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp), verticalArrangement = Arrangement.spacedBy(11.dp)) {
-            categories.drop(1).chunked(2).forEachIndexed { rowIndex, rowItems ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(11.dp)) {
-                    rowItems.forEachIndexed { columnIndex, category ->
-                        val index = rowIndex * 2 + columnIndex
-                        Surface(
-                            Modifier.weight(1f).height(132.dp).clickable { selectedCategory = category },
-                            shape = RoundedCornerShape(22.dp), color = Pk.DeepDark, shadowElevation = 4.dp,
-                        ) {
-                            Box(Modifier.fillMaxSize()) {
-                                Image(
-                                    painterResource(listOf(R.drawable.discovery_cover_1, R.drawable.discovery_cover_2, R.drawable.discovery_cover_3, R.drawable.discovery_cover_4, R.drawable.discovery_cover_5, R.drawable.discovery_cover_6)[index % 6]),
-                                    null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
-                                )
-                                Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Pk.Oxblood.copy(alpha = .10f), Pk.DeepDark.copy(alpha = .88f)))))
-                                Text(
-                                    category.title,
-                                    Modifier.align(Alignment.BottomStart).padding(15.dp),
-                                    fontFamily = UtilitySans,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 16.sp,
-                                    lineHeight = 19.sp,
-                                    color = Color.White,
-                                    maxLines = 2,
-                                )
-                            }
-                        }
-                    }
-                    if (rowItems.size == 1) Spacer(Modifier.weight(1f))
-                }
-            }
         }
     }
 }
@@ -1865,8 +1816,6 @@ private fun programmeCategories() = listOf(
         Feature("Prayer challenge", "One guided day at a time", Icons.Outlined.LocalFireDepartment, Hub.PRAY),
         Feature("Midnight prayer", "Take the night watch", Icons.Outlined.DarkMode, Hub.PRAY),
         Feature("Warfare prayer", "Scripture-led prayer sets", Icons.Outlined.Shield, Hub.PRAY),
-        Feature("Declarations", "Speak God's Word", Icons.Outlined.Campaign, Hub.PRAY),
-        Feature("My prayer list", "Every prayer in one place", Icons.Outlined.FactCheck, Hub.PRAY),
     )),
     ProgrammeCategory("Bible", listOf(
         Feature("Read the Bible", "Translations and offline reading", Icons.Outlined.MenuBook, Hub.BIBLE),
