@@ -372,7 +372,6 @@ fun PrayerKeyOperatingHome(
             biblePulls = { biblePullsOpen = true },
             prayNow = onOpenPrayer,
             challenges = { challengeShelfOpen = true },
-            ledger = onOpenJournal,
         )
         HeroRail(written?.title.orEmpty()) { devotionalOpen = true }
 
@@ -396,10 +395,6 @@ fun PrayerKeyOperatingHome(
 
         EmergencyCard { emergencyPrayerOpen = true }
         TopicalBibleEntry { topicalBibleOpen = true }
-
-        conditional.takeIf { it.isNotEmpty() }?.let { items ->
-            Section("FOR THIS MOMENT") { MomentCards(items, go) }
-        }
 
         ProgrammeLibrary(programmes, go)
         Section("CLOSING VERSE") { ClosingVerseCard() }
@@ -792,14 +787,12 @@ private data class HomeShortcut(
     prayNow: () -> Unit,
     /** The named-challenge shelf. */
     challenges: () -> Unit,
-    ledger: () -> Unit,
 ) {
     val shortcuts = listOf(
         HomeShortcut("Today", Icons.Outlined.WbSunny, R.drawable.prayerkey_hero_dawn, todayBadge, todayPulls),
         HomeShortcut("Read", Icons.Outlined.AutoStories, R.drawable.onboarding_read_v3, readBadge, biblePulls),
         HomeShortcut("Pray now", Icons.Outlined.Bolt, R.drawable.onboarding_pray_v3, open = prayNow),
         HomeShortcut("Challenges", Icons.Outlined.LocalFireDepartment, R.drawable.discovery_cover_3, open = challenges),
-        HomeShortcut("My prayers", Icons.Outlined.FactCheck, R.drawable.onboarding_journal_v3, open = ledger),
     )
     Row(
         Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp).padding(bottom = 14.dp),
@@ -1634,9 +1627,6 @@ private fun ExplorePrayerKeyScreen(
                 Column(Modifier.padding(horizontal = 22.dp, vertical = 8.dp)) {
                     PrayerSessionEntry(start = startPrayer, history = prayerHistory)
                 }
-                momentItems.takeIf { it.isNotEmpty() }?.let { items ->
-                    Section("FOR THIS MOMENT") { MomentCards(items, go) }
-                }
                 ProgrammeLibrary(categories, go)
             }
         }
@@ -1937,6 +1927,13 @@ private fun programmeCategories() = listOf(
     )),
 )
 
-private fun conditionalFeatures(today: LocalDate): List<Feature> = buildList {
-    if (today.dayOfMonth == 1) add(Feature("First fruits", "Begin the month with God", Icons.Outlined.Spa, Hub.PRAY))
-}
+/**
+ * Nothing, now.
+ *
+ * This held one entry: First fruits, on the first of the month. So the band it
+ * fed was empty on thirty days out of thirty-one and then appeared unannounced
+ * on the thirty-first - a section the reader had never seen, between two they
+ * had. Kept as an empty list rather than deleted, because the plumbing is
+ * harmless and the next conditional feature has somewhere to go.
+ */
+private fun conditionalFeatures(today: LocalDate): List<Feature> = emptyList()
