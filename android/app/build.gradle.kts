@@ -19,7 +19,7 @@ android {
         applicationId = "com.prayerkey.manna"
         minSdk = 26
         targetSdk = 36
-        versionCode = 17
+        versionCode = 18
         versionName = "3.0.0"
 
 
@@ -120,12 +120,16 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("com.alphacephei:vosk-android:0.3.47")
 
     /* sherpa-onnx, for punctuation. Not on Maven Central — the project ships
        an .aar on its GitHub releases, fetched by `fetchSherpaOnnx` below and
        kept out of git, because a 38 MB binary does not belong in a repository. */
     implementation(files("libs/sherpa-onnx-1.13.6.aar"))
+
+    /* Pure Java, no native code. The sherpa model ships as a .tar.bz2 and the
+       platform can read neither, so this unpacks it. Chosen over hosting a zip
+       ourselves because the app has no server and should not need one. */
+    implementation("org.apache.commons:commons-compress:1.27.1")
     implementation("androidx.work:work-runtime-ktx:2.10.1")
 
     testImplementation("junit:junit:4.13.2")

@@ -6,9 +6,6 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import org.vosk.Model
-import org.vosk.Recognizer
 import java.io.File
 import java.nio.ByteBuffer
 
@@ -56,31 +53,25 @@ object SermonRefiner {
         onProgress: (Float) -> Unit = {},
     ): Result<String> = withContext(Dispatchers.Default) {
         val app = context.applicationContext
-        if (!VoskModel.isInstalled(app, VoskModel.Kind.Studio)) {
+        if (!SpeechModel.isInstalled(app, SpeechModel.Kind.Speech)) {
             return@withContext Result.failure(IllegalStateException("the sharper listening is not installed yet"))
         }
         if (!audio.isFile || audio.length() == 0L) {
             return@withContext Result.failure(IllegalStateException("the recording is missing"))
         }
 
-        var model: Model? = null
-        var recognizer: Recognizer? = null
+        var engine: SpeechEngine? = null
         runCatching {
-            model = Model(VoskModel.directory(app, VoskModel.Kind.Studio).absolutePath)
-            recognizer = Recognizer(model, RATE.toFloat())
+            engine = SpeechEngine.open(SpeechModel.directory(app, SpeechModel.Kind.Speech))
+                ?: error("the model could not be opened")
             val words = StringBuilder()
             decode(audio, onProgress) { pcm, size ->
-                if (recognizer!!.acceptWaveForm(pcm, size)) {
-                    JSONObject(recognizer!!.result).optString("text").trim()
-                        .takeIf { it.isNotEmpty() }?.let { words.append(it).append(' ') }
-                }
+                engine!!.accept(pcm, size) { }?.let { words.append(it).append(' ') }
             }
-            JSONObject(recognizer!!.finalResult).optString("text").trim()
-                .takeIf { it.isNotEmpty() }?.let { words.append(it) }
+            engine!!.finish()?.let { words.append(it) }
             words.toString().trim().ifEmpty { error("no speech was recognised in the recording") }
         }.also {
-            runCatching { recognizer?.close() }
-            runCatching { model?.close() }
+            runCatching { engine?.release() }
         }
     }
 
@@ -88,7 +79,7 @@ object SermonRefiner {
      * Decodes the AAC master to raw 16-bit PCM and hands it over in chunks.
      *
      * No resampling: [SermonCaptureEngine] records at 16 kHz mono, which is
-     * already exactly what Vosk wants, so the decoded stream can go straight
+     * already exactly what the recogniser wants, so the decoded stream can go straight
      * into the recogniser. If that ever changes this needs a resampler, so it
      * checks rather than assuming.
      */

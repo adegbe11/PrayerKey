@@ -3,8 +3,6 @@ package com.prayerkey.manna.ui.church
 import android.annotation.SuppressLint
 import android.content.Context
 import android.media.*
-import org.vosk.Model
-import org.vosk.Recognizer
 import org.json.JSONObject
 import java.io.File
 import java.nio.ByteBuffer
@@ -28,8 +26,7 @@ class SermonCaptureEngine(
     private var capture: Thread? = null
     private var samples = 0L
     private var segmentStart = 0L
-    private var recognizer: Recognizer? = null
-    private var model: Model? = null
+    private var speech: SpeechEngine? = null
     lateinit var audioFile: File
         private set
     val segments = mutableListOf<SermonSegment>()
@@ -39,14 +36,14 @@ class SermonCaptureEngine(
         if (!running.compareAndSet(false, true)) return
         val dir = SermonSessionStore.directory(app)
         audioFile = File(dir, "sermon_${startedAt}.m4a")
-        prepareVosk(dir)
+        prepareSpeech(dir)
         prepareEncoder()
         val min = AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
         audioRecord = AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, maxOf(min, 32_000))
         if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) { running.set(false); onStatus("Microphone could not be opened"); return }
         SermonSessionStore.write(audioFile, startedAt, "recording", segments)
         audioRecord?.startRecording()
-        onStatus(if (recognizer == null) "Recording · captions are not ready yet" else "Listening · recording safely")
+        onStatus(if (speech == null) "Recording · captions are not ready yet" else "Listening · recording safely")
         capture = thread(name = "sermon-capture", isDaemon = true) { captureLoop(startedAt) }
     }
 
@@ -69,8 +66,12 @@ class SermonCaptureEngine(
         runCatching { codec?.stop() }; runCatching { codec?.release() }; codec = null
         if (muxerStarted) runCatching { muxer?.stop() }
         runCatching { muxer?.release() }; muxer = null
-        runCatching { recognizer?.close() }; recognizer = null
-        runCatching { model?.close() }; model = null
+        /* Whatever was still being spoken when End was pressed. Without this
+           the last sentence of every sermon was lost. */
+        speech?.finish()?.let { tail ->
+            synchronized(segments) { segments += SermonSegment(segmentStart, samples * 1000L / RATE, tail) }
+        }
+        runCatching { speech?.release() }; speech = null
         SermonSessionStore.write(audioFile, startedAt, "complete", segments)
         onStatus("Recording saved")
     }
@@ -82,15 +83,16 @@ class SermonCaptureEngine(
             if (count <= 0) continue
             feedEncoder(pcm, count)
             val now = samples * 1000L / RATE
-            recognizer?.let { vosk ->
-                if (vosk.acceptWaveForm(pcm, count)) {
-                    val text = JSONObject(vosk.result).optString("text").trim()
-                    if (text.isNotEmpty()) {
-                        val segment = SermonSegment(segmentStart, now, text)
-                        synchronized(segments) { segments += segment; SermonSessionStore.write(audioFile, startedAt, "recording", segments) }
-                        segmentStart = now; onSegment(segment)
+            speech?.let { engine ->
+                engine.accept(pcm, count, onPartial)?.let { text ->
+                    val segment = SermonSegment(segmentStart, now, text)
+                    synchronized(segments) {
+                        segments += segment
+                        SermonSessionStore.write(audioFile, startedAt, "recording", segments)
                     }
-                } else onPartial(JSONObject(vosk.partialResult).optString("partial"))
+                    segmentStart = now
+                    onSegment(segment)
+                }
             }
             samples += count / 2
         }
@@ -104,11 +106,9 @@ class SermonCaptureEngine(
      * partial model dies in native code. [VoskModel.isInstalled] checks for the
      * subfolders Vosk actually reads.
      */
-    private fun prepareVosk(dir: File) {
-        if (!VoskModel.isInstalled(app, VoskModel.Kind.Live)) return
-        val modelDir = VoskModel.directory(app, VoskModel.Kind.Live)
-        runCatching { model = Model(modelDir.absolutePath); recognizer = Recognizer(model, RATE.toFloat()).apply { setWords(true) } }
-            .onFailure { recognizer = null; model = null }
+    private fun prepareSpeech(dir: File) {
+        if (!SpeechModel.isInstalled(app, SpeechModel.Kind.Speech)) return
+        speech = SpeechEngine.open(SpeechModel.directory(app, SpeechModel.Kind.Speech))
     }
 
     private fun prepareEncoder() {

@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--
+      The bars are transparent because the app draws behind them.
+
+      android:statusBarColor and android:navigationBarColor are deprecated in
+      API 35 and ignored there, so setting them to the brand purple only
+      described what older versions would do while newer ones did something
+      else. windowBackground keeps the purple so the launch frame is brand
+      coloured rather than white.
+    -->
     <style name="Theme.Manna" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:statusBarColor">#6200ED</item>
-        <item name="android:navigationBarColor">#6200ED</item>
-        <item name="android:windowSplashScreenBackground">#6200ED</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_blank</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">#6200ED</item>
+        <item name="android:windowBackground">#6200ED</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
     </style>
 </resources>

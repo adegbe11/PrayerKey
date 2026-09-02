@@ -70,7 +70,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import com.prayerkey.manna.ui.church.SermonRefiner
 import com.prayerkey.manna.ui.church.SermonService
-import com.prayerkey.manna.ui.church.VoskModel
+import com.prayerkey.manna.ui.church.SpeechModel
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 import com.prayerkey.manna.ui.theme.*
@@ -291,13 +291,13 @@ fun ChurchScreen(
 private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val state by VoskModel.state(VoskModel.Kind.Live).collectAsState()
-    LaunchedEffect(Unit) { VoskModel.refresh(context, VoskModel.Kind.Live) }
+    val state by SpeechModel.state(SpeechModel.Kind.Speech).collectAsState()
+    LaunchedEffect(Unit) { SpeechModel.refresh(context, SpeechModel.Kind.Speech) }
     // installing is the answer to the question; go straight on to recording
-    LaunchedEffect(state) { if (state is VoskModel.State.Ready) onReady() }
+    LaunchedEffect(state) { if (state is SpeechModel.State.Ready) onReady() }
 
     val cs = MaterialTheme.colorScheme
-    val busy = state is VoskModel.State.Downloading || state is VoskModel.State.Unpacking
+    val busy = state is SpeechModel.State.Downloading || state is SpeechModel.State.Unpacking
 
     Dialog(onDismissRequest = { if (!busy) onSkip() }) {
     Column(
@@ -314,7 +314,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
         Spacer(Modifier.height(6.dp))
         Text(
             when (val s = state) {
-                is VoskModel.State.Failed ->
+                is SpeechModel.State.Failed ->
                     "That did not download: ${s.reason}. Recording still works — you can try again."
                 else ->
                     "See the sermon written out as it is spoken, and catch the verses " +
@@ -325,7 +325,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
         )
 
         when (val s = state) {
-            is VoskModel.State.Downloading -> {
+            is SpeechModel.State.Downloading -> {
                 Spacer(Modifier.height(14.dp))
                 LinearProgressIndicator(
                     progress = { s.fraction },
@@ -335,11 +335,11 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Downloading · ${(s.fraction * VoskModel.Kind.Live.megabytes).toInt()} of ${VoskModel.Kind.Live.megabytes} MB",
+                    "Downloading · ${(s.fraction * SpeechModel.Kind.Speech.megabytes).toInt()} of ${SpeechModel.Kind.Speech.megabytes} MB",
                     color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp,
                 )
             }
-            VoskModel.State.Unpacking -> {
+            SpeechModel.State.Unpacking -> {
                 Spacer(Modifier.height(14.dp))
                 Text("Installing…", color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp)
             }
@@ -348,12 +348,12 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         Modifier.clip(R.pill).background(cs.primary)
-                            .clickable { scope.launch { VoskModel.install(context, VoskModel.Kind.Live) } }
+                            .clickable { scope.launch { SpeechModel.install(context, SpeechModel.Kind.Speech) } }
                             .padding(horizontal = 18.dp, vertical = 11.dp),
                     ) {
                         Text(
-                            if (state is VoskModel.State.Failed) "Try again"
-                            else "Turn on · ${VoskModel.Kind.Live.megabytes} MB",
+                            if (state is SpeechModel.State.Failed) "Try again"
+                            else "Turn on · ${SpeechModel.Kind.Speech.megabytes} MB",
                             color = cs.onPrimary, fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -782,17 +782,17 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val cs = MaterialTheme.colorScheme
-    val model by VoskModel.state(VoskModel.Kind.Studio).collectAsState()
+    val model by SpeechModel.state(SpeechModel.Kind.Speech).collectAsState()
     var progress by remember(note.id) { mutableStateOf<Float?>(null) }
     var failure by remember(note.id) { mutableStateOf<String?>(null) }
-    LaunchedEffect(Unit) { VoskModel.refresh(context, VoskModel.Kind.Studio) }
+    LaunchedEffect(Unit) { SpeechModel.refresh(context, SpeechModel.Kind.Speech) }
 
     if (note.refined || note.audioPath.isBlank() || !java.io.File(note.audioPath).isFile) return
 
     fun run() = scope.launch {
         failure = null
-        if (!VoskModel.isInstalled(context, VoskModel.Kind.Studio)) {
-            if (!VoskModel.install(context, VoskModel.Kind.Studio)) {
+        if (!SpeechModel.isInstalled(context, SpeechModel.Kind.Speech)) {
+            if (!SpeechModel.install(context, SpeechModel.Kind.Speech)) {
                 failure = "the download did not finish"
                 return@launch
             }
@@ -817,15 +817,15 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                     color = Muted, fontSize = 11.5.sp, modifier = Modifier.padding(top = 7.dp),
                 )
             }
-            model is VoskModel.State.Downloading -> {
-                val f = (model as VoskModel.State.Downloading).fraction
+            model is SpeechModel.State.Downloading -> {
+                val f = (model as SpeechModel.State.Downloading).fraction
                 LinearProgressIndicator(
                     progress = { f },
                     color = cs.primary, trackColor = cs.onBackground.copy(alpha = .10f),
                     modifier = Modifier.fillMaxWidth().height(4.dp).clip(R.pill),
                 )
                 Text(
-                    "Getting ready · ${(f * VoskModel.Kind.Studio.megabytes).toInt()} of ${VoskModel.Kind.Studio.megabytes} MB",
+                    "Getting ready · ${(f * SpeechModel.Kind.Speech.megabytes).toInt()} of ${SpeechModel.Kind.Speech.megabytes} MB",
                     color = Muted, fontSize = 11.5.sp, modifier = Modifier.padding(top = 7.dp),
                 )
             }
@@ -836,8 +836,8 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                         .padding(horizontal = 14.dp, vertical = 9.dp),
                 ) {
                     Text(
-                        if (VoskModel.isInstalled(context, VoskModel.Kind.Studio)) "Improve this transcript"
-                        else "Improve this transcript · ${VoskModel.Kind.Studio.megabytes} MB once",
+                        if (SpeechModel.isInstalled(context, SpeechModel.Kind.Speech)) "Improve this transcript"
+                        else "Improve this transcript · ${SpeechModel.Kind.Speech.megabytes} MB once",
                         color = cs.primary, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold,
                     )
                 }

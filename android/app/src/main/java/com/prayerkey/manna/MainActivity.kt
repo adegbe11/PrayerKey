@@ -26,7 +26,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notificationRoute = intent?.getStringExtra("prayerkey_destination")
-        WindowCompat.setDecorFitsSystemWindows(window, true)
+        /*
+         * Edge to edge, deliberately.
+         *
+         * This said `true` - fit the content inside the system bars - while
+         * the app targets SDK 36, where Android 15 draws edge to edge whatever
+         * the app asks for. So the request was ignored and the insets were
+         * never handled on purpose, which is what put a black band above the
+         * status bar on several screens.
+         *
+         * enableEdgeToEdge() was already imported and never called.
+         */
+        enableEdgeToEdge()
         setContent {
             // Never open the database before the first frame. The launch
             // experience must appear immediately; the saved palette is
@@ -45,15 +56,15 @@ class MainActivity : ComponentActivity() {
 
             val resolvedTheme = resolveTheme(themeId, followSystem, isSystemInDarkTheme())
             SideEffect {
-                val barColor = if (appReady) {
-                    android.graphics.Color.rgb(34, 34, 34)
-                } else {
-                    android.graphics.Color.rgb(98, 0, 237)
-                }
-                @Suppress("DEPRECATION")
-                window.statusBarColor = barColor
-                @Suppress("DEPRECATION")
-                window.navigationBarColor = barColor
+                /*
+                 * window.statusBarColor and navigationBarColor are deprecated
+                 * in API 35 and do nothing there. What still works is the icon
+                 * appearance, and that is all a transparent bar needs: the app
+                 * is dark behind both bars, so the icons stay light.
+                 *
+                 * Every screen already applies statusBarsPadding() and
+                 * navigationBarsPadding(), so the content sits clear of them.
+                 */
                 WindowCompat.getInsetsController(window, window.decorView).apply {
                     isAppearanceLightStatusBars = false
                     isAppearanceLightNavigationBars = false
