@@ -22,6 +22,8 @@ private const val PRAYING_MOOD = "\uD83D\uDE4F"
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
     private val store = MannaStore(application)
+    private val _storageError = MutableStateFlow<String?>(null)
+    val storageError = _storageError.asStateFlow()
 
     /** The app must NEVER die on a cold start because of a storage
      *  problem — every read falls back to an empty default. */
@@ -59,6 +61,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         // running eight queries on the main thread was costing >15s on a
         // cold start and tripping "failed to complete startup" ANRs.
         viewModelScope.launch(Dispatchers.IO) {
+            try {
+                store.readableDatabase
+            } catch (_: android.database.sqlite.SQLiteException) {
+                _storageError.value = "Your saved history could not be opened. It has not been erased. Update PrayerKey to the latest version and try again. Do not clear app storage."
+                return@launch
+            }
             val saved = safe(emptyList<SavedWord>()) { store.all() }
             val streak = safe(0) { store.streak() }
             val memory = safe(emptyList<MemoryVerse>()) { store.memoryVerses() }

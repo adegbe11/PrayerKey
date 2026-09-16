@@ -197,12 +197,10 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         }
     }
 
-    /** A phone with a newer/foreign schema must never crash the app —
-     *  rebuild the database instead of throwing (default behaviour). */
+    /** Never erase a person's prayer history when an older app opens this file.
+     * Refuse the unsupported version; reinstalling the newer build can recover it. */
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        listOf("saved_words", "app_state", "memory_verses", "sermon_sessions", "sermon_verses", "prayer_journal", "journal_entries", "sermon_notes", "prayer_sessions")
-            .forEach { table -> runCatching { db.execSQL("DROP TABLE IF EXISTS $table") } }
-        onCreate(db)
+        throw android.database.sqlite.SQLiteException("This prayer history requires a newer PrayerKey version. Your data has not been deleted.")
     }
 
     private fun createStateTable(db: SQLiteDatabase) {

@@ -19,7 +19,7 @@ android {
         applicationId = "com.prayerkey.manna"
         minSdk = 26
         targetSdk = 36
-        versionCode = 18
+        versionCode = 19
         versionName = "3.0.0"
 
 
@@ -96,7 +96,12 @@ android {
         isEnable = true
         reset()
         include("arm64-v8a", "armeabi-v7a", "x86_64")
-        isUniversalApk = false
+        /* Also build one APK that carries every architecture.
+           Without it the only files to hand were per-ABI, so an APK sent to
+           somebody with the wrong phone fails to install with "your device
+           isn't compatible" - which says nothing about the actual reason. The
+           bundle is unaffected; Play always splits it per device. */
+        isUniversalApk = true
     }
 
     /* The ONNX model must reach the device as a file, not a deflated stream —

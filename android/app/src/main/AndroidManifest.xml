@@ -3,6 +3,20 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!--
+      Play infers required hardware from permissions. RECORD_AUDIO implies
+      android.hardware.microphone as REQUIRED, and a required feature removes
+      every device without it from the store listing - tablets, some
+      Chromebooks, foldables in desk mode, anything Play is unsure about. Those
+      users see "your device isn't compatible" and never learn why.
+
+      The microphone is used by one screen. The Bible, the prayers, the
+      devotionals, the journal and both offices do not need it, so requiring it
+      to install the app is wrong.
+    -->
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <uses-feature android:name="android.hardware.audio.output" android:required="false" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Church mode listens for a whole service with the screen off -->

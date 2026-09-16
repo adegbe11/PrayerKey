@@ -2,14 +2,13 @@ package com.prayerkey.manna
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.prayerkey.manna.ui.church.VoskModel
+import com.prayerkey.manna.ui.church.SpeechModel
+import com.prayerkey.manna.ui.church.SpeechEngine
 import org.json.JSONObject
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.vosk.Model
-import org.vosk.Recognizer
 import java.io.File
 
 /**
@@ -60,13 +59,12 @@ class SpeechRecognitionTest {
         error("no data chunk in the sample")
     }
 
-    private fun transcribe(kind: VoskModel.Kind): String {
+    private fun transcribe(kind: SpeechModel.Kind): String {
         assumeTrue(
             "${kind.name} model is not installed on this device — skipping",
-            VoskModel.isInstalled(context, kind),
+            SpeechModel.isInstalled(context, kind),
         )
-        val model = Model(VoskModel.directory(context, kind).absolutePath)
-        val recognizer = Recognizer(model, RATE.toFloat())
+        val recognizer = requireNotNull(SpeechEngine.open(SpeechModel.directory(context, kind))) { "Installed speech model could not be opened" }
         val words = StringBuilder()
         try {
             val pcm = samplePcm()
@@ -75,22 +73,19 @@ class SpeechRecognitionTest {
             while (offset < pcm.size) {
                 val n = minOf(CHUNK, pcm.size - offset)
                 val slice = pcm.copyOfRange(offset, offset + n)
-                if (recognizer.acceptWaveForm(slice, n)) {
-                    words.append(JSONObject(recognizer.result).optString("text")).append(' ')
-                }
+                recognizer.accept(slice, n) { }?.let { words.append(it).append(' ') }
                 offset += n
             }
-            words.append(JSONObject(recognizer.finalResult).optString("text"))
+            recognizer.finish()?.let(words::append)
         } finally {
-            runCatching { recognizer.close() }
-            runCatching { model.close() }
+            recognizer.release()
         }
         return words.toString().trim().lowercase()
     }
 
     @Test
     fun the_live_model_turns_speech_into_the_right_words() {
-        val heard = transcribe(VoskModel.Kind.Live)
+        val heard = transcribe(SpeechModel.Kind.Speech)
         assertTrue("the recogniser returned nothing at all", heard.isNotBlank())
 
         /* Content words from the sample, each unmistakable and unlikely to be
@@ -108,10 +103,10 @@ class SpeechRecognitionTest {
         )
     }
 
-    /** The larger model is used by SermonRefiner and must clear the same bar. */
+    /** Capture and refinement now use the same Sherpa speech model. */
     @Test
     fun the_studio_model_turns_speech_into_the_right_words() {
-        val heard = transcribe(VoskModel.Kind.Studio)
+        val heard = transcribe(SpeechModel.Kind.Speech)
         val expected = listOf("ask", "not", "what", "your", "country", "can", "do", "for", "you")
         val found = expected.count { it in heard }
         assertTrue(

@@ -28,6 +28,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
@@ -62,6 +63,13 @@ fun MannaApp(
     onNotificationRouteConsumed: () -> Unit = {},
 ) {
     val viewModel: AppViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val storageError by viewModel.storageError.collectAsState()
+    if (storageError != null) {
+        Box(Modifier.fillMaxSize().background(com.prayerkey.manna.ui.theme.Pk.Cream).padding(32.dp), contentAlignment = Alignment.Center) {
+            Text(storageError!!, color = com.prayerkey.manna.ui.theme.Pk.Charcoal)
+        }
+        return
+    }
     val saved by viewModel.saved.collectAsState()
     val streak by viewModel.streak.collectAsState()
     val memory by viewModel.memory.collectAsState()
@@ -77,7 +85,7 @@ fun MannaApp(
     val formation by viewModel.formation.collectAsState()
     val context = LocalContext.current
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
-    LaunchedEffect(hydrated, preferences.onboarded, preferences.reminderEnabled) {
+    LaunchedEffect(hydrated, preferences.onboarded, preferences.reminderEnabled, preferences.reminderHour, preferences.reminderMinute) {
         if (hydrated && preferences.onboarded) {
             com.prayerkey.manna.reminder.ReminderReceiver.scheduleDailySuite(context, preferences.reminderEnabled)
             com.prayerkey.manna.reminder.ReminderReceiver.schedule(
@@ -105,10 +113,11 @@ fun MannaApp(
     var homeAction by remember { mutableStateOf<String?>(null) }
     var verseIndex by remember { mutableIntStateOf(0) }
     var showProfile by remember { androidx.compose.runtime.mutableStateOf(false) }
+    var prayerDraft by rememberSaveable { mutableStateOf<String?>(null) }
     val rootView = LocalView.current
     SideEffect {
         val window = (rootView.context as? android.app.Activity)?.window
-        val lightSystemChrome = selected != 1
+        val lightSystemChrome = preferences.onboarded && selected != 1
         window?.let {
             androidx.core.view.WindowCompat.getInsetsController(it, rootView).apply {
                 isAppearanceLightStatusBars = lightSystemChrome
@@ -217,7 +226,7 @@ fun MannaApp(
                             accountKind = "local",
                             reminderEnabled = remindersEnabled,
                             reminderHour = reminderHour,
-                            reminderMinute = 0,
+                            reminderMinute = context.getSharedPreferences("onboarding_plan", android.content.Context.MODE_PRIVATE).getInt("reminder_minute", 0),
                         ),
                     )
                 }
@@ -260,6 +269,10 @@ fun MannaApp(
                             onWriteDevotion = { selected = 4 },
                             onOpenBible = { selected = 1 },
                             onOpenPrayer = { selected = 2 },
+                            onOpenPrayerRequest = { request ->
+                                prayerDraft = request
+                                selected = 2
+                            },
                             onOpenJournal = { selected = 4 },
                             onOpenChurch = { selected = 3 },
                             onKeepPrayer = { title, bringing ->
@@ -300,7 +313,11 @@ fun MannaApp(
                         onReviewMemory = viewModel::reviewMemory,
                         reduceMotion = preferences.reduceMotion,
                     )
-                    2 -> PrayerScreen(journal, topics, topicsReady, viewModel::loadTopics, viewModel::savePrayer)
+                    2 -> PrayerScreen(
+                        journal, topics, topicsReady, viewModel::loadTopics, viewModel::savePrayer,
+                        initialRequest = prayerDraft,
+                        onInitialRequestConsumed = { prayerDraft = null },
+                    )
                     3 -> ChurchScreen(
                         notes = sermonNotes,
                         language = preferences.sermonLanguage,

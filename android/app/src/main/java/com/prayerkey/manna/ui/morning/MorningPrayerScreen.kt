@@ -96,9 +96,13 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
         }
 
         OfficeClose(
-            "Evening Prayer opens at half past nine.\nTonight runs the other way — review, thanksgiving,\nconfession, release, rest.",
+            "Return tonight for Evening Prayer.\nReview, thanksgiving, confession, release, rest.",
             palette,
         )
+        androidx.compose.material3.TextButton(onClick = {
+            context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE).edit().putBoolean("${today}:morning", true).apply()
+            onClose()
+        }) { androidx.compose.material3.Text("Finish prayer") }
         Spacer(Modifier.height(40.dp))
     }
 }

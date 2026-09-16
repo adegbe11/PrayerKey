@@ -31,26 +31,40 @@ import com.prayerkey.manna.ui.theme.*
 private data class TopicGroup(val title: String, val topics: List<String>, val color: Color)
 
 private fun words(value: String) = value.split(" · ")
+/**
+ * The subjects, ordered by colour rather than by nothing.
+ *
+ * These were ten unrelated colours - dark green, maroon, brown, teal, slate,
+ * navy, rust - with no relationship to each other or to what they labelled, and
+ * one of them, Faith & doctrine, was full brand violet among nine muted tones,
+ * so it read as a mistake rather than as emphasis.
+ *
+ * Now it is a single ramp, and the ramp carries meaning: amber where life is
+ * daily and tangible, through rose where it is about people, into violet for
+ * God and faith, indigo for the heavy things, and out to teal and green for
+ * creation and the world. Scrolling the page moves through it in order, which
+ * is what makes a grid of twenty tiles feel composed instead of scattered.
+ */
 private val topicalGroups = listOf(
-    TopicGroup("Money & work", words("money · wealth · riches · poverty · debt · borrowing · lending · tithing · giving · offering · firstfruits · generosity · saving · investing · greed · contentment · stewardship · work · business · employees · employers · success · ambition · hard work · laziness · rest · retirement · provision · inheritance"), Color(0xFF355C4A)),
-    TopicGroup("Marriage & relationships", words("marriage · husbands · wives · dating · courtship · engagement · divorce · remarriage · adultery · sex · lust · purity · singleness · finding a spouse · unequally yoked · submission · love in marriage · friendship · betrayal · gossip · toxic people · enemies · neighbours · reconciliation · community · unity · fellowship"), Color(0xFF8B4262)),
-    TopicGroup("Family", words("family · children · parenting · fathers · mothers · sons · daughters · siblings · in-laws · honouring parents · discipline · prodigal children · widows · orphans · adoption · the home · generational blessing · generational curses"), Color(0xFF7A5738)),
-    TopicGroup("Health & body", words("health · healing · sickness · disease · the body · food · eating · fasting · exercise · beauty · appearance · aging · sleep · rest · medicine · mental health · addiction"), Color(0xFF39746B)),
-    TopicGroup("Suffering & trouble", words("suffering · trials · pain · loss · grief · death · dying · injustice · persecution · oppression · poverty · hunger · waiting · endurance · perseverance · deliverance · restoration · comfort · new beginnings"), Color(0xFF4D5777)),
-    TopicGroup("Faith & doctrine", words("faith · grace · mercy · salvation · being born again · baptism · communion · the Holy Spirit · spiritual gifts · fruit of the Spirit · tongues · holiness · sanctification · righteousness · works · the law · predestination · eternal security · backsliding · the Trinity · the blood of Jesus · the name of Jesus · the cross · resurrection"), Color(0xFF5C02D8)),
-    TopicGroup("Prayer & practice", words("prayer · fasting · worship · praise · thanksgiving · meditation · Bible reading · memorisation · obedience · discipleship · evangelism · missions · serving · giving · vows · anointing"), Color(0xFF74436E)),
-    TopicGroup("Spiritual warfare", words("spiritual warfare · the devil · demons · witchcraft · curses · covenants · soul ties · deliverance · evil spirits · dreams · nightmares · night attacks · principalities · the armour of God · binding and loosing · angels · temptation · protection · covering"), Color(0xFF273552)),
-    TopicGroup("Character", words("love · kindness · humility · pride · patience · self-control · honesty · integrity · wisdom · discernment · discipline · gentleness · generosity · compassion · forgiveness · mercy · purity · repentance · truth · courage · faithfulness · gossip · slander · lying · anger · greed · laziness · jealousy · envy"), Color(0xFF9A593C)),
-    TopicGroup("Church & leadership", words("the church · going to church · pastors · elders · deacons · leadership · authority · submission · false prophets · false teachers · prophecy · unity · division · church discipline · giving to the church"), Color(0xFF53607D)),
-    TopicGroup("Nation & society", words("government · leaders · politics · voting · authority · taxes · war · peace · violence · justice · the poor · strangers · immigrants · refugees · slavery · racism · the persecuted church · the nations"), Color(0xFF385F78)),
-    TopicGroup("Creation & the world", words("creation · the environment · animals · nature · the earth · seasons · time · work of God's hands"), Color(0xFF54714A)),
-    TopicGroup("Life stages & seasons", words("birth · childhood · youth · graduation · new job · marriage · pregnancy · parenting · midlife · aging · retirement · death · new year · new month · birthdays · anniversaries · harvest"), Color(0xFF9A6B39)),
-    TopicGroup("God", words("God's love · God's promises · God's timing · God's plan · God's will · God's protection · God's provision · God's presence · God's faithfulness · God's grace · God's mercy · God's power · God's goodness · God's holiness · God's justice · the fear of the Lord · hearing God · trusting God · knowing God"), Color(0xFF5C02D8)),
-    TopicGroup("Identity & purpose", words("identity · purpose · calling · destiny · gifts · talents · direction · decisions · God's will for my life · change · moving · starting over"), Color(0xFF6A477D)),
-    TopicGroup("Everyday", words("morning · evening · night · sleep · travel · safety · study · exams · decisions · conversations · food · money management · time"), Color(0xFF346F75)),
-    TopicGroup("Heavy moods", words("anxious · afraid · worried · stressed · overwhelmed · depressed · sad · grieving · lonely · abandoned · rejected · angry · bitter · jealous · ashamed · guilty · regretful · doubting · confused · discouraged · burnt out · exhausted · restless · hopeless · numb · empty · broken · lost · stuck · tempted · weak · unworthy · misunderstood · betrayed · homesick"), Color(0xFF3D385E)),
-    TopicGroup("Light moods", words("hopeful · peaceful · calm · joyful · happy · grateful · thankful · content · confident · courageous · strong · steady · loved · secure · forgiven · free · restored · expectant · at rest · assured · trusting · encouraged"), Color(0xFF4C7A67)),
-    TopicGroup("Waiting", words("waiting · impatient · uncertain · in transition · praying and nothing is happening · about to give up · starting again"), Color(0xFF8A6844)),
+    TopicGroup("Everyday", words("morning · evening · night · sleep · travel · safety · study · exams · decisions · conversations · food · money management · time"), Color(0xFFB4712A)),
+    TopicGroup("Life stages & seasons", words("birth · childhood · youth · graduation · new job · marriage · pregnancy · parenting · midlife · aging · retirement · death · new year · new month · birthdays · anniversaries · harvest"), Color(0xFFA9612E)),
+    TopicGroup("Money & work", words("money · wealth · riches · poverty · debt · borrowing · lending · tithing · giving · offering · firstfruits · generosity · saving · investing · greed · contentment · stewardship · work · business · employees · employers · success · ambition · hard work · laziness · rest · retirement · provision · inheritance"), Color(0xFF9E5233)),
+    TopicGroup("Family", words("family · children · parenting · fathers · mothers · sons · daughters · siblings · in-laws · honouring parents · discipline · prodigal children · widows · orphans · adoption · the home · generational blessing · generational curses"), Color(0xFF93443B)),
+    TopicGroup("Health & body", words("health · healing · sickness · disease · the body · food · eating · fasting · exercise · beauty · appearance · aging · sleep · rest · medicine · mental health · addiction"), Color(0xFF8A3A47)),
+    TopicGroup("Marriage & relationships", words("marriage · husbands · wives · dating · courtship · engagement · divorce · remarriage · adultery · sex · lust · purity · singleness · finding a spouse · unequally yoked · submission · love in marriage · friendship · betrayal · gossip · toxic people · enemies · neighbours · reconciliation · community · unity · fellowship"), Color(0xFF7E3455)),
+    TopicGroup("Character", words("love · kindness · humility · pride · patience · self-control · honesty · integrity · wisdom · discernment · discipline · gentleness · generosity · compassion · forgiveness · mercy · purity · repentance · truth · courage · faithfulness · gossip · slander · lying · anger · greed · laziness · jealousy · envy"), Color(0xFF6F3163)),
+    TopicGroup("Light moods", words("hopeful · peaceful · calm · joyful · happy · grateful · thankful · content · confident · courageous · strong · steady · loved · secure · forgiven · free · restored · expectant · at rest · assured · trusting · encouraged"), Color(0xFF5F3070)),
+    TopicGroup("Identity & purpose", words("identity · purpose · calling · destiny · gifts · talents · direction · decisions · God's will for my life · change · moving · starting over"), Color(0xFF533075)),
+    TopicGroup("Faith & doctrine", words("faith · grace · mercy · salvation · being born again · baptism · communion · the Holy Spirit · spiritual gifts · fruit of the Spirit · tongues · holiness · sanctification · righteousness · works · the law · predestination · eternal security · backsliding · the Trinity · the blood of Jesus · the name of Jesus · the cross · resurrection"), Color(0xFF46307E)),
+    TopicGroup("God", words("God's love · God's promises · God's timing · God's plan · God's will · God's protection · God's provision · God's presence · God's faithfulness · God's grace · God's mercy · God's power · God's goodness · God's holiness · God's justice · the fear of the Lord · hearing God · trusting God · knowing God"), Color(0xFF3A3389)),
+    TopicGroup("Prayer & practice", words("prayer · fasting · worship · praise · thanksgiving · meditation · Bible reading · memorisation · obedience · discipleship · evangelism · missions · serving · giving · vows · anointing"), Color(0xFF33377F)),
+    TopicGroup("Church & leadership", words("the church · going to church · pastors · elders · deacons · leadership · authority · submission · false prophets · false teachers · prophecy · unity · division · church discipline · giving to the church"), Color(0xFF2F3C78)),
+    TopicGroup("Waiting", words("waiting · impatient · uncertain · in transition · praying and nothing is happening · about to give up · starting again"), Color(0xFF2C4271)),
+    TopicGroup("Heavy moods", words("anxious · afraid · worried · stressed · overwhelmed · depressed · sad · grieving · lonely · abandoned · rejected · angry · bitter · jealous · ashamed · guilty · regretful · doubting · confused · discouraged · burnt out · exhausted · restless · hopeless · numb · empty · broken · lost · stuck · tempted · weak · unworthy · misunderstood · betrayed · homesick"), Color(0xFF2A4A6B)),
+    TopicGroup("Suffering & trouble", words("suffering · trials · pain · loss · grief · death · dying · injustice · persecution · oppression · poverty · hunger · waiting · endurance · perseverance · deliverance · restoration · comfort · new beginnings"), Color(0xFF275165)),
+    TopicGroup("Spiritual warfare", words("spiritual warfare · the devil · demons · witchcraft · curses · covenants · soul ties · deliverance · evil spirits · dreams · nightmares · night attacks · principalities · the armour of God · binding and loosing · angels · temptation · protection · covering"), Color(0xFF245A5F)),
+    TopicGroup("Nation & society", words("government · leaders · politics · voting · authority · taxes · war · peace · violence · justice · the poor · strangers · immigrants · refugees · slavery · racism · the persecuted church · the nations"), Color(0xFF216459)),
+    TopicGroup("Creation & the world", words("creation · the environment · animals · nature · the earth · seasons · time · work of God's hands"), Color(0xFF2A6E4E)),
 )
 
 @Composable
@@ -84,12 +98,30 @@ internal fun TopicalBibleScreen(onClose: () -> Unit) {
 @Composable private fun GroupPicker(query: String, change: (String) -> Unit, open: (TopicGroup) -> Unit) {
     SearchBox(query, change, "Search any subject or feeling")
     val matches = topicalGroups.filter { query.isBlank() || it.title.contains(query, true) || it.topics.any { t -> t.contains(query, true) } }
-    LazyVerticalGrid(GridCells.Fixed(2), contentPadding = PaddingValues(20.dp, 8.dp, 20.dp, 100.dp), horizontalArrangement = Arrangement.spacedBy(11.dp), verticalArrangement = Arrangement.spacedBy(11.dp)) {
+    LazyVerticalGrid(GridCells.Fixed(2), contentPadding = PaddingValues(20.dp, 8.dp, 20.dp, 100.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         items(matches, key = { it.title }) { item ->
-            Column(Modifier.fillMaxWidth().height(125.dp).clip(RoundedCornerShape(20.dp)).background(item.color).clickable { open(item) }.padding(15.dp), verticalArrangement = Arrangement.Bottom) {
-                Icon(groupIcon(item.title), null, tint = Color.White.copy(.86f), modifier = Modifier.size(22.dp))
-                Text(item.title, Modifier.padding(top = 11.dp), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp, lineHeight = 18.sp, maxLines = 2)
-                Text("${item.topics.size} topics", color = Color.White.copy(.68f), fontSize = 10.sp)
+            /* One word on a colour, and nothing else.
+               The icon was a book, a heart or a shield repeated across twenty
+               tiles beside a label that already said Family, or Money & work -
+               decoration competing with the only thing worth reading. The count
+               went with it: "29 topics" does not help anyone choose between
+               money and marriage when they are looking for their own life.
+               Wide and short, so twenty of them make a rhythm down the page
+               rather than twenty blocks. */
+            Column(
+                Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(22.dp))
+                    .background(item.color).clickable { open(item) }
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalArrangement = Arrangement.Bottom,
+            ) {
+                Text(
+                    item.title,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 17.sp,
+                    lineHeight = 21.sp,
+                    maxLines = 2,
+                )
             }
         }
     }
@@ -142,15 +174,3 @@ private fun searchTerm(topic: String): String = when (topic.lowercase()) {
     else -> topic.substringBefore(" and ").removePrefix("God's ")
 }
 
-private fun groupIcon(title: String) = when {
-    title.contains("Money") -> Icons.Outlined.WorkOutline
-    title.contains("Marriage") -> Icons.Outlined.FavoriteBorder
-    title == "Family" -> Icons.Outlined.FamilyRestroom
-    title.contains("Health") -> Icons.Outlined.HealthAndSafety
-    title.contains("warfare", true) -> Icons.Outlined.Shield
-    title.contains("Church") -> Icons.Outlined.Church
-    title.contains("Nation") -> Icons.Outlined.Public
-    title.contains("moods", true) -> Icons.Outlined.Psychology
-    title == "God" -> Icons.Outlined.Flare
-    else -> Icons.Outlined.AutoStories
-}

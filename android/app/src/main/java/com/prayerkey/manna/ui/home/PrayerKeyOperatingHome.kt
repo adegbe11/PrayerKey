@@ -1,11 +1,15 @@
 package com.prayerkey.manna.ui.home
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -30,11 +34,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.Challenge
 import com.prayerkey.manna.data.Devotion
+import com.prayerkey.manna.data.PrayerKeyApi
 import com.prayerkey.manna.data.passageFor
 import com.prayerkey.manna.R
 import com.prayerkey.manna.model.VerseCard
@@ -49,6 +55,7 @@ import com.prayerkey.manna.ui.theme.UtilitySans
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.launch
 
 private enum class Hub { BIBLE, PRAY, CHURCH, JOURNAL }
 private data class Feature(val title: String, val detail: String, val icon: ImageVector, val hub: Hub)
@@ -68,6 +75,7 @@ fun PrayerKeyOperatingHome(
     onWriteDevotion: () -> Unit,
     onOpenBible: () -> Unit,
     onOpenPrayer: () -> Unit,
+    onOpenPrayerRequest: (String) -> Unit,
     onOpenJournal: () -> Unit,
     onOpenChurch: () -> Unit,
     /** Devotional -> prayer list. The day's title and what it invites you to bring. */
@@ -96,6 +104,7 @@ fun PrayerKeyOperatingHome(
     var topicalBibleOpen by rememberSaveable { mutableStateOf(false) }
     var emergencyPrayerOpen by rememberSaveable { mutableStateOf(false) }
     var morningPrayerOpen by rememberSaveable { mutableStateOf(false) }
+    var requestedOffice by rememberSaveable { mutableStateOf<String?>(null) }
     var prayerSessionOpen by rememberSaveable { mutableStateOf(false) }
     /* The ten-pull daily session. Separate from prayerSessionOpen above,
        which is the timed guided journey — different thing, same word. */
@@ -155,7 +164,7 @@ fun PrayerKeyOperatingHome(
        would show 0/10 for a morning that is already done. */
     var todayBadgeText by remember(today) { mutableStateOf<String?>(null) }
     var readBadgeText by remember(today) { mutableStateOf<String?>(null) }
-    LaunchedEffect(todayPullsOpen, biblePullsOpen) {
+    LaunchedEffect(today, todayPullsOpen, biblePullsOpen) {
         todayBadgeText = com.prayerkey.manna.data.PullsProgress.Prayer.badge(context, today)
         readBadgeText = com.prayerkey.manna.data.PullsProgress.Bible.badge(context, today)
     }
@@ -185,7 +194,11 @@ fun PrayerKeyOperatingHome(
                     onOpenPassage = { _, _ -> devotionalOpen = false; onOpenBible() },
                     onAddPrayer = { onKeepPrayer(day.title, day.addLabel) },
                     onKeepReflection = { onKeepReflection(day.question, it) },
-                    onComplete = { devotionalOpen = false },
+                    onComplete = {
+                        context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)
+                            .edit().putBoolean("${today}:devotional", true).apply()
+                        devotionalOpen = false
+                    },
                 )
             }
         }
@@ -218,7 +231,7 @@ fun PrayerKeyOperatingHome(
                asked to choose between them at eleven at night would be worse. */
             val now = java.time.LocalTime.now()
             val close = { morningPrayerOpen = false }
-            when (com.prayerkey.manna.data.OfficeStore.officeFor(now.hour, now.minute)) {
+            when (requestedOffice?.let { com.prayerkey.manna.data.OfficeStore.Office.valueOf(it) } ?: com.prayerkey.manna.data.OfficeStore.officeFor(now.hour, now.minute)) {
                 com.prayerkey.manna.data.OfficeStore.Office.MORNING ->
                     com.prayerkey.manna.ui.morning.MorningPrayerScreen(onClose = close)
                 com.prayerkey.manna.data.OfficeStore.Office.EVENING ->
@@ -342,6 +355,20 @@ fun PrayerKeyOperatingHome(
         }
     }
     val programmes = remember { programmeCategories() }
+    var homeCategory by remember { mutableStateOf<ProgrammeCategory?>(null) }
+    var remindersOpen by remember { mutableStateOf(false) }
+    homeCategory?.let { category ->
+        Dialog(onDismissRequest = { homeCategory = null }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+            ProgrammeCategoryScreen(category, { homeCategory = null }, go)
+        }
+    }
+    if (remindersOpen) AlertDialog(
+        onDismissRequest = { remindersOpen = false },
+        title = { Text("Prayer reminders") },
+        text = { Text("Choose when PrayerKey invites you to pause for prayer. Reminder schedules and notification permissions are available in Settings.") },
+        confirmButton = { TextButton(onClick = { remindersOpen = false; onSettings() }) { Text("Manage reminders") } },
+        dismissButton = { TextButton(onClick = { remindersOpen = false }) { Text("Close") } },
+    )
     val conditional = remember(today) { conditionalFeatures(today) }
 
     if (exploreOpen) {
@@ -364,7 +391,7 @@ fun PrayerKeyOperatingHome(
         Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding()
             .verticalScroll(rememberScrollState()).padding(bottom = Pk.NavClearance)
     ) {
-        Header(today, streak, onSettings)
+        Header(today, streak, onSettings) { remindersOpen = true }
         ShortcutRail(
             todayBadge = todayBadgeText,
             todayPulls = { todayPullsOpen = true },
@@ -373,31 +400,306 @@ fun PrayerKeyOperatingHome(
             prayNow = onOpenPrayer,
             challenges = { challengeShelfOpen = true },
         )
-        HeroRail(written?.title.orEmpty()) { devotionalOpen = true }
+        CompactPrayerPrompt(onOpenPrayerRequest)
+        HeroRail(written?.title.orEmpty()) { if (written != null) devotionalOpen = true }
 
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
             TodayRhythmPanel(
                 devotionalTitle = written?.title.orEmpty(),
                 readingLabel = plan?.readingLabel.orEmpty(),
-                morningPrayer = { morningPrayerOpen = true },
+                morningPrayer = { requestedOffice = "MORNING"; morningPrayerOpen = true },
                 devotional = { devotionalOpen = true },
-                bible = onOpenBible,
-                eveningPrayer = { morningPrayerOpen = true },
+                bible = { biblePullsOpen = true },
+                eveningPrayer = { requestedOffice = "EVENING"; morningPrayerOpen = true },
                 calendar = { prayerCalendarOpen = true },
             )
         }
 
-        Section("TODAY") {
-            VerseCard(todayVerse, onOpenWord)
-            Spacer(Modifier.height(12.dp))
-            PrayerNowCard(morningPrayer) { morningPrayerOpen = true }
+        PrayerKeyIdentitySection(
+            pray = { homeCategory = programmes.first { it.title == "Pray" } },
+            read = { homeCategory = programmes.first { it.title == "Bible" } },
+            fast = { homeCategory = programmes.first { it.title == "Fast" } },
+            grow = { homeCategory = ProgrammeCategory("Grow", listOf(Feature("Prayer challenge", "Build a daily rhythm", Icons.Outlined.LocalFireDepartment, Hub.PRAY), Feature("Memory verse", "Carry Scripture with you", Icons.Outlined.BookmarkBorder, Hub.BIBLE), Feature("Bible challenge", "Grow in the Word", Icons.Outlined.AutoStories, Hub.BIBLE))) },
+            church = { homeCategory = programmes.first { it.title == "Church" } },
+            remember = { homeCategory = ProgrammeCategory("Remember", listOf(Feature("Journal", "Keep your reflections", Icons.Outlined.EditNote, Hub.JOURNAL), Feature("My prayer list", "Return to what you are praying for", Icons.Outlined.FavoriteBorder, Hub.PRAY), Feature("Sermon notes", "Remember what was preached", Icons.Outlined.Notes, Hub.CHURCH))) },
+            topicalBible = { topicalBibleOpen = true },
+        )
+        GiveSupportCard()
+        Section("A WORD TO CARRY") {
+            ClosingVerseCard(today) { verse, reference ->
+                onOpenPrayerRequest("Help me pray $reference: $verse")
+            }
         }
+    }
+}
 
-        EmergencyCard { emergencyPrayerOpen = true }
-        TopicalBibleEntry { topicalBibleOpen = true }
+@Composable
+private fun GiveSupportCard() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var monthly by rememberSaveable { mutableStateOf(false) }
+    var amount by rememberSaveable { mutableStateOf("10") }
+    var loading by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var explain by rememberSaveable { mutableStateOf(false) }
+    val parsedAmount = amount.toIntOrNull()?.takeIf { it in 1..10_000 }
 
-        ProgrammeLibrary(programmes, go)
-        Section("CLOSING VERSE") { ClosingVerseCard() }
+    Surface(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
+        shape = RoundedCornerShape(30.dp),
+        color = Pk.DeepDark,
+        shadowElevation = 8.dp,
+    ) {
+        Column {
+            Box(Modifier.fillMaxWidth().heightIn(min = 238.dp)) {
+                Image(
+                    painterResource(R.drawable.prayerkey_give_artwork),
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize(),
+                    contentScale = ContentScale.Crop,
+                )
+                Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = .45f)))
+                Column(Modifier.padding(24.dp).padding(top = 38.dp)) {
+                    Text("GIVE", color = Pk.GoldLight, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 2.sp)
+                    Text("Keep\nPrayerKey free.", Modifier.padding(top = 10.dp), color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 31.sp, lineHeight = 34.sp)
+                    Text("Help keep prayer available\nto everyone.", Modifier.padding(top = 8.dp), color = Color.White.copy(alpha = .78f), fontFamily = UtilitySans, fontSize = 12.sp, lineHeight = 17.sp)
+                }
+                Surface(
+                    onClick = { explain = !explain },
+                    modifier = Modifier.align(Alignment.TopEnd).padding(15.dp),
+                    shape = RoundedCornerShape(99.dp),
+                    color = Pk.DeepDark.copy(alpha = .72f),
+                    border = BorderStroke(1.dp, Pk.GoldLight.copy(alpha = .55f)),
+                ) {
+                    Text("Why give?", Modifier.padding(horizontal = 14.dp, vertical = 9.dp), color = Color.White, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Column(Modifier.padding(horizontal = 18.dp, vertical = 18.dp)) {
+                if (explain) Text(
+                    "Your gift supports PrayerKey's infrastructure and helps keep its prayer and Scripture tools available without a paywall.",
+                    modifier = Modifier.padding(bottom = 14.dp), color = Color.White.copy(alpha = .72f),
+                    fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 16.sp,
+                )
+
+                Row(
+                    Modifier.fillMaxWidth().background(Color.White.copy(alpha = .08f), RoundedCornerShape(99.dp)).padding(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    listOf(false to "Once", true to "Monthly").forEach { (value, label) ->
+                        Surface(
+                            onClick = { monthly = value }, modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(99.dp),
+                            color = if (monthly == value) Pk.Oxblood else Color.Transparent,
+                        ) {
+                            Text(label, Modifier.padding(vertical = 10.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = Color.White, fontFamily = UtilitySans, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+
+                Surface(
+                    modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
+                    shape = RoundedCornerShape(18.dp), color = Color.White.copy(alpha = .08f),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = .16f)),
+                ) {
+                    Row(Modifier.padding(horizontal = 16.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text("$", color = Color.White, fontFamily = UtilitySans, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        BasicTextField(
+                            value = amount,
+                            onValueChange = { next -> if (next.length <= 5 && next.all { it in '0'..'9' }) amount = next },
+                            modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontFamily = UtilitySans, fontSize = 25.sp, fontWeight = FontWeight.Bold),
+                        )
+                        Text("USD", color = Color.White.copy(alpha = .68f), fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(5, 10, 25, 50).forEach { preset ->
+                        Surface(
+                            onClick = { amount = preset.toString() }, modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(14.dp),
+                            color = if (amount == preset.toString()) Pk.Oxblood else Color.White.copy(alpha = .07f),
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = .14f)),
+                        ) {
+                            Text("$$preset", Modifier.padding(vertical = 10.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = Color.White, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+
+                error?.let {
+                    Text(it, Modifier.padding(top = 10.dp), color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 15.sp)
+                }
+
+                Button(
+                    onClick = {
+                        val gift = parsedAmount ?: return@Button
+                        loading = true; error = null
+                        scope.launch {
+                            try {
+                                val url = Uri.parse(PrayerKeyApi.createDonationCheckout(gift, monthly))
+                                require(url.scheme == "https" && url.host == "checkout.stripe.com")
+                                context.startActivity(Intent(Intent.ACTION_VIEW, url))
+                            } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                                throw cancelled
+                            } catch (_: Exception) {
+                                error = "We couldn't open secure giving. Please try again shortly. No payment has been confirmed."
+                            } finally { loading = false }
+                        }
+                    },
+                    enabled = parsedAmount != null && !loading,
+                    modifier = Modifier.fillMaxWidth().padding(top = 14.dp).height(52.dp),
+                    shape = RoundedCornerShape(99.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood, contentColor = Color.White, disabledContainerColor = Color.White.copy(alpha = .10f)),
+                ) {
+                    Text(
+                        if (loading) "Opening Stripe…" else "Give ${parsedAmount?.let { "$$it" }.orEmpty()}${if (monthly) " monthly" else ""}",
+                        fontFamily = UtilitySans, fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                    )
+                    if (!loading) Icon(Icons.Outlined.ArrowForward, null, Modifier.padding(start = 8.dp).size(18.dp))
+                }
+                Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Outlined.Lock, null, tint = Color.White.copy(alpha = .55f), modifier = Modifier.size(14.dp))
+                    Text(" Secure checkout · Always optional", color = Color.White.copy(alpha = .8f), fontFamily = UtilitySans, fontSize = 11.sp)
+                }
+                if (monthly) Text("Repeats monthly until cancelled. Review the amount and available payment methods at checkout.", Modifier.padding(top = 8.dp), color = Color.White.copy(alpha = .8f), fontFamily = UtilitySans, fontSize = 12.sp, lineHeight = 17.sp)
+            }
+        }
+    }
+}
+
+@Composable
+private fun CompactPrayerPrompt(onSubmit: (String) -> Unit) {
+    var request by rememberSaveable { mutableStateOf("") }
+    Surface(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp).padding(bottom = 15.dp),
+        shape = RoundedCornerShape(99.dp),
+        color = Color.White,
+        border = BorderStroke(1.dp, Pk.Oxblood.copy(alpha = .12f)),
+        shadowElevation = 3.dp,
+    ) {
+        Row(
+            Modifier.fillMaxWidth().height(52.dp).padding(start = 16.dp, end = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Outlined.SelfImprovement, null, tint = Pk.Oxblood, modifier = Modifier.size(19.dp))
+            BasicTextField(
+                value = request,
+                onValueChange = { request = it },
+                modifier = Modifier.weight(1f).padding(horizontal = 11.dp),
+                singleLine = true,
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    color = Pk.Charcoal, fontFamily = UtilitySans, fontSize = 13.sp,
+                ),
+                decorationBox = { inner ->
+                    Box(contentAlignment = Alignment.CenterStart) {
+                        if (request.isBlank()) Text(
+                            "What do you want to pray about?",
+                            color = Pk.Muted, fontFamily = UtilitySans, fontSize = 13.sp,
+                        )
+                        inner()
+                    }
+                },
+            )
+            Surface(
+                modifier = Modifier.size(40.dp).clickable(enabled = request.isNotBlank()) {
+                    onSubmit(request.trim())
+                },
+                shape = CircleShape,
+                color = if (request.isBlank()) Pk.Oxblood.copy(alpha = .10f) else Pk.Oxblood,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        Icons.Outlined.ArrowForward, "Pray about this",
+                        tint = if (request.isBlank()) Pk.Oxblood.copy(alpha = .42f) else Color.White,
+                        modifier = Modifier.size(19.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+private data class PrayerKeyPillar(
+    val title: String,
+    val promise: String,
+    val icon: ImageVector,
+    val image: Int,
+    val open: () -> Unit,
+)
+
+@Composable
+private fun PrayerKeyIdentitySection(
+    pray: () -> Unit,
+    read: () -> Unit,
+    fast: () -> Unit,
+    grow: () -> Unit,
+    church: () -> Unit,
+    remember: () -> Unit,
+    topicalBible: () -> Unit,
+) {
+    val pillars = listOf(
+        PrayerKeyPillar("PRAY", "Bring everything to God.", Icons.Outlined.SelfImprovement, R.drawable.onboarding_pray_v3, pray),
+        PrayerKeyPillar("READ", "Meet Him in His Word.", Icons.Outlined.AutoStories, R.drawable.onboarding_read_v3, read),
+        PrayerKeyPillar("FAST", "Seek God with intention.", Icons.Outlined.WaterDrop, R.drawable.discovery_cover_5, fast),
+        PrayerKeyPillar("GROW", "Build your life of prayer.", Icons.Outlined.LocalFireDepartment, R.drawable.discovery_cover_4, grow),
+        PrayerKeyPillar("CHURCH", "Carry Sunday into the week.", Icons.Outlined.Church, R.drawable.onboarding_church_v3, church),
+        PrayerKeyPillar("REMEMBER", "Never forget what God has done.", Icons.Outlined.EditNote, R.drawable.onboarding_journal_v3, remember),
+    )
+    Column(Modifier.fillMaxWidth().padding(vertical = 18.dp)) {
+        Column(
+            Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            pillars.chunked(2).forEach { rowPillars ->
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    rowPillars.forEach { pillar ->
+                        PrayerKeyPillarCard(pillar, Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+        TopicalBibleEntry(topicalBible)
+    }
+}
+
+@Composable
+private fun PrayerKeyPillarCard(pillar: PrayerKeyPillar, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.heightIn(min = 200.dp).clickable(onClick = pillar.open),
+        shape = RoundedCornerShape(25.dp), color = Pk.DeepDark, shadowElevation = 4.dp,
+    ) {
+        Box {
+            Image(painterResource(pillar.image), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
+            Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = .60f)))
+            Column(
+                Modifier.fillMaxWidth().padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(28.dp),
+            ) {
+                Surface(shape = CircleShape, color = Color.White.copy(alpha = .92f)) {
+                    Icon(
+                        pillar.icon, null, tint = Pk.Oxblood,
+                        modifier = Modifier.padding(8.dp).size(18.dp),
+                    )
+                }
+                Column {
+                    Text(
+                        pillar.title, color = Color.White, fontFamily = DisplaySerif,
+                        fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        pillar.promise, modifier = Modifier.padding(top = 4.dp),
+                        color = Color.White.copy(alpha = .82f), fontFamily = UtilitySans,
+                        fontSize = 12.sp, lineHeight = 17.sp,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -710,28 +1012,36 @@ private fun ContinueRow(icon: ImageVector, title: String, detail: String, open: 
     }
 }
 
-@Composable private fun ClosingVerseCard() {
+@Composable private fun ClosingVerseCard(date: LocalDate, onPray: (String, String) -> Unit) {
     val context = LocalContext.current
-    val verse = "The Lord will watch over your coming and going both now and forevermore."
-    val reference = "Psalm 121:8"
+    val words = listOf(
+        "Psalm 121:8" to "The LORD shall preserve thy going out and thy coming in from this time forth, and even for evermore.",
+        "Psalm 23:1" to "The LORD is my shepherd; I shall not want.",
+        "Psalm 46:1" to "God is our refuge and strength, a very present help in trouble.",
+        "Proverbs 3:5" to "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
+        "1 Peter 5:7" to "Casting all your care upon him; for he careth for you.",
+        "Psalm 119:105" to "Thy word is a lamp unto my feet, and a light unto my path.",
+        "Psalm 56:3" to "What time I am afraid, I will trust in thee.",
+    )
+    val (reference, verse) = words[Math.floorMod(date.toEpochDay(), words.size.toLong()).toInt()]
     Surface(shape = RoundedCornerShape(26.dp), color = Pk.DeepDark, shadowElevation = 3.dp) {
-        Box(Modifier.fillMaxWidth().height(390.dp)) {
-            Image(painterResource(R.drawable.closing_verse_violet), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Pk.DeepDark.copy(alpha = .94f)))))
-            Column(Modifier.fillMaxSize().padding(22.dp), verticalArrangement = Arrangement.Bottom) {
-                Text("A WORD TO CARRY", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.6.sp, color = Pk.GoldLight)
-                Text("“$verse”", Modifier.padding(top = 12.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 23.sp, lineHeight = 30.sp, color = Color.White)
-                Text(reference.uppercase(), Modifier.padding(top = 12.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.3.sp, color = Pk.GoldLight)
+        Box(Modifier.fillMaxWidth().heightIn(min = 330.dp)) {
+            Image(painterResource(R.drawable.closing_verse_violet), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
+            Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = .65f)))
+            Column(Modifier.fillMaxWidth().padding(22.dp).padding(top = 70.dp)) {
+                Text("“$verse”", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 23.sp, lineHeight = 30.sp, color = Color.White)
+                Text(reference.uppercase() + " · KJV", Modifier.padding(top = 12.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.3.sp, color = Pk.GoldLight)
                 Row(Modifier.padding(top = 18.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     PrayerImageAction(Icons.Outlined.Download, "SAVE") { CardShareRenderer.saveClosingVerse(context, verse, reference) }
                     PrayerImageAction(Icons.Outlined.Share, "SHARE") { CardShareRenderer.shareClosingVerse(context, verse, reference) }
                 }
+                Button(onClick = { onPray(verse, reference) }, modifier = Modifier.fillMaxWidth().padding(top = 12.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) { Text("Pray this") }
             }
         }
     }
 }
 
-@Composable private fun Header(date: LocalDate, streak: Int, settings: () -> Unit) {
+@Composable private fun Header(date: LocalDate, streak: Int, settings: () -> Unit, reminders: () -> Unit) {
     Box(Modifier.fillMaxWidth().height(74.dp).padding(horizontal = 20.dp)) {
         Surface(
             onClick = settings,
@@ -750,7 +1060,7 @@ private fun ContinueRow(icon: ImageVector, title: String, detail: String, open: 
             Text(date.format(DateTimeFormatter.ofPattern("EEEE, MMM d")), Modifier.padding(top = 5.dp), fontFamily = UtilitySans, fontSize = 12.sp, color = Pk.Muted)
         }
         Surface(
-            onClick = settings,
+            onClick = reminders,
             modifier = Modifier.align(Alignment.CenterEnd).size(36.dp),
             shape = CircleShape,
             color = Color.White.copy(alpha = .78f),
@@ -760,9 +1070,6 @@ private fun ContinueRow(icon: ImageVector, title: String, detail: String, open: 
             BadgedBox(
                 modifier = Modifier.padding(9.dp),
                 badge = {
-                    if (streak > 0) Badge(containerColor = Pk.Oxblood, contentColor = Color.White) {
-                        Text(streak.coerceAtMost(99).toString(), fontSize = 8.sp)
-                    }
                 },
             ) { Icon(Icons.Outlined.NotificationsNone, "Prayer reminders", tint = Pk.Charcoal, modifier = Modifier.size(18.dp)) }
         }
@@ -799,20 +1106,20 @@ private data class HomeShortcut(
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
         shortcuts.forEach { item ->
-            CircularImageShortcut(item)
+            CircularImageShortcut(item, Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-private fun CircularImageShortcut(item: HomeShortcut) {
+private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modifier) {
     Column(
-        Modifier.width(88.dp).clickable(onClick = item.open),
+        modifier.clickable(onClick = item.open),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(contentAlignment = Alignment.Center) {
             Box(
-                Modifier.size(80.dp)
+                Modifier.padding(horizontal = 4.dp).widthIn(max = 80.dp).fillMaxWidth().aspectRatio(1f)
                     .shadow(5.dp, CircleShape, spotColor = Pk.Oxblood.copy(alpha = .22f))
                     .background(Pk.Oxblood, CircleShape)
                     .padding(3.dp)
@@ -881,17 +1188,15 @@ private fun CircularImageShortcut(item: HomeShortcut) {
             modifier = Modifier.align(Alignment.Center),
             shape = CircleShape, color = Color.White.copy(alpha = .94f), shadowElevation = 10.dp,
         ) {
-                Icon(Icons.Outlined.PlayArrow, "Open today's devotional", Modifier.padding(19.dp).size(30.dp), tint = Pk.Oxblood)
+                Icon(Icons.Outlined.AutoStories, "Read today's devotional", Modifier.padding(19.dp).size(30.dp), tint = Pk.Oxblood)
         }
         Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 22.dp, vertical = 24.dp)) {
             Surface(shape = CircleShape, color = Color.White.copy(alpha = .16f), border = BorderStroke(.5.dp, Color.White.copy(alpha = .24f))) {
                 Text("TODAY'S DEVOTIONAL", Modifier.padding(horizontal = 10.dp, vertical = 6.dp), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp, color = Color.White)
             }
-            Text(title, Modifier.padding(top = 12.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 34.sp, lineHeight = 38.sp, color = Color.White)
+            Text(title.ifBlank { "Preparing today's devotional…" }, Modifier.padding(top = 12.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 30.sp, lineHeight = 35.sp, color = Color.White)
             Row(Modifier.fillMaxWidth().padding(top = 17.dp), verticalAlignment = Alignment.CenterVertically) {
-                repeat(4) { Box(Modifier.padding(end = 6.dp).size(if (it == 0) 20.dp else 6.dp, 6.dp).background(if (it == 0) Pk.GoldLight else Color.White.copy(alpha = .38f), CircleShape)) }
-                Spacer(Modifier.weight(1f))
-                Text("8 MIN", fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Pk.GoldLight)
+                Text("Read · Reflect · Pray", fontFamily = UtilitySans, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Pk.GoldLight)
             }
         }
     }
@@ -1013,18 +1318,6 @@ private fun CircularImageShortcut(item: HomeShortcut) {
         Row(Modifier.padding(horizontal = 12.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = Pk.GoldLight, modifier = Modifier.size(15.dp))
             Text(label, Modifier.padding(start = 6.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 8.sp, letterSpacing = .7.sp, color = Color.White)
-        }
-    }
-}
-
-@Composable private fun EmergencyCard(open: () -> Unit) {
-    Surface(Modifier.padding(horizontal = 22.dp, vertical = 8.dp).fillMaxWidth().clickable(onClick = open), shape = RoundedCornerShape(22.dp), color = Pk.Oxblood) {
-        Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.Bolt, null, tint = Pk.GoldLight, modifier = Modifier.size(28.dp))
-            Column(Modifier.weight(1f).padding(horizontal = 14.dp)) {
-                Text("I NEED PRAYER NOW", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.White)
-            }
-            Icon(Icons.Outlined.ArrowForward, null, tint = Color.White)
         }
     }
 }
@@ -1328,15 +1621,22 @@ private fun CircularImageShortcut(item: HomeShortcut) {
     calendar: () -> Unit,
 ) {
     val context = LocalContext.current
-    val today = LocalDate.now()
+    var clockNow by remember { mutableStateOf(java.time.LocalDateTime.now()) }
+    val today = clockNow.toLocalDate()
     val dateKey = today.toString()
-    val prefs = remember { context.getSharedPreferences("today_rhythm", android.content.Context.MODE_PRIVATE) }
-    var completed by remember(dateKey) { mutableStateOf(prefs.getStringSet(dateKey, emptySet()).orEmpty()) }
-    val hour = remember { java.time.LocalTime.now().hour }
-
-    fun finish(id: String) {
-        completed = completed + id
-        prefs.edit().putStringSet(dateKey, completed).apply()
+    val prefs = remember { context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE) }
+    var completed by remember { mutableStateOf(emptySet<String>()) }
+    val hour = clockNow.hour
+    LaunchedEffect(Unit) {
+        while (true) {
+            clockNow = java.time.LocalDateTime.now()
+            val date = clockNow.toLocalDate()
+            completed = buildSet {
+                listOf("morning", "evening", "devotional").forEach { if (prefs.getBoolean("${date}:$it", false)) add(it) }
+                if (com.prayerkey.manna.data.PullsProgress.Bible.isComplete(context, date)) add("bible")
+            }
+            kotlinx.coroutines.delay(1_000)
+        }
     }
 
     val rows = listOf(
@@ -1383,7 +1683,7 @@ private fun CircularImageShortcut(item: HomeShortcut) {
                     row = row,
                     done = row.id in completed,
                     now = hour in row.hours,
-                    open = { finish(row.id); row.open() },
+                    open = row.open,
                 )
             }
         }

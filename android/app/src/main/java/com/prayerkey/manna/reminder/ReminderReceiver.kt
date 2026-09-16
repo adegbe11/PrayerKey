@@ -68,14 +68,22 @@ class ReminderReceiver : BroadcastReceiver() {
         private const val EXTRA_KIND = "reminder_kind"
 
         fun schedule(context: Context, hour: Int, minute: Int, enabled: Boolean) {
+            context.getSharedPreferences("prayer_reminder", Context.MODE_PRIVATE).edit()
+                .putInt("hour", hour).putInt("minute", minute).putBoolean("enabled", enabled).apply()
             scheduleAt(context, ReminderKind.PRAYER, hour, minute, enabled)
         }
 
         fun scheduleDailySuite(context: Context, enabled: Boolean) {
-            ReminderKind.entries.forEach { scheduleKind(context, it, enabled) }
+            val single = context.getSharedPreferences("onboarding_plan", Context.MODE_PRIVATE).getBoolean("single_reminder", false)
+            ReminderKind.entries.forEach { scheduleKind(context, it, enabled && (!single || it == ReminderKind.PRAYER)) }
         }
 
         private fun scheduleKind(context: Context, kind: ReminderKind, enabled: Boolean) {
+            if (kind == ReminderKind.PRAYER) {
+                val prefs = context.getSharedPreferences("prayer_reminder", Context.MODE_PRIVATE)
+                scheduleAt(context, kind, prefs.getInt("hour", kind.hour), prefs.getInt("minute", kind.minute), enabled && prefs.getBoolean("enabled", true))
+                return
+            }
             scheduleAt(context, kind, kind.hour, kind.minute, enabled, kind.dayOfWeek)
         }
 

@@ -106,6 +106,10 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
             "Morning Prayer opens at first light.\nTomorrow runs the other way — enter, praise,\nconfess, thank, and walk out into it.",
             palette,
         )
+        androidx.compose.material3.TextButton(onClick = {
+            context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE).edit().putBoolean("${today}:evening", true).apply()
+            onClose()
+        }) { Text("Finish prayer") }
         Spacer(Modifier.height(40.dp))
     }
 }

@@ -72,7 +72,10 @@ class MainActivity : ComponentActivity() {
             }
 
             MannaTheme(resolvedTheme) {
-                if (appReady) {
+                var previewWelcome by remember { mutableStateOf(BuildConfig.DEBUG && intent.getBooleanExtra("preview_welcome", false)) }
+                if (previewWelcome) {
+                    com.prayerkey.manna.ui.screens.GuidedWelcome(preview = true, onBack = { previewWelcome = false }) { _, _ -> previewWelcome = false }
+                } else if (appReady) {
                     MannaApp(
                         onThemeChange = { id, follow -> themeId = id; followSystem = follow },
                         notificationRoute = notificationRoute,

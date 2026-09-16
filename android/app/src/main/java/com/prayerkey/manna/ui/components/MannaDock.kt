@@ -156,12 +156,12 @@ fun MannaDock(
                            wayfinding — the dock is the only signpost in the
                            app, which is the wrong place to be subtle. */
                         Text(
-                            item.label.uppercase(),
+                            item.label,
                             color = if (active) com.prayerkey.manna.ui.theme.Pk.GoldLight else Ivory.copy(alpha = .60f),
                             fontFamily = UtilitySans,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Medium,
-                            letterSpacing = 1.sp,
+                            letterSpacing = 0.sp,
                             maxLines = 1,
                             modifier = Modifier.padding(top = 4.dp),
                             // kill Android's font padding so the label sits

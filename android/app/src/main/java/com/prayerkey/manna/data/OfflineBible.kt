@@ -87,6 +87,8 @@ class OfflineBible(private val context: Context) {
     }
 
     private fun parse(): List<BibleVerse> {
+        // Reference-specific apparatus repairs, shared with the Supabase importer.
+        val corrections = context.assets.open("kjv-corrections.json").bufferedReader().use { org.json.JSONObject(it.readText()) }
         return context.assets.open("kjv.json").bufferedReader().use { source ->
             val reader = JsonReader(source)
             buildList(31_102) {
@@ -117,7 +119,8 @@ class OfflineBible(private val context: Context) {
                                marginal notes — and it was all reaching the
                                screen with the braces showing. Resolve it once,
                                here, so every reader of this Bible benefits. */
-                            val clean = cleanScripture(raw)
+                            val reference = "$name ${chapterIndex + 1}:${verseIndex + 1}"
+                            val clean = cleanScripture(corrections.optString(reference, raw))
                             add(
                                 BibleVerse(
                                     name, chapterIndex + 1, verseIndex + 1,

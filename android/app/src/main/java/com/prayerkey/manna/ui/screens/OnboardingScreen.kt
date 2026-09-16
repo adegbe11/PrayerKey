@@ -78,25 +78,9 @@ private val Ivory = Color(0xFFF6F0E1)
  */
 @Composable
 fun OnboardingScreen(onDone: (remindersEnabled: Boolean, hour: Int) -> Unit) {
-    var opening by remember { mutableStateOf(true) }
-    var openingStage by remember { mutableIntStateOf(1) }
-
-    LaunchedEffect(Unit) {
-        delay(650)
-        openingStage = 2
-        delay(650)
-        openingStage = 3
-        delay(650)
-        openingStage = 4
-        delay(1050)
-        opening = false
-    }
-
-    if (opening) {
-        LaunchPrelude(openingStage)
-        return
-    }
-    PersonalPlanOnboarding(onDone)
+    var started by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+    if (started) GuidedWelcome(onBack = { started = false }, onDone = onDone)
+    else WelcomeScreen { started = true }
 }
 
 /* ─────────────────────── 1. the gesture itself ─────────────────────── */

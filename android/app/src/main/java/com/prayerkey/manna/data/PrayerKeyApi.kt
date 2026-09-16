@@ -33,6 +33,13 @@ object PrayerKeyApi {
     // drops POST bodies on cross-host redirects (broke prayer/generate).
     private const val BASE_URL = "https://www.prayerkey.com"
 
+    suspend fun createDonationCheckout(amount: Int, monthly: Boolean): String = withContext(Dispatchers.IO) {
+        val body = JSONObject()
+            .put("amount", amount)
+            .put("frequency", if (monthly) "monthly" else "once")
+        request("/api/give/checkout", "POST", body).getString("url")
+    }
+
     suspend fun generatePrayer(request: String, moods: List<String>): GeneratedPrayer = withContext(Dispatchers.IO) {
         val body = JSONObject().put("userInput", request).put("moods", JSONArray(moods))
         val json = request("/api/prayer/generate", "POST", body)
