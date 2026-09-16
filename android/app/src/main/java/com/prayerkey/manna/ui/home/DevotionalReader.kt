@@ -24,6 +24,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Headphones
@@ -171,7 +172,10 @@ fun DevotionalReader(
                 Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                NavCircle(Icons.Outlined.ArrowBackIosNew, "Back", onClick = onClose)
+                /* Close, not back. This opens straight from Home, the same way the
+                   offices do, and they close with an X. An arrow promises a
+                   level above that does not exist. */
+                NavCircle(Icons.Outlined.Close, "Close", onClick = onClose)
                 Text(
                     "${dateLine.take(dateLine.indexOf(' ').coerceAtLeast(0)).ifBlank { dateLine }} · ${day.minutes} MIN",
                     color = Mono, style = MonoLabel, fontSize = 9.sp,

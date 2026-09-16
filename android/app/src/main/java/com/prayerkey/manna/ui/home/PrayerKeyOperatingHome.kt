@@ -436,12 +436,8 @@ fun PrayerKeyOperatingHome(
         }
 
         PrayerKeyIdentitySection(
-            pray = { homeCategory = programmes.first { it.title == "Pray" } },
-            read = { homeCategory = programmes.first { it.title == "Bible" } },
             fast = { homeCategory = programmes.first { it.title == "Fast" } },
             grow = { homeCategory = ProgrammeCategory("Grow", listOf(Feature("Prayer challenge", "Build a daily rhythm", Icons.Outlined.LocalFireDepartment, Hub.PRAY), Feature("Memory verse", "Carry Scripture with you", Icons.Outlined.BookmarkBorder, Hub.BIBLE), Feature("Bible challenge", "Grow in the Word", Icons.Outlined.AutoStories, Hub.BIBLE))) },
-            church = { homeCategory = programmes.first { it.title == "Church" } },
-            remember = { homeCategory = ProgrammeCategory("Remember", listOf(Feature("Journal", "Keep your reflections", Icons.Outlined.EditNote, Hub.JOURNAL), Feature("My prayer list", "Return to what you are praying for", Icons.Outlined.FavoriteBorder, Hub.PRAY), Feature("Sermon notes", "Remember what was preached", Icons.Outlined.Notes, Hub.CHURCH))) },
             topicalBible = { topicalBibleOpen = true },
         )
         GiveSupportCard()
@@ -679,21 +675,26 @@ private data class PrayerKeyPillar(
 
 @Composable
 private fun PrayerKeyIdentitySection(
-    pray: () -> Unit,
-    read: () -> Unit,
     fast: () -> Unit,
     grow: () -> Unit,
-    church: () -> Unit,
-    remember: () -> Unit,
     topicalBible: () -> Unit,
 ) {
+    /*
+     * Only what the dock cannot already reach.
+     *
+     * There were six, and five of them were a third or fourth door to
+     * somewhere else on the same screen. Pray was reachable from the dock, the
+     * circle rail, this tile, and the "what do you want to pray about" field -
+     * four doors, one room, all visible at once. Read was the same. Church and
+     * Remember were the dock again in different words.
+     *
+     * Fasting and the challenges have no tab of their own, so these two are
+     * the only ones here that take you somewhere new. The tiles were never the
+     * problem - they are the best artwork in the app - the duplication was.
+     */
     val pillars = listOf(
-        PrayerKeyPillar("PRAY", "Bring everything to God.", Icons.Outlined.SelfImprovement, R.drawable.onboarding_pray_v3, pray),
-        PrayerKeyPillar("READ", "Meet Him in His Word.", Icons.Outlined.AutoStories, R.drawable.onboarding_read_v3, read),
         PrayerKeyPillar("FAST", "Seek God with intention.", Icons.Outlined.WaterDrop, R.drawable.discovery_cover_5, fast),
         PrayerKeyPillar("GROW", "Build your life of prayer.", Icons.Outlined.LocalFireDepartment, R.drawable.discovery_cover_4, grow),
-        PrayerKeyPillar("CHURCH", "Carry Sunday into the week.", Icons.Outlined.Church, R.drawable.onboarding_church_v3, church),
-        PrayerKeyPillar("REMEMBER", "Never forget what God has done.", Icons.Outlined.EditNote, R.drawable.onboarding_journal_v3, remember),
     )
     Column(Modifier.fillMaxWidth().padding(vertical = 18.dp)) {
         Column(

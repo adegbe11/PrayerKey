@@ -29,7 +29,7 @@ fun ChallengeById(id: String, onClose: () -> Unit) {
        that occupies nothing inside a Dialog turns the reader's first tap into
        a tap outside it, which closes the screen instead of turning the page. */
     val loaded = plan
-    if (loaded == null) ChallengeLoading() else ChallengeDayScreen(loaded, onClose)
+    if (loaded == null) ChallengeLoading() else ChallengeDayScreen(loaded, pushed = false, onClose = onClose)
 }
 
 /** The shelf, then whichever plan is chosen from it. */
@@ -40,6 +40,6 @@ fun ChallengeShelfRoute(onClose: () -> Unit) {
     if (plan == null) {
         ChallengeShelf(onOpen = { chosen = it }, onClose = onClose)
     } else {
-        ChallengeDayScreen(plan, onClose = { chosen = null })
+        ChallengeDayScreen(plan, pushed = true, onClose = { chosen = null })
     }
 }

@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -66,6 +67,14 @@ import com.prayerkey.manna.ui.theme.UtilitySans
 @Composable
 fun ChallengeDayScreen(
     challenge: ChallengePlan,
+    /**
+     * Whether the shelf is behind this.
+     *
+     * An arrow promises a level above it. Opened from the shelf there is one;
+     * opened straight from a reminder there is not, and the arrow was telling
+     * the reader they had come from somewhere they had never been.
+     */
+    pushed: Boolean = true,
     onClose: () -> Unit,
 ) {
     /* The gesture has to mean the same thing as the arrow.
@@ -97,7 +106,13 @@ fun ChallengeDayScreen(
             Box(
                 Modifier.size(34.dp).clip(CircleShape).background(Color.White).clickable(onClick = onClose),
                 contentAlignment = Alignment.Center,
-            ) { Icon(Icons.Outlined.ArrowBack, "Back", tint = Pk.Charcoal, modifier = Modifier.size(17.dp)) }
+            ) {
+                Icon(
+                    if (pushed) Icons.Outlined.ArrowBack else Icons.Outlined.Close,
+                    if (pushed) "Back" else "Close",
+                    tint = Pk.Charcoal, modifier = Modifier.size(17.dp),
+                )
+            }
             Spacer(Modifier.width(14.dp))
             Text(
                 challenge.title.uppercase(),
