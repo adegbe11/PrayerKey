@@ -86,22 +86,23 @@ fun MannaDock(
            refracts what is actually underneath it, and the tint drops to a
            trace so the content shows through rather than being restated. */
         /*
-         * A light capsule, with the brand colour on the selected tab instead
-         * of across the whole bar.
+         * The brand capsule, with the selected tab knocked out of it.
          *
-         * It was solid violet, which meant the strongest colour on every
-         * screen belonged to navigation - furniture shouting louder than the
-         * devotional, the verse and the prayer it sits beneath. Apple's tab
-         * bars are near-white for the same reason, and the accent appears once,
-         * behind the tab you are on.
+         * I made this white for a while, reasoning from Apple's tab bars that
+         * the one element present on every screen should not be the loudest.
+         * That is sound for an app whose colour lives in its content - Apple
+         * Music has album art on every screen. This app's violet is the brand
+         * itself, and a white bar gave it away for a principle that was not
+         * ours.
          *
-         * The colour has not changed. Where it is applied has.
+         * The chip stays, inverted: white behind the selected glyph, violet
+         * knocked out of it. Same idea, right way round.
          */
         val dockShape = RoundedCornerShape(31.dp)
         Surface(
             shape = dockShape,
             color = Color.Transparent,
-            border = BorderStroke(0.8.dp, Color.White.copy(alpha = .55f)),
+            border = BorderStroke(0.8.dp, Color.White.copy(alpha = .34f)),
             shadowElevation = 18.dp,
         ) {
             Row(
@@ -113,10 +114,10 @@ fun MannaDock(
                                 shape = dockShape,
                                 blurRadius = 34.dp,
                                 lens = 1.04f,
-                                tint = Color.White.copy(alpha = .72f),
+                                tint = Pk.Oxblood.copy(alpha = .82f),
                             )
                         } else {
-                            Modifier.background(Color.White.copy(alpha = .93f))
+                            Modifier.background(Pk.Oxblood.copy(alpha = .93f))
                         },
                     )
                     .padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 11.dp),
@@ -130,7 +131,7 @@ fun MannaDock(
                         spring(dampingRatio = Spring.DampingRatioMediumBouncy), label = "dock-scale",
                     )
                     val tint by animateColorAsState(
-                        if (active) Color.White else Pk.Charcoal.copy(alpha = .62f),
+                        if (active) Pk.Oxblood else Ivory.copy(alpha = .66f),
                         spring(stiffness = Spring.StiffnessMediumLow), label = "dock-tint",
                     )
                     /* The chip. A rounded square behind the glyph of the tab
@@ -138,7 +139,7 @@ fun MannaDock(
                        out of it. It is the whole of the selected state - no
                        underline, no dot, no second colour. */
                     val chip by animateColorAsState(
-                        if (active) Pk.Oxblood else Color.Transparent,
+                        if (active) Color.White else Color.Transparent,
                         spring(stiffness = Spring.StiffnessMediumLow), label = "dock-chip",
                     )
 
@@ -184,7 +185,7 @@ fun MannaDock(
                            app, which is the wrong place to be subtle. */
                         Text(
                             item.label,
-                            color = if (active) Pk.Oxblood else Pk.Charcoal.copy(alpha = .62f),
+                            color = if (active) Color.White else Ivory.copy(alpha = .66f),
                             fontFamily = UtilitySans,
                             fontSize = 10.5.sp,
                             fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium,
