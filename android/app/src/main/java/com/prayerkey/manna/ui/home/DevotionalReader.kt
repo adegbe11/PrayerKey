@@ -415,12 +415,6 @@ fun DevotionalReader(
                             fontFamily = UtilitySans, fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold,
                         )
                     }
-                    Spacer(Modifier.height(11.dp))
-                    Text(
-                        "IT GOES TO YOUR PRAYER LIST, DATED TODAY",
-                        color = Faint, style = MonoLabel, fontSize = 8.sp,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
                 }
 
                 // ── one question ──────────────────────────────────────────
@@ -463,7 +457,7 @@ fun DevotionalReader(
                     )
                 }
                 Spacer(Modifier.height(10.dp))
-                Text("SAVED TO YOUR JOURNAL · PRIVATE", color = Faint, style = MonoLabel, fontSize = 8.sp)
+                Text("SAVED", color = Faint, style = MonoLabel, fontSize = 8.sp)
 
                 // ── close ─────────────────────────────────────────────────
                 Spacer(Modifier.height(36.dp))

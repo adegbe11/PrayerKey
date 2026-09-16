@@ -173,8 +173,6 @@ private fun experience(title: String): Experience = when (title) {
                 Text(title, Modifier.padding(top = 4.dp, bottom = 20.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 35.sp, lineHeight = 40.sp, color = Pk.Charcoal)
                 when (spec.kind) {
                     ExperienceKind.COURSE -> CourseProgress(completed.size, spec.items.size)
-                    ExperienceKind.SCHEDULE -> TimeBanner()
-                    ExperienceKind.COMMUNITY -> CommunityBanner()
                     else -> Unit
                 }
                 spec.items.forEachIndexed { index, item ->
@@ -215,18 +213,18 @@ private fun experience(title: String): Experience = when (title) {
                             if (next != null) {
                                 completed = completed + next
                                 prefs.edit().putStringSet("done_$title", completed).apply()
-                                confirmation = if (completed.size == spec.items.size) "Programme completed. Your progress is saved." else "Today's step completed. The next step is now unlocked."
-                            } else confirmation = "Programme completed. Your progress is saved."
+                                confirmation = if (completed.size == spec.items.size) "Finished." else "Done for today."
+                            } else confirmation = "Finished."
                         }
                         else -> {
                             // kept in the app's own store, not a private preference
                             onKeep(title, note)
                             prefs.edit().putString("note_$title", note).apply()
                             confirmation = when (title) {
-                                "Dreams" -> "Dream saved privately. Review it with Scripture, prayer and wise counsel."
-                                "My prayer list" -> "Prayer added to your private list."
-                                "Testimonies" -> "Testimony saved privately."
-                                else -> "Saved here in $title."
+                                "Dreams" -> "Dream saved."
+                                "My prayer list" -> "Added."
+                                "Testimonies" -> "Testimony saved."
+                                else -> "Saved."
                             }
                         }
                     }
@@ -250,12 +248,4 @@ private fun experience(title: String): Experience = when (title) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("YOUR PROGRESS", style = MaterialTheme.typography.labelSmall, color = Pk.Muted); Text("$done of $total", style = MaterialTheme.typography.labelSmall, color = Pk.Oxblood) }
         LinearProgressIndicator(progress = { if (total == 0) 0f else done.toFloat() / total }, Modifier.fillMaxWidth().padding(top = 8.dp).height(6.dp), color = Pk.Oxblood, trackColor = Pk.Hair)
     }
-}
-
-@Composable private fun TimeBanner() = Surface(Modifier.fillMaxWidth().padding(bottom = 18.dp), shape = RoundedCornerShape(18.dp), color = Pk.DeepDark) {
-    Row(Modifier.padding(17.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Outlined.Schedule, null, tint = Pk.GoldLight); Text("Your next faithful moment can begin now.", Modifier.padding(start = 12.dp), fontFamily = UtilitySans, fontSize = 13.sp, color = Color.White) }
-}
-
-@Composable private fun CommunityBanner() = Surface(Modifier.fillMaxWidth().padding(bottom = 18.dp), shape = RoundedCornerShape(18.dp), color = Pk.Oxblood.copy(alpha = .08f)) {
-    Row(Modifier.padding(17.dp), verticalAlignment = Alignment.CenterVertically) { Icon(Icons.Outlined.VerifiedUser, null, tint = Pk.Oxblood); Text("Privacy, consent and reporting controls are always available.", Modifier.padding(start = 12.dp), fontFamily = UtilitySans, fontSize = 12.sp, lineHeight = 18.sp, color = Pk.Charcoal) }
 }

@@ -43,7 +43,7 @@ class SermonCaptureEngine(
         if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) { running.set(false); onStatus("Microphone could not be opened"); return }
         SermonSessionStore.write(audioFile, startedAt, "recording", segments)
         audioRecord?.startRecording()
-        onStatus(if (speech == null) "Recording · captions are not ready yet" else "Listening · recording safely")
+        onStatus(if (speech == null) "Recording" else "Listening")
         capture = thread(name = "sermon-capture", isDaemon = true) { captureLoop(startedAt) }
     }
 

@@ -109,7 +109,7 @@ private fun CinematicDailyRhythmPage(
                     }
                     Button(onClick = onComplete, modifier = Modifier.fillMaxWidth().padding(top = 28.dp).height(58.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
                         Icon(Icons.Outlined.Check, null, Modifier.size(18.dp))
-                        Text("AMEN · COMPLETE", Modifier.padding(start = 9.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .8.sp)
+                        Text("AMEN", Modifier.padding(start = 9.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .8.sp)
                     }
                     Spacer(Modifier.navigationBarsPadding().height(10.dp))
                 }
@@ -187,7 +187,7 @@ private fun DailyRhythmPage(
                 Spacer(Modifier.height(28.dp))
             }
             Button(onClick = onComplete, modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
-                Text("AMEN · COMPLETE", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .8.sp)
+                Text("AMEN", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = .8.sp)
             }
         }
     }

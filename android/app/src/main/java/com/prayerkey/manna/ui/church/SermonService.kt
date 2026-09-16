@@ -148,7 +148,7 @@ class SermonService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notifyManager().createNotificationChannel(
                 NotificationChannel(CHANNEL, "Church listening", NotificationManager.IMPORTANCE_LOW).apply {
-                    description = "Shows while Manna is taking your sermon notes"
+                    description = "Sermon notes in progress"
                     setShowBadge(false)
                 },
             )

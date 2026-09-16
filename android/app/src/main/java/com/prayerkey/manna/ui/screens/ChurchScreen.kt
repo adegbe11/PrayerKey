@@ -650,7 +650,7 @@ private fun NoteView(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState())
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 130.dp),
     ) {
-        Text("SUNDAY NOTES · WRITTEN FOR YOU", color = Gold, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+        Text("SUNDAY NOTES", color = Gold, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
         Text(note.title, fontFamily = BookSerif, fontSize = 33.sp, lineHeight = 38.sp, modifier = Modifier.padding(top = 8.dp))
         Text(
             "${todayLabel()} · $minutes min · ${note.scriptures.size} scriptures caught",
@@ -838,7 +838,7 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                 }
                 Text(
                     failure?.let { "That did not work: $it." }
-                        ?: "Listens to the recording again, more carefully. Takes a few minutes, and never leaves your phone.",
+                        ?: "A few minutes. Never leaves your phone.",
                     color = Muted, fontSize = 11.5.sp, lineHeight = 16.sp,
                     modifier = Modifier.padding(top = 7.dp),
                 )

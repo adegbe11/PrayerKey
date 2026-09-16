@@ -223,6 +223,6 @@ object SermonArranger {
             appendLine(note.takeaway)
         }
         appendLine()
-        append("My notes from today — Manna")
+        append("My notes from today — PrayerKey")
     }
 }

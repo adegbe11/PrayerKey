@@ -139,7 +139,6 @@ fun JournalScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
                 JournalMark()
                 Text("Your Journal is private", fontFamily = BookSerif, fontSize = 24.sp, modifier = Modifier.padding(top = 18.dp))
-                Text("Unlock with your device security to read or write entries.", color = Muted, fontSize = 12.5.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 7.dp))
                 Button(onClick = {
                     val manager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
                     manager.createConfirmDeviceCredentialIntent("Unlock PrayerKey Journal", "Your journal is protected by your device lock")?.let(unlock::launch)

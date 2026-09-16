@@ -874,7 +874,7 @@ fun LegacyPrayerScreen(
                             loading = true; error = null
                             runCatching { PrayerKeyApi.generatePrayer(request, moods.toList()) }
                                 .onSuccess { generated = it }
-                                .onFailure { error = it.message ?: "Prayer could not be generated" }
+                                .onFailure { error = it.message ?: "That did not come through. Try again." }
                             loading = false
                         }
                     }
