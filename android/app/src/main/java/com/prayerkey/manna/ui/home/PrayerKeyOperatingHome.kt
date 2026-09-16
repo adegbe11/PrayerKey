@@ -1695,12 +1695,15 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
+        /* Thicker. A larger radius and more air inside it is most of what
+           reads as iOS - not the blur, which people notice second. 28 with
+           13dp rows was a tidy card; 34 with 17 is a considered one. */
+        shape = RoundedCornerShape(34.dp),
         color = Color.White,
         border = BorderStroke(1.dp, Pk.Hair),
         shadowElevation = 2.dp,
     ) {
-        Column(Modifier.padding(vertical = 20.dp)) {
+        Column(Modifier.padding(vertical = 24.dp)) {
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 22.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -1766,15 +1769,18 @@ private data class RhythmRow(
     val ready = !row.reservesDetail || row.detail.isNotBlank()
     Row(
         Modifier.fillMaxWidth().clickable(enabled = ready, onClick = open)
-            .padding(horizontal = 22.dp, vertical = 13.dp),
+            .padding(horizontal = 22.dp, vertical = 17.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            Modifier.size(46.dp).clip(RoundedCornerShape(15.dp))
+            /* 16 on 50 is the proportion iOS uses for a rounded square - about
+               a third of the side. At 15 on 46 it was very slightly too tight
+               and read as a rounded rectangle rather than a squircle. */
+            Modifier.size(50.dp).clip(RoundedCornerShape(16.dp))
                 .background(Pk.Oxblood.copy(alpha = .10f * alpha)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(row.icon, null, tint = Pk.Oxblood.copy(alpha = alpha), modifier = Modifier.size(21.dp))
+            Icon(row.icon, null, tint = Pk.Oxblood.copy(alpha = alpha), modifier = Modifier.size(23.dp))
         }
         Column(Modifier.weight(1f).padding(start = 15.dp)) {
             Text(

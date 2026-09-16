@@ -85,11 +85,23 @@ fun MannaDock(
            empty page, because it never sampled either. With a backdrop it
            refracts what is actually underneath it, and the tint drops to a
            trace so the content shows through rather than being restated. */
+        /*
+         * A light capsule, with the brand colour on the selected tab instead
+         * of across the whole bar.
+         *
+         * It was solid violet, which meant the strongest colour on every
+         * screen belonged to navigation - furniture shouting louder than the
+         * devotional, the verse and the prayer it sits beneath. Apple's tab
+         * bars are near-white for the same reason, and the accent appears once,
+         * behind the tab you are on.
+         *
+         * The colour has not changed. Where it is applied has.
+         */
         val dockShape = RoundedCornerShape(31.dp)
         Surface(
             shape = dockShape,
             color = Color.Transparent,
-            border = BorderStroke(0.8.dp, Color.White.copy(alpha = .34f)),
+            border = BorderStroke(0.8.dp, Color.White.copy(alpha = .55f)),
             shadowElevation = 18.dp,
         ) {
             Row(
@@ -99,15 +111,15 @@ fun MannaDock(
                             Modifier.liquidGlass(
                                 backdrop = backdrop,
                                 shape = dockShape,
-                                blurRadius = 30.dp,
-                                lens = 1.10f,
-                                tint = Pk.Oxblood.copy(alpha = .82f),
+                                blurRadius = 34.dp,
+                                lens = 1.04f,
+                                tint = Color.White.copy(alpha = .72f),
                             )
                         } else {
-                            Modifier.background(Pk.Oxblood.copy(alpha = .93f))
+                            Modifier.background(Color.White.copy(alpha = .93f))
                         },
                     )
-                    .padding(start = 6.dp, end = 6.dp, top = 11.dp, bottom = 12.dp),
+                    .padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 11.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -118,8 +130,16 @@ fun MannaDock(
                         spring(dampingRatio = Spring.DampingRatioMediumBouncy), label = "dock-scale",
                     )
                     val tint by animateColorAsState(
-                        if (active) com.prayerkey.manna.ui.theme.Pk.GoldLight else Ivory.copy(alpha = .60f),
+                        if (active) Color.White else Pk.Charcoal.copy(alpha = .62f),
                         spring(stiffness = Spring.StiffnessMediumLow), label = "dock-tint",
+                    )
+                    /* The chip. A rounded square behind the glyph of the tab
+                       you are on, in the brand colour, with the icon knocked
+                       out of it. It is the whole of the selected state - no
+                       underline, no dot, no second colour. */
+                    val chip by animateColorAsState(
+                        if (active) Pk.Oxblood else Color.Transparent,
+                        spring(stiffness = Spring.StiffnessMediumLow), label = "dock-chip",
                     )
 
                     /* Equal weight per tab: five stacked icon+label cells that
@@ -146,24 +166,31 @@ fun MannaDock(
                             .padding(top = 2.dp, bottom = 2.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Icon(
-                            item.icon, contentDescription = null,
-                            tint = tint,
-                            modifier = Modifier.size(21.dp).scale(iconScale),
-                        )
+                        Box(
+                            Modifier.size(width = 44.dp, height = 32.dp)
+                                .clip(RoundedCornerShape(11.dp))
+                                .background(chip),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                item.icon, contentDescription = null,
+                                tint = tint,
+                                modifier = Modifier.size(21.dp).scale(iconScale),
+                            )
+                        }
                         /* Every tab is named, always. A sparkle and a church
                            glyph are not guessable, and Home carries no other
                            wayfinding — the dock is the only signpost in the
                            app, which is the wrong place to be subtle. */
                         Text(
                             item.label,
-                            color = if (active) com.prayerkey.manna.ui.theme.Pk.GoldLight else Ivory.copy(alpha = .60f),
+                            color = if (active) Pk.Oxblood else Pk.Charcoal.copy(alpha = .62f),
                             fontFamily = UtilitySans,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Medium,
+                            fontSize = 10.5.sp,
+                            fontWeight = if (active) FontWeight.SemiBold else FontWeight.Medium,
                             letterSpacing = 0.sp,
                             maxLines = 1,
-                            modifier = Modifier.padding(top = 4.dp),
+                            modifier = Modifier.padding(top = 3.dp),
                             // kill Android's font padding so the label sits
                             // optically centred under the icon
                             style = androidx.compose.ui.text.TextStyle(
