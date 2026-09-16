@@ -1101,16 +1101,11 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                     Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
                 )
                 Box(Modifier.fillMaxSize().background(Pk.Oxblood.copy(alpha = .10f)))
-                Surface(
-                    Modifier.align(Alignment.BottomStart).padding(5.dp),
-                    shape = CircleShape,
-                    color = Color.White.copy(alpha = .92f),
-                ) {
-                    Icon(
-                        item.icon, null, tint = Pk.Oxblood,
-                        modifier = Modifier.padding(4.dp).size(13.dp),
-                    )
-                }
+                /* Each circle carried a small white glyph badge - a sun, a
+                   book, a bolt, a flame - clipped over the bottom-left of the
+                   artwork, directly above a label that already read Today,
+                   Read, Pray now, Challenges. Four little stickers on four
+                   paintings, saying what was written underneath them. */
             }
             item.badge?.let { badge ->
                 Surface(
@@ -1138,8 +1133,20 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
 }
 
 @Composable private fun HeroRail(title: String, open: () -> Unit) {
+    /*
+     * Inset and rounded, like the rest of the page.
+     *
+     * Everything else on Home floats on the cream - the rail circles, the ask
+     * field, the Today card, the dock. The hero alone ran edge to edge with
+     * square corners, so the ground simply stopped at it and started again
+     * underneath. It read as a seam rather than a card.
+     *
+     * The photograph has not changed and has not been cropped smaller; it is
+     * the same image in a frame that agrees with its neighbours.
+     */
     Box(
-        Modifier.fillMaxWidth().height(470.dp).clickable(onClick = open)
+        Modifier.fillMaxWidth().padding(horizontal = 20.dp).height(455.dp)
+            .clip(RoundedCornerShape(34.dp)).clickable(onClick = open)
     ) {
         Image(
             painterResource(R.drawable.prayerkey_hero_dawn), null,
@@ -1153,12 +1160,10 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                 )
             )
         )
-        Surface(
-            modifier = Modifier.align(Alignment.Center),
-            shape = CircleShape, color = Color.White.copy(alpha = .94f), shadowElevation = 10.dp,
-        ) {
-                Icon(Icons.Outlined.AutoStories, "Read today's devotional", Modifier.padding(19.dp).size(30.dp), tint = Pk.Oxblood)
-        }
+        /* A white medallion used to float dead centre, over the reader's face,
+           carrying a book icon - on a card already labelled TODAY'S DEVOTIONAL
+           and signed "Read · Reflect · Pray". It marked the artwork like a
+           watermark to say a third time what the words say. */
         Column(Modifier.align(Alignment.BottomStart).padding(horizontal = 22.dp, vertical = 24.dp)) {
             Surface(shape = CircleShape, color = Color.White.copy(alpha = .16f), border = BorderStroke(.5.dp, Color.White.copy(alpha = .24f))) {
                 Text("TODAY'S DEVOTIONAL", Modifier.padding(horizontal = 10.dp, vertical = 6.dp), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp, color = Color.White)
