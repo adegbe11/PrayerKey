@@ -120,7 +120,7 @@ fun GiveScreen(onClose: () -> Unit) {
                     fontSize = 34.sp, lineHeight = 37.sp,
                 )
                 Text(
-                    "Your gift keeps the prayers, the Bible and the devotionals available with no paywall, to everyone, including the people who could never pay for them.",
+                    "No paywall, for everyone — including the ones who could never pay.",
                     Modifier.padding(top = 12.dp), color = Color.White.copy(alpha = .80f),
                     fontFamily = UtilitySans, fontSize = 13.sp, lineHeight = 20.sp,
                 )
