@@ -504,16 +504,6 @@ private fun JournalOverview(
                         Text("WRITE TODAY", color = violet, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = .9.sp, modifier = Modifier.padding(start = 8.dp))
                     }
                 }
-                if (entries.isEmpty()) {
-                    Text(
-                        "A quiet place for prayers, gratitude, questions, and the moments you do not want to lose.",
-                        color = Color.White.copy(alpha = .76f),
-                        fontFamily = UtilitySans,
-                        fontSize = 12.5.sp,
-                        lineHeight = 19.sp,
-                        modifier = Modifier.padding(top = 18.dp),
-                    )
-                }
             }
         }
 
@@ -668,7 +658,7 @@ private fun JourneyInsightCard(insight: JourneyInsight) {
                     Text(insight.nextStep, color = Color.White, fontSize = 12.5.sp, lineHeight = 18.sp, modifier = Modifier.padding(top = 5.dp))
                 }
             }
-            Text("Based only on patterns in your private journey—not a claim about what God is saying.", color = Color.White.copy(alpha = .48f), fontSize = 9.5.sp, lineHeight = 14.sp, modifier = Modifier.padding(top = 10.dp))
+            Text("Patterns in your own writing — not a word from God.", color = Color.White.copy(alpha = .48f), fontSize = 9.5.sp, lineHeight = 14.sp, modifier = Modifier.padding(top = 10.dp))
         }
     }
 

@@ -108,10 +108,12 @@ fun PrayerScreen(
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 120.dp)) {
                 if (generated == null) {
                     Text("What's on your heart?", Modifier.padding(top = 31.dp), color = PrayInk, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 38.sp)
-                    Text(
-                        "Share what you’re facing, carrying, or hoping for. PrayerKey will help you turn it into a personal, Bible-grounded prayer.",
-                        Modifier.padding(top = 12.dp, bottom = 26.dp), color = PrayMuted, fontFamily = UtilitySans, fontStyle = FontStyle.Italic, fontSize = 16.sp, lineHeight = 24.sp,
-                    )
+                    /* The heading asks the question and the field says where
+                       to put the answer. A paragraph between them explaining
+                       that the app will turn it into a prayer is the app
+                       talking about itself on a screen meant for talking to
+                       God. */
+                    Spacer(Modifier.height(22.dp))
                     PrayerComposer(request, loading, { request = it }) {
                         if (request.isNotBlank() && !loading) scope.launch {
                             loading = true; error = null
@@ -121,8 +123,12 @@ fun PrayerScreen(
                             loading = false
                         }
                     }
+                    /* Cut to the half that is a promise rather than a
+                       tutorial. "You can begin with one honest sentence" is
+                       instruction; the privacy is a fact somebody writing
+                       something painful needs, and it is worth eight words. */
                     Text(
-                        "You can begin with one honest sentence. Your words stay private unless you choose to keep the prayer.",
+                        "Private unless you keep it.",
                         Modifier.padding(top = 20.dp),
                         color = PrayMuted,
                         fontFamily = UtilitySans,

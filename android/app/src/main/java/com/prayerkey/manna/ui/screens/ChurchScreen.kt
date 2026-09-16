@@ -463,20 +463,15 @@ private fun ReadyView(
         }
 
         if (notes.isEmpty()) {
+            /* One line, not a heading over a paragraph. The paragraph went on
+               to describe what the user is about to watch happen on the screen
+               in front of them. The only part they cannot work out for
+               themselves is where to put the phone. */
             Text(
-                "How it works",
-                color = cs.onBackground,
-                fontFamily = DisplaySerif,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 30.dp),
-            )
-            Text(
-                "Place your phone near the preacher. The spoken words will appear on screen and save as sermon notes.",
+                "Place the phone near the preacher.",
                 color = cs.onBackground.copy(alpha = .62f),
                 fontSize = 13.5.sp,
-                lineHeight = 20.sp,
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = 30.dp),
             )
         }
 
@@ -902,7 +897,7 @@ private fun SavedNoteSheet(
                 Text("Share these notes")
             }
             Text(
-                "Includes Scripture, discussion, prayer, and one action. Your private Journey is never included.",
+                "Your private Journey is never included.",
                 color = Muted, fontSize = 10.5.sp, lineHeight = 15.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
             )
@@ -986,8 +981,7 @@ private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: ()
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 30.dp)) {
             Text("Where is the service?", fontFamily = BookSerif, fontSize = 24.sp)
             Text(
-                "Captions are English only for now. Choosing your region does not " +
-                    "change the listening — it tells the notes which turns of phrase to expect.",
+                "English captions. Region tunes the spelling and the turns of phrase.",
                 fontSize = 13.sp, color = Muted, modifier = Modifier.padding(top = 6.dp, bottom = 14.dp),
             )
             androidx.compose.foundation.lazy.LazyColumn(

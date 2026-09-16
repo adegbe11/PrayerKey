@@ -437,15 +437,6 @@ private fun BibleChallengeReader(
 
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)) {
                 Text("${portion.book} ${portion.chapter}", color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 33.sp, modifier = Modifier.padding(top = 24.dp))
-                Surface(Modifier.fillMaxWidth().padding(top = 14.dp), shape = RoundedCornerShape(16.dp), color = Pk.GoldWash) {
-                    Column(Modifier.padding(15.dp)) { Text("Before you read", color = Pk.GoldDeep, fontSize = 13.sp, fontWeight = FontWeight.Bold); Text(contextKey(portion.book, portion.chapter), color = Pk.Charcoal, fontFamily = BookSerif, fontSize = 15.sp, lineHeight = 22.sp, modifier = Modifier.padding(top = 6.dp)) }
-                }
-                Surface(Modifier.fillMaxWidth().padding(top = 12.dp), shape = RoundedCornerShape(16.dp), color = Pk.Sunken) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text("Think about this", color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                        Text(bibleChallengePrompt(portion.book), color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 8.dp))
-                    }
-                }
                 if (verses.isEmpty()) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth().padding(top = 24.dp).height(2.dp), color = Pk.Oxblood, trackColor = Pk.Hair)
                 } else {
@@ -458,6 +449,18 @@ private fun BibleChallengeReader(
                             lineHeight = 31.sp,
                             modifier = Modifier.padding(horizontal = 7.dp, vertical = 6.dp).padding(top = if (verse.verse == 1) 14.dp else 6.dp),
                         ) }
+                    }
+                }
+                /* The question sits after the chapter now.
+                   Two cards used to stand between the title and the reading: a
+                   paragraph on how to approach the book, and this question.
+                   You came to read Mark 4; you got told about Mark 4 first.
+                   The paragraph is gone, and the question, which is a reflection
+                   rather than an instruction, waits until there is something to
+                   reflect on. */
+                Surface(Modifier.fillMaxWidth().padding(top = 20.dp), shape = RoundedCornerShape(16.dp), color = Pk.Sunken) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text(bibleChallengePrompt(portion.book), color = Pk.Charcoal, fontFamily = DisplaySerif, fontSize = 20.sp, lineHeight = 27.sp)
                     }
                 }
                 Surface(Modifier.fillMaxWidth().padding(top = 18.dp), shape = RoundedCornerShape(16.dp), color = Pk.Oxblood) {
@@ -480,15 +483,6 @@ private fun BibleChallengeReader(
             }
         }
     }
-}
-
-private fun contextKey(book: String, chapter: Int): String = when (book) {
-    "Genesis" -> "This is the beginning of God’s covenant story and the world in which His promises unfold. Notice what this chapter reveals about God, people, and trust."
-    "Psalms" -> "This is a prayer written from real human experience—joy, fear, grief, or confidence. Read it as words you can honestly bring to God today."
-    "Proverbs" -> "This chapter gathers practical wisdom for ordinary decisions and relationships. Look for one sentence you can practise before the day ends."
-    "Matthew", "Mark", "Luke", "John" -> "You are reading the life and teaching of Jesus. Watch what He does, what He says, and how people respond to Him."
-    "Acts" -> "The early church is learning to follow the risen Jesus through the Holy Spirit. This chapter shows faith becoming public action and community."
-    else -> "This chapter belongs to the Bible’s larger story of creation, covenant, rescue, and restoration. Read for what it reveals about God and the faithful response He invites."
 }
 
 private fun bibleChallengePrompt(book: String): String = when (book) {

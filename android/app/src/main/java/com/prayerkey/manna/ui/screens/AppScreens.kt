@@ -1295,7 +1295,7 @@ fun ProfileScreen(
         title = { Text("PrayerKey", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold) },
         text = {
             Text(
-                "A private daily place for Scripture, prayer, church notes, and remembrance. PrayerKey is free, has no ads, and keeps your personal journey on this device.",
+                "Free, no ads, and your journey stays on this device.",
                 color = Pk.Muted, lineHeight = 21.sp,
             )
         },

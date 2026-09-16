@@ -380,7 +380,13 @@ fun DevotionalReader(
                     Spacer(Modifier.height(14.dp))
                     Text(
                         buildAnnotatedString {
-                            append(day.prayer)
+                            /* The Amen is set apart in oxblood italic, so it is
+                               drawn here rather than left in the prayer text.
+                               Most prayers already close with one, and appending
+                               unconditionally gave every written-out prayer
+                               "In Jesus' name, Amen. Amen." Take whichever is
+                               there, then add the one that is styled. */
+                            append(day.prayer.trimEnd().removeSuffix("Amen.").removeSuffix("Amen").trimEnd())
                             append(" ")
                             withStyle(
                                 SpanStyle(color = Pk.Oxblood, fontStyle = FontStyle.Italic),

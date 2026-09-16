@@ -123,7 +123,14 @@ object Pk {
     val RowHeight = 66.dp
 
     /** Clearance under the last element so the floating nav never covers it. */
-    val NavClearance = 108.dp
+    /**
+     * Room under the dock.
+     *
+     * 108 was the dock's own height almost exactly, so a page ended flush
+     * against it and the last row sat half-hidden behind the capsule. Content
+     * needs to clear the bar, not touch it.
+     */
+    val NavClearance = 128.dp
 }
 
 /**

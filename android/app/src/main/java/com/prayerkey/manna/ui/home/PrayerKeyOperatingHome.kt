@@ -368,19 +368,14 @@ fun PrayerKeyOperatingHome(
     }
     val programmes = remember { programmeCategories() }
     var homeCategory by remember { mutableStateOf<ProgrammeCategory?>(null) }
-    var remindersOpen by remember { mutableStateOf(false) }
     homeCategory?.let { category ->
         Dialog(onDismissRequest = { homeCategory = null }, properties = DialogProperties(usePlatformDefaultWidth = false)) {
             ProgrammeCategoryScreen(category, { homeCategory = null }, go)
         }
     }
-    if (remindersOpen) AlertDialog(
-        onDismissRequest = { remindersOpen = false },
-        title = { Text("Prayer reminders") },
-        text = { Text("Choose when PrayerKey invites you to pause for prayer. Reminder schedules and notification permissions are available in Settings.") },
-        confirmButton = { TextButton(onClick = { remindersOpen = false; onSettings() }) { Text("Manage reminders") } },
-        dismissButton = { TextButton(onClick = { remindersOpen = false }) { Text("Close") } },
-    )
+    /* The bell opens reminders. It used to open a dialog whose entire content
+       was a sentence saying reminders are in Settings, and whose confirm button
+       went to Settings - a signpost in front of a door. */
     val conditional = remember(today) { conditionalFeatures(today) }
 
     if (exploreOpen) {
@@ -479,7 +474,7 @@ fun PrayerKeyOperatingHome(
                 },
         ) {
             Box(Modifier.statusBarsPadding()) {
-                Header(today, streak, onSettings) { remindersOpen = true }
+                Header(today, streak, onSettings, reminders = onSettings)
             }
         }
     }
