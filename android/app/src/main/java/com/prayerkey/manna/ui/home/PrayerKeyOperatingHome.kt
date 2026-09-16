@@ -114,6 +114,7 @@ fun PrayerKeyOperatingHome(
     var todayPullsOpen by rememberSaveable { mutableStateOf(false) }
     var biblePullsOpen by rememberSaveable { mutableStateOf(false) }
     var challengeShelfOpen by rememberSaveable { mutableStateOf(false) }
+    var giveOpen by rememberSaveable { mutableStateOf(false) }
     var openChallengeId by rememberSaveable { mutableStateOf<String?>(null) }
     var prayerCalendarOpen by rememberSaveable { mutableStateOf(false) }
     var exploreOpen by rememberSaveable { mutableStateOf(false) }
@@ -306,6 +307,14 @@ fun PrayerKeyOperatingHome(
             }
         }
     }
+    if (giveOpen) {
+        Dialog(
+            onDismissRequest = { giveOpen = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            com.prayerkey.manna.ui.give.GiveScreen(onClose = { giveOpen = false })
+        }
+    }
     if (challengeShelfOpen) {
         Dialog(
             onDismissRequest = { challengeShelfOpen = false },
@@ -440,7 +449,7 @@ fun PrayerKeyOperatingHome(
             grow = { homeCategory = ProgrammeCategory("Grow", listOf(Feature("Prayer challenge", "Build a daily rhythm", Icons.Outlined.LocalFireDepartment, Hub.PRAY), Feature("Memory verse", "Carry Scripture with you", Icons.Outlined.BookmarkBorder, Hub.BIBLE), Feature("Bible challenge", "Grow in the Word", Icons.Outlined.AutoStories, Hub.BIBLE))) },
             topicalBible = { topicalBibleOpen = true },
         )
-        GiveSupportCard()
+        GiveSupportCard { giveOpen = true }
         Section("A WORD TO CARRY") {
             ClosingVerseCard(today) { verse, reference ->
                 onOpenPrayerRequest("Help me pray $reference: $verse")
@@ -477,137 +486,54 @@ fun PrayerKeyOperatingHome(
 }
 
 @Composable
-private fun GiveSupportCard() {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var monthly by rememberSaveable { mutableStateOf(false) }
-    var amount by rememberSaveable { mutableStateOf("10") }
-    var loading by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var explain by rememberSaveable { mutableStateOf(false) }
-    val parsedAmount = amount.toIntOrNull()?.takeIf { it in 1..10_000 }
-
+/**
+ * The invitation. The asking happens on its own page.
+ *
+ * This was the whole Stripe checkout - an amount field, four presets, a
+ * once-or-monthly switch, an error slot and a button - sitting on Home between
+ * the day's prayer and the closing verse. A payment form in the middle of a
+ * devotional, and the loudest thing on the page that was not prayer.
+ *
+ * What stays is the artwork and the sentence. A form on a scrolling page is
+ * something to scroll past; a page is a decision, and the people who open it
+ * meant to.
+ */
+private fun GiveSupportCard(onOpen: () -> Unit) {
     Surface(
+        onClick = onOpen,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
         shape = RoundedCornerShape(30.dp),
         color = Pk.DeepDark,
         shadowElevation = 8.dp,
     ) {
-        Column {
-            Box(Modifier.fillMaxWidth().heightIn(min = 238.dp)) {
-                Image(
-                    painterResource(R.drawable.prayerkey_give_artwork),
-                    contentDescription = null,
-                    modifier = Modifier.matchParentSize(),
-                    contentScale = ContentScale.Crop,
+        Box(Modifier.fillMaxWidth().heightIn(min = 190.dp)) {
+            Image(
+                painterResource(R.drawable.prayerkey_give_artwork),
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop,
+            )
+            Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = .45f)))
+            Column(Modifier.align(Alignment.BottomStart).padding(22.dp)) {
+                Text("GIVE", color = Pk.GoldLight, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 2.sp)
+                Text(
+                    "Keep PrayerKey free.",
+                    Modifier.padding(top = 8.dp), color = Color.White,
+                    fontFamily = DisplaySerif, fontWeight = FontWeight.Bold,
+                    fontSize = 27.sp, lineHeight = 31.sp,
                 )
-                Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = .45f)))
-                Column(Modifier.padding(24.dp).padding(top = 38.dp)) {
-                    Text("GIVE", color = Pk.GoldLight, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 2.sp)
-                    Text("Keep\nPrayerKey free.", Modifier.padding(top = 10.dp), color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 31.sp, lineHeight = 34.sp)
-                    Text("Help keep prayer available\nto everyone.", Modifier.padding(top = 8.dp), color = Color.White.copy(alpha = .78f), fontFamily = UtilitySans, fontSize = 12.sp, lineHeight = 17.sp)
-                }
-                Surface(
-                    onClick = { explain = !explain },
-                    modifier = Modifier.align(Alignment.TopEnd).padding(15.dp),
-                    shape = RoundedCornerShape(99.dp),
-                    color = Pk.DeepDark.copy(alpha = .72f),
-                    border = BorderStroke(1.dp, Pk.GoldLight.copy(alpha = .55f)),
-                ) {
-                    Text("Why give?", Modifier.padding(horizontal = 14.dp, vertical = 9.dp), color = Color.White, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                }
-            }
-
-            Column(Modifier.padding(horizontal = 18.dp, vertical = 18.dp)) {
-                if (explain) Text(
-                    "Your gift supports PrayerKey's infrastructure and helps keep its prayer and Scripture tools available without a paywall.",
-                    modifier = Modifier.padding(bottom = 14.dp), color = Color.White.copy(alpha = .72f),
-                    fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 16.sp,
-                )
-
-                Row(
-                    Modifier.fillMaxWidth().background(Color.White.copy(alpha = .08f), RoundedCornerShape(99.dp)).padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    listOf(false to "Once", true to "Monthly").forEach { (value, label) ->
-                        Surface(
-                            onClick = { monthly = value }, modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(99.dp),
-                            color = if (monthly == value) Pk.Oxblood else Color.Transparent,
-                        ) {
-                            Text(label, Modifier.padding(vertical = 10.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = Color.White, fontFamily = UtilitySans, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-
-                Surface(
-                    modifier = Modifier.fillMaxWidth().padding(top = 14.dp),
-                    shape = RoundedCornerShape(18.dp), color = Color.White.copy(alpha = .08f),
-                    border = BorderStroke(1.dp, Color.White.copy(alpha = .16f)),
-                ) {
-                    Row(Modifier.padding(horizontal = 16.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text("$", color = Color.White, fontFamily = UtilitySans, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                        BasicTextField(
-                            value = amount,
-                            onValueChange = { next -> if (next.length <= 5 && next.all { it in '0'..'9' }) amount = next },
-                            modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            textStyle = androidx.compose.ui.text.TextStyle(color = Color.White, fontFamily = UtilitySans, fontSize = 25.sp, fontWeight = FontWeight.Bold),
-                        )
-                        Text("USD", color = Color.White.copy(alpha = .68f), fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-
-                Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf(5, 10, 25, 50).forEach { preset ->
-                        Surface(
-                            onClick = { amount = preset.toString() }, modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(14.dp),
-                            color = if (amount == preset.toString()) Pk.Oxblood else Color.White.copy(alpha = .07f),
-                            border = BorderStroke(1.dp, Color.White.copy(alpha = .14f)),
-                        ) {
-                            Text("$$preset", Modifier.padding(vertical = 10.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = Color.White, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-
-                error?.let {
-                    Text(it, Modifier.padding(top = 10.dp), color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 11.sp, lineHeight = 15.sp)
-                }
-
-                Button(
-                    onClick = {
-                        val gift = parsedAmount ?: return@Button
-                        loading = true; error = null
-                        scope.launch {
-                            try {
-                                val url = Uri.parse(PrayerKeyApi.createDonationCheckout(gift, monthly))
-                                require(url.scheme == "https" && url.host == "checkout.stripe.com")
-                                context.startActivity(Intent(Intent.ACTION_VIEW, url))
-                            } catch (cancelled: kotlinx.coroutines.CancellationException) {
-                                throw cancelled
-                            } catch (_: Exception) {
-                                error = "We couldn't open secure giving. Please try again shortly. No payment has been confirmed."
-                            } finally { loading = false }
-                        }
-                    },
-                    enabled = parsedAmount != null && !loading,
-                    modifier = Modifier.fillMaxWidth().padding(top = 14.dp).height(52.dp),
-                    shape = RoundedCornerShape(99.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood, contentColor = Color.White, disabledContainerColor = Color.White.copy(alpha = .10f)),
-                ) {
+                Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        if (loading) "Opening Stripe…" else "Give ${parsedAmount?.let { "$$it" }.orEmpty()}${if (monthly) " monthly" else ""}",
-                        fontFamily = UtilitySans, fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                        "Help keep prayer available to everyone",
+                        color = Color.White.copy(alpha = .82f),
+                        fontFamily = UtilitySans, fontSize = 12.sp,
                     )
-                    if (!loading) Icon(Icons.Outlined.ArrowForward, null, Modifier.padding(start = 8.dp).size(18.dp))
+                    Icon(
+                        Icons.Outlined.ArrowForward, null,
+                        Modifier.padding(start = 7.dp).size(15.dp),
+                        tint = Pk.GoldLight,
+                    )
                 }
-                Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.Lock, null, tint = Color.White.copy(alpha = .55f), modifier = Modifier.size(14.dp))
-                    Text(" Secure checkout · Always optional", color = Color.White.copy(alpha = .8f), fontFamily = UtilitySans, fontSize = 11.sp)
-                }
-                if (monthly) Text("Repeats monthly until cancelled. Review the amount and available payment methods at checkout.", Modifier.padding(top = 8.dp), color = Color.White.copy(alpha = .8f), fontFamily = UtilitySans, fontSize = 12.sp, lineHeight = 17.sp)
             }
         }
     }
