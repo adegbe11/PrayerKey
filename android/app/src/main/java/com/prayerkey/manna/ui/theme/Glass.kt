@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.layer.GraphicsLayer
@@ -113,8 +114,18 @@ fun Modifier.glassSource(backdrop: GlassBackdrop): Modifier = drawWithContent {
 fun Modifier.liquidGlass(
     backdrop: GlassBackdrop,
     shape: Shape,
-    blurRadius: androidx.compose.ui.unit.Dp = 26.dp,
-    lens: Float = 1.07f,
+    /*
+     * iOS 27 retuned this material. The first version leaned on refraction -
+     * you could see what was behind a pane bending through it - and text laid
+     * over busy content suffered for it. Apple's fix was to diffuse complex
+     * content harder and let the depth come from the edge instead.
+     *
+     * So the blur goes up and the lensing comes down. What is behind a pane is
+     * now a suggestion of colour rather than a readable image, which is what
+     * makes it safe to put words on.
+     */
+    blurRadius: androidx.compose.ui.unit.Dp = 34.dp,
+    lens: Float = 1.04f,
     tint: Color = Pk.Oxblood.copy(alpha = .05f),
 ): Modifier = composed {
     var origin by remember { mutableStateOf(Offset.Zero) }
@@ -153,15 +164,18 @@ fun Modifier.liquidGlass(
                    only as it approaches the rim, so the middle of the pane stays
                    readable and the border compresses hard. */
                 withTransform({
-                    scale(lens * 2.4f, lens * 2.4f, pivot = center)
+                    scale(lens * 1.8f, lens * 1.8f, pivot = center)
                     translate(-origin.x, -origin.y)
                 }) {
                     drawLayer(backdrop.frosted)
                 }
+                /* The compressed band is narrower than it was - solid through
+                   72% of the pane rather than 58% - so the lensing is a rim
+                   effect and the middle stays flat enough to read on. */
                 drawRect(
                     brush = Brush.radialGradient(
                         0f to Color.Black,
-                        .58f to Color.Black,
+                        .72f to Color.Black,
                         1f to Color.Transparent,
                         center = center,
                         radius = maxOf(size.width, size.height) * .78f,
@@ -184,13 +198,17 @@ fun Modifier.liquidGlass(
                     ),
                 )
 
-                // one specular, upper left, tight enough to stay a highlight
+                /* The specular, brightened for iOS 27.
+                   With less refraction happening the pane needs the highlight
+                   to carry more of the impression of a curved surface, so it
+                   is stronger and tighter than the diffuse version it
+                   replaces. */
                 drawRect(
                     Brush.radialGradient(
-                        0f to Color.White.copy(alpha = .22f),
+                        0f to Color.White.copy(alpha = .34f),
                         1f to Color.Transparent,
                         center = Offset(size.width * .3f, size.height * .14f),
-                        radius = size.minDimension * .75f,
+                        radius = size.minDimension * .62f,
                     ),
                 )
             }
@@ -205,17 +223,33 @@ fun Modifier.liquidGlass(
 /**
  * The edge.
  *
- * Two hairlines and two faint colour fringes. The fringes are warm on one side
- * and cool on the other, which is what a thick transparent edge does to light
- * passing through it, and it is the detail that stops the rim looking drawn on.
+ * A dark ring, two lit hairlines, and two faint colour fringes.
+ *
+ * The dark ring is the iOS 27 addition and the one that does the most work.
+ * Without it a pane dissolves into whatever it sits on - which is fine over a
+ * photograph, where the refraction alone separates it, and useless over a flat
+ * page, where there is nothing to bend. The ring gives the glass an outside,
+ * so it reads as an object resting on the page rather than a lighter patch of
+ * it, and it is why iOS 27 glass works on plain backgrounds where iOS 26 glass
+ * looked like a smudge.
+ *
+ * The fringes are warm on one side and cool on the other, which is what a thick
+ * transparent edge does to light passing through it, and it is the detail that
+ * stops the rim looking drawn on.
  */
 private fun ContentDrawScope.drawGlassEdge(size: Size, path: Path) {
+    // the dark ring, outside everything else
+    drawPath(
+        path,
+        Color.Black.copy(alpha = .18f),
+        style = Stroke(width = 1.2.dp.toPx()),
+    )
     clipPath(path) {
         val w = 1.5.dp.toPx()
         // lit top face
         drawRect(
             Brush.verticalGradient(
-                0f to Color.White.copy(alpha = .85f),
+                0f to Color.White.copy(alpha = .95f),
                 1f to Color.Transparent,
             ),
             size = Size(size.width, w * 2f),

@@ -25,6 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -387,11 +390,28 @@ fun PrayerKeyOperatingHome(
         }
     }
 
-    Column(
-        Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding()
-            .verticalScroll(rememberScrollState()).padding(bottom = Pk.NavClearance)
-    ) {
-        Header(today, streak, onSettings) { remindersOpen = true }
+    /*
+     * The masthead stays put and the page runs under it.
+     *
+     * It used to scroll away with everything else, so the devotional hero rose
+     * up and the screen lost its name and its date. iOS 27 addressed exactly
+     * this - content passing beneath a floating bar now gets a uniform bar
+     * above it, so the words stay legible against whatever is underneath.
+     *
+     * Uniform is the word that matters. Not a lens: there is nothing to refract
+     * over a flat page, and a bar that sampled this screen would be sampling
+     * its own output. A diffused ground and a darkened edge, brought in only
+     * once something is actually behind it.
+     */
+    val scroll = rememberScrollState()
+    val underneath = (scroll.value / 140f).coerceIn(0f, 1f)
+
+    Box(Modifier.fillMaxSize().background(Pk.Cream)) {
+        Column(
+            Modifier.fillMaxSize().statusBarsPadding()
+                .verticalScroll(scroll).padding(bottom = Pk.NavClearance)
+        ) {
+        Spacer(Modifier.height(74.dp))
         ShortcutRail(
             todayBadge = todayBadgeText,
             todayPulls = { todayPullsOpen = true },
@@ -428,6 +448,33 @@ fun PrayerKeyOperatingHome(
         Section("A WORD TO CARRY") {
             ClosingVerseCard(today) { verse, reference ->
                 onOpenPrayerRequest("Help me pray $reference: $verse")
+            }
+        }
+        }
+
+        Box(
+            /* The ground is painted first and the inset applied after, so it
+               covers the status bar strip as well. With the padding first, the
+               bar only covered its own height and the page scrolled up through
+               the clock and the battery with nothing behind it - which is the
+               exact failure edge-to-edge introduces and the reason iOS 27 made
+               this bar uniform. */
+            Modifier.fillMaxWidth()
+                .drawBehind {
+                    /* The uniform ground, and the darkened edge under it. Both
+                       arrive with the content rather than sitting there from
+                       the first frame - at the top of the page there is nothing
+                       behind the bar and nothing to separate it from. */
+                    drawRect(Pk.Cream.copy(alpha = .94f * underneath))
+                    drawRect(
+                        Color.Black.copy(alpha = .10f * underneath),
+                        topLeft = Offset(0f, size.height - 1.dp.toPx()),
+                        size = Size(size.width, 1.dp.toPx()),
+                    )
+                },
+        ) {
+            Box(Modifier.statusBarsPadding()) {
+                Header(today, streak, onSettings) { remindersOpen = true }
             }
         }
     }
