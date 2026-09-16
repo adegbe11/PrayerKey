@@ -3,6 +3,7 @@ package com.prayerkey.manna
 import com.prayerkey.manna.ui.church.ReferenceDetector
 import com.prayerkey.manna.ui.church.SermonArranger
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -124,6 +125,9 @@ class ChurchNotesTest {
         assertTrue(text.contains("SCRIPTURES PREACHED"))
         assertTrue(text.contains("THE MAIN POINTS"))
         assertTrue(text.contains("62 min"))
-        assertTrue(text.contains("Manna"))
+        // the share text is the line that lands in somebody else's inbox,
+        // so it carries the app's actual name
+        assertTrue(text.contains("PrayerKey"))
+        assertFalse(text.contains("Manna"))
     }
 }
