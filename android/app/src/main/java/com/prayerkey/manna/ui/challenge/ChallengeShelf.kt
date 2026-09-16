@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.challenge
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +62,12 @@ fun ChallengeShelf(
     onOpen: (ChallengePlan) -> Unit,
     onClose: () -> Unit,
 ) {
+    /* The gesture has to mean the same thing as the arrow.
+       Without this the whole route is one Dialog, so a back swipe dismissed
+       it outright: Home -> shelf -> Day 1, swipe back, and you were on Home
+       with the shelf skipped. The arrow returned to the shelf correctly, so
+       the two controls disagreed about where you were. */
+    BackHandler(onBack = onClose)
     val context = LocalContext.current
     var challenges by remember { mutableStateOf<List<ChallengePlan>>(emptyList()) }
     LaunchedEffect(Unit) { challenges = Challenges.all(context) }
