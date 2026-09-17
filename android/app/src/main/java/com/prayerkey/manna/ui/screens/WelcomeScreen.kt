@@ -62,7 +62,7 @@ fun WelcomeScreen(onContinue: () -> Unit) {
             Text("Prayer, Scripture, and space to reflect.", Modifier.padding(top = 14.dp), color = Color.White.copy(alpha = .85f),
                 fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height((availableHeight - 570.dp).coerceAtLeast(100.dp)))
-            WelcomeAction("Begin", primary = true, onClick = onContinue)
+            WelcomeAction("Get started", primary = true, onClick = onContinue)
             Spacer(Modifier.height(20.dp))
         }
     }
