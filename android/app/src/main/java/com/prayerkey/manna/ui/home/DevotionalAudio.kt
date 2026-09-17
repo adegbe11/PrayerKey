@@ -238,11 +238,6 @@ fun DevotionalAudioBar(voice: DevotionalVoice, modifier: Modifier = Modifier) {
                     color = Pk.Crisp, fontFamily = UtilitySans,
                     fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
                 )
-                Spacer(Modifier.height(3.dp))
-                Text(
-                    "Read aloud on this device",
-                    color = Pk.Crisp.copy(alpha = .66f), fontFamily = UtilitySans, fontSize = 11.5.sp,
-                )
             }
             /* Plain tinted text. A rate control is a preference, not an action,
                and it was reading as the second most important thing on the
