@@ -1773,9 +1773,20 @@ private data class RhythmRow(
     recommended: Boolean,
     open: () -> Unit,
 ) {
-    /* Dimmed outside its hour, and never below the legibility floor - this is
-       a row you are meant to read and decide against, not a disabled control. */
-    val alpha = if (now || done) 1f else .45f
+    /*
+     * Every row at full strength.
+     *
+     * Rows outside their hour were drawn at 45% so the current one would stand
+     * out. Then the recommendation arrived - a tinted row and a badge naming it
+     * - and the dimming was suddenly saying the same thing a second time, in
+     * the one language a screen cannot use twice. Faded type does not read as
+     * "later today". It reads as broken, or as switched off, which is what
+     * Morning and Afternoon looked like at six in the evening.
+     *
+     * Kept as a constant rather than deleted line by line, because the value is
+     * what changed and not the idea that a row can be de-emphasised.
+     */
+    val alpha = 1f
     /* Not tappable until it has something to open. Tapping "Bible reading"
        before the plan resolves used to open an empty chapter. */
     val ready = !row.reservesDetail || row.detail.isNotBlank()
@@ -1805,8 +1816,12 @@ private data class RhythmRow(
                 row.title,
                 fontFamily = UtilitySans,
                 fontSize = 16.sp,
-                fontWeight = if (now && !done) FontWeight.SemiBold else FontWeight.Normal,
+                fontWeight = if (highlight) FontWeight.SemiBold else FontWeight.Normal,
                 color = Pk.Charcoal.copy(alpha = alpha),
+                /* "Evening Prayer" was breaking over two lines: the badge sets
+                   the width of the column opposite, and Recommended now is a
+                   wide thing to hang off the end of a row. */
+                maxLines = 1,
             )
             if (row.detail.isNotBlank() || row.reservesDetail) {
                 Text(
@@ -1838,14 +1853,14 @@ private data class RhythmRow(
                 Box(
                     Modifier.padding(top = 6.dp).clip(RoundedCornerShape(99.dp))
                         .background(Pk.Oxblood.copy(alpha = .10f))
-                        .padding(horizontal = 9.dp, vertical = 4.dp),
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(5.dp).clip(CircleShape).background(Pk.Oxblood))
                         Text(
                             "Recommended now",
                             Modifier.padding(start = 5.dp),
-                            fontFamily = UtilitySans, fontSize = 9.5.sp,
+                            fontFamily = UtilitySans, fontSize = 9.sp,
                             fontWeight = FontWeight.Bold, color = Pk.Oxblood,
                         )
                     }
