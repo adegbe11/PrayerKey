@@ -25,6 +25,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.MenuBook
+import androidx.compose.material.icons.outlined.WbSunny
+import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Headphones
@@ -112,25 +115,11 @@ fun DevotionalReader(
         rangeLabel = availableRange(bible, day.reading)
     }
 
-    var speechReady by remember { mutableStateOf(false) }
-    var listening by remember { mutableStateOf(false) }
     var saved by remember { mutableStateOf(false) }
     var prayerAdded by remember { mutableStateOf(false) }
     var reflection by remember { mutableStateOf("") }
     var completed by remember { mutableStateOf(false) }
     var sharing by remember { mutableStateOf(false) }
-
-    val speaker = remember {
-        TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS }
-    }
-    DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
-    LaunchedEffect(speechReady) {
-        if (speechReady) {
-            speaker.language = Locale.getDefault()
-            speaker.setSpeechRate(.88f)
-            speaker.setPitch(.97f)
-        }
-    }
 
     /* What gets read aloud, in the order it appears on screen — including the
        scripture, which is the part most worth hearing. Built from the resolved
@@ -151,6 +140,8 @@ fun DevotionalReader(
             add(day.question)
         }.filter { it.isNotBlank() }.joinToString(" … ")
     }
+
+    val voice = rememberDevotionalVoice(spoken)
 
     val progress by remember {
         derivedStateOf {
@@ -178,28 +169,10 @@ fun DevotionalReader(
                    offices do, and they close with an X. An arrow promises a
                    level above that does not exist. */
                 NavCircle(Icons.Outlined.Close, "Close", onClick = onClose)
-                Text(
-                    "${dateLine.take(dateLine.indexOf(' ').coerceAtLeast(0)).ifBlank { dateLine }} · ${day.minutes} MIN",
-                    color = Mono, style = MonoLabel, fontSize = 9.sp,
-                    modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
-                )
-                /* Audio at the top. Toggles rather than only starting: a voice
-                   you cannot stop from the same button you started it with is
-                   the reason people never press play twice. */
-                NavCircle(
-                    if (listening) Icons.Outlined.StopCircle else Icons.Outlined.Headphones,
-                    if (listening) "Stop listening" else "Listen to this devotional",
-                    active = listening,
-                    enabled = speechReady,
-                ) {
-                    if (listening) {
-                        speaker.stop(); listening = false
-                    } else {
-                        speaker.speak(spoken, TextToSpeech.QUEUE_FLUSH, null, "devotional-${day.day}")
-                        listening = true
-                    }
-                }
-                Spacer(Modifier.width(7.dp))
+                /* The bar used to carry WEDNESDAY · 3 MIN, and the masthead
+                   carries WEDNESDAY 16 SEPTEMBER · 3 MIN READ sixty points
+                   below it. The same two facts, twice, in the same eyeline. */
+                Spacer(Modifier.weight(1f))
                 NavCircle(
                     if (saved) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder,
                     if (saved) "Saved" else "Save this devotional",
@@ -212,23 +185,74 @@ fun DevotionalReader(
             ) {
                 // ── masthead ──────────────────────────────────────────────
                 Spacer(Modifier.height(14.dp))
-                Text(day.seriesLabel, color = Pk.GoldDeep, style = MonoLabel, fontSize = 9.sp)
-                Spacer(Modifier.height(14.dp))
+                Text("DEVOTIONAL OF THE DAY", color = Pk.Muted, style = MonoLabel, fontSize = 9.sp)
+                Spacer(Modifier.height(12.dp))
+                /*
+                 * The title turns violet where it turns personal.
+                 *
+                 * It was forty points of uniform black - correct, and inert.
+                 * Splitting it and carrying the brand through the second half
+                 * gives the page one deliberate colour event above the fold,
+                 * and it lands on the part of the sentence that names what the
+                 * day is about: Grace When You / Feel Small.
+                 *
+                 * Balanced by word, so the break falls where a typesetter would
+                 * put it rather than wherever the measure happened to run out.
+                 */
+                val words = remember(day.title) { day.title.split(" ") }
+                val split = remember(words) { (words.size + 1) / 2 }
                 Text(
-                    day.title,
-                    color = Pk.Charcoal, fontFamily = DisplaySerif,
-                    fontSize = 40.sp, lineHeight = 42.sp,
-                    fontWeight = FontWeight.Light, letterSpacing = (-1).sp,
+                    buildAnnotatedString {
+                        withStyle(SpanStyle(color = Pk.Charcoal)) {
+                            append(words.take(split).joinToString(" "))
+                        }
+                        if (words.size > split) {
+                            append("\n")
+                            withStyle(SpanStyle(color = Pk.Oxblood)) {
+                                append(words.drop(split).joinToString(" "))
+                            }
+                        }
+                    },
+                    fontFamily = DisplaySerif,
+                    fontSize = 42.sp, lineHeight = 46.sp,
+                    fontWeight = FontWeight.Light, letterSpacing = (-1.2).sp,
                 )
-                Spacer(Modifier.height(16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(dateLine, color = Faint, style = MonoLabel, fontSize = 8.5.sp)
-                    Box(
-                        Modifier.padding(horizontal = 9.dp).size(2.5.dp)
-                            .clip(CircleShape).background(Faint),
+                if (day.theme.isNotBlank()) {
+                    Spacer(Modifier.height(14.dp))
+                    Text(
+                        day.theme,
+                        color = Body.copy(alpha = .78f), fontFamily = BookSerif,
+                        fontWeight = FontWeight.Light, fontSize = 17.sp, lineHeight = 26.sp,
                     )
-                    Text("${day.minutes} MIN READ", color = Faint, style = MonoLabel, fontSize = 8.5.sp)
                 }
+                Spacer(Modifier.height(18.dp))
+                /* Date, then where the day sits in its Key. Reading time left
+                   this row - the player directly below already gives the
+                   length, in minutes and seconds. */
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Outlined.CalendarToday, null, tint = Pk.Muted, modifier = Modifier.size(13.dp))
+                    Text(
+                        dateLine, color = Faint, style = MonoLabel, fontSize = 8.5.sp,
+                        modifier = Modifier.padding(start = 7.dp),
+                    )
+                    Box(
+                        Modifier.padding(horizontal = 11.dp).width(1.dp).height(11.dp)
+                            .background(Faint.copy(alpha = .5f)),
+                    )
+                    Icon(Icons.Outlined.WbSunny, null, tint = Pk.GoldDeep, modifier = Modifier.size(13.dp))
+                    Text(
+                        "DAY ${day.seriesDay} OF ${day.seriesOf}",
+                        color = Faint, style = MonoLabel, fontSize = 8.5.sp,
+                        modifier = Modifier.padding(start = 7.dp),
+                    )
+                }
+                /* The player, where the article starts rather than in the
+                   chrome. Listening is a way of taking the devotional, not a
+                   utility like close or bookmark, and it belongs with the
+                   thing it reads. */
+                Spacer(Modifier.height(22.dp))
+                DevotionalAudioBar(voice)
+
                 Spacer(Modifier.height(22.dp))
                 Hair()
 
@@ -236,11 +260,18 @@ fun DevotionalReader(
                 Spacer(Modifier.height(26.dp))
                 Column(
                     Modifier.fillMaxWidth()
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(22.dp))
                         .background(Brush.linearGradient(listOf(Color.White, Color(0xFFF7F3EA))))
                         .padding(22.dp),
                 ) {
-                    Text("TODAY'S READING", color = Pk.GoldDeep, style = MonoLabel)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.MenuBook, null, tint = Pk.Oxblood, modifier = Modifier.size(17.dp))
+                        Text(
+                            "Key Scripture", color = Pk.Oxblood, fontFamily = UtilitySans,
+                            fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 9.dp),
+                        )
+                    }
                     Spacer(Modifier.height(13.dp))
                     val opening = scripture[day.reading.ref.label]
                     if (opening == null) {
@@ -278,6 +309,8 @@ fun DevotionalReader(
                 }
 
                 // ── body ──────────────────────────────────────────────────
+                Text("TODAY'S MESSAGE", color = Pk.Muted, style = MonoLabel, fontSize = 9.sp)
+                Spacer(Modifier.height(16.dp))
                 Spacer(Modifier.height(30.dp))
                 day.body.forEachIndexed { index, block ->
                     when (block) {
