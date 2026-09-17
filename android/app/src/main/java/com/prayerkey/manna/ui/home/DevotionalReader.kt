@@ -3,6 +3,7 @@ package com.prayerkey.manna.ui.home
 import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,6 +49,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -57,6 +60,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prayerkey.manna.R
 import com.prayerkey.manna.data.DevoBlock
 import com.prayerkey.manna.data.Devotional
 import com.prayerkey.manna.data.OfflineBible
@@ -97,7 +101,6 @@ fun DevotionalReader(
 ) {
     BackHandler(onBack = onClose)
     val context = LocalContext.current
-    val scroll = rememberScrollState()
 
     val dateLine = remember {
         LocalDate.now()
@@ -143,23 +146,41 @@ fun DevotionalReader(
 
     val voice = rememberDevotionalVoice(spoken)
 
-    val progress by remember {
-        derivedStateOf {
-            val max = scroll.maxValue
-            if (max <= 0) 0f else (scroll.value.toFloat() / max).coerceIn(0f, 1f)
-        }
-    }
-
-    Box(Modifier.fillMaxSize().background(Paper)) {
+    /*
+     * The dawn artwork carries the reader, and the white is gone.
+     *
+     * Every page was cream with white cards on it, so the devotional looked
+     * like a form: boxes of text stacked on a background whose only job was to
+     * be lighter than they were. The app already owns a picture that says what
+     * this screen is for, and it is the one people meet on the way in.
+     *
+     * The scrim is doing real work and is heavier than the welcome screen's.
+     * There a name and a button sit over the image; here whole paragraphs do,
+     * and body text over a photograph is the fastest way to make something
+     * beautiful unreadable. It deepens towards the foot, where the longest
+     * lines fall and the picture is busiest.
+     */
+    Box(Modifier.fillMaxSize().background(Pk.DeepDark)) {
+        Image(
+            painterResource(R.drawable.welcome_prayer_dawn),
+            contentDescription = null,
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop,
+        )
+        Box(
+            Modifier.matchParentSize().background(
+                Brush.verticalGradient(
+                    listOf(
+                        Pk.DeepDark.copy(alpha = .58f),
+                        Pk.DeepDark.copy(alpha = .78f),
+                        Pk.DeepDark.copy(alpha = .90f),
+                    ),
+                ),
+            ),
+        )
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
 
             // ── progress ──────────────────────────────────────────────────
-            Box(Modifier.fillMaxWidth().height(2.5.dp).background(Pk.Charcoal.copy(alpha = .06f))) {
-                Box(
-                    Modifier.fillMaxWidth(progress).height(2.5.dp).background(Pk.Oxblood),
-                )
-            }
-
             // ── nav ───────────────────────────────────────────────────────
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
@@ -180,365 +201,34 @@ fun DevotionalReader(
                 ) { saved = !saved }
             }
 
-            Column(
-                Modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = 26.dp),
-            ) {
-                // ── masthead ──────────────────────────────────────────────
-                Spacer(Modifier.height(14.dp))
-                Text("DEVOTIONAL OF THE DAY", color = Pk.Muted, style = MonoLabel, fontSize = 9.sp)
-                Spacer(Modifier.height(12.dp))
-                /*
-                 * The title turns violet where it turns personal.
-                 *
-                 * It was forty points of uniform black - correct, and inert.
-                 * Splitting it and carrying the brand through the second half
-                 * gives the page one deliberate colour event above the fold,
-                 * and it lands on the part of the sentence that names what the
-                 * day is about: Grace When You / Feel Small.
-                 *
-                 * Balanced by word, so the break falls where a typesetter would
-                 * put it rather than wherever the measure happened to run out.
-                 */
-                val words = remember(day.title) { day.title.split(" ") }
-                val split = remember(words) { (words.size + 1) / 2 }
-                Text(
-                    buildAnnotatedString {
-                        withStyle(SpanStyle(color = Pk.Charcoal)) {
-                            append(words.take(split).joinToString(" "))
-                        }
-                        if (words.size > split) {
-                            append("\n")
-                            withStyle(SpanStyle(color = Pk.Oxblood)) {
-                                append(words.drop(split).joinToString(" "))
-                            }
-                        }
-                    },
-                    fontFamily = DisplaySerif,
-                    fontSize = 42.sp, lineHeight = 46.sp,
-                    fontWeight = FontWeight.Light, letterSpacing = (-1.2).sp,
+            val pages = rememberDevotionalPages(day)
+            val pager = androidx.compose.foundation.pager.rememberPagerState { pages.size }
+
+            /* How far through, now that there is no scroll to measure. The old
+               rule tracked scroll.value against scroll.maxValue, which after
+               the flip meant a bar that never moved. */
+            FlipRail(pager.currentPage, pages.size)
+            Spacer(Modifier.height(10.dp))
+
+            androidx.compose.foundation.pager.HorizontalPager(
+                state = pager,
+                modifier = Modifier.weight(1f),
+                pageSpacing = 0.dp,
+            ) { index ->
+                DevotionalPageContent(
+                    page = pages[index],
+                    day = day,
+                    scripture = scripture,
+                    dateLine = dateLine,
+                    rangeLabel = rangeLabel,
+                    voice = voice,
+                    prayerAdded = prayerAdded,
+                    completed = completed,
+                    onAddPrayer = { prayerAdded = true; onAddPrayer(day.title) },
+                    onOpenPassage = { onOpenPassage(day.reading.book, day.reading.chapter) },
+                    onShareLine = { sharing = true },
+                    onComplete = { completed = true; onComplete() },
                 )
-                if (day.theme.isNotBlank()) {
-                    Spacer(Modifier.height(14.dp))
-                    Text(
-                        day.theme,
-                        color = Body.copy(alpha = .78f), fontFamily = BookSerif,
-                        fontWeight = FontWeight.Light, fontSize = 17.sp, lineHeight = 26.sp,
-                    )
-                }
-                Spacer(Modifier.height(18.dp))
-                /* Date, then where the day sits in its Key. Reading time left
-                   this row - the player directly below already gives the
-                   length, in minutes and seconds. */
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Outlined.CalendarToday, null, tint = Pk.Muted, modifier = Modifier.size(13.dp))
-                    Text(
-                        dateLine, color = Faint, style = MonoLabel, fontSize = 8.5.sp,
-                        modifier = Modifier.padding(start = 7.dp),
-                    )
-                    Box(
-                        Modifier.padding(horizontal = 11.dp).width(1.dp).height(11.dp)
-                            .background(Faint.copy(alpha = .5f)),
-                    )
-                    Icon(Icons.Outlined.WbSunny, null, tint = Pk.GoldDeep, modifier = Modifier.size(13.dp))
-                    Text(
-                        "DAY ${day.seriesDay} OF ${day.seriesOf}",
-                        color = Faint, style = MonoLabel, fontSize = 8.5.sp,
-                        modifier = Modifier.padding(start = 7.dp),
-                    )
-                }
-                /* The player, where the article starts rather than in the
-                   chrome. Listening is a way of taking the devotional, not a
-                   utility like close or bookmark, and it belongs with the
-                   thing it reads. */
-                Spacer(Modifier.height(22.dp))
-                DevotionalAudioBar(voice)
-
-                Spacer(Modifier.height(22.dp))
-                Hair()
-
-                // ── the reading ───────────────────────────────────────────
-                Spacer(Modifier.height(26.dp))
-                Column(
-                    Modifier.fillMaxWidth()
-                        .clip(RoundedCornerShape(22.dp))
-                        .background(Brush.linearGradient(listOf(Color.White, Color(0xFFF7F3EA))))
-                        .padding(22.dp),
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.MenuBook, null, tint = Pk.Oxblood, modifier = Modifier.size(17.dp))
-                        Text(
-                            "Key Scripture", color = Pk.Oxblood, fontFamily = UtilitySans,
-                            fontSize = 13.sp, fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(start = 9.dp),
-                        )
-                    }
-                    Spacer(Modifier.height(13.dp))
-                    val opening = scripture[day.reading.ref.label]
-                    if (opening == null) {
-                        CircularProgressIndicator(
-                            color = Pk.Oxblood, strokeWidth = 2.dp,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    } else {
-                        Text(
-                            "“$opening”",
-                            color = Body, fontFamily = BookSerif, fontStyle = FontStyle.Italic,
-                            fontWeight = FontWeight.Light, fontSize = 20.sp, lineHeight = 30.sp,
-                        )
-                    }
-                    Spacer(Modifier.height(14.dp))
-                    Box(
-                        Modifier.fillMaxWidth().height(1.dp)
-                            .background(Pk.Gold.copy(alpha = .25f)),
-                    )
-                    Spacer(Modifier.height(13.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            "${day.reading.ref.label.uppercase(Locale.getDefault())} · KJV",
-                            color = Faint, style = MonoLabel, fontSize = 8.5.sp,
-                            modifier = Modifier.weight(1f),
-                        )
-                        Text(
-                            "Read $rangeLabel →",
-                            color = Pk.Oxblood, style = MonoLabel, fontSize = 8.5.sp,
-                            modifier = Modifier.clickable {
-                                onOpenPassage(day.reading.book, day.reading.chapter)
-                            },
-                        )
-                    }
-                }
-
-                // ── body ──────────────────────────────────────────────────
-                Text("TODAY'S MESSAGE", color = Pk.Muted, style = MonoLabel, fontSize = 9.sp)
-                Spacer(Modifier.height(16.dp))
-                Spacer(Modifier.height(30.dp))
-                day.body.forEachIndexed { index, block ->
-                    when (block) {
-                        is DevoBlock.Para -> {
-                            /* The drop cap belongs to the first paragraph only,
-                               and it is drawn as an oversized first character
-                               rather than a real float — Compose has no float,
-                               and a fake one that pushed three lines sideways
-                               looked worse than a large letter does. */
-                            Text(
-                                if (index == 0) dropCapped(block.text) else buildAnnotatedString { append(block.text) },
-                                color = Body, fontFamily = BookSerif, fontWeight = FontWeight.Light,
-                                fontSize = 19.5.sp, lineHeight = 33.sp,
-                            )
-                            Spacer(Modifier.height(20.dp))
-                        }
-                        is DevoBlock.Quote -> {
-                            Spacer(Modifier.height(6.dp))
-                            Row(Modifier.fillMaxWidth()) {
-                                Box(
-                                    Modifier.width(2.dp).height(quoteHeight(scripture[block.ref.label]))
-                                        .background(Pk.Gold.copy(alpha = .5f)),
-                                )
-                                Column(Modifier.padding(start = 18.dp)) {
-                                    Text(
-                                        scripture[block.ref.label] ?: "…",
-                                        color = Body.copy(alpha = .82f), fontFamily = BookSerif,
-                                        fontStyle = FontStyle.Italic, fontWeight = FontWeight.Light,
-                                        fontSize = 18.sp, lineHeight = 28.sp,
-                                    )
-                                    Spacer(Modifier.height(9.dp))
-                                    Text(
-                                        block.ref.label.uppercase(Locale.getDefault()),
-                                        color = Faint, style = MonoLabel, fontSize = 8.sp,
-                                    )
-                                }
-                            }
-                            Spacer(Modifier.height(26.dp))
-                        }
-                    }
-                }
-
-                // ── the line ──────────────────────────────────────────────
-                Spacer(Modifier.height(14.dp))
-                Column(
-                    Modifier.fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(
-                            Brush.linearGradient(
-                                listOf(Pk.VioletLit, Pk.Oxblood, Pk.VioletDeep),
-                            ),
-                        )
-                        .clickable { sharing = true }
-                        .padding(horizontal = 24.dp, vertical = 30.dp),
-                ) {
-                    Text(
-                        buildAnnotatedString {
-                            append(day.line.first)
-                            append("\n")
-                            withStyle(
-                                SpanStyle(
-                                    color = Pk.GoldLight, fontStyle = FontStyle.Italic,
-                                    fontWeight = FontWeight.Light,
-                                ),
-                            ) { append(day.line.second) }
-                        },
-                        color = Color.White, fontFamily = DisplaySerif,
-                        fontWeight = FontWeight.Light, fontSize = 29.sp, lineHeight = 36.sp,
-                        letterSpacing = (-0.6).sp,
-                    )
-                    Spacer(Modifier.height(20.dp))
-                    Box(
-                        Modifier.fillMaxWidth().height(1.dp)
-                            .background(Pk.GoldLight.copy(alpha = .28f)),
-                    )
-                    Spacer(Modifier.height(16.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            "SHARE THIS LINE", color = Pk.GoldLight.copy(alpha = .8f),
-                            style = MonoLabel, fontSize = 8.5.sp, modifier = Modifier.weight(1f),
-                        )
-                        Text("→", color = Pk.GoldLight.copy(alpha = .8f), fontSize = 12.sp)
-                    }
-                }
-
-                Spacer(Modifier.height(34.dp))
-                day.after.forEach {
-                    Text(
-                        it, color = Body, fontFamily = BookSerif, fontWeight = FontWeight.Light,
-                        fontSize = 19.5.sp, lineHeight = 33.sp,
-                    )
-                    Spacer(Modifier.height(20.dp))
-                }
-
-                // ── prayer ────────────────────────────────────────────────
-                Spacer(Modifier.height(14.dp))
-                Column(
-                    Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp))
-                        .background(Color.White).padding(24.dp),
-                ) {
-                    Text("PRAY IT", color = Pk.GoldDeep, style = MonoLabel)
-                    Spacer(Modifier.height(14.dp))
-                    Text(
-                        buildAnnotatedString {
-                            /* The Amen is set apart in oxblood italic, so it is
-                               drawn here rather than left in the prayer text.
-                               Most prayers already close with one, and appending
-                               unconditionally gave every written-out prayer
-                               "In Jesus' name, Amen. Amen." Take whichever is
-                               there, then add the one that is styled. */
-                            append(day.prayer.trimEnd().removeSuffix("Amen.").removeSuffix("Amen").trimEnd())
-                            append(" ")
-                            withStyle(
-                                SpanStyle(color = Pk.Oxblood, fontStyle = FontStyle.Italic),
-                            ) { append("Amen.") }
-                        },
-                        color = Body, fontFamily = BookSerif, fontWeight = FontWeight.Light,
-                        fontSize = 20.sp, lineHeight = 31.sp,
-                    )
-                    Spacer(Modifier.height(20.dp))
-                    Box(
-                        Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
-                            .background(
-                                if (prayerAdded) Color(0xFF0E9B5C).copy(alpha = .1f)
-                                else Pk.Oxblood.copy(alpha = .07f),
-                            )
-                            .clickable(enabled = !prayerAdded) {
-                                prayerAdded = true
-                                onAddPrayer(day.title)
-                            }
-                            .padding(vertical = 15.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            if (prayerAdded) "Added to your list · day 1" else day.addLabel,
-                            color = if (prayerAdded) Color(0xFF0A7346) else Pk.Oxblood,
-                            fontFamily = UtilitySans, fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold,
-                        )
-                    }
-                }
-
-                // ── one question ──────────────────────────────────────────
-                Spacer(Modifier.height(34.dp))
-                Hair()
-                Spacer(Modifier.height(28.dp))
-                Text("ONE QUESTION", color = Faint, style = MonoLabel)
-                Spacer(Modifier.height(14.dp))
-                Text(
-                    day.question, color = Pk.Charcoal, fontFamily = DisplaySerif,
-                    fontWeight = FontWeight.Light, fontSize = 27.sp, lineHeight = 34.sp,
-                    letterSpacing = (-0.5).sp,
-                )
-                Spacer(Modifier.height(18.dp))
-                Box(
-                    Modifier.fillMaxWidth().clip(RoundedCornerShape(17.dp))
-                        .background(Color.White).padding(17.dp),
-                ) {
-                    BasicTextField(
-                        value = reflection,
-                        /* Kept locally and written once on "mark as read" —
-                           saving per keystroke would put a hundred revisions of
-                           one sentence in the journal. */
-                        onValueChange = { reflection = it },
-                        textStyle = TextStyle(
-                            color = Body, fontFamily = BookSerif,
-                            fontWeight = FontWeight.Light, fontSize = 18.sp, lineHeight = 27.sp,
-                        ),
-                        modifier = Modifier.fillMaxWidth().height(104.dp),
-                        decorationBox = { field ->
-                            if (reflection.isEmpty()) {
-                                Text(
-                                    "A sentence is enough.",
-                                    color = Pk.Charcoal.copy(alpha = .24f), fontFamily = BookSerif,
-                                    fontWeight = FontWeight.Light, fontSize = 18.sp,
-                                )
-                            }
-                            field()
-                        },
-                    )
-                }
-                Spacer(Modifier.height(10.dp))
-                Text("SAVED", color = Faint, style = MonoLabel, fontSize = 8.sp)
-
-                // ── close ─────────────────────────────────────────────────
-                Spacer(Modifier.height(36.dp))
-                Hair()
-                Spacer(Modifier.height(26.dp))
-                Box(
-                    Modifier.fillMaxWidth().clip(RoundedCornerShape(17.dp))
-                        .background(
-                            if (completed) Color(0xFF0E9B5C).copy(alpha = .1f) else Pk.Oxblood,
-                        )
-                        .clickable(enabled = !completed) {
-                            completed = true
-                            if (reflection.isNotBlank()) onKeepReflection(reflection)
-                            onComplete()
-                        }
-                        .padding(vertical = 16.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        if (completed) "Read · ${dateLine.substringAfter(' ')}" else "Mark as read",
-                        color = if (completed) Color(0xFF0A7346) else Color.White,
-                        fontFamily = UtilitySans, fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold,
-                    )
-                }
-
-                // ── tomorrow ──────────────────────────────────────────────
-                if (tomorrow != null) {
-                    Spacer(Modifier.height(26.dp))
-                    Column(
-                        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
-                            .background(Color.White).padding(18.dp),
-                    ) {
-                        Text(
-                            "TOMORROW · DAY ${tomorrow.seriesDay}",
-                            color = Faint, style = MonoLabel, fontSize = 8.sp,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            tomorrow.title, color = Pk.Charcoal, fontFamily = DisplaySerif,
-                            fontWeight = FontWeight.Light, fontSize = 19.sp, lineHeight = 23.sp,
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(44.dp))
-                Spacer(Modifier.navigationBarsPadding())
             }
         }
 
@@ -607,17 +297,18 @@ private fun NavCircle(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) = Box(
+    // dark ground now, so the circles are lit rather than shaded
     Modifier.size(31.dp).clip(CircleShape)
-        .background(Pk.Charcoal.copy(alpha = .055f))
+        .background(Pk.Crisp.copy(alpha = .16f))
         .clickable(enabled = enabled, onClick = onClick),
     contentAlignment = Alignment.Center,
 ) {
     Icon(
         icon, description,
         tint = when {
-            !enabled -> Pk.Charcoal.copy(alpha = .22f)
-            active -> Pk.Oxblood
-            else -> Pk.Charcoal
+            !enabled -> Pk.Crisp.copy(alpha = .3f)
+            active -> Pk.GoldLight
+            else -> Pk.Crisp
         },
         modifier = Modifier.size(15.dp),
     )

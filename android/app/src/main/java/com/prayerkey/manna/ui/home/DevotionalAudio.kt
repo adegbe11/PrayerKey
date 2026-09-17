@@ -212,7 +212,10 @@ fun DevotionalAudioBar(voice: DevotionalVoice, modifier: Modifier = Modifier) {
         modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(22.dp))
-            .background(Color.White)
+            /* Glass, not a white slab. On the artwork a solid white card was
+               the brightest thing on the screen and pulled the eye off the
+               title it sits under. */
+            .background(Color.White.copy(alpha = .13f))
             .padding(horizontal = 18.dp, vertical = 16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -232,13 +235,13 @@ fun DevotionalAudioBar(voice: DevotionalVoice, modifier: Modifier = Modifier) {
             Column(Modifier.weight(1f).padding(start = 14.dp)) {
                 Text(
                     "Listen to this devotional",
-                    color = Pk.Charcoal, fontFamily = UtilitySans,
+                    color = Pk.Crisp, fontFamily = UtilitySans,
                     fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
                 )
                 Spacer(Modifier.height(3.dp))
                 Text(
                     "Read aloud on this device",
-                    color = Pk.Muted, fontFamily = UtilitySans, fontSize = 11.5.sp,
+                    color = Pk.Crisp.copy(alpha = .66f), fontFamily = UtilitySans, fontSize = 11.5.sp,
                 )
             }
             /* Plain tinted text. A rate control is a preference, not an action,
@@ -246,7 +249,7 @@ fun DevotionalAudioBar(voice: DevotionalVoice, modifier: Modifier = Modifier) {
                card because it had a filled background. */
             Text(
                 (if (voice.speed == 1f) "1" else voice.speed.toString().removeSuffix(".0")) + "×",
-                color = Pk.Oxblood, fontFamily = UtilitySans,
+                color = Pk.GoldLight, fontFamily = UtilitySans,
                 fontSize = 13.sp, fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .clip(RoundedCornerShape(9.dp))
@@ -259,17 +262,17 @@ fun DevotionalAudioBar(voice: DevotionalVoice, modifier: Modifier = Modifier) {
         Box(
             Modifier.fillMaxWidth().height(4.dp)
                 .clip(CircleShape)
-                .background(Pk.Charcoal.copy(alpha = .09f)),
+                .background(Pk.Crisp.copy(alpha = .22f)),
         ) {
             Box(
                 Modifier.fillMaxWidth(fill).fillMaxHeight()
-                    .clip(CircleShape).background(Pk.Oxblood),
+                    .clip(CircleShape).background(Pk.GoldLight),
             )
         }
         Spacer(Modifier.height(8.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(clock(voice.elapsedSeconds), color = Pk.Muted, fontFamily = UtilitySans, fontSize = 10.5.sp)
-            Text(clock(voice.estimatedSeconds), color = Pk.Muted, fontFamily = UtilitySans, fontSize = 10.5.sp)
+            Text(clock(voice.elapsedSeconds), color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 10.5.sp)
+            Text(clock(voice.estimatedSeconds), color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 10.5.sp)
         }
     }
 }
