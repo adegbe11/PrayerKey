@@ -57,7 +57,7 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
     /* On by default after dark. Somebody opening this at half past nine should
        not have to find the switch first. */
     var night by remember { mutableStateOf(OfficeStore.isEvening(java.time.LocalTime.now().hour)) }
-    val palette = if (night) NightPalette else DayPalette
+    val palette = if (night) NightPalette else DawnPalette
 
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
@@ -75,6 +75,7 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
         speaking = speaking.value,
         colophon = "Morning Prayer opens at first light.\nTomorrow runs the other way — enter, praise,\nconfess, thank, and walk out into it.",
         finishLabel = "Finish prayer",
+        background = com.prayerkey.manna.R.drawable.today_prayer_violet,
         onClose = onClose,
         onFinish = {
             context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)

@@ -51,7 +51,7 @@ fun NightPrayerScreen(onClose: () -> Unit) {
     BackHandler(onBack = onClose)
     val today = remember { LocalDate.now() }
     var day by remember { mutableStateOf(false) }
-    val palette = if (day) DayPalette else NightPalette
+    val palette = if (day) DawnPalette else NightPalette
 
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
@@ -64,6 +64,7 @@ fun NightPrayerScreen(onClose: () -> Unit) {
         voice = voice,
         speaking = speaking.value,
         colophon = "Morning Prayer opens at first light.",
+        background = com.prayerkey.manna.R.drawable.today_prayer_violet,
         onClose = onClose,
         length = "Two minutes. Short enough to learn by heart.",
         scale = NightScale,
@@ -97,7 +98,7 @@ fun NightPrayerScreen(onClose: () -> Unit) {
 fun MidnightPrayerScreen(onClose: () -> Unit) {
     BackHandler(onBack = onClose)
     var day by remember { mutableStateOf(false) }
-    val palette = if (day) DayPalette else MidnightPalette
+    val palette = if (day) DawnPalette else MidnightPalette
 
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
@@ -110,6 +111,7 @@ fun MidnightPrayerScreen(onClose: () -> Unit) {
         voice = voice,
         speaking = speaking.value,
         colophon = "Morning Prayer opens at first light.\nSleep now. The watch is His.",
+        background = com.prayerkey.manna.R.drawable.today_prayer_violet,
         onClose = onClose,
         length = "Twelve to three. Pray it standing, and pray it out loud.",
         trailing = { Lamp(day, palette) { day = !day } },

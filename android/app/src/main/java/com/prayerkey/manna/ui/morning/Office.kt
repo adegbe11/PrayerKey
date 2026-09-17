@@ -107,6 +107,24 @@ val NightPalette = OfficePalette(
 )
 
 /**
+ * Daylight, over the artwork.
+ *
+ * [DayPalette] is ink on white and cannot come with the offices onto a violet
+ * photograph - near-black body text over that image is unreadable, and oxblood
+ * at rubric size disappears into it entirely. This is the same office, lit from
+ * the other side: white ink, and the gold that the night offices already use
+ * for the same reason.
+ */
+val DawnPalette = OfficePalette(
+    paper = Color(0xFF241344),
+    ink = Color(0xFFFFFFFF),
+    ink2 = Color(0xFFD3C7EC),
+    accent = Pk.GoldLight,
+    rule = Color(0x33FFFFFF),
+    field = Color(0x1FFFFFFF),
+)
+
+/**
  * The watch.
  *
  * Darker than [NightPalette] and warmer in the accent. The midnight office is

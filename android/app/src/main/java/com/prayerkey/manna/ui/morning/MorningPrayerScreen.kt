@@ -51,7 +51,7 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
     BackHandler(onBack = onClose)
     val context = LocalContext.current
     val today = remember { LocalDate.now() }
-    val palette = DayPalette
+    val palette = DawnPalette
 
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
@@ -75,6 +75,7 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
         speaking = speaking.value,
         colophon = "Return tonight for Evening Prayer.\nReview, thanksgiving, confession, release, rest.",
         finishLabel = "Finish prayer",
+        background = com.prayerkey.manna.R.drawable.today_prayer_violet,
         onClose = onClose,
         onFinish = {
             context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)
