@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.BibleVerse
 import com.prayerkey.manna.data.OfflineBible
 import com.prayerkey.manna.ui.theme.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private data class TopicGroup(val title: String, val topics: List<String>, val color: Color)
 
@@ -145,7 +147,7 @@ internal fun TopicalBibleScreen(onClose: () -> Unit) {
     var loading by remember(topic) { mutableStateOf(true) }
     LaunchedEffect(topic) {
         val bible = OfflineBible(context)
-        verses = bible.search(searchTerm(topic), 22)
+        verses = withContext(Dispatchers.IO) { bible.search(searchTerm(topic), 22) }
         if (verses.isEmpty()) verses = bible.search("God", 12)
         loading = false
     }

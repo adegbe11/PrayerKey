@@ -56,6 +56,8 @@ import com.prayerkey.manna.ui.theme.PkText
 import com.prayerkey.manna.ui.theme.Spectral
 import com.prayerkey.manna.data.OfflineBible
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private const val PUBLIC_DOMAIN_KJV_BASE = "https://publicdomainaudiobibles.com/content/mp3/KJV"
 
@@ -133,7 +135,9 @@ fun AudioBibleScreen(
         duration = 1
         error = null
         chapterUri = null
-        narration = OfflineBible(context).chapter(book, chapter).map { "Verse ${it.verse}. ${it.text}" }
+        narration = withContext(Dispatchers.IO) {
+            OfflineBible(context).chapter(book, chapter).map { "Verse ${it.verse}. ${it.text}" }
+        }
         loading = true
         chapterUri = publicDomainChapterUrl(book, chapter)
         builtInNarration = chapterUri == null

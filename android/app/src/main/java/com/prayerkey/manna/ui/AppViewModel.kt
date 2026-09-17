@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 private const val PRAYING_MOOD = "\uD83D\uDE4F"
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
-    private val store = MannaStore(application)
+    private val store = MannaStore.of(application)
     private val _storageError = MutableStateFlow<String?>(null)
     val storageError = _storageError.asStateFlow()
 

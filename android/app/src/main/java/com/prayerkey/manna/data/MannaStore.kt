@@ -123,6 +123,34 @@ data class SermonNote(
 )
 
 class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 14) {
+
+    companion object {
+        /**
+         * One database for the process.
+         *
+         * Four places built their own MannaStore - the view model, the journal
+         * screen, morning prayer and the boot receiver - and nothing ever
+         * called close(). Each helper opens its own connection to manna.db and
+         * holds it until the object is collected, at which point SQLite's
+         * CloseGuard reports a leaked Closeable. StrictMode found it on a cold
+         * start, before any of those screens had been opened twice.
+         *
+         * Separate connections to one file are the worse half of it. They do
+         * not share a cache, they contend on writes, and a read taken on one
+         * can miss a write committed on another - a class of bug that shows up
+         * as a saved prayer that is not there yet, and never reproduces.
+         *
+         * The application context is deliberate: a store built on an Activity
+         * outlives it and leaks the whole screen.
+         */
+        @Volatile private var shared: MannaStore? = null
+
+        fun of(context: Context): MannaStore =
+            shared ?: synchronized(this) {
+                shared ?: MannaStore(context.applicationContext).also { shared = it }
+            }
+    }
+
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("""CREATE TABLE saved_words (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

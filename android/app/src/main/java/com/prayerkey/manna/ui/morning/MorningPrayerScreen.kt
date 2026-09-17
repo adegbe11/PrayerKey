@@ -63,7 +63,7 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
        first run, and the movement simply omits the note rather than inventing
        one — a fabricated memory would be worse than none. */
     val ledger = remember {
-        runCatching { MannaStore(context.applicationContext).prayerJournal().firstOrNull() }.getOrNull()
+        runCatching { MannaStore.of(context).prayerJournal().firstOrNull() }.getOrNull()
     }
 
     Column(

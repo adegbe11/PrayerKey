@@ -66,6 +66,8 @@ import com.prayerkey.manna.ui.theme.UtilitySans
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * A day of the written year.
@@ -106,7 +108,7 @@ fun DevotionalReader(
     var rangeLabel by remember(day.day) { mutableStateOf(day.reading.rangeLabel) }
     LaunchedEffect(day.day) {
         val bible = OfflineBible(context)
-        scripture = resolveScripture(bible, day)
+        scripture = withContext(Dispatchers.IO) { resolveScripture(bible, day) }
         rangeLabel = availableRange(bible, day.reading)
     }
 

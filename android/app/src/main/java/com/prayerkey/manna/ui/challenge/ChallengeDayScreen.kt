@@ -51,6 +51,8 @@ import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * One day of a challenge.
@@ -92,7 +94,9 @@ fun ChallengeDayScreen(
 
     LaunchedEffect(challenge.id) { ChallengeProgress.start(context, challenge.id) }
     LaunchedEffect(today.day) {
-        val verses = OfflineBible(context).chapter(today.read.book, today.read.chapter)
+        val verses = withContext(Dispatchers.IO) {
+            OfflineBible(context).chapter(today.read.book, today.read.chapter)
+        }
         passage = verses
             .filter { it.verse in today.read.from..today.read.to }
             .map { it.verse to it.text }

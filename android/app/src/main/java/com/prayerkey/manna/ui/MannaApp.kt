@@ -87,10 +87,16 @@ fun MannaApp(
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     LaunchedEffect(hydrated, preferences.onboarded, preferences.reminderEnabled, preferences.reminderHour, preferences.reminderMinute) {
         if (hydrated && preferences.onboarded) {
-            com.prayerkey.manna.reminder.ReminderReceiver.scheduleDailySuite(context, preferences.reminderEnabled)
-            com.prayerkey.manna.reminder.ReminderReceiver.schedule(
-                context, preferences.reminderHour, preferences.reminderMinute, preferences.reminderEnabled,
-            )
+            /* Scheduling touches AlarmManager and the reminder preferences, and
+               a LaunchedEffect runs on the main dispatcher - so this was disk
+               work on the thread drawing the first frame. Nothing here needs to
+               finish before the app is usable. */
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                com.prayerkey.manna.reminder.ReminderReceiver.scheduleDailySuite(context, preferences.reminderEnabled)
+                com.prayerkey.manna.reminder.ReminderReceiver.schedule(
+                    context, preferences.reminderHour, preferences.reminderMinute, preferences.reminderEnabled,
+                )
+            }
         }
         if (hydrated && preferences.onboarded && preferences.reminderEnabled &&
             android.os.Build.VERSION.SDK_INT >= 33 &&

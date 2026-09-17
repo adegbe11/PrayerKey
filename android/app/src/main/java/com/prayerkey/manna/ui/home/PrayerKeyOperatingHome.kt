@@ -176,9 +176,11 @@ fun PrayerKeyOperatingHome(
     var todayVerse by remember(plan) { mutableStateOf<VerseCard?>(null) }
     LaunchedEffect(plan) {
         val reading = plan?.reading ?: return@LaunchedEffect
-        val text = com.prayerkey.manna.data.OfflineBible(context)
-            .chapter(reading.book, reading.chapter)
-            .firstOrNull { it.verse == reading.verse }?.text
+        val text = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            com.prayerkey.manna.data.OfflineBible(context)
+                .chapter(reading.book, reading.chapter)
+                .firstOrNull { it.verse == reading.verse }?.text
+        }
         if (text != null) {
             todayVerse = VerseCard(reading.ref.label, "KJV", text, "")
         }
@@ -328,7 +330,11 @@ fun PrayerKeyOperatingHome(
     }
     openChallengeId?.let { id ->
         var challenge by remember(id) { mutableStateOf<com.prayerkey.manna.data.ChallengePlan?>(null) }
-        LaunchedEffect(id) { challenge = com.prayerkey.manna.data.Challenges.byId(context, id) }
+        LaunchedEffect(id) {
+            challenge = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                com.prayerkey.manna.data.Challenges.byId(context, id)
+            }
+        }
         Dialog(
             onDismissRequest = { openChallengeId = null },
             properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),

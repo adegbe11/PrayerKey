@@ -9,6 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.prayerkey.manna.data.ChallengePlan
 import com.prayerkey.manna.data.Challenges
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * The two ways into a challenge from anywhere else in the app.
@@ -23,7 +25,7 @@ import com.prayerkey.manna.data.Challenges
 fun ChallengeById(id: String, onClose: () -> Unit) {
     val context = LocalContext.current
     var plan by remember(id) { mutableStateOf<ChallengePlan?>(null) }
-    LaunchedEffect(id) { plan = Challenges.byId(context, id) }
+    LaunchedEffect(id) { plan = withContext(Dispatchers.IO) { Challenges.byId(context, id) } }
 
     /* Always fill the screen, even before the asset has parsed. A composable
        that occupies nothing inside a Dialog turns the reader's first tap into

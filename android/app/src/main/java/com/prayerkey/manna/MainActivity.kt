@@ -24,6 +24,39 @@ class MainActivity : ComponentActivity() {
     private var notificationRoute by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        /*
+         * Debug builds fail loudly on main-thread disk reads.
+         *
+         * The app ships five JSON assets and one of them is the King James
+         * Version - 4.5 MB, 31,102 verses. Reading it takes long enough to
+         * drop frames, and LaunchedEffect runs on the main dispatcher, so
+         * `LaunchedEffect { bible.chapter(...) }` reads and parses it on the
+         * thread that draws. That reads as perfectly ordinary Compose and is
+         * why eight of them accumulated without anyone noticing.
+         *
+         * Grep found those eight. StrictMode finds the ninth, at the moment it
+         * is written, instead of leaving it to be felt as "the app is a bit
+         * slow sometimes". Debug only - penaltyLog, never penaltyDeath, since
+         * a first-launch read is unavoidable and should not be fatal.
+         */
+        if (BuildConfig.DEBUG) {
+            android.os.StrictMode.setThreadPolicy(
+                android.os.StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()
+                    .penaltyLog()
+                    .build(),
+            )
+            android.os.StrictMode.setVmPolicy(
+                android.os.StrictMode.VmPolicy.Builder()
+                    .detectLeakedClosableObjects()
+                    .detectActivityLeaks()
+                    .penaltyLog()
+                    .build(),
+            )
+        }
+        com.prayerkey.manna.data.PrefsWarmer.warm(this)
         super.onCreate(savedInstanceState)
         notificationRoute = intent?.getStringExtra("prayerkey_destination")
         /*

@@ -806,7 +806,7 @@ private fun JournalMark() {
 @Composable
 private fun EntryCard(entry: JournalEntry, conceal: Boolean = false, onAnswer: () -> Unit, onClick: () -> Unit) {
     val context = LocalContext.current
-    val prayerStore = remember { MannaStore(context.applicationContext) }
+    val prayerStore = remember { MannaStore.of(context) }
     var prayedCount by remember(entry.id) {
         mutableIntStateOf(prayerStore.prayerSessions(500).count { it.challenge == "Prayer ledger" && it.focus == entry.body })
     }

@@ -45,6 +45,8 @@ import com.prayerkey.manna.data.Challenges
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * The shelf: every challenge, named, on one screen.
@@ -70,7 +72,7 @@ fun ChallengeShelf(
     BackHandler(onBack = onClose)
     val context = LocalContext.current
     var challenges by remember { mutableStateOf<List<ChallengePlan>>(emptyList()) }
-    LaunchedEffect(Unit) { challenges = Challenges.all(context) }
+    LaunchedEffect(Unit) { challenges = withContext(Dispatchers.IO) { Challenges.all(context) } }
 
     Column(Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding()) {
         Row(
