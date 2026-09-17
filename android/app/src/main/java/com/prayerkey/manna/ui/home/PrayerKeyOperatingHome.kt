@@ -1619,11 +1619,17 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     }
 
     val rows = listOf(
-        RhythmRow("devotional", "Daily Devotional", devotionalTitle, Icons.Outlined.AutoStories, 0..23, minutes = devotionalMinutes, reservesDetail = true, note = "Read · Reflect · Pray", open = devotional),
-        RhythmRow("bible", "Bible Reading", readingLabel, Icons.Outlined.MenuBook, 0..23, minutes = 4, reservesDetail = true, note = "Know God deeper through His Word.", open = bible),
-        RhythmRow("morning", "Morning Prayer", "Start your day with God.", Icons.Outlined.WbSunny, 4..11, minutes = 3, open = morningPrayer),
-        RhythmRow("afternoon", "Afternoon Prayer", "Pause. Reset. Pray.", Icons.Outlined.LightMode, 12..16, minutes = 2, open = afternoonPrayer),
-        RhythmRow("evening", "Evening Prayer", "End your day in His presence.", Icons.Outlined.DarkMode, 17..23, minutes = 3, open = eveningPrayer),
+        /* Title, then whatever is actually today's, then how long it takes.
+           The strap lines went: "Start your day with God" under Morning Prayer
+           told a reader nothing the title had not, and three of those stacked
+           turned a schedule back into a page to read. The devotional and the
+           reading keep their line because it changes daily and is the reason
+           you would open one rather than the other. */
+        RhythmRow("devotional", "Daily Devotional", devotionalTitle, Icons.Outlined.AutoStories, 0..23, minutes = devotionalMinutes, reservesDetail = true, open = devotional),
+        RhythmRow("bible", "Bible Reading", readingLabel, Icons.Outlined.MenuBook, 0..23, minutes = 4, reservesDetail = true, open = bible),
+        RhythmRow("morning", "Morning Prayer", "", Icons.Outlined.WbSunny, 4..11, minutes = 3, open = morningPrayer),
+        RhythmRow("afternoon", "Afternoon Prayer", "", Icons.Outlined.WbTwilight, 12..16, minutes = 2, open = afternoonPrayer),
+        RhythmRow("evening", "Evening Prayer", "", Icons.Outlined.DarkMode, 17..23, minutes = 3, open = eveningPrayer),
     )
     val doneCount = rows.count { it.id in completed }
 
@@ -1676,13 +1682,6 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                         fontFamily = UtilitySans,
                         fontSize = 12.sp,
                         color = Pk.Muted,
-                    )
-                    Text(
-                        "A closer you. A brighter tomorrow.",
-                        Modifier.padding(top = 4.dp),
-                        fontFamily = UtilitySans,
-                        fontSize = 11.5.sp,
-                        color = Pk.Muted.copy(alpha = .8f),
                     )
                 }
                 Box(
@@ -1739,22 +1738,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                         )
                     }
                 }
-                Box(
-                    Modifier.padding(start = 14.dp).width(1.dp).height(30.dp)
-                        .background(Pk.Charcoal.copy(alpha = .09f)),
-                )
-                Column(Modifier.padding(start = 14.dp)) {
-                    Text(
-                        if (doneCount == rows.size) "All done" else "Keep going",
-                        fontFamily = UtilitySans, fontSize = 12.5.sp,
-                        fontWeight = FontWeight.SemiBold, color = Pk.Charcoal,
-                    )
-                    Text(
-                        if (doneCount == 0) "Start anywhere." else "You’re doing well.",
-                        Modifier.padding(top = 2.dp),
-                        fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted,
-                    )
-                }
+
             }
         }
     }
@@ -1769,8 +1753,6 @@ private data class RhythmRow(
     val hours: IntRange,
     /** How long it takes, so the card can be chosen between rather than read. */
     val minutes: Int = 0,
-    /** A third line, under the detail: what this row is for. */
-    val note: String = "",
     /**
      * Whether this row will have a detail once the day has loaded.
      *
@@ -1836,15 +1818,6 @@ private data class RhythmRow(
                     color = Pk.Muted.copy(alpha = alpha),
                     maxLines = 2,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                )
-            }
-            if (row.note.isNotBlank()) {
-                Text(
-                    row.note,
-                    Modifier.padding(top = 3.dp),
-                    fontFamily = UtilitySans,
-                    fontSize = 11.sp,
-                    color = Pk.Muted.copy(alpha = .75f * alpha),
                 )
             }
         }

@@ -47,7 +47,7 @@ fun AfternoonPrayerScreen(onClose: () -> Unit) {
                 .edit().putBoolean("${today}:afternoon", true).apply()
             onClose()
         },
-        length = "Two minutes, standing, in the middle of whatever you are doing.",
+        length = "Two minutes, standing.",
     )
 }
 
