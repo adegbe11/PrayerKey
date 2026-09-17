@@ -31,7 +31,6 @@ import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import com.prayerkey.manna.ui.theme.goldKey
 
 private data class WelcomeChoice(val id: String, val title: String, val icon: ImageVector)
 private val goals = listOf(
@@ -151,7 +150,11 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
                                and keeps ic_notification, because there it is
                                showing you what will actually appear in the
                                shade. This is a logo, and gets the logo. */
-                            Canvas(Modifier.padding(top = 6.dp).size(58.dp)) { goldKey(center, size.height) }
+                            Image(
+                                painterResource(R.drawable.prayerkey_mark),
+                                contentDescription = null,
+                                modifier = Modifier.padding(top = 6.dp).size(62.dp),
+                            )
                             if (selectedGoals.isNotEmpty() || selectedTopics.isNotEmpty()) {
                                 Text((goals.filter { it.id in selectedGoals }.map { it.title } + topics.filter { it.id in selectedTopics }.map { it.title }).joinToString(" · "), Modifier.padding(top = 20.dp), color = Pk.Crisp, fontFamily = UtilitySans, lineHeight = 23.sp)
                             }

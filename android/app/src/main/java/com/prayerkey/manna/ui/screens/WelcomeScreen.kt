@@ -25,7 +25,6 @@ import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import com.prayerkey.manna.ui.theme.goldKey
 
 /**
  * The first screen, and now only a door.
@@ -56,15 +55,18 @@ fun WelcomeScreen(onContinue: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(20.dp))
-            /* The mark, drawn the way the splash draws it.
-               This was ic_notification - the status-bar icon, which Android
-               reduces to a flat alpha silhouette because that is all it will
-               render at 18 px. Blown up to 48dp and tinted gold it was a
-               different symbol entirely, a praying figure rather than the
-               cross-topped key, and a crude one. goldKey is the brand mark and
-               the same call the launch screen makes, so the icon a person sees
-               opening the app is now the icon they saw a second earlier. */
-            Canvas(Modifier.size(66.dp)) { goldKey(center, size.height) }
+            /* The mark itself, lifted from the store icon.
+               Not a redrawing of it. Two approximations had been standing in
+               for the logo - the notification silhouette, and goldKey, which
+               draws a cross-topped key. The real mark is neither: it is a
+               praying figure whose robe forms the bow of a key and whose body
+               forms the shank. That is not a shape worth reconstructing in
+               path commands, so it is the artwork, cut off its violet tile. */
+            Image(
+                painterResource(R.drawable.prayerkey_mark),
+                contentDescription = "PrayerKey",
+                modifier = Modifier.size(72.dp),
+            )
             Text("PrayerKey", fontFamily = DisplaySerif, fontSize = 28.sp, color = Color.White)
             Spacer(Modifier.height(28.dp))
             Text("A closer walk\nwith God.", color = Color.White, fontFamily = DisplaySerif,

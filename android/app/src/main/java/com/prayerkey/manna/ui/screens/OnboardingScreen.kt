@@ -7,7 +7,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
-import com.prayerkey.manna.ui.theme.goldKey
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -182,12 +181,11 @@ private fun CardBackFace() {
     Box(Modifier.fillMaxSize().background(NightFill), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             // the brand's mark, matching the launcher icon and Home
-            androidx.compose.foundation.Canvas(Modifier.size(38.dp)) {
-                goldKey(
-                    androidx.compose.ui.geometry.Offset(size.width / 2f, size.height / 2f),
-                    height = size.height,
-                )
-            }
+            androidx.compose.foundation.Image(
+                androidx.compose.ui.res.painterResource(com.prayerkey.manna.R.drawable.prayerkey_mark),
+                contentDescription = null,
+                modifier = Modifier.size(44.dp),
+            )
             Spacer(Modifier.height(16.dp))
             com.prayerkey.manna.ui.theme.StampedGold("PRAYERKEY", size = 14.sp, tracking = 3.8.sp)
         }

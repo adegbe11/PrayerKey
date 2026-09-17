@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.Pk
-import com.prayerkey.manna.ui.theme.goldKey
 
 /** PrayerKey's cinematic threshold. Short, legible and silent by design. */
 @Composable
@@ -30,7 +29,11 @@ fun LaunchPrelude(stage: Int) {
                 2 -> OpeningWord("Seek.")
                 3 -> OpeningWord("Knock.")
                 else -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Canvas(Modifier.size(54.dp)) { goldKey(center, size.height) }
+                    androidx.compose.foundation.Image(
+                        androidx.compose.ui.res.painterResource(com.prayerkey.manna.R.drawable.prayerkey_mark),
+                        contentDescription = null,
+                        modifier = Modifier.size(62.dp),
+                    )
                     Text("PRAYERKEY", Modifier.padding(top = 20.dp), color = Color.White, fontFamily = BookSerif, fontWeight = FontWeight.Bold, fontSize = 31.sp, letterSpacing = 5.sp)
                     Text("MATTHEW 7:7", Modifier.padding(top = 13.dp), color = Pk.GoldLight, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 2.4.sp)
                 }
