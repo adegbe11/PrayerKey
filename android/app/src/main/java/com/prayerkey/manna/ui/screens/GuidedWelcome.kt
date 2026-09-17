@@ -126,7 +126,12 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
                             Surface(Modifier.fillMaxWidth(), color = Pk.Crisp.copy(alpha = .09f), shape = RoundedCornerShape(24.dp), border = BorderStroke(1.dp, Pk.Crisp.copy(alpha = .18f))) {
                                 Column(Modifier.padding(20.dp)) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(painterResource(R.drawable.ic_notification), null, Modifier.size(30.dp), tint = Pk.GoldLight)
+                                        /* The mark, because the real reminder
+                                           now carries it as its large icon.
+                                           This card is a picture of what will
+                                           arrive in the shade, so it has to
+                                           keep matching what actually does. */
+                                        Image(painterResource(R.drawable.prayerkey_mark), null, Modifier.size(34.dp))
                                         Text("PrayerKey", Modifier.padding(start = 12.dp), color = Pk.Crisp, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold)
                                     }
                                     Text("Time for prayer", Modifier.padding(top = 18.dp), color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 24.sp)

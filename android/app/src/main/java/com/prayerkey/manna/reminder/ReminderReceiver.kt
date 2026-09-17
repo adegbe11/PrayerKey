@@ -46,8 +46,17 @@ class ReminderReceiver : BroadcastReceiver() {
             context, 8_000 + kind.ordinal, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
+        /* The small icon is the status-bar glyph, and Android will render it
+           as a flat silhouette whatever we hand it - that is the platform, not
+           a choice. The large icon has no such rule, so the logo goes there and
+           the notification in the shade shows the actual mark. */
         val notification = NotificationCompat.Builder(context, kind.channel)
             .setSmallIcon(R.drawable.ic_notification)
+            .setLargeIcon(
+                androidx.core.graphics.drawable.IconCompat
+                    .createWithResource(context, R.drawable.prayerkey_mark)
+                    .toIcon(context),
+            )
             .setColor(0xFF6200ED.toInt())
             .setContentTitle(headline)
             .setContentText(if (kind == ReminderKind.CALENDAR) message.second else message.second)
