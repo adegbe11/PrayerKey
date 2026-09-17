@@ -436,6 +436,7 @@ fun PrayerKeyOperatingHome(
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
             TodayRhythmPanel(
                 devotionalTitle = written?.title.orEmpty(),
+                devotionalMinutes = written?.minutes ?: 0,
                 readingLabel = plan?.readingLabel.orEmpty(),
                 morningPrayer = { requestedOffice = "MORNING"; morningPrayerOpen = true },
                 devotional = { devotionalOpen = true },
@@ -1593,6 +1594,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
  */
 @Composable private fun TodayRhythmPanel(
     devotionalTitle: String,
+    devotionalMinutes: Int,
     readingLabel: String,
     morningPrayer: () -> Unit,
     devotional: () -> Unit,
@@ -1620,11 +1622,31 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     }
 
     val rows = listOf(
-        RhythmRow("morning", "Morning prayer", "", Icons.Outlined.WbSunny, 4..16, open = morningPrayer),
-        RhythmRow("devotional", "Daily devotional", devotionalTitle, Icons.Outlined.AutoStories, 0..23, reservesDetail = true, open = devotional),
-        RhythmRow("bible", "Bible reading", readingLabel, Icons.Outlined.MenuBook, 0..23, reservesDetail = true, open = bible),
-        RhythmRow("evening", "Evening prayer", "", Icons.Outlined.DarkMode, 17..23, open = eveningPrayer),
+        RhythmRow("morning", "Morning Prayer", "Start your day with God.", Icons.Outlined.WbSunny, 4..16, minutes = 3, open = morningPrayer),
+        RhythmRow("devotional", "Daily Devotional", devotionalTitle, Icons.Outlined.AutoStories, 0..23, minutes = devotionalMinutes, reservesDetail = true, open = devotional),
+        RhythmRow("bible", "Bible Reading", readingLabel, Icons.Outlined.MenuBook, 0..23, minutes = 4, reservesDetail = true, open = bible),
+        RhythmRow("evening", "Evening Prayer", "End your day in His presence.", Icons.Outlined.DarkMode, 17..23, minutes = 3, open = eveningPrayer),
     )
+    val doneCount = rows.count { it.id in completed }
+
+    /*
+     * One row is recommended, and only one.
+     *
+     * The badge first went on every row whose hour matched, which put "Now" on
+     * three of the four: the devotional and the reading are open all day, so
+     * their range is 0..23 and always matches. A recommendation that points at
+     * most of the list is not a recommendation.
+     *
+     * So: the narrowest unfinished window that contains this hour - which is
+     * always an office, since only the offices have one - and failing that, the
+     * first thing still to do.
+     */
+    val recommended = rows
+        .filter { it.id !in completed }
+        .let { open ->
+            open.filter { hour in it.hours }.minByOrNull { it.hours.last - it.hours.first }
+                ?: open.firstOrNull()
+        }?.id
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -1641,14 +1663,23 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                 Modifier.fillMaxWidth().padding(horizontal = 22.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    "Today, " + today.format(DateTimeFormatter.ofPattern("MMM d", java.util.Locale.UK)),
-                    Modifier.weight(1f),
-                    fontFamily = DisplaySerif,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 26.sp,
-                    color = Pk.Charcoal,
-                )
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "Today, " + today.format(DateTimeFormatter.ofPattern("MMM d", java.util.Locale.UK)),
+                        fontFamily = DisplaySerif,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 26.sp,
+                        color = Pk.Charcoal,
+                    )
+                    Text(
+                        today.format(DateTimeFormatter.ofPattern("EEEE", java.util.Locale.UK)) +
+                            "  ·  Day ${today.dayOfYear}",
+                        Modifier.padding(top = 3.dp),
+                        fontFamily = UtilitySans,
+                        fontSize = 12.sp,
+                        color = Pk.Muted,
+                    )
+                }
                 Box(
                     Modifier.size(44.dp).clip(CircleShape)
                         .background(Pk.Oxblood.copy(alpha = .08f))
@@ -1666,8 +1697,45 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                     row = row,
                     done = row.id in completed,
                     now = hour in row.hours,
+                    recommended = row.id == recommended,
                     open = row.open,
                 )
+            }
+
+            /* The foot of the card, which the rows can no longer say on their
+               own. A chevron tells you a row opens something; it does not tell
+               you how much of today is behind you, and the count is the reason
+               anybody opens this card twice. */
+            Box(
+                Modifier.padding(horizontal = 22.dp).padding(top = 10.dp, bottom = 2.dp)
+                    .fillMaxWidth().height(1.dp).background(Pk.Charcoal.copy(alpha = .07f)),
+            )
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        "Today’s progress",
+                        fontFamily = UtilitySans, fontSize = 12.5.sp,
+                        fontWeight = FontWeight.SemiBold, color = Pk.Charcoal,
+                    )
+                    Text(
+                        "$doneCount of ${rows.size} completed",
+                        Modifier.padding(top = 2.dp),
+                        fontFamily = UtilitySans, fontSize = 11.5.sp, color = Pk.Muted,
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    rows.forEach { row ->
+                        Box(
+                            Modifier.size(9.dp).clip(CircleShape).background(
+                                if (row.id in completed) Pk.Oxblood
+                                else Pk.Charcoal.copy(alpha = .13f),
+                            ),
+                        )
+                    }
+                }
             }
         }
     }
@@ -1680,6 +1748,8 @@ private data class RhythmRow(
     val detail: String,
     val icon: ImageVector,
     val hours: IntRange,
+    /** How long it takes, so the card can be chosen between rather than read. */
+    val minutes: Int = 0,
     /**
      * Whether this row will have a detail once the day has loaded.
      *
@@ -1693,16 +1763,28 @@ private data class RhythmRow(
     val open: () -> Unit,
 )
 
-@Composable private fun RhythmEntry(row: RhythmRow, done: Boolean, now: Boolean, open: () -> Unit) {
+@Composable private fun RhythmEntry(
+    row: RhythmRow,
+    done: Boolean,
+    now: Boolean,
+    recommended: Boolean,
+    open: () -> Unit,
+) {
     /* Dimmed outside its hour, and never below the legibility floor - this is
        a row you are meant to read and decide against, not a disabled control. */
     val alpha = if (now || done) 1f else .45f
     /* Not tappable until it has something to open. Tapping "Bible reading"
        before the plan resolves used to open an empty chapter. */
     val ready = !row.reservesDetail || row.detail.isNotBlank()
+    /* The row for this hour is lifted rather than merely undimmed. Four rows at
+       equal weight make you read all four to find the one you came for. */
+    val highlight = recommended && !done
     Row(
-        Modifier.fillMaxWidth().clickable(enabled = ready, onClick = open)
-            .padding(horizontal = 22.dp, vertical = 17.dp),
+        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 2.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(if (highlight) Pk.Oxblood.copy(alpha = .05f) else Color.Transparent)
+            .clickable(enabled = ready, onClick = open)
+            .padding(horizontal = 10.dp, vertical = 15.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -1731,22 +1813,49 @@ private data class RhythmRow(
                     fontSize = 12.5.sp,
                     lineHeight = 17.sp,
                     color = Pk.Muted.copy(alpha = alpha),
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
             }
         }
-        /* Not a control. It fills because a screen was finished. */
-        Box(Modifier.size(26.dp), contentAlignment = Alignment.Center) {
+        /* How long it takes, then whether it is done.
+           The empty circle read as a checkbox - something to tick - when every
+           one of these rows is a door. It is a chevron unless the day has
+           actually been completed, and then it is the tick it earned. */
+        Column(horizontalAlignment = Alignment.End) {
+            if (row.minutes > 0) {
+                Text(
+                    "${row.minutes} MIN",
+                    fontFamily = UtilitySans, fontSize = 9.5.sp,
+                    letterSpacing = 1.1.sp, fontWeight = FontWeight.Bold,
+                    color = Pk.Muted.copy(alpha = alpha),
+                )
+            }
+            if (highlight) {
+                Box(
+                    Modifier.padding(top = 6.dp).clip(RoundedCornerShape(99.dp))
+                        .background(Pk.Oxblood.copy(alpha = .10f))
+                        .padding(horizontal = 9.dp, vertical = 4.dp),
+                ) {
+                    Text(
+                        "Now",
+                        fontFamily = UtilitySans, fontSize = 9.5.sp,
+                        fontWeight = FontWeight.Bold, color = Pk.Oxblood,
+                    )
+                }
+            }
+        }
+        Box(Modifier.padding(start = 12.dp).size(26.dp), contentAlignment = Alignment.Center) {
             if (done) {
                 Box(
                     Modifier.size(26.dp).clip(CircleShape).background(Pk.Oxblood),
                     contentAlignment = Alignment.Center,
                 ) { Icon(Icons.Outlined.Check, null, tint = Color.White, modifier = Modifier.size(15.dp)) }
             } else {
-                Box(
-                    Modifier.size(26.dp).clip(CircleShape)
-                        .border(1.5.dp, Pk.Charcoal.copy(alpha = .18f * alpha), CircleShape),
+                Icon(
+                    Icons.Outlined.ChevronRight, null,
+                    tint = Pk.Charcoal.copy(alpha = .32f * alpha),
+                    modifier = Modifier.size(22.dp),
                 )
             }
         }
