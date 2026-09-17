@@ -1,7 +1,5 @@
 package com.prayerkey.manna.ui.screens
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,15 +25,24 @@ import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 
+/**
+ * The first screen, and now only a door.
+ *
+ * It used to open with "Create an account", "Sign in", and beneath them, in
+ * quiet grey, "Not now" - which was the only one of the three that led into
+ * the app. The other two left it, opening prayerkey.com in a browser.
+ *
+ * PrayerKey has no accounts. There is no token, no session, no user: the
+ * journal, the streak and the saved prayers live in this install and nowhere
+ * else. So signing in bought nothing and returned you to the same screen, and
+ * the offer carried a suggestion it could not keep - that your writing was
+ * being kept somewhere safe, and would follow you to a new phone.
+ *
+ * A gate that guards nothing still costs a decision, and this one asked for it
+ * before anybody had seen a single verse.
+ */
 @Composable
 fun WelcomeScreen(onContinue: () -> Unit) {
-    val context = LocalContext.current
-    var error by remember { mutableStateOf(false) }
-    fun account(path: String) {
-        error = runCatching {
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.prayerkey.com/$path")))
-        }.isFailure
-    }
     BoxWithConstraints(Modifier.fillMaxSize().background(Pk.DeepDark)) {
         val availableHeight = maxHeight
         Image(painterResource(R.drawable.welcome_prayer_dawn), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
@@ -56,14 +62,8 @@ fun WelcomeScreen(onContinue: () -> Unit) {
             Text("Prayer, Scripture, and space to reflect.", Modifier.padding(top = 14.dp), color = Color.White.copy(alpha = .85f),
                 fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height((availableHeight - 570.dp).coerceAtLeast(100.dp)))
-            WelcomeAction("Create an account", primary = true) { account("register") }
-            Spacer(Modifier.height(10.dp))
-            WelcomeAction("Sign in", primary = false) { account("login") }
-            TextButton(onClick = onContinue, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) {
-                Text("Not now", color = Color.White.copy(alpha = .85f), fontFamily = UtilitySans, fontSize = 14.sp)
-            }
-            if (error) Text("Couldn't open the account page. Please try again.", color = Color.White, fontSize = 12.sp, textAlign = TextAlign.Center)
-            Spacer(Modifier.height(12.dp))
+            WelcomeAction("Begin", primary = true, onClick = onContinue)
+            Spacer(Modifier.height(20.dp))
         }
     }
 }
