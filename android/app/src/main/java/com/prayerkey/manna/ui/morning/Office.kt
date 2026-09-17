@@ -575,20 +575,67 @@ class OfficeVoice(private val speaking: MutableState<Boolean>) {
     var engine: TextToSpeech? = null
     var ready = false
 
-    fun toggle(movements: List<OfficeMovement>) {
+    /**
+     * Raised when a movement has finished being spoken, so a paged office can
+     * turn to the next one.
+     *
+     * The office used to be queued whole - every movement handed to the engine
+     * back to back, ending with Amen - which was right while the text sat still
+     * and the voice travelled down it. With pages, a voice running ahead of the
+     * page is a reader looking at Adore while hearing Ask, so it now speaks one
+     * movement and says when it is done.
+     */
+    var onMovementDone: (() -> Unit)? = null
+
+    /** The page the voice wants next. The office clears it once it has turned. */
+    var pendingPage by androidx.compose.runtime.mutableStateOf<Int?>(null)
+
+    fun stop() {
+        engine?.stop()
+        speaking.value = false
+        pendingPage = null
+    }
+
+    fun speakMovement(movement: OfficeMovement) {
         val tts = engine ?: return
-        if (speaking.value) { tts.stop(); speaking.value = false; return }
         if (!ready) return
         speaking.value = true
-        movements.forEachIndexed { i, movement ->
-            val mode = if (i == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
-            tts.speak(movement.rubric, mode, null, "rubric-$i")
-            movement.body.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
-            movement.scripture?.let { tts.speak(it.text, TextToSpeech.QUEUE_ADD, null, null) }
-            movement.after.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
-            movement.declarations.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
+        tts.speak(movement.rubric, TextToSpeech.QUEUE_FLUSH, null, null)
+        movement.body.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
+        movement.scripture?.let { tts.speak(it.text, TextToSpeech.QUEUE_ADD, null, null) }
+        movement.after.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
+        movement.declarations.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
+        movement.points.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
+        /* A silent tail carries the id, so onDone fires once at the end of the
+           movement rather than after each paragraph inside it. */
+        tts.speak(" ", TextToSpeech.QUEUE_ADD, null, MOVEMENT_END)
+    }
+
+    /** The close: the office signs off rather than stopping mid-air. */
+    fun finish() {
+        val tts = engine ?: return
+        speaking.value = true
+        tts.speak("Amen.", TextToSpeech.QUEUE_FLUSH, null, OFFICE_END)
+    }
+
+    /** Begin reading from wherever the reader currently is. */
+    fun startFrom(page: Int, pages: List<OfficePage>) {
+        when (val here = pages.getOrNull(page)) {
+            is OfficePage.Move -> speakMovement(here.movement)
+            else -> {
+                // a title or an ask page has nothing to say; start at the first movement
+                val firstMove = pages.indexOfFirst { it is OfficePage.Move }
+                if (firstMove >= 0) {
+                    speaking.value = true
+                    pendingPage = firstMove
+                }
+            }
         }
-        tts.speak("Amen.", TextToSpeech.QUEUE_ADD, null, "office-end")
+    }
+
+    companion object {
+        const val MOVEMENT_END = "office-movement-end"
+        const val OFFICE_END = "office-end"
     }
 }
 
@@ -601,8 +648,12 @@ fun rememberOfficeVoice(speaking: MutableState<Boolean>): OfficeVoice {
         tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {}
             override fun onDone(utteranceId: String?) {
-                if (utteranceId == "office-end") speaking.value = false
+                when (utteranceId) {
+                    OfficeVoice.OFFICE_END -> speaking.value = false
+                    OfficeVoice.MOVEMENT_END -> voice.onMovementDone?.invoke()
+                }
             }
+
             @Deprecated("Deprecated in Java")
             override fun onError(utteranceId: String?) { speaking.value = false }
         })

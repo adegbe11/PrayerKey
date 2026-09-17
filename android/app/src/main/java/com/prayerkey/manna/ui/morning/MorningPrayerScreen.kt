@@ -66,44 +66,49 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
         runCatching { MannaStore.of(context).prayerJournal().firstOrNull() }.getOrNull()
     }
 
-    Column(
-        Modifier.fillMaxSize().background(palette.paper).verticalScroll(rememberScrollState())
-            .statusBarsPadding().padding(horizontal = 26.dp).navigationBarsPadding(),
-    ) {
-        Spacer(Modifier.height(10.dp))
-        RunningHead("Morning Prayer", today.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.UK)), palette, onClose)
-        Spacer(Modifier.height(26.dp))
-        OfficeTitle("Morning Prayer", palette, speaking.value) { voice.toggle(MORNING) }
-        Spacer(Modifier.height(26.dp))
-
-        MORNING.forEachIndexed { index, movement ->
-            Movement(movement, palette, dropCap = index == 0)
-
-            if (movement.rubric == "Thank" && ledger != null) {
-                val when_ = Instant.ofEpochMilli(ledger.createdAt).atZone(ZoneId.systemDefault())
+    OfficeFlip(
+        title = "Morning Prayer",
+        dateLine = today.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.UK)),
+        movements = MORNING,
+        palette = palette,
+        voice = voice,
+        speaking = speaking.value,
+        colophon = "Return tonight for Evening Prayer.\nReview, thanksgiving, confession, release, rest.",
+        finishLabel = "Finish prayer",
+        onClose = onClose,
+        onFinish = {
+            context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)
+                .edit().putBoolean("${today}:morning", true).apply()
+            onClose()
+        },
+        /* The ask and the ledger note used to sit underneath their movements.
+           On a paged office each gets its own page, which is better than it
+           sounds: writing down what you are asking God for deserves a screen
+           to itself rather than a box under a paragraph. */
+        after = buildMap {
+            /* Only when there is something in the ledger. Adding the page
+               unconditionally put a blank screen in the middle of the office on
+               any install with no prayers saved yet - which is every install on
+               its first morning. The old code guarded this inline; moving the
+               page out of the movement moved the guard with it, and I left it
+               behind. */
+            if (ledger != null) put("Thank", "ledger")
+            put("Ask", "ask")
+        },
+    ) { key ->
+        when (key) {
+            "ledger" -> ledger?.let {
+                val when_ = Instant.ofEpochMilli(it.createdAt).atZone(ZoneId.systemDefault())
                     .toLocalDate().format(DateTimeFormatter.ofPattern("d MMMM", Locale.UK))
                 LedgerNote(
                     label = "From your ledger, $when_",
-                    entry = ledger.request.ifBlank { ledger.title },
+                    entry = it.request.ifBlank { it.title },
                     invitation = "Thank Him for it now if He did it.",
                     palette = palette,
                 )
             }
-            if (movement.rubric == "Ask") {
-                OfficeField(ask, "Write it plainly. Nobody sees this but you.", palette) { ask = it }
-            }
-            Spacer(Modifier.height(30.dp))
+            "ask" -> OfficeField(ask, "Write it plainly. Nobody sees this but you.", palette) { ask = it }
         }
-
-        OfficeClose(
-            "Return tonight for Evening Prayer.\nReview, thanksgiving, confession, release, rest.",
-            palette,
-        )
-        androidx.compose.material3.TextButton(onClick = {
-            context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE).edit().putBoolean("${today}:morning", true).apply()
-            onClose()
-        }) { androidx.compose.material3.Text("Finish prayer") }
-        Spacer(Modifier.height(40.dp))
     }
 }
 

@@ -66,12 +66,27 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
     var release by remember { mutableStateOf(OfficeStore.eveningRelease(context, today)) }
     DisposableEffect(Unit) { onDispose { OfficeStore.setEveningRelease(context, release, today) } }
 
-    Column(
-        Modifier.fillMaxSize().background(palette.paper).verticalScroll(rememberScrollState())
-            .statusBarsPadding().padding(horizontal = 26.dp).navigationBarsPadding(),
-    ) {
-        Spacer(Modifier.height(10.dp))
-        RunningHead("Evening Prayer", today.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d MMMM", java.util.Locale.UK)), palette, onClose) {
+    OfficeFlip(
+        title = "Evening Prayer",
+        dateLine = today.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d MMMM", java.util.Locale.UK)),
+        movements = EVENING,
+        palette = palette,
+        voice = voice,
+        speaking = speaking.value,
+        colophon = "Morning Prayer opens at first light.\nTomorrow runs the other way — enter, praise,\nconfess, thank, and walk out into it.",
+        finishLabel = "Finish prayer",
+        onClose = onClose,
+        onFinish = {
+            context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)
+                .edit().putBoolean("${today}:evening", true).apply()
+            onClose()
+        },
+        scale = if (night) NightScale else DayScale,
+        after = buildMap {
+            if (morningAsk.isNotBlank()) put("Thank", "morning-ask")
+            put("Release", "release")
+        },
+        trailing = {
             Text(
                 if (night) "Day" else "Night",
                 Modifier.clickable { night = !night },
@@ -80,37 +95,17 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
                 fontSize = 13.5.sp,
                 color = palette.accent,
             )
+        },
+    ) { key ->
+        when (key) {
+            "morning-ask" -> LedgerNote(
+                label = "This morning you asked",
+                entry = morningAsk,
+                invitation = "Tell Him how it went.",
+                palette = palette,
+            )
+            "release" -> OfficeField(release, "What are you handing over tonight?", palette) { release = it }
         }
-        Spacer(Modifier.height(26.dp))
-        OfficeTitle("Evening Prayer", palette, speaking.value) { voice.toggle(EVENING) }
-        Spacer(Modifier.height(26.dp))
-
-        EVENING.forEachIndexed { index, movement ->
-            Movement(movement, palette, dropCap = index == 0)
-
-            if (movement.rubric == "Thank" && morningAsk.isNotBlank()) {
-                LedgerNote(
-                    label = "This morning you asked",
-                    entry = morningAsk,
-                    invitation = "Tell Him how it went.",
-                    palette = palette,
-                )
-            }
-            if (movement.rubric == "Release") {
-                OfficeField(release, "What are you handing over tonight?", palette) { release = it }
-            }
-            Spacer(Modifier.height(30.dp))
-        }
-
-        OfficeClose(
-            "Morning Prayer opens at first light.\nTomorrow runs the other way — enter, praise,\nconfess, thank, and walk out into it.",
-            palette,
-        )
-        androidx.compose.material3.TextButton(onClick = {
-            context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE).edit().putBoolean("${today}:evening", true).apply()
-            onClose()
-        }) { Text("Finish prayer") }
-        Spacer(Modifier.height(40.dp))
     }
 }
 

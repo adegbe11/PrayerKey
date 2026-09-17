@@ -56,33 +56,20 @@ fun NightPrayerScreen(onClose: () -> Unit) {
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
 
-    Column(
-        Modifier.fillMaxSize().background(palette.paper).verticalScroll(rememberScrollState())
-            .statusBarsPadding().padding(horizontal = 26.dp).navigationBarsPadding(),
-    ) {
-        Spacer(Modifier.height(10.dp))
-        RunningHead(
-            "Night Prayer",
-            today.format(DateTimeFormatter.ofPattern("EEEE", Locale.UK)),
-            palette, onClose,
-        ) { Lamp(day, palette) { day = !day } }
-        Spacer(Modifier.height(30.dp))
-        OfficeTitle(
-            "Night Prayer", palette, speaking.value,
-            length = "Two minutes. Short enough to learn by heart.",
-        ) { voice.toggle(NIGHT) }
-        Spacer(Modifier.height(30.dp))
-
-        NIGHT.forEachIndexed { index, movement ->
-            Movement(movement, palette, dropCap = index == 0, scale = NightScale)
-            Spacer(Modifier.height(38.dp))
-        }
-
-        OfficeClose("Morning Prayer opens at first light.", palette)
-        Spacer(Modifier.height(38.dp))
-        WakePanel(palette)
-        Spacer(Modifier.height(40.dp))
-    }
+    OfficeFlip(
+        title = "Night Prayer",
+        dateLine = today.format(DateTimeFormatter.ofPattern("EEEE", Locale.UK)),
+        movements = NIGHT,
+        palette = palette,
+        voice = voice,
+        speaking = speaking.value,
+        colophon = "Morning Prayer opens at first light.",
+        onClose = onClose,
+        length = "Two minutes. Short enough to learn by heart.",
+        scale = NightScale,
+        trailing = { Lamp(day, palette) { day = !day } },
+        closeExtra = { WakePanel(palette) },
+    )
 }
 
 /**
@@ -115,29 +102,18 @@ fun MidnightPrayerScreen(onClose: () -> Unit) {
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
 
-    Column(
-        Modifier.fillMaxSize().background(palette.paper).verticalScroll(rememberScrollState())
-            .statusBarsPadding().padding(horizontal = 26.dp).navigationBarsPadding(),
-    ) {
-        Spacer(Modifier.height(10.dp))
-        RunningHead("Midnight Prayer", "The first watch", palette, onClose) {
-            Lamp(day, palette) { day = !day }
-        }
-        Spacer(Modifier.height(28.dp))
-        OfficeTitle(
-            "Midnight Prayer", palette, speaking.value,
-            length = "Twelve to three. Pray it standing, and pray it out loud.",
-        ) { voice.toggle(MIDNIGHT) }
-        Spacer(Modifier.height(28.dp))
-
-        MIDNIGHT.forEachIndexed { index, movement ->
-            Movement(movement, palette, dropCap = index == 0)
-            Spacer(Modifier.height(34.dp))
-        }
-
-        OfficeClose("Morning Prayer opens at first light.\nSleep now. The watch is His.", palette)
-        Spacer(Modifier.height(40.dp))
-    }
+    OfficeFlip(
+        title = "Midnight Prayer",
+        dateLine = "The first watch",
+        movements = MIDNIGHT,
+        palette = palette,
+        voice = voice,
+        speaking = speaking.value,
+        colophon = "Morning Prayer opens at first light.\nSleep now. The watch is His.",
+        onClose = onClose,
+        length = "Twelve to three. Pray it standing, and pray it out loud.",
+        trailing = { Lamp(day, palette) { day = !day } },
+    )
 }
 
 @Composable
