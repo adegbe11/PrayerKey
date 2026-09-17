@@ -240,6 +240,8 @@ fun PrayerKeyOperatingHome(
             when (requestedOffice?.let { com.prayerkey.manna.data.OfficeStore.Office.valueOf(it) } ?: com.prayerkey.manna.data.OfficeStore.officeFor(now.hour, now.minute)) {
                 com.prayerkey.manna.data.OfficeStore.Office.MORNING ->
                     com.prayerkey.manna.ui.morning.MorningPrayerScreen(onClose = close)
+                com.prayerkey.manna.data.OfficeStore.Office.AFTERNOON ->
+                    com.prayerkey.manna.ui.morning.AfternoonPrayerScreen(onClose = close)
                 com.prayerkey.manna.data.OfficeStore.Office.EVENING ->
                     com.prayerkey.manna.ui.morning.EveningPrayerScreen(onClose = close)
                 com.prayerkey.manna.data.OfficeStore.Office.NIGHT ->
@@ -439,6 +441,7 @@ fun PrayerKeyOperatingHome(
                 devotionalMinutes = written?.minutes ?: 0,
                 readingLabel = plan?.readingLabel.orEmpty(),
                 morningPrayer = { requestedOffice = "MORNING"; morningPrayerOpen = true },
+                afternoonPrayer = { requestedOffice = "AFTERNOON"; morningPrayerOpen = true },
                 devotional = { devotionalOpen = true },
                 bible = { biblePullsOpen = true },
                 eveningPrayer = { requestedOffice = "EVENING"; morningPrayerOpen = true },
@@ -990,16 +993,9 @@ private fun ContinueRow(icon: ImageVector, title: String, detail: String, open: 
 
 @Composable private fun ClosingVerseCard(date: LocalDate, onPray: (String, String) -> Unit) {
     val context = LocalContext.current
-    val words = listOf(
-        "Psalm 121:8" to "The LORD shall preserve thy going out and thy coming in from this time forth, and even for evermore.",
-        "Psalm 23:1" to "The LORD is my shepherd; I shall not want.",
-        "Psalm 46:1" to "God is our refuge and strength, a very present help in trouble.",
-        "Proverbs 3:5" to "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
-        "1 Peter 5:7" to "Casting all your care upon him; for he careth for you.",
-        "Psalm 119:105" to "Thy word is a lamp unto my feet, and a light unto my path.",
-        "Psalm 56:3" to "What time I am afraid, I will trust in thee.",
-    )
-    val (reference, verse) = words[Math.floorMod(date.toEpochDay(), words.size.toLong()).toInt()]
+    /* The same list the Today card reads, so the head of the page and the foot
+       of it can never name different verses for one day. */
+    val (reference, verse) = verseOfDay(date)
     Surface(shape = RoundedCornerShape(26.dp), color = Pk.DeepDark, shadowElevation = 3.dp) {
         Box(Modifier.fillMaxWidth().heightIn(min = 330.dp)) {
             Image(painterResource(R.drawable.closing_verse_violet), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
@@ -1597,6 +1593,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     devotionalMinutes: Int,
     readingLabel: String,
     morningPrayer: () -> Unit,
+    afternoonPrayer: () -> Unit,
     devotional: () -> Unit,
     bible: () -> Unit,
     eveningPrayer: () -> Unit,
@@ -1614,7 +1611,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
             clockNow = java.time.LocalDateTime.now()
             val date = clockNow.toLocalDate()
             completed = buildSet {
-                listOf("morning", "evening", "devotional").forEach { if (prefs.getBoolean("${date}:$it", false)) add(it) }
+                listOf("morning", "afternoon", "evening", "devotional").forEach { if (prefs.getBoolean("${date}:$it", false)) add(it) }
                 if (com.prayerkey.manna.data.PullsProgress.Bible.isComplete(context, date)) add("bible")
             }
             kotlinx.coroutines.delay(1_000)
@@ -1622,9 +1619,10 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     }
 
     val rows = listOf(
-        RhythmRow("morning", "Morning Prayer", "Start your day with God.", Icons.Outlined.WbSunny, 4..16, minutes = 3, open = morningPrayer),
-        RhythmRow("devotional", "Daily Devotional", devotionalTitle, Icons.Outlined.AutoStories, 0..23, minutes = devotionalMinutes, reservesDetail = true, open = devotional),
-        RhythmRow("bible", "Bible Reading", readingLabel, Icons.Outlined.MenuBook, 0..23, minutes = 4, reservesDetail = true, open = bible),
+        RhythmRow("devotional", "Daily Devotional", devotionalTitle, Icons.Outlined.AutoStories, 0..23, minutes = devotionalMinutes, reservesDetail = true, note = "Read · Reflect · Pray", open = devotional),
+        RhythmRow("bible", "Bible Reading", readingLabel, Icons.Outlined.MenuBook, 0..23, minutes = 4, reservesDetail = true, note = "Know God deeper through His Word.", open = bible),
+        RhythmRow("morning", "Morning Prayer", "Start your day with God.", Icons.Outlined.WbSunny, 4..11, minutes = 3, open = morningPrayer),
+        RhythmRow("afternoon", "Afternoon Prayer", "Pause. Reset. Pray.", Icons.Outlined.LightMode, 12..16, minutes = 2, open = afternoonPrayer),
         RhythmRow("evening", "Evening Prayer", "End your day in His presence.", Icons.Outlined.DarkMode, 17..23, minutes = 3, open = eveningPrayer),
     )
     val doneCount = rows.count { it.id in completed }
@@ -1679,6 +1677,13 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                         fontSize = 12.sp,
                         color = Pk.Muted,
                     )
+                    Text(
+                        "A closer you. A brighter tomorrow.",
+                        Modifier.padding(top = 4.dp),
+                        fontFamily = UtilitySans,
+                        fontSize = 11.5.sp,
+                        color = Pk.Muted.copy(alpha = .8f),
+                    )
                 }
                 Box(
                     Modifier.size(44.dp).clip(CircleShape)
@@ -1687,11 +1692,9 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                     contentAlignment = Alignment.Center,
                 ) { Icon(Icons.Outlined.CalendarToday, "Prayer calendar", tint = Pk.Oxblood, modifier = Modifier.size(19.dp)) }
             }
-            Box(
-                Modifier.padding(horizontal = 22.dp).padding(top = 16.dp, bottom = 4.dp)
-                    .fillMaxWidth().height(2.dp).clip(RoundedCornerShape(99.dp))
-                    .background(Pk.Charcoal.copy(alpha = .07f)),
-            )
+            Spacer(Modifier.height(16.dp))
+            VerseOfTheDayStrip(today)
+            Spacer(Modifier.height(6.dp))
             rows.forEach { row ->
                 RhythmEntry(
                     row = row,
@@ -1736,6 +1739,22 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                         )
                     }
                 }
+                Box(
+                    Modifier.padding(start = 14.dp).width(1.dp).height(30.dp)
+                        .background(Pk.Charcoal.copy(alpha = .09f)),
+                )
+                Column(Modifier.padding(start = 14.dp)) {
+                    Text(
+                        if (doneCount == rows.size) "All done" else "Keep going",
+                        fontFamily = UtilitySans, fontSize = 12.5.sp,
+                        fontWeight = FontWeight.SemiBold, color = Pk.Charcoal,
+                    )
+                    Text(
+                        if (doneCount == 0) "Start anywhere." else "You’re doing well.",
+                        Modifier.padding(top = 2.dp),
+                        fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted,
+                    )
+                }
             }
         }
     }
@@ -1750,6 +1769,8 @@ private data class RhythmRow(
     val hours: IntRange,
     /** How long it takes, so the card can be chosen between rather than read. */
     val minutes: Int = 0,
+    /** A third line, under the detail: what this row is for. */
+    val note: String = "",
     /**
      * Whether this row will have a detail once the day has loaded.
      *
@@ -1817,6 +1838,15 @@ private data class RhythmRow(
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                 )
             }
+            if (row.note.isNotBlank()) {
+                Text(
+                    row.note,
+                    Modifier.padding(top = 3.dp),
+                    fontFamily = UtilitySans,
+                    fontSize = 11.sp,
+                    color = Pk.Muted.copy(alpha = .75f * alpha),
+                )
+            }
         }
         /* How long it takes, then whether it is done.
            The empty circle read as a checkbox - something to tick - when every
@@ -1837,11 +1867,15 @@ private data class RhythmRow(
                         .background(Pk.Oxblood.copy(alpha = .10f))
                         .padding(horizontal = 9.dp, vertical = 4.dp),
                 ) {
-                    Text(
-                        "Now",
-                        fontFamily = UtilitySans, fontSize = 9.5.sp,
-                        fontWeight = FontWeight.Bold, color = Pk.Oxblood,
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(5.dp).clip(CircleShape).background(Pk.Oxblood))
+                        Text(
+                            "Recommended now",
+                            Modifier.padding(start = 5.dp),
+                            fontFamily = UtilitySans, fontSize = 9.5.sp,
+                            fontWeight = FontWeight.Bold, color = Pk.Oxblood,
+                        )
+                    }
                 }
             }
         }
@@ -2332,3 +2366,96 @@ private fun programmeCategories() = listOf(
  * harmless and the next conditional feature has somewhere to go.
  */
 private fun conditionalFeatures(today: LocalDate): List<Feature> = emptyList()
+
+/**
+ * The verse of the day, at the head of the card.
+ *
+ * The same rotation the closing verse uses, so the two cannot disagree about
+ * what today's verse is - one list, read by day, in both places.
+ */
+@Composable private fun VerseOfTheDayStrip(date: LocalDate) {
+    val context = LocalContext.current
+    val (reference, verse) = remember(date) { verseOfDay(date) }
+    var saved by remember(date) { mutableStateOf(false) }
+
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 14.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(Pk.Oxblood.copy(alpha = .045f))
+            .padding(horizontal = 16.dp, vertical = 15.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Outlined.MenuBook, null, tint = Pk.Oxblood, modifier = Modifier.size(16.dp))
+            Text(
+                "Verse of the Day",
+                Modifier.padding(start = 8.dp).weight(1f),
+                fontFamily = UtilitySans, fontSize = 12.sp,
+                fontWeight = FontWeight.Bold, color = Pk.Oxblood,
+            )
+            Text(
+                reference,
+                fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted,
+            )
+        }
+        Text(
+            "“" + verse + "”",
+            Modifier.padding(top = 11.dp),
+            fontFamily = BookSerif, fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Light, fontSize = 16.5.sp, lineHeight = 25.sp,
+            color = Pk.Charcoal,
+        )
+        Row(Modifier.padding(top = 13.dp)) {
+            VerseAction(if (saved) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "Saved" else "Save") {
+                if (!saved) {
+                    saved = true
+                    com.prayerkey.manna.data.MannaStore.of(context)
+                        .save(VerseCard(reference, "KJV", verse, ""))
+                }
+            }
+            Spacer(Modifier.width(10.dp))
+            VerseAction(Icons.Outlined.IosShare, "Share") {
+                context.startActivity(
+                    android.content.Intent.createChooser(
+                        android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(android.content.Intent.EXTRA_TEXT, "“" + verse + "”" + "\n" + reference + " (KJV)")
+                        },
+                        "Share this verse",
+                    ),
+                )
+            }
+        }
+    }
+}
+
+@Composable private fun VerseAction(icon: ImageVector, label: String, onClick: () -> Unit) {
+    Row(
+        Modifier.clip(RoundedCornerShape(99.dp))
+            .background(Color.White)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 13.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, null, tint = Pk.Oxblood, modifier = Modifier.size(14.dp))
+        Text(
+            label,
+            Modifier.padding(start = 7.dp),
+            fontFamily = UtilitySans, fontSize = 11.5.sp,
+            fontWeight = FontWeight.SemiBold, color = Pk.Charcoal,
+        )
+    }
+}
+
+/** One list, so the head of the Today card and the closing card agree. */
+internal fun verseOfDay(date: LocalDate): Pair<String, String> {
+    val words = listOf(
+        "Psalm 121:8" to "The LORD shall preserve thy going out and thy coming in from this time forth, and even for evermore.",
+        "Psalm 23:1" to "The LORD is my shepherd; I shall not want.",
+        "Psalm 46:1" to "God is our refuge and strength, a very present help in trouble.",
+        "Proverbs 3:5" to "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
+        "1 Peter 5:7" to "Casting all your care upon him; for he careth for you.",
+        "Psalm 119:105" to "Thy word is a lamp unto my feet, and a light unto my path.",
+        "Psalm 56:3" to "What time I am afraid, I will trust in thee.",
+    )
+    return words[Math.floorMod(date.toEpochDay(), words.size.toLong()).toInt()]
+}

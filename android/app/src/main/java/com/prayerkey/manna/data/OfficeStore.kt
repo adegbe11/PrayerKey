@@ -54,11 +54,15 @@ object OfficeStore {
      *   21:30  Night      two minutes, then sleep
      *   00:00  Midnight   the watch
      */
-    enum class Office { MORNING, EVENING, NIGHT, MIDNIGHT }
+    enum class Office { MORNING, AFTERNOON, EVENING, NIGHT, MIDNIGHT }
 
     fun officeFor(hour: Int, minute: Int = 0): Office = when {
         hour < 4 -> Office.MIDNIGHT
-        hour < 17 -> Office.MORNING
+        hour < 12 -> Office.MORNING
+        /* Noon to five belongs to the afternoon office. It used to be morning's,
+           which meant somebody opening this at three was handed a prayer that
+           begins "before this day takes me" - a day half over. */
+        hour < 17 -> Office.AFTERNOON
         hour < 21 || (hour == 21 && minute < 30) -> Office.EVENING
         else -> Office.NIGHT
     }
