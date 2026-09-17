@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,6 +25,7 @@ import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
+import com.prayerkey.manna.ui.theme.goldKey
 
 /**
  * The first screen, and now only a door.
@@ -54,7 +56,15 @@ fun WelcomeScreen(onContinue: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(20.dp))
-            Icon(painterResource(R.drawable.ic_notification), contentDescription = "PrayerKey", tint = Pk.GoldLight, modifier = Modifier.size(48.dp))
+            /* The mark, drawn the way the splash draws it.
+               This was ic_notification - the status-bar icon, which Android
+               reduces to a flat alpha silhouette because that is all it will
+               render at 18 px. Blown up to 48dp and tinted gold it was a
+               different symbol entirely, a praying figure rather than the
+               cross-topped key, and a crude one. goldKey is the brand mark and
+               the same call the launch screen makes, so the icon a person sees
+               opening the app is now the icon they saw a second earlier. */
+            Canvas(Modifier.size(66.dp)) { goldKey(center, size.height) }
             Text("PrayerKey", fontFamily = DisplaySerif, fontSize = 28.sp, color = Color.White)
             Spacer(Modifier.height(28.dp))
             Text("A closer walk\nwith God.", color = Color.White, fontFamily = DisplaySerif,

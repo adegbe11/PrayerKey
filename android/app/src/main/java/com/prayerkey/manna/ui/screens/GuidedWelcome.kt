@@ -3,6 +3,7 @@ package com.prayerkey.manna.ui.screens
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -30,6 +31,7 @@ import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
+import com.prayerkey.manna.ui.theme.goldKey
 
 private data class WelcomeChoice(val id: String, val title: String, val icon: ImageVector)
 private val goals = listOf(
@@ -144,7 +146,12 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
                             }
                         }
                         3 -> {
-                            Icon(painterResource(R.drawable.ic_notification), null, Modifier.padding(top = 6.dp).size(42.dp), tint = Pk.GoldLight)
+                            /* The brand mark, not the notification glyph.
+                               The card in step 2 above is a mock notification
+                               and keeps ic_notification, because there it is
+                               showing you what will actually appear in the
+                               shade. This is a logo, and gets the logo. */
+                            Canvas(Modifier.padding(top = 6.dp).size(58.dp)) { goldKey(center, size.height) }
                             if (selectedGoals.isNotEmpty() || selectedTopics.isNotEmpty()) {
                                 Text((goals.filter { it.id in selectedGoals }.map { it.title } + topics.filter { it.id in selectedTopics }.map { it.title }).joinToString(" · "), Modifier.padding(top = 20.dp), color = Pk.Crisp, fontFamily = UtilitySans, lineHeight = 23.sp)
                             }
