@@ -2351,23 +2351,39 @@ private fun conditionalFeatures(today: LocalDate): List<Feature> = emptyList()
     val (reference, verse) = remember(date) { verseOfDay(date) }
     var saved by remember(date) { mutableStateOf(false) }
 
-    Column(
+    /*
+     * The same ground as the closing verse card at the foot of Home.
+     *
+     * It was a pale lavender wash, which is the one place on this page the
+     * brand appears as a tint rather than as itself - and the app already owns
+     * a treatment for exactly this content twelve hundred points below: the
+     * violet artwork under a deep scrim, gold reference, white serif. Two
+     * cards showing the same verse on one screen should not be two designs.
+     */
+    Box(
         Modifier.fillMaxWidth().padding(horizontal = 14.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(Pk.Oxblood.copy(alpha = .045f))
-            .padding(horizontal = 16.dp, vertical = 15.dp),
+            .background(Pk.DeepDark),
     ) {
+        Image(
+            painterResource(R.drawable.closing_verse_violet),
+            contentDescription = null,
+            modifier = Modifier.matchParentSize(),
+            contentScale = ContentScale.Crop,
+        )
+        Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = .68f)))
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 15.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.MenuBook, null, tint = Pk.Oxblood, modifier = Modifier.size(16.dp))
+            Icon(Icons.Outlined.MenuBook, null, tint = Pk.GoldLight, modifier = Modifier.size(16.dp))
             Text(
                 "Verse of the Day",
                 Modifier.padding(start = 8.dp).weight(1f),
                 fontFamily = UtilitySans, fontSize = 12.sp,
-                fontWeight = FontWeight.Bold, color = Pk.Oxblood,
+                fontWeight = FontWeight.Bold, color = Pk.GoldLight,
             )
             Text(
                 reference,
-                fontFamily = UtilitySans, fontSize = 11.sp, color = Pk.Muted,
+                fontFamily = UtilitySans, fontSize = 11.sp, color = Color.White.copy(alpha = .70f),
             )
         }
         Text(
@@ -2375,7 +2391,7 @@ private fun conditionalFeatures(today: LocalDate): List<Feature> = emptyList()
             Modifier.padding(top = 11.dp),
             fontFamily = BookSerif, fontStyle = FontStyle.Italic,
             fontWeight = FontWeight.Light, fontSize = 16.5.sp, lineHeight = 25.sp,
-            color = Pk.Charcoal,
+            color = Color.White,
         )
         Row(Modifier.padding(top = 13.dp)) {
             VerseAction(if (saved) Icons.Outlined.Favorite else Icons.Outlined.FavoriteBorder, if (saved) "Saved" else "Save") {
@@ -2398,23 +2414,26 @@ private fun conditionalFeatures(today: LocalDate): List<Feature> = emptyList()
                 )
             }
         }
+        }
     }
 }
 
 @Composable private fun VerseAction(icon: ImageVector, label: String, onClick: () -> Unit) {
     Row(
         Modifier.clip(RoundedCornerShape(99.dp))
-            .background(Color.White)
+            /* Glass on the photograph. A solid white pill was the brightest
+               thing in the card and outranked the verse. */
+            .background(Color.White.copy(alpha = .15f))
             .clickable(onClick = onClick)
             .padding(horizontal = 13.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(icon, null, tint = Pk.Oxblood, modifier = Modifier.size(14.dp))
+        Icon(icon, null, tint = Pk.GoldLight, modifier = Modifier.size(14.dp))
         Text(
             label,
             Modifier.padding(start = 7.dp),
             fontFamily = UtilitySans, fontSize = 11.5.sp,
-            fontWeight = FontWeight.SemiBold, color = Pk.Charcoal,
+            fontWeight = FontWeight.SemiBold, color = Color.White,
         )
     }
 }
