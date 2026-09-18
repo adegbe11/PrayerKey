@@ -176,8 +176,20 @@ fun OfficeFlip(
     val crease = remember { Animatable(0f) }
     var direction by remember { mutableIntStateOf(0) }
 
+    /*
+     * A turn in flight owns the crease.
+     *
+     * settle() animates for 330ms and only then clears direction, so a second
+     * swipe starting inside that window found direction still set and began
+     * snapTo-ing the crease while animateTo was driving it. The two fought and
+     * the turn was dropped - about one swipe in seven when reading quickly,
+     * which reads as the page sticking rather than as a gesture being ignored.
+     */
+    var turning by remember { androidx.compose.runtime.mutableStateOf(false) }
+
     fun settle(commit: Boolean, forward: Boolean) {
         scope.launch {
+            turning = true
             crease.animateTo(if (commit) 1f else 0f, tween(330))
             if (commit) {
                 index = (index + if (forward) 1 else -1).coerceIn(0, pages.lastIndex)
@@ -185,6 +197,7 @@ fun OfficeFlip(
             }
             direction = 0
             crease.snapTo(0f)
+            turning = false
         }
     }
 
@@ -238,13 +251,14 @@ fun OfficeFlip(
                 detectHorizontalDragGestures(
                     onDragStart = { travelled = 0f },
                     onDragEnd = {
-                        if (direction != 0) {
+                        if (direction != 0 && !turning) {
                             settle(commit = crease.value > .3f, forward = direction > 0)
                         }
                     },
                     onDragCancel = { if (direction != 0) settle(false, direction > 0) },
                 ) { change, dragAmount ->
                     change.consume()
+                    if (turning) return@detectHorizontalDragGestures
                     travelled -= dragAmount
                     if (direction == 0 && kotlin.math.abs(travelled) > 6f) {
                         val forward = travelled > 0
