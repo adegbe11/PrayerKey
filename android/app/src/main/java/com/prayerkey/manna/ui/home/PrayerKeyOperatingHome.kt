@@ -442,6 +442,8 @@ fun PrayerKeyOperatingHome(
                 readingLabel = plan?.readingLabel.orEmpty(),
                 morningPrayer = { requestedOffice = "MORNING"; morningPrayerOpen = true },
                 afternoonPrayer = { requestedOffice = "AFTERNOON"; morningPrayerOpen = true },
+                nightPrayer = { requestedOffice = "NIGHT"; morningPrayerOpen = true },
+                midnightPrayer = { requestedOffice = "MIDNIGHT"; morningPrayerOpen = true },
                 devotional = { devotionalOpen = true },
                 bible = { biblePullsOpen = true },
                 eveningPrayer = { requestedOffice = "EVENING"; morningPrayerOpen = true },
@@ -1594,6 +1596,8 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     readingLabel: String,
     morningPrayer: () -> Unit,
     afternoonPrayer: () -> Unit,
+    nightPrayer: () -> Unit,
+    midnightPrayer: () -> Unit,
     devotional: () -> Unit,
     bible: () -> Unit,
     eveningPrayer: () -> Unit,
@@ -1611,11 +1615,37 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
             clockNow = java.time.LocalDateTime.now()
             val date = clockNow.toLocalDate()
             completed = buildSet {
-                listOf("morning", "afternoon", "evening", "devotional").forEach { if (prefs.getBoolean("${date}:$it", false)) add(it) }
+                listOf("morning", "afternoon", "evening", "night", "midnight", "devotional").forEach { if (prefs.getBoolean("${date}:$it", false)) add(it) }
                 if (com.prayerkey.manna.data.PullsProgress.Bible.isComplete(context, date)) add("bible")
             }
             kotlinx.coroutines.delay(1_000)
         }
+    }
+
+    /*
+     * The last slot follows the clock, which is how Night and Midnight became
+     * reachable at all.
+     *
+     * NightPrayerScreen had no entry point anywhere in the app. The office
+     * exists, it is written, it now turns pages - and nothing opened it. Its
+     * only route was a Discovery title "Night prayer" that no shelf item
+     * carries, inside HomeContentLibrary, which is itself never called.
+     * Midnight was barely better: reachable only by tapping the 23:55
+     * notification, so if you dismissed that, the watch was gone for the night.
+     *
+     * OfficeStore.officeFor already knows which office an hour belongs to -
+     * that is its whole job, and the office screens have always trusted it. The
+     * row now asks it the same question, so one slot is Evening Prayer at six,
+     * Night Prayer at ten, and the Midnight watch at one in the morning, and
+     * each opens the office whose name it is showing.
+     */
+    val lateRow = when (com.prayerkey.manna.data.OfficeStore.officeFor(hour, clockNow.minute)) {
+        com.prayerkey.manna.data.OfficeStore.Office.NIGHT ->
+            RhythmRow("night", "Night Prayer", "", Icons.Outlined.Bedtime, 0..23, minutes = 2, open = nightPrayer)
+        com.prayerkey.manna.data.OfficeStore.Office.MIDNIGHT ->
+            RhythmRow("midnight", "Midnight Prayer", "", Icons.Outlined.DarkMode, 0..23, minutes = 5, open = midnightPrayer)
+        else ->
+            RhythmRow("evening", "Evening Prayer", "", Icons.Outlined.DarkMode, 17..23, minutes = 3, open = eveningPrayer)
     }
 
     val rows = listOf(
@@ -1629,7 +1659,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
         RhythmRow("bible", "Bible Reading", readingLabel, Icons.Outlined.MenuBook, 0..23, minutes = 4, reservesDetail = true, open = bible),
         RhythmRow("morning", "Morning Prayer", "", Icons.Outlined.WbSunny, 4..11, minutes = 3, open = morningPrayer),
         RhythmRow("afternoon", "Afternoon Prayer", "", Icons.Outlined.WbTwilight, 12..16, minutes = 2, open = afternoonPrayer),
-        RhythmRow("evening", "Evening Prayer", "", Icons.Outlined.DarkMode, 17..23, minutes = 3, open = eveningPrayer),
+        lateRow,
     )
     val doneCount = rows.count { it.id in completed }
 
