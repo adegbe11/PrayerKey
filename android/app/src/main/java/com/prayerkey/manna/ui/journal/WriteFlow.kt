@@ -235,6 +235,15 @@ fun WriteSheet(
     initialMedia: List<String> = emptyList(),
     initialEntryAt: Long = System.currentTimeMillis(),
     editing: Boolean = false,
+    /**
+     * What the sheet was opened to do: "media", "voice" or "verse".
+     *
+     * The journal home offers Photo, Voice and Bible as ways in. Without this
+     * they would all land on the same blank page with the tools sitting in a
+     * bar at the bottom, and three buttons that do one thing are three lies.
+     * The sheet performs the action it was asked for, once, as it opens.
+     */
+    openWith: String? = null,
     onDismiss: () -> Unit,
     onSubmit: (WriteResult) -> Unit,
     onDelete: (() -> Unit)? = null,
@@ -283,6 +292,18 @@ fun WriteSheet(
         uris.forEach { uri -> runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) } }
         media = (media + uris.map { it.toString() }).distinct().take(30)
     }
+    androidx.compose.runtime.LaunchedEffect(openWith) {
+        when (openWith) {
+            "media" -> mediaPicker.launch(arrayOf("image/*", "video/*", "audio/*", "application/pdf"))
+            "voice" -> voiceDisclosure = true
+            /* Details too, or the tick lands inside a panel that is closed by
+               default on a new entry - so Bible would set something true and
+               show the user a blank page, which is indistinguishable from a
+               button that does nothing. */
+            "verse" -> { attachToday = true; showDetails = true }
+        }
+    }
+
     val voiceInput = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()?.let { spoken ->
             body = if (body.isBlank()) spoken else "$body\n$spoken"

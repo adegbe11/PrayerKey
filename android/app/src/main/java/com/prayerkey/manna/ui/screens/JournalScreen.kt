@@ -6,6 +6,13 @@ import android.content.Intent
 import android.net.Uri
 import android.view.WindowManager
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.MenuBook
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -158,6 +165,10 @@ fun JournalScreen(
     // suggestion sheet; `writing` holds the chosen prompt (null = blank page).
     var picking by remember { mutableStateOf(false) }
     var writing by remember { mutableStateOf(false) }
+    /* Which of Voice, Photo or Bible opened the page, so the sheet can do that
+       thing as it appears rather than showing a blank page with the tool
+       hidden in a bar at the bottom. */
+    var quickStart by remember { mutableStateOf<String?>(null) }
     var chosen by remember { mutableStateOf<com.prayerkey.manna.ui.journal.JournalSuggestions.Prompt?>(null) }
     var answeringEntry by remember { mutableStateOf<JournalEntry?>(null) }
     var reviewingPrayer by remember { mutableStateOf<JournalEntry?>(null) }
@@ -212,6 +223,10 @@ fun JournalScreen(
                     onQuery = { query = it }, onEdit = { viewing = it },
                     onAnswer = { reviewingPrayer = it },
                     onWelcomeTap = { chosen = null; picking = true },
+                    onQuickStart = { key ->
+                        chosen = null
+                        if (key == "prompt") picking = true else { quickStart = key; writing = true }
+                    },
                     insight = journeyInsight,
                     concealPreviews = concealPreviews,
                 )
@@ -268,8 +283,9 @@ fun JournalScreen(
     if (writing) com.prayerkey.manna.ui.journal.WriteSheet(
         prompt = chosen,
         todayCard = todayCard,
-        onDismiss = { writing = false; chosen = null },
-        onSubmit = { result -> onAdd2(result); writing = false; chosen = null },
+        openWith = quickStart,
+        onDismiss = { writing = false; chosen = null; quickStart = null },
+        onSubmit = { result -> onAdd2(result); writing = false; chosen = null; quickStart = null },
     )
 
     viewing?.let { entry ->
@@ -354,6 +370,7 @@ private fun JournalTimeline(
     onQuery: (String) -> Unit,
     onEdit: (JournalEntry) -> Unit,
     onWelcomeTap: () -> Unit,
+    onQuickStart: (String) -> Unit,
     onAnswer: (JournalEntry) -> Unit,
     insight: JourneyInsight?,
     concealPreviews: Boolean,
@@ -397,6 +414,7 @@ private fun JournalTimeline(
             onWrite = onWelcomeTap,
             onOpen = onEdit,
             onCollection = { collection -> selectedCollection = collection },
+            onQuickStart = onQuickStart,
         )
 
         if (entries.isEmpty()) return
@@ -476,6 +494,7 @@ private data class JournalCollection(val title: String, val count: Int, val icon
 private fun JournalOverview(
     entries: List<JournalEntry>, streak: Int, memory: JournalEntry?,
     onWrite: () -> Unit, onOpen: (JournalEntry) -> Unit, onCollection: (String?) -> Unit,
+    onQuickStart: (String) -> Unit,
 ) {
     val violet = Pk.Oxblood
     val ink = Pk.Charcoal
@@ -489,26 +508,85 @@ private fun JournalOverview(
         JournalCollection("Sermon notes", entries.count { it.source == "sermon" }, Icons.Outlined.GraphicEq, Color(0xFF8A3D72)),
         JournalCollection("All pages", entries.size, Icons.Outlined.AutoStories, ink),
     )
+    val today = remember { java.time.LocalDate.now() }
     Column(Modifier.padding(top = 18.dp)) {
-        Surface(
-            Modifier.fillMaxWidth().clickable(onClick = onWrite),
-            shape = RoundedCornerShape(28.dp), color = violet, shadowElevation = 5.dp,
+        /*
+         * The hero carries the artwork and the day, not a flat violet block.
+         *
+         * It also asks a different question each day rather than the same one
+         * forever - a journal that greets you identically on day one and day
+         * two hundred is a form, and the point of the question is that it is
+         * worth answering today.
+         */
+        Box(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp))
+                .background(Pk.DeepDark).clickable(onClick = onWrite),
         ) {
+            Image(
+                painterResource(com.prayerkey.manna.R.drawable.today_manuscript_hero),
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop,
+            )
+            Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = .62f)))
             Column(Modifier.padding(24.dp)) {
-                Text("TODAY'S PAGE", color = Color.White.copy(alpha = .70f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.5.sp)
-                Text("What do you want to remember?", color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 27.sp, lineHeight = 32.sp, modifier = Modifier.padding(top = 10.dp))
+                Text(
+                    "TODAY" + "’" + "S JOURNAL",
+                    color = Color.White.copy(alpha = .72f), fontFamily = UtilitySans,
+                    fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.5.sp,
+                )
+                Text(
+                    today.format(java.time.format.DateTimeFormatter.ofPattern("EEE, MMM d", java.util.Locale.UK)),
+                    Modifier.padding(top = 4.dp),
+                    color = Color.White.copy(alpha = .60f), fontFamily = UtilitySans, fontSize = 11.5.sp,
+                )
+                Text(
+                    "“" + HOME_QUESTIONS[Math.floorMod(today.toEpochDay(), HOME_QUESTIONS.size.toLong()).toInt()] + "”",
+                    color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold,
+                    fontSize = 28.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 14.dp),
+                )
                 Surface(shape = RoundedCornerShape(99.dp), color = Color.White, modifier = Modifier.padding(top = 20.dp)) {
                     Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.Create, null, tint = violet, modifier = Modifier.size(17.dp))
-                        Text("WRITE TODAY", color = violet, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = .9.sp, modifier = Modifier.padding(start = 8.dp))
+                        Text("Write today", color = violet, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp))
                     }
                 }
             }
         }
 
-        if (entries.isEmpty()) {
+        /* Four ways in. Each opens the page already doing the thing it names -
+           the picker open, the dictation notice up, today's verse attached -
+           because three buttons that all land on the same blank page are three
+           of the same button. */
+        Row(
+            Modifier.fillMaxWidth().padding(top = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            listOf(
+                Triple("Voice", Icons.Outlined.Mic, "voice"),
+                Triple("Photo", Icons.Outlined.Image, "media"),
+                Triple("Bible", Icons.Outlined.MenuBook, "verse"),
+                Triple("Prompt", Icons.Outlined.Lightbulb, "prompt"),
+            ).forEach { (label, icon, key) ->
+                Column(
+                    Modifier.weight(1f).clip(RoundedCornerShape(18.dp))
+                        .background(violet.copy(alpha = .07f))
+                        .clickable { onQuickStart(key) }
+                        .padding(vertical = 14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Icon(icon, null, tint = violet, modifier = Modifier.size(21.dp))
+                    Text(
+                        label, Modifier.padding(top = 7.dp), color = ink,
+                        fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Medium,
+                    )
+                }
+            }
+        }
+
+        run {
             Text(
-                "A SMALL BEGINNING",
+                if (entries.isEmpty()) "A SMALL BEGINNING" else "QUICK PROMPTS",
                 color = muted, fontFamily = UtilitySans, fontWeight = FontWeight.Bold,
                 fontSize = 10.sp, letterSpacing = 1.4.sp,
                 modifier = Modifier.padding(top = 24.dp, bottom = 10.dp),
@@ -1039,3 +1117,20 @@ private fun WordList(words: List<SavedWord>, canAnswer: Boolean, onAnswer: (Save
         }
     }
 }
+
+/**
+ * The question the journal opens with, one per day.
+ *
+ * Written rather than generated, and about a life with God rather than about
+ * feelings in general - which is the difference between this and every other
+ * journal that asks how your day was.
+ */
+private val HOME_QUESTIONS = listOf(
+    "What is on your heart today?",
+    "Where did you see God this week?",
+    "What are you asking Him for?",
+    "What has He already done that you have not thanked Him for?",
+    "What do you want to remember about today?",
+    "What are you carrying that you could put down?",
+    "What is one way you have seen His faithfulness?",
+)
