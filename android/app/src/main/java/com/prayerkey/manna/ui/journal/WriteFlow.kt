@@ -43,6 +43,13 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material.icons.outlined.StopCircle
+import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Videocam
+import androidx.compose.material.icons.outlined.MenuBook
+import androidx.compose.material.icons.outlined.Mood
+import androidx.compose.material.icons.outlined.Sell
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -109,6 +116,7 @@ import com.prayerkey.manna.ui.theme.BookSerif
 private val MARKS = listOf(
     "H" to "\n## ",
     "B" to "**bold**",
+    "I" to "*italic*",
     "•" to "\n- ",
     "☐" to "\n- [ ] ",
     "❝" to "\n> ",
@@ -401,7 +409,11 @@ fun WriteSheet(
                 IconButton(onClick = onDismiss) {
                     Icon(Icons.Outlined.ArrowBack, "Close editor", tint = ink)
                 }
-                Spacer(Modifier.weight(1f))
+                Text(
+                    if (editing) "Edit entry" else "New journal entry",
+                    Modifier.weight(1f),
+                    color = ink, fontWeight = FontWeight.SemiBold, fontSize = 16.sp,
+                )
                 onDelete?.let {
                     IconButton(onClick = { confirmDelete = true }) {
                         Icon(Icons.Outlined.Delete, "Delete entry", tint = muted)
@@ -575,13 +587,6 @@ fun WriteSheet(
                             OutlinedTextField(weather, { weather = it }, label = { Text("Weather") }, leadingIcon = { Icon(Icons.Outlined.WbSunny, null) }, singleLine = true, modifier = Modifier.weight(1f), shape = R.control)
                         }
 
-                        Row(Modifier.fillMaxWidth().padding(top = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Column(Modifier.weight(1f)) {
-                                Text("This is a prayer request", color = ink, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-                                Text("So you can mark it answered later", color = muted, fontSize = 11.sp)
-                            }
-                            Switch(isPrayer, { isPrayer = it })
-                        }
                         Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text("Favourite", color = ink, fontSize = 14.sp, modifier = Modifier.weight(1f))
                             IconButton(onClick = { favorite = !favorite }) {
@@ -600,12 +605,97 @@ fun WriteSheet(
                     }
                 }
 
+                /*
+                 * Eight ways to put something in an entry, as a grid rather
+                 * than a row of small glyphs on a bar.
+                 *
+                 * The four on the top row each take a different kind of thing
+                 * and open the right picker for it. The four below open the
+                 * details panel, where place, mood and tags actually live -
+                 * they are signposts to one panel rather than four separate
+                 * screens, which the panel makes obvious by showing all of them
+                 * together the moment it opens.
+                 */
+                Spacer(Modifier.height(22.dp))
+                val tiles = listOf(
+                    Triple("Photo", Icons.Outlined.Image) { mediaPicker.launch(arrayOf("image/*")) },
+                    Triple("Video", Icons.Outlined.Videocam) { mediaPicker.launch(arrayOf("video/*")) },
+                    Triple("Audio", Icons.Outlined.Mic) { voiceDisclosure = true },
+                    Triple("Verse", Icons.Outlined.MenuBook) { attachToday = true; showDetails = true },
+                    Triple("Attach", Icons.Outlined.AttachFile) { mediaPicker.launch(arrayOf("*/*")) },
+                    Triple("Place", Icons.Outlined.Place) { showDetails = true },
+                    Triple("Mood", Icons.Outlined.Mood) { showDetails = true },
+                    Triple("Tag", Icons.Outlined.Sell) { showDetails = true },
+                )
+                tiles.chunked(4).forEach { row ->
+                    Row(
+                        Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        row.forEach { (label, icon, act) ->
+                            Column(
+                                Modifier.weight(1f).clip(RoundedCornerShape(14.dp))
+                                    .background(accent.copy(alpha = .07f))
+                                    .clickable { act() }
+                                    .padding(vertical = 12.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Icon(icon, null, tint = accent, modifier = Modifier.size(19.dp))
+                                Text(
+                                    label, Modifier.padding(top = 6.dp), color = ink,
+                                    fontSize = 10.5.sp, fontWeight = FontWeight.Medium,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                /* The prayer switch was buried in the details panel, which is
+                   the wrong place for the one flag that decides whether this
+                   entry can ever be marked answered. */
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 6.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(if (isPrayer) accent.copy(alpha = .10f) else ink.copy(alpha = .04f))
+                        .clickable { isPrayer = !isPrayer }
+                        .padding(horizontal = 14.dp, vertical = 13.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        if (isPrayer) Icons.Outlined.CheckCircle else Icons.Outlined.RadioButtonUnchecked,
+                        null, tint = if (isPrayer) accent else muted, modifier = Modifier.size(19.dp),
+                    )
+                    Text(
+                        "Add to prayer list",
+                        Modifier.weight(1f).padding(start = 11.dp),
+                        color = ink, fontSize = 14.sp,
+                        fontWeight = if (isPrayer) FontWeight.SemiBold else FontWeight.Normal,
+                    )
+                    Icon(Icons.Outlined.KeyboardArrowRight, null, tint = muted, modifier = Modifier.size(18.dp))
+                }
+
+                val ready2 = body.isNotBlank()
+                Box(
+                    Modifier.fillMaxWidth().padding(top = 14.dp)
+                        .clip(RoundedCornerShape(99.dp))
+                        .background(if (ready2) accent else muted.copy(alpha = .18f))
+                        .clickable(enabled = ready2) { submit() }
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        "Save entry",
+                        color = if (ready2) cs.onPrimary else muted,
+                        fontWeight = FontWeight.SemiBold, fontSize = 15.sp,
+                    )
+                }
+
                 Spacer(Modifier.height(28.dp))
             }
 
-            /* The tools live on a bar at the bottom, within thumb reach of
-               where you are typing, instead of floating in the middle of the
-               page between the title and the body. */
+            /* The marks stay on a bar at the bottom, within thumb reach of
+               where you are typing. Only the marks - the pickers moved up into
+               the grid, where they are labelled. */
             // the bar needs an edge; on themes where surface and background
             // are near-identical it otherwise floats with no boundary
             HorizontalDivider(color = line)
@@ -623,37 +713,6 @@ fun WriteSheet(
                             .clickable { body += token },
                         contentAlignment = Alignment.Center,
                     ) { Text(label, color = ink, fontWeight = FontWeight.Bold, fontSize = 13.sp) }
-                }
-                Box(
-                    Modifier.size(40.dp).clip(RoundedCornerShape(11.dp))
-                        .background(ink.copy(alpha = .06f))
-                        .clickable { mediaPicker.launch(arrayOf("image/*", "video/*", "audio/*", "application/pdf")) },
-                    contentAlignment = Alignment.Center,
-                ) { Icon(Icons.Outlined.AttachFile, "Attach media", tint = ink, modifier = Modifier.size(18.dp)) }
-                Box(
-                    Modifier.size(40.dp).clip(RoundedCornerShape(11.dp))
-                        .background(ink.copy(alpha = .06f))
-                        .clickable { voiceDisclosure = true },
-                    contentAlignment = Alignment.Center,
-                ) { Icon(Icons.Outlined.Mic, "Dictate", tint = ink, modifier = Modifier.size(18.dp)) }
-                Box(
-                    Modifier.size(40.dp).clip(RoundedCornerShape(11.dp))
-                        .background(if (recorder != null) Color(0xFFC94B36).copy(alpha = .20f) else ink.copy(alpha = .06f))
-                        .clickable {
-                            if (recorder != null) {
-                                runCatching { recorder?.stop() }; recorder?.release(); recorder = null
-                                recordingUri?.let { media = (media + it).distinct() }; recordingUri = null
-                            } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startAudioRecording()
-                            else audioPermission.launch(Manifest.permission.RECORD_AUDIO)
-                        },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        if (recorder != null) Icons.Outlined.StopCircle else Icons.Outlined.FiberManualRecord,
-                        if (recorder != null) "Stop audio recording" else "Record audio",
-                        tint = if (recorder != null) Color(0xFFC94B36) else ink,
-                        modifier = Modifier.size(18.dp),
-                    )
                 }
             }
         }
