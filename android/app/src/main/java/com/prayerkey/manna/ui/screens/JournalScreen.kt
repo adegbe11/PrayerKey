@@ -169,6 +169,14 @@ fun JournalScreen(
        thing as it appears rather than showing a blank page with the tool
        hidden in a bar at the bottom. */
     var quickStart by remember { mutableStateOf<String?>(null) }
+    /* The template library, its preview, and what the sheet was seeded with. */
+    var browsingTemplates by remember { mutableStateOf(false) }
+    var previewing by remember { mutableStateOf<com.prayerkey.manna.data.JournalTemplate?>(null) }
+    var seeded by remember { mutableStateOf<com.prayerkey.manna.data.JournalTemplate?>(null) }
+    val templatePrefs = remember { context.getSharedPreferences("journal_templates", android.content.Context.MODE_PRIVATE) }
+    var recentTemplates by remember {
+        mutableStateOf(templatePrefs.getString("recent", "").orEmpty().split(",").filter { it.isNotBlank() })
+    }
     var chosen by remember { mutableStateOf<com.prayerkey.manna.ui.journal.JournalSuggestions.Prompt?>(null) }
     var answeringEntry by remember { mutableStateOf<JournalEntry?>(null) }
     var reviewingPrayer by remember { mutableStateOf<JournalEntry?>(null) }
@@ -225,7 +233,8 @@ fun JournalScreen(
                     onWelcomeTap = { chosen = null; picking = true },
                     onQuickStart = { key ->
                         chosen = null
-                        if (key == "prompt") picking = true else { quickStart = key; writing = true }
+                        if (key == "prompt") browsingTemplates = true
+                        else { quickStart = key; writing = true }
                     },
                     insight = journeyInsight,
                     concealPreviews = concealPreviews,
@@ -284,9 +293,50 @@ fun JournalScreen(
         prompt = chosen,
         todayCard = todayCard,
         openWith = quickStart,
-        onDismiss = { writing = false; chosen = null; quickStart = null },
-        onSubmit = { result -> onAdd2(result); writing = false; chosen = null; quickStart = null },
+        initialTitle = seeded?.title.orEmpty(),
+        initialBody = seeded?.let { com.prayerkey.manna.data.starterFor(it) }.orEmpty(),
+        initialJournal = seeded?.journal ?: "My Journey",
+        initialIsPrayer = seeded?.prayer == true,
+        onDismiss = { writing = false; chosen = null; quickStart = null; seeded = null },
+        onSubmit = { result -> onAdd2(result); writing = false; chosen = null; quickStart = null; seeded = null },
     )
+
+    if (browsingTemplates) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { browsingTemplates = false },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            com.prayerkey.manna.ui.journal.TemplateGallery(
+                recent = recentTemplates,
+                onPick = { previewing = it },
+                onClose = { browsingTemplates = false },
+            )
+        }
+    }
+
+    previewing?.let { template ->
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { previewing = null },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            com.prayerkey.manna.ui.journal.TemplatePreview(
+                template = template,
+                onUse = {
+                    /* Most recent first, no duplicates, six deep - a recents
+                       list long enough to be useful and short enough that the
+                       gallery still opens on the collections. */
+                    recentTemplates = (listOf(it.id) + recentTemplates).distinct().take(6)
+                    templatePrefs.edit().putString("recent", recentTemplates.joinToString(",")).apply()
+                    seeded = it
+                    previewing = null
+                    browsingTemplates = false
+                    chosen = null
+                    writing = true
+                },
+                onClose = { previewing = null },
+            )
+        }
+    }
 
     viewing?.let { entry ->
         EntryDetailSheet(entry, onDismiss = { viewing = null }, onEdit = { viewing = null; editing = entry })
