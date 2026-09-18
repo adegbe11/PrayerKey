@@ -172,6 +172,7 @@ fun JournalScreen(
     /* The template library, its preview, and what the sheet was seeded with. */
     var browsingTemplates by remember { mutableStateOf(false) }
     var previewing by remember { mutableStateOf<com.prayerkey.manna.data.JournalTemplate?>(null) }
+    var reading by remember { mutableStateOf<com.prayerkey.manna.data.JournalTemplate?>(null) }
     var seeded by remember { mutableStateOf<com.prayerkey.manna.data.JournalTemplate?>(null) }
     val templatePrefs = remember { context.getSharedPreferences("journal_templates", android.content.Context.MODE_PRIVATE) }
     var recentTemplates by remember {
@@ -327,13 +328,42 @@ fun JournalScreen(
                        gallery still opens on the collections. */
                     recentTemplates = (listOf(it.id) + recentTemplates).distinct().take(6)
                     templatePrefs.edit().putString("recent", recentTemplates.joinToString(",")).apply()
-                    seeded = it
+                    /* Into the book, not the editor. A template is a run of
+                       pages you turn; handing its questions to a scrolling form
+                       was the thing that made it a questionnaire. */
+                    reading = it
                     previewing = null
                     browsingTemplates = false
-                    chosen = null
-                    writing = true
                 },
                 onClose = { previewing = null },
+            )
+        }
+    }
+
+    reading?.let { template ->
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { reading = null },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            com.prayerkey.manna.ui.journal.TemplateBook(
+                template = template,
+                onClose = { reading = null },
+                onFinish = { title, body, journalName, isPrayer ->
+                    onAdd2(
+                        com.prayerkey.manna.ui.journal.WriteResult(
+                            mood = "\uD83D\uDE4F",
+                            body = body,
+                            gratitude = "",
+                            verseRef = null,
+                            verseText = null,
+                            source = "write",
+                            isPrayer = isPrayer,
+                            title = title,
+                            journal = journalName,
+                        ),
+                    )
+                    reading = null
+                },
             )
         }
     }

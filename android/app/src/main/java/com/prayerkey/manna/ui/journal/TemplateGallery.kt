@@ -79,7 +79,7 @@ fun TemplateGallery(
                     q.isEmpty() ||
                         t.title.lowercase().contains(q) ||
                         t.summary.lowercase().contains(q) ||
-                        t.prompts.any { it.lowercase().contains(q) }
+                        t.prompts.any { it.question.lowercase().contains(q) || it.heading.lowercase().contains(q) }
                     )
         }
     }
@@ -269,11 +269,21 @@ fun TemplatePreview(
                         fontSize = 11.sp, fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(end = 12.dp, top = 3.dp),
                     )
-                    Text(
-                        prompt,
-                        color = Pk.Charcoal, fontFamily = BookSerif,
-                        fontWeight = FontWeight.Light, fontSize = 18.sp, lineHeight = 26.sp,
-                    )
+                    Column {
+                        if (prompt.heading.isNotBlank()) {
+                            Text(
+                                prompt.heading,
+                                color = Pk.Oxblood, fontFamily = UtilitySans,
+                                fontSize = 9.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(bottom = 5.dp),
+                            )
+                        }
+                        Text(
+                            prompt.question,
+                            color = Pk.Charcoal, fontFamily = BookSerif,
+                            fontWeight = FontWeight.Light, fontSize = 18.sp, lineHeight = 26.sp,
+                        )
+                    }
                 }
             }
             Spacer(Modifier.height(20.dp))

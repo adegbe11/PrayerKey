@@ -32,18 +32,54 @@ package com.prayerkey.manna.data
  * writing will fix it.
  */
 
+/**
+ * One page of a template.
+ *
+ * A printed prayer journal does not put ten questions on a spread. It gives a
+ * page a name, one question, and a line of direction underneath - and then the
+ * rest of the page is empty, which is the whole point. This is that page.
+ *
+ * @param heading  the page name, set in small capitals: ADORATION, CONFESSION
+ * @param question what the page actually asks
+ * @param guide    one line under the question, telling you how to approach it
+ * @param starter  an opening clause, offered and never inserted on its own
+ * @param people   the page offers the people you have prayed for before
+ * @param private  the page says plainly that nobody else sees it
+ * @param skippable confession and the like can be passed over without penalty
+ */
+data class TemplatePrompt(
+    val heading: String,
+    val question: String,
+    val guide: String = "",
+    val starter: String = "",
+    val people: Boolean = false,
+    val private: Boolean = false,
+    val skippable: Boolean = false,
+)
+
+/** A question with no page furniture, for the shorter templates. */
+fun p(question: String, heading: String = "", guide: String = "") =
+    TemplatePrompt(heading.ifBlank { "" }, question, guide)
+
 data class JournalTemplate(
     val id: String,
     val collection: String,
     val title: String,
     /** One line on the gallery card: what this is for. */
     val summary: String,
-    /** The questions, in order. Each becomes a heading in the entry. */
-    val prompts: List<String>,
+    /** The pages, in order. */
+    val prompts: List<TemplatePrompt>,
     /** Suggested when the template is used, unless the writer changes it. */
     val journal: String = "My Journey",
     /** Whether an entry from this template joins the prayer list by default. */
     val prayer: Boolean = false,
+    /** The verse on the cover. */
+    val verse: String = "",
+    val verseRef: String = "",
+    /** A held silence before the first question, in seconds. 0 for none. */
+    val stillness: Int = 0,
+    /** A held silence near the end, for listening. 0 for none. */
+    val listen: Int = 0,
 ) {
     val minutes: Int get() = maxOf(2, prompts.size)
 }
@@ -75,50 +111,106 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-today", "Prayer", "Prayer for today",
         "Bring the day in front of you to God",
         listOf(
-            "What is on my heart today?",
-            "What am I asking God for?",
-            "Who needs my prayers today?",
-            "What Scripture am I standing on?",
-            "What am I surrendering to Him?",
+            p("What is on my heart today?"),
+            p("What am I asking God for?"),
+            p("Who needs my prayers today?"),
+            p("What Scripture am I standing on?"),
+            p("What am I surrendering to Him?"),
         ),
         prayer = true,
     ),
+    /*
+     * Morning Prayer, written out in full as a book.
+     *
+     * The shape is the one the good printed prayer journals use, and the
+     * reason they use it is that it removes decisions. Somebody at seven in the
+     * morning should not have to work out what to pray about; the page should
+     * already know, and should ask one thing at a time.
+     *
+     * Adoration comes before asking, which is the whole argument of an ACTS
+     * journal - begin with who God is and the page cannot become a wishlist.
+     * Confession is marked private and skippable, because a page that shames
+     * somebody for passing over it will be passed over for good. Listening sits
+     * near the end and records what came to mind without telling the writer
+     * what it was.
+     */
     JournalTemplate(
         "prayer-morning", "Prayer", "Morning prayer",
-        "Hand the day over before it starts",
+        "Twelve pages. Begin the day with God.",
         listOf(
-            "Father, before this day takes me…",
-            "What I am asking for today",
-            "Who I am carrying into this day",
-            "What I am trusting You with",
+            TemplatePrompt(
+                "ADORATION", "God, You are…",
+                "Begin with who God is, not with what you need.",
+                starter = "Father, You are faithful…",
+            ),
+            TemplatePrompt(
+                "SURRENDER", "What are you carrying this morning?",
+                "Leave it here before you carry it all day.",
+            ),
+            TemplatePrompt(
+                "CONFESSION", "Search my heart, O God.",
+                "Anything you need to bring to Him honestly.",
+                private = true, skippable = true,
+            ),
+            TemplatePrompt(
+                "GRATITUDE", "Before I ask, I remember.",
+                "Three things you are thankful for this morning.",
+                starter = "Today, thank You for…",
+            ),
+            TemplatePrompt(
+                "TODAY'S WORD", "What stands out to you?",
+                "Read it slowly, then write what caught you.",
+            ),
+            TemplatePrompt(
+                "PEOPLE ON MY HEART", "Who are you praying for?",
+                "Name them, and say what you are asking for them.",
+                people = true,
+            ),
+            TemplatePrompt(
+                "I AM ASKING", "What do you need from God today?",
+                "Plainly. He is not put off by a direct request.",
+            ),
+            TemplatePrompt(
+                "I SURRENDER", "What will you stop trying to control today?",
+                "Different from confession. This is letting go.",
+                starter = "I place this in Your hands…",
+            ),
+            TemplatePrompt(
+                "MY PRAYER", "Father, this morning…",
+                "Everything above, in your own words.",
+            ),
         ),
         prayer = true,
+        verse = "My voice shalt thou hear in the morning, O LORD; in the morning will I direct my prayer unto thee, and will look up.",
+        verseRef = "Psalm 5:3",
+        stillness = 30,
+        listen = 60,
     ),
     JournalTemplate(
         "prayer-evening", "Prayer", "Evening prayer",
         "Put the day down",
         listOf(
-            "What happened today that I want to tell You",
-            "What I am sorry for",
-            "What I am thankful for",
-            "What I am leaving with You tonight",
+            p("What happened today that I want to tell You"),
+            p("What I am sorry for"),
+            p("What I am thankful for"),
+            p("What I am leaving with You tonight"),
         ),
     ),
     JournalTemplate(
         "prayer-bed", "Prayer", "Prayer before bed",
         "Short, for when you are already tired",
         listOf(
-            "What I am still turning over",
-            "What I am handing over before I sleep",
+            p("What I am still turning over"),
+            p("What I am handing over before I sleep"),
         ),
     ),
     JournalTemplate(
         "prayer-self", "Prayer", "Prayer for myself",
         "The one people find hardest to write",
         listOf(
-            "What do I actually need right now?",
-            "What am I afraid to ask for?",
-            "What would change if He answered?",
+            p("What do I actually need right now?"),
+            p("What am I afraid to ask for?"),
+            p("What would change if He answered?"),
         ),
         prayer = true,
     ),
@@ -126,10 +218,10 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-someone", "Prayer", "Prayer for someone else",
         "Hold one person up by name",
         listOf(
-            "Who am I praying for?",
-            "What are they facing?",
-            "What am I asking God to do for them?",
-            "What Scripture am I praying over them?",
+            p("Who am I praying for?"),
+            p("What are they facing?"),
+            p("What am I asking God to do for them?"),
+            p("What Scripture am I praying over them?"),
         ),
         prayer = true,
     ),
@@ -137,10 +229,10 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-intercession", "Prayer", "Intercession",
         "Standing in the gap for others",
         listOf(
-            "Who or what am I standing in the gap for?",
-            "What is the need, plainly?",
-            "What am I asking God to do?",
-            "How long have I been praying this?",
+            p("Who or what am I standing in the gap for?"),
+            p("What is the need, plainly?"),
+            p("What am I asking God to do?"),
+            p("How long have I been praying this?"),
         ),
         prayer = true,
     ),
@@ -148,9 +240,9 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-family", "Prayer", "Prayer for my family",
         "Each one, by name",
         listOf(
-            "Who in my family am I praying for today?",
-            "What do they need?",
-            "What am I asking God for our home?",
+            p("Who in my family am I praying for today?"),
+            p("What do they need?"),
+            p("What am I asking God for our home?"),
         ),
         journal = "Family", prayer = true,
     ),
@@ -158,10 +250,10 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-children", "Prayer", "Prayer for my children",
         "For the ones you are raising",
         listOf(
-            "What I see in them that I thank God for",
-            "What I am worried about",
-            "What I am asking God to do in them",
-            "What I want them to know about Him",
+            p("What I see in them that I thank God for"),
+            p("What I am worried about"),
+            p("What I am asking God to do in them"),
+            p("What I want them to know about Him"),
         ),
         journal = "Family", prayer = true,
     ),
@@ -169,10 +261,10 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-marriage", "Prayer", "Prayer for my marriage",
         "For the two of you",
         listOf(
-            "What I am thankful for in my marriage",
-            "Where we are struggling",
-            "What I am asking God to change in me first",
-            "What I am asking Him to do between us",
+            p("What I am thankful for in my marriage"),
+            p("Where we are struggling"),
+            p("What I am asking God to change in me first"),
+            p("What I am asking Him to do between us"),
         ),
         journal = "Family", prayer = true,
     ),
@@ -180,10 +272,10 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-healing", "Prayer", "Prayer for healing",
         "For a body, a mind, or a wound",
         listOf(
-            "Who needs healing, and what kind?",
-            "What am I asking God for specifically?",
-            "What Scripture am I holding on to?",
-            "What is hard about waiting for this?",
+            p("Who needs healing, and what kind?"),
+            p("What am I asking God for specifically?"),
+            p("What Scripture am I holding on to?"),
+            p("What is hard about waiting for this?"),
         ),
         prayer = true,
     ),
@@ -191,10 +283,10 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-work", "Prayer", "Prayer for work",
         "The hours you spend most of your life in",
         listOf(
-            "What is in front of me at work?",
-            "Where do I need wisdom?",
-            "Who do I work with that I should pray for?",
-            "How can this work be done for Him today?",
+            p("What is in front of me at work?"),
+            p("Where do I need wisdom?"),
+            p("Who do I work with that I should pray for?"),
+            p("How can this work be done for Him today?"),
         ),
         prayer = true,
     ),
@@ -202,10 +294,10 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-finances", "Prayer", "Prayer for finances",
         "Honest about money",
         listOf(
-            "What is the real situation?",
-            "What am I anxious about?",
-            "What am I asking God for?",
-            "What am I trusting Him with instead of solving?",
+            p("What is the real situation?"),
+            p("What am I anxious about?"),
+            p("What am I asking God for?"),
+            p("What am I trusting Him with instead of solving?"),
         ),
         prayer = true,
     ),
@@ -213,17 +305,19 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "prayer-guidance", "Prayer", "Prayer for guidance",
         "When the next step is not obvious",
         listOf(
-            "What am I trying to decide?",
-            "What do I already sense He is saying?",
-            "What am I afraid of choosing wrongly?",
-            "What am I asking Him to make clear?",
+            p("What am I trying to decide?"),
+            p("What do I already sense He is saying?"),
+            p("What am I afraid of choosing wrongly?"),
+            p("What am I asking Him to make clear?"),
         ),
         prayer = true,
     ),
     JournalTemplate(
         "prayer-open", "Prayer", "Open prayer",
         "No structure. Just write it.",
-        listOf("Father…"),
+        listOf(
+            p("Father…"),
+        ),
         prayer = true,
     ),
 
@@ -233,73 +327,92 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "walk-morning", "Daily walk", "Morning with God",
         "Five quiet minutes before anything else",
         listOf(
-            "What is the first thing on my mind?",
-            "What am I reading or thinking about today?",
-            "What am I asking for?",
-            "What do I want to carry into today?",
+            p("What is the first thing on my mind?"),
+            p("What am I reading or thinking about today?"),
+            p("What am I asking for?"),
+            p("What do I want to carry into today?"),
         ),
     ),
     JournalTemplate(
         "walk-evening", "Daily walk", "Evening with God",
         "Look back over the day with Him",
         listOf(
-            "Where was God in today?",
-            "What did I get right?",
-            "What would I do differently?",
-            "What am I thankful for tonight?",
+            p("Where was God in today?"),
+            p("What did I get right?"),
+            p("What would I do differently?"),
+            p("What am I thankful for tonight?"),
         ),
     ),
     JournalTemplate(
         "walk-start", "Daily walk", "Start my day",
         "Three lines, then go",
-        listOf("Today I am…", "Today I need…", "Today I will…"),
+        listOf(
+            p("Today I am…"),
+            p("Today I need…"),
+            p("Today I will…"),
+        ),
     ),
     JournalTemplate(
         "walk-end", "Daily walk", "End my day",
         "Three lines, then sleep",
-        listOf("Today was…", "I am thankful for…", "I am leaving behind…"),
+        listOf(
+            p("Today was…"),
+            p("I am thankful for…"),
+            p("I am leaving behind…"),
+        ),
     ),
     JournalTemplate(
         "walk-five", "Daily walk", "Five minutes with God",
         "When that is honestly all there is",
-        listOf("One thing I want to say to Him", "One thing I want to ask Him"),
+        listOf(
+            p("One thing I want to say to Him"),
+            p("One thing I want to ask Him"),
+        ),
     ),
     JournalTemplate(
         "walk-today", "Daily walk", "Today with God",
         "The whole day, in one page",
         listOf(
-            "What happened today?",
-            "Where did I notice Him?",
-            "What did today teach me?",
+            p("What happened today?"),
+            p("Where did I notice Him?"),
+            p("What did today teach me?"),
         ),
     ),
     JournalTemplate(
         "walk-moment", "Daily walk", "A God moment",
         "The thing you will forget by Friday",
-        listOf("What happened?", "Why did it stay with me?", "What do I think He was saying?"),
+        listOf(
+            p("What happened?"),
+            p("Why did it stay with me?"),
+            p("What do I think He was saying?"),
+        ),
     ),
     JournalTemplate(
         "walk-saw", "Daily walk", "Where I saw God today",
         "Look for Him in the ordinary parts",
         listOf(
-            "In something small",
-            "In another person",
-            "In something that did not go my way",
+            p("In something small"),
+            p("In another person"),
+            p("In something that did not go my way"),
         ),
     ),
     JournalTemplate(
         "walk-sleep", "Daily walk", "Before I sleep",
         "The last thought of the day",
-        listOf("What I am putting down", "What I am thankful for", "What I am trusting Him with tonight"),
+        listOf(
+            p("What I am putting down"),
+            p("What I am thankful for"),
+            p("What I am trusting Him with tonight"),
+        ),
     ),
     JournalTemplate(
         "walk-checkin", "Daily walk", "Daily spiritual check-in",
         "An honest state of things",
         listOf(
-            "How is my heart today, really?",
-            "How has my prayer life been this week?",
-            "What am I avoiding?",
-            "What is one step back towards Him?",
+            p("How is my heart today, really?"),
+            p("How has my prayer life been this week?"),
+            p("What am I avoiding?"),
+            p("What is one step back towards Him?"),
         ),
     ),
 
@@ -309,82 +422,98 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "bible-soap", "Bible & Scripture", "SOAP study",
         "Scripture, Observation, Application, Prayer",
         listOf(
-            "SCRIPTURE — write the verse out in full",
-            "OBSERVATION — what does it actually say?",
-            "APPLICATION — what does it ask of me?",
-            "PRAYER — pray it back to Him",
+            p("SCRIPTURE — write the verse out in full"),
+            p("OBSERVATION — what does it actually say?"),
+            p("APPLICATION — what does it ask of me?"),
+            p("PRAYER — pray it back to Him"),
         ),
     ),
     JournalTemplate(
         "bible-study", "Bible & Scripture", "Bible study",
         "A passage, worked through",
         listOf(
-            "Passage",
-            "What is happening here?",
-            "What does this say about God?",
-            "What does this say about people?",
-            "What will I do about it?",
+            p("Passage"),
+            p("What is happening here?"),
+            p("What does this say about God?"),
+            p("What does this say about people?"),
+            p("What will I do about it?"),
         ),
     ),
     JournalTemplate(
         "bible-verse", "Bible & Scripture", "Verse reflection",
         "One verse, sat with",
-        listOf("The verse", "What stands out", "What it means for today"),
+        listOf(
+            p("The verse"),
+            p("What stands out"),
+            p("What it means for today"),
+        ),
     ),
     JournalTemplate(
         "bible-chapter", "Bible & Scripture", "Chapter study",
         "A whole chapter at once",
         listOf(
-            "Chapter",
-            "What happens in it",
-            "The verse that stopped me",
-            "What I take from the whole chapter",
+            p("Chapter"),
+            p("What happens in it"),
+            p("The verse that stopped me"),
+            p("What I take from the whole chapter"),
         ),
     ),
     JournalTemplate(
         "bible-character", "Bible & Scripture", "Character study",
         "A person in Scripture, closely",
         listOf(
-            "Who am I studying?",
-            "What did they do?",
-            "Where did they fail?",
-            "How did God deal with them?",
-            "What is here for me?",
+            p("Who am I studying?"),
+            p("What did they do?"),
+            p("Where did they fail?"),
+            p("How did God deal with them?"),
+            p("What is here for me?"),
         ),
     ),
     JournalTemplate(
         "bible-meditation", "Bible & Scripture", "Scripture meditation",
         "Slowly, one line at a time",
         listOf(
-            "The passage",
-            "Read it once — what do I notice?",
-            "Read it again — what word stays?",
-            "Read it a third time — what is He saying?",
+            p("The passage"),
+            p("Read it once — what do I notice?"),
+            p("Read it again — what word stays?"),
+            p("Read it a third time — what is He saying?"),
         ),
     ),
     JournalTemplate(
         "bible-mean", "Bible & Scripture", "What does this verse mean to me?",
         "Between the text and your life",
-        listOf("The verse", "What it meant then", "What it means for where I am now"),
+        listOf(
+            p("The verse"),
+            p("What it meant then"),
+            p("What it means for where I am now"),
+        ),
     ),
     JournalTemplate(
         "bible-remember", "Bible & Scripture", "Scripture to remember",
         "Worth carrying",
-        listOf("The verse", "Why I want to keep it", "When I will need it"),
+        listOf(
+            p("The verse"),
+            p("Why I want to keep it"),
+            p("When I will need it"),
+        ),
     ),
     JournalTemplate(
         "bible-notes", "Bible & Scripture", "Bible reading notes",
         "Plain notes as you read",
-        listOf("What I read", "Notes", "Questions I still have"),
+        listOf(
+            p("What I read"),
+            p("Notes"),
+            p("Questions I still have"),
+        ),
     ),
     JournalTemplate(
         "bible-apply", "Bible & Scripture", "Scripture application",
         "From reading to doing",
         listOf(
-            "The passage",
-            "What it asks of me",
-            "One thing I will change this week",
-            "How I will know I did it",
+            p("The passage"),
+            p("What it asks of me"),
+            p("One thing I will change this week"),
+            p("How I will know I did it"),
         ),
     ),
 
@@ -394,10 +523,10 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "answered-new", "Answered prayer", "New prayer request",
         "Start the record. Come back to it later.",
         listOf(
-            "What am I praying for?",
-            "Why this matters to me",
-            "Scripture I am standing on",
-            "Who is praying with me",
+            p("What am I praying for?"),
+            p("Why this matters to me"),
+            p("Scripture I am standing on"),
+            p("Who is praying with me"),
         ),
         prayer = true,
     ),
@@ -405,36 +534,40 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "answered-mark", "Answered prayer", "He answered",
         "Write it down while you still remember the detail",
         listOf(
-            "What did I ask for?",
-            "What happened?",
-            "How did He answer — was it what I expected?",
-            "What did I learn about Him?",
+            p("What did I ask for?"),
+            p("What happened?"),
+            p("How did He answer — was it what I expected?"),
+            p("What did I learn about Him?"),
         ),
     ),
     JournalTemplate(
         "answered-update", "Answered prayer", "Update on a prayer",
         "Nothing finished yet, but something moved",
-        listOf("What am I still praying for?", "What has changed?", "What am I asking now?"),
+        listOf(
+            p("What am I still praying for?"),
+            p("What has changed?"),
+            p("What am I asking now?"),
+        ),
         prayer = true,
     ),
     JournalTemplate(
         "answered-testimony", "Answered prayer", "Testimony",
         "The version you could tell someone",
         listOf(
-            "What was the situation?",
-            "What did I pray?",
-            "What did God do?",
-            "What do I want people to know from this?",
+            p("What was the situation?"),
+            p("What did I pray?"),
+            p("What did God do?"),
+            p("What do I want people to know from this?"),
         ),
     ),
     JournalTemplate(
         "answered-waiting", "Answered prayer", "Still waiting",
         "Honest about the ones that are not answered yet",
         listOf(
-            "What am I still waiting on?",
-            "How long has it been?",
-            "What is hard about the waiting?",
-            "What keeps me praying it anyway?",
+            p("What am I still waiting on?"),
+            p("How long has it been?"),
+            p("What is hard about the waiting?"),
+            p("What keeps me praying it anyway?"),
         ),
         prayer = true,
     ),
@@ -442,25 +575,28 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "answered-no", "Answered prayer", "When the answer was no",
         "This belongs in the record too",
         listOf(
-            "What did I ask for?",
-            "What happened instead?",
-            "What do I not understand?",
-            "What am I choosing to trust?",
+            p("What did I ask for?"),
+            p("What happened instead?"),
+            p("What do I not understand?"),
+            p("What am I choosing to trust?"),
         ),
     ),
     JournalTemplate(
         "answered-review", "Answered prayer", "Looking back over my prayers",
         "Read the old ones and see",
         listOf(
-            "What have I been praying this year?",
-            "What has He already answered?",
-            "What pattern do I see?",
+            p("What have I been praying this year?"),
+            p("What has He already answered?"),
+            p("What pattern do I see?"),
         ),
     ),
     JournalTemplate(
         "answered-thanks", "Answered prayer", "Thank You for answering",
         "Close the loop",
-        listOf("What He did", "What I want to say to Him about it"),
+        listOf(
+            p("What He did"),
+            p("What I want to say to Him about it"),
+        ),
     ),
 
     /* ── Gratitude · 8 ─────────────────────────────────────────────── */
@@ -468,46 +604,67 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
     JournalTemplate(
         "grat-three", "Gratitude", "Three things",
         "The shortest useful entry there is",
-        listOf("One", "Two", "Three"),
+        listOf(
+            p("One"),
+            p("Two"),
+            p("Three"),
+        ),
         journal = "Gratitude",
     ),
     JournalTemplate(
         "grat-thank", "Gratitude", "Thank You, God",
         "Said directly to Him",
-        listOf("Thank You for…", "Thank You especially for…"),
+        listOf(
+            p("Thank You for…"),
+            p("Thank You especially for…"),
+        ),
         journal = "Gratitude",
     ),
     JournalTemplate(
         "grat-provision", "Gratitude", "His provision today",
         "What arrived that you did not arrange",
-        listOf("What I needed", "What came", "What that tells me about Him"),
+        listOf(
+            p("What I needed"),
+            p("What came"),
+            p("What that tells me about Him"),
+        ),
         journal = "Gratitude",
     ),
     JournalTemplate(
         "grat-people", "Gratitude", "People I am thankful for",
         "Name them",
-        listOf("Who", "Why", "Will I tell them?"),
+        listOf(
+            p("Who"),
+            p("Why"),
+            p("Will I tell them?"),
+        ),
         journal = "Gratitude",
     ),
     JournalTemplate(
         "grat-small", "Gratitude", "Small blessings",
         "The ones too small to mention",
-        listOf("Something small today I am glad of"),
+        listOf(
+            p("Something small today I am glad of"),
+        ),
         journal = "Gratitude",
     ),
     JournalTemplate(
         "grat-unexpected", "Gratitude", "An unexpected blessing",
         "The thing you were not praying for",
-        listOf("What happened?", "Why it surprised me", "What I want to say about it"),
+        listOf(
+            p("What happened?"),
+            p("Why it surprised me"),
+            p("What I want to say about it"),
+        ),
         journal = "Gratitude",
     ),
     JournalTemplate(
         "grat-week", "Gratitude", "Weekly gratitude",
         "Once a week, look back over seven days",
         listOf(
-            "The best thing this week",
-            "The hardest thing, and what came of it",
-            "Three things I am thankful for",
+            p("The best thing this week"),
+            p("The hardest thing, and what came of it"),
+            p("Three things I am thankful for"),
         ),
         journal = "Gratitude",
     ),
@@ -515,9 +672,9 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "grat-hard", "Gratitude", "Gratitude in a hard season",
         "Not pretending. Still looking.",
         listOf(
-            "What is hard right now",
-            "What is still true and good",
-            "One thing I can thank Him for today",
+            p("What is hard right now"),
+            p("What is still true and good"),
+            p("One thing I can thank Him for today"),
         ),
         journal = "Gratitude",
     ),
@@ -527,57 +684,75 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
     JournalTemplate(
         "ref-week", "Reflection", "This week",
         "Seven days, looked at properly",
-        listOf("What happened", "What I learned", "What I want to carry forward"),
+        listOf(
+            p("What happened"),
+            p("What I learned"),
+            p("What I want to carry forward"),
+        ),
     ),
     JournalTemplate(
         "ref-month", "Reflection", "This month",
         "A wider view",
         listOf(
-            "What changed this month",
-            "Where did I grow?",
-            "Where did I go backwards?",
-            "What am I asking for next month?",
+            p("What changed this month"),
+            p("Where did I grow?"),
+            p("Where did I go backwards?"),
+            p("What am I asking for next month?"),
         ),
     ),
     JournalTemplate(
         "ref-year", "Reflection", "This year",
         "The long look",
         listOf(
-            "What defined this year",
-            "What God did",
-            "What I got wrong",
-            "What I am taking into next year",
+            p("What defined this year"),
+            p("What God did"),
+            p("What I got wrong"),
+            p("What I am taking into next year"),
         ),
     ),
     JournalTemplate(
         "ref-examen", "Reflection", "Evening examen",
         "An old practice: walk back through the day",
         listOf(
-            "What am I grateful for today?",
-            "Where did I feel most alive?",
-            "Where did I turn away from God or people?",
-            "What do I want tomorrow to look like?",
+            p("What am I grateful for today?"),
+            p("Where did I feel most alive?"),
+            p("Where did I turn away from God or people?"),
+            p("What do I want tomorrow to look like?"),
         ),
     ),
     JournalTemplate(
         "ref-honest", "Reflection", "An honest page",
         "For things you would not say out loud",
-        listOf("What I am actually thinking", "What I have not admitted", "What I want to do about it"),
+        listOf(
+            p("What I am actually thinking"),
+            p("What I have not admitted"),
+            p("What I want to do about it"),
+        ),
     ),
     JournalTemplate(
         "ref-lesson", "Reflection", "What I learned",
         "One lesson, written down so it sticks",
-        listOf("What happened", "What I learned", "What it will change"),
+        listOf(
+            p("What happened"),
+            p("What I learned"),
+            p("What it will change"),
+        ),
     ),
     JournalTemplate(
         "ref-letter", "Reflection", "A letter to God",
         "Write to Him, not about Him",
-        listOf("Dear Father,"),
+        listOf(
+            p("Dear Father,"),
+        ),
     ),
     JournalTemplate(
         "ref-future", "Reflection", "A letter to myself, later",
         "For the version of you who reads this in a year",
-        listOf("Where I am now", "What I hope has happened by then", "What I want you to remember"),
+        listOf(
+            p("Where I am now"),
+            p("What I hope has happened by then"),
+            p("What I want you to remember"),
+        ),
     ),
 
     /* ── Spiritual warfare · 8 ─────────────────────────────────────── */
@@ -586,67 +761,83 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "war-fighting", "Spiritual warfare", "What I am fighting in prayer",
         "Name it plainly",
         listOf(
-            "What am I up against?",
-            "What am I asking God to do?",
-            "What Scripture am I standing on?",
-            "What am I refusing to agree with?",
+            p("What am I up against?"),
+            p("What am I asking God to do?"),
+            p("What Scripture am I standing on?"),
+            p("What am I refusing to agree with?"),
         ),
         prayer = true,
     ),
     JournalTemplate(
         "war-fear", "Spiritual warfare", "Prayer against fear",
         "For the thing that wakes you at three",
-        listOf("What am I afraid of?", "What is true instead?", "What am I asking Him for?"),
+        listOf(
+            p("What am I afraid of?"),
+            p("What is true instead?"),
+            p("What am I asking Him for?"),
+        ),
         prayer = true,
     ),
     JournalTemplate(
         "war-thoughts", "Spiritual warfare", "Breaking a thought pattern",
         "The sentence you keep saying to yourself",
         listOf(
-            "What do I keep telling myself?",
-            "Where did that come from?",
-            "What does God say instead?",
-            "What will I say next time it comes?",
+            p("What do I keep telling myself?"),
+            p("Where did that come from?"),
+            p("What does God say instead?"),
+            p("What will I say next time it comes?"),
         ),
     ),
     JournalTemplate(
         "war-standing", "Spiritual warfare", "Scripture I am standing on",
         "Write the verse. Then write why.",
-        listOf("The verse", "What I am facing", "What this verse settles"),
+        listOf(
+            p("The verse"),
+            p("What I am facing"),
+            p("What this verse settles"),
+        ),
     ),
     JournalTemplate(
         "war-armour", "Spiritual warfare", "The armour of God",
         "Ephesians 6, one piece at a time",
         listOf(
-            "Truth — what lie am I putting down?",
-            "Righteousness — what am I making right?",
-            "Peace — where do I need to stand still?",
-            "Faith — what am I trusting Him for?",
-            "Salvation — what do I know is settled?",
-            "The Word — what am I praying back to Him?",
+            p("Truth — what lie am I putting down?"),
+            p("Righteousness — what am I making right?"),
+            p("Peace — where do I need to stand still?"),
+            p("Faith — what am I trusting Him for?"),
+            p("Salvation — what do I know is settled?"),
+            p("The Word — what am I praying back to Him?"),
         ),
     ),
     JournalTemplate(
         "war-temptation", "Spiritual warfare", "Prayer against temptation",
         "Honest, and without shame",
         listOf(
-            "What keeps pulling at me?",
-            "When is it strongest?",
-            "What will I do differently?",
-            "What am I asking God for?",
+            p("What keeps pulling at me?"),
+            p("When is it strongest?"),
+            p("What will I do differently?"),
+            p("What am I asking God for?"),
         ),
         prayer = true,
     ),
     JournalTemplate(
         "war-protection", "Spiritual warfare", "Prayer for protection",
         "Over people, a home, a journey",
-        listOf("Who or what am I covering?", "What am I asking God to guard?", "Scripture I am praying"),
+        listOf(
+            p("Who or what am I covering?"),
+            p("What am I asking God to guard?"),
+            p("Scripture I am praying"),
+        ),
         prayer = true,
     ),
     JournalTemplate(
         "war-victory", "Spiritual warfare", "Victory journal",
         "Write down what He has already won",
-        listOf("What was I fighting?", "What changed?", "What do I now know?"),
+        listOf(
+            p("What was I fighting?"),
+            p("What changed?"),
+            p("What do I now know?"),
+        ),
     ),
 
     /* ── Spiritual growth · 7 ──────────────────────────────────────── */
@@ -654,41 +845,67 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
     JournalTemplate(
         "grow-where", "Spiritual growth", "Where I am growing",
         "Notice it, or you will miss it",
-        listOf("What is different in me than a year ago?", "What made the difference?", "What is next?"),
+        listOf(
+            p("What is different in me than a year ago?"),
+            p("What made the difference?"),
+            p("What is next?"),
+        ),
     ),
     JournalTemplate(
         "grow-stuck", "Spiritual growth", "Where I am stuck",
         "The same thing, again",
-        listOf("What keeps repeating?", "What have I tried?", "What have I not tried?", "What am I asking for?"),
+        listOf(
+            p("What keeps repeating?"),
+            p("What have I tried?"),
+            p("What have I not tried?"),
+            p("What am I asking for?"),
+        ),
     ),
     JournalTemplate(
         "grow-conviction", "Spiritual growth", "Something convicted me",
         "The part that was uncomfortable",
-        listOf("What was it?", "Why did it land?", "What will I do?"),
+        listOf(
+            p("What was it?"),
+            p("Why did it land?"),
+            p("What will I do?"),
+        ),
     ),
     JournalTemplate(
         "grow-habit", "Spiritual growth", "A habit I am building",
         "Small, and repeated",
-        listOf("The habit", "Why it matters", "How it has gone this week", "What will help next week"),
+        listOf(
+            p("The habit"),
+            p("Why it matters"),
+            p("How it has gone this week"),
+            p("What will help next week"),
+        ),
     ),
     JournalTemplate(
         "grow-fruit", "Spiritual growth", "Fruit of the Spirit check",
         "Galatians 5, honestly",
         listOf(
-            "Which of these is growing in me?",
-            "Which is missing right now?",
-            "Where was that tested this week?",
+            p("Which of these is growing in me?"),
+            p("Which is missing right now?"),
+            p("Where was that tested this week?"),
         ),
     ),
     JournalTemplate(
         "grow-obedience", "Spiritual growth", "Something He asked me to do",
         "And what you did about it",
-        listOf("What did I sense He was asking?", "Did I do it?", "What happened?"),
+        listOf(
+            p("What did I sense He was asking?"),
+            p("Did I do it?"),
+            p("What happened?"),
+        ),
     ),
     JournalTemplate(
         "grow-mentor", "Spiritual growth", "Someone I am learning from",
         "Who is ahead of you, and what you see",
-        listOf("Who", "What I see in them", "What I want to learn"),
+        listOf(
+            p("Who"),
+            p("What I see in them"),
+            p("What I want to learn"),
+        ),
     ),
 
     /* ── Difficult seasons · 6 ─────────────────────────────────────── */
@@ -697,56 +914,60 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "hard-afraid", "Difficult seasons", "When I am afraid",
         "Put the fear into words first",
         listOf(
-            "What am I afraid of?",
-            "What is the worst I am imagining?",
-            "What is actually true?",
-            "What do I need from God right now?",
+            p("What am I afraid of?"),
+            p("What is the worst I am imagining?"),
+            p("What is actually true?"),
+            p("What do I need from God right now?"),
         ),
     ),
     JournalTemplate(
         "hard-anxious", "Difficult seasons", "When I am anxious",
         "For when it will not settle",
         listOf(
-            "What is my mind circling?",
-            "What is in my control?",
-            "What is not?",
-            "What am I handing over?",
+            p("What is my mind circling?"),
+            p("What is in my control?"),
+            p("What is not?"),
+            p("What am I handing over?"),
         ),
     ),
     JournalTemplate(
         "hard-lonely", "Difficult seasons", "When I am lonely",
         "Written for a real evening",
         listOf(
-            "What does the loneliness feel like?",
-            "When did it start?",
-            "Who could I reach for?",
-            "What do I want to say to God about it?",
+            p("What does the loneliness feel like?"),
+            p("When did it start?"),
+            p("Who could I reach for?"),
+            p("What do I want to say to God about it?"),
         ),
     ),
     JournalTemplate(
         "hard-grief", "Difficult seasons", "When I am grieving",
         "No stages, no timeline",
         listOf(
-            "Who or what have I lost?",
-            "What do I miss today?",
-            "What do I want to remember?",
-            "What do I want to say to God?",
+            p("Who or what have I lost?"),
+            p("What do I miss today?"),
+            p("What do I want to remember?"),
+            p("What do I want to say to God?"),
         ),
     ),
     JournalTemplate(
         "hard-silence", "Difficult seasons", "When God feels silent",
         "This is allowed to be written down",
         listOf(
-            "How long has it felt like this?",
-            "What did I expect Him to say?",
-            "What do I still believe when I do not feel it?",
-            "What am I going to keep doing anyway?",
+            p("How long has it felt like this?"),
+            p("What did I expect Him to say?"),
+            p("What do I still believe when I do not feel it?"),
+            p("What am I going to keep doing anyway?"),
         ),
     ),
     JournalTemplate(
         "hard-nopray", "Difficult seasons", "When I do not know what to pray",
         "Start anywhere",
-        listOf("What I would say if I could", "What I want Him to know", "Help me with…"),
+        listOf(
+            p("What I would say if I could"),
+            p("What I want Him to know"),
+            p("Help me with…"),
+        ),
         prayer = true,
     ),
 
@@ -755,35 +976,52 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
     JournalTemplate(
         "fam-home", "Family", "Our home",
         "What is happening under this roof",
-        listOf("How is our home right now?", "What needs prayer?", "What am I thankful for?"),
+        listOf(
+            p("How is our home right now?"),
+            p("What needs prayer?"),
+            p("What am I thankful for?"),
+        ),
         journal = "Family",
     ),
     JournalTemplate(
         "fam-child", "Family", "About one of my children",
         "One child, one page",
-        listOf("Who", "What I am noticing", "What I am praying for them", "What I want to tell them"),
+        listOf(
+            p("Who"),
+            p("What I am noticing"),
+            p("What I am praying for them"),
+            p("What I want to tell them"),
+        ),
         journal = "Family",
     ),
     JournalTemplate(
         "fam-spouse", "Family", "About my husband or wife",
         "Written for you, not for them",
-        listOf("What I am grateful for", "What is hard", "What I will do this week"),
+        listOf(
+            p("What I am grateful for"),
+            p("What is hard"),
+            p("What I will do this week"),
+        ),
         journal = "Family",
     ),
     JournalTemplate(
         "fam-parents", "Family", "My parents",
         "Whatever that relationship is",
-        listOf("Where things stand", "What I carry from them", "What I am praying"),
+        listOf(
+            p("Where things stand"),
+            p("What I carry from them"),
+            p("What I am praying"),
+        ),
         journal = "Family",
     ),
     JournalTemplate(
         "fam-hard", "Family", "A hard relationship",
         "Honest, and not for sending",
         listOf(
-            "Who, and what happened",
-            "My part in it",
-            "What forgiveness would look like",
-            "What I am asking God for",
+            p("Who, and what happened"),
+            p("My part in it"),
+            p("What forgiveness would look like"),
+            p("What I am asking God for"),
         ),
         journal = "Family",
     ),
@@ -794,11 +1032,11 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "purp-decision", "Purpose & decisions", "A decision before God",
         "Lay it out before you choose",
         listOf(
-            "What am I deciding?",
-            "The case for",
-            "The case against",
-            "What is my gut, and why?",
-            "What am I asking God to show me?",
+            p("What am I deciding?"),
+            p("The case for"),
+            p("The case against"),
+            p("What is my gut, and why?"),
+            p("What am I asking God to show me?"),
         ),
         prayer = true,
     ),
@@ -806,32 +1044,40 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "purp-calling", "Purpose & decisions", "What is God calling me to?",
         "The long question",
         listOf(
-            "What keeps coming back to me?",
-            "What am I good at that serves others?",
-            "What would I do if I were not afraid?",
-            "What is one step I could take?",
+            p("What keeps coming back to me?"),
+            p("What am I good at that serves others?"),
+            p("What would I do if I were not afraid?"),
+            p("What is one step I could take?"),
         ),
     ),
     JournalTemplate(
         "purp-discern", "Purpose & decisions", "Discernment",
         "Testing what you think you are hearing",
         listOf(
-            "What do I think God is saying?",
-            "Does it agree with Scripture?",
-            "What do wise people say?",
-            "What is my motive, honestly?",
-            "What happens if I wait?",
+            p("What do I think God is saying?"),
+            p("Does it agree with Scripture?"),
+            p("What do wise people say?"),
+            p("What is my motive, honestly?"),
+            p("What happens if I wait?"),
         ),
     ),
     JournalTemplate(
         "purp-doors", "Purpose & decisions", "Open door, closed door",
         "What has opened and what has shut",
-        listOf("What has opened", "What has closed", "What I make of that"),
+        listOf(
+            p("What has opened"),
+            p("What has closed"),
+            p("What I make of that"),
+        ),
     ),
     JournalTemplate(
         "purp-purpose", "Purpose & decisions", "Why am I here?",
         "Occasionally worth asking",
-        listOf("What am I for?", "Who is better off because of me?", "What would I regret not doing?"),
+        listOf(
+            p("What am I for?"),
+            p("Who is better off because of me?"),
+            p("What would I regret not doing?"),
+        ),
     ),
 
     /* ── Dreams & notes · 4 ────────────────────────────────────────── */
@@ -839,25 +1085,43 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
     JournalTemplate(
         "dream-record", "Dreams & notes", "A dream",
         "Record it before you interpret it",
-        listOf("What happened in it", "How it felt", "What I noticed on waking"),
+        listOf(
+            p("What happened in it"),
+            p("How it felt"),
+            p("What I noticed on waking"),
+        ),
         journal = "Dreams",
     ),
     JournalTemplate(
         "dream-recurring", "Dreams & notes", "A recurring dream",
         "When it keeps coming back",
-        listOf("The dream", "How often", "What is always the same", "What I am asking God about it"),
+        listOf(
+            p("The dream"),
+            p("How often"),
+            p("What is always the same"),
+            p("What I am asking God about it"),
+        ),
         journal = "Dreams",
     ),
     JournalTemplate(
         "dream-impression", "Dreams & notes", "Something I sensed",
         "An impression, written down plainly",
-        listOf("What I sensed", "When and where", "What I will do with it — if anything yet"),
+        listOf(
+            p("What I sensed"),
+            p("When and where"),
+            p("What I will do with it — if anything yet"),
+        ),
         journal = "Dreams",
     ),
     JournalTemplate(
         "dream-word", "Dreams & notes", "A word someone gave me",
         "Keep the record, test it later",
-        listOf("Who said it", "What they said", "What I think about it", "What happened afterwards"),
+        listOf(
+            p("Who said it"),
+            p("What they said"),
+            p("What I think about it"),
+            p("What happened afterwards"),
+        ),
         journal = "Dreams",
     ),
 
@@ -867,25 +1131,35 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "church-sermon", "Sermon & church", "Sermon notes",
         "Sunday, in a form you can use on Wednesday",
         listOf(
-            "Church and speaker",
-            "Scripture",
-            "The main message",
-            "What stood out",
-            "What convicted me",
-            "What I will do differently",
+            p("Church and speaker"),
+            p("Scripture"),
+            p("The main message"),
+            p("What stood out"),
+            p("What convicted me"),
+            p("What I will do differently"),
         ),
         journal = "Church",
     ),
     JournalTemplate(
         "church-service", "Sermon & church", "Church today",
         "The whole morning, not only the sermon",
-        listOf("What we sang that stayed with me", "What was said", "Who I spoke to", "What I am taking home"),
+        listOf(
+            p("What we sang that stayed with me"),
+            p("What was said"),
+            p("Who I spoke to"),
+            p("What I am taking home"),
+        ),
         journal = "Church",
     ),
     JournalTemplate(
         "church-group", "Sermon & church", "Bible study group",
         "What the room said, and what you thought",
-        listOf("What we studied", "What others saw that I did not", "My own question", "What I will follow up"),
+        listOf(
+            p("What we studied"),
+            p("What others saw that I did not"),
+            p("My own question"),
+            p("What I will follow up"),
+        ),
         journal = "Church",
     ),
 )
@@ -901,4 +1175,22 @@ fun templatesByCollection(): Map<String, List<JournalTemplate>> =
 fun starterFor(template: JournalTemplate): String = template.starter()
 
 fun JournalTemplate.starter(): String =
-    prompts.joinToString("\n\n") { "## " + it + "\n" } + "\n"
+    prompts.joinToString("\n\n") { "## " + it.heading.ifBlank { it.question } + "\n" } + "\n"
+
+/**
+ * The finished page, built from what was actually written.
+ *
+ * Pages left empty leave nothing behind - a book you stopped halfway through
+ * should read as far as you got, not as a run of blank headings.
+ */
+fun JournalTemplate.compose(answers: Map<Int, String>): String = buildString {
+    prompts.forEachIndexed { index, prompt ->
+        val written = answers[index].orEmpty().trim()
+        if (written.isEmpty()) return@forEachIndexed
+        append("## ").append(prompt.heading.ifBlank { prompt.question }).append("\n\n")
+        append(written).append("\n\n")
+    }
+}
+
+fun composeOf(template: JournalTemplate, answers: Map<Int, String>): String =
+    template.compose(answers)
