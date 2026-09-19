@@ -50,6 +50,7 @@ import androidx.compose.material.icons.outlined.Mood
 import androidx.compose.material.icons.outlined.Sell
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
+import androidx.compose.material.icons.outlined.VolunteerActivism
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -422,20 +423,19 @@ fun WriteSheet(
                 IconButton(onClick = { showDetails = !showDetails }) {
                     Icon(Icons.Outlined.Tune, "Entry details", tint = if (showDetails) accent else muted)
                 }
+                /* Done, in the accent, as text. A filled grey pill reading
+                   SAVE was the heaviest object on an empty page and shouted at
+                   somebody who had not written a word yet. */
                 val ready = body.isNotBlank()
-                Box(
-                    Modifier.padding(start = 4.dp, end = 6.dp).height(40.dp).clip(R.control)
-                        .background(if (ready) accent else muted.copy(alpha = .18f))
-                        .clickable(enabled = ready) { submit() },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        "SAVE",
-                        color = if (ready) cs.onPrimary else muted,
-                        fontWeight = FontWeight.Bold, fontSize = 13.sp, letterSpacing = 1.sp,
-                        modifier = Modifier.padding(horizontal = 20.dp),
-                    )
-                }
+                Text(
+                    "Done",
+                    color = if (ready) accent else muted.copy(alpha = .5f),
+                    fontWeight = FontWeight.SemiBold, fontSize = 16.sp,
+                    modifier = Modifier.padding(start = 4.dp, end = 8.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .clickable(enabled = ready) { submit() }
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                )
             }
 
             /* The date is the page's masthead, the way a diary opens with the
@@ -605,114 +605,67 @@ fun WriteSheet(
                     }
                 }
 
-                /*
-                 * Eight ways to put something in an entry, as a grid rather
-                 * than a row of small glyphs on a bar.
-                 *
-                 * The four on the top row each take a different kind of thing
-                 * and open the right picker for it. The four below open the
-                 * details panel, where place, mood and tags actually live -
-                 * they are signposts to one panel rather than four separate
-                 * screens, which the panel makes obvious by showing all of them
-                 * together the moment it opens.
-                 */
-                Spacer(Modifier.height(22.dp))
-                val tiles = listOf(
-                    Triple("Photo", Icons.Outlined.Image) { mediaPicker.launch(arrayOf("image/*")) },
-                    Triple("Video", Icons.Outlined.Videocam) { mediaPicker.launch(arrayOf("video/*")) },
-                    Triple("Audio", Icons.Outlined.Mic) { voiceDisclosure = true },
-                    Triple("Verse", Icons.Outlined.MenuBook) { attachToday = true; showDetails = true },
-                    Triple("Attach", Icons.Outlined.AttachFile) { mediaPicker.launch(arrayOf("*/*")) },
-                    Triple("Place", Icons.Outlined.Place) { showDetails = true },
-                    Triple("Mood", Icons.Outlined.Mood) { showDetails = true },
-                    Triple("Tag", Icons.Outlined.Sell) { showDetails = true },
-                )
-                tiles.chunked(4).forEach { row ->
-                    Row(
-                        Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        row.forEach { (label, icon, act) ->
-                            Column(
-                                Modifier.weight(1f).clip(RoundedCornerShape(14.dp))
-                                    .background(accent.copy(alpha = .07f))
-                                    .clickable { act() }
-                                    .padding(vertical = 12.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                            ) {
-                                Icon(icon, null, tint = accent, modifier = Modifier.size(19.dp))
-                                Text(
-                                    label, Modifier.padding(top = 6.dp), color = ink,
-                                    fontSize = 10.5.sp, fontWeight = FontWeight.Medium,
-                                )
-                            }
-                        }
-                    }
-                }
-
-                /* The prayer switch was buried in the details panel, which is
-                   the wrong place for the one flag that decides whether this
-                   entry can ever be marked answered. */
-                Row(
-                    Modifier.fillMaxWidth().padding(top = 6.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(if (isPrayer) accent.copy(alpha = .10f) else ink.copy(alpha = .04f))
-                        .clickable { isPrayer = !isPrayer }
-                        .padding(horizontal = 14.dp, vertical = 13.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        if (isPrayer) Icons.Outlined.CheckCircle else Icons.Outlined.RadioButtonUnchecked,
-                        null, tint = if (isPrayer) accent else muted, modifier = Modifier.size(19.dp),
-                    )
-                    Text(
-                        "Add to prayer list",
-                        Modifier.weight(1f).padding(start = 11.dp),
-                        color = ink, fontSize = 14.sp,
-                        fontWeight = if (isPrayer) FontWeight.SemiBold else FontWeight.Normal,
-                    )
-                    Icon(Icons.Outlined.KeyboardArrowRight, null, tint = muted, modifier = Modifier.size(18.dp))
-                }
-
-                val ready2 = body.isNotBlank()
-                Box(
-                    Modifier.fillMaxWidth().padding(top = 14.dp)
-                        .clip(RoundedCornerShape(99.dp))
-                        .background(if (ready2) accent else muted.copy(alpha = .18f))
-                        .clickable(enabled = ready2) { submit() }
-                        .padding(vertical = 16.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        "Save entry",
-                        color = if (ready2) cs.onPrimary else muted,
-                        fontWeight = FontWeight.SemiBold, fontSize = 15.sp,
-                    )
-                }
-
                 Spacer(Modifier.height(28.dp))
             }
 
-            /* The marks stay on a bar at the bottom, within thumb reach of
-               where you are typing. Only the marks - the pickers moved up into
-               the grid, where they are labelled. */
-            // the bar needs an edge; on themes where surface and background
-            // are near-identical it otherwise floats with no boundary
-            HorizontalDivider(color = line)
-            Row(
-                Modifier.fillMaxWidth().background(panel).navigationBarsPadding()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 12.dp, vertical = 9.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                MARKS.forEach { (label, token) ->
-                    Box(
-                        Modifier.size(40.dp).clip(RoundedCornerShape(11.dp))
-                            .background(ink.copy(alpha = .06f))
-                            .clickable { body += token },
-                        contentAlignment = Alignment.Center,
-                    ) { Text(label, color = ink, fontWeight = FontWeight.Bold, fontSize = 13.sp) }
+            /*
+             * The page, then one quiet row of tools above the keyboard.
+             *
+             * It used to be an eight-tile grid, an "Add to prayer list" row,
+             * a full-width Save button and a bar of formatting marks - four
+             * layers of controls on a page whose only job is to hold words.
+             * Apple's journal composer is the date, the text, and one slim
+             * row of glyphs, and it is right: the tools should be reachable
+             * without ever being the first thing you see.
+             *
+             * So the grid folds into five glyphs. Formatting hides behind Aa
+             * until it is wanted. Place, mood, tags and journal already live
+             * in the details sheet behind the slider icon at the top. The
+             * prayer flag becomes a glyph that fills when it is on.
+             */
+            var marks by remember { mutableStateOf(false) }
+            Column(Modifier.fillMaxWidth().background(cs.background).navigationBarsPadding()) {
+                AnimatedVisibility(marks) {
+                    Row(
+                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 14.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        MARKS.forEach { (label, token) ->
+                            Box(
+                                Modifier.size(38.dp).clip(RoundedCornerShape(10.dp))
+                                    .clickable { body += token },
+                                contentAlignment = Alignment.Center,
+                            ) { Text(label, color = ink, fontWeight = FontWeight.SemiBold, fontSize = 14.sp) }
+                        }
+                    }
+                }
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    ToolGlyph(Icons.Outlined.Image, "Add photo", muted) {
+                        mediaPicker.launch(arrayOf("image/*", "video/*"))
+                    }
+                    ToolGlyph(Icons.Outlined.Mic, "Dictate", muted) { voiceDisclosure = true }
+                    ToolGlyph(Icons.Outlined.MenuBook, "Attach today's verse", if (attachToday) accent else muted) {
+                        attachToday = !attachToday
+                    }
+                    ToolGlyph(Icons.Outlined.VolunteerActivism, if (isPrayer) "On prayer list" else "Add to prayer list", if (isPrayer) accent else muted) {
+                        isPrayer = !isPrayer
+                    }
+                    ToolGlyph(Icons.Outlined.AttachFile, "Attach a file", muted) {
+                        mediaPicker.launch(arrayOf("*/*"))
+                    }
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        "Aa",
+                        color = if (marks) accent else muted,
+                        fontWeight = FontWeight.SemiBold, fontSize = 16.sp,
+                        modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                            .clickable { marks = !marks }
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    )
                 }
             }
         }
@@ -738,4 +691,12 @@ fun WriteSheet(
         confirmButton = { TextButton(onClick = { confirmDelete = false; onDelete?.invoke() }) { Text("Delete", color = Color(0xFFB3402A)) } },
         dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Keep entry") } },
     )
+}
+
+@Composable
+private fun ToolGlyph(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, tint: Color, onClick: () -> Unit) {
+    Box(
+        Modifier.size(44.dp).clip(CircleShape).clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) { Icon(icon, label, tint = tint, modifier = Modifier.size(21.dp)) }
 }
