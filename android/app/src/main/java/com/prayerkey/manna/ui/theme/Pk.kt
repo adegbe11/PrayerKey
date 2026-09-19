@@ -21,6 +21,11 @@ import com.prayerkey.manna.R
  * spending.
  */
 object Pk {
+    // Physical-journal materials, distinct from the app's neutral chrome.
+    val JournalPaper = Color(0xFFF5EDDC)
+    val JournalEdge = Color(0xFFD5C7AB)
+    val JournalInk = Color(0xFF352D38)
+    val JournalRule = Color(0xFFC9BDA6)
 
     /* ── the six ─────────────────────────────────────────────────────── */
 

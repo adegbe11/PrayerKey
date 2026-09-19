@@ -182,6 +182,7 @@ fun JournalScreen(
     var answeringEntry by remember { mutableStateOf<JournalEntry?>(null) }
     var reviewingPrayer by remember { mutableStateOf<JournalEntry?>(null) }
     var libraryOpen by remember { mutableStateOf(false) }
+    var promptLibraryOpen by remember { mutableStateOf(false) }
 
     BackHandler(enabled = tab != JournalTab.Journey) {
         tab = JournalTab.Journey
@@ -234,7 +235,8 @@ fun JournalScreen(
                     onWelcomeTap = { chosen = null; picking = true },
                     onQuickStart = { key ->
                         chosen = null
-                        if (key == "prompt") browsingTemplates = true
+                        if (key == "template") browsingTemplates = true
+                        else if (key == "prompt") promptLibraryOpen = true
                         else { quickStart = key; writing = true }
                     },
                     insight = journeyInsight,
@@ -288,6 +290,22 @@ fun JournalScreen(
             onPick = { prompt -> chosen = prompt; picking = false; writing = true },
             onDismiss = { picking = false },
         )
+    }
+
+    if (promptLibraryOpen) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { promptLibraryOpen = false },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        ) {
+            com.prayerkey.manna.ui.journal.PromptLibrary(
+                onClose = { promptLibraryOpen = false },
+                onPrompt = { question, pack ->
+                    chosen = com.prayerkey.manna.ui.journal.JournalSuggestions.Prompt(pack.uppercase(), question, "prompt", suggestPrayer = pack.equals("Prayer", true))
+                    promptLibraryOpen = false
+                    writing = true
+                },
+            )
+        }
     }
 
     if (writing) com.prayerkey.manna.ui.journal.WriteSheet(
@@ -625,15 +643,14 @@ private fun JournalOverview(
                     color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold,
                     fontSize = 28.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 14.dp),
                 )
-                Surface(shape = RoundedCornerShape(99.dp), color = Color.White, modifier = Modifier.padding(top = 20.dp)) {
-                    Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.Create, null, tint = violet, modifier = Modifier.size(17.dp))
-                        Text("Write today", color = violet, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.padding(start = 8.dp))
-                    }
-                }
+                /* The + at the foot of the screen writes a page; a second button here
+                   saying the same thing was one control too many. The card still opens
+                   a page when tapped. */
             }
         }
 
+        /* Quick entry points stay intentionally limited to four: capture a
+           thought, attach a photo, open a guided template, or choose a prompt. */
         /* Four ways in. Each opens the page already doing the thing it names -
            the picker open, the dictation notice up, today's verse attached -
            because three buttons that all land on the same blank page are three
@@ -645,7 +662,7 @@ private fun JournalOverview(
             listOf(
                 Triple("Voice", Icons.Outlined.Mic, "voice"),
                 Triple("Photo", Icons.Outlined.Image, "media"),
-                Triple("Bible", Icons.Outlined.MenuBook, "verse"),
+                Triple("Template", Icons.Outlined.AutoStories, "template"),
                 Triple("Prompt", Icons.Outlined.Lightbulb, "prompt"),
             ).forEach { (label, icon, key) ->
                 Column(
@@ -663,36 +680,10 @@ private fun JournalOverview(
                 }
             }
         }
-
-        run {
-            Text(
-                if (entries.isEmpty()) "A SMALL BEGINNING" else "QUICK PROMPTS",
-                color = muted, fontFamily = UtilitySans, fontWeight = FontWeight.Bold,
-                fontSize = 10.sp, letterSpacing = 1.4.sp,
-                modifier = Modifier.padding(top = 24.dp, bottom = 10.dp),
-            )
-            listOf(
-                "One thing I am grateful for today",
-                "A prayer I do not want to forget",
-                "What God may be teaching me",
-            ).forEach { prompt ->
-                Surface(
-                    onClick = onWrite,
-                    shape = RoundedCornerShape(18.dp), color = Color.White,
-                    border = BorderStroke(1.dp, violet.copy(alpha = .12f)),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                ) {
-                    Row(Modifier.padding(horizontal = 15.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.EditNote, null, tint = violet, modifier = Modifier.size(19.dp))
-                        Text(prompt, Modifier.weight(1f).padding(start = 11.dp), color = ink, fontSize = 12.5.sp)
-                        Icon(Icons.Outlined.ChevronRight, null, tint = muted, modifier = Modifier.size(17.dp))
-                    }
-                }
-            }
-            return@Column
-        }
-
-        Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        /* Three tiles reading 0, 0 and 0 on a new journal were the loudest
+           thing on the page and said nothing. They appear once there is a page
+           to count. */
+        if (entries.isNotEmpty()) Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
                 Column(Modifier.padding(16.dp)) { Text(entries.size.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("PAGES", color = muted, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold) }
             }
@@ -704,9 +695,12 @@ private fun JournalOverview(
             }
         }
 
-        Text("COLLECTIONS", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
-        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            collections.forEach { item ->
+        /* A shelf of collections that all read "0 pages" is a table of contents
+           for a book nobody has written yet. Each appears when it has a page. */
+        val filled = collections.filter { it.count > 0 }
+        if (filled.isNotEmpty()) Text("YOUR PRAYER JOURNEY", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
+        if (filled.isNotEmpty()) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            filled.forEach { item ->
                 Surface(
                     Modifier.width(142.dp).height(112.dp).clickable { onCollection(if (item.title == "All pages") null else item.title.lowercase()) },
                     shape = RoundedCornerShape(20.dp), color = Color.White, border = BorderStroke(1.dp, item.tint.copy(alpha = .12f)),
@@ -725,7 +719,6 @@ private fun JournalOverview(
                 Column(Modifier.padding(18.dp)) {
                     Text(entry.title.ifBlank { "Your latest page" }, color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 19.sp)
                     Text(entry.body, color = muted, fontFamily = BookSerif, fontSize = 13.sp, lineHeight = 20.sp, maxLines = 2, modifier = Modifier.padding(top = 6.dp))
-                    Text("OPEN PAGE", color = violet, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = .8.sp, modifier = Modifier.padding(top = 12.dp))
                 }
             }
         }

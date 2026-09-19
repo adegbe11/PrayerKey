@@ -29,12 +29,14 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -45,6 +47,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalView
@@ -112,6 +120,22 @@ private fun pagesOf(t: JournalTemplate): List<BookPage> = buildList {
     add(BookPage.Amen)
 }
 
+/** Gives every guided book a real-world closing page: reflection becomes
+ * prayer, gratitude becomes remembrance, and a difficult season gets a next
+ * faithful step. This keeps short templates from ending abruptly. */
+private fun JournalTemplate.withBookRhythm(): JournalTemplate {
+    val closing = when (collection) {
+        "Prayer" -> TemplatePrompt("CLOSING PRAYER", "What will you place in God’s hands as you close?", "Leave the page with one honest sentence of trust.")
+        "Bible & Scripture" -> TemplatePrompt("CARRY IT", "How will you carry this Scripture into today?", "Name one small response, not a perfect plan.")
+        "Answered prayer" -> TemplatePrompt("REMEMBER", "What do you want your future self to remember about God’s faithfulness?", "Write it as a testimony you can return to.")
+        "Difficult seasons" -> TemplatePrompt("NEXT STEP", "What is the next faithful step you can take?", "It can be small. Faithfulness does not need to be dramatic.")
+        "Sermon & church" -> TemplatePrompt("RESPONSE", "What will you do with what you heard?", "Turn one insight into a prayer or action.")
+        "Gratitude" -> TemplatePrompt("THANK YOU", "What final thank-you do you want to pray today?", "Name the gift so you do not forget it.")
+        else -> TemplatePrompt("CLOSING", "What do you want to carry forward from this page?", "End with one sentence you can remember.")
+    }
+    return if (prompts.any { it.heading == closing.heading }) this else copy(prompts = prompts + closing)
+}
+
 @Composable
 fun TemplateBook(
     template: JournalTemplate,
@@ -119,13 +143,29 @@ fun TemplateBook(
     onFinish: (title: String, body: String, journal: String, prayer: Boolean) -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val pages = remember(template.id) { pagesOf(template) }
-    val answers = remember(template.id) { mutableStateMapOf<Int, String>() }
-    val startedAt = remember(template.id) { System.currentTimeMillis() }
+    val bookTemplate = remember(template.id) { template.withBookRhythm() }
+    val pages = remember(bookTemplate.id) { pagesOf(bookTemplate) }
+    val answers = rememberSaveable(template.id, saver = mapSaver(
+        save = { state: androidx.compose.runtime.snapshots.SnapshotStateMap<Int, String> -> state.mapKeys { it.key.toString() } },
+        restore = { saved -> mutableStateMapOf<Int, String>().apply { saved.forEach { (key, value) -> put(key.toInt(), value as String) } } },
+    )) { mutableStateMapOf<Int, String>() }
+    val startedAt = rememberSaveable(template.id) { System.currentTimeMillis() }
     val scope = rememberCoroutineScope()
     val view = LocalView.current
+    DisposableEffect(view) {
+        val window = (view.context as? android.app.Activity)?.window
+        val controller = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view) }
+        val previousStatus = controller?.isAppearanceLightStatusBars
+        val previousNavigation = controller?.isAppearanceLightNavigationBars
+        controller?.isAppearanceLightStatusBars = true
+        controller?.isAppearanceLightNavigationBars = true
+        onDispose {
+            previousStatus?.let { controller?.isAppearanceLightStatusBars = it }
+            previousNavigation?.let { controller?.isAppearanceLightNavigationBars = it }
+        }
+    }
 
-    var index by remember(template.id) { mutableIntStateOf(0) }
+    var index by rememberSaveable(template.id) { mutableIntStateOf(0) }
     val crease = remember { Animatable(0f) }
     var direction by remember { mutableIntStateOf(0) }
     var turning by remember { mutableStateOf(false) }
@@ -153,7 +193,7 @@ fun TemplateBook(
         settle(commit = true, forward = forward)
     }
 
-    Box(Modifier.fillMaxSize().background(Pk.Cream)) {
+    Box(Modifier.fillMaxSize().background(Pk.DeepDark)) {
         Box(
             Modifier.fillMaxSize().pointerInput(pages.size) {
                 var travelled = 0f
@@ -191,58 +231,154 @@ fun TemplateBook(
              * it has anything to show.
              */
             if (direction == 0) {
-                Leaf(template, pages, index, answers, startedAt,
-                    onTurn = { turn(true) }, onFinish = onFinish, onClose = onClose)
+                Leaf(bookTemplate, pages, index, answers, startedAt,
+                    onTurn = { turn(true) }, onFinish = onFinish, onClose = onClose, onBack = { turn(false) })
             } else {
                 FoldedPage(
                     progress = { crease.value },
                     under = {
-                        Leaf(template, pages, if (direction < 0) index else index + 1, answers, startedAt,
+                        Leaf(bookTemplate, pages, if (direction < 0) index else index + 1, answers, startedAt,
                             onTurn = {}, onFinish = onFinish, onClose = onClose)
                     },
                     folding = {
-                        Leaf(template, pages, if (direction < 0) index - 1 else index, answers, startedAt,
+                        Leaf(bookTemplate, pages, if (direction < 0) index - 1 else index, answers, startedAt,
                             onTurn = {}, onFinish = onFinish, onClose = onClose)
                     },
                 )
             }
         }
 
-        /* The page number and the way out, on every leaf. A book you cannot
-           leave is a trap, and one that does not say where you are is a scroll
-           with extra steps. */
-        Row(
-            Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        /* Only the way out sits at the top. The page number moved to the foot,
+           where a printed book keeps it, and the back arrow became the ‹ beside
+           it. A breadcrumb reading PRAYERKEY / JOURNAL and a second counter in
+           the corner were an app's furniture laid over a page. */
+        IconButton(
+            onClick = onClose,
+            modifier = Modifier.statusBarsPadding().padding(start = 10.dp, top = 2.dp),
         ) {
-            IconButton(onClick = onClose) {
-                Icon(Icons.Outlined.Close, "Close", tint = Pk.Charcoal, modifier = Modifier.size(19.dp))
-            }
-            Spacer(Modifier.weight(1f))
-            if (index in 1 until pages.lastIndex) {
-                Text(
-                    "%02d".format(index) + " / " + "%02d".format(pages.size - 2),
-                    color = Pk.Muted, fontFamily = UtilitySans,
-                    fontSize = 10.sp, letterSpacing = 1.4.sp,
-                    modifier = Modifier.padding(end = 16.dp),
-                )
-            }
+            Icon(Icons.Outlined.Close, "Close", tint = Pk.JournalInk.copy(alpha = .7f), modifier = Modifier.size(19.dp))
         }
     }
 }
 
 /** Every leaf sits in the same measure, centred, on paper. */
 @Composable
-private fun Sheet(content: @Composable ColumnScope.() -> Unit) {
-    Column(
-        Modifier.fillMaxSize().background(Pk.Cream)
-            .statusBarsPadding().navigationBarsPadding().imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 34.dp, vertical = 46.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        content = content,
-    )
+private fun Sheet(
+    footer: (@Composable () -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    JournalPaper {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()) {
+            Column(
+                Modifier.weight(1f).fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(start = 33.dp, end = 25.dp, top = 70.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                content = content,
+            )
+            footer?.invoke()
+        }
+    }
+}
+
+/**
+ * The foot of a page: where you are, and which way the book turns.
+ *
+ * A folio, as a printed book has, with a faint chevron either side instead of
+ * Continue and Back buttons. Swiping turns the page as before; the chevrons
+ * are for anyone who does not know that yet.
+ */
+@Composable
+private fun Folio(number: Int, of: Int, onBack: () -> Unit, onNext: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().padding(start = 22.dp, end = 30.dp, bottom = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            "‹", color = Pk.JournalInk.copy(alpha = .45f), fontSize = 26.sp,
+            modifier = Modifier.clip(CircleShape).clickable(onClick = onBack).padding(horizontal = 14.dp, vertical = 2.dp),
+        )
+        Text(
+            "—  " + number + "  —",
+            Modifier.weight(1f),
+            color = Pk.JournalInk.copy(alpha = .5f), fontFamily = BookSerif,
+            fontSize = 13.sp, textAlign = TextAlign.Center,
+        )
+        Text(
+            "›", color = Pk.JournalInk.copy(alpha = .45f), fontSize = 26.sp,
+            modifier = Modifier.clip(CircleShape).clickable(onClick = onNext).padding(horizontal = 14.dp, vertical = 2.dp),
+        )
+    }
+}
+
+/**
+ * Whether a page is a list rather than a passage.
+ *
+ * Gratitude, people and requests are written as a list in every printed prayer
+ * journal - a box and a line per item - because each one is a separate thing
+ * that may later be ticked off as answered. Prose would bury them.
+ */
+private fun TemplatePrompt.isList(): Boolean =
+    people ||
+        heading in setOf("GRATITUDE", "I AM ASKING", "PEOPLE ON MY HEART", "THANK YOU") ||
+        question.lowercase().let { it.contains("three things") || it.contains("who am i praying") || it.contains("who are you praying") }
+
+/**
+ * Checkbox rows, the way a printed prayer-request page is laid out.
+ *
+ * Stored as a markdown checklist, so the finished entry reads the same way and
+ * a request can be ticked later from the journal.
+ */
+@Composable
+private fun Checklist(value: String, onChange: (String) -> Unit, rows: Int, firstHint: String) {
+    val items = remember(value) {
+        val parsed = value.lines().filter { it.isNotBlank() }.map { line ->
+            val done = line.startsWith("- [x] ")
+            done to line.removePrefix("- [x] ").removePrefix("- [ ] ")
+        }
+        parsed + List((rows - parsed.size).coerceAtLeast(1)) { false to "" }
+    }
+    fun save(next: List<Pair<Boolean, String>>) {
+        onChange(next.filter { it.second.isNotBlank() }.joinToString("\n") { (if (it.first) "- [x] " else "- [ ] ") + it.second })
+    }
+    Column(Modifier.fillMaxWidth()) {
+        items.forEachIndexed { i, (done, text) ->
+            Row(
+                Modifier.fillMaxWidth().height(44.dp).drawBehind {
+                    drawLine(Pk.JournalRule.copy(alpha = .7f), Offset(28.dp.toPx(), size.height - 1.dp.toPx()), Offset(size.width, size.height - 1.dp.toPx()), .65.dp.toPx())
+                },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(
+                    Modifier.size(15.dp).clip(RoundedCornerShape(2.dp))
+                        .background(if (done) Pk.Oxblood else Pk.Oxblood.copy(alpha = .14f))
+                        .clickable(enabled = text.isNotBlank()) {
+                            save(items.mapIndexed { j, it -> if (j == i) (!it.first to it.second) else it })
+                        },
+                    contentAlignment = Alignment.Center,
+                ) { if (done) Text("\u2713", color = Color.White, fontSize = 10.sp) }
+                BasicTextField(
+                    text,
+                    { typed -> save(items.mapIndexed { j, it -> if (j == i) (it.first to typed.replace("\n", " ")) else it }) },
+                    singleLine = true,
+                    textStyle = TextStyle(
+                        color = Pk.JournalInk, fontFamily = BookSerif, fontSize = 17.sp,
+                        textDecoration = if (done) androidx.compose.ui.text.style.TextDecoration.LineThrough else null,
+                    ),
+                    modifier = Modifier.weight(1f).padding(start = 13.dp),
+                    decorationBox = { field ->
+                        Box {
+                            if (text.isEmpty() && i == 0 && firstHint.isNotBlank()) {
+                                Text(firstHint, color = Pk.Muted.copy(alpha = .7f), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 17.sp)
+                            }
+                            field()
+                        }
+                    },
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -255,14 +391,16 @@ private fun Leaf(
     onTurn: () -> Unit,
     onFinish: (String, String, String, Boolean) -> Unit,
     onClose: () -> Unit,
+    onBack: () -> Unit = {},
 ) {
+    val folio: @Composable () -> Unit = { Folio(at, pages.size - 2, onBack, onTurn) }
     when (val page = pages.getOrNull(at) ?: return) {
 
         BookPage.Cover -> Sheet {
             Text(
-                template.title.uppercase(Locale.UK),
-                color = Pk.Charcoal, fontFamily = UtilitySans, fontSize = 11.sp,
-                letterSpacing = 3.sp, fontWeight = FontWeight.Bold,
+                template.title,
+                color = Pk.JournalInk, fontFamily = DisplaySerif, fontSize = 43.sp, lineHeight = 47.sp,
+                letterSpacing = (-1).sp, fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
             )
             Text(
@@ -270,9 +408,9 @@ private fun Leaf(
                 Modifier.padding(top = 10.dp),
                 color = Pk.Muted, fontFamily = BookSerif, fontSize = 13.sp,
             )
-            Spacer(Modifier.height(44.dp))
-            Text("✹", color = Pk.GoldDeep, fontSize = 17.sp)
-            Spacer(Modifier.height(44.dp))
+            Spacer(Modifier.height(30.dp))
+            Box(Modifier.fillMaxWidth(.35f).height(1.dp).background(Pk.GoldDeep.copy(alpha = .4f)))
+            Spacer(Modifier.height(30.dp))
             if (template.verse.isNotBlank()) {
                 Text(
                     "“" + template.verse + "”",
@@ -297,8 +435,7 @@ private fun Leaf(
             Turn("Begin", onTurn)
         }
 
-        is BookPage.Still -> Sheet {
-            Numeral(at)
+        is BookPage.Still -> Sheet(footer = folio) {
             Heading("BE STILL")
             Text(
                 "Before you ask for anything, become still before God.",
@@ -319,77 +456,78 @@ private fun Leaf(
                 Modifier.padding(top = 8.dp),
                 color = Pk.Muted, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 1.6.sp,
             )
-            Spacer(Modifier.height(36.dp))
-            Turn("Continue", onTurn)
         }
 
-        is BookPage.Write -> Sheet {
-            Numeral(at)
-            Heading(page.prompt.heading.ifBlank { "" })
-            Text(
-                page.prompt.question,
-                Modifier.padding(top = if (page.prompt.heading.isBlank()) 0.dp else 16.dp),
-                color = Pk.Charcoal, fontFamily = DisplaySerif, fontWeight = FontWeight.Light,
-                fontSize = 27.sp, lineHeight = 35.sp, letterSpacing = (-0.5).sp,
-                textAlign = TextAlign.Center,
-            )
-            if (page.prompt.guide.isNotBlank()) {
-                Text(
-                    page.prompt.guide,
-                    Modifier.padding(top = 14.dp),
-                    color = Pk.Muted, fontFamily = BookSerif, fontSize = 14.sp,
-                    lineHeight = 21.sp, textAlign = TextAlign.Center,
-                )
-            }
-
-            Spacer(Modifier.height(30.dp))
-            /* Ruled lines, because that is what the page under your pen looks
-               like and because an empty box says "fill me in" where a ruled
-               page says "there is room". */
-            Ruled(
-                value = answers[page.index].orEmpty(),
-                onChange = { answers[page.index] = it },
-            )
-
-            if (page.prompt.private) {
-                Row(
-                    Modifier.padding(top = 18.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(Icons.Outlined.Lock, null, tint = Pk.Muted, modifier = Modifier.size(13.dp))
+        /*
+         * A writing page, laid out the way a printed journal sheet is.
+         *
+         * The heading and the question sit at the top, left-aligned, and the
+         * rest of the page is ruled down to the margin - the lines are the
+         * page, not a box placed on it. Lists get a box and a line per item,
+         * like a prayer-request sheet. The opening words, where a page has
+         * them, are pencilled faintly on the first line instead of offered in
+         * a button, so the page never asks you to press anything to begin.
+         */
+        is BookPage.Write -> JournalPaper {
+            Column(
+                Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()
+                    .padding(start = 33.dp, end = 30.dp, top = 58.dp),
+            ) {
+                if (page.prompt.heading.isNotBlank()) {
                     Text(
-                        "FOR YOUR EYES ONLY",
-                        Modifier.padding(start = 7.dp),
-                        color = Pk.Muted, fontFamily = UtilitySans,
-                        fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold,
+                        page.prompt.heading,
+                        color = Pk.GoldDeep, fontFamily = UtilitySans, fontSize = 11.sp,
+                        letterSpacing = 2.6.sp, fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                }
+                Text(
+                    page.prompt.question,
+                    color = Pk.JournalInk, fontFamily = DisplaySerif, fontWeight = FontWeight.Medium,
+                    fontSize = 27.sp, lineHeight = 33.sp, letterSpacing = (-0.4).sp,
+                )
+                if (page.prompt.guide.isNotBlank()) {
+                    Text(
+                        page.prompt.guide,
+                        Modifier.padding(top = 10.dp),
+                        color = Pk.Muted, fontFamily = BookSerif, fontStyle = FontStyle.Italic,
+                        fontSize = 14.5.sp, lineHeight = 21.sp,
                     )
                 }
-            }
+                if (page.prompt.private) {
+                    Row(Modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Lock, null, tint = Pk.Muted, modifier = Modifier.size(12.dp))
+                        Text(
+                            "For your eyes only",
+                            Modifier.padding(start = 6.dp),
+                            color = Pk.Muted, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 12.5.sp,
+                        )
+                    }
+                }
+                Spacer(Modifier.height(22.dp))
 
-            if (page.prompt.starter.isNotBlank() && answers[page.index].isNullOrBlank()) {
-                Spacer(Modifier.height(20.dp))
-                Text(
-                    "Need a beginning?",
-                    color = Pk.Muted, fontFamily = UtilitySans, fontSize = 11.sp,
-                )
-                Text(
-                    "“" + page.prompt.starter + "”",
-                    Modifier.padding(top = 8.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Pk.Oxblood.copy(alpha = .06f))
-                        .clickable { answers[page.index] = page.prompt.starter + " " }
-                        .padding(horizontal = 14.dp, vertical = 10.dp),
-                    color = Pk.Oxblood, fontFamily = BookSerif, fontStyle = FontStyle.Italic,
-                    fontSize = 15.sp, textAlign = TextAlign.Center,
-                )
+                Box(Modifier.weight(1f).fillMaxWidth()) {
+                    if (page.prompt.isList()) {
+                        Checklist(
+                            value = answers[page.index].orEmpty(),
+                            onChange = { answers[page.index] = it },
+                            rows = 8,
+                            firstHint = page.prompt.starter,
+                        )
+                    } else {
+                        Ruled(
+                            value = answers[page.index].orEmpty(),
+                            onChange = { answers[page.index] = it },
+                            hint = page.prompt.starter,
+                            fill = true,
+                        )
+                    }
+                }
+                folio()
             }
-
-            Spacer(Modifier.height(30.dp))
-            Turn(if (page.prompt.skippable && answers[page.index].isNullOrBlank()) "Skip for today" else "Continue", onTurn)
         }
 
-        is BookPage.Listen -> Sheet {
-            Numeral(at)
+        is BookPage.Listen -> Sheet(footer = folio) {
             Heading("LISTEN")
             Text(
                 "Do not rush away. Sit quietly for a moment.",
@@ -419,8 +557,6 @@ private fun Leaf(
                 color = Pk.Muted, fontFamily = UtilitySans, fontSize = 10.5.sp,
                 textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(30.dp))
-            Turn("Continue", onTurn)
         }
 
         BookPage.Amen -> Sheet {
@@ -512,21 +648,35 @@ private fun Leaf(
  * A bordered text box is a form control. Ruled lines are what a journal looks
  * like, and they say "there is room here" where a box says "fill this in".
  */
-@Composable private fun Ruled(value: String, onChange: (String) -> Unit, lines: Int = 5) {
-    Box(Modifier.fillMaxWidth()) {
-        Column {
-            repeat(lines) {
-                Spacer(Modifier.height(33.dp))
-                Box(Modifier.fillMaxWidth().height(1.dp).background(Pk.Charcoal.copy(alpha = .13f)))
-            }
+@Composable private fun Ruled(
+    value: String,
+    onChange: (String) -> Unit,
+    lines: Int = 5,
+    hint: String = "",
+    fill: Boolean = false,
+) {
+    val spacing = with(LocalDensity.current) { 34.sp.toPx() }
+    val minHeight = with(LocalDensity.current) { (spacing * lines).toDp() }
+    Box((if (fill) Modifier.fillMaxSize() else Modifier.fillMaxWidth().heightIn(min = minHeight)).drawBehind {
+        var y = spacing - 2.dp.toPx()
+        while (y < size.height) {
+            drawLine(Pk.JournalRule.copy(alpha = .7f), Offset(0f, y), Offset(size.width, y), .65.dp.toPx())
+            y += spacing
         }
+    }) {
         BasicTextField(
             value, onChange,
             textStyle = TextStyle(
-                color = Pk.Charcoal, fontFamily = BookSerif,
+                color = Pk.JournalInk, fontFamily = BookSerif,
                 fontSize = 17.sp, lineHeight = 34.sp,
             ),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = if (fill) Modifier.fillMaxSize() else Modifier.fillMaxWidth().heightIn(min = minHeight),
+            decorationBox = { field ->
+                Box {
+                    if (value.isBlank()) Text(hint.ifBlank { "Write here…" }, color = Pk.Muted.copy(alpha = .75f), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 17.sp, lineHeight = 34.sp)
+                    field()
+                }
+            },
         )
     }
 }

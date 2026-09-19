@@ -126,17 +126,6 @@ fun TemplateGallery(
             }
         }
 
-        Row(
-            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Chip("All", collection == null) { collection = null }
-            TEMPLATE_COLLECTIONS.forEach { c ->
-                Chip(c.emoji + "  " + c.name, collection == c.name) { collection = c.name }
-            }
-        }
-
         LazyColumn(Modifier.weight(1f), contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)) {
             if (query.isBlank() && collection == null && recents.isNotEmpty()) {
                 item {
@@ -159,8 +148,54 @@ fun TemplateGallery(
                     )
                 }
             }
-            items(results, key = { it.id }) { TemplateRow(it, onPick) }
+            if (query.isBlank() && collection == null) {
+                item {
+                    Text("Recommended", fontFamily = DisplaySerif, fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Pk.Charcoal, modifier = Modifier.padding(bottom = 12.dp))
+                    JOURNAL_TEMPLATES.firstOrNull { it.id == "prayer-morning" }?.let { TemplateFeatureCard(it, onPick) }
+                    Text("Browse by purpose", fontFamily = DisplaySerif, fontSize = 23.sp, fontWeight = FontWeight.Bold, color = Pk.Charcoal, modifier = Modifier.padding(top = 26.dp, bottom = 12.dp))
+                }
+                TEMPLATE_COLLECTIONS.take(9).forEach { c ->
+                    val cards = JOURNAL_TEMPLATES.filter { it.collection == c.name }.take(3)
+                    if (cards.isNotEmpty()) {
+                        item(key = "section-${c.name}") {
+                            Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text(c.emoji + "  " + c.name, Modifier.weight(1f), fontFamily = DisplaySerif, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Pk.Charcoal)
+                                Text("See all", color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.clickable { collection = c.name })
+                            }
+                        }
+                        items(cards, key = { "card-${it.id}" }) { TemplateCard(it, onPick) }
+                    }
+                }
+            } else {
+                items(results, key = { it.id }) { TemplateRow(it, onPick) }
+            }
         }
+    }
+}
+
+@Composable
+private fun TemplateFeatureCard(template: JournalTemplate, onPick: (JournalTemplate) -> Unit) {
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Pk.DeepDark).clickable { onPick(template) }.padding(22.dp)) {
+        Text("PRAYER", color = Pk.Gold, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
+        Text(template.title, color = Color.White, fontFamily = DisplaySerif, fontSize = 27.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
+        Text(template.summary, color = Color.White.copy(alpha = .72f), fontFamily = UtilitySans, fontSize = 13.sp, modifier = Modifier.padding(top = 5.dp))
+        Text("Use now  →", color = Color.White, fontFamily = UtilitySans, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp))
+    }
+}
+
+@Composable
+private fun TemplateCard(template: JournalTemplate, onPick: (JournalTemplate) -> Unit) {
+    val tint = when (template.collection) {
+        "Prayer" -> Color(0xFF5B22C7)
+        "Bible & Scripture" -> Color(0xFF1E6A68)
+        "Answered prayer" -> Color(0xFF8A5A16)
+        "Difficult seasons" -> Color(0xFF394B70)
+        else -> Pk.Oxblood
+    }
+    Row(Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(18.dp)).background(tint.copy(alpha = .10f)).clickable { onPick(template) }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(48.dp).clip(RoundedCornerShape(14.dp)).background(tint), contentAlignment = Alignment.Center) { Text(TEMPLATE_COLLECTIONS.find { it.name == template.collection }?.emoji.orEmpty(), fontSize = 22.sp) }
+        Column(Modifier.weight(1f).padding(start = 14.dp)) { Text(template.title, color = Pk.Charcoal, fontFamily = UtilitySans, fontSize = 15.sp, fontWeight = FontWeight.SemiBold); Text(template.summary, color = Pk.Muted, fontFamily = UtilitySans, fontSize = 11.5.sp, maxLines = 1, modifier = Modifier.padding(top = 3.dp)) }
+        Text("${template.prompts.size} pages", color = tint, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -229,7 +264,8 @@ fun TemplatePreview(
     BackHandler(onBack = onClose)
     val emoji = TEMPLATE_COLLECTIONS.find { it.name == template.collection }?.emoji.orEmpty()
 
-    Column(Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding().navigationBarsPadding()) {
+    JournalPaper {
+    Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onClose) { Icon(Icons.Outlined.ArrowBack, "Back", tint = Pk.Charcoal) }
             Text(
@@ -297,10 +333,11 @@ fun TemplatePreview(
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                "Use this template",
+                "Use now",
                 color = Color.White, fontFamily = UtilitySans,
                 fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
             )
         }
+    }
     }
 }

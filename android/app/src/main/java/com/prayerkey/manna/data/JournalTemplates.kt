@@ -136,7 +136,7 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
      */
     JournalTemplate(
         "prayer-morning", "Prayer", "Morning prayer",
-        "Twelve pages. Begin the day with God.",
+        "Begin the day with God.",
         listOf(
             TemplatePrompt(
                 "ADORATION", "God, You are…",
@@ -1161,6 +1161,41 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
             p("What I will follow up"),
         ),
         journal = "Church",
+    ),
+    JournalTemplate(
+        "prayer-update", "Prayer", "Prayer update",
+        "Return to a prayer matter and notice what has changed",
+        listOf(
+            p("What am I still bringing to God?"),
+            p("What has changed since I last wrote?"),
+            p("What Scripture is helping me keep going?"),
+            p("What is my next faithful step?"),
+        ),
+        prayer = true,
+    ),
+    JournalTemplate(
+        "scripture-prayer", "Bible & Scripture", "Pray this Scripture",
+        "Let one passage become your prayer today",
+        listOf(
+            p("The Scripture I am carrying is…"),
+            p("What do I notice about God here?"),
+            p("My prayer from this passage is…"),
+            p("How will I carry this into today?"),
+        ),
+        journal = "Scripture",
+        prayer = true,
+    ),
+    JournalTemplate(
+        "remember-faithfulness", "Answered prayer", "Remember His faithfulness",
+        "Keep a record of what God has carried you through",
+        listOf(
+            p("What was I asking God for?"),
+            p("What happened, in its own time?"),
+            p("What do I want to remember when I am afraid again?"),
+            p("My thank-you prayer is…"),
+        ),
+        journal = "Answered prayer",
+        prayer = true,
     ),
 )
 

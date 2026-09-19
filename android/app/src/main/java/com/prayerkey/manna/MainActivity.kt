@@ -105,8 +105,14 @@ class MainActivity : ComponentActivity() {
             }
 
             MannaTheme(resolvedTheme) {
+                var previewJournal by remember { mutableStateOf(BuildConfig.DEBUG && intent.getBooleanExtra("preview_journal", false)) }
                 var previewWelcome by remember { mutableStateOf(BuildConfig.DEBUG && intent.getBooleanExtra("preview_welcome", false)) }
-                if (previewWelcome) {
+                if (previewJournal) {
+                    com.prayerkey.manna.ui.journal.TemplateBook(
+                        template = com.prayerkey.manna.data.JOURNAL_TEMPLATES.first { it.id == "prayer-morning" },
+                        onClose = { previewJournal = false }, onFinish = { _, _, _, _ -> previewJournal = false },
+                    )
+                } else if (previewWelcome) {
                     com.prayerkey.manna.ui.screens.GuidedWelcome(preview = true, onBack = { previewWelcome = false }) { _, _ -> previewWelcome = false }
                 } else if (appReady) {
                     MannaApp(
