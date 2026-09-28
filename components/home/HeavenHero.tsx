@@ -65,7 +65,8 @@ export default function HeavenHero({ words }: { words: string[] }) {
             Where beautiful
           </motion.span>
           <span className="hm-hero__word">
-            <AnimatePresence mode="wait" initial={false}>
+            {/* Old and new words cross-fade in the same cell, so the line is never empty. */}
+            <AnimatePresence initial={false}>
               <motion.span key={words[index]} className="pk-gold-text" initial={{ opacity: 0, y: "0.3em", filter: "blur(10px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: "-0.3em", filter: "blur(10px)" }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}>
                 {words[index]}
               </motion.span>

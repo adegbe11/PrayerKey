@@ -17,6 +17,7 @@ const LINKS = [
   { href: "/pray/topics", label: "Topics" },
   { href: "/live",   label: "Live Sermon" },
   { href: "/guides", label: "Guides" },
+  { href: "/download", label: "App" },
 ];
 
 const DOCK = [
@@ -34,6 +35,8 @@ const MENU = [
 
 // Full-screen tools draw their own chrome.
 const BARE = ["/live/projector"];
+// Pages that open on a full-bleed night hero; the nav floats over it with no spacer.
+const FULL_BLEED = ["/", "/download"];
 
 function matches(path: string, href: string) {
   return href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
@@ -100,7 +103,7 @@ export default function CapsuleNav() {
           </div>
         </div>
       </header>
-      {path !== "/" && <div aria-hidden className="pk-nav__spacer" />}
+      {!FULL_BLEED.includes(path) && <div aria-hidden className="pk-nav__spacer" />}
 
       {/* Phone menu: every section, large and calm. */}
       <div className={`pk-sheet ${open ? "is-open" : ""}`} aria-hidden={!open}>

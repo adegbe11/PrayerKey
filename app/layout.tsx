@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Lora, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import CapsuleNav from "@/components/layout/CapsuleNav";
+import AppInvite from "@/components/app/AppInvite";
 import Link from "next/link";
 
 // The app's three typefaces: Playfair for display, Lora for scripture, Inter for everything else.
@@ -172,6 +173,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <CapsuleNav />
+        <AppInvite />
 
         <main style={{
           maxWidth: "1440px",
@@ -229,6 +231,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </span>
             <div style={{ display: "flex", gap: "28px", flexWrap: "wrap" }}>
               {[
+                { href: "/download",                 label: "Get the App" },
                 { href: "/about",                    label: "About" },
                 { href: "/author/collins-asein",     label: "Author" },
                 { href: "/prayer",                   label: "All Prayers" },

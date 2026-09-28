@@ -56,8 +56,8 @@
   margin: 26px 0 0; color: #fff; font-size: clamp(50px, 9vw, 116px); line-height: 0.98; letter-spacing: -0.025em;
   text-shadow: 0 4px 40px rgba(20,0,40,0.45);
 }
-.hm-hero__word { display: block; min-height: 1.02em; }
-.hm-hero__word > span { display: inline-block; padding: 0 0.04em 0.08em; }
+.hm-hero__word { display: grid; justify-items: center; min-height: 1.02em; }
+.hm-hero__word > span { grid-area: 1 / 1; display: inline-block; padding: 0 0.04em 0.08em; }
 .hm-hero__lead { margin: 26px auto 0; max-width: 620px; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.55; color: rgba(255,255,255,0.84); }
 .hm-hero__ask {
   margin-top: 36px; width: min(620px, 100%); display: flex; align-items: center; gap: 8px; padding: 7px 7px 7px 24px;

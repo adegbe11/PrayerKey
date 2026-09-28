@@ -1,0 +1,113 @@
+/* Download page. Night hero with the phones, then light chapters, one feature at a time. */
+
+.dl { margin-top: calc(-1 * clamp(32px, 5vw, 64px)); }
+.dl-wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 40px); }
+.dl-h2 { margin: 0; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.04; color: var(--pk-text); }
+.dl-h2--light { color: #fff; }
+.dl-center { text-align: center; }
+.dl-muted { color: var(--pk-text-3); }
+
+/* ── Hero ── */
+.dl-hero { position: relative; overflow: hidden; isolation: isolate; color: #fff; min-height: max(100svh, 760px); display: flex; align-items: center; }
+.dl-hero__sky { position: absolute; inset: 0; z-index: -3; background: url("/art/dawn-mountain.webp") center 30% / cover no-repeat; opacity: 0.5; animation: pk-settle 3s var(--pk-spring) both; }
+.dl-hero::before { content: ""; position: absolute; inset: 0; z-index: -2; background: linear-gradient(180deg, #0B0014 0%, rgba(22,0,34,0.82) 35%, rgba(42,8,90,0.78) 75%, #160022 100%); }
+.dl-hero__glow { position: absolute; z-index: -1; right: 8%; top: 22%; width: min(760px, 90vw); aspect-ratio: 1; background: radial-gradient(circle, rgba(122,31,255,0.55) 0%, rgba(232,201,140,0.14) 35%, transparent 65%); filter: blur(10px); animation: pk-float 9s ease-in-out infinite; }
+.dl-hero__grid { width: 100%; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(30px, 5vw, 70px); align-items: center; padding-top: 110px; padding-bottom: 70px; }
+.dl-hero__title { margin: 22px 0 0; font-size: clamp(42px, 5.2vw, 72px); line-height: 1.0; letter-spacing: -0.025em; color: #fff; }
+.dl-hero__lead { margin: 22px 0 0; max-width: 520px; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.55; color: rgba(255,255,255,0.8); }
+.dl-hero__get { margin-top: 32px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.dl-qr { display: inline-flex; align-items: center; gap: 12px; padding: 8px 14px 8px 8px; border-radius: 18px; background: rgba(255,255,255,0.1); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16); }
+.dl-qr img { width: 64px; height: 64px; padding: 6px; border-radius: 10px; background: #fff; }
+.dl-qr span { max-width: 90px; font: 600 12px/1.35 var(--pk-font-sans); color: rgba(255,255,255,0.8); }
+.dl-trust { list-style: none; padding: 0; margin: 28px 0 0; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.dl-trust li { display: flex; align-items: center; gap: 6px; font: 600 14px/1 var(--pk-font-sans); color: rgba(255,255,255,0.86); }
+.dl-trust svg { color: #E8C98C; }
+
+.dl-hero__phones { position: relative; height: min(680px, 72vh); min-height: 520px; }
+.dl-hero__phone { position: absolute; width: min(270px, 23vw); top: 50%; left: 50%; }
+.dl-hero__phone--front { z-index: 3; margin: calc(min(270px, 23vw) * -1.07) 0 0 calc(min(270px, 23vw) * -0.5); }
+.dl-hero__phone--left { z-index: 1; width: min(230px, 19vw); margin: calc(min(230px, 19vw) * -0.95) 0 0 calc(min(230px, 19vw) * -1.35); opacity: 0.95; }
+.dl-hero__phone--right { z-index: 2; width: min(230px, 19vw); margin: calc(min(230px, 19vw) * -0.95) 0 0 calc(min(230px, 19vw) * 0.35); opacity: 0.95; }
+.dl-hero__phone--front .pk-phone { animation: pk-float 7s ease-in-out infinite; }
+
+/* ── Opening lines ── */
+.dl-start { background: var(--pk-bg); padding: clamp(96px, 12vw, 160px) 0 clamp(40px, 6vw, 70px); text-align: center; }
+.dl-start__line { margin: 0 auto; max-width: 900px; font-size: clamp(32px, 4.6vw, 56px); line-height: 1.12; color: var(--pk-text); }
+.dl-start__answer { margin: 26px auto 0; font-size: clamp(32px, 4.6vw, 56px); line-height: 1.12; color: var(--pk-accent); }
+
+/* ── Chapters ── */
+.dl-chapters { background: var(--pk-bg); }
+.dl-chapter { padding: clamp(50px, 7vw, 90px) 0; }
+.dl-chapter__grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); gap: clamp(40px, 7vw, 110px); align-items: center; }
+.dl-chapter__grid--flip { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); }
+.dl-chapter__grid--flip .dl-chapter__shot { order: 2; }
+.dl-chapter__shot { display: flex; justify-content: center; }
+.dl-chapter__shot .pk-phone { width: min(300px, 70vw); }
+.dl-chapter__copy .dl-h2 { margin-top: 16px; }
+.dl-chapter__copy p { margin-top: 18px; max-width: 520px; font-size: 18px; line-height: 1.65; color: var(--pk-text-2); }
+
+/* ── Includes ── */
+.dl-includes { background: var(--pk-bg); padding: clamp(80px, 10vw, 130px) 0; }
+.dl-includes__list { margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.dl-includes__item { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-radius: 18px; background: var(--pk-card); box-shadow: var(--pk-shadow-sm); font: 500 15px/1.35 var(--pk-font-sans); color: var(--pk-text); }
+.dl-includes__item svg { flex-shrink: 0; color: var(--pk-accent); }
+
+/* ── Private ── */
+.dl-private { background: radial-gradient(80% 60% at 50% 0%, rgba(122,31,255,0.35), transparent 60%), linear-gradient(180deg, #160022, #0E0016); padding: clamp(96px, 12vw, 150px) 0; }
+.dl-private__grid { margin-top: 44px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.dl-private__card { display: flex; flex-direction: column; gap: 10px; padding: 28px 24px; border-radius: 26px; background: rgba(255,255,255,0.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); color: #fff; }
+.dl-private__card svg { color: #E8C98C; }
+.dl-private__card strong { font-size: 24px; line-height: 1.15; }
+.dl-private__card span { font-size: 15px; line-height: 1.5; color: rgba(255,255,255,0.7); }
+
+/* ── Steps ── */
+.dl-steps { background: var(--pk-bg); padding: clamp(96px, 12vw, 150px) 0; }
+.dl-steps__list { margin-top: 44px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; text-align: center; }
+.dl-steps__item span { display: block; font-size: 72px; line-height: 1; color: var(--pk-accent); }
+.dl-steps__item strong { display: block; margin-top: 12px; font: 600 20px/1.3 var(--pk-font-sans); color: var(--pk-text); }
+.dl-steps__item p { margin: 6px auto 0; max-width: 28ch; font-size: 16px; line-height: 1.5; color: var(--pk-text-2); }
+.dl-steps__cta { margin-top: 48px; display: flex; justify-content: center; }
+
+/* ── FAQ ── */
+.dl-faq { max-width: 900px; margin: 0 auto; padding: clamp(40px, 6vw, 70px) 0 clamp(96px, 12vw, 140px); }
+.dl-faq__list { margin-top: 40px; border-top: 1px solid var(--pk-border); }
+.dl-faq details { border-bottom: 1px solid var(--pk-border); }
+.dl-faq summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 68px; padding: 18px 4px; font: 600 17px/1.4 var(--pk-font-sans); color: var(--pk-text); }
+.dl-faq summary::-webkit-details-marker { display: none; }
+.dl-faq__plus { position: relative; width: 18px; height: 18px; flex-shrink: 0; color: var(--pk-accent); }
+.dl-faq__plus::before, .dl-faq__plus::after { content: ""; position: absolute; left: 0; top: 50%; width: 18px; height: 2px; margin-top: -1px; border-radius: 2px; background: currentColor; transition: transform 300ms var(--pk-spring); }
+.dl-faq__plus::after { transform: rotate(90deg); }
+.dl-faq details[open] .dl-faq__plus::after { transform: rotate(0deg); }
+.dl-faq details p { padding: 0 44px 22px 4px; font-size: 16px; line-height: 1.7; color: var(--pk-text-2); }
+.dl-faq__web { margin-top: 26px; text-align: center; font-size: 15px; color: var(--pk-text-3); }
+.dl-faq__web a { color: var(--pk-accent); font-weight: 600; text-decoration: none; }
+
+/* ── End ── */
+.dl-end { position: relative; overflow: hidden; isolation: isolate; min-height: max(80svh, 560px); display: flex; align-items: flex-end; justify-content: center; }
+.dl-end__art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; z-index: -2; }
+.dl-end__shade { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(14,0,22,0.55) 0%, rgba(14,0,22,0.1) 40%, rgba(14,0,22,0.85) 100%); }
+.dl-end__text { padding: 0 20px clamp(64px, 10vw, 120px); display: flex; flex-direction: column; align-items: center; gap: 28px; text-align: center; }
+.dl-end__title { margin: 0; color: #fff; font-size: clamp(40px, 6.4vw, 84px); line-height: 1.02; text-shadow: 0 6px 40px rgba(0,0,0,0.45); max-width: 14ch; }
+
+@media (max-width: 899px) {
+  .dl-hero__grid { grid-template-columns: 1fr; padding-top: 96px; text-align: center; }
+  .dl-hero__copy { display: flex; flex-direction: column; align-items: center; }
+  .dl-hero__lead { margin-left: auto; margin-right: auto; }
+  .dl-hero__get { justify-content: center; }
+  .dl-qr { display: none; }
+  .dl-trust { justify-content: center; }
+  .dl-hero__phones { height: 470px; min-height: 0; }
+  .dl-hero__phone--front { width: 210px; margin: -225px 0 0 -105px; }
+  .dl-hero__phone--left, .dl-hero__phone--right { width: 150px; }
+  .dl-hero__phone--left { margin: -150px 0 0 -178px; }
+  .dl-hero__phone--right { margin: -150px 0 0 28px; }
+  .dl-chapter__grid, .dl-chapter__grid--flip { grid-template-columns: 1fr; text-align: center; }
+  .dl-chapter__grid--flip .dl-chapter__shot { order: 0; }
+  .dl-chapter__copy p { margin-left: auto; margin-right: auto; }
+  .dl-private__grid { grid-template-columns: 1fr 1fr; }
+  .dl-steps__list { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .dl-private__grid { grid-template-columns: 1fr; }
+  .dl-faq details p { padding-right: 4px; }
+}

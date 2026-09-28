@@ -3,12 +3,13 @@ import { motion, useReducedMotion } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
 
 // Content rises into place with a soft spring the first time it scrolls into view.
-export default function Reveal({ children, delay = 0, y = 32, className, style }: { children: ReactNode; delay?: number; y?: number; className?: string; style?: CSSProperties }) {
+export default function Reveal({ children, delay = 0, y = 32, className, style, role }: { children: ReactNode; delay?: number; y?: number; className?: string; style?: CSSProperties; role?: string }) {
   const reduce = useReducedMotion();
   return (
     <motion.div
       className={className}
       style={style}
+      role={role}
       initial={reduce ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
