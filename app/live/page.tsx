@@ -11,8 +11,8 @@ type ServiceState = "idle" | "live" | "ended";
 type SearchMode   = "book" | "context";
 
 // ── Design tokens — deep navy, iOS-27 / Liquid Glass ─────────────────────────
-const VOID    = "#0B1726";                          // Deep navy
-const VOID_HI = "#0F2238";                          // Lifted card bg
+const VOID    = "#160022";                          // Deep navy
+const VOID_HI = "#22093A";                          // Lifted card bg
 const GLASS   = "rgba(15,34,56,0.72)";              // Frosted glass
 const YELLOW  = "#F4D03F";                          // Premium pill accent
 const BLUE    = "#3B82F6";                          // Action FAB
@@ -59,7 +59,7 @@ function VerseScreen({
     <div style={{
       flex: 1, borderRadius: "20px", overflow: "hidden", position: "relative" as const,
       background: `
-        radial-gradient(ellipse 75% 65% at 50% 45%, #0F2238 0%, #060D18 70%, #03070F 100%)
+        radial-gradient(ellipse 75% 65% at 50% 45%, #22093A 0%, #060D18 70%, #03070F 100%)
       `,
       border: `1px solid ${verse ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.05)"}`,
       display: "flex", alignItems: "center", justifyContent: "center",
@@ -847,7 +847,7 @@ export default function LivePage() {
               boxShadow: autoMode ? `inset 0 0 4px rgba(0,0,0,0.2)` : "none" }}>
               <div style={{ position:"absolute" as const, top:"2px", left: autoMode ? "12px" : "2px",
                 width:"10px", height:"10px", borderRadius:"50%",
-                background: autoMode ? "#0B1726" : T2, transition:"left 200ms ease",
+                background: autoMode ? "#160022" : T2, transition:"left 200ms ease",
                 boxShadow:"0 1px 3px rgba(0,0,0,0.4)" }} />
             </div>
             <span style={{ fontSize:"10px", fontWeight:700,
@@ -859,7 +859,7 @@ export default function LivePage() {
             style={{ padding:"7px 12px", background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)",
               border:`1px solid ${BORDER}`, borderRadius:"100px",
               color:T1, fontSize:"11px", fontWeight:700, outline:"none", boxShadow:HILITE }}>
-            {TRANSLATIONS.map(t => <option key={t} style={{ background:"#0B1726" }}>{t}</option>)}
+            {TRANSLATIONS.map(t => <option key={t} style={{ background:"#160022" }}>{t}</option>)}
           </select>
 
           {/* Projector */}
@@ -1031,7 +1031,7 @@ export default function LivePage() {
                 style={{ padding:"7px 12px", background:"rgba(255,255,255,0.04)",
                   border:`1px solid ${BORDER}`, borderRadius:"100px", color:T1, fontSize:"11px", fontWeight:700, outline:"none",
                   boxShadow:HILITE }}>
-                {TRANSLATIONS.map(t => <option key={t} style={{ background:"#0B1726" }}>{t}</option>)}
+                {TRANSLATIONS.map(t => <option key={t} style={{ background:"#160022" }}>{t}</option>)}
               </select>
             </div>
           </div>
@@ -1129,7 +1129,7 @@ export default function LivePage() {
                   boxShadow: active ? HILITE : "none", transition:"all 180ms" }}>
                   {label}
                   {count > 0 && (
-                    <span style={{ fontSize:"9px", fontWeight:800, color:"#0B1726", background:YELLOW,
+                    <span style={{ fontSize:"9px", fontWeight:800, color:"#160022", background:YELLOW,
                       padding:"1px 6px", borderRadius:"100px", letterSpacing:0,
                       boxShadow: active ? `0 0 8px ${YELLOW}40` : "none" }}>{count}</span>
                   )}

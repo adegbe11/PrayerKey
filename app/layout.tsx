@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import dynamic from "next/dynamic";
+import { Inter, Lora, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import SimpleNav from "@/components/layout/SimpleNav";
+import CapsuleNav from "@/components/layout/CapsuleNav";
 import Link from "next/link";
 
-// Defer cursor — it runs a rAF loop; loading it after hydration keeps the
-// main thread free during LCP and avoids an unnecessary server-side pass.
-const Cursor = dynamic(() => import("@/components/ui/Cursor"), { ssr: false });
+// The app's three typefaces: Playfair for display, Lora for scripture, Inter for everything else.
+const display = Playfair_Display({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-display", display: "swap" });
+const book = Lora({ subsets: ["latin"], weight: ["400", "500"], style: ["normal", "italic"], variable: "--font-book", display: "swap" });
+const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 
 const BASE_URL = "https://www.prayerkey.com";
 
@@ -54,8 +55,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit:  "cover", // iOS: paint behind the notch / Dynamic Island
   themeColor:   [
-    { media: "(prefers-color-scheme: light)", color: "#F2EBDC" },
-    { media: "(prefers-color-scheme: dark)",  color: "#0D1B15" },
+    { media: "(prefers-color-scheme: light)", color: "#F5F5F7" },
+    { media: "(prefers-color-scheme: dark)",  color: "#160022" },
   ],
 };
 
@@ -145,20 +146,13 @@ const softwareLd = {
     "No account required",
     "Free forever",
   ],
-  aggregateRating: {
-    "@type":       "AggregateRating",
-    ratingValue:   "4.9",
-    ratingCount:   "214",
-    bestRating:    "5",
-    worstRating:   "1",
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     // suppressHydrationWarning: the anti-flash script swaps data-theme
     // from localStorage before React hydrates — expected, not a bug
-    <html lang="en" data-theme="light" suppressHydrationWarning>
+    <html lang="en" data-theme="light" className={`${display.variable} ${book.variable} ${sans.variable}`} suppressHydrationWarning>
       <head>
         {/* ── Anti-flash theme script — runs before any paint ── */}
         <script
@@ -177,8 +171,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareLd) }} />
       </head>
       <body>
-        <Cursor />
-        <SimpleNav />
+        <CapsuleNav />
 
         <main style={{
           maxWidth: "1440px",
@@ -208,12 +201,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 textLength="1000"
                 lengthAdjust="spacingAndGlyphs"
                 style={{
-                  fontFamily:    "-apple-system,'SF Pro Display','Helvetica Neue',sans-serif",
-                  fontWeight:    900,
+                  fontFamily:    "var(--pk-font-display)",
+                  fontWeight:    700,
                   fontSize:      "175px",
                   fill:          "var(--pk-wordmark-fill)",
-                  letterSpacing: "-4px",
-                  opacity:       0.18,
+                  letterSpacing: "2px",
+                  opacity:       0.12,
                 }}
               >
                 PRAYERKEY

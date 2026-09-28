@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { composePrayer } from "@/lib/prayer-engine/compose";
 
@@ -20,15 +20,22 @@ export default function PrayPage() {
     setMoods((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
   }
 
-  function generate() {
-    if (!input.trim()) return;
+  // Links from the home page and verses arrive as /pray?topic=…; pray it straight away.
+  useEffect(() => {
+    const topic = new URLSearchParams(window.location.search).get("topic")?.trim().slice(0, 500);
+    if (topic) { setInput(topic); generate(topic); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function generate(text: string = input) {
+    if (!text.trim()) return;
     setLoading(true);
     setError("");
     setPrayer(null);
     // Compose entirely on-device — no API, no server, nothing leaves the page.
     // Moods are folded into the input so the keyword engine can score them.
     const moodText = moods.length ? ` I am feeling ${moods.join(" and ").toLowerCase()}.` : "";
-    const result   = composePrayer(input + moodText);
+    const result   = composePrayer(text + moodText);
     setPrayer({
       title:         `A Prayer for ${result.topics.join(" & ")}`,
       prayer:        result.prayer + "\n\nAmen.",
@@ -167,7 +174,7 @@ export default function PrayPage() {
 
       {/* ── Generate button ── */}
       <button
-        onClick={generate}
+        onClick={() => generate()}
         disabled={loading || !input.trim()}
         style={{
           width:        "100%",

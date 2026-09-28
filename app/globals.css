@@ -3,109 +3,124 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════
-   THEME TOKENS — Light (Crimson + Apple White) / Dark
+   THEME TOKENS — the PrayerKey app palette.
+   Light is the app's Canvas (Apple grey, ink, electric violet, gold leaf);
+   dark is its Night (deep violet sky with gold).
 ═══════════════════════════════════════════════════ */
 
-/* ── Light mode (DEFAULT) — Sanctuary: Ivory + Pine + Brass ── */
 :root {
-  /* ── Backgrounds: warm ivory ── */
-  --pk-bg:          #F2EBDC;          /* ivory — main page background */
-  --pk-surface:     #EAE1CC;          /* deeper ivory for footer/panels */
-  --pk-surface-2:   #DFD4B8;          /* deepest ivory for dividers */
-  --pk-card:        rgba(255,255,255,0.55); /* frosted white card floats on ivory */
-  --pk-card-hover:  rgba(255,255,255,0.80);
+  /* ── The app's named colours ── */
+  --pk-violet:        #6200ED;   /* Electric — primary */
+  --pk-violet-lit:    #7A1FFF;
+  --pk-violet-deep:   #4A00B8;
+  --pk-night:         #160022;   /* Night — deep violet sky */
+  --pk-gold-leaf:     #B07C1F;
+  --pk-gold-light:    #E8C98C;
+  --pk-ink:           #1D1D1F;
 
-  /* ── Borders: pine ink on ivory ── */
-  --pk-border:      rgba(17,36,28,0.14);
-  --pk-border-2:    rgba(17,36,28,0.26);
+  /* ── Type ── */
+  --pk-font-display:  var(--font-display), "Playfair Display", Georgia, serif;
+  --pk-font-book:     var(--font-book), "Lora", Georgia, serif;
+  --pk-font-sans:     var(--font-sans), "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 
-  /* ── Text: deep pine hierarchy ── */
-  --pk-text:        #11241C;          /* deep pine */
-  --pk-text-2:      #3E5247;          /* mid pine */
-  --pk-text-3:      #7C8779;          /* muted pine-gray */
+  /* ── Motion ── */
+  --pk-spring:        cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* ── Brass accent (primary, deepened for AA contrast on ivory) ── */
-  --pk-accent:         #8F6B1E;
-  --pk-accent-dark:    #6F5316;
-  --pk-accent-dim:     rgba(201,162,75,0.14);
-  --pk-accent-border:  rgba(143,107,30,0.30);
+  /* ── Backgrounds ── */
+  --pk-bg:          #F5F5F7;
+  --pk-surface:     #FFFFFF;
+  --pk-surface-2:   #ECEAF2;
+  --pk-card:        #FFFFFF;
+  --pk-card-hover:  #FBF9FF;
 
-  /* ── Sage CTA (replaces purple) ── */
-  --pk-purple:         #4E7D66;
-  --pk-purple-dim:     rgba(111,162,135,0.13);
-  --pk-purple-border:  rgba(78,125,102,0.28);
+  /* ── Borders ── */
+  --pk-border:      rgba(22,0,34,0.09);
+  --pk-border-2:    rgba(22,0,34,0.17);
 
-  /* ── Brass gold — scripture / Bible feature ── */
-  --pk-gold:           #8A6420;
-  --pk-gold-dim:       rgba(201,162,75,0.13);
-  --pk-gold-border:    rgba(138,100,32,0.26);
+  /* ── Text ── */
+  --pk-text:        #1D1D1F;
+  --pk-text-2:      #48484C;
+  --pk-text-3:      #6E6E73;
+
+  /* ── Primary accent: electric violet ── */
+  --pk-accent:         #6200ED;
+  --pk-accent-dark:    #4A00B8;
+  --pk-accent-dim:     rgba(98,0,237,0.08);
+  --pk-accent-border:  rgba(98,0,237,0.22);
+
+  --pk-purple:         #6200ED;
+  --pk-purple-dim:     rgba(98,0,237,0.08);
+  --pk-purple-border:  rgba(98,0,237,0.22);
+
+  /* ── Gold leaf: scripture ── */
+  --pk-gold:           #B07C1F;
+  --pk-gold-dim:       rgba(176,124,31,0.11);
+  --pk-gold-border:    rgba(176,124,31,0.28);
 
   /* ── Nav ── */
-  --pk-nav-bg:         rgba(242,235,220,0.94);
-  --pk-nav-border:     rgba(17,36,28,0.12);
-  --pk-nav-text:       #11241C;
-  --pk-nav-text-muted: rgba(17,36,28,0.45);
-  --pk-nav-active-bg:  rgba(201,162,75,0.14);
-  --pk-nav-active-clr: #8F6B1E;
+  --pk-nav-bg:         rgba(245,245,247,0.72);
+  --pk-nav-border:     rgba(22,0,34,0.08);
+  --pk-nav-text:       #1D1D1F;
+  --pk-nav-text-muted: rgba(29,29,31,0.56);
+  --pk-nav-active-bg:  rgba(98,0,237,0.09);
+  --pk-nav-active-clr: #6200ED;
 
   /* ── Footer ── */
-  --pk-footer-border:  rgba(17,36,28,0.12);
-  --pk-footer-text:    rgba(17,36,28,0.40);
-  --pk-wordmark-fill:  #C9A24B;
+  --pk-footer-border:  rgba(22,0,34,0.08);
+  --pk-footer-text:    rgba(29,29,31,0.56);
+  --pk-wordmark-fill:  #6200ED;
 
-  /* ── Shadows: soft warm ── */
-  --pk-shadow:         0 2px 24px rgba(17,36,28,0.10);
-  --pk-shadow-sm:      0 1px 8px rgba(17,36,28,0.07);
+  /* ── Shadows: soft, violet-tinted ── */
+  --pk-shadow:         0 12px 40px rgba(22,0,34,0.08), 0 2px 8px rgba(22,0,34,0.04);
+  --pk-shadow-sm:      0 2px 12px rgba(22,0,34,0.06);
 
-  /* ── Misc ── */
-  --pk-red:            #A03A2A;        /* muted oxblood for live/alerts */
-  --pk-scrollbar:      rgba(143,107,30,0.32);
+  --pk-red:            #D70015;
+  --pk-scrollbar:      rgba(98,0,237,0.30);
 }
 
-/* ── Dark mode — Sanctuary: Pine + Ivory + Brass ── */
 [data-theme="dark"] {
-  --pk-bg:          #0D1B15;          /* deepest pine */
-  --pk-surface:     #11241C;          /* pine */
-  --pk-surface-2:   #1B342A;          /* panel pine */
-  --pk-card:        rgba(242,235,220,0.045);
-  --pk-card-hover:  rgba(242,235,220,0.08);
+  --pk-bg:          #0E0016;
+  --pk-surface:     #160022;
+  --pk-surface-2:   #22093A;
+  --pk-card:        rgba(255,255,255,0.05);
+  --pk-card-hover:  rgba(255,255,255,0.08);
 
-  --pk-border:      rgba(242,235,220,0.12);
-  --pk-border-2:    rgba(242,235,220,0.20);
+  --pk-border:      rgba(255,255,255,0.10);
+  --pk-border-2:    rgba(255,255,255,0.18);
 
-  --pk-text:        #F2EBDC;          /* ivory */
-  --pk-text-2:      rgba(242,235,220,0.64);
-  --pk-text-3:      rgba(242,235,220,0.40);
+  --pk-text:        #F5F5F7;
+  --pk-text-2:      rgba(245,245,247,0.72);
+  --pk-text-3:      rgba(245,245,247,0.50);
 
-  --pk-accent:         #C9A24B;       /* brass */
-  --pk-accent-dark:    #A98430;
-  --pk-accent-dim:     rgba(201,162,75,0.10);
-  --pk-accent-border:  rgba(201,162,75,0.28);
+  --pk-accent:         #A57BFF;
+  --pk-accent-dark:    #7A1FFF;
+  --pk-accent-dim:     rgba(165,123,255,0.14);
+  --pk-accent-border:  rgba(165,123,255,0.32);
 
-  --pk-purple:         #6FA287;       /* sage */
-  --pk-purple-dim:     rgba(111,162,135,0.12);
-  --pk-purple-border:  rgba(111,162,135,0.26);
+  --pk-purple:         #A57BFF;
+  --pk-purple-dim:     rgba(165,123,255,0.14);
+  --pk-purple-border:  rgba(165,123,255,0.32);
 
-  --pk-gold:           #C9A24B;
-  --pk-gold-dim:       rgba(201,162,75,0.10);
-  --pk-gold-border:    rgba(201,162,75,0.26);
+  --pk-gold:           #E8C98C;
+  --pk-gold-dim:       rgba(232,201,140,0.12);
+  --pk-gold-border:    rgba(232,201,140,0.28);
 
-  --pk-nav-bg:         rgba(13,27,21,0.90);
-  --pk-nav-border:     rgba(242,235,220,0.10);
-  --pk-nav-text:       #F2EBDC;
-  --pk-nav-text-muted: rgba(242,235,220,0.44);
-  --pk-nav-active-bg:  rgba(201,162,75,0.10);
-  --pk-nav-active-clr: #C9A24B;
+  --pk-nav-bg:         rgba(22,0,34,0.72);
+  --pk-nav-border:     rgba(255,255,255,0.08);
+  --pk-nav-text:       #F5F5F7;
+  --pk-nav-text-muted: rgba(245,245,247,0.56);
+  --pk-nav-active-bg:  rgba(165,123,255,0.16);
+  --pk-nav-active-clr: #C9B0FF;
 
-  --pk-footer-border:  rgba(242,235,220,0.10);
-  --pk-footer-text:    rgba(242,235,220,0.22);
-  --pk-wordmark-fill:  #C9A24B;
+  --pk-footer-border:  rgba(255,255,255,0.08);
+  --pk-footer-text:    rgba(245,245,247,0.50);
+  --pk-wordmark-fill:  #A57BFF;
 
-  --pk-shadow:         4px 4px 0 0 rgba(201,162,75,0.10);
-  --pk-shadow-sm:      2px 2px 0 0 rgba(201,162,75,0.07);
+  --pk-shadow:         0 12px 40px rgba(0,0,0,0.45);
+  --pk-shadow-sm:      0 2px 12px rgba(0,0,0,0.35);
 
-  --pk-red:            #E0604A;
-  --pk-scrollbar:      rgba(201,162,75,0.25);
+  --pk-red:            #FF6961;
+  --pk-scrollbar:      rgba(165,123,255,0.30);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -153,22 +168,13 @@ body {
 body {
   background:              var(--pk-bg);
   color:                   var(--pk-text);
-  font-family:             "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+  font-family:             var(--pk-font-sans);
   -webkit-font-smoothing:  antialiased;
   overflow-x:              hidden;
-  cursor:                  none;
   transition:              background 250ms ease, color 250ms ease;
 }
 
-/* Light mode: show real cursor on mobile / always */
-@media (max-width: 768px) {
-  body { cursor: auto; }
-}
-
-a, button, [role="button"] { cursor: none; }
-@media (max-width: 768px) {
-  a, button, [role="button"] { cursor: pointer; }
-}
+a, button, [role="button"], summary { cursor: pointer; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 3px; }
@@ -267,14 +273,13 @@ body::before {
 :root body::before {
   /* Subtle warm radial glow on parchment — crimson from top-left, mauve from bottom-right */
   background:
-    radial-gradient(ellipse 55% 35% at 10% 0%,   rgba(178,34,34,0.07)  0%, transparent 70%),
-    radial-gradient(ellipse 40% 28% at 90% 100%,  rgba(122,80,16,0.06)  0%, transparent 70%);
+    radial-gradient(ellipse 55% 35% at 10% 0%,   rgba(98,0,237,0.05)  0%, transparent 70%),
+    radial-gradient(ellipse 40% 28% at 90% 100%,  rgba(176,124,31,0.05)  0%, transparent 70%);
 }
 [data-theme="dark"] body::before {
   background:
-    radial-gradient(ellipse 70% 40% at 15% 0%,   rgba(196,154,42,0.07)  0%, transparent 70%),
-    radial-gradient(ellipse 50% 35% at 85% 100%,  rgba(175,82,222,0.05)  0%, transparent 70%),
-    radial-gradient(ellipse 60% 30% at 50% 50%,   rgba(196,154,42,0.03)  0%, transparent 60%);
+    radial-gradient(ellipse 70% 40% at 15% 0%,   rgba(122,31,255,0.16)  0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 85% 100%,  rgba(232,201,140,0.06)  0%, transparent 70%);
 }
 body > * { position: relative; z-index: 1; }
 
@@ -386,7 +391,7 @@ body::after {
    TYPOGRAPHY UTILITIES
 ═══════════════════════════════════════════════════ */
 .shimmer-accent {
-  background: linear-gradient(90deg, var(--pk-accent) 0%, #E88080 40%, var(--pk-accent) 60%, var(--pk-accent-dark) 100%);
+  background: linear-gradient(90deg, var(--pk-violet) 0%, var(--pk-violet-lit) 40%, var(--pk-gold-leaf) 60%, var(--pk-violet) 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -411,7 +416,7 @@ body::after {
 
 /* ── Scripture typography — BibleGateway-inspired ── */
 .scripture-text {
-  font-family:   Georgia, "Times New Roman", "Palatino Linotype", serif;
+  font-family:   var(--pk-font-book);
   font-size:     clamp(16px, 1.8vw, 22px);
   font-style:    italic;
   line-height:   1.85;
@@ -419,7 +424,7 @@ body::after {
   color:         var(--pk-text);
 }
 .scripture-ref {
-  font-family:   Georgia, serif;
+  font-family:   var(--pk-font-book);
   font-size:     14px;
   font-style:    normal;
   font-weight:   700;
@@ -528,4 +533,144 @@ details[open] > div { animation: faqOpen 200ms ease both; }
 @media (max-width: 520px) {
   .stats-row { flex-wrap: wrap !important; }
   .stats-row > div { flex: 1 1 45%; border-right: none !important; border-bottom: 1px solid var(--pk-border); }
+}
+
+/* ═══════════════════════════════════════════════════
+   PRAYERKEY 2.0 — capsules, glass and heaven motion
+═══════════════════════════════════════════════════ */
+
+.pk-bleed { width: 100vw; margin-left: calc(50% - 50vw); }
+.pk-display { font-family: var(--pk-font-display); font-weight: 600; letter-spacing: -0.02em; line-height: 1.02; }
+.pk-book { font-family: var(--pk-font-book); }
+
+/* Capsules: every action on the site is one of these. */
+.pk-capsule {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 24px; border-radius: 999px; border: 0;
+  font: 600 15px/1 var(--pk-font-sans); letter-spacing: -0.01em;
+  text-decoration: none; white-space: nowrap;
+  transition: transform 260ms var(--pk-spring), background 200ms ease, box-shadow 260ms ease, color 200ms ease;
+}
+.pk-capsule:active { transform: scale(0.96); }
+.pk-capsule--violet { background: var(--pk-violet); color: #fff; box-shadow: 0 10px 30px rgba(98,0,237,0.32); }
+.pk-capsule--violet:hover { background: var(--pk-violet-lit); box-shadow: 0 14px 40px rgba(98,0,237,0.42); }
+.pk-capsule--light { background: #fff; color: var(--pk-violet-deep); box-shadow: 0 14px 40px rgba(10,0,20,0.35); }
+.pk-capsule--light:hover { transform: translateY(-1px); }
+.pk-capsule--glass {
+  background: rgba(255,255,255,0.14); color: #fff;
+  -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.24);
+}
+.pk-capsule--glass:hover { background: rgba(255,255,255,0.22); }
+.pk-capsule--tint { background: var(--pk-accent-dim); color: var(--pk-accent); }
+.pk-capsule--tint:hover { background: var(--pk-accent-border); }
+.pk-capsule--gold { background: linear-gradient(180deg, #F3DDA8, #D9B25E); color: #2A1600; box-shadow: 0 10px 30px rgba(176,124,31,0.30); }
+
+.pk-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px;
+  font: 600 12px/1.1 var(--pk-font-sans); letter-spacing: 0.04em;
+}
+.pk-chip--glass { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.92); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+.pk-chip--violet { background: var(--pk-accent-dim); color: var(--pk-accent); }
+.pk-chip--gold { background: var(--pk-gold-dim); color: var(--pk-gold); }
+
+/* ── Nav ── */
+.pk-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 12px clamp(12px, 3vw, 28px) 0; pointer-events: none; }
+.pk-nav__bar {
+  pointer-events: auto; max-width: 1180px; margin: 0 auto; height: 58px;
+  display: flex; align-items: center; gap: 10px; padding: 0 8px 0 18px;
+  border-radius: 999px; background: var(--pk-nav-bg);
+  -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 0 0 1px var(--pk-nav-border), 0 8px 30px rgba(22,0,34,0.08);
+  transition: background 400ms ease, box-shadow 400ms ease;
+}
+.pk-nav__brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: 8px; flex-shrink: 0; }
+.pk-nav__brand img { display: block; height: 26px; width: auto; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15)); }
+.pk-nav__brand span { font: 700 19px/1 var(--pk-font-display); color: var(--pk-nav-text); letter-spacing: 0.01em; transition: color 400ms ease; }
+.pk-nav__links { display: flex; align-items: center; gap: 2px; flex: 1; }
+.pk-nav__links a {
+  display: flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px;
+  font: 500 14px/1 var(--pk-font-sans); color: var(--pk-nav-text-muted); text-decoration: none;
+  transition: color 200ms ease, background 200ms ease;
+}
+.pk-nav__links a:hover { color: var(--pk-nav-text); }
+.pk-nav__links a.is-active { color: var(--pk-nav-active-clr); background: var(--pk-nav-active-bg); font-weight: 600; }
+.pk-nav__end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.pk-nav__end .pk-theme-toggle { width: 40px; height: 40px; border-radius: 999px; background: transparent; border-color: transparent; }
+.pk-nav__give { font: 600 14px/1 var(--pk-font-sans); color: var(--pk-gold); text-decoration: none; padding: 0 12px; min-height: 40px; display: flex; align-items: center; border-radius: 999px; }
+.pk-nav__give:hover { background: var(--pk-gold-dim); }
+.pk-nav__cta { min-height: 42px; padding: 0 20px; font-size: 14px; }
+.pk-nav__menu { display: none; width: 42px; height: 42px; border-radius: 999px; border: 0; background: transparent; color: var(--pk-nav-text); align-items: center; justify-content: center; }
+.pk-nav__spacer { height: 70px; }
+
+.pk-nav--dark .pk-nav__bar { background: rgba(22,0,34,0.28); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14), 0 8px 30px rgba(0,0,0,0.18); }
+.pk-nav--dark .pk-nav__brand span,
+.pk-nav--dark .pk-nav__menu { color: #fff; }
+.pk-nav--dark .pk-nav__links a { color: rgba(255,255,255,0.72); }
+.pk-nav--dark .pk-nav__links a:hover { color: #fff; }
+.pk-nav--dark .pk-nav__give { color: var(--pk-gold-light); }
+.pk-nav--dark .pk-theme-toggle { color: rgba(255,255,255,0.8); }
+.pk-nav--dark .pk-nav__cta { background: #fff; color: var(--pk-violet-deep); box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+
+/* ── Phone menu sheet ── */
+.pk-sheet {
+  position: fixed; inset: 0; z-index: 999; display: flex; align-items: center; justify-content: center;
+  background: var(--pk-bg); opacity: 0; pointer-events: none; transition: opacity 320ms ease;
+}
+.pk-sheet.is-open { opacity: 1; pointer-events: auto; }
+.pk-sheet nav { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pk-sheet a {
+  font: 600 clamp(28px, 7vw, 36px)/1.2 var(--pk-font-display); color: var(--pk-text); text-decoration: none; padding: 8px 20px;
+  opacity: 0; transform: translateY(16px); transition: opacity 360ms ease, transform 460ms var(--pk-spring);
+}
+.pk-sheet.is-open a { opacity: 1; transform: none; }
+.pk-sheet a.is-active { color: var(--pk-accent); }
+
+/* ── The app's tab bar ── */
+.pk-dock {
+  position: fixed; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); z-index: 1000;
+  display: none; justify-content: space-between; max-width: 520px; margin: 0 auto; padding: 8px 6px;
+  border-radius: 30px; background: linear-gradient(180deg, #7A1FFF, #6200ED);
+  box-shadow: 0 18px 44px rgba(74,0,184,0.45), inset 0 1px 0 rgba(255,255,255,0.22);
+}
+.pk-dock a {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 50px; justify-content: center;
+  color: rgba(255,255,255,0.62); text-decoration: none; border-radius: 22px;
+  font: 600 11px/1 var(--pk-font-sans); letter-spacing: 0.06em; text-transform: uppercase;
+  transition: color 200ms ease, background 200ms ease, transform 200ms var(--pk-spring);
+}
+.pk-dock a:active { transform: scale(0.92); }
+.pk-dock a.is-active { color: #fff; background: rgba(255,255,255,0.14); }
+.pk-dock a.is-active svg { color: var(--pk-gold-light); }
+
+@media (max-width: 1080px) {
+  .pk-nav__links { display: none; }
+  .pk-nav__give { display: none; }
+}
+@media (max-width: 899px) {
+  .pk-nav { padding: 8px 10px 0; }
+  .pk-nav__bar { height: 52px; padding: 0 6px 0 16px; }
+  .pk-nav__cta { display: none !important; }
+  .pk-nav__menu { display: flex; }
+  .pk-nav__spacer { height: 60px; }
+  .pk-dock { display: flex; }
+  body { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); }
+}
+
+/* ── Heaven: the home page sky ── */
+@keyframes pk-rays      { to { transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes pk-rise      { 0% { transform: translate3d(0, 0, 0); opacity: 0; } 12% { opacity: var(--o, 0.8); } 88% { opacity: var(--o, 0.8); } 100% { transform: translate3d(var(--dx, 0px), -105vh, 0); opacity: 0; } }
+@keyframes pk-float     { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@keyframes pk-breathe   { 0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.08); } }
+@keyframes pk-shine     { from { background-position: -160% 0; } to { background-position: 260% 0; } }
+@keyframes pk-settle    { from { transform: scale(1.12); } to { transform: scale(1.0); } }
+@keyframes pk-word-in   { from { opacity: 0; transform: translateY(0.35em); filter: blur(8px); } to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes pk-caret     { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.pk-gold-text {
+  background: linear-gradient(100deg, #E8C98C 0%, #FFF4D6 45%, #E8C98C 55%, #C99A45 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  animation: pk-shine 6s ease-in-out infinite;
 }
