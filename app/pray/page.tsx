@@ -71,7 +71,7 @@ export default function PrayPage() {
           boxShadow:    "3px 3px 0 0 var(--pk-purple-border)",
         }}>
           <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-purple)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            AI Prayer Generator
+            Prayer Generator
           </span>
         </div>
 

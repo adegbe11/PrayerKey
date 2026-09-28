@@ -22,7 +22,7 @@ const NAV_SECTIONS = [
     items: [
       { href: "/", icon: Home, label: "Home" },
       { href: "/live", icon: Radio, label: "Live Sermon", live: true },
-      { href: "/prayer", icon: Sparkles, label: "Prayer AI" },
+      { href: "/prayer", icon: Sparkles, label: "Prayer" },
       { href: "/discover", icon: Compass, label: "Discover" },
     ],
   },

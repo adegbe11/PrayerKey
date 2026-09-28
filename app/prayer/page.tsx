@@ -492,12 +492,12 @@ export default function PrayerHubPage() {
           padding:      "clamp(32px,5vw,56px)",
           textAlign:    "center",
         }}>
-          <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--pk-accent)", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: "16px" }}>✦ AI Prayer Generator</div>
+          <div style={{ fontSize: "13px", fontWeight: 800, color: "var(--pk-accent)", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: "16px" }}>✦ Prayer Generator</div>
           <h2 style={{ fontSize: "clamp(22px,3vw,32px)", fontWeight: 800, color: "var(--pk-text)", margin: "0 0 12px", letterSpacing: "-0.025em" }}>
             Don&apos;t see your situation?
           </h2>
           <p style={{ fontSize: "16px", color: "var(--pk-text-2)", margin: "0 0 28px", lineHeight: 1.7, maxWidth: "480px", marginInline: "auto" }}>
-            Our AI prayer generator writes a personalised prayer for <em>any</em> situation you&apos;re facing — in seconds, free, no account needed.
+            Our prayer generator writes a personalised prayer for <em>any</em> situation you&apos;re facing — in seconds, free, no account needed.
           </p>
           <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
             <Link

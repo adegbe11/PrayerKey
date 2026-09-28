@@ -3,11 +3,11 @@
 export const FAQS = [
   {
     q: "What is PrayerKey?",
-    a: "PrayerKey is a free AI-powered church companion that helps pastors, ministers, and believers generate personalised prayers, automatically detect Bible verses during live sermons, and search the entire Bible by keyword, topic, or reference — all without creating an account.",
+    a: "PrayerKey is a free church companion that helps pastors, ministers, and believers write personal, scripture-based prayers, automatically detect Bible verses during live sermons, and search the entire Bible by keyword, topic, or reference — all without creating an account.",
   },
   {
-    q: "How does AI prayer generation work?",
-    a: "You type what's on your heart — a worry, a praise, a need — and PrayerKey's AI writes a full, scripture-grounded prayer tailored to your words. It includes relevant Bible verses and an encouragement note. The whole process takes under 10 seconds.",
+    q: "How does the prayer generator work?",
+    a: "You type what's on your heart — a worry, a praise, a need — and PrayerKey finds the themes in your words and builds a full, scripture-grounded prayer from them, with relevant Bible verses. Prayers are composed from scripture-based prayer patterns, not written by an AI chatbot, and appear in a moment.",
   },
   {
     q: "Is PrayerKey free to use?",
@@ -59,7 +59,7 @@ export const FAQS = [
   },
   {
     q: "Does PrayerKey work without an internet connection?",
-    a: "PrayerKey requires an internet connection for AI prayer generation, live sermon verse detection, and Bible search — since these features use cloud-based AI models. However, the website itself loads quickly on any standard connection including mobile data.",
+    a: "Live sermon verse detection and Bible search need an internet connection, because they use cloud speech recognition and search. The prayer generator runs in your browser once the page has loaded. The PrayerKey Android app works offline, including the whole King James Bible.",
   },
   {
     q: "How many people can use PrayerKey during a live church service?",
@@ -71,15 +71,15 @@ export const FAQS = [
   },
   {
     q: "What language are the prayers generated in?",
-    a: "PrayerKey currently generates prayers in English. The quality and tone reflect the input you provide — so if you write your request in a formal style, the prayer will match. Support for additional languages is planned for future updates.",
+    a: "PrayerKey currently writes prayers in English. Support for additional languages is planned for future updates.",
   },
   {
     q: "How is PrayerKey different from a regular Bible app?",
-    a: "Standard Bible apps let you read and search scripture. PrayerKey goes further — it actively listens during sermons and auto-displays verses on a projector, writes original AI prayers from your personal requests, and connects Bible search with intelligent cross-references. It is a live ministry tool, not just a reading app.",
+    a: "Standard Bible apps let you read and search scripture. PrayerKey goes further — it actively listens during sermons and auto-displays verses on a projector, writes personal prayers from your own requests, and connects Bible search with intelligent cross-references. It is a live ministry tool, not just a reading app.",
   },
   {
     q: "Is PrayerKey better than PewBeam?",
-    a: "PrayerKey and PewBeam both display Bible verses during sermons, but PrayerKey goes significantly further. PewBeam focuses on manual verse display — a pastor or operator selects verses to push to the screen. PrayerKey does this automatically: it listens to the sermon and detects verses in real time with no manual input. On top of that, PrayerKey adds AI prayer generation, full Bible search with cross-references, 11 translations, and a live projector designer — all completely free with no account required. For churches that want a hands-free, all-in-one tool, PrayerKey is the stronger choice.",
+    a: "PrayerKey and PewBeam both display Bible verses during sermons, but PrayerKey goes significantly further. PewBeam focuses on manual verse display — a pastor or operator selects verses to push to the screen. PrayerKey does this automatically: it listens to the sermon and detects verses in real time with no manual input. On top of that, PrayerKey adds a prayer generator, full Bible search with cross-references, 11 translations, and a live projector designer — all completely free with no account required. For churches that want a hands-free, all-in-one tool, PrayerKey is the stronger choice.",
   },
   {
     q: "Can I use PrayerKey for funerals, weddings, or special church ceremonies?",

@@ -22,7 +22,7 @@ const WORLD = [
 // The three long-standing feature write-ups, kept word for word.
 const DEEP = [
   {
-    href: "/pray", art: "/art/window-prayer.webp", chip: "Feature 01", title: <>#1 AI Prayer<br />Generator for Churches</>,
+    href: "/pray", art: "/art/window-prayer.webp", chip: "Feature 01", title: <>#1 Prayer<br />Generator for Churches</>,
     lead: "The most personal way to write scripture-grounded prayers in seconds — for any situation.",
     heading: "Your Personal Prayer Writer",
     body: "Tell PrayerKey what you’re going through and it writes a full, heartfelt prayer grounded in scripture — personalised to your exact words, mood, and situation. Every prayer includes relevant Bible verses and an encouragement note.",
