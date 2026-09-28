@@ -110,12 +110,15 @@ export default function PrayerCardModal({ prayer, onClose }: Props) {
       {/* ── Backdrop ── */}
       <div
         onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Your prayer"
         style={{
           position:       "fixed",
           inset:          0,
           background:     "rgba(10,6,2,0.88)",
           backdropFilter: "blur(8px)",
-          zIndex:         1000,
+          zIndex:         1200,
           display:        "flex",
           alignItems:     "flex-start",
           justifyContent: "center",

@@ -733,3 +733,7 @@ details[open] > div { animation: faqOpen 200ms ease both; }
 .pk-invite__desk img { width: 92px; height: 92px; flex-shrink: 0; }
 .pk-invite__desk span { font: 500 13px/1.45 var(--pk-font-sans); display: flex; flex-direction: column; gap: 6px; }
 .pk-invite__desk a { color: #6200ED; font-weight: 700; text-decoration: none; }
+
+/* A full-screen dialog owns the screen: no tab bar or install card on top of it. */
+body:has([aria-modal="true"]) .pk-dock,
+body:has([aria-modal="true"]) .pk-invite { display: none; }
