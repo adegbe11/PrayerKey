@@ -1,11 +1,9 @@
 "use client";
 import { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { Check } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import PlayBadge from "./PlayBadge";
 import Phone from "./Phone";
-
-const TRUST = ["Free", "No account", "Works offline", "No data collected"];
 
 export default function DownloadHero() {
   const ref = useRef<HTMLElement>(null);
@@ -38,9 +36,6 @@ export default function DownloadHero() {
               <span>Scan with your phone</span>
             </span>
           </motion.div>
-          <motion.ul className="dl-trust" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.85 }}>
-            {TRUST.map((t) => <li key={t}><Check size={15} /> {t}</li>)}
-          </motion.ul>
         </div>
 
         <div className="dl-hero__phones" aria-hidden>

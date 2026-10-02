@@ -1,0 +1,65 @@
+/* The phone's Journal, drawn on the web. */
+.ja { display: flex; justify-content: center; }
+.ja-phone { width: min(100%, 300px); aspect-ratio: 9 / 19.4; padding: 9px; border-radius: 44px; background: linear-gradient(145deg, #2A2A2E, #0C0C0E); box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 0 0 1.5px #3A3A40, 0 40px 90px rgba(0,0,0,0.5); }
+.ja-screen { container-type: inline-size; position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 36px; background: #F5EDDC; }
+.ja-ui { --s: calc(100cqw / 300); position: absolute; inset: 0; perspective: 1400px; font-family: var(--pk-font-sans); color: #1D1D1F; }
+.ja-ui button { font: inherit; border: 0; background: none; padding: 0; cursor: pointer; color: inherit; -webkit-tap-highlight-color: transparent; }
+.ja-ui svg { flex-shrink: 0; }
+
+.ja-welcome { position: absolute; inset: 0; display: flex; flex-direction: column; background: linear-gradient(180deg, #EFE3D1 0%, #FBF6EE 42%, #BDB9B1 100%); }
+.ja-top { display: flex; align-items: center; justify-content: space-between; padding: calc(34 * var(--s)) calc(20 * var(--s)) 0; }
+.ja-title { margin: 0; font: 400 calc(31 * var(--s))/1 var(--pk-font-display); letter-spacing: -0.01em; color: #2B2622; }
+.ja-icons { display: flex; gap: calc(22 * var(--s)); color: #7A736A; }
+.ja-icons svg { width: calc(24 * var(--s)); height: calc(24 * var(--s)); }
+.ja-center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 calc(26 * var(--s)); }
+.ja-verse-wrap { display: flex; flex-direction: column; align-items: center; gap: calc(18 * var(--s)); text-align: center; }
+.ja-verse { margin: 0; font: 400 calc(21 * var(--s))/1.42 var(--pk-font-book); letter-spacing: -0.01em; }
+.ja-verse span { transition: color 0.3s; }
+.ja-verse .is-ink { color: #2B2622; }
+.ja-verse .is-now { color: #8B6A2F; }
+.ja-verse .is-next { color: rgba(43,38,34,0.16); }
+.ja-verse .is-wait { color: transparent; }
+.ja-ref { font: 600 calc(11 * var(--s))/1 var(--pk-font-sans); letter-spacing: 0.18em; color: #B07C1F; }
+.ja-bookbtn { display: flex; flex-direction: column; align-items: center; gap: calc(18 * var(--s)); margin-top: calc(-34 * var(--s)); }
+.ja-bible { width: calc(150 * var(--s)); height: calc(172 * var(--s)); }
+.ja-vision { font: 600 calc(17 * var(--s))/1.2 var(--pk-font-sans); color: #2B2622; }
+.ja-fab { position: absolute; left: 50%; bottom: calc(100 * var(--s)); width: calc(56 * var(--s)); height: calc(56 * var(--s)); margin-left: calc(-28 * var(--s)); display: grid; place-items: center; }
+.ja-fab__dot { position: relative; z-index: 2; width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center; background: #BB8A3E; color: #1D1D1F; box-shadow: 0 8px 18px rgba(120,80,20,0.3); transition: transform 0.2s; }
+.ja-fab__dot svg { width: calc(30 * var(--s)); height: calc(30 * var(--s)); }
+.ja-fab.is-tap .ja-fab__dot { transform: scale(0.88); }
+.ja-fab__ring { position: absolute; inset: calc(-14 * var(--s)); border-radius: 50%; background: rgba(187,138,62,0.2); animation: ja-pulse 2.4s ease-out infinite; }
+.ja-fab__ring--2 { animation-delay: 1.2s; }
+@keyframes ja-pulse { 0% { transform: scale(0.55); opacity: 0.9; } 100% { transform: scale(1.5); opacity: 0; } }
+.ja-nav { position: absolute; left: calc(8 * var(--s)); right: calc(8 * var(--s)); bottom: calc(14 * var(--s)); display: flex; justify-content: space-between; padding: calc(7 * var(--s)); border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 10px 30px rgba(60,40,10,0.14); }
+.ja-nav span { display: flex; flex-direction: column; align-items: center; gap: calc(3 * var(--s)); padding: calc(7 * var(--s)) calc(10 * var(--s)); border-radius: 999px; color: #7A736A; }
+.ja-nav span.is-on { background: #F2E6D4; color: #B07C1F; }
+.ja-nav svg { width: calc(20 * var(--s)); height: calc(20 * var(--s)); }
+.ja-nav b { font: 500 calc(9.5 * var(--s))/1 var(--pk-font-sans); }
+
+/* the paper */
+.ja-book { position: absolute; inset: 0; transform-origin: left center; padding: calc(30 * var(--s)) calc(14 * var(--s)) calc(18 * var(--s)) calc(10 * var(--s)); background: #160022; }
+.ja-sheet { position: relative; width: 100%; height: 100%; padding: calc(3 * var(--s)) 0 0 calc(3 * var(--s)); }
+.ja-sheet__edge { position: absolute; inset: calc(3 * var(--s)) 0 0 calc(3 * var(--s)); border-radius: calc(3 * var(--s)) calc(12 * var(--s)) calc(12 * var(--s)) calc(3 * var(--s)); background: #D5C7AB; box-shadow: 0 8px 22px rgba(0,0,0,0.5); }
+.ja-paper { position: relative; width: calc(100% - 5 * var(--s)); height: calc(100% - 5 * var(--s)); border-radius: calc(2 * var(--s)) calc(9 * var(--s)) calc(9 * var(--s)) calc(2 * var(--s)); background:
+  linear-gradient(90deg, rgba(53,45,56,0.07) 0 calc(15 * var(--s)), transparent calc(15 * var(--s))),
+  linear-gradient(90deg, transparent calc(10 * var(--s)), rgba(53,45,56,0.15) calc(10 * var(--s)) calc(11 * var(--s)), transparent calc(11 * var(--s)) calc(17 * var(--s)), rgba(255,255,255,0.6) calc(17 * var(--s)) calc(18 * var(--s)), transparent calc(18 * var(--s))),
+  #F5EDDC; overflow: hidden; }
+.ja-paper::after { content: ""; position: absolute; top: calc(12 * var(--s)); bottom: calc(10 * var(--s)); right: calc(1.5 * var(--s)); width: calc(4.5 * var(--s)); border-left: 1px solid rgba(201,189,166,0.55); border-right: 1px solid rgba(201,189,166,0.55); }
+.ja-ribbon { position: absolute; top: 0; right: calc(23 * var(--s)); width: calc(15 * var(--s)); height: calc(67 * var(--s)); background: #6200ED; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 90%, 0 100%); z-index: 2; }
+.ja-paper__body { position: relative; height: 100%; display: flex; flex-direction: column; padding: calc(42 * var(--s)) calc(26 * var(--s)) calc(14 * var(--s)) calc(30 * var(--s)); }
+.ja-heading { font: 700 calc(10 * var(--s))/1 var(--pk-font-sans); letter-spacing: 0.2em; color: #70501A; }
+.ja-q { margin: calc(12 * var(--s)) 0 0; font: 300 calc(29 * var(--s))/1.12 var(--pk-font-display); letter-spacing: -0.01em; color: #1D1D1F; }
+.ja-guide { margin: calc(10 * var(--s)) 0 0; font: italic 400 calc(13.5 * var(--s))/1.5 var(--pk-font-book); color: rgba(29,29,31,0.7); }
+.ja-lines { flex: 1; width: 100%; margin-top: calc(14 * var(--s)); resize: none; border: 0; outline: 0; background: repeating-linear-gradient(180deg, transparent 0 calc(31 * var(--s)), rgba(201,189,166,0.7) calc(31 * var(--s)) calc(32 * var(--s))); font: 400 calc(17 * var(--s))/calc(32 * var(--s)) var(--pk-font-book); color: #352D38; caret-color: #6200ED; padding: 0; }
+.ja-folio { display: flex; align-items: center; justify-content: space-between; padding-top: calc(8 * var(--s)); font: 600 calc(11 * var(--s))/1 var(--pk-font-sans); color: #6E6E73; }
+.ja-folio button { width: calc(34 * var(--s)); height: calc(34 * var(--s)); border-radius: 50%; display: grid; place-items: center; background: rgba(53,45,56,0.07); }
+.ja-folio svg { width: calc(18 * var(--s)); height: calc(18 * var(--s)); }
+.ja-cover { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.ja-cover__title { margin: 0; font: 500 calc(37 * var(--s))/1.08 var(--pk-font-display); letter-spacing: -0.02em; color: #352D38; }
+.ja-cover__date { margin: calc(10 * var(--s)) 0 0; font: 400 calc(12 * var(--s))/1 var(--pk-font-book); color: #6E6E73; }
+.ja-rule { display: block; width: 35%; height: 1px; margin: calc(24 * var(--s)) 0; background: rgba(112,80,26,0.4); }
+.ja-cover__verse { margin: 0; font: italic 300 calc(15 * var(--s))/1.65 var(--pk-font-book); color: #1D1D1F; }
+.ja-cover__ref { margin-top: calc(14 * var(--s)); font: 700 calc(9 * var(--s))/1 var(--pk-font-sans); letter-spacing: 0.16em; color: #6E6E73; }
+.ja-cover__sum { margin: calc(26 * var(--s)) 0 calc(22 * var(--s)); font: 400 calc(13 * var(--s))/1.4 var(--pk-font-book); color: rgba(29,29,31,0.7); }
+.ja-ui .ja-begin { display: inline-flex; align-items: center; gap: 6px; padding: calc(10 * var(--s)) calc(30 * var(--s)); border-radius: 999px; background: #6200ED; color: #fff !important; font: 600 calc(14 * var(--s))/1 var(--pk-font-sans); text-decoration: none; }
+.ja-ui .ja-again { margin-top: calc(16 * var(--s)); font: 600 calc(12 * var(--s))/1 var(--pk-font-sans) !important; color: #6E6E73 !important; }

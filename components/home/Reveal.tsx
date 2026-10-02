@@ -1,5 +1,6 @@
 "use client";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { CSSProperties, ReactNode } from "react";
 
 // Content rises into place with a soft spring the first time it scrolls into view.

@@ -18,10 +18,10 @@
   color: #fff;
 }
 .hm-hero__art { position: absolute; inset: -6% 0 -10%; z-index: -3; }
-.hm-hero__art img {
-  width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%;
-  opacity: 0.9; animation: pk-settle 3.2s var(--pk-spring) both;
-}
+.hm-hero__art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--mpos, 50% 28%); opacity: 0; transition: opacity 2s ease-in-out; will-change: transform, opacity; }
+.hm-hero__art img { animation: hm-move 18s ease-in-out infinite alternate; }
+.hm-hero__art img.is-on { opacity: 0.9; }
+@keyframes hm-move { from { transform: scale(1.02) translate3d(0, 0, 0); } to { transform: scale(1.13) translate3d(var(--dx, -1.4%), var(--dy, -1.2%), 0); } }
 .hm-hero__veil {
   position: absolute; inset: 0; z-index: -2;
   background:
@@ -174,7 +174,7 @@
 .hm-faq details p { padding: 0 44px 22px 4px; font-size: 16px; line-height: 1.7; color: var(--pk-text-2); }
 
 /* Wide screens crop the portrait sky; aim lower so the raised hands stay in view. */
-@media (min-width: 900px) { .hm-hero__art img { object-position: 50% 74%; } }
+@media (min-width: 900px) { .hm-hero__art img { object-position: var(--pos, 50% 74%); } }
 
 @media (max-width: 899px) {
   .hm-world__grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 240px; }
@@ -200,3 +200,23 @@
 @media (prefers-reduced-motion: reduce) {
   .hm-hero__rays, .hm-hero__glow, .hm-hero__dust span, .hm-hero__art img, .hm-hero__cue span, .pk-gold-text { animation: none !important; }
 }
+
+/* ── The app ── */
+.hm-app { padding: clamp(72px, 9vw, 130px) 0 clamp(40px, 6vw, 80px); overflow: hidden; }
+.hm-app__grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: clamp(24px, 5vw, 64px); align-items: center; }
+.hm-app__copy { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
+.hm-app__copy .hm-actions { margin-top: 6px; align-items: center; }
+.hm-app__phones { display: flex; justify-content: center; align-items: flex-end; gap: clamp(8px, 2vw, 22px); }
+.hm-app__phone { width: clamp(96px, 19vw, 230px); flex: 0 0 auto; }
+.hm-app__phone--c { width: clamp(110px, 22vw, 270px); transform: translateY(-4%); animation: pk-float 7s ease-in-out infinite; }
+.hm-app__phone--l, .hm-app__phone--r { opacity: 0.96; }
+.hm-faq__more { border-bottom: 0; }
+.hm-faq__more > details:last-child { border-bottom: 0; }
+@media (max-width: 899px) {
+  .hm-app__grid { grid-template-columns: 1fr; text-align: center; }
+  .hm-app__copy { align-items: center; }
+  .hm-app__copy .hm-actions { justify-content: center; }
+  .hm-app__phones { margin-top: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .hm-app__phone--c { animation: none; } }
+

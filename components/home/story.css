@@ -1,0 +1,42 @@
+/* One pinned stage: each idea owns the screen while you scroll. */
+.st { position: relative; background: linear-gradient(180deg, #0B0014 0%, #160022 50%, #0B0014 100%); color: #fff; }
+.st-pin { position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; align-items: center; }
+.st-glow { position: absolute; left: 50%; top: 20%; width: min(1100px, 150vw); aspect-ratio: 1; transform: translateX(-50%); background: radial-gradient(circle, rgba(122,31,255,0.3) 0%, rgba(98,0,237,0.1) 38%, transparent 66%); pointer-events: none; animation: st-breathe 9s ease-in-out infinite; }
+@keyframes st-breathe { 0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); } 50% { opacity: 1; transform: translateX(-50%) scale(1.08); } }
+.st-dots { position: absolute; z-index: 3; right: clamp(12px, 2.4vw, 32px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.st-dots button { display: block; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 99px; background: rgba(255,255,255,0.28); transition: height 0.4s var(--pk-spring), background 0.3s; cursor: pointer; }
+.st-dots button::after { content: ""; position: absolute; inset: -8px -10px; }
+.st-dots li { position: relative; }
+.st-dots .is-done { background: var(--pk-gold-light); }
+.st-dots .is-on { height: 26px; background: #fff; }
+.st-stage { position: relative; width: 100%; padding-top: 70px; padding-bottom: 20px; }
+.st-scene { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(24px, 5vw, 80px); align-items: center; }
+.st-copy, .st-visual { min-width: 0; }
+.st-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
+.st-title { margin: 0; font-size: clamp(38px, 5.6vw, 84px); line-height: 1.02; color: #fff; text-wrap: balance; }
+.st-visual { display: flex; justify-content: center; align-items: center; min-width: 0; }
+
+/* every visual is sized to the screen it has to fit on */
+.st .bb-scene { --w: min(clamp(150px, 27vw, 400px), calc((100svh - 200px) / 1.282)); height: calc(var(--w) * 1.282 + 40px); }
+.st .pl, .st .ja { width: 100%; }
+.st .pl { gap: 12px; }
+.st .pl-deck { width: min(420px, 100%, calc((100svh - 260px) * 0.714)); }
+.st .ja-phone { width: min(100%, 360px, calc((100svh - 130px) * 0.464)); }
+.st-phones { max-width: 100%; display: flex; justify-content: center; align-items: flex-end; gap: clamp(8px, 2vw, 22px); }
+.st-phone { flex: 0 0 auto; width: min(clamp(90px, 15vw, 230px), calc((100svh - 180px) * 0.42)); }
+.st-phone--c { width: min(clamp(104px, 19vw, 290px), calc((100svh - 130px) * 0.48)); animation: pk-float 7s ease-in-out infinite; }
+
+@media (max-width: 899px) {
+  .st-stage { padding-top: 64px; padding-bottom: 96px; }
+  .st-scene { grid-template-columns: 1fr; gap: 14px; text-align: center; }
+  .st-copy { align-items: center; gap: 14px; }
+  .st-title { font-size: clamp(26px, 7.4vw, 40px); }
+  .st-copy .pk-capsule, .st-copy .pk-play { transform: scale(0.92); }
+  .st .bb-scene { --w: min(36vw, calc((100svh - 330px) / 1.282)); }
+  .st .pl-deck { width: min(300px, 100%, calc((100svh - 400px) * 0.714)); }
+  .st .ja-phone { width: min(100%, 300px, calc((100svh - 330px) * 0.464)); }
+  .st-phone { width: min(26vw, calc((100svh - 400px) * 0.42)); }
+  .st-phone--c { width: min(31vw, calc((100svh - 350px) * 0.48)); }
+  .st-dots { right: 8px; }
+}
+@media (min-width: 900px) { .st-title--long { font-size: clamp(32px, 4.1vw, 60px); } }

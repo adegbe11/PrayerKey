@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { X } from "lucide-react";
 import { playUrl } from "@/lib/app-store";
 
@@ -99,15 +100,10 @@ export default function AppInvite() {
             </span>
             <span className="pk-invite__meta">
               <strong>PrayerKey</strong>
-              <span>Prayer &amp; Bible · Free on Google Play</span>
             </span>
           </div>
 
           <p className="pk-invite__title pk-display">{copy.title}</p>
-          <p className="pk-invite__line">{copy.line}</p>
-          <div className="pk-invite__chips" aria-hidden>
-            <span>Free</span><span>Works offline</span><span>No account</span>
-          </div>
 
           {kind === "android" ? (
             <div className="pk-invite__actions">
@@ -115,12 +111,8 @@ export default function AppInvite() {
               <button type="button" onClick={dismiss} className="pk-invite__later">Not now</button>
             </div>
           ) : (
-            <div className="pk-invite__desk">
-              <img src="/app/qr-play.svg" alt="QR code for PrayerKey on Google Play" width={92} height={92} />
-              <span>
-                Scan with your Android phone to install.
-                <Link href="/download" onClick={() => setOpen(false)}>See the app</Link>
-              </span>
+            <div className="pk-invite__actions">
+              <Link href="/download" onClick={() => { snooze(AFTER_INSTALL_DAYS); setOpen(false); }} className="pk-capsule pk-capsule--violet pk-invite__get">Get the app</Link>
             </div>
           )}
         </motion.aside>

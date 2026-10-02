@@ -229,7 +229,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <span style={{ fontSize: "12px", color: "var(--pk-footer-text)", letterSpacing: "0.02em" }}>
               {new Date().getFullYear()} © PrayerKey
             </span>
-            <div style={{ display: "flex", gap: "28px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "8px 28px", flexWrap: "wrap" }}>
               {[
                 { href: "/download",                 label: "Get the App" },
                 { href: "/about",                    label: "About" },
@@ -243,6 +243,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ].map((l) => (
                 <Link key={l.href} href={l.href} style={{
                   fontSize:       "12px",
+                  display:        "inline-block",
+                  padding:        "13px 0",
                   color:          "var(--pk-footer-text)",
                   textDecoration: "none",
                   letterSpacing:  "0.02em",

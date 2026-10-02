@@ -2,10 +2,14 @@ import Link from "next/link";
 import { ArrowRight, BookOpen, Check, Sparkles } from "lucide-react";
 import HeavenHero from "@/components/home/HeavenHero";
 import PrayerOfDay from "@/components/home/PrayerOfDay";
+import Story from "@/components/home/Story";
 import Reveal, { RevealWords } from "@/components/home/Reveal";
-import { ROTATING_WORDS, getDailyPrayer, getDailyVerse } from "@/lib/home/daily";
+import { DAILY_VERSES, ROTATING_WORDS, getDailyPrayer, getDailyVerse } from "@/lib/home/daily";
 import { FAQS } from "@/lib/home/faqs";
 import "@/components/home/home.css";
+import "@/components/home/stage.css";
+import "@/components/home/story.css";
+import "@/components/home/journal-app.css";
 
 // The verse and prayer change daily, so the page is rebuilt every hour rather than frozen at build time.
 export const revalidate = 3600;
@@ -50,6 +54,9 @@ const DEEP = [
 export default function HomePage() {
   const verse = getDailyVerse();
   const prayer = getDailyPrayer();
+  // Ten verses a day, starting somewhere new each day.
+  const first = DAILY_VERSES.indexOf(verse);
+  const pulls = Array.from({ length: 10 }, (_, k) => DAILY_VERSES[(first + k) % DAILY_VERSES.length]);
   const faqLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -77,29 +84,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Everything in one place */}
-      <section className="hm-world pk-bleed" aria-labelledby="hm-world-title">
-        <div className="hm-wrap">
-          <Reveal>
-            <h2 id="hm-world-title" className="pk-display hm-h2">Everything you need to pray.<br /><span className="hm-muted">In one place.</span></h2>
-          </Reveal>
-          <div className="hm-world__grid">
-            {WORLD.map((w, i) => (
-              <Reveal key={w.href} delay={i * 0.06} className={w.big ? "hm-world__cell hm-world__cell--big" : "hm-world__cell"}>
-                <Link href={w.href} className="hm-tile">
-                  <img src={w.art} alt="" loading="lazy" />
-                  <span className="hm-tile__shade" />
-                  <span className="hm-tile__text">
-                    <span className="pk-chip pk-chip--glass">{w.chip}</span>
-                    <span className="hm-tile__title pk-display">{w.title}</span>
-                    {w.cta && <span className="pk-capsule pk-capsule--light hm-tile__cta">{w.cta} <ArrowRight size={16} /></span>}
-                  </span>
-                </Link>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Story verses={pulls} />
 
       <PrayerOfDay prayer={prayer} />
 
@@ -139,12 +124,21 @@ export default function HomePage() {
       <section className="hm-faq" aria-labelledby="hm-faq-title">
         <Reveal><h2 id="hm-faq-title" className="pk-display hm-h2 hm-h2--center">Frequently Asked Questions</h2></Reveal>
         <div className="hm-faq__list">
-          {FAQS.map((f) => (
+          {FAQS.slice(0, 8).map((f) => (
             <details key={f.q}>
               <summary><span>{f.q}</span><span aria-hidden className="hm-faq__plus" /></summary>
               <p>{f.a}</p>
             </details>
           ))}
+          <details className="hm-faq__more">
+            <summary><span>More questions</span><span aria-hidden className="hm-faq__plus" /></summary>
+            {FAQS.slice(8).map((f) => (
+              <details key={f.q}>
+                <summary><span>{f.q}</span><span aria-hidden className="hm-faq__plus" /></summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </details>
         </div>
       </section>
     </div>

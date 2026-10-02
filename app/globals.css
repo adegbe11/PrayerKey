@@ -707,26 +707,26 @@ details[open] > div { animation: faqOpen 200ms ease both; }
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14), 0 30px 80px rgba(14,0,24,0.55);
 }
 .pk-invite--android { left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 92px); max-width: 520px; margin: 0 auto; }
-.pk-invite--desktop { right: 24px; bottom: 24px; width: 360px; }
+.pk-invite--desktop { right: 24px; bottom: 24px; width: 300px; }
 .pk-invite__close {
   position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 999px; border: 0;
   display: grid; place-items: center; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8);
 }
 .pk-invite__close:hover { background: rgba(255,255,255,0.18); color: #fff; }
 .pk-invite__head { display: flex; align-items: center; gap: 12px; padding-right: 36px; }
-.pk-invite__icon { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
-.pk-invite__icon img { width: 56px; height: 56px; border-radius: 14px; display: block; box-shadow: 0 8px 22px rgba(98,0,237,0.5); animation: pk-invite-pop 900ms var(--pk-spring) both; }
+.pk-invite__icon { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+.pk-invite__icon img { width: 44px; height: 44px; border-radius: 11px; display: block; box-shadow: 0 8px 22px rgba(98,0,237,0.5); animation: pk-invite-pop 900ms var(--pk-spring) both; }
 .pk-invite__icon i { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #FFE9B8; box-shadow: 0 0 8px #E8C98C; pointer-events: none; }
 @keyframes pk-invite-pop { 0% { transform: scale(0.6) rotate(-8deg); } 60% { transform: scale(1.08) rotate(2deg); } 100% { transform: none; } }
 .pk-invite__meta { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .pk-invite__meta strong { font: 700 16px/1.1 var(--pk-font-sans); }
 .pk-invite__meta span { font: 500 12px/1.2 var(--pk-font-sans); color: rgba(255,255,255,0.62); }
-.pk-invite__title { margin: 14px 0 0; font-size: 25px; line-height: 1.12; color: #fff; }
+.pk-invite__title { margin: 12px 0 0; font-size: 19px; line-height: 1.2; color: #fff; }
 .pk-invite__line { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: rgba(255,255,255,0.75); }
 .pk-invite__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
 .pk-invite__chips span { padding: 5px 10px; border-radius: 999px; font: 600 12px/1 var(--pk-font-sans); color: #E8C98C; background: rgba(232,201,140,0.12); }
-.pk-invite__actions { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
-.pk-invite__get { flex: 1; min-height: 50px; font-size: 16px; background: #fff; color: #4A00B8; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.pk-invite__actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.pk-invite__get { flex: 1; min-height: 46px; font-size: 15px; background: #fff; color: #4A00B8; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 .pk-invite__get:hover { background: #F4EEFF; }
 .pk-invite__later { min-height: 50px; padding: 0 16px; border: 0; background: transparent; color: rgba(255,255,255,0.65); font: 600 14px/1 var(--pk-font-sans); }
 .pk-invite__desk { display: flex; align-items: center; gap: 14px; margin-top: 14px; padding: 12px; border-radius: 18px; background: #fff; color: #1D1D1F; }
