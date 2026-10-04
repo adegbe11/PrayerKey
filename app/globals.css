@@ -737,3 +737,33 @@ details[open] > div { animation: faqOpen 200ms ease both; }
 /* A full-screen dialog owns the screen: no tab bar or install card on top of it. */
 body:has([aria-modal="true"]) .pk-dock,
 body:has([aria-modal="true"]) .pk-invite { display: none; }
+
+
+/* The app banner: a slim bar across the top on Android phones. While it shows,
+   --pk-banner holds its height and the page and the fixed nav move down by it. */
+body { padding-top: var(--pk-banner, 0px); transition: padding-top 280ms ease; }
+.pk-nav { top: var(--pk-banner, 0px); transition: top 280ms ease; }
+.pk-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1050; height: 64px;
+  display: flex; align-items: center; gap: 10px; padding: 0 12px 0 6px;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(34,9,58,0.97), rgba(22,0,34,0.97));
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(10,0,20,0.28);
+}
+.pk-banner__close {
+  width: 34px; height: 34px; flex: none; display: grid; place-items: center;
+  border-radius: 50%; color: rgba(255,255,255,0.62); background: none; border: 0;
+}
+.pk-banner__icon { width: 40px; height: 40px; border-radius: 10px; flex: none; box-shadow: 0 4px 12px rgba(98,0,237,0.45); }
+.pk-banner__meta { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.2; }
+.pk-banner__meta strong { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.pk-banner__meta span { font-size: 12px; color: rgba(255,255,255,0.66); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pk-banner__get {
+  flex: none; padding: 9px 18px; border-radius: 999px; font-size: 14px; font-weight: 700;
+  color: #fff; background: #6200ED; text-decoration: none;
+  box-shadow: 0 6px 18px rgba(98,0,237,0.5), inset 0 1px 0 rgba(255,255,255,0.22);
+  transition: transform 160ms ease;
+}
+.pk-banner__get:active { transform: scale(0.95); }
+body:has([aria-modal="true"]) .pk-banner { display: none; }

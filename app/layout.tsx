@@ -3,6 +3,7 @@ import { Inter, Lora, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import CapsuleNav from "@/components/layout/CapsuleNav";
 import AppInvite from "@/components/app/AppInvite";
+import AppBanner from "@/components/app/AppBanner";
 import Link from "next/link";
 
 // The app's three typefaces: Playfair for display, Lora for scripture, Inter for everything else.
@@ -172,6 +173,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareLd) }} />
       </head>
       <body>
+        <AppBanner />
         <CapsuleNav />
         <AppInvite />
 

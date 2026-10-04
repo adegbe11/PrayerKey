@@ -1,7 +1,7 @@
 {
   "name": "PrayerKey",
   "short_name": "PrayerKey",
-  "description": "Free AI prayer generator, live sermon verse detection, and Bible search.",
+  "description": "Prayers for every situation, the whole Bible and a prayer journal. Free.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#160022",
@@ -41,5 +41,13 @@
       "type": "image/png",
       "purpose": "any"
     }
-  ]
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.prayerkey.manna",
+      "id": "com.prayerkey.manna"
+    }
+  ],
+  "prefer_related_applications": true
 }
