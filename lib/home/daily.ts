@@ -1,6 +1,6 @@
 // Daily content for the home page: the verse and prayer change every day of the year.
 
-export const ROTATING_WORDS = ["prayers", "sermons", "miracles", "blessings", "churches", "revivals"];
+export const ROTATING_WORDS = ["prayers", "blessings", "testimonies", "revivals"];
 
 /* ── Verse of the Day pool — cycles daily ─────────────────────────────── */
 export const DAILY_VERSES = [

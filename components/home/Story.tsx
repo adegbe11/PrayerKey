@@ -10,7 +10,7 @@ import JournalApp from "./JournalApp";
 
 // One pinned stage. As you scroll, each idea takes over the whole screen, then hands over to the next.
 const SCENES = [
-  { id: "bible", chip: "The Bible", title: "Open Monochrome Bible Old and New Testament" },
+  { id: "bible", chip: "The Bible", title: "The whole Bible." },
   { id: "pull", chip: "Pull", title: "Pull your manna." },
   { id: "journal", chip: "Journal", title: "Write it down." },
   { id: "app", chip: "The app", title: "Take it with you." },
