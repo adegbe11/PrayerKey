@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import "@/components/article/article.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 import PrayerComposer from "@/components/PrayerComposer";
@@ -82,143 +83,75 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div style={{ maxWidth: "780px", margin: "0 auto", padding: "0 24px 100px" }}>
-
-        {/* ── Breadcrumb ── */}
-        <nav aria-label="Breadcrumb" style={{
-          marginBottom: "28px", fontSize: "13px", color: "var(--pk-text-3)",
-          display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap",
-        }}>
-          <Link href="/" style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Home</Link>
-          <span>/</span>
-          <Link href="/guides" style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Guides</Link>
-          <span>/</span>
-          <span style={{ color: "var(--pk-accent)" }}>{guide.title}</span>
+      <article className="ar">
+        <nav aria-label="Breadcrumb" className="ar-crumbs">
+          <Link href="/">Home</Link><span>/</span>
+          <Link href="/guides">Guides</Link>
         </nav>
 
-        {/* ── Prayer tool — above the fold (Airbnb pattern) ── */}
-        <PrayerComposer compact />
+        <p className="ar-eyebrow">Prayer guide · {guide.readMinutes} min read</p>
+        <h1 className="ar-h1">{guide.title}</h1>
+        <p className="ar-lede">{guide.intro}</p>
 
-        {/* ── Header ── */}
-        <div style={{ marginBottom: "36px" }}>
-          <div style={{
-            display: "inline-block", padding: "4px 12px", borderRadius: "4px",
-            border: "1.5px solid var(--pk-accent-border)", background: "var(--pk-accent-dim)",
-            fontSize: "10px", fontWeight: 700, color: "var(--pk-accent)",
-            letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "16px",
-          }}>
-            Prayer Guide · {guide.readMinutes} min read
+        <div className="ar-byline">
+          <span className="ar-byline__face" aria-hidden>CA</span>
+          <div>
+            <Link href="/author/collins-asein">{AUTHOR}</Link>
+            <br /><span>PrayerKey Editorial</span>
           </div>
-
-          <h1 style={{
-            fontSize: "clamp(28px, 5vw, 46px)", fontWeight: 800,
-            color: "var(--pk-text)", margin: "0 0 16px",
-            letterSpacing: "-0.03em", lineHeight: 1.12,
-          }}>
-            {guide.title}
-          </h1>
-
-          {/* Author bar */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "18px", flexWrap: "wrap" }}>
-            <div style={{
-              width: "36px", height: "36px", borderRadius: "50%",
-              background: "linear-gradient(135deg, var(--pk-accent), var(--pk-purple))",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "13px", fontWeight: 800, color: "#fff", flexShrink: 0,
-            }}>CA</div>
-            <div>
-              <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--pk-text)" }}>
-                <Link href="/author/collins-asein" style={{ color: "var(--pk-text)", textDecoration: "none" }}>{AUTHOR}</Link>
-                <span style={{ color: "var(--pk-text-3)", fontWeight: 400 }}> · Christian Author & Faith Technologist</span>
-              </div>
-              <div style={{ fontSize: "11px", color: "var(--pk-text-3)" }}>
-                Scripture-verified · PrayerKey Editorial
-              </div>
-            </div>
-          </div>
-
-          <p style={{ fontSize: "17px", color: "var(--pk-text-2)", lineHeight: 1.8, margin: 0 }}>
-            {guide.intro}
-          </p>
         </div>
 
-        {/* ── Sections ── */}
-        {guide.sections.map((section) => (
-          <section key={section.heading} style={{ marginBottom: "40px" }}>
-            <h2 style={{
-              fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 700,
-              color: "var(--pk-text)", margin: "0 0 14px", letterSpacing: "-0.02em",
-            }}>
-              {section.heading}
-            </h2>
-            {section.body.split("\n\n").map((para, i) => (
-              <p key={i} style={{
-                fontSize: "16px", color: "var(--pk-text-2)",
-                lineHeight: 1.85, margin: i === 0 ? "0 0 14px" : "0 0 14px",
-              }}>
-                {para}
-              </p>
+        {/* On this page: the guide's sections, numbered, so it can be read in any order */}
+        <nav className="ar-toc" aria-label="On this page">
+          <p className="ar-eyebrow">On this page</p>
+          <ol>
+            {guide.sections.map((section, i) => (
+              <li key={section.heading}><a href={`#s${i + 1}`}>{section.heading}</a></li>
+            ))}
+          </ol>
+        </nav>
+
+        {guide.sections.map((section, i) => (
+          <section key={section.heading} id={`s${i + 1}`} className="ar-section">
+            <h2 className="ar-h2"><span className="ar-num">{i + 1}.</span> {section.heading}</h2>
+            {section.body.split("\n\n").map((para, j) => (
+              <p key={j} className="ar-p">{para}</p>
             ))}
             {section.links && section.links.length > 0 && (
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "4px" }}>
+              <ul className="ar-links">
                 {section.links.map((l) => (
-                  <Link key={l.href} href={l.href} style={{
-                    display: "inline-block", padding: "8px 16px",
-                    borderRadius: "10px", border: "1.5px solid var(--pk-accent-border)",
-                    background: "var(--pk-accent-dim)", fontSize: "13px", fontWeight: 600,
-                    color: "var(--pk-accent)", textDecoration: "none",
-                  }}>
-                    {l.label} →
-                  </Link>
+                  <li key={l.href}><Link href={l.href}>{l.label}</Link></li>
                 ))}
-              </div>
+              </ul>
             )}
           </section>
         ))}
 
-        {/* ── FAQs ── */}
-        <section style={{ marginBottom: "48px" }}>
-          <h2 style={{ fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 18px", letterSpacing: "-0.02em" }}>
-            Frequently Asked Questions
-          </h2>
-          <div style={{ display: "grid", gap: "12px" }}>
-            {guide.faqs.map((faq) => (
-              <details key={faq.q} style={{
-                background: "var(--pk-surface)", border: "1.5px solid var(--pk-border)",
-                borderRadius: "12px", padding: "16px 20px",
-              }}>
-                <summary style={{ fontSize: "15px", fontWeight: 700, color: "var(--pk-text)", cursor: "pointer" }}>
-                  {faq.q}
-                </summary>
-                <p style={{ fontSize: "14px", color: "var(--pk-text-2)", lineHeight: 1.75, margin: "12px 0 0" }}>
-                  {faq.a}
-                </p>
-              </details>
-            ))}
-          </div>
+        <section className="ar-own" aria-labelledby="own">
+          <h2 id="own" className="ar-h2">Pray now</h2>
+          <p>Write what is on your heart and pray it with Scripture.</p>
+          <PrayerComposer compact />
         </section>
 
-        {/* ── More guides ── */}
-        <section>
-          <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 14px" }}>
-            More Prayer Guides
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "12px" }}>
-            {otherGuides.map((g) => (
-              <Link key={g.slug} href={`/guides/${g.slug}`} style={{
-                display: "block", padding: "16px 18px",
-                background: "var(--pk-surface)", border: "1.5px solid var(--pk-border)",
-                borderRadius: "12px", textDecoration: "none",
-              }}>
-                <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)", marginBottom: "4px", lineHeight: 1.4 }}>
-                  {g.title}
-                </div>
-                <div style={{ fontSize: "12px", color: "var(--pk-text-3)" }}>{g.readMinutes} min read</div>
-              </Link>
-            ))}
-          </div>
+        <section className="ar-section ar-faq" aria-labelledby="faq">
+          <h2 id="faq" className="ar-h2">Questions</h2>
+          {guide.faqs.map((faq) => (
+            <details key={faq.q}>
+              <summary>{faq.q}</summary>
+              <p>{faq.a}</p>
+            </details>
+          ))}
         </section>
-      </div>
+
+        <section className="ar-section" aria-labelledby="more">
+          <h2 id="more" className="ar-h2">More guides</h2>
+          <ul className="ar-links">
+            {otherGuides.map((g) => (
+              <li key={g.slug}><Link href={`/guides/${g.slug}`}>{g.title}</Link></li>
+            ))}
+          </ul>
+        </section>
+      </article>
     </>
   );
 }

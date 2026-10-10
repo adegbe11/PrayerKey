@@ -3,16 +3,16 @@
 import { useState, useRef } from "react";
 import { composePrayer, type ComposedPrayer } from "@/lib/prayer-engine/compose";
 
-/* ── Lampstand palette ─────────────────────────────────────────── */
+/* ── Palette: PrayerKey night violet, with the gold kept for the action ── */
 const C = {
-  pine:      "#11241C",
-  panel:     "#1B342A",
-  panel2:    "#234134",
+  pine:      "#160022",
+  panel:     "#22093A",
+  panel2:    "#2E0F4D",
   ivory:     "#F2EBDC",
   ivoryDim:  "#CFC8B6",
   brass:     "#C9A24B",
   brassSoft: "#E0C685",
-  sage:      "#6FA287",
+  sage:      "#C9B8F0",
   line:      "rgba(242,235,220,.14)",
   brassLine: "rgba(201,162,75,.35)",
 };
@@ -81,7 +81,7 @@ export default function PrayerComposer({ seedTopic, compact }: Props) {
             fontSize: "11px", fontWeight: 800, color: C.brass,
             letterSpacing: "0.14em", textTransform: "uppercase", margin: 0,
           }}>
-            ✦ Type your prayer points. Receive a prayer.
+            Your prayer
           </p>
         </div>
 
@@ -122,7 +122,7 @@ export default function PrayerComposer({ seedTopic, compact }: Props) {
 
       {/* Example chips */}
       <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "12px" }} aria-label="Example prayer points">
-        {(seedTopic ? [seedTopic, ...DEFAULT_CHIPS.slice(0, 4)] : DEFAULT_CHIPS).map((chip) => (
+        {(seedTopic ? [seedTopic, ...DEFAULT_CHIPS.slice(0, compact ? 2 : 4)] : DEFAULT_CHIPS).map((chip) => (
           <button
             key={chip}
             onClick={() => generate(chip)}

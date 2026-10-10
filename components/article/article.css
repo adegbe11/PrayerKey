@@ -1,0 +1,74 @@
+/* The article page: one column, the title first, headings that carry the page,
+   and nothing in a box that does not need to be. The way a well-made guide reads -
+   and the way iOS sets text: big confident type, generous air, quiet chrome. */
+
+.ar { max-width: 720px; margin: 0 auto; padding: 8px 22px 110px; color: var(--pk-text); }
+
+.ar-crumbs { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--pk-text-3); margin: 6px 0 26px; }
+.ar-crumbs a { color: var(--pk-text-3); text-decoration: none; }
+.ar-crumbs a:hover { color: var(--pk-accent); }
+
+.ar-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--pk-accent); margin: 0 0 12px; }
+.ar-h1 { font-family: var(--pk-font-display); font-size: clamp(38px, 7.5vw, 60px); line-height: 1.04; letter-spacing: -0.02em; font-weight: 700; margin: 0 0 18px; }
+.ar-lede { font-size: clamp(18px, 2.2vw, 21px); line-height: 1.6; color: var(--pk-text-2); margin: 0 0 22px; }
+
+.ar-byline { display: flex; align-items: center; gap: 12px; padding: 16px 0; border-top: 1px solid var(--pk-border); border-bottom: 1px solid var(--pk-border); margin-bottom: 44px; font-size: 14px; }
+.ar-byline__face { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #fff; font-weight: 800; font-size: 14px; background: linear-gradient(135deg, #8A4DFF, #6200ED); }
+.ar-byline a { color: var(--pk-text); font-weight: 700; text-decoration: none; }
+.ar-byline span { color: var(--pk-text-3); }
+
+/* the prayer itself: set like a page of a prayer book, not a card */
+.ar-prayer { margin: 0 0 18px; }
+.ar-prayer p { font-family: var(--pk-font-book); font-size: clamp(21px, 2.6vw, 25px); line-height: 1.65; margin: 0; white-space: pre-wrap; }
+.ar-verses { margin: 26px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.ar-verses li { padding-left: 16px; border-left: 3px solid var(--pk-accent); }
+.ar-verses q { quotes: none; display: block; font-size: 16px; line-height: 1.6; color: var(--pk-text-2); }
+.ar-verses a { display: inline-block; margin-top: 4px; font-size: 13px; font-weight: 700; color: var(--pk-accent); text-decoration: none; }
+
+.ar-section { margin-top: 64px; }
+.ar-h2 { font-family: var(--pk-font-display); font-size: clamp(28px, 4.4vw, 36px); line-height: 1.15; letter-spacing: -0.015em; font-weight: 700; margin: 0 0 18px; }
+.ar-p { font-size: 18px; line-height: 1.75; color: var(--pk-text-2); margin: 0 0 18px; }
+
+/* numbered lists: big violet numbers, no box around each line */
+.ar-steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+.ar-steps li { counter-increment: s; position: relative; padding: 0 0 22px 52px; font-size: 18px; line-height: 1.65; color: var(--pk-text-2); }
+.ar-steps li::before {
+  content: counter(s); position: absolute; left: 0; top: -2px; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 15px; font-weight: 800; color: #fff; background: #6200ED;
+}
+
+/* your own prayer: one clean panel in the brand colour */
+.ar-own { margin-top: 64px; padding: clamp(22px, 4vw, 34px); border-radius: 26px; color: #fff;
+  background: radial-gradient(120% 120% at 15% 0%, #8A4DFF 0%, #6200ED 45%, #3B0A99 100%);
+  box-shadow: 0 24px 60px rgba(98, 0, 237, 0.28); }
+.ar-own .ar-h2 { color: #fff; margin-bottom: 8px; }
+.ar-own > p { color: rgba(255,255,255,.82); font-size: 16px; line-height: 1.6; margin: 0 0 18px; }
+
+.ar-faq details { border-bottom: 1px solid var(--pk-border); }
+.ar-faq details:first-of-type { border-top: 1px solid var(--pk-border); }
+.ar-faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 16px; padding: 20px 2px; font-size: 18px; font-weight: 650; color: var(--pk-text); }
+.ar-faq summary::-webkit-details-marker { display: none; }
+.ar-faq summary::after { content: "+"; color: var(--pk-accent); font-size: 22px; line-height: 1; transition: transform 200ms ease; }
+.ar-faq details[open] summary::after { transform: rotate(45deg); }
+.ar-faq details p { font-size: 17px; line-height: 1.7; color: var(--pk-text-2); margin: 0 2px 20px; }
+
+.ar-links { list-style: none; margin: 0; padding: 0; }
+.ar-links li { border-bottom: 1px solid var(--pk-border); }
+.ar-links a { display: flex; justify-content: space-between; align-items: center; padding: 16px 2px; font-size: 17px; font-weight: 600; color: var(--pk-text); text-decoration: none; }
+.ar-links a::after { content: "→"; color: var(--pk-accent); }
+.ar-links a:hover { color: var(--pk-accent); }
+
+.ar-note { margin-top: 56px; font-size: 14px; line-height: 1.7; color: var(--pk-text-3); }
+.ar-note a { color: var(--pk-text-2); }
+.ar-more { display: inline-block; margin-top: 18px; font-size: 15px; font-weight: 700; color: var(--pk-accent); text-decoration: none; }
+
+/* On this page */
+.ar-toc { padding: 22px 24px; border-radius: 22px; background: var(--pk-surface); border: 1px solid var(--pk-border); margin-bottom: 8px; }
+.ar-toc ol { margin: 0; padding-left: 22px; display: grid; gap: 10px; }
+.ar-toc li { font-size: 16px; line-height: 1.45; color: var(--pk-text-3); }
+.ar-toc a { color: var(--pk-text); text-decoration: none; font-weight: 600; }
+.ar-toc a:hover { color: var(--pk-accent); }
+.ar-num { color: var(--pk-accent); }
+.ar-section { scroll-margin-top: 96px; }
+.ar-ref { display: inline-block; margin-top: 4px; font-size: 13px; font-weight: 700; color: var(--pk-accent); }
+.ar-byline .ar-byline__face { color: #fff; }
