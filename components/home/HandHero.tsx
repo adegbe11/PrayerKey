@@ -52,8 +52,8 @@ export default function HandHero() {
           transition={{ type: "spring", stiffness: 60, damping: 16, delay: 0.2 }}
         >
           <picture>
-            <source media="(max-width: 700px)" srcSet="/art/hero-hand-sm.webp" />
-            <img src="/art/hero-hand.webp" alt="" fetchPriority="high" />
+            <source media="(max-width: 700px)" srcSet="/art/hero-phone-sm.webp" />
+            <img src="/art/hero-phone.webp" alt="" fetchPriority="high" />
           </picture>
         </motion.div>
       </div>
