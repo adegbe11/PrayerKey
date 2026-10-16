@@ -1,0 +1,34 @@
+/* The hand hero: the brand violet, one promise, the real app in a hand. */
+.hh { position: relative; overflow: hidden; color: #fff; background: #6200ED; isolation: isolate; }
+.hh::before { /* a soft light behind the hand, nothing more */
+  content: ""; position: absolute; z-index: -1; width: 70vmax; height: 70vmax; right: -18vmax; top: -10vmax; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255,255,255,0.16), rgba(255,255,255,0)); }
+.hh__grid { max-width: 1200px; margin: 0 auto; padding: clamp(110px, 12vw, 150px) 24px 0; display: grid; grid-template-columns: 1.05fr 0.95fr; align-items: end; gap: 24px; min-height: min(100svh, 860px); }
+.hh__copy { padding-bottom: clamp(64px, 9vw, 120px); }
+.hh__title { font-family: var(--pk-font-sans); font-weight: 900; text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.95; font-size: clamp(44px, 6.6vw, 88px); margin: 0; }
+.hh__lead { margin: 26px 0 0; max-width: 480px; font-size: clamp(17px, 1.5vw, 19px); line-height: 1.55; color: rgba(255,255,255,0.86); }
+.hh__get { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.hh__ask { margin-top: 18px; max-width: 460px; display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 18px; border-radius: 999px;
+  background: rgba(255,255,255,0.14); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.26); }
+.hh__ask:focus-within { background: rgba(255,255,255,0.2); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6); }
+.hh__ask input { flex: 1; min-width: 0; height: 44px; border: 0; outline: 0; background: transparent; color: #fff; font: 500 16px/1 var(--pk-font-sans); }
+.hh__ask input::placeholder { color: rgba(255,255,255,0.7); }
+.hh__ask button { width: 44px; height: 44px; flex: none; border: 0; border-radius: 50%; display: grid; place-items: center; background: #fff; color: #6200ED; cursor: pointer; transition: transform 160ms ease; }
+.hh__ask button:active { transform: scale(0.94); }
+.hh__trust { margin: 18px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.01em; color: rgba(255,255,255,0.72); }
+.hh__hand { align-self: end; justify-self: center; width: min(100%, 520px); }
+.hh__hand img { display: block; width: 100%; height: auto; filter: drop-shadow(0 30px 60px rgba(20, 0, 60, 0.35)); }
+
+@media (max-width: 860px) {
+  .hh__grid { grid-template-columns: 1fr; text-align: center; padding-top: 92px; min-height: auto; gap: 0; }
+  .hh__copy { padding-bottom: 0; }
+  .hh__title { font-size: clamp(30px, 9.2vw, 52px); letter-spacing: -0.045em; }
+  .hh__lead { font-size: 16px; margin-top: 14px; }
+  .hh__lead, .hh__ask { margin-left: auto; margin-right: auto; }
+  .hh__get { justify-content: center; margin-top: 18px; }
+  .hh__ask { margin-top: 12px; }
+  .hh__trust { margin-top: 10px; font-size: 12px; }
+  /* the hand rises into the first screen: it is the point of the page */
+  .hh__hand { width: min(74%, 340px); margin-top: 14px; }
+}
+.hh__br { display: none; } @media (max-width: 860px) { .hh__br { display: inline; } }

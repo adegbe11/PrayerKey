@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Sparkles } from "lucide-react";
-import HeavenHero from "@/components/home/HeavenHero";
+import HandHero from "@/components/home/HandHero";
+import "@/components/home/hand-hero.css";
 import Story from "@/components/home/Story";
 import Reveal, { RevealWords } from "@/components/home/Reveal";
-import { DAILY_VERSES, ROTATING_WORDS, getDailyVerse } from "@/lib/home/daily";
+import { DAILY_VERSES, getDailyVerse } from "@/lib/home/daily";
 import { FAQS } from "@/lib/home/faqs";
 import "@/components/home/home.css";
 import "@/components/home/stage.css";
@@ -37,7 +38,7 @@ export default function HomePage() {
   return (
     <div className="hm">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
-      <HeavenHero words={ROTATING_WORDS} />
+      <HandHero />
 
       {/* Verse of the day */}
       <section className="hm-verse pk-bleed" aria-labelledby="hm-verse-title">
