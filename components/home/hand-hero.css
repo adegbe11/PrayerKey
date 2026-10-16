@@ -16,7 +16,7 @@
 .hh__ask button { width: 44px; height: 44px; flex: none; border: 0; border-radius: 50%; display: grid; place-items: center; background: #fff; color: #6200ED; cursor: pointer; transition: transform 160ms ease; }
 .hh__ask button:active { transform: scale(0.94); }
 .hh__trust { margin: 18px 0 0; font-size: 13px; font-weight: 600; letter-spacing: 0.01em; color: rgba(255,255,255,0.72); }
-.hh__hand { align-self: center; justify-self: center; width: min(112%, 640px); margin-bottom: clamp(40px, 6vw, 90px); }
+.hh__hand { align-self: end; justify-self: end; width: min(150%, 860px); margin-right: calc(-1 * max(24px, (100vw - 1200px) / 2 + 24px)); }
 .hh__hand img { display: block; width: 100%; height: auto; filter: drop-shadow(0 30px 60px rgba(20, 0, 60, 0.35)); }
 
 @media (max-width: 860px) {
@@ -29,6 +29,6 @@
   .hh__ask { margin-top: 12px; }
   .hh__trust { margin-top: 10px; font-size: 12px; }
   /* the hand rises into the first screen: it is the point of the page */
-  .hh__hand { width: min(96%, 440px); margin: 14px auto 28px; }
+  .hh__hand { width: min(108%, 470px); margin: 16px -24px 0 auto; justify-self: end; }
 }
 .hh__br { display: none; } @media (max-width: 860px) { .hh__br { display: inline; } }
