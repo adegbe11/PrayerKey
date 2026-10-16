@@ -32,3 +32,11 @@
   .hh__hand { width: min(108%, 470px); margin: 16px -24px 0 auto; justify-self: end; }
 }
 .hh__br { display: none; } @media (max-width: 860px) { .hh__br { display: inline; } }
+
+/* the phone rises in by CSS alone; with motion reduced it simply sits there */
+@keyframes hh-rise { from { opacity: 0; transform: translateY(70px) rotate(3deg); } to { opacity: 1; transform: none; } }
+.hh__hand { animation: hh-rise 1.1s cubic-bezier(.2,.9,.25,1) .15s both; }
+@media (prefers-reduced-motion: reduce) { .hh__hand { animation: none; } }
+@keyframes hh-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+.hh-in { animation: hh-up .8s cubic-bezier(.2,.9,.25,1) both; }
+@media (prefers-reduced-motion: reduce) { .hh-in { animation: none; } }
