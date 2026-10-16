@@ -40,8 +40,6 @@ export default function HandHero() {
             <input id="hh-heart" value={heart} onChange={(e) => setHeart(e.target.value)} maxLength={500} placeholder="Or pray now: what is on your heart?" autoComplete="off" />
             <button type="submit" aria-label="Pray"><ArrowRight size={18} /></button>
           </motion.form>
-
-          <motion.p className="hh__trust" {...rise(0.45)}>Free · Works offline · Your prayers stay on your phone</motion.p>
         </div>
 
         <motion.div
