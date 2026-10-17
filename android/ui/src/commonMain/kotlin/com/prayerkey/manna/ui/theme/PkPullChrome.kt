@@ -1,6 +1,5 @@
 package com.prayerkey.manna.ui.theme
 
-import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -41,7 +40,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
+import com.prayerkey.manna.ui.platform.Haptic
+import com.prayerkey.manna.ui.platform.rememberHaptics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -74,7 +74,7 @@ fun PullToReveal(
     bar: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     val density = LocalDensity.current
     val scope = androidx.compose.runtime.rememberCoroutineScope()
 
@@ -116,7 +116,7 @@ fun PullToReveal(
                         onDragEnd = {
                             val settled = if (pull.value > threshold) barHeight else 0f
                             if ((settled > 0f) != open) {
-                                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                                haptics.perform(Haptic.Click)
                             }
                             open = settled > 0f
                             scope.launch { pull.animateTo(settled, tween(260)) }
@@ -145,7 +145,7 @@ fun PullToReveal(
             Column(
                 Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 10.dp)
                     .clickable {
-                        view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                        haptics.perform(Haptic.Click)
                         open = !open
                         scope.launch { pull.animateTo(if (open) barHeight else 0f, tween(260)) }
                     }

@@ -18,6 +18,7 @@ actual fun rememberHaptics(): Haptics = remember {
     Haptics { kind ->
         when (kind) {
             Haptic.Tick -> UISelectionFeedbackGenerator().selectionChanged()
+            Haptic.Click -> UIImpactFeedbackGenerator(UIImpactFeedbackStyle.UIImpactFeedbackStyleSoft).impactOccurred()
             Haptic.Tap -> UIImpactFeedbackGenerator(UIImpactFeedbackStyle.UIImpactFeedbackStyleLight).impactOccurred()
             Haptic.LongPress -> UIImpactFeedbackGenerator(UIImpactFeedbackStyle.UIImpactFeedbackStyleMedium).impactOccurred()
             Haptic.Confirm -> UINotificationFeedbackGenerator().notificationOccurred(UINotificationFeedbackType.UINotificationFeedbackTypeSuccess)
@@ -25,3 +26,7 @@ actual fun rememberHaptics(): Haptics = remember {
         }
     }
 }
+
+actual val supportsBackdropBlur: Boolean = true
+
+actual val noFontPadding: androidx.compose.ui.text.PlatformTextStyle? = null

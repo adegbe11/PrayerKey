@@ -6,8 +6,8 @@ import androidx.compose.material3.Shapes
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import com.prayerkey.manna.ui.platform.noFontPadding
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -37,7 +37,7 @@ val Hairline = Color(0x1A1A0A2E)
  * were left at Material defaults, which is a large part of why the app
  * looked stock.
  */
-private val NoPad = PlatformTextStyle(includeFontPadding = false)
+private val NoPad = noFontPadding
 private val Trim = LineHeightStyle(
     alignment = LineHeightStyle.Alignment.Center,
     trim = LineHeightStyle.Trim.None,
@@ -67,7 +67,7 @@ private fun body(size: Int, line: Int, weight: FontWeight = FontWeight.Normal) =
     lineHeightStyle = Trim,
 )
 
-private val MannaType = Typography(
+private val MannaType: Typography get() = Typography(
     displayLarge = display(40, 46, -1.2),
     displayMedium = display(34, 41, -0.9),
     displaySmall = display(28, 34, -0.6),

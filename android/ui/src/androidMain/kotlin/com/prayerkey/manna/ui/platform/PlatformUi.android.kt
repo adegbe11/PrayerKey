@@ -19,6 +19,7 @@ actual fun rememberHaptics(): Haptics {
             val constant = when (kind) {
                 Haptic.Tick -> HapticFeedbackConstants.CLOCK_TICK
                 Haptic.Tap -> HapticFeedbackConstants.VIRTUAL_KEY
+                Haptic.Click -> HapticFeedbackConstants.CONTEXT_CLICK
                 Haptic.LongPress -> HapticFeedbackConstants.LONG_PRESS
                 Haptic.Confirm -> if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.CONFIRM else HapticFeedbackConstants.VIRTUAL_KEY
                 Haptic.Reject -> if (Build.VERSION.SDK_INT >= 30) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.LONG_PRESS
@@ -27,3 +28,7 @@ actual fun rememberHaptics(): Haptics {
         }
     }
 }
+
+actual val supportsBackdropBlur: Boolean = Build.VERSION.SDK_INT >= 31
+
+actual val noFontPadding: androidx.compose.ui.text.PlatformTextStyle? = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)

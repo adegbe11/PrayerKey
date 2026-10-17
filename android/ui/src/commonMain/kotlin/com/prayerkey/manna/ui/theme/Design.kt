@@ -5,7 +5,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
-import java.time.LocalTime
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 /**
  * One design system for the whole app.
@@ -47,7 +49,7 @@ val ChipFillSelected = Pk.Oxblood.copy(alpha = .10f)
  * lit rather than printed. Kept under 4% alpha; it should register as
  * atmosphere, not colour.
  */
-fun dayWash(hour: Int = LocalTime.now().hour): Brush = SolidColor(Pk.Cream)
+fun dayWash(hour: Int = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour): Brush = SolidColor(Pk.Cream)
 
 /** A soft ambient shadow colour — never black, always the ink at low alpha. */
 val SoftShadow = Night.copy(alpha = .22f)

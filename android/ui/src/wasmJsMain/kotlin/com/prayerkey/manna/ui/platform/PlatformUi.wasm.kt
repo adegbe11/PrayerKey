@@ -10,3 +10,7 @@ actual fun platformContext(): PlatformContext = AppContext
 
 @Composable
 actual fun rememberHaptics(): Haptics = Haptics { }
+
+actual val supportsBackdropBlur: Boolean = true
+
+actual val noFontPadding: androidx.compose.ui.text.PlatformTextStyle? = null

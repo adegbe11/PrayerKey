@@ -1,8 +1,5 @@
 package com.prayerkey.manna.ui.theme
 
-import android.graphics.RenderEffect
-import android.graphics.Shader
-import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,7 +11,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.BlurEffect
+import androidx.compose.ui.graphics.TileMode
+import com.prayerkey.manna.ui.platform.supportsBackdropBlur
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
@@ -132,9 +131,9 @@ fun Modifier.liquidGlass(
     val density = LocalDensity.current
 
     val blurred = remember(blurRadius, density) {
-        if (Build.VERSION.SDK_INT >= 31) {
+        if (supportsBackdropBlur) {
             val px = with(density) { blurRadius.toPx() }
-            RenderEffect.createBlurEffect(px, px, Shader.TileMode.CLAMP).asComposeRenderEffect()
+            BlurEffect(px, px, TileMode.Clamp)
         } else {
             null
         }

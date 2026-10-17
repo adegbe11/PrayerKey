@@ -1,6 +1,5 @@
 package com.prayerkey.manna.ui.theme
 
-import android.view.HapticFeedbackConstants
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -30,11 +29,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalView
+import com.prayerkey.manna.ui.platform.Haptic
+import com.prayerkey.manna.ui.platform.rememberHaptics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.time.LocalDate
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.todayIn
 
 /**
  * The masthead: oxblood, closed by a single gold hairline.
@@ -50,7 +55,7 @@ fun PkHeader(
     streakDays: Int,
     /** Sunday-first, seven entries ending today. True where the day was kept. */
     week: List<Boolean>,
-    today: LocalDate = LocalDate.now(),
+    today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
     trailingLabel: String? = null,
 ) {
     Column(
@@ -108,8 +113,8 @@ fun PkHeader(
         ) {
             val letters = remember(today) {
                 (6 downTo 0).map { back ->
-                    today.minusDays(back.toLong()).dayOfWeek
-                        .getDisplayName(java.time.format.TextStyle.NARROW, java.util.Locale.getDefault())
+                    // the narrow day letter, M T W T F S S
+                    today.minus(DatePeriod(days = back)).dayOfWeek.name.take(1)
                 }
             }
             letters.forEachIndexed { i, letter ->
@@ -169,7 +174,7 @@ fun PkNav(
     selected: Int,
     onSelect: (Int) -> Unit,
 ) {
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     Box(
         /* No navigationBarsPadding here. MainActivity sets
            decorFitsSystemWindows(true), so the window is already inset and
@@ -202,7 +207,7 @@ fun PkNav(
                             indication = null,
                         ) {
                             if (!on) {
-                                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                                haptics.perform(Haptic.Click)
                                 onSelect(index)
                             }
                         }
