@@ -1,11 +1,13 @@
 package com.prayerkey.manna.ui
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.prayerkey.manna.data.MannaRepository
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.ioDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
-import com.prayerkey.manna.data.MannaStore
 import com.prayerkey.manna.data.SavedWord
 import com.prayerkey.manna.data.MemoryVerse
 import com.prayerkey.manna.data.UserPrefs
@@ -20,8 +22,16 @@ import kotlinx.coroutines.launch
 
 private const val PRAYING_MOOD = "\uD83D\uDE4F"
 
-class AppViewModel(application: Application) : AndroidViewModel(application) {
-    private val store = MannaStore.of(application)
+/**
+ * The app's state, shared by Android and iPhone. [store] is Android's SQLite
+ * MannaStore or the iPhone's JsonMannaStore; this never knows which.
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+class AppViewModel(private val context: PlatformContext, private val store: MannaRepository) : ViewModel() {
+    /* Every store call runs on this one lane, in order. SQLite would cope
+       with more, but the iPhone's file store must never see two at once, and
+       one lane is what made "saved, then listed" reliable on both. */
+    private val lane = ioDispatcher.limitedParallelism(1)
     private val _storageError = MutableStateFlow<String?>(null)
     val storageError = _storageError.asStateFlow()
 
@@ -60,10 +70,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         // PERF: the constructor touches no disk. Opening the database and
         // running eight queries on the main thread was costing >15s on a
         // cold start and tripping "failed to complete startup" ANRs.
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(lane) {
             try {
-                store.readableDatabase
-            } catch (_: android.database.sqlite.SQLiteException) {
+                store.open()
+            } catch (_: Exception) {
                 _storageError.value = "Your saved history could not be opened. It has not been erased. Update PrayerKey to the latest version and try again. Do not clear app storage."
                 return@launch
             }
@@ -107,8 +117,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun loadTopics() {
         if (topicsRequested) return
         topicsRequested = true
-        viewModelScope.launch(Dispatchers.IO) {
-            val local = com.prayerkey.manna.data.LocalPrayerTopics.load(getApplication())
+        viewModelScope.launch(ioDispatcher) {
+            val local = com.prayerkey.manna.data.LocalPrayerTopics.load(context)
             if (local.isNotEmpty()) withContext(Dispatchers.Main) {
                 _topics.value = local
                 _topicsReady.value = true
@@ -141,7 +151,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadChallenge(id: String) {
         if (_challengeDays.value.containsKey(id)) return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(lane) {
             val days = safe(emptySet<Int>()) { store.challengeDays(id) }
             withContext(Dispatchers.Main) {
                 _challengeDays.value = _challengeDays.value + (id to days)
@@ -163,7 +173,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Every mutation writes on the IO dispatcher and publishes on Main,
      *  so a card swipe is never blocked by a disk write. */
-    private fun io(block: () -> Unit) = viewModelScope.launch(Dispatchers.IO) { runCatching(block) }
+    private fun io(block: () -> Unit) = viewModelScope.launch(lane) { runCatching(block) }
 
     fun save(card: VerseCard) = io { store.save(card); val r = store.all(); _saved.value = r }
     fun markAnswered(id: Long, testimony: String) = io { store.markAnswered(id, testimony); _saved.value = store.all() }

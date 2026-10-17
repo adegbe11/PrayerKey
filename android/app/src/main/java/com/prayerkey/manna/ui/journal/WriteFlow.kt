@@ -141,23 +141,7 @@ val MOOD_LIST = listOf(
 /** Moods that mean "this is hard" get a calmer canvas and a body cue. */
 private val HEAVY = setOf("😔", "😭", "🙏")
 
-data class WriteResult(
-    val mood: String,
-    val body: String,
-    val gratitude: String,
-    val verseRef: String?,
-    val verseText: String?,
-    val source: String,
-    val isPrayer: Boolean,
-    val title: String = "",
-    val tags: List<String> = emptyList(),
-    val journal: String = "My Journey",
-    val favorite: Boolean = false,
-    val location: String = "",
-    val weather: String = "",
-    val media: List<String> = emptyList(),
-    val entryAt: Long = System.currentTimeMillis(),
-)
+/* WriteResult lives in :ui (journal/WriteResult.kt), where the view model can see it. */
 
 /**
  * The editor. Three things earn their place here beyond a text box:

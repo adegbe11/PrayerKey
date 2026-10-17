@@ -35,3 +35,29 @@ private class AndroidKeyValues(private val p: SharedPreferences) : KeyValues {
 }
 
 actual val ioDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.IO
+
+actual fun PlatformContext.readFile(name: String): String? =
+    java.io.File(filesDir, name).takeIf { it.exists() }?.readText()
+
+actual fun PlatformContext.writeFile(name: String, text: String) {
+    val target = java.io.File(filesDir, name)
+    val temp = java.io.File(filesDir, "$name.tmp")
+    temp.writeText(text)
+    if (!temp.renameTo(target)) { target.delete(); temp.renameTo(target) }
+}
+
+actual fun deleteFile(path: String) {
+    runCatching { java.io.File(path).delete() }
+}
+
+actual suspend fun httpRequest(url: String, method: String, body: String?, headers: Map<String, String>): HttpResult =
+    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        val connection = (java.net.URL(url).openConnection() as java.net.HttpURLConnection).apply {
+            requestMethod = method; connectTimeout = 15_000; readTimeout = 30_000
+            headers.forEach { (k, v) -> setRequestProperty(k, v) }
+            if (body != null) { doOutput = true; outputStream.bufferedWriter().use { it.write(body) } }
+        }
+        val code = connection.responseCode
+        val stream = if (code in 200..299) connection.inputStream else connection.errorStream
+        HttpResult(code, stream?.bufferedReader()?.use { it.readText() }.orEmpty())
+    }

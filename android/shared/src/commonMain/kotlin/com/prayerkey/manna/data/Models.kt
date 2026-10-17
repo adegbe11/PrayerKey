@@ -1,7 +1,11 @@
 package com.prayerkey.manna.data
 
-// The shapes of PrayerKey's data, shared by Android and iPhone.
+import kotlinx.serialization.Serializable
 
+// The shapes of PrayerKey's data, shared by Android and iPhone. The saved
+// ones are @Serializable for the iPhone's store, which keeps them in a file.
+
+@Serializable
 data class SavedWord(
     val id: Long,
     val reference: String,
@@ -12,10 +16,13 @@ data class SavedWord(
     val testimony: String? = null,
 )
 
+@Serializable
 data class MemoryVerse(val reference: String, val verse: String, val stage: Int, val correctCount: Int = 0, val nextReviewAt: Long = 0L)
 
+@Serializable
 data class JournalPrayer(val id: Long, val title: String, val request: String, val prayer: String, val scriptureRef: String?, val createdAt: Long)
 
+@Serializable
 data class JournalEntry(
     val id: Long,
     val entryDay: Long,          // epoch day — one calendar day per group
@@ -43,6 +50,7 @@ data class JournalEntry(
     val media: List<String> = emptyList(),
 )
 
+@Serializable
 data class SermonNote(
     val id: Long,
     val title: String,
@@ -91,6 +99,7 @@ data class PrayerTopic(
 
 data class RemoteVerse(val reference: String, val text: String, val translation: String)
 
+@Serializable
 enum class PrayerStage(val key: String, val label: String) {
     Praying("praying", "Praying"),
     Waiting("waiting", "Waiting"),

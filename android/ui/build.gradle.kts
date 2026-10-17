@@ -39,6 +39,9 @@ kotlin {
             api(compose.materialIconsExtended)
             api(compose.components.resources)
             api("org.jetbrains.compose.ui:ui-backhandler:1.8.2")
+            // ViewModel and viewModel { } for every platform, matching the app's androidx lifecycle 2.9
+            api("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.0")
+            api("org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
         }
     }
 }

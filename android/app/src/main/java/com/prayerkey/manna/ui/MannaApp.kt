@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui
 
+import com.prayerkey.manna.data.mannaStore
 import com.prayerkey.manna.resources.*
 import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.togetherWith
@@ -65,7 +66,10 @@ fun MannaApp(
     notificationRoute: String? = null,
     onNotificationRouteConsumed: () -> Unit = {},
 ) {
-    val viewModel: AppViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val storeContext = LocalContext.current.applicationContext
+    val viewModel: AppViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
+        AppViewModel(storeContext, storeContext.mannaStore())
+    }
     val storageError by viewModel.storageError.collectAsState()
     if (storageError != null) {
         Box(Modifier.fillMaxSize().background(com.prayerkey.manna.ui.theme.Pk.Cream).padding(32.dp), contentAlignment = Alignment.Center) {

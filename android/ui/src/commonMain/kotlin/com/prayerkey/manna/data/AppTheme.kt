@@ -128,9 +128,7 @@ val APP_THEMES: List<AppTheme> = listOf(
     ),
 )
 
-/** Grace, unless the phone is in dark mode and the user follows the system. */
-const val DEFAULT_THEME_ID = "grace"
-const val DARK_THEME_ID = "vigil"
+/* DEFAULT_THEME_ID and DARK_THEME_ID live in :shared (Store.kt), beside the settings that store them. */
 
 fun themeById(id: String): AppTheme =
     APP_THEMES.firstOrNull { it.id == id } ?: APP_THEMES.first()

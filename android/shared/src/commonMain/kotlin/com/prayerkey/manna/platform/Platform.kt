@@ -55,3 +55,28 @@ fun today(): kotlinx.datetime.LocalDate =
 /** The phone's current time of day and date. */
 fun now(): kotlinx.datetime.LocalDateTime =
     kotlinx.datetime.Clock.System.now().toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())
+
+/** A file the app keeps for itself, by name: Android's files folder; the iPhone app's Documents. */
+expect fun PlatformContext.readFile(name: String): String?
+
+/** Replaces the whole file, safely: written beside it first, then moved into place. */
+expect fun PlatformContext.writeFile(name: String, text: String)
+
+/** Removes a file by its full path, if it is there. */
+expect fun deleteFile(path: String)
+
+/** What a web request came back with. [code] is 0 when nothing came back at all. */
+class HttpResult(val code: Int, val text: String)
+
+/** One HTTPS request, off the main thread. Throws when there is no connection. */
+expect suspend fun httpRequest(url: String, method: String, body: String?, headers: Map<String, String>): HttpResult
+
+/** Percent-encodes [value] for a URL's path or query (spaces become %20). */
+fun encodeUrlComponent(value: String): String = buildString {
+    for (byte in value.encodeToByteArray()) {
+        val c = byte.toInt() and 0xFF
+        val ch = c.toChar()
+        if (ch.isLetterOrDigit() && c < 128 || ch in "-_.~") append(ch)
+        else { append('%'); append("0123456789ABCDEF"[c shr 4]); append("0123456789ABCDEF"[c and 15]) }
+    }
+}

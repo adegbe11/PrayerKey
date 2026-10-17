@@ -44,3 +44,11 @@ private class MemoryKeyValues : KeyValues {
         override fun apply() { ops.forEach { it() }; ops.clear() }
     }
 }
+
+private val files = mutableMapOf<String, String>()
+actual fun PlatformContext.readFile(name: String): String? = files[name]
+actual fun PlatformContext.writeFile(name: String, text: String) { files[name] = text }
+actual fun deleteFile(path: String) { files.remove(path) }
+
+actual suspend fun httpRequest(url: String, method: String, body: String?, headers: Map<String, String>): HttpResult =
+    error("the web build is a compile check")

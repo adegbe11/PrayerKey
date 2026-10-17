@@ -7,53 +7,12 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.prayerkey.manna.model.VerseCard
 import org.json.JSONObject
 
-data class UserPrefs(
-    val name: String = "",
-    val reminderHour: Int = 7,
-    val reminderMinute: Int = 0,
-    val reminderEnabled: Boolean = false,
-    val reduceMotion: Boolean = false,
-    val translation: String = "KJV",
-    val onboarded: Boolean = false,
-    val accountReady: Boolean = false,
-    val accountEmail: String = "",
-    val accountKind: String = "private",
-    val sermonLanguage: String = "en-US",
-    val themeId: String = DEFAULT_THEME_ID,
-    /** Let the phone decide light or dark; the theme supplies the accent. */
-    val followSystemTheme: Boolean = true,
-    val journalLock: Boolean = false,
-    val concealJournalPreviews: Boolean = false,
-    /* The book reader. Bible readers skew older and a fixed small serif
-       would shut a lot of them out, so the size is theirs to set and the
-       reader re-paginates around it. */
-    val readerTextSize: Int = 17,
-    /** Where the ribbon is resting, as "Psalms 23". Null = not dropped. */
-    val readerRibbon: String? = null,
-)
-data class SermonVerse(val reference: String, val text: String, val detectedAt: Long)
-data class SermonSession(val id: Long, val title: String, val startedAt: Long, val endedAt: Long?, val verses: List<SermonVerse>)
-data class PrayerSession(
-    val id: Long,
-    val challenge: String,
-    val focus: String,
-    val day: Int,
-    val minutes: Int,
-    val prayedAt: Long,
-)
+class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 14), MannaRepository {
 
-data class FormationState(
-    val morningWord: Boolean = true,
-    val middayPrayer: Boolean = false,
-    val eveningExamen: Boolean = true,
-    val sabbathDay: String = "Sunday",
-    val pilgrimageId: String = "",
-    val pilgrimageDay: Int = 0,
-    val familyNames: String = "",
-    val trustedPhone: String = "",
-)
-
-class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null, 14) {
+    /** Opening the database is the read that can fail; the view model catches it. */
+    override fun open() {
+        readableDatabase
+    }
 
     companion object {
         /**
@@ -235,7 +194,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         db.execSQL("CREATE INDEX IF NOT EXISTS prayer_sessions_date ON prayer_sessions(prayed_at DESC)")
     }
 
-    fun logPrayerSession(challenge: String, focus: String, day: Int, minutes: Int): Long =
+    override fun logPrayerSession(challenge: String, focus: String, day: Int, minutes: Int): Long =
         writableDatabase.insert("prayer_sessions", null, ContentValues().apply {
             put("challenge", challenge)
             put("focus", focus.trim())
@@ -244,7 +203,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
             put("prayed_at", System.currentTimeMillis())
         })
 
-    fun prayerSessions(limit: Int = 100): List<PrayerSession> = readableDatabase.query(
+    override fun prayerSessions(limit: Int): List<PrayerSession> = readableDatabase.query(
         "prayer_sessions", null, null, null, null, null, "prayed_at DESC", limit.toString()
     ).use { cursor -> buildList {
         while (cursor.moveToNext()) add(PrayerSession(
@@ -261,10 +220,10 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     private fun join(items: List<String>) = items.joinToString("\n")
     private fun split(raw: String) = raw.split("\n").filter { it.isNotBlank() }
 
-    fun saveSermonNote(
+    override fun saveSermonNote(
         title: String, scriptures: List<String>, points: List<String>,
         quotes: List<String>, takeaway: String, transcript: String, minutes: Int,
-        audioPath: String = "",
+        audioPath: String,
     ): Long = writableDatabase.insert("sermon_notes", null, ContentValues().apply {
         put("audio_path", audioPath)
         put("title", title)
@@ -284,7 +243,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
      * produces a strictly better note rather than an alternative one — the
      * old text is not worth keeping alongside.
      */
-    fun refineSermonNote(
+    override fun refineSermonNote(
         id: Long, title: String, scriptures: List<String>, points: List<String>,
         quotes: List<String>, takeaway: String, transcript: String,
     ) {
@@ -303,7 +262,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         )
     }
 
-    fun sermonNotes(): List<SermonNote> = readableDatabase.query(
+    override fun sermonNotes(): List<SermonNote> = readableDatabase.query(
         "sermon_notes", null, null, null, null, null, "created_at DESC"
     ).use { c ->
         buildList {
@@ -334,7 +293,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
      * The path is read before the row goes, because afterwards there is no way
      * left to find the file.
      */
-    fun deleteSermonNote(id: Long) {
+    override fun deleteSermonNote(id: Long) {
         val audio = readableDatabase.query(
             "sermon_notes", arrayOf("audio_path"), "id = ?",
             arrayOf(id.toString()), null, null, null,
@@ -347,12 +306,12 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         runCatching { java.io.File(file.parentFile, file.nameWithoutExtension + ".json").delete() }
     }
 
-    fun addJournalEntry(
+    override fun addJournalEntry(
         mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?,
-        source: String = "write", isPrayer: Boolean = false,
-        title: String = "", tags: List<String> = emptyList(), journal: String = "My Journey",
-        favorite: Boolean = false, location: String = "", weather: String = "", media: List<String> = emptyList(),
-        entryAt: Long = System.currentTimeMillis(),
+        source: String, isPrayer: Boolean,
+        title: String, tags: List<String>, journal: String,
+        favorite: Boolean, location: String, weather: String, media: List<String>,
+        entryAt: Long,
     ): Long {
         val now = System.currentTimeMillis()
         return writableDatabase.insert("journal_entries", null, ContentValues().apply {
@@ -367,7 +326,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     }
 
     /** A prayer entry that God answered — the proof pile. */
-    fun answerJournalEntry(id: Long, testimony: String) {
+    override fun answerJournalEntry(id: Long, testimony: String) {
         writableDatabase.update("journal_entries", ContentValues().apply {
             put("answered_at", System.currentTimeMillis())
             put("testimony", testimony.trim())
@@ -376,7 +335,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         }, "id = ?", arrayOf(id.toString()))
     }
 
-    fun updatePrayerJourney(id: Long, stage: PrayerStage, nextAction: String, testimony: String) {
+    override fun updatePrayerJourney(id: Long, stage: PrayerStage, nextAction: String, testimony: String) {
         val answered = stage == PrayerStage.Answered || stage == PrayerStage.AnsweredDifferently
         writableDatabase.update("journal_entries", ContentValues().apply {
             put("prayer_status", stage.key)
@@ -392,11 +351,11 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         }, "id = ?", arrayOf(id.toString()))
     }
 
-    fun updateJournalEntry(
-        id: Long, mood: String, body: String, gratitude: String, isPrayer: Boolean? = null,
-        title: String? = null, tags: List<String>? = null, journal: String? = null,
-        favorite: Boolean? = null, location: String? = null, weather: String? = null, media: List<String>? = null,
-        entryAt: Long? = null,
+    override fun updateJournalEntry(
+        id: Long, mood: String, body: String, gratitude: String, isPrayer: Boolean?,
+        title: String?, tags: List<String>?, journal: String?,
+        favorite: Boolean?, location: String?, weather: String?, media: List<String>?,
+        entryAt: Long?,
     ) {
         writableDatabase.update("journal_entries", ContentValues().apply {
             put("mood", mood); put("body", body.trim()); put("gratitude", gratitude.trim())
@@ -408,11 +367,11 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         }, "id = ?", arrayOf(id.toString()))
     }
 
-    fun deleteJournalEntry(id: Long) {
+    override fun deleteJournalEntry(id: Long) {
         writableDatabase.delete("journal_entries", "id = ?", arrayOf(id.toString()))
     }
 
-    fun journalEntries(): List<JournalEntry> = readableDatabase.query(
+    override fun journalEntries(): List<JournalEntry> = readableDatabase.query(
         "journal_entries", null, null, null, null, null, "created_at DESC"
     ).use { cursor ->
         buildList { while (cursor.moveToNext()) add(JournalEntry(
@@ -442,7 +401,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     }
 
     /** Consecutive days (ending today or yesterday) with at least one entry. */
-    fun journalStreak(): Int {
+    override fun journalStreak(): Int {
         val days = journalEntries().map { it.entryDay }.toSortedSet(compareByDescending { it })
         if (days.isEmpty()) return 0
         val today = java.time.LocalDate.now().toEpochDay()
@@ -454,13 +413,13 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         return count
     }
 
-    fun savePrayer(title: String, request: String, prayer: String, scriptureRef: String?) {
+    override fun savePrayer(title: String, request: String, prayer: String, scriptureRef: String?) {
         writableDatabase.insert("prayer_journal", null, ContentValues().apply {
             put("title", title); put("request", request); put("prayer", prayer); put("scripture_ref", scriptureRef); put("created_at", System.currentTimeMillis())
         })
     }
 
-    fun prayerJournal(): List<JournalPrayer> = readableDatabase.query("prayer_journal", null, null, null, null, null, "created_at DESC").use { cursor ->
+    override fun prayerJournal(): List<JournalPrayer> = readableDatabase.query("prayer_journal", null, null, null, null, null, "created_at DESC").use { cursor ->
         buildList { while (cursor.moveToNext()) add(JournalPrayer(
             cursor.getLong(cursor.getColumnIndexOrThrow("id")),
             cursor.getString(cursor.getColumnIndexOrThrow("title")),
@@ -471,21 +430,21 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         )) }
     }
 
-    fun startSermon(title: String = "Sunday service"): Long = writableDatabase.insert("sermon_sessions", null, ContentValues().apply {
+    override fun startSermon(title: String): Long = writableDatabase.insert("sermon_sessions", null, ContentValues().apply {
         put("title", title); put("started_at", System.currentTimeMillis())
     })
 
-    fun addSermonVerse(sessionId: Long, reference: String, text: String) {
+    override fun addSermonVerse(sessionId: Long, reference: String, text: String) {
         writableDatabase.insertWithOnConflict("sermon_verses", null, ContentValues().apply {
             put("session_id", sessionId); put("reference", reference); put("verse", text); put("detected_at", System.currentTimeMillis())
         }, SQLiteDatabase.CONFLICT_IGNORE)
     }
 
-    fun endSermon(sessionId: Long) {
+    override fun endSermon(sessionId: Long) {
         writableDatabase.update("sermon_sessions", ContentValues().apply { put("ended_at", System.currentTimeMillis()) }, "id = ?", arrayOf(sessionId.toString()))
     }
 
-    fun sermons(): List<SermonSession> = readableDatabase.query("sermon_sessions", null, null, null, null, null, "started_at DESC").use { cursor ->
+    override fun sermons(): List<SermonSession> = readableDatabase.query("sermon_sessions", null, null, null, null, null, "started_at DESC").use { cursor ->
         buildList {
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(cursor.getColumnIndexOrThrow("id"))
@@ -501,13 +460,13 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         }
     }
 
-    fun memorize(card: VerseCard) {
+    override fun memorize(card: VerseCard) {
         writableDatabase.insertWithOnConflict("memory_verses", null, ContentValues().apply {
             put("reference", card.reference); put("verse", card.verse); put("stage", 1)
         }, SQLiteDatabase.CONFLICT_IGNORE)
     }
 
-    fun reviewMemory(reference: String, correct: Boolean) {
+    override fun reviewMemory(reference: String, correct: Boolean) {
         val current = memoryVerses().firstOrNull { it.reference == reference } ?: return
         val review = MemorySchedule.after(current, correct, System.currentTimeMillis())
         writableDatabase.update("memory_verses", ContentValues().apply {
@@ -517,7 +476,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         }, "reference = ?", arrayOf(reference))
     }
 
-    fun memoryVerses(): List<MemoryVerse> = readableDatabase.query("memory_verses", null, null, null, null, null, "next_review_at ASC, stage ASC").use { cursor ->
+    override fun memoryVerses(): List<MemoryVerse> = readableDatabase.query("memory_verses", null, null, null, null, null, "next_review_at ASC, stage ASC").use { cursor ->
         buildList {
             while (cursor.moveToNext()) add(MemoryVerse(
                 cursor.getString(cursor.getColumnIndexOrThrow("reference")),
@@ -545,18 +504,18 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
        challenge does not earn a table of its own, and adding one would mean
        another schema version for every device. */
 
-    fun challengeDays(id: String): Set<Int> =
+    override fun challengeDays(id: String): Set<Int> =
         state("challenge_$id").orEmpty()
             .split(',')
             .mapNotNull { it.trim().toIntOrNull() }
             .toSet()
 
-    fun setChallengeDay(id: String, day: Int, done: Boolean) {
+    override fun setChallengeDay(id: String, day: Int, done: Boolean) {
         val next = challengeDays(id).toMutableSet().apply { if (done) add(day) else remove(day) }
         putState("challenge_$id", next.sorted().joinToString(","))
     }
 
-    fun preferences(): UserPrefs = UserPrefs(
+    override fun preferences(): UserPrefs = UserPrefs(
         name = state("name") ?: "",
         reminderHour = state("reminder_hour")?.toIntOrNull() ?: 7,
         reminderMinute = state("reminder_minute")?.toIntOrNull() ?: 0,
@@ -578,7 +537,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         followSystemTheme = state("theme_follow_system") != "false",
     )
 
-    fun savePreferences(prefs: UserPrefs) {
+    override fun savePreferences(prefs: UserPrefs) {
         putState("name", prefs.name); putState("reminder_hour", prefs.reminderHour.toString())
         putState("reminder_minute", prefs.reminderMinute.toString()); putState("reminder_enabled", prefs.reminderEnabled.toString())
         putState("reduce_motion", prefs.reduceMotion.toString()); putState("translation", prefs.translation)
@@ -592,7 +551,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         putState("theme", prefs.themeId); putState("theme_follow_system", prefs.followSystemTheme.toString())
     }
 
-    fun formation(): FormationState = FormationState(
+    override fun formation(): FormationState = FormationState(
         morningWord = state("formation_morning")?.toBooleanStrictOrNull() ?: true,
         middayPrayer = state("formation_midday")?.toBooleanStrictOrNull() ?: false,
         eveningExamen = state("formation_evening")?.toBooleanStrictOrNull() ?: true,
@@ -603,7 +562,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         trustedPhone = state("formation_trusted_phone") ?: "",
     )
 
-    fun saveFormation(value: FormationState) {
+    override fun saveFormation(value: FormationState) {
         putState("formation_morning", value.morningWord.toString())
         putState("formation_midday", value.middayPrayer.toString())
         putState("formation_evening", value.eveningExamen.toString())
@@ -617,7 +576,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     /** Replaces journey content from a MANNA-owned archive. The caller must
      * obtain explicit confirmation because restore intentionally replaces the
      * current private journey rather than creating silent duplicates. */
-    fun restoreArchive(raw: String) {
+    override fun restoreArchive(raw: String) {
         val root = JSONObject(raw)
         require(root.optString("format").startsWith("manna-journey-v")) { "This is not a PrayerKey backup file" }
         writableDatabase.beginTransaction()
@@ -672,9 +631,9 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
     }
     private fun jsonLines(json: JSONObject, key: String): String = json.optJSONArray(key)?.let { rows -> buildList { repeat(rows.length()) { add(rows.optString(it)) } }.joinToString("\n") }.orEmpty()
 
-    fun streak(): Int = state("streak")?.toIntOrNull() ?: 0
+    override fun streak(): Int = state("streak")?.toIntOrNull() ?: 0
 
-    fun recordDailyPull(): Int {
+    override fun recordDailyPull(): Int {
         val today = java.time.LocalDate.now().toEpochDay()
         val last = state("last_pull_day")?.toLongOrNull()
         val next = when (last) {
@@ -686,7 +645,7 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         return next
     }
 
-    fun save(card: VerseCard) {
+    override fun save(card: VerseCard) {
         val values = ContentValues().apply {
             put("reference", card.reference); put("translation", card.translation)
             put("verse", card.verse); put("saved_at", System.currentTimeMillis())
@@ -694,14 +653,14 @@ class MannaStore(context: Context) : SQLiteOpenHelper(context, "manna.db", null,
         writableDatabase.insertWithOnConflict("saved_words", null, values, SQLiteDatabase.CONFLICT_IGNORE)
     }
 
-    fun markAnswered(id: Long, testimony: String) {
+    override fun markAnswered(id: Long, testimony: String) {
         val values = ContentValues().apply {
             put("answered_at", System.currentTimeMillis()); put("testimony", testimony.trim())
         }
         writableDatabase.update("saved_words", values, "id = ?", arrayOf(id.toString()))
     }
 
-    fun all(): List<SavedWord> = readableDatabase.query(
+    override fun all(): List<SavedWord> = readableDatabase.query(
         "saved_words", null, null, null, null, null, "saved_at DESC"
     ).use { cursor ->
         buildList {
