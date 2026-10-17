@@ -1,9 +1,12 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
+
 
 /**
  * The Fasting Challenge: how long, what kind, what for, and when you pray
@@ -87,9 +90,6 @@ data class FastingChallenge(
 
     val title: String get() = if (days > 1) "$days day fast" else length.label + " fast"
 
-    fun start(): LocalDateTime =
-        LocalDateTime.ofEpochSecond(startedAt, 0, java.time.ZoneOffset.UTC)
-            .plusSeconds(java.time.ZoneId.systemDefault().rules.getOffset(java.time.Instant.now()).totalSeconds.toLong())
 
     fun endsAt(): Long = startedAt + hours * 3600L
 
@@ -103,81 +103,22 @@ data class FastingChallenge(
 
     fun dayOf(nowSeconds: Long): Int = (elapsed(nowSeconds) / 86_400L).toInt() + 1
 
-    val finished: Boolean get() = running && remaining(System.currentTimeMillis() / 1000) == 0L
+    val finished: Boolean get() = running && remaining(Clock.System.now().toEpochMilliseconds() / 1000) == 0L
 
     fun breakLabel(): String {
         val h = if (breakHour % 12 == 0) 12 else breakHour % 12
-        return "%d:%02d %s".format(h, breakMinute, if (breakHour < 12) "AM" else "PM")
+        return "$h:${breakMinute.toString().padStart(2, '0')} ${if (breakHour < 12) "AM" else "PM"}"
     }
 
     fun endLabel(): String =
-        LocalDate.now().plusDays((days - 1).toLong())
-            .format(java.time.format.DateTimeFormatter.ofPattern("EEE, d MMM"))
+        Clock.System.todayIn(TimeZone.currentSystemDefault()).plus(DatePeriod(days = days - 1)).let { d ->
+            // "Mon, 6 Oct", as java.time's "EEE, d MMM" wrote it
+            "${d.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.uppercase() }}, ${d.dayOfMonth} " +
+                d.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+        }
 }
 
-object FastingStore {
-    private fun prefs(context: Context) =
-        context.getSharedPreferences("fasting_challenge", Context.MODE_PRIVATE)
 
-    fun load(context: Context): FastingChallenge {
-        val p = prefs(context)
-        return FastingChallenge(
-            length = runCatching { FastLength.valueOf(p.getString("length", "SEVEN").orEmpty()) }
-                .getOrDefault(FastLength.SEVEN),
-            customHours = p.getInt("customHours", 24),
-            type = runCatching { FastType.valueOf(p.getString("type", "WATER").orEmpty()) }
-                .getOrDefault(FastType.WATER),
-            purpose = p.getString("purpose", "Breakthrough").orEmpty(),
-            note = p.getString("note", "").orEmpty(),
-            startedAt = p.getLong("startedAt", 0L),
-            breakHour = p.getInt("breakHour", 18),
-            breakMinute = p.getInt("breakMinute", 0),
-            dailyBreak = p.getBoolean("dailyBreak", false),
-            rhythms = p.getStringSet("rhythms", setOf("MORNING")).orEmpty()
-                .mapNotNull { name -> runCatching { PrayerRhythm.valueOf(name) }.getOrNull() }.toSet(),
-            reminders = p.getBoolean("reminders", true),
-            kept = p.getString("kept", "").orEmpty().split(",").mapNotNull { it.trim().toIntOrNull() }.toSet(),
-            prayerSessions = p.getInt("prayerSessions", 0),
-            scriptures = p.getInt("scriptures", 0),
-            entries = p.getInt("entries", 0),
-            testimony = p.getString("testimony", "").orEmpty(),
-            answered = p.getBoolean("answered", false),
-        )
-    }
-
-    fun save(context: Context, fast: FastingChallenge) {
-        prefs(context).edit()
-            .putString("length", fast.length.name)
-            .putInt("customHours", fast.customHours)
-            .putString("type", fast.type.name)
-            .putString("purpose", fast.purpose)
-            .putString("note", fast.note)
-            .putLong("startedAt", fast.startedAt)
-            .putInt("breakHour", fast.breakHour)
-            .putInt("breakMinute", fast.breakMinute)
-            .putBoolean("dailyBreak", fast.dailyBreak)
-            .putStringSet("rhythms", fast.rhythms.map { it.name }.toSet())
-            .putBoolean("reminders", fast.reminders)
-            .putString("kept", fast.kept.sorted().joinToString(","))
-            .putInt("prayerSessions", fast.prayerSessions)
-            .putInt("scriptures", fast.scriptures)
-            .putInt("entries", fast.entries)
-            .putString("testimony", fast.testimony)
-            .putBoolean("answered", fast.answered)
-            .apply()
-    }
-
-    fun journal(context: Context, day: Int): String =
-        prefs(context).getString("journal_$day", "").orEmpty()
-
-    fun saveJournal(context: Context, day: Int, text: String) {
-        prefs(context).edit().putString("journal_$day", text).apply()
-    }
-
-    fun clear(context: Context) {
-        prefs(context).edit().clear().apply()
-    }
-}
 
 /** The verse and the focus for this hour of the fast. */
 data class FastMoment(val verse: String, val ref: String, val focus: String, val prayer: String)
@@ -238,5 +179,3 @@ fun fastMoment(fast: FastingChallenge, day: Int): FastMoment {
     )
 }
 
-/** The hour a rhythm falls on, as a time. */
-fun PrayerRhythm.time(): LocalTime = LocalTime.of(hour, 0)

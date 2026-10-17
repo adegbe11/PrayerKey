@@ -1,6 +1,12 @@
 package com.prayerkey.manna.data
 
-import java.time.LocalDate
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
+
 
 /**
  * Today's devotion, and the two challenges.
@@ -59,7 +65,7 @@ private val REFLECTIONS = listOf(
 )
 
 /** A day's index, stable for everyone in the same calendar day. */
-private fun dayIndex(date: LocalDate): Int = date.toEpochDay().toInt()
+private fun dayIndex(date: LocalDate): Int = date.toEpochDays().toLong().toInt()
 
 fun devotionFor(
     date: LocalDate,
@@ -68,13 +74,13 @@ fun devotionFor(
 ): Devotion? {
     if (verses.isEmpty()) return null
     val day = dayIndex(date)
-    val (reference, translation, text) = verses[Math.floorMod(day, verses.size)]
-    val topic = topics.takeIf { it.isNotEmpty() }?.get(Math.floorMod(day * 7, topics.size))
+    val (reference, translation, text) = verses[day.mod(verses.size)]
+    val topic = topics.takeIf { it.isNotEmpty() }?.get((day * 7).mod(topics.size))
     return Devotion(
         date = date,
         reference = reference,
         verse = text,
-        reflection = REFLECTIONS[Math.floorMod(day, REFLECTIONS.size)],
+        reflection = REFLECTIONS[day.mod(REFLECTIONS.size)],
         prayerSlug = topic?.slug,
         prayerTitle = topic?.title,
     )
@@ -124,7 +130,7 @@ fun prayerChallenge(
     if (topics.isEmpty()) return null
     val total = 21
     val day = (0 until total).firstOrNull { it !in doneDays } ?: (total - 1)
-    val topic = topics[Math.floorMod(day * 13, topics.size)]
+    val topic = topics[(day * 13).mod(topics.size)]
     return Challenge(
         id = "twenty-one-days",
         title = "21 days of prayer",

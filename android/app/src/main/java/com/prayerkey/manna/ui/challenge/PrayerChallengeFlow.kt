@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.challenge
 
+import kotlinx.datetime.toKotlinLocalDate
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -117,7 +118,7 @@ fun PrayerChallengeRoute(onClose: () -> Unit) {
     }
     var prayedSeconds by remember { mutableIntStateOf(0) }
     val today = remember { LocalDate.now() }
-    val day = challenge.dayFor(today)
+    val day = challenge.dayFor(today.toKotlinLocalDate())
 
     fun keep(next: PrayerChallenge) {
         challenge = next

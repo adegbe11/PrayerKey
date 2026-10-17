@@ -1,6 +1,12 @@
 package com.prayerkey.manna.data
 
-import java.time.LocalDate
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
+
 
 /**
  * The day's prayer, cut into ten movements you pull through one at a time.
@@ -144,7 +150,7 @@ private fun asDeclaration(point: String): String {
  * therefore sound alike.
  */
 private fun pick(bank: List<String>, date: LocalDate, stride: Long): String =
-    bank[Math.floorMod(date.toEpochDay() * stride, bank.size.toLong()).toInt()]
+    bank[(date.toEpochDays().toLong() * stride).mod(bank.size.toLong()).toInt()]
 
 private const val WORD_INVITATION =
     "Speak to me before I speak to anyone else today. Let Your word settle the things in me that argument never settles."

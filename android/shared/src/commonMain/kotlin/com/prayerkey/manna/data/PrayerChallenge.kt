@@ -1,8 +1,13 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.todayIn
+
 import com.prayerkey.manna.model.prayerForDay
-import java.time.LocalDate
 
 /**
  * Prayer + Challenge: a number of days, a thing you are asking God for, and
@@ -53,13 +58,13 @@ data class PrayerChallenge(
     val heading: String get() = focus.ifBlank { category }.ifBlank { "This season" }
 
     /** Which day of the challenge today is, from 1. Runs past the end if unfinished. */
-    fun dayFor(today: LocalDate = LocalDate.now()): Int =
-        if (!started) 1 else ((today.toEpochDay() - startedOn).toInt() + 1).coerceIn(1, days)
+    fun dayFor(today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): Int =
+        if (!started) 1 else ((today.toEpochDays().toLong() - startedOn).toInt() + 1).coerceIn(1, days)
 
     val complete: Boolean get() = done.size >= days
 
     /** Days prayed in an unbroken run up to the current day. */
-    fun streak(today: LocalDate = LocalDate.now()): Int {
+    fun streak(today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): Int {
         var day = dayFor(today)
         var run = 0
         while (day >= 1 && day in done) {
@@ -72,73 +77,11 @@ data class PrayerChallenge(
     fun timeLabel(): String {
         val h = if (hour % 12 == 0) 12 else hour % 12
         val suffix = if (hour < 12) "AM" else "PM"
-        return "%d:%02d %s".format(h, minute, suffix)
+        return "$h:${minute.toString().padStart(2, '0')} $suffix"
     }
 }
 
-object PrayerChallengeStore {
-    private const val FILE = "prayer_challenge"
 
-    private fun prefs(context: Context) = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-
-    fun load(context: Context): PrayerChallenge {
-        val p = prefs(context)
-        return PrayerChallenge(
-            days = p.getInt("days", 21),
-            focus = p.getString("focus", "").orEmpty(),
-            category = p.getString("category", "").orEmpty(),
-            practice = runCatching {
-                ChallengePractice.valueOf(p.getString("practice", "BIBLE").orEmpty())
-            }.getOrDefault(ChallengePractice.BIBLE),
-            hour = p.getInt("hour", 6),
-            minute = p.getInt("minute", 30),
-            reminder = p.getBoolean("reminder", true),
-            startedOn = p.getLong("started", 0L),
-            done = p.getString("done", "").orEmpty()
-                .split(",").mapNotNull { it.trim().toIntOrNull() }.toSet(),
-            answered = p.getBoolean("answered", false),
-        )
-    }
-
-    fun save(context: Context, challenge: PrayerChallenge) {
-        prefs(context).edit()
-            .putInt("days", challenge.days)
-            .putString("focus", challenge.focus)
-            .putString("category", challenge.category)
-            .putString("practice", challenge.practice.name)
-            .putInt("hour", challenge.hour)
-            .putInt("minute", challenge.minute)
-            .putBoolean("reminder", challenge.reminder)
-            .putLong("started", challenge.startedOn)
-            .putString("done", challenge.done.sorted().joinToString(","))
-            .putBoolean("answered", challenge.answered)
-            .apply()
-    }
-
-    /** What was written at the end of a day, kept so the journey can be read back. */
-    fun reflection(context: Context, day: Int): String =
-        prefs(context).getString("reflection_$day", "").orEmpty()
-
-    fun saveReflection(context: Context, day: Int, text: String, feeling: String, seconds: Int) {
-        prefs(context).edit()
-            .putString("reflection_$day", text)
-            .putString("feeling_$day", feeling)
-            .putInt("seconds_$day", seconds)
-            .apply()
-    }
-
-    fun feeling(context: Context, day: Int): String = prefs(context).getString("feeling_$day", "").orEmpty()
-
-    fun seconds(context: Context, day: Int): Int = prefs(context).getInt("seconds_$day", 0)
-
-    /** Minutes prayed across the whole challenge. */
-    fun minutesPrayed(context: Context, days: Int): Int =
-        (1..days).sumOf { prefs(context).getInt("seconds_$it", 0) } / 60
-
-    fun clear(context: Context) {
-        prefs(context).edit().clear().apply()
-    }
-}
 
 /** A day of the challenge: the verse, the focus, what to pray, what to read. */
 data class ChallengeDayPage(
@@ -229,7 +172,7 @@ private val READINGS = listOf(
 
 /** The day's page, built from the challenge and the day. */
 fun challengeDayPage(challenge: PrayerChallenge, day: Int): ChallengeDayPage {
-    val prayer = prayerForDay(LocalDate.now().dayOfYear + day)
+    val prayer = prayerForDay(Clock.System.todayIn(TimeZone.currentSystemDefault()).dayOfYear + day)
     val pool = POINTS[challenge.category] ?: GENERAL
     val start = (day - 1) * 3
     val points = (0..2).map { pool[(start + it) % pool.size] }
