@@ -1,5 +1,8 @@
 package com.prayerkey.manna.platform
 
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.toLocalDateTime
+
 /**
  * What the shared code needs from the phone it runs on.
  *
@@ -44,3 +47,11 @@ expect fun PlatformContext.readAsset(path: String): String?
 
 /** Where file reads run: the IO pool on phones; the web has none and uses Default. */
 expect val ioDispatcher: kotlinx.coroutines.CoroutineDispatcher
+
+/** Today on the phone's own calendar. */
+fun today(): kotlinx.datetime.LocalDate =
+    kotlinx.datetime.Clock.System.todayIn(kotlinx.datetime.TimeZone.currentSystemDefault())
+
+/** The phone's current time of day and date. */
+fun now(): kotlinx.datetime.LocalDateTime =
+    kotlinx.datetime.Clock.System.now().toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault())

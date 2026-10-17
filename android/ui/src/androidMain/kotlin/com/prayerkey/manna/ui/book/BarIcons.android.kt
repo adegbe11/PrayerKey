@@ -14,7 +14,7 @@ import androidx.core.view.WindowCompat
  * deprecated and ignored from Android 15, and which Play flags.
  */
 @Composable
-internal fun BarIcons(dark: Boolean) {
+actual fun BarIcons(dark: Boolean) {
     val view = LocalView.current
     DisposableEffect(dark) {
         val window = (view.context as? android.app.Activity)?.window

@@ -1,9 +1,11 @@
 package com.prayerkey.manna.ui.session
 
+import com.prayerkey.manna.ui.platform.screenHeightDp
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
-import android.view.HapticFeedbackConstants
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -61,9 +63,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -255,9 +255,9 @@ fun PullSession(
     if (movements.isEmpty()) return
     val isBible = verb == "read"
 
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     val density = LocalDensity.current
-    val screenH = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
+    val screenH = with(density) { screenHeightDp().dp.toPx() }
     val scope = rememberCoroutineScope()
 
     var index by remember(title) { mutableIntStateOf(startAt.coerceIn(0, movements.lastIndex)) }
@@ -274,7 +274,7 @@ fun PullSession(
     fun advance() {
         if (animating) return
         scope.launch {
-            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+            haptics.perform(Haptic.Confirm)
             animating = true
             anim.snapTo(dragY)
             anim.animateTo(screenH * 1.15f, tween(230))
@@ -332,7 +332,7 @@ fun PullSession(
                         },
                     ) { change, amount ->
                         change.consume()
-                        val now = System.currentTimeMillis()
+                        val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                         val dt = (now - lastMoveAt).coerceAtLeast(1)
                         velocity = amount.y / dt * 16f
                         lastMoveAt = now

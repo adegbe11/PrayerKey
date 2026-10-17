@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
  * single flat `color =` before this.
  */
 fun Modifier.premiumCard(
-    shape: RoundedCornerShape = R.card,
+    shape: RoundedCornerShape = Corners.card,
     fill: Brush = SolidColor(Color.White),
     lift: Boolean = true,
 ): Modifier = this
@@ -50,7 +50,7 @@ val GoldFill: Brush = SolidColor(Color.White)
  * detail that separates "a coloured rectangle" from "an object".
  */
 fun Modifier.topHighlight(
-    shape: RoundedCornerShape = R.card,
+    shape: RoundedCornerShape = Corners.card,
     strength: Float = .75f,
 ): Modifier = this
     .border(
@@ -60,7 +60,7 @@ fun Modifier.topHighlight(
     )
 
 /** Same idea on a dark surface, where the highlight is gold rather than white. */
-fun Modifier.goldEdge(shape: RoundedCornerShape = R.card): Modifier = this
+fun Modifier.goldEdge(shape: RoundedCornerShape = Corners.card): Modifier = this
     .border(
         width = 0.8.dp,
         brush = SolidColor(GiltLine.copy(alpha = .42f)),
@@ -87,10 +87,10 @@ fun Modifier.bloom(color: Color = Gold, alpha: Float = .10f): Modifier =
 
 /** Floating glass, for pills that sit over content. */
 fun Modifier.glassPill(): Modifier = this
-    .shadow(9.dp, R.pill, spotColor = Night.copy(alpha = .12f))
-    .clip(R.pill)
+    .shadow(9.dp, Corners.pill, spotColor = Night.copy(alpha = .12f))
+    .clip(Corners.pill)
     .background(SolidColor(Pk.Sunken.copy(alpha = .94f)))
-    .topHighlight(R.pill, strength = .9f)
+    .topHighlight(Corners.pill, strength = .9f)
 
 @Suppress("unused")
 private val unusedSize = Size.Zero

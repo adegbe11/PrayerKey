@@ -28,6 +28,8 @@ kotlin {
     wasmJs { browser() }
 
     sourceSets {
+        // the common BackHandler is still marked experimental in Compose 1.8
+        all { languageSettings.optIn("androidx.compose.ui.ExperimentalComposeUiApi") }
         commonMain.dependencies {
             api(project(":shared"))
             api(compose.runtime)

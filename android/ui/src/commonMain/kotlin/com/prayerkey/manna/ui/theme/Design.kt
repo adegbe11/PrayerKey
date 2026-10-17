@@ -12,11 +12,14 @@ import kotlinx.datetime.toLocalDateTime
 /**
  * One design system for the whole app.
  *
+ * Named Corners, not R: Android drops any class called R from a library,
+ * taking it for generated resources, and this one vanished at runtime.
+ *
  * The screens had drifted: 14/15/16/17/18/20/22/24/26dp radii across cards
  * that sit next to each other, which reads as pieces assembled from
  * different templates. Everything now draws from these tokens.
  */
-object R {
+object Corners {
     /** Big surfaces: cards, sheets, the verse deck. */
     val card = RoundedCornerShape(Pk.CardRadius)
     /** Things you touch: buttons, fields, chips with square-ish ends. */

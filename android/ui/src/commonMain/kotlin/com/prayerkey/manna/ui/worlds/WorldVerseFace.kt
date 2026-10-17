@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.theme.Corners
 import com.prayerkey.manna.ui.theme.BookSerif
 
 /* Ivory on night, gold for the small marks. */
@@ -83,7 +83,7 @@ fun WorldVerseFace(
         ) {
             if (world.isPromise) {
                 Box(
-                    Modifier.clip(R.pill).background(Oxblood.copy(alpha = .08f))
+                    Modifier.clip(Corners.pill).background(Oxblood.copy(alpha = .08f))
                         .padding(horizontal = 14.dp, vertical = 6.dp),
                 ) {
                     Text(

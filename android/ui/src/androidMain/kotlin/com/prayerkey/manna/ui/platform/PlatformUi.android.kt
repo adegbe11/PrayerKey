@@ -32,3 +32,6 @@ actual fun rememberHaptics(): Haptics {
 actual val supportsBackdropBlur: Boolean = Build.VERSION.SDK_INT >= 31
 
 actual val noFontPadding: androidx.compose.ui.text.PlatformTextStyle? = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false)
+
+@Composable
+actual fun screenHeightDp(): Int = androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp

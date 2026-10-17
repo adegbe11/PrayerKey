@@ -19,7 +19,7 @@ import kotlin.random.Random
 
 /** Actual UI on a drawn paper surface: no rasterised text, no repeating image seams. */
 @Composable
-internal fun JournalPaper(content: @Composable BoxScope.() -> Unit) {
+fun JournalPaper(content: @Composable BoxScope.() -> Unit) {
     Box(Modifier.fillMaxSize().background(Pk.DeepDark).padding(start = 7.dp, end = 9.dp, top = 5.dp, bottom = 8.dp)) {
         Box(Modifier.fillMaxSize().padding(start = 3.dp, top = 3.dp)
             .shadow(12.dp, RoundedCornerShape(3.dp, 12.dp, 12.dp, 3.dp))

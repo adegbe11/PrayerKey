@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.journal
 
+import com.prayerkey.manna.platform.today
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -45,7 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import com.prayerkey.manna.ui.theme.BookSerif
 
 /**
@@ -74,7 +75,7 @@ private val REMEMBRANCE = listOf(
 @Composable
 fun JournalWelcome(onOpen: () -> Unit, modifier: Modifier = Modifier) {
     val scheme = MaterialTheme.colorScheme
-    val line = remember { REMEMBRANCE[(LocalDate.now().toEpochDay() % REMEMBRANCE.size).toInt()] }
+    val line = remember { REMEMBRANCE[(today().toEpochDays() % REMEMBRANCE.size).toInt()] }
 
     // the verse holds long enough to be read, then hands over to the book
     var showVerse by remember { mutableStateOf(false) }

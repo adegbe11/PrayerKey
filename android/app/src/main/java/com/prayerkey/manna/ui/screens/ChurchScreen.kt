@@ -316,7 +316,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
     Dialog(onDismissRequest = { if (!busy) onSkip() }) {
     Column(
         Modifier.fillMaxWidth()
-            .clip(R.card)
+            .clip(Corners.card)
             .background(cs.surface)
             .padding(22.dp),
     ) {
@@ -345,7 +345,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                     progress = { s.fraction },
                     color = cs.primary,
                     trackColor = cs.onBackground.copy(alpha = .10f),
-                    modifier = Modifier.fillMaxWidth().height(4.dp).clip(R.pill),
+                    modifier = Modifier.fillMaxWidth().height(4.dp).clip(Corners.pill),
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -361,7 +361,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                 Spacer(Modifier.height(18.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        Modifier.clip(R.pill).background(cs.primary)
+                        Modifier.clip(Corners.pill).background(cs.primary)
                             .clickable { scope.launch { SpeechModel.install(context, SpeechModel.Kind.Speech) } }
                             .padding(horizontal = 18.dp, vertical = 11.dp),
                     ) {
@@ -376,7 +376,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                        start the recording rather than cancel it — the sermon is
                        beginning and this question is not worth missing it for. */
                     Box(
-                        Modifier.clip(R.pill).clickable(onClick = onSkip)
+                        Modifier.clip(Corners.pill).clickable(onClick = onSkip)
                             .padding(horizontal = 16.dp, vertical = 11.dp),
                     ) {
                         Text(
@@ -416,7 +416,7 @@ private fun ReadyView(
                 modifier = Modifier.weight(1f),
             )
             Row(
-                Modifier.clip(R.pill).clickable(onClick = onLanguage)
+                Modifier.clip(Corners.pill).clickable(onClick = onLanguage)
                     .padding(horizontal = 10.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -435,9 +435,9 @@ private fun ReadyView(
 
         Box(
             Modifier.fillMaxWidth().padding(top = 28.dp)
-                .shadow(24.dp, R.card, spotColor = cs.primary.copy(alpha = .30f))
-                .clip(R.card).background(NightGloss)
-                .border(1.dp, Ivory.copy(alpha = .12f), R.card),
+                .shadow(24.dp, Corners.card, spotColor = cs.primary.copy(alpha = .30f))
+                .clip(Corners.card).background(NightGloss)
+                .border(1.dp, Ivory.copy(alpha = .12f), Corners.card),
             contentAlignment = Alignment.BottomCenter,
         ) {
             Sanctuary(GiltLine, Ivory, Modifier.fillMaxWidth().height(390.dp).graphicsLayer(alpha = .18f))
@@ -488,7 +488,7 @@ private fun ReadyView(
             notes.take(6).forEach { note ->
                 Box(
                     Modifier.fillMaxWidth().padding(bottom = 10.dp)
-                        .clip(R.card).background(cs.surface)
+                        .clip(Corners.card).background(cs.surface)
                         .clickable { onOpen(note) },
                 ) {
                     Column(Modifier.padding(16.dp)) {
@@ -625,7 +625,7 @@ private fun ListeningView(
             }
             Spacer(Modifier.weight(1f))
             Row(
-                Modifier.clip(R.pill).background(cs.primary).clickable(onClick = onEnd)
+                Modifier.clip(Corners.pill).background(cs.primary).clickable(onClick = onEnd)
                     .padding(horizontal = 20.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -724,8 +724,8 @@ private fun NoteView(
         if (!empty) Row(Modifier.fillMaxWidth().padding(top = 26.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(
                 Modifier.weight(1f).height(52.dp)
-                    .shadow(6.dp, R.control, spotColor = cs.onBackground.copy(alpha = .16f))
-                    .clip(R.control).background(cs.primary).clickable(onClick = onSave),
+                    .shadow(6.dp, Corners.control, spotColor = cs.onBackground.copy(alpha = .16f))
+                    .clip(Corners.control).background(cs.primary).clickable(onClick = onSave),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -739,8 +739,8 @@ private fun NoteView(
                loudest thing on a screen about listening. */
             Box(
                 Modifier.weight(1f).height(52.dp)
-                    .clip(R.control)
-                    .border(1.dp, cs.outlineVariant, R.control).clickable(onClick = onShare),
+                    .clip(Corners.control)
+                    .border(1.dp, cs.outlineVariant, Corners.control).clickable(onClick = onShare),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -822,7 +822,7 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                 LinearProgressIndicator(
                     progress = { progress ?: 0f },
                     color = cs.primary, trackColor = cs.onBackground.copy(alpha = .10f),
-                    modifier = Modifier.fillMaxWidth().height(4.dp).clip(R.pill),
+                    modifier = Modifier.fillMaxWidth().height(4.dp).clip(Corners.pill),
                 )
                 Text(
                     "Reading the recording · ${((progress ?: 0f) * 100).toInt()}%",
@@ -834,7 +834,7 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                 LinearProgressIndicator(
                     progress = { f },
                     color = cs.primary, trackColor = cs.onBackground.copy(alpha = .10f),
-                    modifier = Modifier.fillMaxWidth().height(4.dp).clip(R.pill),
+                    modifier = Modifier.fillMaxWidth().height(4.dp).clip(Corners.pill),
                 )
                 Text(
                     "Getting ready · ${(f * SpeechModel.Kind.Speech.megabytes).toInt()} of ${SpeechModel.Kind.Speech.megabytes} MB",
@@ -843,7 +843,7 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
             }
             else -> {
                 Box(
-                    Modifier.clip(R.pill).background(cs.primary.copy(alpha = .10f))
+                    Modifier.clip(Corners.pill).background(cs.primary.copy(alpha = .10f))
                         .clickable { run() }
                         .padding(horizontal = 14.dp, vertical = 9.dp),
                 ) {
@@ -1009,7 +1009,7 @@ private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: ()
                     val on = lang.tag == current
                     Surface(
                         onClick = { onPick(lang.tag) },
-                        shape = R.control,
+                        shape = Corners.control,
                         color = if (on) Ivory else Color.White,
                         border = BorderStroke(1.dp, if (on) Gold.copy(alpha = .5f) else Hairline),
                         modifier = Modifier.fillMaxWidth(),

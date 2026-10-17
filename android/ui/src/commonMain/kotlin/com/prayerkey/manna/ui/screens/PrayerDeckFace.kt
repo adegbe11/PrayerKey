@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.PrayerTopic
-import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.theme.Corners
 import com.prayerkey.manna.ui.worlds.VerseWorld
 import com.prayerkey.manna.ui.theme.BookSerif
 
@@ -197,7 +197,7 @@ private fun worldFor(category: String, slug: String): VerseWorld {
  */
 private const val CARD_BUDGET = 380
 
-internal fun preview(prayer: String): Pair<String, Boolean> {
+fun preview(prayer: String): Pair<String, Boolean> {
     val clean = prayer.replace(Regex("""\s+"""), " ").trim()
     if (clean.length <= CARD_BUDGET) return clean to false
 

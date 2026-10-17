@@ -26,3 +26,7 @@ expect val supportsBackdropBlur: Boolean
 
 /** Text without the extra font padding Android adds above and below; other platforms never add it. */
 expect val noFontPadding: androidx.compose.ui.text.PlatformTextStyle?
+
+/** The screen's height in dp, as the screens measured it on Android. */
+@Composable
+expect fun screenHeightDp(): Int

@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.components
 
-import android.view.HapticFeedbackConstants
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -30,7 +31,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.disabled
@@ -46,7 +46,7 @@ import com.prayerkey.manna.ui.theme.InkSoft
 import com.prayerkey.manna.ui.theme.Muted
 import com.prayerkey.manna.ui.theme.Night
 import com.prayerkey.manna.ui.theme.NightFill
-import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.theme.Corners
 import com.prayerkey.manna.ui.theme.glassPill
 import com.prayerkey.manna.ui.theme.topHighlight
 
@@ -67,7 +67,7 @@ fun PkChip(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     val press by animateFloatAsState(
@@ -84,18 +84,18 @@ fun PkChip(
             .scale(press)
             .height(48.dp)
             .then(
-                if (selected) Modifier.shadow(10.dp, R.pill, spotColor = Night.copy(alpha = .3f))
+                if (selected) Modifier.shadow(10.dp, Corners.pill, spotColor = Night.copy(alpha = .3f))
                 else Modifier,
             )
-            .clip(R.pill)
+            .clip(Corners.pill)
             .background(if (selected) NightFill else SolidColor(ChipFill))
-            .topHighlight(R.pill, strength = if (selected) .22f else .7f)
+            .topHighlight(Corners.pill, strength = if (selected) .22f else .7f)
             .semantics(mergeDescendants = true) {
                 contentDescription = label
                 role = Role.Button
             }
             .clickable(interactionSource = interaction, indication = null) {
-                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                haptics.perform(Haptic.Tick)
                 onClick()
             }
             .padding(horizontal = 16.dp),
@@ -123,7 +123,7 @@ fun PkButton(
     fill: Brush? = null,
     onClick: () -> Unit,
 ) {
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     val cs = androidx.compose.material3.MaterialTheme.colorScheme
     val paint = fill ?: SolidColor(cs.primary)
     val interaction = remember { MutableInteractionSource() }
@@ -138,23 +138,23 @@ fun PkButton(
             .height(62.dp)
             .then(
                 if (enabled) Modifier
-                    .shadow(12.dp, R.control, spotColor = Night.copy(alpha = .24f), ambientColor = Color.Transparent)
-                    .shadow(3.dp, R.control, spotColor = Night.copy(alpha = .18f), ambientColor = Color.Transparent)
+                    .shadow(12.dp, Corners.control, spotColor = Night.copy(alpha = .24f), ambientColor = Color.Transparent)
+                    .shadow(3.dp, Corners.control, spotColor = Night.copy(alpha = .18f), ambientColor = Color.Transparent)
                 else Modifier,
             )
-            .clip(R.control)
+            .clip(Corners.control)
             .background(
                 if (enabled) paint
                 else SolidColor(cs.onSurface.copy(alpha = .12f)),
             )
-            .topHighlight(R.control, strength = if (enabled) .42f else .2f)
+            .topHighlight(Corners.control, strength = if (enabled) .42f else .2f)
             .semantics(mergeDescendants = true) {
                 contentDescription = label
                 role = Role.Button
                 if (!enabled) disabled()
             }
             .clickable(enabled = enabled, interactionSource = interaction, indication = null) {
-                view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                haptics.perform(Haptic.Confirm)
                 onClick()
             },
         contentAlignment = Alignment.Center,

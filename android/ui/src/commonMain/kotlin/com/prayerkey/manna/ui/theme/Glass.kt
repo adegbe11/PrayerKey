@@ -75,8 +75,8 @@ import androidx.compose.ui.unit.dp
  * this blurred the entire app.
  */
 class GlassBackdrop internal constructor(
-    internal val sharp: GraphicsLayer,
-    internal val frosted: GraphicsLayer,
+    val sharp: GraphicsLayer,
+    val frosted: GraphicsLayer,
 )
 
 @Composable

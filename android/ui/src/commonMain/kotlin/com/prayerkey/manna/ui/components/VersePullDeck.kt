@@ -1,6 +1,8 @@
 package com.prayerkey.manna.ui.components
 
-import android.view.HapticFeedbackConstants
+import com.prayerkey.manna.ui.platform.screenHeightDp
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -57,9 +59,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -98,9 +98,9 @@ fun VersePullDeck(
     onCurrentChanged: (RemoteVerse) -> Unit = {},
 ) {
     if (verses.isEmpty()) return
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     val density = LocalDensity.current
-    val screenH = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
+    val screenH = with(density) { screenHeightDp().dp.toPx() }
     val scope = rememberCoroutineScope()
 
     var index by remember(verses) { mutableIntStateOf(0) }
@@ -133,7 +133,7 @@ fun VersePullDeck(
     fun advance() { index++ }
 
     fun flingNext() = scope.launch {
-        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        haptics.perform(Haptic.Confirm)
         animating = true; anim.snapTo(dragY)
         anim.animateTo(screenH * 1.15f, tween(220))
         advance()
@@ -141,7 +141,7 @@ fun VersePullDeck(
     }
 
     fun flingSave() = scope.launch {
-        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        haptics.perform(Haptic.Confirm)
         onSave(current)
         animating = true; anim.snapTo(dragY)
         anim.animateTo(-screenH * 1.15f, tween(220))
@@ -167,7 +167,7 @@ fun VersePullDeck(
                     },
                 ) { change, amount ->
                     change.consume()
-                    val now = System.currentTimeMillis()
+                    val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                     val dt = (now - lastMoveAt).coerceAtLeast(1)
                     velocity = amount.y / dt * 16f
                     lastMoveAt = now

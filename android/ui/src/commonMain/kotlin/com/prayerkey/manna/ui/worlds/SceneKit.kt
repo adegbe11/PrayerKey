@@ -28,7 +28,7 @@ import kotlin.math.sin
  */
 
 /** Distance haze. [depth] 0 = foreground, 1 = far away. */
-internal fun DrawScope.haze(topFrac: Float, depth: Float, skyColour: Color) {
+fun DrawScope.haze(topFrac: Float, depth: Float, skyColour: Color) {
     if (depth <= 0f) return
     val y = size.height * topFrac
     drawRect(
@@ -46,7 +46,7 @@ internal fun DrawScope.haze(topFrac: Float, depth: Float, skyColour: Color) {
  * A ridge line built from a seeded profile. [depth] fades it toward the sky
  * so successive ranges sit behind one another instead of stacking flat.
  */
-internal fun DrawScope.range(
+fun DrawScope.range(
     baseFrac: Float,
     heightFrac: Float,
     colour: Color,
@@ -88,7 +88,7 @@ internal fun DrawScope.range(
 }
 
 /** Sun or moon: core, scatter, and a wash over the sky beneath it. */
-internal fun DrawScope.light(
+fun DrawScope.light(
     centre: Offset,
     radius: Float,
     core: Color,
@@ -119,7 +119,7 @@ internal fun DrawScope.light(
  * Mirrors whatever [above] draws into the water below [waterTop], flipped
  * and softened. Cheap, and it is the detail that sells a lake.
  */
-internal fun DrawScope.reflection(waterTop: Float, tint: Color, above: DrawScope.() -> Unit) {
+fun DrawScope.reflection(waterTop: Float, tint: Color, above: DrawScope.() -> Unit) {
     val y = size.height * waterTop
     clipRect(top = y, bottom = size.height) {
         scale(scaleX = 1f, scaleY = -1f, pivot = Offset(size.width / 2f, y)) {
@@ -138,7 +138,7 @@ internal fun DrawScope.reflection(waterTop: Float, tint: Color, above: DrawScope
 }
 
 /** Horizontal ripple lines, brightest near the far shore. */
-internal fun DrawScope.ripples(waterTop: Float, phase: Float, animate: Boolean, tint: Color = Color.White) {
+fun DrawScope.ripples(waterTop: Float, phase: Float, animate: Boolean, tint: Color = Color.White) {
     val y = size.height * waterTop
     val span = size.height - y
     for (i in 0 until 16) {
@@ -159,7 +159,7 @@ internal fun DrawScope.ripples(waterTop: Float, phase: Float, animate: Boolean, 
  * Film grain. Deterministic, drawn once per size, and the fastest way to
  * stop a smooth gradient from looking like a computer made it.
  */
-internal fun DrawScope.grain(strength: Float = .05f, dots: Int = 900) {
+fun DrawScope.grain(strength: Float = .05f, dots: Int = 900) {
     var s = 20250802
     fun rnd(): Float { s = (s * 1103515245 + 12345) and 0x7fffffff; return (s % 1000) / 1000f }
     for (i in 0 until dots) {
@@ -174,7 +174,7 @@ internal fun DrawScope.grain(strength: Float = .05f, dots: Int = 900) {
 }
 
 /** A soft vignette so the eye lands in the middle, not the corners. */
-internal fun DrawScope.vignette(strength: Float = .34f) {
+fun DrawScope.vignette(strength: Float = .34f) {
     drawRect(
         Brush.radialGradient(
             listOf(Color.Transparent, Color.Black.copy(alpha = strength)),
@@ -185,7 +185,7 @@ internal fun DrawScope.vignette(strength: Float = .34f) {
 }
 
 /** Rolling hills — smooth where mountains are jagged. */
-internal fun DrawScope.rolling(
+fun DrawScope.rolling(
     baseFrac: Float,
     heightFrac: Float,
     colour: Color,

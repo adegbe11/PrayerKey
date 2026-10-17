@@ -570,7 +570,7 @@ private fun JournalTimeline(
             query, onQuery,
             placeholder = { Text("Search your journal…", fontSize = 13.sp) },
             leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Muted) },
-            singleLine = true, shape = R.control,
+            singleLine = true, shape = Corners.control,
             modifier = Modifier.fillMaxWidth().padding(top = Space.block),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Electric, unfocusedBorderColor = Color.Transparent,
@@ -762,7 +762,7 @@ private fun JournalMemories(
     val meaningful = remember(entries, onThisDay) { entries.filter { it.favorite || it.media.isNotEmpty() || it.answeredAt != null }.filterNot { it.id == onThisDay?.id } }
     Column(Modifier.fillMaxWidth().padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         onThisDay?.let { memory -> run {
-            Surface(onClick = { onEdit(memory) }, shape = R.card, color = Night, modifier = Modifier.fillMaxWidth()) {
+            Surface(onClick = { onEdit(memory) }, shape = Corners.card, color = Night, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp)) {
                     Text("On this day", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     Text(memory.title.ifBlank { "A page from your story" }, color = Color.White, fontFamily = BookSerif, fontSize = 21.sp, modifier = Modifier.padding(top = 8.dp))

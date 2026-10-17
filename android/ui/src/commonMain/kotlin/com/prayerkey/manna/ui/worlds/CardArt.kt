@@ -130,13 +130,13 @@ fun DrawScope.cardMotif(motif: CardMotif, p: CardPalette, seedRef: String) {
         CardMotif.SUNBURST -> {
             val c = Offset(w * .5f, h * .78f)
             for (i in 0 until 9) {
-                val a0 = Math.toRadians((i * 20.0) + 180.0)
-                val a1 = a0 + Math.toRadians(9.0)
+                val a0 = (((i * 20.0) * kotlin.math.PI / 180.0) + 180.0)
+                val a1 = a0 + ((9.0) * kotlin.math.PI / 180.0)
                 val r = w * 1.3f
                 tri(
                     c.x, c.y,
-                    c.x + (Math.cos(a0) * r).toFloat(), c.y + (Math.sin(a0) * r).toFloat(),
-                    c.x + (Math.cos(a1) * r).toFloat(), c.y + (Math.sin(a1) * r).toFloat(),
+                    c.x + (kotlin.math.cos(a0) * r).toFloat(), c.y + (kotlin.math.sin(a0) * r).toFloat(),
+                    c.x + (kotlin.math.cos(a1) * r).toFloat(), c.y + (kotlin.math.sin(a1) * r).toFloat(),
                     if (i % 2 == 0) p.shapeA else p.shapeB,
                 )
             }

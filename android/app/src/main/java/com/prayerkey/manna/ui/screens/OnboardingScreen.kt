@@ -55,7 +55,7 @@ import com.prayerkey.manna.ui.theme.Canvas
 import com.prayerkey.manna.ui.theme.Gold
 import com.prayerkey.manna.ui.theme.Muted
 import com.prayerkey.manna.ui.theme.NightFill
-import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.theme.Corners
 import com.prayerkey.manna.ui.worlds.WorldVerseFace
 import kotlin.math.roundToInt
 import com.prayerkey.manna.ui.theme.BookSerif
@@ -115,7 +115,7 @@ private fun PullToLearn(onPulled: () -> Unit, onSkip: () -> Unit) {
             fontWeight = FontWeight.SemiBold,
             fontSize = 13.sp,
             modifier = Modifier.align(Alignment.TopEnd).padding(top = 12.dp, end = 22.dp)
-                .clip(R.pill).clickable(onClick = onSkip).padding(horizontal = 14.dp, vertical = 9.dp),
+                .clip(Corners.pill).clickable(onClick = onSkip).padding(horizontal = 14.dp, vertical = 9.dp),
         )
         Box(
             Modifier.fillMaxSize().padding(horizontal = 14.dp)
@@ -123,7 +123,7 @@ private fun PullToLearn(onPulled: () -> Unit, onSkip: () -> Unit) {
                 // it lands on top of them
                 .padding(top = 60.dp, bottom = if (revealed) 170.dp else 150.dp)
                 .offset { IntOffset(0, (dragY.coerceAtLeast(0f) * .16f).roundToInt()) }
-                .clip(R.card)
+                .clip(Corners.card)
                 .pointerInput(revealed) {
                     if (revealed) return@pointerInput
                     detectDragGestures(
@@ -220,7 +220,7 @@ private fun ReminderStep(onDone: (Boolean, Int) -> Unit) {
             listOf(5, 6, 7, 8, 9).forEach { h ->
                 val on = h == hour
                 Box(
-                    Modifier.size(54.dp).clip(R.pill)
+                    Modifier.size(54.dp).clip(Corners.pill)
                         .background(
                             if (on) NightFill
                             else androidx.compose.ui.graphics.SolidColor(Color(0xFFF0F0F3)),

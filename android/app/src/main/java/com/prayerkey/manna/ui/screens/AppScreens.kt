@@ -626,7 +626,7 @@ fun LegacyPrayerScreen(
                     )
                     Surface(
                         onClick = { if (searchMiss) topicQuery = "" else onLoadTopics() },
-                        shape = R.pill, color = deckCs.primary.copy(alpha = .14f),
+                        shape = Corners.pill, color = deckCs.primary.copy(alpha = .14f),
                         modifier = Modifier.padding(top = 18.dp),
                     ) {
                         Text(
@@ -706,16 +706,16 @@ fun LegacyPrayerScreen(
             /* ── Prayer of the Day — same daily prayer as prayerkey.com ── */
             Surface(
                 onClick = { potdOpen = true },
-                shape = R.card, color = Color.Transparent,
+                shape = Corners.card, color = Color.Transparent,
                 // shadow on the OUTER modifier only — layering it with the
                 // gradient background painted a doubled inner edge
                 modifier = Modifier.fillMaxWidth().padding(top = Space.block, bottom = Space.block)
-                    .shadow(24.dp, R.card, spotColor = Night.copy(alpha = .32f), ambientColor = Night.copy(alpha = .12f))
-                    .shadow(3.dp, R.card, spotColor = Night.copy(alpha = .3f), ambientColor = Color.Transparent)
-                    .clip(R.card)
+                    .shadow(24.dp, Corners.card, spotColor = Night.copy(alpha = .32f), ambientColor = Night.copy(alpha = .12f))
+                    .shadow(3.dp, Corners.card, spotColor = Night.copy(alpha = .3f), ambientColor = Color.Transparent)
+                    .clip(Corners.card)
                     .background(NightFill)
                     .bloom(Gold, .09f)
-                    .goldEdge(R.card),
+                    .goldEdge(Corners.card),
             ) {
                 Row(Modifier.padding(horizontal = 20.dp, vertical = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
@@ -753,7 +753,7 @@ fun LegacyPrayerScreen(
                     ),
                     minLines = 3,
                     maxLines = 10,
-                    shape = R.card,
+                    shape = Corners.card,
                     colors = OutlinedTextFieldDefaults.colors(
                         // a tinted pane rather than a filled beige box; the
                         // solid fill read as a web contact form
@@ -838,7 +838,7 @@ fun LegacyPrayerScreen(
                                     val on = item in moods
                                     Surface(
                                         onClick = { if (on) moods.remove(item) else moods.add(item) },
-                                        shape = R.pill,
+                                        shape = Corners.pill,
                                         color = if (on) ChipFillSelected else ChipFill,
                                     ) {
                                         Text(
@@ -961,7 +961,7 @@ fun LegacyPrayerScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Healing, family, work, grief…", fontSize = 14.sp) },
                     leadingIcon = { Icon(Icons.Outlined.Search, null, tint = Muted) },
-                    singleLine = true, shape = R.control, colors = fieldColors(),
+                    singleLine = true, shape = Corners.control, colors = fieldColors(),
                 )
                 Spacer(Modifier.height(14.dp))
                 val hits = topics.filter {
@@ -975,7 +975,7 @@ fun LegacyPrayerScreen(
                     items(hits.take(40), key = { it.slug }) { topic ->
                         Surface(
                             onClick = { selectedTopic = topic; searchOpen = false },
-                            shape = R.control, color = Color.White,
+                            shape = Corners.control, color = Color.White,
                             border = androidx.compose.foundation.BorderStroke(1.dp, Hairline),
                             modifier = Modifier.fillMaxWidth(),
                         ) {
@@ -1216,7 +1216,7 @@ fun ProfileScreen(
         }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 22.dp).padding(bottom = Pk.NavClearance)) {
         OutlinedTextField(prefs.name, { onUpdate(prefs.copy(name = it)) }, placeholder = { Text("Your name") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White, focusedBorderColor = Pk.Oxblood, unfocusedBorderColor = Pk.Hair))
-        Box(Modifier.fillMaxWidth().padding(vertical = 18.dp).clip(R.card).background(NightFill).border(0.7.dp, Pk.GoldLight.copy(alpha = .28f), R.card)) {
+        Box(Modifier.fillMaxWidth().padding(vertical = 18.dp).clip(Corners.card).background(NightFill).border(0.7.dp, Pk.GoldLight.copy(alpha = .28f), Corners.card)) {
             Row(Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { Text(streak.toString(), color = Color.White, fontFamily = BookSerif, fontSize = 48.sp); Text("day streak", color = Color.White.copy(.7f)) }
                 // the same figure as the streak beside it: a smaller number in another face read as a footnote
@@ -1310,7 +1310,7 @@ fun ProfileScreen(
 private fun SettingRow(label: String, value: String, onClick: () -> Unit = {}, action: @Composable () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-        shape = R.card,
+        shape = Corners.card,
         color = Color.White,
         border = BorderStroke(1.dp, Pk.Hair),
     ) {

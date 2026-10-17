@@ -25,7 +25,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.theme.Corners
 
 /**
  * A verse as a printed devotional card.
@@ -53,7 +53,7 @@ fun ScriptureCard(
     val motif = remember(world) { world.motif() }
     val body = remember(text, palette) { emphasise(text, palette.ink) }
 
-    Box(modifier.clip(R.card).background(palette.ground)) {
+    Box(modifier.clip(Corners.card).background(palette.ground)) {
         Canvas(Modifier.fillMaxSize()) {
             cardMotif(motif, palette, reference)
             settleMotif(palette.ground)
@@ -136,7 +136,7 @@ private val CARRIERS_STRONG = (
         "goodness good perfect complete lacking nothing all sufficient"
     ).split(" ").toHashSet()
 
-internal fun emphasise(text: String, ink: androidx.compose.ui.graphics.Color): AnnotatedString {
+fun emphasise(text: String, ink: androidx.compose.ui.graphics.Color): AnnotatedString {
     val tokens = Regex("[\\p{L}’']+|[^\\p{L}’']+").findAll(text).map { it.value }.toList()
 
     val scored = tokens.withIndex()

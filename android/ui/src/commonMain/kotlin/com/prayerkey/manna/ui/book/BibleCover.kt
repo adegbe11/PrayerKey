@@ -17,7 +17,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.painterResource
@@ -289,7 +288,7 @@ private fun DrawScope.shield() {
 
     // Fine hand-tooled rays and vines inside the gothic panel.
     for (i in 0 until 12) {
-        val angle = (Math.PI * 2.0 * i / 12.0).toFloat()
+        val angle = (kotlin.math.PI * 2.0 * i / 12.0).toFloat()
         val innerRadius = hw * .48f
         val outerRadius = hw * .76f
         val start = Offset(cx + cos(angle) * innerRadius, cy + sin(angle) * innerRadius * .82f)
@@ -339,7 +338,7 @@ private fun DrawScope.cornerFleurons() {
         Triple(a, h - a, 270f),
     ).forEach { (x, y, rot) ->
         val p = Path()
-        val rad = Math.toRadians(rot.toDouble())
+        val rad = rot.toDouble() * kotlin.math.PI / 180.0
         fun at(dx: Float, dy: Float): Offset {
             val c = cos(rad).toFloat()
             val s = sin(rad).toFloat()

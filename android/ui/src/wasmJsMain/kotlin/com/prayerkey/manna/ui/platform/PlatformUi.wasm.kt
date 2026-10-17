@@ -14,3 +14,10 @@ actual fun rememberHaptics(): Haptics = Haptics { }
 actual val supportsBackdropBlur: Boolean = true
 
 actual val noFontPadding: androidx.compose.ui.text.PlatformTextStyle? = null
+
+@OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
+@Composable
+actual fun screenHeightDp(): Int {
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    return with(density) { androidx.compose.ui.platform.LocalWindowInfo.current.containerSize.height.toDp().value.toInt() }
+}

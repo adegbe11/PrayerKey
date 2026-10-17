@@ -1,6 +1,8 @@
 package com.prayerkey.manna.ui.components
 
-import android.view.HapticFeedbackConstants
+import com.prayerkey.manna.ui.platform.screenHeightDp
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -41,9 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.ui.theme.Gold
 import com.prayerkey.manna.ui.theme.Hairline
 import com.prayerkey.manna.ui.theme.Night
-import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.theme.Corners
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -95,9 +95,9 @@ fun <T> PullDeck(
     card: @Composable (item: T, front: Boolean, modifier: Modifier) -> Unit,
 ) {
     if (items.isEmpty()) return
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     val density = LocalDensity.current
-    val screenH = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
+    val screenH = with(density) { screenHeightDp().dp.toPx() }
     val scope = rememberCoroutineScope()
 
     var index by remember(items) { mutableIntStateOf(0) }
@@ -117,7 +117,7 @@ fun <T> PullDeck(
     val keepP = (-progress).coerceAtLeast(0f)
 
     fun flingNext() = scope.launch {
-        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        haptics.perform(Haptic.Confirm)
         animating = true; anim.snapTo(dragY)
         anim.animateTo(screenH * 1.15f, tween(220))
         onNext(current)
@@ -126,7 +126,7 @@ fun <T> PullDeck(
     }
 
     fun flingKeep() = scope.launch {
-        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        haptics.perform(Haptic.Confirm)
         onKeep(current)
         animating = true; anim.snapTo(dragY)
         anim.animateTo(-screenH * 1.15f, tween(220))
@@ -152,7 +152,7 @@ fun <T> PullDeck(
                 },
             ) { change, amount ->
                 change.consume()
-                val now = System.currentTimeMillis()
+                val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                 val dt = (now - lastMoveAt).coerceAtLeast(1)
                 velocity = amount.y / dt * 16f
                 lastMoveAt = now
@@ -177,7 +177,7 @@ fun <T> PullDeck(
             Box(
                 Modifier.align(Alignment.TopCenter).padding(top = 108.dp)
                     .graphicsLayer { alpha = pullP * 1.5f; rotationZ = -8f }
-                    .border(BorderStroke(3.dp, Gold), R.tag)
+                    .border(BorderStroke(3.dp, Gold), Corners.tag)
                     .padding(horizontal = 16.dp, vertical = 6.dp),
             ) {
                 Text(pullStamp, color = Gold, fontWeight = FontWeight.Black, fontSize = 22.sp, letterSpacing = 2.sp)
@@ -185,7 +185,7 @@ fun <T> PullDeck(
             Box(
                 Modifier.align(Alignment.BottomCenter).padding(bottom = 190.dp)
                     .graphicsLayer { alpha = keepP * 1.5f; rotationZ = 8f }
-                    .border(BorderStroke(3.dp, Night), R.tag)
+                    .border(BorderStroke(3.dp, Night), Corners.tag)
                     .padding(horizontal = 16.dp, vertical = 6.dp),
             ) {
                 Text(keepStamp, color = Night, fontWeight = FontWeight.Black, fontSize = 22.sp, letterSpacing = 2.sp)

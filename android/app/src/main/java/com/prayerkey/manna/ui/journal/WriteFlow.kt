@@ -100,7 +100,7 @@ import com.prayerkey.manna.ui.church.ReferenceDetector
 import com.prayerkey.manna.ui.theme.premiumCard
 import com.prayerkey.manna.ui.theme.PaperFill
 import com.prayerkey.manna.ui.theme.topHighlight
-import com.prayerkey.manna.ui.theme.R
+import com.prayerkey.manna.ui.theme.Corners
 import com.prayerkey.manna.ui.theme.InkSoft
 import com.prayerkey.manna.ui.theme.Electric
 import com.prayerkey.manna.ui.theme.Gold
@@ -526,11 +526,11 @@ fun WriteSheet(
                                 FilterChip(selected = journal == name, onClick = { journal = name }, label = { Text(name, fontSize = 11.sp) })
                             }
                         }
-                        OutlinedTextField(gratitude, { gratitude = it }, label = { Text("Grateful for") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 10.dp), shape = R.control)
-                        OutlinedTextField(tags, { tags = it }, label = { Text("Tags") }, placeholder = { Text("faith, family, healing") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), shape = R.control)
+                        OutlinedTextField(gratitude, { gratitude = it }, label = { Text("Grateful for") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 10.dp), shape = Corners.control)
+                        OutlinedTextField(tags, { tags = it }, label = { Text("Tags") }, placeholder = { Text("faith, family, healing") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), shape = Corners.control)
                         Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedTextField(location, { location = it }, label = { Text("Place") }, leadingIcon = { Icon(Icons.Outlined.Place, null) }, singleLine = true, modifier = Modifier.weight(1f), shape = R.control)
-                            OutlinedTextField(weather, { weather = it }, label = { Text("Weather") }, leadingIcon = { Icon(Icons.Outlined.WbSunny, null) }, singleLine = true, modifier = Modifier.weight(1f), shape = R.control)
+                            OutlinedTextField(location, { location = it }, label = { Text("Place") }, leadingIcon = { Icon(Icons.Outlined.Place, null) }, singleLine = true, modifier = Modifier.weight(1f), shape = Corners.control)
+                            OutlinedTextField(weather, { weather = it }, label = { Text("Weather") }, leadingIcon = { Icon(Icons.Outlined.WbSunny, null) }, singleLine = true, modifier = Modifier.weight(1f), shape = Corners.control)
                         }
 
                         Row(Modifier.fillMaxWidth().padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
