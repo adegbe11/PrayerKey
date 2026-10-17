@@ -111,28 +111,43 @@ jobs:
       - name: Launch in the simulator and take screenshots
         working-directory: iosApp
         run: |
-          DEVICE=$(xcrun simctl list devices available | grep -m1 -E "iPhone 16 Pro \(" | sed -E 's/.*\(([0-9A-F-]+)\).*/\1/')
+          # iPhone 16 Pro Max: its screenshots are the 6.9-inch size App Store Connect requires
+          DEVICE=$(xcrun simctl list devices available | grep -m1 -E "iPhone 16 Pro Max \(" | sed -E 's/.*\(([0-9A-F-]+)\).*/\1/')
           xcrun simctl boot "$DEVICE"
           xcrun simctl bootstatus "$DEVICE" -b
+          xcrun simctl status_bar "$DEVICE" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3
           xcrun simctl install "$DEVICE" build/Build/Products/Debug-iphonesimulator/PrayerKey.app
+          mkdir -p screenshots
+          # first launch as a new person: the welcome
           xcrun simctl launch --console-pty "$DEVICE" com.prayerkey.manna > console.log 2>&1 &
-          for t in 6 20; do
-            sleep $t
-            xcrun simctl io "$DEVICE" screenshot shot.png
-            sips -Z 640 -s format jpeg -s formatOptions 60 shot.png --out shot.jpg > /dev/null
-            echo "::notice title=Screenshot after ${t}s::data:image/jpeg;base64,$(base64 -i shot.jpg | tr -d '\n')"
-          done
+          sleep 15
+          xcrun simctl io "$DEVICE" screenshot screenshots/0-welcome.png
           if ! xcrun simctl spawn "$DEVICE" launchctl list | grep -q com.prayerkey.manna; then
             msg=$(tail -60 console.log | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
             echo "::error title=The app stopped::$msg"
             exit 1
           fi
+          # then as a returning person, one screen per launch
+          n=1
+          for route in home bible prayer devotional journal church; do
+            xcrun simctl terminate "$DEVICE" com.prayerkey.manna || true
+            xcrun simctl launch "$DEVICE" com.prayerkey.manna -demo -route "$route" >> console.log 2>&1
+            sleep 14
+            xcrun simctl io "$DEVICE" screenshot "screenshots/$n-$route.png"
+            n=$((n + 1))
+          done
+          # small copies as annotations, so the run can be looked at without signing in
+          for f in screenshots/*.png; do
+            sips -Z 420 -s format jpeg -s formatOptions 45 "$f" --out small.jpg > /dev/null
+            echo "::notice title=$(basename "$f")::data:image/jpeg;base64,$(base64 -i small.jpg | tr -d '
+')"
+          done
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: simulator
           path: |
-            iosApp/shot.png
+            iosApp/screenshots
             iosApp/console.log
           if-no-files-found: ignore

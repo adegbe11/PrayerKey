@@ -17,6 +17,15 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationC
         // as a reading app's audio should.
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
         UNUserNotificationCenter.current().delegate = self
+        #if DEBUG
+        // App Store screenshots from the simulator: `-demo` opens as a returning
+        // user, `-route bible` (any notification route) opens that screen
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-demo") { DemoSetup.shared.prepare() }
+        if let index = arguments.firstIndex(of: "-route"), index + 1 < arguments.count {
+            NotificationRoutes.shared.open(route: arguments[index + 1])
+        }
+        #endif
 
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = HostController()

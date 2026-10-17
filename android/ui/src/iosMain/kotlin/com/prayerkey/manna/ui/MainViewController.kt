@@ -12,6 +12,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeUIViewController
 import com.prayerkey.manna.data.DEFAULT_THEME_ID
+import com.prayerkey.manna.data.mannaStore
 import com.prayerkey.manna.data.resolveTheme
 import com.prayerkey.manna.ui.platform.PlatformOverlay
 import com.prayerkey.manna.ui.screens.LaunchPrelude
@@ -24,6 +25,20 @@ object NotificationRoutes {
 
     fun open(route: String) {
         pending = route
+    }
+}
+
+/**
+ * For App Store screenshots from the simulator (debug builds only, called by
+ * the Swift app for a `-demo` launch argument): a returning user, so the app
+ * opens on Home rather than the welcome.
+ */
+object DemoSetup {
+    fun prepare() {
+        val store = com.prayerkey.manna.platform.AppContext.mannaStore()
+        if (!store.preferences().onboarded) {
+            store.savePreferences(store.preferences().copy(onboarded = true, name = "Grace", reminderEnabled = true))
+        }
     }
 }
 
