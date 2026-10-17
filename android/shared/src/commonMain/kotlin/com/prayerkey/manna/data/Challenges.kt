@@ -1,9 +1,15 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.platform.readAsset
+import kotlin.concurrent.Volatile
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 
 /**
  * Named challenges.
@@ -68,11 +74,11 @@ object Challenges {
 
     @Volatile private var cache: List<ChallengePlan>? = null
 
-    suspend fun all(context: Context): List<ChallengePlan> = withContext(Dispatchers.IO) {
+    suspend fun all(context: PlatformContext): List<ChallengePlan> = withContext(Dispatchers.IO) {
         cache ?: parse(context).also { cache = it }
     }
 
-    suspend fun byId(context: Context, id: String): ChallengePlan? =
+    suspend fun byId(context: PlatformContext, id: String): ChallengePlan? =
         all(context).firstOrNull { it.id == id }
 
     /**
@@ -81,32 +87,31 @@ object Challenges {
      * A malformed challenge is dropped rather than taking the shelf down with
      * it — one bad entry should cost one card, not the feature.
      */
-    private fun parse(context: Context): List<ChallengePlan> = runCatching {
-        val raw = context.applicationContext.assets.open(ASSET)
-            .bufferedReader().use { it.readText() }
-        val array = JSONObject(raw).getJSONArray("challenges")
+    private fun parse(context: PlatformContext): List<ChallengePlan> = runCatching {
+        val raw = context.readAsset(ASSET) ?: return emptyList()
+        val array = Json.parseToJsonElement(raw).jsonObject.getArray("challenges")
         buildList {
-            for (i in 0 until array.length()) {
-                val o = array.optJSONObject(i) ?: continue
+            for (entry in array) {
+                val o = entry as? JsonObject ?: continue
                 runCatching { add(challenge(o)) }
             }
         }
     }.getOrDefault(emptyList())
 
-    private fun challenge(o: JSONObject): ChallengePlan {
-        val written = o.getJSONArray("written")
+    private fun challenge(o: JsonObject): ChallengePlan {
+        val written = o.getArray("written")
         return ChallengePlan(
             id = o.getString("id"),
             title = o.getString("title"),
             days = o.getInt("days"),
             promise = o.getString("promise"),
             cover = o.optString("cover"),
-            written = (0 until written.length()).map { day(written.getJSONObject(it)) },
+            written = written.map { day(it.jsonObject) },
         )
     }
 
-    private fun day(o: JSONObject): ChallengePlanDay {
-        val read = o.getJSONObject("read")
+    private fun day(o: JsonObject): ChallengePlanDay {
+        val read = o.getObject("read")
         return ChallengePlanDay(
             day = o.getInt("day"),
             title = o.getString("title"),
@@ -137,18 +142,18 @@ object ChallengeProgress {
 
     private const val FILE = "challenges"
 
-    private fun prefs(context: Context) =
-        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+    private fun prefs(context: PlatformContext) =
+        context.keyValues(FILE)
 
     /** The challenge currently running, or null. */
-    fun activeId(context: Context): String? =
+    fun activeId(context: PlatformContext): String? =
         prefs(context).getString("active", null)
 
     /** Days completed in [id]. 0 before it starts. */
-    fun completed(context: Context, id: String): Int =
+    fun completed(context: PlatformContext, id: String): Int =
         prefs(context).getInt("done_$id", 0)
 
-    fun start(context: Context, id: String) {
+    fun start(context: PlatformContext, id: String) {
         prefs(context).edit().putString("active", id).apply()
     }
 
@@ -156,19 +161,19 @@ object ChallengeProgress {
      * Marks a day done. Only ever moves forward, so re-reading day three of a
      * plan you are on day nine of cannot set you back six days.
      */
-    fun complete(context: Context, id: String, day: Int) {
+    fun complete(context: PlatformContext, id: String, day: Int) {
         if (day <= completed(context, id)) return
         prefs(context).edit().putInt("done_$id", day).apply()
     }
 
     /** Where the challenge opens: the next unread day, or the last one. */
-    fun resumeDay(context: Context, challenge: ChallengePlan): Int =
+    fun resumeDay(context: PlatformContext, challenge: ChallengePlan): Int =
         (completed(context, challenge.id) + 1).coerceAtMost(challenge.days)
 
-    fun isFinished(context: Context, challenge: ChallengePlan): Boolean =
+    fun isFinished(context: PlatformContext, challenge: ChallengePlan): Boolean =
         completed(context, challenge.id) >= challenge.days
 
-    fun abandon(context: Context) {
+    fun abandon(context: PlatformContext) {
         prefs(context).edit().remove("active").apply()
     }
 }

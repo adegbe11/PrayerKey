@@ -19,3 +19,4 @@ fun bibleChallenge(date: JLocalDate, doneDays: Set<Int>) = bibleChallenge(date.t
 fun prayerChallenge(date: JLocalDate, topics: List<PrayerTopic>, doneDays: Set<Int>) =
     prayerChallenge(date.toKotlinLocalDate(), topics, doneDays)
 fun pullsFor(date: JLocalDate, prayer: PrayerTopic?, reading: String? = null) = pullsFor(date.toKotlinLocalDate(), prayer, reading)
+fun planFor(devotional: Devotional, topics: List<PrayerTopic>, date: JLocalDate) = planFor(devotional, topics, date.toKotlinLocalDate())

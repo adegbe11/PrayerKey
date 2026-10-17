@@ -1,10 +1,15 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.readAsset
+import kotlin.concurrent.Volatile
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /**
  * A year of written devotionals.
@@ -92,12 +97,10 @@ object Devotionals {
 
     @Volatile private var cache: List<Devotional>? = null
 
-    suspend fun all(context: Context): List<Devotional> =
+    suspend fun all(context: PlatformContext): List<Devotional> =
         cache ?: withContext(Dispatchers.IO) {
-            val parsed = parse(
-                context.assets.open("devotionals.json").bufferedReader().use { it.readText() },
-            )
-            cache = parsed
+            val parsed = context.readAsset("devotionals.json")?.let(::parse).orEmpty()
+            if (parsed.isNotEmpty()) cache = parsed
             parsed
         }
 
@@ -113,10 +116,10 @@ object Devotionals {
      * still being written, its written days cycle rather than the screen going
      * blank — and [coverage] is what tells the truth about that.
      */
-    suspend fun forDate(context: Context, date: LocalDate, startedOn: LocalDate?): Devotional? {
+    suspend fun forDate(context: PlatformContext, date: LocalDate, startedOn: LocalDate?): Devotional? {
         val days = all(context)
         if (days.isEmpty()) return null
-        val thisKey = days.filter { it.month == date.monthValue }
+        val thisKey = days.filter { it.month == date.monthNumber }
         if (thisKey.isEmpty()) {
             // this Key is not written yet; fall back to whatever is written
             return days[(date.dayOfYear - 1).mod(days.size)]
@@ -126,7 +129,7 @@ object Devotionals {
     }
 
     /** Written days against calendar slots, per Key. Honest progress. */
-    suspend fun coverage(context: Context): List<Triple<Int, String, Pair<Int, Int>>> {
+    suspend fun coverage(context: PlatformContext): List<Triple<Int, String, Pair<Int, Int>>> {
         val days = all(context)
         return (1..12).map { m ->
             val inMonth = days.filter { it.month == m }
@@ -135,27 +138,25 @@ object Devotionals {
     }
 
     /** The day after [day], for the "tomorrow" card. Wraps at the end. */
-    suspend fun after(context: Context, day: Devotional): Devotional? {
+    suspend fun after(context: PlatformContext, day: Devotional): Devotional? {
         val days = all(context)
         if (days.isEmpty()) return null
-        return days[Math.floorMod(day.day, days.size)]
+        return days[day.day.mod(days.size)]
     }
 
-    internal fun parse(json: String): List<Devotional> {
-        val root = JSONObject(json)
+    fun parse(json: String): List<Devotional> {
+        val root = Json.parseToJsonElement(json).jsonObject
         val out = mutableListOf<Devotional>()
-        val keys = root.getJSONArray("keys")
-        for (k in 0 until keys.length()) {
-            val key = keys.getJSONObject(k)
+        for (k in root.getArray("keys")) {
+            val key = k.jsonObject
             val name = key.getString("name")
             val theme = key.getString("theme")
             val month = key.getInt("month")
             val slots = key.getInt("days")
-            val days = key.getJSONArray("written")
-            for (d in 0 until days.length()) {
-                val o = days.getJSONObject(d)
-                val read = o.getJSONObject("read")
-                val body = o.getJSONArray("body")
+            for ((d, entry) in key.getArray("written").withIndex()) {
+                val o = entry.jsonObject
+                val read = o.getObject("read")
+                val body = o.getArray("body")
                 out += Devotional(
                     day = o.optInt("day", d + 1),
                     series = name,
@@ -172,10 +173,10 @@ object Devotionals {
                         from = read.getInt("from"),
                         to = read.getInt("to"),
                     ),
-                    body = (0 until body.length()).map { i ->
-                        val b = body.getJSONObject(i)
+                    body = body.map { entry ->
+                        val b = entry.jsonObject
                         if (b.has("q")) {
-                            val q = b.getJSONObject("q")
+                            val q = b.getObject("q")
                             DevoBlock.Quote(
                                 VerseRef(q.getString("book"), q.getInt("chapter"), q.getInt("verse")),
                             )
@@ -183,12 +184,10 @@ object Devotionals {
                             DevoBlock.Para(b.getString("p"))
                         }
                     },
-                    line = o.getJSONObject("line").let {
+                    line = o.getObject("line").let {
                         DevoLine(it.getString("a"), it.getString("b"))
                     },
-                    after = o.getJSONArray("after").let { a ->
-                        (0 until a.length()).map { a.getString(it) }
-                    },
+                    after = o.getArray("after").map { it.jsonPrimitive.content },
                     prayer = o.getString("prayer"),
                     prayerCategory = o.getString("prayerCategory"),
                     addLabel = o.getString("addLabel"),
@@ -244,7 +243,7 @@ fun planFor(devotional: Devotional, topics: List<PrayerTopic>, date: LocalDate):
         /* Stable for the date so everyone praying together gets the same one,
            and stepped rather than sequential so a category with six prayers
            does not serve them in the same order every time it comes round. */
-        it[Math.floorMod(date.toEpochDay() * 7, it.size.toLong()).toInt()]
+        it[(date.toEpochDays().toLong() * 7).mod(it.size.toLong()).toInt()]
     }
     return TodayPlan(devotional, prayer)
 }

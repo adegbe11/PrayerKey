@@ -173,7 +173,7 @@ fun PrayerKeyOperatingHome(
     var written by remember(today) { mutableStateOf<com.prayerkey.manna.data.Devotional?>(null) }
     var writtenNext by remember(today) { mutableStateOf<com.prayerkey.manna.data.Devotional?>(null) }
     LaunchedEffect(today, startedOn) {
-        written = com.prayerkey.manna.data.Devotionals.forDate(context, today, startedOn)
+        written = com.prayerkey.manna.data.Devotionals.forDate(context, today.toKotlinLocalDate(), startedOn.toKotlinLocalDate())
         written?.let { writtenNext = com.prayerkey.manna.data.Devotionals.after(context, it) }
     }
 
@@ -190,7 +190,7 @@ fun PrayerKeyOperatingHome(
         }
     }
     val plan = remember(written, prayerTopics, today) {
-        written?.let { com.prayerkey.manna.data.planFor(it, prayerTopics, today) }
+        written?.let { com.prayerkey.manna.data.planFor(it, prayerTopics, today.toKotlinLocalDate()) }
     }
     /* Read rather than remembered: the session is usually prayed from the
        notification, so Home is recomposed after the fact and a cached value

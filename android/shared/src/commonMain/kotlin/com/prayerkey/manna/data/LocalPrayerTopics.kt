@@ -1,8 +1,14 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
-import org.json.JSONArray
-import org.json.JSONObject
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.readAsset
+import kotlin.concurrent.Volatile
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
 
 /**
  * The prayer deck, on the device.
@@ -27,41 +33,35 @@ object LocalPrayerTopics {
      */
     @Volatile private var cached: List<PrayerTopic>? = null
 
-    fun load(context: Context): List<PrayerTopic> =
-        cached ?: synchronized(this) { cached ?: read(context).also { cached = it } }
+    /* No lock: two screens racing on a cold start would both parse and both
+       get the same list, which costs a moment once rather than a lock on
+       every call after. */
+    fun load(context: PlatformContext): List<PrayerTopic> =
+        cached ?: read(context).also { if (it.isNotEmpty()) cached = it }
 
-    private fun read(context: Context): List<PrayerTopic> = runCatching {
-        val raw = context.assets.open("prayer-topics.json")
-            .bufferedReader().use { it.readText() }
-        parse(JSONObject(raw).getJSONArray("topics"))
+    private fun read(context: PlatformContext): List<PrayerTopic> = runCatching {
+        val raw = context.readAsset("prayer-topics.json") ?: return emptyList()
+        parse(Json.parseToJsonElement(raw).jsonObject.getArray("topics"))
     }.getOrDefault(emptyList())
 
-    private fun parse(topics: JSONArray): List<PrayerTopic> = buildList {
-        for (index in 0 until topics.length()) {
-            val item = topics.optJSONObject(index) ?: continue
+    private fun parse(topics: JsonArray): List<PrayerTopic> = buildList {
+        for (entry in topics) {
+            val item = entry as? JsonObject ?: continue
             // one malformed entry must not cost the whole deck
             runCatching { add(topic(item)) }
         }
     }
 
-    private fun topic(item: JSONObject): PrayerTopic {
-        val scripture = item.optJSONArray("scripture") ?: JSONArray()
-        val points = item.optJSONArray("prayerPoints") ?: JSONArray()
+    private fun topic(item: JsonObject): PrayerTopic {
+        val scripture = item.optArray("scripture") ?: JsonArray(emptyList())
+        val points = item.optArray("prayerPoints") ?: JsonArray(emptyList())
         return PrayerTopic(
             slug = item.getString("slug"),
             title = item.getString("title"),
             category = item.getString("category"),
             prayer = editorialPrayer(item.optString("prayer")),
-            scripture = buildList {
-                for (i in 0 until scripture.length()) {
-                    scripture.optJSONObject(i)?.let {
-                        add(it.optString("ref") to it.optString("text"))
-                    }
-                }
-            },
-            prayerPoints = buildList {
-                for (i in 0 until points.length()) add(points.optString(i))
-            },
+            scripture = scripture.mapNotNull { (it as? JsonObject)?.let { s -> s.optString("ref") to s.optString("text") } },
+            prayerPoints = points.map { (it as? JsonPrimitive)?.contentOrNull.orEmpty() },
         )
     }
 
