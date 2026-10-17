@@ -37,7 +37,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: 0, letterSpacing: "0.02em" }}>
-          Last updated: April 2026
+          Last updated: October 2026
         </p>
       </div>
 
@@ -60,6 +60,16 @@ export default function PrivacyPage() {
           {"\n\n"}When you use the live sermon verse detection feature, audio from your microphone is processed by a speech recognition service that converts it to text. That text is then analysed to detect Bible verse references. The audio itself is not recorded or stored. The transcription is processed in memory and used only to identify verses in the moment.
 
           {"\n\n"}When you use Bible search, your search query is sent to an AI service to retrieve relevant Bible verses and cross-references. The query is not stored after the response is returned.
+        </LegalSection>
+
+        <LegalSection title="The PrayerKey App (iPhone and Android)">
+          The PrayerKey app has no account and no sign-in. Everything you write or keep in it, your journal, prayers, sermon notes, saved verses, memory verses, photos you attach, streaks and settings, is stored only on your phone. PrayerKey does not upload it, cannot see it, and has no copy of it. Deleting the app deletes it. If you want a copy, the app can create a backup file that you save or share yourself.
+
+          {"\n\n"}A few features need the internet. When you ask for a prayer, the words you type are sent to prayerkey.com, a prayer is composed from Scripture and sent back, and the request is not stored. Bible search sends your search words to prayerkey.com. Translations other than the King James Version are fetched from bible-api.com using the verse reference. The audio Bible streams public-domain recordings from publicdomainaudiobibles.com. None of these requests carries your name or any account, because there is none.
+
+          {"\n\n"}Church notes and spoken journal entries use the microphone, only while you are recording, and only after you allow it. Speech is turned into text by your phone: on iPhone by Apple's speech recognition, on the device itself where your iPhone supports it; on Android by your phone's speech service or an offline model downloaded once to your phone. A recording of the sermon is kept on your phone so the transcript can be improved later, and deleting the note deletes the recording. PrayerKey never receives your audio.
+
+          {"\n\n"}Reminders are scheduled on your phone. If you turn on the journal lock, your phone's own Face ID, Touch ID or passcode check is used; PrayerKey never sees biometric data. The app contains no advertising, no analytics and no tracking of any kind, and it does not share data with anyone.
         </LegalSection>
 
         <LegalSection title="Cookies and Local Storage">
