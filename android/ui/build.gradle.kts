@@ -29,7 +29,12 @@ kotlin {
 
     sourceSets {
         // the common BackHandler is still marked experimental in Compose 1.8
-        all { languageSettings.optIn("androidx.compose.ui.ExperimentalComposeUiApi") }
+        all {
+            languageSettings.optIn("androidx.compose.ui.ExperimentalComposeUiApi")
+            // the iPhone code calls Apple's frameworks through Kotlin/Native interop
+            languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            languageSettings.optIn("kotlinx.cinterop.BetaInteropApi")
+        }
         commonMain.dependencies {
             api(project(":shared"))
             api(compose.runtime)

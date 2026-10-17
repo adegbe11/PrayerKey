@@ -1,0 +1,49 @@
+# The iPhone app. XcodeGen turns this into PrayerKey.xcodeproj (run `xcodegen`
+# in this folder on a Mac; CI does it on every build). Everything the app shows
+# is the shared Kotlin in ../android/shared and ../android/ui, compiled into
+# PrayerKeyUI.framework by the build phase below; Swift only starts it.
+name: PrayerKey
+options:
+  bundleIdPrefix: com.prayerkey
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  base:
+    MARKETING_VERSION: "3.4.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  PrayerKey:
+    type: application
+    platform: iOS
+    sources:
+      - path: PrayerKey
+      # the prayers, the Bible, the devotionals and the challenges, shipped
+      # in the app bundle as they are in Android's assets
+      - path: ../android/app/src/main/assets/kjv.json
+        buildPhase: resources
+      - path: ../android/app/src/main/assets/kjv-corrections.json
+        buildPhase: resources
+      - path: ../android/app/src/main/assets/devotionals.json
+        buildPhase: resources
+      - path: ../android/app/src/main/assets/prayer-topics.json
+        buildPhase: resources
+      - path: ../android/app/src/main/assets/challenges.json
+        buildPhase: resources
+    preBuildScripts:
+      - name: Compile the shared Kotlin
+        basedOnDependencyAnalysis: false
+        script: |
+          cd "$SRCROOT/../android"
+          ./gradlew :ui:embedAndSignAppleFrameworkForXcode
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.prayerkey.manna
+        PRODUCT_NAME: PrayerKey
+        INFOPLIST_FILE: PrayerKey/Info.plist
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        FRAMEWORK_SEARCH_PATHS: "$(inherited) $(SRCROOT)/../android/ui/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)"
+        OTHER_LDFLAGS: "$(inherited) -framework PrayerKeyUI"
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_VERSION: "5.0"

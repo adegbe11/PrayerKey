@@ -4,8 +4,8 @@ name: iOS build
 # android/ui), and Kotlin can only compile for iPhone on a Mac. This runs on
 # GitHub's macOS machines for the ios-port branch; nothing here signs or ships.
 #
-# Compiler errors are also posted as annotations, so they can be read from the
-# public API without a signed-in session.
+# Compiler errors and simulator screenshots are posted as annotations, so they
+# can be read from the public API without a signed-in session.
 on:
   push:
     branches: [ios-port]
@@ -51,7 +51,6 @@ jobs:
         working-directory: android
         run: |
           grep -E "^e: |What went wrong|Could not resolve|> " build.log | sed 's#file:///Users/runner/work/PrayerKey/PrayerKey/android/##' | sort -u > errors.txt || true
-          # one annotation per 40 lines, newlines encoded the way annotations expect
           split -l 40 errors.txt chunk_
           for f in chunk_*; do
             msg=$(sed 's/%/%25/g' "$f" | awk '{printf "%s%%0A", $0}')
@@ -61,3 +60,79 @@ jobs:
       - name: Run the shared tests on the iPhone simulator
         working-directory: android
         run: bash ./gradlew --no-daemon :shared:iosSimulatorArm64Test
+
+  app:
+    name: Build the iPhone app and run it in the simulator
+    needs: kotlin
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Cache Kotlin/Native toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('android/build.gradle.kts') }}
+
+      - name: Generate the Xcode project
+        working-directory: iosApp
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Build for the simulator
+        working-directory: iosApp
+        run: |
+          set -o pipefail
+          xcodebuild -project PrayerKey.xcodeproj -scheme PrayerKey -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build 2>&1 | tee xcode.log | grep -E "error:|warning: .*PrayerKey|BUILD" || true
+          test -d build/Build/Products/Debug-iphonesimulator/PrayerKey.app
+
+      - name: Report build errors
+        if: failure()
+        working-directory: iosApp
+        run: |
+          grep -E "error:|^e: |What went wrong" xcode.log | sort -u | head -120 > errors.txt || true
+          split -l 40 errors.txt chunk_
+          for f in chunk_*; do
+            msg=$(sed 's/%/%25/g' "$f" | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Xcode::$msg"
+          done
+
+      - name: Launch in the simulator and take screenshots
+        working-directory: iosApp
+        run: |
+          DEVICE=$(xcrun simctl list devices available | grep -m1 -E "iPhone 16 Pro \(" | sed -E 's/.*\(([0-9A-F-]+)\).*/\1/')
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
+          xcrun simctl install "$DEVICE" build/Build/Products/Debug-iphonesimulator/PrayerKey.app
+          xcrun simctl launch --console-pty "$DEVICE" com.prayerkey.manna > console.log 2>&1 &
+          for t in 6 20; do
+            sleep $t
+            xcrun simctl io "$DEVICE" screenshot shot.png
+            sips -Z 640 -s format jpeg -s formatOptions 60 shot.png --out shot.jpg > /dev/null
+            echo "::notice title=Screenshot after ${t}s::data:image/jpeg;base64,$(base64 -i shot.jpg | tr -d '\n')"
+          done
+          if ! xcrun simctl spawn "$DEVICE" launchctl list | grep -q com.prayerkey.manna; then
+            msg=$(tail -60 console.log | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=The app stopped::$msg"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: simulator
+          path: |
+            iosApp/shot.png
+            iosApp/console.log
+          if-no-files-found: ignore

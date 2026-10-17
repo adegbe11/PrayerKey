@@ -26,6 +26,10 @@ kotlin {
     wasmJs { browser() }
 
     sourceSets {
+        all {
+            languageSettings.optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            languageSettings.optIn("kotlinx.cinterop.BetaInteropApi")
+        }
         commonMain.dependencies {
             // api: shared functions take and return these dates, so the app sees them too
             api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")

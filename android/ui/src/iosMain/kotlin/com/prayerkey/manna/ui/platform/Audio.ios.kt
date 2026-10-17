@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.platform
 
+import kotlinx.cinterop.set
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.get
 import kotlinx.cinterop.useContents
