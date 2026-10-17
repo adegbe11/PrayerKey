@@ -8,25 +8,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-data class GeneratedPrayer(
-    val id: String,
-    val title: String,
-    val prayer: String,
-    val encouragement: String,
-    val verses: List<Pair<String, String>>,
-)
-
 data class DetectedVerse(val detected: Boolean, val reference: String, val text: String, val confidence: Double)
-
-data class PrayerTopic(
-    val slug: String,
-    val title: String,
-    val category: String,
-    val prayer: String,
-    val scripture: List<Pair<String, String>>,
-    val prayerPoints: List<String>,
-)
-data class RemoteVerse(val reference: String, val text: String, val translation: String)
 
 object PrayerKeyApi {
     // www is canonical — the bare domain 301s, and HttpURLConnection

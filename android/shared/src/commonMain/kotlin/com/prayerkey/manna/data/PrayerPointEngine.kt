@@ -344,7 +344,7 @@ object PrayerPointEngine {
     }
 
     /** "Prayer for Kidney Disease" -> "kidney disease". */
-    internal fun subject(topic: PrayerTopic): String =
+    fun subject(topic: PrayerTopic): String =
         topic.title
             .replace(Regex("""(?i)^\s*(a\s+)?prayer\s+(for|of|to|against|during|before|after|over|when|about|in|on|at|upon|concerning)\s+"""), "")
             .replace(Regex("""(?i)^\s*(a\s+)?prayer\s+based\s+on\s+"""), "")

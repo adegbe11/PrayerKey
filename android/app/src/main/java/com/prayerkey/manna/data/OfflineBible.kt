@@ -6,18 +6,6 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import android.util.JsonReader
 
-data class BibleVerse(
-    val book: String,
-    val chapter: Int,
-    val verse: Int,
-    /** Display text: the 1611 braces are already resolved away. */
-    val text: String,
-    /** Where the translators supplied words, for setting them in italic. */
-    val supplied: List<IntRange> = emptyList(),
-) {
-    val reference: String get() = "$book $chapter:$verse"
-}
-
 class OfflineBible(private val context: Context) {
 
     suspend fun search(query: String, limit: Int = 30): List<BibleVerse> = withContext(Dispatchers.IO) {
