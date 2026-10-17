@@ -1,9 +1,12 @@
 package com.prayerkey.manna.ui.journal
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import com.prayerkey.manna.data.JournalPrayer
 import com.prayerkey.manna.data.SavedWord
 import com.prayerkey.manna.data.SermonNote
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * Cures blank-page anxiety by never opening on a blank page.
@@ -96,7 +99,7 @@ object JournalSuggestions {
         // always at least one open question
         out += Prompt(
             kicker = "TODAY",
-            text = DAILY[(LocalDate.now().toEpochDay() % DAILY.size).toInt()],
+            text = DAILY[(Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays() % DAILY.size).toInt()],
             source = "write",
         )
         return out.take(4)

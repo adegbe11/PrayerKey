@@ -1,6 +1,6 @@
 package com.prayerkey.manna.data
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 data class DailyQuote(val text: String, val author: String = "PrayerKey")
 
@@ -38,9 +38,9 @@ private val quoteResponses = listOf(
 )
 
 val DAILY_QUOTES: List<DailyQuote> = List(365) { index ->
-    val pair = Math.floorMod(index * 73, 400)
+    val pair = (index * 73).mod(400)
     DailyQuote("${quoteOpenings[pair / 20]}, ${quoteResponses[pair % 20]}")
 }
 
 fun quoteFor(date: LocalDate): DailyQuote =
-    DAILY_QUOTES[Math.floorMod(date.toEpochDay().toInt(), DAILY_QUOTES.size)]
+    DAILY_QUOTES[date.toEpochDays().mod(DAILY_QUOTES.size)]

@@ -1,6 +1,6 @@
 package com.prayerkey.manna.data
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 data class DailyPassage(
     val title: String,
@@ -63,4 +63,4 @@ val DAILY_PASSAGES: List<DailyPassage> =
     }).take(365)
 
 fun passageFor(date: LocalDate): DailyPassage =
-    DAILY_PASSAGES[Math.floorMod(date.toEpochDay().toInt(), DAILY_PASSAGES.size)]
+    DAILY_PASSAGES[date.toEpochDays().mod(DAILY_PASSAGES.size)]

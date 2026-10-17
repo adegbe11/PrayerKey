@@ -1,6 +1,6 @@
 package com.prayerkey.manna.data
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import com.prayerkey.manna.model.DailyPrayer
 
 /**
@@ -29,7 +29,7 @@ fun dailyPrayerFor(date: LocalDate, topics: List<PrayerTopic>): DailyPrayer {
     /* A stride coprime with almost any list length, so consecutive days land in
        different parts of the library rather than walking it in order — two
        prayers about grief on Monday and Tuesday read as a rut. */
-    val topic = topics[Math.floorMod(date.toEpochDay() * 7, topics.size.toLong()).toInt()]
+    val topic = topics[(date.toEpochDays().toLong() * 7).mod(topics.size.toLong()).toInt()]
     return DailyPrayer(
         ref = topic.scripture.firstOrNull()?.first ?: passageFor(date).reference,
         title = topic.title,

@@ -1,6 +1,9 @@
 package com.prayerkey.manna.model
 
-import java.time.LocalDate
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
+import kotlinx.datetime.LocalDate
 
 /**
  * Prayer of the Day - one for every day of the year, including the 29th of
@@ -17,7 +20,7 @@ import java.time.LocalDate
 data class DailyPrayer(val ref: String, val title: String, val verse: String, val prayer: String)
 
 /** The prayer for today. Day 1 is the first of January; leap years reach 366. */
-fun todaysPrayer(): DailyPrayer = prayerForDay(LocalDate.now().dayOfYear)
+fun todaysPrayer(): DailyPrayer = prayerForDay(Clock.System.todayIn(TimeZone.currentSystemDefault()).dayOfYear)
 
 fun prayerForDay(dayOfYear: Int): DailyPrayer =
     DailyPrayersPool[(dayOfYear - 1).coerceAtLeast(0) % DailyPrayersPool.size]

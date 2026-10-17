@@ -1,7 +1,10 @@
 package com.prayerkey.manna.data
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import com.prayerkey.manna.model.DailyPrayer
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /*
  * A short prayer for each hour of the day - morning, afternoon, evening,
@@ -181,7 +184,7 @@ private val MIDNIGHT = listOf(
 )
 
 /** Today's prayer for this hour of the day: "morning", "afternoon", "evening", "night" or "midnight". */
-fun hourPrayer(hour: String, date: LocalDate = LocalDate.now()): DailyPrayer {
+fun hourPrayer(hour: String, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): DailyPrayer {
     val list = when (hour) {
         "afternoon" -> AFTERNOON
         "evening" -> EVENING

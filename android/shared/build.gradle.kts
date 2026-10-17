@@ -16,10 +16,14 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+    // Builds on Windows with no Java at all, exactly as iPhone will: the check
+    // that nothing Java-only has slipped into the shared code.
+    mingwX64()
 
     sourceSets {
         commonMain.dependencies {
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+            // api: shared functions take and return these dates, so the app sees them too
+            api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

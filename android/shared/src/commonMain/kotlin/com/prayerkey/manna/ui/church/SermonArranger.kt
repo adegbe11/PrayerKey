@@ -110,7 +110,7 @@ object SermonArranger {
             if (ws.isEmpty()) return 0.0
             val hit = ws.toSet().sumOf { theme[it] ?: 0.0 }
             // normalise so a long rambling sentence does not win on bulk
-            return hit / Math.sqrt(ws.size.toDouble()) * 100.0
+            return hit / kotlin.math.sqrt(ws.size.toDouble()) * 100.0
         }
 
         fun cueScore(s: String, list: List<String>?): Double {

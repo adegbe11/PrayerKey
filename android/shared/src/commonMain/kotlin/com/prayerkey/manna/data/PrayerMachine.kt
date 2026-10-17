@@ -1,5 +1,8 @@
 package com.prayerkey.manna.data
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 /**
  * The prayer machine: what someone brings, turned into a prayer to pray.
  *
@@ -58,7 +61,7 @@ object PrayerMachine {
     }
 
     /** Builds the prayer for [request], or null when there are no prayers to draw on. */
-    fun guide(request: String, topics: List<PrayerTopic>, day: Int = java.time.LocalDate.now().dayOfYear): Guided? {
+    fun guide(request: String, topics: List<PrayerTopic>, day: Int = Clock.System.todayIn(TimeZone.currentSystemDefault()).dayOfYear): Guided? {
         val topic = match(request, topics) ?: return null
         val (verseRef, verseText) = topic.scripture.firstOrNull() ?: ("Psalm 46:10" to "Be still, and know that I am God.")
         val steps = buildList {
@@ -111,7 +114,7 @@ object PrayerMachine {
     }
 
     /** The prayer in short pieces, two sentences at a time, the Amen kept for its own step. */
-    internal fun chunks(prayer: String): List<String> {
+    fun chunks(prayer: String): List<String> {
         val body = prayer.trim()
             .replace(Regex("""\s*(In Jesus['’] (mighty )?name,?\s*)?Amen\.?\s*$""", RegexOption.IGNORE_CASE), "")
             .trim()
@@ -123,7 +126,7 @@ object PrayerMachine {
     }
 
     /** The asking, prayed for someone else: written for each area of life. */
-    internal fun intercession(category: String, p: Person): String {
+    fun intercession(category: String, p: Person): String {
         val who = p.name; val o = p.obj; val pos = p.possessive
         return when (category) {
             "Health" -> "Lord, I lift $who up to You. You know $pos body and everything the doctors have said. Lay Your healing hand on $o and ease $pos pain. Give wisdom to everyone caring for $o, and give $o rest and courage. Let $o feel You near in every hour of this."

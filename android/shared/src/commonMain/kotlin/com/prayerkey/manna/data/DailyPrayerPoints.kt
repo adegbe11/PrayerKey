@@ -1,6 +1,6 @@
 package com.prayerkey.manna.data
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 private val powerfulPrayerPoints = listOf(
     "Father, I thank You because Your power is greater than every battle before me.",
@@ -57,7 +57,7 @@ private val powerfulPrayerPoints = listOf(
 
 /** Exactly fifty prayers, date-stable but rotated daily so each day opens differently. */
 fun prayerPointsFor(date: LocalDate, reference: String): List<String> {
-    val shift = Math.floorMod(date.toEpochDay().toInt() * 17, powerfulPrayerPoints.size)
+    val shift = (date.toEpochDays() * 17).mod(powerfulPrayerPoints.size)
     val rotated = List(powerfulPrayerPoints.size) { powerfulPrayerPoints[(it + shift) % powerfulPrayerPoints.size] }
     return rotated.mapIndexed { index, point ->
         if (index == rotated.lastIndex) point.replace("Your Word today", "Your Word in $reference") else point
