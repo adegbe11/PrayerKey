@@ -195,7 +195,7 @@ class SermonService : Service() {
             .build()
     }
 
-    data class Caught(val reference: String, val atMillis: Long)
+    /* Caught is shared (SermonEngine.kt), so the shared Church screen reads it directly. */
 
     companion object {
         private const val CHANNEL = "manna.church"

@@ -308,10 +308,10 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
     val state by SpeechModel.state(SpeechModel.Kind.Speech).collectAsState()
     LaunchedEffect(Unit) { SpeechModel.refresh(context, SpeechModel.Kind.Speech) }
     // installing is the answer to the question; go straight on to recording
-    LaunchedEffect(state) { if (state is SpeechModel.State.Ready) onReady() }
+    LaunchedEffect(state) { if (state is com.prayerkey.manna.ui.church.ModelState.Ready) onReady() }
 
     val cs = MaterialTheme.colorScheme
-    val busy = state is SpeechModel.State.Downloading || state is SpeechModel.State.Unpacking
+    val busy = state is com.prayerkey.manna.ui.church.ModelState.Downloading || state is com.prayerkey.manna.ui.church.ModelState.Unpacking
 
     Dialog(onDismissRequest = { if (!busy) onSkip() }) {
     Column(
@@ -328,7 +328,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
         Spacer(Modifier.height(6.dp))
         Text(
             when (val s = state) {
-                is SpeechModel.State.Failed ->
+                is com.prayerkey.manna.ui.church.ModelState.Failed ->
                     "That did not download: ${s.reason}. Recording still works — you can try again."
                 else ->
                     "See the sermon written out as it is spoken, and catch the verses " +
@@ -339,7 +339,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
         )
 
         when (val s = state) {
-            is SpeechModel.State.Downloading -> {
+            is com.prayerkey.manna.ui.church.ModelState.Downloading -> {
                 Spacer(Modifier.height(14.dp))
                 LinearProgressIndicator(
                     progress = { s.fraction },
@@ -353,7 +353,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                     color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp,
                 )
             }
-            SpeechModel.State.Unpacking -> {
+            com.prayerkey.manna.ui.church.ModelState.Unpacking -> {
                 Spacer(Modifier.height(14.dp))
                 Text("Installing…", color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp)
             }
@@ -366,7 +366,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                             .padding(horizontal = 18.dp, vertical = 11.dp),
                     ) {
                         Text(
-                            if (state is SpeechModel.State.Failed) "Try again"
+                            if (state is com.prayerkey.manna.ui.church.ModelState.Failed) "Try again"
                             else "Turn on · ${SpeechModel.Kind.Speech.megabytes} MB",
                             color = cs.onPrimary, fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold,
                         )
@@ -539,7 +539,7 @@ private fun ReadyView(
 @Composable
 private fun ListeningView(
     startedAt: Long,
-    caught: List<SermonService.Caught>,
+    caught: List<com.prayerkey.manna.ui.church.Caught>,
     partial: String,
     chunks: List<String>,
     captureStatus: String,
@@ -829,8 +829,8 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                     color = Muted, fontSize = 11.5.sp, modifier = Modifier.padding(top = 7.dp),
                 )
             }
-            model is SpeechModel.State.Downloading -> {
-                val f = (model as SpeechModel.State.Downloading).fraction
+            model is com.prayerkey.manna.ui.church.ModelState.Downloading -> {
+                val f = (model as com.prayerkey.manna.ui.church.ModelState.Downloading).fraction
                 LinearProgressIndicator(
                     progress = { f },
                     color = cs.primary, trackColor = cs.onBackground.copy(alpha = .10f),

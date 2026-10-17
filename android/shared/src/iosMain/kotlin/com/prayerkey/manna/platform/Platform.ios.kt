@@ -79,13 +79,15 @@ actual suspend fun httpRequest(url: String, method: String, body: String?, heade
         val nsUrl = platform.Foundation.NSURL.URLWithString(url) ?: run {
             cont.resumeWith(Result.failure(IllegalArgumentException("Bad URL"))); return@suspendCancellableCoroutine
         }
-        val request = platform.Foundation.NSMutableURLRequest.requestWithURL(nsUrl).apply {
-            setHTTPMethod(method)
-            setTimeoutInterval(30.0)
+        val request = platform.Foundation.NSMutableURLRequest(uRL = nsUrl).apply {
+            HTTPMethod = method
+            timeoutInterval = 30.0
             headers.forEach { (k, v) -> setValue(v, forHTTPHeaderField = k) }
-            if (body != null) setHTTPBody(NSString.create(string = body).dataUsingEncoding(NSUTF8StringEncoding))
+            if (body != null) HTTPBody = NSString.create(string = body).dataUsingEncoding(NSUTF8StringEncoding)
         }
-        val task = platform.Foundation.NSURLSession.sharedSession.dataTaskWithRequest(request) { data, response, error ->
+        val task = platform.Foundation.NSURLSession.sharedSession.dataTaskWithRequest(
+            request,
+            completionHandler = { data: platform.Foundation.NSData?, response: platform.Foundation.NSURLResponse?, error: platform.Foundation.NSError? ->
             if (error != null) {
                 cont.resumeWith(Result.failure(IllegalStateException(error.localizedDescription)))
             } else {
@@ -93,7 +95,8 @@ actual suspend fun httpRequest(url: String, method: String, body: String?, heade
                 val text = data?.let { NSString.create(data = it, encoding = NSUTF8StringEncoding)?.toString() }.orEmpty()
                 cont.resumeWith(Result.success(HttpResult(code, text)))
             }
-        }
+            },
+        )
         cont.invokeOnCancellation { task.cancel() }
         task.resume()
     }

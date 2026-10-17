@@ -59,6 +59,7 @@ class MainActivity : ComponentActivity() {
         com.prayerkey.manna.data.PrefsWarmer.warm(this)
         com.prayerkey.manna.ui.platform.Reminders.scheduler = com.prayerkey.manna.reminder.AndroidReminders
         com.prayerkey.manna.ui.share.Share.cards = com.prayerkey.manna.share.AndroidShareCards
+        com.prayerkey.manna.ui.church.Sermons.engine = com.prayerkey.manna.ui.church.AndroidSermonEngine
         super.onCreate(savedInstanceState)
         notificationRoute = intent?.getStringExtra("prayerkey_destination")
         /*

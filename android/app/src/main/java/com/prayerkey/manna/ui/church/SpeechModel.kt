@@ -64,17 +64,11 @@ object SpeechModel {
         ),
     }
 
-    sealed interface State {
-        data object Absent : State
-        data class Downloading(val fraction: Float) : State
-        data object Unpacking : State
-        data object Ready : State
-        data class Failed(val reason: String) : State
-    }
+    /* The model's state is the shared ModelState (SermonEngine.kt). */
 
-    private val states = Kind.entries.associateWith { MutableStateFlow<State>(State.Absent) }
+    private val states = Kind.entries.associateWith { MutableStateFlow<ModelState>(ModelState.Absent) }
 
-    fun state(kind: Kind): StateFlow<State> = states.getValue(kind).asStateFlow()
+    fun state(kind: Kind): StateFlow<ModelState> = states.getValue(kind).asStateFlow()
 
     fun directory(context: Context, kind: Kind) =
         File(context.applicationContext.filesDir, kind.folder)
@@ -93,7 +87,7 @@ object SpeechModel {
     }
 
     fun refresh(context: Context, kind: Kind) {
-        states.getValue(kind).value = if (isInstalled(context, kind)) State.Ready else State.Absent
+        states.getValue(kind).value = if (isInstalled(context, kind)) ModelState.Ready else ModelState.Absent
     }
 
     /**
@@ -106,7 +100,7 @@ object SpeechModel {
     suspend fun install(context: Context, kind: Kind): Boolean = withContext(Dispatchers.IO) {
         val app = context.applicationContext
         val state = states.getValue(kind)
-        if (isInstalled(app, kind)) { state.value = State.Ready; return@withContext true }
+        if (isInstalled(app, kind)) { state.value = ModelState.Ready; return@withContext true }
 
         val target = directory(app, kind)
         val archive = File(app.cacheDir, "${kind.folder}.tar.bz2.part")
@@ -116,7 +110,7 @@ object SpeechModel {
             staging.deleteRecursively()
             archive.delete()
 
-            state.value = State.Downloading(0f)
+            state.value = ModelState.Downloading(0f)
             val connection = (URL(kind.url).openConnection() as HttpURLConnection).apply {
                 connectTimeout = 30_000
                 readTimeout = 60_000
@@ -132,7 +126,7 @@ object SpeechModel {
                         if (read < 0) break
                         output.write(buffer, 0, read)
                         written += read
-                        state.value = State.Downloading((written.toFloat() / total).coerceIn(0f, 1f))
+                        state.value = ModelState.Downloading((written.toFloat() / total).coerceIn(0f, 1f))
                     }
                 }
             }
@@ -142,7 +136,7 @@ object SpeechModel {
                 error("the download was cut short at ${archive.length() / 1_048_576} MB")
             }
 
-            state.value = State.Unpacking
+            state.value = ModelState.Unpacking
             untar(archive, staging)
 
             /* The archive holds one folder named for the model version. Find
@@ -159,10 +153,10 @@ object SpeechModel {
             require(isInstalled(app, kind)) { "the unpacked model was incomplete" }
             true
         }.onSuccess {
-            state.value = State.Ready
+            state.value = ModelState.Ready
         }.onFailure { failure ->
             target.deleteRecursively()
-            state.value = State.Failed(failure.message ?: "the download did not finish")
+            state.value = ModelState.Failed(failure.message ?: "the download did not finish")
         }.also {
             archive.delete()
             staging.deleteRecursively()
@@ -171,7 +165,7 @@ object SpeechModel {
 
     fun remove(context: Context, kind: Kind) {
         directory(context, kind).deleteRecursively()
-        states.getValue(kind).value = State.Absent
+        states.getValue(kind).value = ModelState.Absent
     }
 
     internal val FILES = listOf("encoder.onnx", "decoder.onnx", "joiner.onnx", "tokens.txt")

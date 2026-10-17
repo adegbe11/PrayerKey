@@ -131,6 +131,12 @@ actual fun showToast(context: PlatformContext, message: String, long: Boolean) {
 
 @Composable
 actual fun PlatformOverlay() {
+    DictationPanel()
+    Toast()
+}
+
+@Composable
+private fun Toast() {
     val message = IosToast.message ?: return
     LaunchedEffect(IosToast.serial) {
         delay(if (IosToast.long) 3_500 else 2_000)
