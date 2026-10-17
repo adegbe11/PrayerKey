@@ -5,7 +5,11 @@ import platform.Foundation.NSBundle
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.NSUserDefaults
+import platform.Foundation.HTTPBody
+import platform.Foundation.HTTPMethod
 import platform.Foundation.create
+import platform.Foundation.dataTaskWithRequest
+import platform.Foundation.setValue
 import platform.Foundation.dataUsingEncoding
 import platform.Foundation.stringWithContentsOfFile
 import platform.Foundation.writeToFile
@@ -79,9 +83,10 @@ actual suspend fun httpRequest(url: String, method: String, body: String?, heade
         val nsUrl = platform.Foundation.NSURL.URLWithString(url) ?: run {
             cont.resumeWith(Result.failure(IllegalArgumentException("Bad URL"))); return@suspendCancellableCoroutine
         }
-        val request = platform.Foundation.NSMutableURLRequest(uRL = nsUrl).apply {
+        val request = platform.Foundation.NSMutableURLRequest(
+            uRL = nsUrl, cachePolicy = platform.Foundation.NSURLRequestUseProtocolCachePolicy, timeoutInterval = 30.0,
+        ).apply {
             HTTPMethod = method
-            timeoutInterval = 30.0
             headers.forEach { (k, v) -> setValue(v, forHTTPHeaderField = k) }
             if (body != null) HTTPBody = NSString.create(string = body).dataUsingEncoding(NSUTF8StringEncoding)
         }
