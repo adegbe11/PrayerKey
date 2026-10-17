@@ -3,6 +3,9 @@ name: iOS build
 # The iPhone app is built from the same Kotlin as Android (android/shared and
 # android/ui), and Kotlin can only compile for iPhone on a Mac. This runs on
 # GitHub's macOS machines for the ios-port branch; nothing here signs or ships.
+#
+# Compiler errors are also posted as annotations, so they can be read from the
+# public API without a signed-in session.
 on:
   push:
     branches: [ios-port]
@@ -35,12 +38,25 @@ jobs:
 
       - name: Compile for the iPhone simulator and devices
         working-directory: android
-        run: >
-          bash ./gradlew --no-daemon --stacktrace
-          :shared:compileKotlinIosSimulatorArm64
-          :shared:compileKotlinIosArm64
-          :ui:compileKotlinIosSimulatorArm64
-          :ui:compileKotlinIosArm64
+        run: |
+          set -o pipefail
+          bash ./gradlew --no-daemon --continue \
+            :shared:compileKotlinIosSimulatorArm64 \
+            :ui:compileKotlinIosSimulatorArm64 \
+            :shared:compileKotlinIosArm64 \
+            :ui:compileKotlinIosArm64 2>&1 | tee build.log
+
+      - name: Report compiler errors
+        if: failure()
+        working-directory: android
+        run: |
+          grep -E "^e: |What went wrong|Could not resolve|> " build.log | sed 's#file:///Users/runner/work/PrayerKey/PrayerKey/android/##' | sort -u > errors.txt || true
+          # one annotation per 40 lines, newlines encoded the way annotations expect
+          split -l 40 errors.txt chunk_
+          for f in chunk_*; do
+            msg=$(sed 's/%/%25/g' "$f" | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Kotlin (iOS)::$msg"
+          done
 
       - name: Run the shared tests on the iPhone simulator
         working-directory: android
