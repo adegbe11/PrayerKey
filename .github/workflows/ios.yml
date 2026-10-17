@@ -1,0 +1,47 @@
+name: iOS build
+
+# The iPhone app is built from the same Kotlin as Android (android/shared and
+# android/ui), and Kotlin can only compile for iPhone on a Mac. This runs on
+# GitHub's macOS machines for the ios-port branch; nothing here signs or ships.
+on:
+  push:
+    branches: [ios-port]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  kotlin:
+    name: Compile shared code and screens for iPhone
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Cache Kotlin/Native toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('android/build.gradle.kts') }}
+
+      - name: Compile for the iPhone simulator and devices
+        working-directory: android
+        run: >
+          bash ./gradlew --no-daemon --stacktrace
+          :shared:compileKotlinIosSimulatorArm64
+          :shared:compileKotlinIosArm64
+          :ui:compileKotlinIosSimulatorArm64
+          :ui:compileKotlinIosArm64
+
+      - name: Run the shared tests on the iPhone simulator
+        working-directory: android
+        run: bash ./gradlew --no-daemon :shared:iosSimulatorArm64Test
