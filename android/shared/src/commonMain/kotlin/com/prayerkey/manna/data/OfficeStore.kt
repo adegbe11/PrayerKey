@@ -1,7 +1,11 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
-import java.time.LocalDate
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.keyValues
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 
 /**
  * What was written in the morning, so the evening can ask about it.
@@ -20,24 +24,24 @@ object OfficeStore {
 
     private const val FILE = "daily_office"
 
-    private fun prefs(context: Context) =
-        context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+    private fun prefs(context: PlatformContext) =
+        context.keyValues(FILE)
 
-    private fun key(prefix: String, date: LocalDate) = "$prefix${date.toEpochDay()}"
+    private fun key(prefix: String, date: LocalDate) = "$prefix${date.toEpochDays()}"
 
     /** What was asked for on [date]. Blank when nothing was written. */
-    fun morningAsk(context: Context, date: LocalDate = LocalDate.now()): String =
+    fun morningAsk(context: PlatformContext, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): String =
         prefs(context).getString(key("ask_", date), "").orEmpty()
 
-    fun setMorningAsk(context: Context, text: String, date: LocalDate = LocalDate.now()) {
+    fun setMorningAsk(context: PlatformContext, text: String, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())) {
         prefs(context).edit().putString(key("ask_", date), text.trim()).apply()
     }
 
     /** What was handed over on the night of [date]. */
-    fun eveningRelease(context: Context, date: LocalDate = LocalDate.now()): String =
+    fun eveningRelease(context: PlatformContext, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): String =
         prefs(context).getString(key("release_", date), "").orEmpty()
 
-    fun setEveningRelease(context: Context, text: String, date: LocalDate = LocalDate.now()) {
+    fun setEveningRelease(context: PlatformContext, text: String, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())) {
         prefs(context).edit().putString(key("release_", date), text.trim()).apply()
     }
 

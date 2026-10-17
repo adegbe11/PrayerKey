@@ -1,15 +1,14 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
-import com.prayerkey.manna.model.prayerForDay
-import java.time.LocalDate
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.keyValues
 
 object PrayerChallengeStore {
     private const val FILE = "prayer_challenge"
 
-    private fun prefs(context: Context) = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+    private fun prefs(context: PlatformContext) = context.keyValues(FILE)
 
-    fun load(context: Context): PrayerChallenge {
+    fun load(context: PlatformContext): PrayerChallenge {
         val p = prefs(context)
         return PrayerChallenge(
             days = p.getInt("days", 21),
@@ -28,7 +27,7 @@ object PrayerChallengeStore {
         )
     }
 
-    fun save(context: Context, challenge: PrayerChallenge) {
+    fun save(context: PlatformContext, challenge: PrayerChallenge) {
         prefs(context).edit()
             .putInt("days", challenge.days)
             .putString("focus", challenge.focus)
@@ -44,10 +43,10 @@ object PrayerChallengeStore {
     }
 
     /** What was written at the end of a day, kept so the journey can be read back. */
-    fun reflection(context: Context, day: Int): String =
+    fun reflection(context: PlatformContext, day: Int): String =
         prefs(context).getString("reflection_$day", "").orEmpty()
 
-    fun saveReflection(context: Context, day: Int, text: String, feeling: String, seconds: Int) {
+    fun saveReflection(context: PlatformContext, day: Int, text: String, feeling: String, seconds: Int) {
         prefs(context).edit()
             .putString("reflection_$day", text)
             .putString("feeling_$day", feeling)
@@ -55,15 +54,15 @@ object PrayerChallengeStore {
             .apply()
     }
 
-    fun feeling(context: Context, day: Int): String = prefs(context).getString("feeling_$day", "").orEmpty()
+    fun feeling(context: PlatformContext, day: Int): String = prefs(context).getString("feeling_$day", "").orEmpty()
 
-    fun seconds(context: Context, day: Int): Int = prefs(context).getInt("seconds_$day", 0)
+    fun seconds(context: PlatformContext, day: Int): Int = prefs(context).getInt("seconds_$day", 0)
 
     /** Minutes prayed across the whole challenge. */
-    fun minutesPrayed(context: Context, days: Int): Int =
+    fun minutesPrayed(context: PlatformContext, days: Int): Int =
         (1..days).sumOf { prefs(context).getInt("seconds_$it", 0) } / 60
 
-    fun clear(context: Context) {
+    fun clear(context: PlatformContext) {
         prefs(context).edit().clear().apply()
     }
 }

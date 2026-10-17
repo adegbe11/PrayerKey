@@ -1,5 +1,6 @@
 package com.prayerkey.manna
 
+import kotlinx.datetime.toKotlinTimeZone
 import com.prayerkey.manna.data.FastLength
 import com.prayerkey.manna.data.FastMachine
 import com.prayerkey.manna.data.FastMachine.Moment
@@ -67,7 +68,7 @@ class MachineTest {
     fun `the prayer memory asks a week later, in the evening`() {
         val zone = ZoneId.of("Africa/Lagos")
         val prayed = LocalDateTime.of(2026, 10, 4, 7, 15).atZone(zone).toInstant().toEpochMilli()
-        val ask = java.time.Instant.ofEpochMilli(PrayerMemory.followUpAt(prayed, zone)).atZone(zone).toLocalDateTime()
+        val ask = java.time.Instant.ofEpochMilli(PrayerMemory.followUpAt(prayed, zone.toKotlinTimeZone())).atZone(zone).toLocalDateTime()
         assertEquals(LocalDateTime.of(2026, 10, 11, 19, 0), ask)
     }
 }

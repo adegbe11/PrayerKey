@@ -1,12 +1,15 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
-import java.time.LocalDate
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.keyValues
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 
 object MeditationStore {
-    private fun prefs(context: Context) = context.getSharedPreferences("meditation", Context.MODE_PRIVATE)
+    private fun prefs(context: PlatformContext) = context.keyValues("meditation")
 
-    fun setup(context: Context): MeditationSetup {
+    fun setup(context: PlatformContext): MeditationSetup {
         val p = prefs(context)
         return MeditationSetup(
             focus = runCatching { MeditationFocus.valueOf(p.getString("focus", "PEACE").orEmpty()) }
@@ -20,7 +23,7 @@ object MeditationStore {
         )
     }
 
-    fun saveSetup(context: Context, setup: MeditationSetup) {
+    fun saveSetup(context: PlatformContext, setup: MeditationSetup) {
         prefs(context).edit()
             .putString("focus", setup.focus.name)
             .putString("custom", setup.custom)
@@ -30,7 +33,7 @@ object MeditationStore {
             .apply()
     }
 
-    fun record(context: Context): MeditationRecord {
+    fun record(context: PlatformContext): MeditationRecord {
         val p = prefs(context)
         return MeditationRecord(
             sessions = p.getInt("sessions", 0),
@@ -42,14 +45,14 @@ object MeditationStore {
     }
 
     /** A session that was actually sat through, counted. */
-    fun finish(context: Context, setup: MeditationSetup, seconds: Int, ref: String) {
+    fun finish(context: PlatformContext, setup: MeditationSetup, seconds: Int, ref: String) {
         val r = record(context)
         prefs(context).edit()
             .putInt("sessions", r.sessions + 1)
             .putLong("seconds", r.seconds + seconds)
             .putStringSet("topics", r.topics + setup.focus.name)
             .putStringSet("verses", r.verses + ref)
-            .putStringSet("days", (r.days + LocalDate.now().toEpochDay()).map { it.toString() }.toSet())
+            .putStringSet("days", (r.days + Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays().toLong()).map { it.toString() }.toSet())
             .apply()
     }
 }

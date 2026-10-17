@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.morning
 
+import kotlinx.datetime.toKotlinLocalDate
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -56,8 +57,8 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
 
-    var ask by remember { mutableStateOf(OfficeStore.morningAsk(context, today)) }
-    DisposableEffect(Unit) { onDispose { OfficeStore.setMorningAsk(context, ask, today) } }
+    var ask by remember { mutableStateOf(OfficeStore.morningAsk(context, today.toKotlinLocalDate())) }
+    DisposableEffect(Unit) { onDispose { OfficeStore.setMorningAsk(context, ask, today.toKotlinLocalDate()) } }
 
     /* The most recent thing this person actually asked God for. Absent on a
        first run, and the movement simply omits the note rather than inventing

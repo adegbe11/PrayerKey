@@ -1,15 +1,13 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.keyValues
 
 object FastingStore {
-    private fun prefs(context: Context) =
-        context.getSharedPreferences("fasting_challenge", Context.MODE_PRIVATE)
+    private fun prefs(context: PlatformContext) =
+        context.keyValues("fasting_challenge")
 
-    fun load(context: Context): FastingChallenge {
+    fun load(context: PlatformContext): FastingChallenge {
         val p = prefs(context)
         return FastingChallenge(
             length = runCatching { FastLength.valueOf(p.getString("length", "SEVEN").orEmpty()) }
@@ -35,7 +33,7 @@ object FastingStore {
         )
     }
 
-    fun save(context: Context, fast: FastingChallenge) {
+    fun save(context: PlatformContext, fast: FastingChallenge) {
         prefs(context).edit()
             .putString("length", fast.length.name)
             .putInt("customHours", fast.customHours)
@@ -57,14 +55,14 @@ object FastingStore {
             .apply()
     }
 
-    fun journal(context: Context, day: Int): String =
+    fun journal(context: PlatformContext, day: Int): String =
         prefs(context).getString("journal_$day", "").orEmpty()
 
-    fun saveJournal(context: Context, day: Int, text: String) {
+    fun saveJournal(context: PlatformContext, day: Int, text: String) {
         prefs(context).edit().putString("journal_$day", text).apply()
     }
 
-    fun clear(context: Context) {
+    fun clear(context: PlatformContext) {
         prefs(context).edit().clear().apply()
     }
 }

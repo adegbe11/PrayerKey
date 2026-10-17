@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.home
 
+import kotlinx.datetime.toKotlinLocalDate
 import com.prayerkey.manna.ui.theme.pressable
 import androidx.compose.material.icons.outlined.VolunteerActivism
 import androidx.compose.runtime.derivedStateOf
@@ -196,7 +197,7 @@ fun PrayerKeyOperatingHome(
        would show 0/10 for a morning that is already done. */
     var todayBadgeText by remember(today) { mutableStateOf<String?>(null) }
     LaunchedEffect(today, todayPullsOpen, biblePullsOpen) {
-        todayBadgeText = com.prayerkey.manna.data.PullsProgress.Prayer.badge(context, today)
+        todayBadgeText = com.prayerkey.manna.data.PullsProgress.Prayer.badge(context, today.toKotlinLocalDate())
     }
     val morningPrayer = remember(prayerTopics, today) { com.prayerkey.manna.data.dailyPrayerFor(today, prayerTopics) }
     var todayVerse by remember(plan) { mutableStateOf<VerseCard?>(null) }
@@ -1597,7 +1598,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     val prefs = remember { context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE) }
     fun keptOn(date: LocalDate): Set<String> = buildSet {
         listOf("morning", "afternoon", "evening", "night", "midnight", "devotional").forEach { if (prefs.getBoolean("${date}:$it", false)) add(it) }
-        if (com.prayerkey.manna.data.PullsProgress.Bible.isComplete(context, date)) add("bible")
+        if (com.prayerkey.manna.data.PullsProgress.Bible.isComplete(context, date.toKotlinLocalDate())) add("bible")
     }
     // read now, not a second from now: an empty first frame made every kept
     // stop "complete" again - and celebrate - each time Home was opened

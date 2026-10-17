@@ -1,6 +1,7 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.keyValues
 
 /**
  * What the first screens asked for, kept where the rest of the app can use it.
@@ -10,15 +11,15 @@ import android.content.Context
  * asked for the sake of asking. They now decide which prayer comes first.
  */
 object OnboardingPlan {
-    private fun prefs(context: Context) =
-        context.getSharedPreferences("onboarding_plan", Context.MODE_PRIVATE)
+    private fun prefs(context: PlatformContext) =
+        context.keyValues("onboarding_plan")
 
-    fun goals(context: Context): Set<String> = prefs(context).getStringSet("goals", emptySet()).orEmpty()
+    fun goals(context: PlatformContext): Set<String> = prefs(context).getStringSet("goals", emptySet()).orEmpty()
 
-    fun topics(context: Context): Set<String> = prefs(context).getStringSet("topics", emptySet()).orEmpty()
+    fun topics(context: PlatformContext): Set<String> = prefs(context).getStringSet("topics", emptySet()).orEmpty()
 
     /** The prompt packs this person said they came for, most wanted first. */
-    fun packs(context: Context): List<String> {
+    fun packs(context: PlatformContext): List<String> {
         val chosen = topics(context) + goals(context)
         val order = listOf(
             "gratitude" to "Thanksgiving",

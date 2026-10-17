@@ -1,7 +1,11 @@
 package com.prayerkey.manna.data
 
-import android.content.Context
-import java.time.LocalDate
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.keyValues
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 
 /**
  * Where you stopped.
@@ -27,23 +31,23 @@ sealed class PullsProgress(private val file: String, private val noun: String) {
     object Prayer : PullsProgress("prayer_session", "prayer")
     object Bible : PullsProgress("bible_session", "reading")
 
-    private fun at(date: LocalDate) = "at_" + date.toEpochDay()
-    private fun of(date: LocalDate) = "of_" + date.toEpochDay()
-    private fun prefs(context: Context) = context.getSharedPreferences(file, Context.MODE_PRIVATE)
+    private fun at(date: LocalDate) = "at_" + date.toEpochDays()
+    private fun of(date: LocalDate) = "of_" + date.toEpochDays()
+    private fun prefs(context: PlatformContext) = context.keyValues(file)
 
     /** How many pulls are done today. 0 when untouched. */
-    fun progress(context: Context, date: LocalDate = LocalDate.now()): Int =
+    fun progress(context: PlatformContext, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): Int =
         prefs(context).getInt(at(date), 0)
 
     /** How long today's deck is, as last seen. 0 before it has ever been opened. */
-    fun total(context: Context, date: LocalDate = LocalDate.now()): Int =
+    fun total(context: PlatformContext, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): Int =
         prefs(context).getInt(of(date), 0)
 
     /**
      * Records the position. Only ever moves forward, so re-opening a finished
      * deck to read it again cannot reset the day to zero.
      */
-    fun record(context: Context, done: Int, outOf: Int, date: LocalDate = LocalDate.now()) {
+    fun record(context: PlatformContext, done: Int, outOf: Int, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())) {
         val editor = prefs(context).edit()
         if (outOf > 0) editor.putInt(of(date), outOf)
         val now = done.coerceIn(0, outOf.takeIf { it > 0 } ?: done)
@@ -51,17 +55,17 @@ sealed class PullsProgress(private val file: String, private val noun: String) {
         editor.apply()
     }
 
-    fun isComplete(context: Context, date: LocalDate = LocalDate.now()): Boolean {
+    fun isComplete(context: PlatformContext, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): Boolean {
         val outOf = total(context, date)
         return outOf > 0 && progress(context, date) >= outOf
     }
 
     /** Where the deck should open. A finished day starts again from the top. */
-    fun resumeAt(context: Context, date: LocalDate = LocalDate.now()): Int =
+    fun resumeAt(context: PlatformContext, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): Int =
         if (isComplete(context, date)) 0 else progress(context, date)
 
     /** "6/10" for the home badge, or null when today has not been started. */
-    fun badge(context: Context, date: LocalDate = LocalDate.now()): String? {
+    fun badge(context: PlatformContext, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): String? {
         val done = progress(context, date)
         val outOf = total(context, date)
         return if (done <= 0 || outOf <= 0) null else "$done/$outOf"
@@ -74,7 +78,7 @@ sealed class PullsProgress(private val file: String, private val noun: String) {
      * advertisement for the app; "You stopped at six" is a fact about the
      * reader's own morning, and only one of the two gets opened.
      */
-    fun notificationLine(context: Context, date: LocalDate = LocalDate.now()): Pair<String, String> {
+    fun notificationLine(context: PlatformContext, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): Pair<String, String> {
         val done = progress(context, date)
         val outOf = total(context, date)
         return when {

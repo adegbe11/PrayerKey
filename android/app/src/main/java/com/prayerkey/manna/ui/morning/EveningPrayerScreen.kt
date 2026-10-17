@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.morning
 
+import kotlinx.datetime.toKotlinLocalDate
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -62,9 +63,9 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
 
-    val morningAsk = remember { OfficeStore.morningAsk(context, today) }
-    var release by remember { mutableStateOf(OfficeStore.eveningRelease(context, today)) }
-    DisposableEffect(Unit) { onDispose { OfficeStore.setEveningRelease(context, release, today) } }
+    val morningAsk = remember { OfficeStore.morningAsk(context, today.toKotlinLocalDate()) }
+    var release by remember { mutableStateOf(OfficeStore.eveningRelease(context, today.toKotlinLocalDate())) }
+    DisposableEffect(Unit) { onDispose { OfficeStore.setEveningRelease(context, release, today.toKotlinLocalDate()) } }
 
     OfficeFlip(
         title = "Evening Prayer",
