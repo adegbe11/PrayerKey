@@ -933,7 +933,7 @@ fun LegacyPrayerScreen(
                     }
                     Text("Share as a card", color = Muted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 26.dp, bottom = 10.dp))
                 }
-                items(com.prayerkey.manna.share.CardFormat.entries.toList(), key = { it.name }) { format ->
+                items(com.prayerkey.manna.ui.share.CardFormat.entries.toList(), key = { it.name }) { format ->
                     Surface(
                         onClick = { com.prayerkey.manna.share.PrayerCardRenderer.share(shareContext, potd, format) },
                         shape = RoundedCornerShape(16.dp), color = Color.White,

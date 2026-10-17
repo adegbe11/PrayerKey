@@ -1,10 +1,13 @@
 package com.prayerkey.manna.ui.meditation
 
-import android.media.AudioAttributes
-import android.media.AudioFormat
-import android.media.AudioTrack
 import com.prayerkey.manna.data.Ambience
-import kotlin.concurrent.thread
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.ui.platform.PcmOut
+import com.prayerkey.manna.ui.platform.openPcmOut
+import kotlin.concurrent.Volatile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.sin
@@ -18,16 +21,17 @@ import kotlin.random.Random
  * plays offline on the first launch. Each is deliberately plain - a bed to
  * sit on rather than music to listen to - and held well under the voice.
  */
-internal class Soundscape(private val kind: Ambience) {
+class Soundscape(private val kind: Ambience) {
     @Volatile private var playing = false
     @Volatile private var paused = false
-    private var worker: Thread? = null
-    private var track: AudioTrack? = null
+    private var worker: Job? = null
+    private var track: PcmOut? = null
 
     fun start() {
         if (kind == Ambience.NONE || playing) return
         playing = true
-        worker = thread(name = "PrayerKeySoundscape", isDaemon = true) { run() }
+        // a writer that blocks on the output, so it gets an IO thread of its own
+        worker = CoroutineScope(ioDispatcher).launch { run() }
     }
 
     fun pause(value: Boolean) {
@@ -36,9 +40,9 @@ internal class Soundscape(private val kind: Ambience) {
 
     fun stop() {
         playing = false
-        worker?.join(400)
+        worker?.cancel()
         worker = null
-        track?.runCatching { stop(); release() }
+        track?.release()
         track = null
     }
 
@@ -46,26 +50,8 @@ internal class Soundscape(private val kind: Ambience) {
 
     private fun run() {
         val rate = 22_050
-        val min = AudioTrack.getMinBufferSize(rate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
-            .coerceAtLeast(4096)
-        val audio = AudioTrack.Builder()
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .build(),
-            )
-            .setAudioFormat(
-                AudioFormat.Builder().setSampleRate(rate)
-                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT).build(),
-            )
-            .setBufferSizeInBytes(min * 2)
-            .setTransferMode(AudioTrack.MODE_STREAM)
-            .build()
+        val audio = openPcmOut(rate, .55f)
         track = audio
-        audio.setVolume(.55f)
-        audio.play()
 
         val random = Random(kind.ordinal * 31 + 7)
         val buffer = ShortArray(2048)
@@ -83,8 +69,8 @@ internal class Soundscape(private val kind: Ambience) {
 
         while (playing) {
             if (paused) {
-                java.util.Arrays.fill(buffer, 0)
-                audio.write(buffer, 0, buffer.size)
+                buffer.fill(0)
+                if (audio.write(buffer, buffer.size) < 0) break
                 continue
             }
             for (i in buffer.indices) {
@@ -169,7 +155,7 @@ internal class Soundscape(private val kind: Ambience) {
                 buffer[i] = (s * fadeIn * 9_000).coerceIn(-32_000.0, 32_000.0).toInt().toShort()
                 n++
             }
-            if (audio.write(buffer, 0, buffer.size) < 0) break
+            if (audio.write(buffer, buffer.size) < 0) break
         }
     }
 }

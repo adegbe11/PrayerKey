@@ -1,9 +1,12 @@
 package com.prayerkey.manna.ui.home
 
-import android.media.AudioAttributes
-import android.media.AudioFormat
-import android.media.AudioTrack
-import kotlin.concurrent.thread
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.ui.platform.PcmOut
+import com.prayerkey.manna.ui.platform.openPcmOut
+import kotlin.concurrent.Volatile
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.sin
 
@@ -11,27 +14,18 @@ import kotlin.math.sin
  * A quiet, copyright-free worship pad generated on the phone. It needs no
  * download, works offline, and fades its chord changes so there are no clicks.
  */
-internal class AmbientPrayerPlayer {
+class AmbientPrayerPlayer {
     @Volatile private var playing = false
-    private var worker: Thread? = null
-    private var track: AudioTrack? = null
+    private var worker: Job? = null
+    private var track: PcmOut? = null
 
     fun start() {
         if (playing) return
         playing = true
-        worker = thread(name = "PrayerKeyAmbientPad", isDaemon = true) {
+        worker = CoroutineScope(ioDispatcher).launch {
             val rate = 22_050
-            val size = AudioTrack.getMinBufferSize(rate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
-                .coerceAtLeast(4096)
-            val audio = AudioTrack.Builder()
-                .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
-                .setAudioFormat(AudioFormat.Builder().setSampleRate(rate).setChannelMask(AudioFormat.CHANNEL_OUT_MONO).setEncoding(AudioFormat.ENCODING_PCM_16BIT).build())
-                .setBufferSizeInBytes(size * 2)
-                .setTransferMode(AudioTrack.MODE_STREAM)
-                .build()
+            val audio = openPcmOut(rate, .12f)
             track = audio
-            audio.setVolume(.12f)
-            audio.play()
             val buffer = ShortArray(2048)
             val chords = arrayOf(
                 doubleArrayOf(130.81, 164.81, 196.00), // C
@@ -52,17 +46,17 @@ internal class AmbientPrayerPlayer {
                     buffer[i] = (wave * breath * edgeFade * 5_500).toInt().toShort()
                     sample++
                 }
-                if (audio.write(buffer, 0, buffer.size) < 0) break
+                if (audio.write(buffer, buffer.size) < 0) break
             }
-            runCatching { audio.pause(); audio.flush(); audio.release() }
+            audio.release()
             track = null
         }
     }
 
     fun stop() {
         playing = false
-        runCatching { track?.pause() }
-        worker?.interrupt()
+        track?.release()
+        worker?.cancel()
         worker = null
     }
 }

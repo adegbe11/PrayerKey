@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.core.content.FileProvider
 import com.prayerkey.manna.model.DailyPrayer
+import com.prayerkey.manna.ui.share.CardFormat
 import java.io.File
 import java.io.FileOutputStream
 
@@ -17,13 +18,7 @@ import java.io.FileOutputStream
  * (ivory canvas, gold cross, huge book name, golden chapter:verse,
  * verse, short prayer, PRAYERKEY.COM watermark) in every social format.
  */
-enum class CardFormat(val label: String, val w: Int, val h: Int) {
-    SQUARE("Instagram", 1080, 1080),
-    STORY("Story / TikTok", 1080, 1920),
-    FACEBOOK("Facebook", 1200, 630),
-    TWITTER("Twitter / X", 1200, 675),
-    PINTEREST("Pinterest", 1000, 1500),
-}
+/* CardFormat is shared (com.prayerkey.manna.ui.share), so iPhone draws the same shapes. */
 
 object PrayerCardRenderer {
 
