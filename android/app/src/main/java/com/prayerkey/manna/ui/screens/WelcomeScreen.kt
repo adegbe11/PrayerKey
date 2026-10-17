@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
@@ -23,12 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
@@ -54,7 +54,7 @@ fun WelcomeScreen(onContinue: () -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize().background(Pk.DeepDark)) {
         val availableHeight = maxHeight
         // the dawn drifts slowly closer while you read
-        Image(painterResource(R.drawable.welcome_prayer_dawn), null, Modifier.matchParentSize().drift(), contentScale = ContentScale.Crop)
+        Image(painterResource(Res.drawable.welcome_prayer_dawn), null, Modifier.matchParentSize().drift(), contentScale = ContentScale.Crop)
         Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = .18f)))
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -71,7 +71,7 @@ fun WelcomeScreen(onContinue: () -> Unit) {
                forms the shank. That is not a shape worth reconstructing in
                path commands, so it is the artwork, cut off its violet tile. */
             Image(
-                painterResource(R.drawable.prayerkey_mark),
+                painterResource(Res.drawable.prayerkey_mark),
                 contentDescription = "PrayerKey",
                 modifier = Modifier.size(72.dp).rise(0, distance = 14f),
             )

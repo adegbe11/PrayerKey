@@ -1,10 +1,10 @@
 package com.prayerkey.manna.data
 
 import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.ioDispatcher
 import com.prayerkey.manna.platform.readAsset
 import kotlin.concurrent.Volatile
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -13,7 +13,7 @@ import kotlinx.serialization.json.jsonObject
 
 class OfflineBible(private val context: PlatformContext) {
 
-    suspend fun search(query: String, limit: Int = 30): List<BibleVerse> = withContext(Dispatchers.IO) {
+    suspend fun search(query: String, limit: Int = 30): List<BibleVerse> = withContext(ioDispatcher) {
         val normalized = query.trim()
         if (normalized.isBlank()) return@withContext verses().take(30)
         val direct = Regex("^(.+?)\\s+(\\d+)(?::(\\d+))?$", RegexOption.IGNORE_CASE).matchEntire(normalized)
@@ -32,7 +32,7 @@ class OfflineBible(private val context: PlatformContext) {
         }.take(limit).toList()
     }
 
-    suspend fun chapter(book: String, chapter: Int): List<BibleVerse> = withContext(Dispatchers.IO) {
+    suspend fun chapter(book: String, chapter: Int): List<BibleVerse> = withContext(ioDispatcher) {
         verses().filter { it.book == book && it.chapter == chapter }
     }
 
@@ -43,7 +43,7 @@ class OfflineBible(private val context: PlatformContext) {
      * the first few matches for "peace", which made Pull look like a whole
      * Bible deck while it was actually cycling through ten verses.
      */
-    suspend fun pullDeck(): List<BibleVerse> = withContext(Dispatchers.IO) {
+    suspend fun pullDeck(): List<BibleVerse> = withContext(ioDispatcher) {
         verses().shuffled()
     }
 

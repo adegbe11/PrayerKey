@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.resources.*
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -30,7 +31,7 @@ fun LaunchPrelude(stage: Int) {
                 3 -> OpeningWord("Knock.")
                 else -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     androidx.compose.foundation.Image(
-                        androidx.compose.ui.res.painterResource(com.prayerkey.manna.R.drawable.prayerkey_mark),
+                        org.jetbrains.compose.resources.painterResource(Res.drawable.prayerkey_mark),
                         contentDescription = null,
                         modifier = Modifier.size(62.dp),
                     )

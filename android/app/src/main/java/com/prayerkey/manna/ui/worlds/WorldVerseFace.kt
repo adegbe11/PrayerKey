@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.worlds
 
+import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -26,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.ui.theme.R
 import com.prayerkey.manna.ui.theme.BookSerif
-import com.prayerkey.manna.R as AppR
 
 /* Ivory on night, gold for the small marks. */
 private val Ink = Color(0xFF222222)
@@ -57,10 +57,10 @@ fun WorldVerseFace(
 ) {
     val world = remember(reference, text) { WorldPicker.forVerse(reference, text) }
     val artwork = remember(reference) {
-        val cards = intArrayOf(
-            AppR.drawable.verse_card_botanical,
-            AppR.drawable.verse_card_dawn,
-            AppR.drawable.verse_card_oxblood,
+        val cards = listOf(
+            Res.drawable.verse_card_botanical,
+            Res.drawable.verse_card_dawn,
+            Res.drawable.verse_card_oxblood,
         )
         cards[(reference.hashCode() and Int.MAX_VALUE) % cards.size]
     }

@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.home
 
+import com.prayerkey.manna.resources.*
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -21,14 +22,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.*
-import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -64,9 +64,9 @@ private fun CinematicDailyRhythmPage(
         else -> "Evening prayer"
     }
     val art = when (moment) {
-        "morning" -> R.drawable.rhythm_morning
-        "reflection" -> R.drawable.rhythm_reflection
-        else -> R.drawable.rhythm_evening
+        "morning" -> Res.drawable.rhythm_morning
+        "reflection" -> Res.drawable.rhythm_reflection
+        else -> Res.drawable.rhythm_evening
     }
     val reference = when (moment) {
         "morning" -> prayer.ref

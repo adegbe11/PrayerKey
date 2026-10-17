@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 rootProject.name = "Manna"
 include(":app")
 include(":shared")
+include(":ui")

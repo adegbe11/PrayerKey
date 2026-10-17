@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.resources.*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -35,12 +36,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
@@ -124,7 +124,7 @@ fun OnboardingSlides(
                     .border(1.dp, Color.White.copy(alpha = .85f), RoundedCornerShape(34.dp)),
             ) {
                 Image(
-                    painter = painterResource(R.drawable.onboarding_manna_woman),
+                    painter = painterResource(Res.drawable.onboarding_manna_woman),
                     contentDescription = "A woman listening peacefully through headphones",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),

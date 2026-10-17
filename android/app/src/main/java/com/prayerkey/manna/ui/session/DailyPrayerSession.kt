@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.session
 
+import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import android.view.HapticFeedbackConstants
@@ -64,7 +65,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,6 @@ import com.prayerkey.manna.data.PrayerPulls
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import com.prayerkey.manna.R
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -153,7 +153,7 @@ fun PullSessionLoading(title: String) {
 
     Box(Modifier.fillMaxSize().background(Pk.DeepDark)) {
         Image(
-            painterResource(R.drawable.verse_card_dawn),
+            painterResource(Res.drawable.verse_card_dawn),
             contentDescription = null,
             modifier = Modifier.fillMaxSize().graphicsLayer {
                 scaleX = reveal.value
@@ -483,7 +483,7 @@ private fun FittedWords(text: String, color: Color, reserve: androidx.compose.ui
 @Composable
 private fun SessionGround(isBible: Boolean) {
     Image(
-        painterResource(if (isBible) R.drawable.verse_card_botanical else R.drawable.today_prayer_violet),
+        painterResource(if (isBible) Res.drawable.verse_card_botanical else Res.drawable.today_prayer_violet),
         contentDescription = null,
         modifier = Modifier.fillMaxSize(),
         contentScale = ContentScale.Crop,

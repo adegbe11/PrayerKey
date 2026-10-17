@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui.screens
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,26 +23,25 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.data.PrayerTopic
 import com.prayerkey.manna.ui.theme.DisplaySerif
 
-private data class SituationStyle(val color: Color, val cover: Int)
+private data class SituationStyle(val color: Color, val cover: DrawableResource)
 
 private val situationStyles = listOf(
-    SituationStyle(Color(0xFF5C02D8), R.drawable.discovery_cover_1),
-    SituationStyle(Color(0xFF214E78), R.drawable.discovery_cover_2),
-    SituationStyle(Color(0xFF8A3D62), R.drawable.discovery_cover_3),
-    SituationStyle(Color(0xFF396B5A), R.drawable.discovery_cover_4),
-    SituationStyle(Color(0xFF9B5A32), R.drawable.discovery_cover_5),
-    SituationStyle(Color(0xFF3E3A78), R.drawable.discovery_cover_6),
-    SituationStyle(Color(0xFF6D4C41), R.drawable.discovery_cover_2),
-    SituationStyle(Color(0xFF2A6873), R.drawable.discovery_cover_4),
+    SituationStyle(Color(0xFF5C02D8), Res.drawable.discovery_cover_1),
+    SituationStyle(Color(0xFF214E78), Res.drawable.discovery_cover_2),
+    SituationStyle(Color(0xFF8A3D62), Res.drawable.discovery_cover_3),
+    SituationStyle(Color(0xFF396B5A), Res.drawable.discovery_cover_4),
+    SituationStyle(Color(0xFF9B5A32), Res.drawable.discovery_cover_5),
+    SituationStyle(Color(0xFF3E3A78), Res.drawable.discovery_cover_6),
+    SituationStyle(Color(0xFF6D4C41), Res.drawable.discovery_cover_2),
+    SituationStyle(Color(0xFF2A6873), Res.drawable.discovery_cover_4),
 )
 
 @Composable

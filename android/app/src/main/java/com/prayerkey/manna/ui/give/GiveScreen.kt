@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.give
 
+import com.prayerkey.manna.resources.*
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -48,14 +49,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.data.PrayerKeyApi
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
@@ -95,7 +95,7 @@ fun GiveScreen(onClose: () -> Unit) {
     ) {
         Box(Modifier.fillMaxWidth().heightIn(min = 300.dp)) {
             Image(
-                painterResource(R.drawable.prayerkey_give_artwork),
+                painterResource(Res.drawable.prayerkey_give_artwork),
                 contentDescription = null,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop,

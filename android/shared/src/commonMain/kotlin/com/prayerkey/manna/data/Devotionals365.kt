@@ -1,10 +1,9 @@
 package com.prayerkey.manna.data
 
 import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.ioDispatcher
 import com.prayerkey.manna.platform.readAsset
 import kotlin.concurrent.Volatile
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.json.Json
@@ -98,7 +97,7 @@ object Devotionals {
     @Volatile private var cache: List<Devotional>? = null
 
     suspend fun all(context: PlatformContext): List<Devotional> =
-        cache ?: withContext(Dispatchers.IO) {
+        cache ?: withContext(ioDispatcher) {
             val parsed = context.readAsset("devotionals.json")?.let(::parse).orEmpty()
             if (parsed.isNotEmpty()) cache = parsed
             parsed

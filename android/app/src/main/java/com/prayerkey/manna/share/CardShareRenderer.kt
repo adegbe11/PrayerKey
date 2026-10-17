@@ -1,5 +1,6 @@
 package com.prayerkey.manna.share
 
+import com.prayerkey.manna.resources.Res
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -97,7 +98,7 @@ object CardShareRenderer {
     private fun closingVerseStatus(context: Context, verse: String, reference: String): Bitmap {
         val out = Bitmap.createBitmap(1080, 1920, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
-        val art = cardArt(context, com.prayerkey.manna.R.drawable.closing_verse_violet)
+        val art = cardArt("drawable/closing_verse_violet.png")
         canvas.drawBitmap(art, null, android.graphics.Rect(0, 0, 1080, 1920), Paint(Paint.ANTI_ALIAS_FLAG)); art.recycle()
         val shade = Paint().apply { shader = LinearGradient(0f, 450f, 0f, 1780f, Color.TRANSPARENT, Color.argb(230, 26, 10, 46), Shader.TileMode.CLAMP) }
         canvas.drawRect(0f, 0f, 1080f, 1920f, shade)
@@ -116,7 +117,7 @@ object CardShareRenderer {
     private fun prayerStatus(context: Context, prayer: String): Bitmap {
         val out = Bitmap.createBitmap(1080, 1920, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
-        val art = cardArt(context, com.prayerkey.manna.R.drawable.today_prayer_violet)
+        val art = cardArt("drawable/today_prayer_violet.webp")
         canvas.drawBitmap(art, null, android.graphics.Rect(0, 0, 1080, 1920), Paint(Paint.ANTI_ALIAS_FLAG))
         art.recycle()
         val shade = Paint().apply { shader = LinearGradient(0f, 220f, 0f, 1680f, Color.argb(55, 26, 10, 46), Color.argb(190, 26, 10, 46), Shader.TileMode.CLAMP) }
@@ -136,7 +137,7 @@ object CardShareRenderer {
     private fun brandedStatus(context: Context, card: VerseCard): Bitmap {
         val out = Bitmap.createBitmap(1080, 1920, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
-        val art = cardArt(context, com.prayerkey.manna.R.drawable.verse_card_oxblood)
+        val art = cardArt("drawable/verse_card_oxblood.webp")
         val scale = maxOf(1080f / art.width, 1920f / art.height)
         val left = (1080f - art.width * scale) / 2f
         canvas.drawBitmap(art, null, android.graphics.RectF(left, 0f, left + art.width * scale, art.height * scale), Paint(Paint.ANTI_ALIAS_FLAG))
@@ -366,13 +367,15 @@ object CardShareRenderer {
      * bigger, so a larger picture swapped in later cannot load its whole
      * resolution into memory to be scaled away.
      */
-    private fun cardArt(context: Context, res: Int): android.graphics.Bitmap {
+    private fun cardArt(path: String): android.graphics.Bitmap {
+        // the artwork is a shared resource now, the same file the iPhone app draws
+        val bytes = kotlinx.coroutines.runBlocking { Res.readBytes(path) }
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        BitmapFactory.decodeResource(context.resources, res, bounds)
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
         var sample = 1
         while (bounds.outWidth / (sample * 2) >= 1080 && bounds.outHeight / (sample * 2) >= 1920) sample *= 2
-        return BitmapFactory.decodeResource(
-            context.resources, res,
+        return BitmapFactory.decodeByteArray(
+            bytes, 0, bytes.size,
             BitmapFactory.Options().apply { inSampleSize = sample; inScaled = false },
         )
     }

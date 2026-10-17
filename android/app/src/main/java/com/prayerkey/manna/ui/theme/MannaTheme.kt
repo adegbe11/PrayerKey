@@ -101,6 +101,7 @@ fun MannaTheme(
     theme: com.prayerkey.manna.data.AppTheme = com.prayerkey.manna.data.APP_THEMES.first(),
     content: @Composable () -> Unit,
 ) {
+    LoadPkFonts()
     // One identity in two reading conditions: warm paper by day, midnight
     // oxblood after dark. Accent and semantic colours never change brands.
     val scheme = if (theme.dark) androidx.compose.material3.darkColorScheme(

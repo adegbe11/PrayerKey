@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.resources.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -24,12 +25,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
@@ -121,7 +121,7 @@ fun PersonalPlanOnboarding(onDone: (remindersEnabled: Boolean, hour: Int) -> Uni
 private fun PromiseStep(next: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
         Image(
-            painterResource(R.drawable.onboarding_pray_v3), null,
+            painterResource(Res.drawable.onboarding_pray_v3), null,
             Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
         )
         Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, Color(0x551A0A2E), Color(0xF21A0A2E)))))

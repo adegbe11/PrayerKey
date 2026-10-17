@@ -33,3 +33,5 @@ private class AndroidKeyValues(private val p: SharedPreferences) : KeyValues {
         override fun apply() = e.apply()
     }
 }
+
+actual val ioDispatcher: kotlinx.coroutines.CoroutineDispatcher = kotlinx.coroutines.Dispatchers.IO

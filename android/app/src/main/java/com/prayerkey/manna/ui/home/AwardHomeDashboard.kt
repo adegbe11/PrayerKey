@@ -64,7 +64,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.platform.LocalContext
 import android.view.HapticFeedbackConstants
 import androidx.compose.ui.text.font.FontWeight
@@ -75,7 +75,6 @@ import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.Challenge
 import com.prayerkey.manna.data.Devotion
 import com.prayerkey.manna.data.OfflineBible
-import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.GiltLine
 import com.prayerkey.manna.ui.theme.Ink

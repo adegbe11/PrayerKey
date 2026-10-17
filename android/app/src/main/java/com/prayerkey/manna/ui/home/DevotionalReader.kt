@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.home
 
+import com.prayerkey.manna.resources.*
 import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -50,7 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -60,7 +61,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.data.DevoBlock
 import com.prayerkey.manna.data.Devotional
 import com.prayerkey.manna.data.OfflineBible
@@ -162,7 +162,7 @@ fun DevotionalReader(
      */
     Box(Modifier.fillMaxSize().background(Pk.DeepDark)) {
         Image(
-            painterResource(R.drawable.welcome_prayer_dawn),
+            painterResource(Res.drawable.welcome_prayer_dawn),
             contentDescription = null,
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop,
@@ -279,7 +279,7 @@ private val Body = Color(0xFF241238)
 private val Faint = Color(0xFF1A0A2E).copy(alpha = .3f)
 private val Mono = Color(0xFF1A0A2E).copy(alpha = .3f)
 
-private val MonoLabel = TextStyle(
+private val MonoLabel: TextStyle get() = TextStyle(
     fontFamily = UtilitySans, fontSize = 8.5.sp,
     fontWeight = FontWeight.SemiBold, letterSpacing = 1.5.sp,
 )

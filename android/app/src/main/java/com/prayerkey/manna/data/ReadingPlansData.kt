@@ -1,5 +1,7 @@
 package com.prayerkey.manna.data
 
+import com.prayerkey.manna.resources.*
+
 /*
  * The reading plans. Written, not generated: each day is a passage, a short
  * devotion on it, a prayer point and a question. Built from JSON by a script,
@@ -13,7 +15,7 @@ private val PLAN_0 = ReadingPlanDef(
     blurb = "A 7-day journey to build a solid foundation in your relationship with God.",
     verse = "In the beginning was the Word, and the Word was with God, and the Word was God.",
     verseRef = "John 1:1",
-    art = com.prayerkey.manna.R.drawable.onboarding_read_v3,
+    art = Res.drawable.onboarding_read_v3,
     days = listOf(
         PlanDay("The Beginning", "Genesis", 1, 1, 5, "God Creates", "In the beginning, God spoke, and everything came to life. The same God who brought light out of darkness can bring order, beauty and purpose into your life today.", "Thank God for His creativity and for the purpose He has for your life.", "What does this passage teach you about who God is?"),
         PlanDay("Created with Purpose", "Genesis", 1, 26, 31, "Made in His Image", "You were not an accident. God made you in His image, on purpose, and looked at what He had made and called it very good.", "Ask God to show you the purpose He had in mind when He made you.", "What would change if you believed God calls you good?"),
@@ -32,7 +34,7 @@ private val PLAN_1 = ReadingPlanDef(
     blurb = "Seven days to discover who God says you are.",
     verse = "See what great love the Father has lavished on us, that we should be called children of God.",
     verseRef = "1 John 3:1",
-    art = com.prayerkey.manna.R.drawable.onboarding_journal_v3,
+    art = Res.drawable.onboarding_journal_v3,
     days = listOf(
         PlanDay("Chosen", "Ephesians", 1, 3, 8, "Chosen Before Time", "Before the world began, God chose you. Your worth was settled long before you did anything to prove it.", "Thank God that you are chosen, not merely tolerated.", "How would you live today if you truly believed you were chosen?"),
         PlanDay("Loved", "Romans", 8, 35, 39, "Nothing Can Separate", "No failure, fear or power can separate you from the love of God in Christ. His love is not fragile.", "Ask God to settle His love deep in your heart.", "What have you believed could separate you from God's love?"),
@@ -51,7 +53,7 @@ private val PLAN_2 = ReadingPlanDef(
     blurb = "Seven days of Scripture for the anxious heart.",
     verse = "Cast all your anxiety on Him because He cares for you.",
     verseRef = "1 Peter 5:7",
-    art = com.prayerkey.manna.R.drawable.onboarding_prayer,
+    art = Res.drawable.onboarding_prayer,
     days = listOf(
         PlanDay("He Cares for You", "1 Peter", 5, 6, 11, "Cast Your Cares", "God does not tell you to carry your worries better. He tells you to throw them onto Him, because He cares for you.", "Name one worry and give it to God.", "What would it feel like to not carry this alone?"),
         PlanDay("Do Not Worry", "Matthew", 6, 25, 34, "Look at the Birds", "Jesus points to the birds and the flowers. Your Father feeds and clothes them, and you are worth far more to Him.", "Ask God to help you trust Him for today only.", "Which worry belongs to tomorrow, not today?"),
@@ -70,7 +72,7 @@ private val PLAN_3 = ReadingPlanDef(
     blurb = "Seven days to grow a grateful heart.",
     verse = "Give thanks in all circumstances; for this is God's will for you in Christ Jesus.",
     verseRef = "1 Thessalonians 5:18",
-    art = com.prayerkey.manna.R.drawable.discovery_cover_4,
+    art = Res.drawable.discovery_cover_4,
     days = listOf(
         PlanDay("Give Thanks", "Psalms", 100, 1, 5, "Enter with Thanks", "Thanksgiving is the way into God's presence. Before you ask for anything, remember who He is and what He has done.", "Thank God for three things before you ask for anything.", "What are you most grateful for this morning?"),
         PlanDay("In All Circumstances", "1 Thessalonians", 5, 16, 24, "Thanks in Everything", "You are not asked to be thankful for everything, but in everything. Even in hard seasons, God is still good and still near.", "Thank God for His presence in a hard situation.", "What can you thank God for even in this season?"),
@@ -89,7 +91,7 @@ private val PLAN_4 = ReadingPlanDef(
     blurb = "Two weeks with the people of faith, and the God they trusted.",
     verse = "Now faith is confidence in what we hope for and assurance about what we do not see.",
     verseRef = "Hebrews 11:1",
-    art = com.prayerkey.manna.R.drawable.discovery_cover_5,
+    art = Res.drawable.discovery_cover_5,
     days = listOf(
         PlanDay("What Faith Is", "Hebrews", 11, 1, 6, "Assurance of Things Unseen", "Faith is not a feeling you work up. It is trust placed in a God who rewards those who seek Him.", "Ask God to grow your faith today.", "What are you hoping for that you cannot yet see?"),
         PlanDay("Abraham Believed", "Genesis", 15, 1, 6, "Counted as Righteous", "Abraham had no evidence but a promise and a sky full of stars. He believed God, and God counted it as righteousness.", "Ask God to help you believe His promises.", "Which promise of God are you finding hard to believe?"),
@@ -115,7 +117,7 @@ private val PLAN_5 = ReadingPlanDef(
     blurb = "Two weeks with the God who heals body, heart and mind.",
     verse = "He heals the brokenhearted and binds up their wounds.",
     verseRef = "Psalm 147:3",
-    art = com.prayerkey.manna.R.drawable.welcome_prayer_dawn,
+    art = Res.drawable.welcome_prayer_dawn,
     days = listOf(
         PlanDay("The Lord Who Heals", "Exodus", 15, 22, 27, "Jehovah Rapha", "At bitter water God revealed Himself as the Lord who heals. He is able to make bitter things sweet.", "Bring God what is bitter in you.", "What in your life needs God's healing touch?"),
         PlanDay("He Heals the Brokenhearted", "Psalms", 147, 1, 6, "Binding Up Wounds", "The God who counts the stars also binds up the wounds of the brokenhearted. No pain is too small for Him.", "Ask God to bind up your wounds.", "What heartbreak have you carried without telling God?"),
@@ -141,7 +143,7 @@ private val PLAN_6 = ReadingPlanDef(
     blurb = "Three weeks of God's steadying Word when the future feels unclear.",
     verse = "You will keep in perfect peace those whose minds are steadfast, because they trust in you.",
     verseRef = "Isaiah 26:3",
-    art = com.prayerkey.manna.R.drawable.rhythm_reflection,
+    art = Res.drawable.rhythm_reflection,
     days = listOf(
         PlanDay("The Lord Is My Shepherd", "Psalms", 23, 1, 6, "I Shall Not Want", "When the future is unclear, the Shepherd is not. He leads, restores and walks with you through every valley.", "Ask the Shepherd to lead you today.", "Where do you need a shepherd right now?"),
         PlanDay("My Times Are in Your Hands", "Psalms", 31, 14, 24, "Held by God", "Your future is not floating free. Your times are in God's hands, and they are safe there.", "Place your future in God's hands.", "What part of your future feels out of control?"),
@@ -174,7 +176,7 @@ private val PLAN_7 = ReadingPlanDef(
     blurb = "Three weeks to learn to pray from the prayers of Scripture.",
     verse = "Call to me and I will answer you and tell you great and unsearchable things you do not know.",
     verseRef = "Jeremiah 33:3",
-    art = com.prayerkey.manna.R.drawable.onboarding_pray_v3,
+    art = Res.drawable.onboarding_pray_v3,
     days = listOf(
         PlanDay("Lord, Teach Us to Pray", "Luke", 11, 1, 4, "The First Request", "The disciples watched Jesus pray and asked Him to teach them. Prayer is learned by staying close to Jesus.", "Ask Jesus to teach you to pray.", "What do you want to learn about prayer?"),
         PlanDay("Our Father", "Matthew", 6, 9, 13, "A Pattern for Prayer", "The Lord's Prayer begins with God, His name and His kingdom, before it turns to our needs.", "Pray the Lord's Prayer slowly.", "Which line of the Lord's Prayer speaks to you today?"),

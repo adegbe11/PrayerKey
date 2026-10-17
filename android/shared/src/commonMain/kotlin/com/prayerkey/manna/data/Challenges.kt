@@ -2,10 +2,9 @@ package com.prayerkey.manna.data
 
 import com.prayerkey.manna.platform.PlatformContext
 import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.platform.ioDispatcher
 import com.prayerkey.manna.platform.readAsset
 import kotlin.concurrent.Volatile
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -74,7 +73,7 @@ object Challenges {
 
     @Volatile private var cache: List<ChallengePlan>? = null
 
-    suspend fun all(context: PlatformContext): List<ChallengePlan> = withContext(Dispatchers.IO) {
+    suspend fun all(context: PlatformContext): List<ChallengePlan> = withContext(ioDispatcher) {
         cache ?: parse(context).also { cache = it }
     }
 

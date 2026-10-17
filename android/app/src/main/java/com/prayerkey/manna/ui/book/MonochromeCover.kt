@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.book
 
+import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -66,7 +67,7 @@ fun MonochromeCover(onOpen: () -> Unit, modifier: Modifier = Modifier, full: Boo
            rendered once as an image: drawn live from lines it read as a
            barcode, and paint needs hundreds of overlapping bristles. */
         androidx.compose.foundation.Image(
-            androidx.compose.ui.res.painterResource(com.prayerkey.manna.R.drawable.mono_cross),
+            org.jetbrains.compose.resources.painterResource(Res.drawable.mono_cross),
             contentDescription = null,
             contentScale = androidx.compose.ui.layout.ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize(),

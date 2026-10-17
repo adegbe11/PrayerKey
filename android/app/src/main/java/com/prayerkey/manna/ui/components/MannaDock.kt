@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.components
 
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.ui.draw.drawBehind
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.Spring
@@ -58,7 +59,7 @@ data class DockItem(
     val label: String,
     val icon: ImageVector? = null,
     /** A drawn mark, tinted like a glyph. The Pray tab wears the key. */
-    @androidx.annotation.DrawableRes val mark: Int? = null,
+    val mark: DrawableResource? = null,
 )
 
 /**
@@ -211,7 +212,7 @@ fun MannaDock(
                         ) {
                             if (item.mark != null) {
                                 androidx.compose.foundation.Image(
-                                    androidx.compose.ui.res.painterResource(item.mark),
+                                    org.jetbrains.compose.resources.painterResource(item.mark),
                                     contentDescription = null,
                                     colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(tint),
                                     modifier = Modifier.size(23.dp).scale(iconScale),

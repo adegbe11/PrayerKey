@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.book
 
+import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,8 +20,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import com.prayerkey.manna.R
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.runtime.setValue
@@ -87,7 +87,7 @@ fun BibleCover(onOpen: () -> Unit, modifier: Modifier = Modifier) {
         // photograph competed with its border and made the cover look pasted
         // onto another book.
         Image(
-            painter = painterResource(R.drawable.bible_cover_red),
+            painter = painterResource(Res.drawable.bible_cover_red),
             contentDescription = "The Holy Bible cover",
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize(),

@@ -2,13 +2,11 @@ package com.prayerkey.manna.ui.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 
 /**
  * The palette, the spacing scale and the type scale. One source for all three.
@@ -151,14 +149,7 @@ object Pk {
  *
  * SIL Open Font License; see app/licenses/Spectral-OFL.txt.
  */
-val Spectral = FontFamily(
-    Font(R.font.spectral_light, FontWeight.Light),
-    Font(R.font.spectral_light_italic, FontWeight.Light, FontStyle.Italic),
-    Font(R.font.spectral_regular, FontWeight.Normal),
-    Font(R.font.spectral_italic, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.spectral_medium, FontWeight.Medium),
-    Font(R.font.spectral_semi_bold, FontWeight.SemiBold),
-)
+val Spectral: FontFamily get() = PkFonts.spectral
 
 /**
  * Six named styles. Screens use these and never set a font size.
@@ -170,7 +161,7 @@ val Spectral = FontFamily(
 object PkText {
 
     /** PRAYERKEY. The strongest type in the app. */
-    val Brand = TextStyle(
+    val Brand: TextStyle get() = TextStyle(
         fontFamily = Spectral, fontSize = 23.sp,
         fontWeight = FontWeight.Medium, letterSpacing = 3.2.sp,
     )
@@ -181,49 +172,49 @@ object PkText {
      * They were tracked capitals at 11sp. Sentence case at 13sp reads at a
      * glance and stops every section shouting at the writing under it.
      */
-    val SectionLabel = TextStyle(
+    val SectionLabel: TextStyle get() = TextStyle(
         fontFamily = Spectral, fontSize = 13.sp,
         fontWeight = FontWeight.Medium, letterSpacing = 0.sp,
     )
 
     /** The dated headline. */
-    val Display = TextStyle(
+    val Display: TextStyle get() = TextStyle(
         fontFamily = Spectral, fontSize = 34.sp, lineHeight = 39.sp,
         fontWeight = FontWeight.Medium, letterSpacing = (-0.2).sp,
     )
 
     /** A card's own heading. */
-    val CardTitle = TextStyle(
+    val CardTitle: TextStyle get() = TextStyle(
         fontFamily = Spectral, fontSize = 17.sp,
         fontWeight = FontWeight.SemiBold,
     )
 
     /** A row's name. */
-    val RowTitle = TextStyle(
+    val RowTitle: TextStyle get() = TextStyle(
         fontFamily = Spectral, fontSize = 17.sp,
         fontWeight = FontWeight.Normal,
     )
 
     /** Minutes, counts, states. 11sp, not 10 — tiny metadata still has to be read. */
-    val Meta = TextStyle(
+    val Meta: TextStyle get() = TextStyle(
         fontFamily = Spectral, fontSize = 11.sp,
         fontWeight = FontWeight.Medium, letterSpacing = 1.2.sp,
     )
 
     /** Scripture, and the devotional quote. Light italic: quoted speech. */
-    val Scripture = TextStyle(
+    val Scripture: TextStyle get() = TextStyle(
         fontFamily = Spectral, fontSize = 19.sp, lineHeight = 28.sp,
         fontWeight = FontWeight.Light, fontStyle = FontStyle.Italic,
     )
 
     /** A verse reference. */
-    val Reference = TextStyle(
+    val Reference: TextStyle get() = TextStyle(
         fontFamily = Spectral, fontSize = 12.sp,
         fontWeight = FontWeight.Medium, letterSpacing = 1.4.sp,
     )
 
     /** Under a nav glyph. */
-    val NavLabel = TextStyle(
+    val NavLabel: TextStyle get() = TextStyle(
         fontFamily = Spectral, fontSize = 10.sp,
         fontWeight = FontWeight.Normal, letterSpacing = 1.sp,
     )

@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.morning
 
+import com.prayerkey.manna.resources.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,7 +65,7 @@ fun NightPrayerScreen(onClose: () -> Unit) {
         voice = voice,
         speaking = speaking.value,
         colophon = "Morning Prayer opens at first light.",
-        background = com.prayerkey.manna.R.drawable.today_prayer_violet,
+        background = Res.drawable.today_prayer_violet,
         onClose = onClose,
         length = "Two minutes. Short enough to learn by heart.",
         scale = NightScale,
@@ -111,7 +112,7 @@ fun MidnightPrayerScreen(onClose: () -> Unit) {
         voice = voice,
         speaking = speaking.value,
         colophon = "Morning Prayer opens at first light.\nSleep now. The watch is His.",
-        background = com.prayerkey.manna.R.drawable.today_prayer_violet,
+        background = Res.drawable.today_prayer_violet,
         onClose = onClose,
         length = "Twelve to three. Pray it standing, and pray it out loud.",
         trailing = { Lamp(day, palette) { day = !day } },

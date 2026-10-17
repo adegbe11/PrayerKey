@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.challenge
 
+import com.prayerkey.manna.resources.*
 import kotlinx.datetime.toKotlinLocalDate
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
@@ -73,14 +74,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.data.CHALLENGE_FOCUSES
 import com.prayerkey.manna.data.CHALLENGE_LENGTHS
 import com.prayerkey.manna.data.ChallengePractice
@@ -305,7 +305,7 @@ private fun Welcome(onClose: () -> Unit, onContinue: () -> Unit) {
                     .clip(RoundedCornerShape(28.dp)),
             ) {
                 Image(
-                    painterResource(R.drawable.welcome_prayer_dawn), null,
+                    painterResource(Res.drawable.welcome_prayer_dawn), null,
                     Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
                 )
                 Box(
@@ -900,7 +900,7 @@ private fun PrayingSession(
 
     Box(Modifier.fillMaxSize()) {
         Image(
-            painterResource(R.drawable.rhythm_reflection), null,
+            painterResource(Res.drawable.rhythm_reflection), null,
             Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
         )
         Box(
@@ -1280,7 +1280,7 @@ fun StartChallengeCard(started: Boolean, day: Int, of: Int, onOpen: () -> Unit) 
         Modifier.fillMaxWidth().height(168.dp).clip(RoundedCornerShape(28.dp)).clickable(onClick = onOpen),
     ) {
         Image(
-            painterResource(R.drawable.discovery_cover_5), null,
+            painterResource(Res.drawable.discovery_cover_5), null,
             Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
         )
         Box(

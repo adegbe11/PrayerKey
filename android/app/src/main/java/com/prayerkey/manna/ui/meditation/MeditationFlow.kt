@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui.meditation
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.prayerkey.manna.resources.*
 import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -69,14 +71,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.data.Ambience
 import com.prayerkey.manna.data.MEDITATION_MINUTES
 import com.prayerkey.manna.data.MeditationFocus
@@ -209,7 +210,7 @@ private fun Welcome(onClose: () -> Unit, onStart: () -> Unit) {
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         Box(Modifier.fillMaxWidth().aspectRatio(.9f)) {
             Image(
-                painterResource(R.drawable.rhythm_reflection), null,
+                painterResource(Res.drawable.rhythm_reflection), null,
                 Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
             )
             Box(
@@ -405,13 +406,13 @@ private fun VoiceStep(
 
 // ── 5. what you hear under it ───────────────────────────────────────────
 
-private fun artOf(a: Ambience): Int? = when (a) {
+private fun artOf(a: Ambience): DrawableResource? = when (a) {
     Ambience.NONE -> null
-    Ambience.NATURE -> R.drawable.discovery_cover_5
-    Ambience.RAIN -> R.drawable.onboarding_prayer
-    Ambience.OCEAN -> R.drawable.discovery_cover_2
-    Ambience.PIANO -> R.drawable.rhythm_evening
-    Ambience.HARP -> R.drawable.discovery_cover_4
+    Ambience.NATURE -> Res.drawable.discovery_cover_5
+    Ambience.RAIN -> Res.drawable.onboarding_prayer
+    Ambience.OCEAN -> Res.drawable.discovery_cover_2
+    Ambience.PIANO -> Res.drawable.rhythm_evening
+    Ambience.HARP -> Res.drawable.discovery_cover_4
 }
 
 @Composable
@@ -590,7 +591,7 @@ private fun Session(
 
     Box(Modifier.fillMaxSize()) {
         Image(
-            painterResource(artOf(setup.ambience) ?: R.drawable.rhythm_reflection), null,
+            painterResource(artOf(setup.ambience) ?: Res.drawable.rhythm_reflection), null,
             Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
         )
         Box(
@@ -969,7 +970,7 @@ fun MeditationCard(onOpen: () -> Unit) {
         Modifier.fillMaxWidth().height(168.dp).clip(RoundedCornerShape(28.dp)).clickable(onClick = onOpen),
     ) {
         Image(
-            painterResource(R.drawable.rhythm_reflection), null,
+            painterResource(Res.drawable.rhythm_reflection), null,
             Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
         )
         Box(

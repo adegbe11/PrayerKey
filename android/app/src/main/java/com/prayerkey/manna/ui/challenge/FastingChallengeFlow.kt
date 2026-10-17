@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.challenge
 
+import com.prayerkey.manna.resources.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -66,14 +67,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.data.FAST_PURPOSES
 import com.prayerkey.manna.data.FastLength
 import com.prayerkey.manna.data.FastType
@@ -583,7 +583,7 @@ private fun ActiveFast(
 
     Box(Modifier.fillMaxSize()) {
         Image(
-            painterResource(R.drawable.rhythm_morning), null,
+            painterResource(Res.drawable.rhythm_morning), null,
             Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
         )
         Box(
@@ -735,7 +735,7 @@ private fun FastPrayer(fast: FastingChallenge, onClose: () -> Unit, onPrayed: ()
 
     Box(Modifier.fillMaxSize()) {
         Image(
-            painterResource(R.drawable.onboarding_pray_v3), null,
+            painterResource(Res.drawable.onboarding_pray_v3), null,
             Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
         )
         Box(Modifier.fillMaxSize().background(Pk.DeepDark.copy(alpha = .88f)))
@@ -955,7 +955,7 @@ private fun BreakingFast(fast: FastingChallenge, onBack: () -> Unit, onBreak: (I
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()) {
         Box(Modifier.fillMaxWidth().height(230.dp)) {
             Image(
-                painterResource(R.drawable.rhythm_evening), null,
+                painterResource(Res.drawable.rhythm_evening), null,
                 Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
             )
             Box(Modifier.fillMaxSize().background(Pk.DeepDark.copy(alpha = .58f)))
@@ -1035,7 +1035,7 @@ private fun FastComplete(
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()) {
         Box(Modifier.fillMaxWidth().height(240.dp)) {
             Image(
-                painterResource(R.drawable.discovery_cover_4), null,
+                painterResource(Res.drawable.discovery_cover_4), null,
                 Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
             )
             Box(Modifier.fillMaxSize().background(Pk.DeepDark.copy(alpha = .52f)))
@@ -1132,7 +1132,7 @@ fun StartFastCard(running: Boolean, title: String, day: Int, of: Int, onOpen: ()
         Modifier.fillMaxWidth().height(168.dp).clip(RoundedCornerShape(28.dp)).clickable(onClick = onOpen),
     ) {
         Image(
-            painterResource(R.drawable.rhythm_morning), null,
+            painterResource(Res.drawable.rhythm_morning), null,
             Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
         )
         Box(

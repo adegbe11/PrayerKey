@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui.home
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.prayerkey.manna.resources.*
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -25,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.background
 import androidx.compose.ui.draw.clip
@@ -223,13 +225,13 @@ private fun ProgrammeSetup(spec: FaithProgramme, selected: String, hour: Int, on
 }
 
 /** Each programme gets a face, so the landing continues the card that opened it. */
-private fun programmeArt(title: String): Int = when (title) {
-    "Prayer points" -> com.prayerkey.manna.R.drawable.discovery_cover_1
-    "Fasting" -> com.prayerkey.manna.R.drawable.discovery_cover_3
-    "Memory verse" -> com.prayerkey.manna.R.drawable.discovery_cover_2
-    "Midnight prayer" -> com.prayerkey.manna.R.drawable.discovery_cover_4
-    "Warfare prayer" -> com.prayerkey.manna.R.drawable.discovery_cover_5
-    else -> com.prayerkey.manna.R.drawable.discovery_cover_6
+private fun programmeArt(title: String): DrawableResource = when (title) {
+    "Prayer points" -> Res.drawable.discovery_cover_1
+    "Fasting" -> Res.drawable.discovery_cover_3
+    "Memory verse" -> Res.drawable.discovery_cover_2
+    "Midnight prayer" -> Res.drawable.discovery_cover_4
+    "Warfare prayer" -> Res.drawable.discovery_cover_5
+    else -> Res.drawable.discovery_cover_6
 }
 
 @Composable

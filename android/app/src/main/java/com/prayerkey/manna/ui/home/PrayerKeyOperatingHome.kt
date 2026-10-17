@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui.home
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.prayerkey.manna.resources.*
 import kotlinx.datetime.toKotlinLocalDate
 import com.prayerkey.manna.ui.theme.pressable
 import androidx.compose.material.icons.outlined.VolunteerActivism
@@ -60,7 +62,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -73,7 +75,6 @@ import com.prayerkey.manna.data.Challenge
 import com.prayerkey.manna.data.Devotion
 import com.prayerkey.manna.data.PrayerKeyApi
 import com.prayerkey.manna.data.passageFor
-import com.prayerkey.manna.R
 import com.prayerkey.manna.model.VerseCard
 import com.prayerkey.manna.share.CardShareRenderer
 import com.prayerkey.manna.ui.theme.DisplaySerif
@@ -1012,7 +1013,7 @@ private fun ContinueRow(icon: ImageVector, title: String, detail: String, open: 
 private data class HomeShortcut(
     val label: String,
     val icon: ImageVector,
-    val image: Int,
+    val image: DrawableResource,
     val badge: String? = null,
     val open: () -> Unit,
 )
@@ -1026,9 +1027,9 @@ private data class HomeShortcut(
     challenges: () -> Unit,
 ) {
     val shortcuts = listOf(
-        HomeShortcut("Today", Icons.Outlined.WbSunny, R.drawable.prayerkey_hero_dawn, todayBadge, todayPulls),
-        HomeShortcut("Pray now", Icons.Outlined.Bolt, R.drawable.onboarding_pray_v3, open = prayNow),
-        HomeShortcut("Challenges", Icons.Outlined.LocalFireDepartment, R.drawable.discovery_cover_3, open = challenges),
+        HomeShortcut("Today", Icons.Outlined.WbSunny, Res.drawable.prayerkey_hero_dawn, todayBadge, todayPulls),
+        HomeShortcut("Pray now", Icons.Outlined.Bolt, Res.drawable.onboarding_pray_v3, open = prayNow),
+        HomeShortcut("Challenges", Icons.Outlined.LocalFireDepartment, Res.drawable.discovery_cover_3, open = challenges),
     )
     Row(
         Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 2.dp).padding(bottom = 14.dp),
@@ -1114,7 +1115,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
            behind them. Held to a third of the card's height, so the frame
            never runs out of photograph to show. */
         Image(
-            painterResource(R.drawable.prayerkey_hero_dawn), null,
+            painterResource(Res.drawable.prayerkey_hero_dawn), null,
             Modifier.fillMaxSize().graphicsLayer {
                 // read here, in the layer, so a scroll only redraws the picture
                 val drift = (scrolled() * .34f).coerceAtMost(150f)
@@ -1178,7 +1179,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     ) {
         Box(Modifier.fillMaxWidth().aspectRatio(.56f)) {
             Image(
-                painterResource(R.drawable.verse_card_oxblood), null,
+                painterResource(Res.drawable.verse_card_oxblood), null,
                 Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
             )
             Column(
@@ -1233,11 +1234,11 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(30.dp), color = Pk.DeepDark, shadowElevation = 5.dp) {
         // sized to the prayer: a fixed 470dp left a band of empty violet under the buttons
         Box(Modifier.fillMaxWidth()) {
-            Image(painterResource(R.drawable.today_prayer_violet), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
+            Image(painterResource(Res.drawable.today_prayer_violet), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
             Box(Modifier.matchParentSize().background(Brush.verticalGradient(listOf(Pk.DeepDark.copy(alpha = .16f), Pk.DeepDark.copy(alpha = .52f), Pk.DeepDark.copy(alpha = .90f)))))
             Column(Modifier.fillMaxWidth().padding(horizontal = 23.dp, vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 // the PrayerKey mark - hands at prayer - not a meditation pose
-                Image(painterResource(R.drawable.prayerkey_mark), null, Modifier.padding(top = 4.dp).size(38.dp))
+                Image(painterResource(Res.drawable.prayerkey_mark), null, Modifier.padding(top = 4.dp).size(38.dp))
                 /* Its own title, then the prayer entire.
                    The card used to say "Morning prayer" over two hundred
                    words cut off at eleven lines with three dots - a prayer
@@ -1297,7 +1298,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                 .clip(RoundedCornerShape(27.dp)).clickable(onClick = open),
         ) {
             Image(
-                painterResource(R.drawable.closing_verse_violet), null,
+                painterResource(Res.drawable.closing_verse_violet), null,
                 Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
             )
             Box(
@@ -1311,7 +1312,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
             /* The Bible is a physical object here, not an icon. Its edge,
                leather and gold type make the feature feel worth opening. */
             Image(
-                painterResource(R.drawable.bible_cover_red), "Holy Bible",
+                painterResource(Res.drawable.bible_cover_red), "Holy Bible",
                 Modifier.align(Alignment.CenterStart).padding(start = 18.dp)
                     .width(118.dp).height(196.dp)
                     .shadow(14.dp, RoundedCornerShape(9.dp), spotColor = Color.Black.copy(alpha = .7f))
@@ -1783,15 +1784,15 @@ private data class RhythmRow(
 )
 
 /** The picture each part of the day wears. */
-private fun artOf(id: String): Int = when (id) {
+private fun artOf(id: String): DrawableResource = when (id) {
     // not the devotional hero's picture: the two sit one above the other
-    "devotional" -> R.drawable.today_manuscript_hero
-    "bible" -> R.drawable.onboarding_read_v3
-    "morning" -> R.drawable.welcome_prayer_dawn
-    "afternoon" -> R.drawable.discovery_cover_4
-    "evening" -> R.drawable.rhythm_evening
-    "night" -> R.drawable.onboarding_prayer
-    else -> R.drawable.rhythm_reflection
+    "devotional" -> Res.drawable.today_manuscript_hero
+    "bible" -> Res.drawable.onboarding_read_v3
+    "morning" -> Res.drawable.welcome_prayer_dawn
+    "afternoon" -> Res.drawable.discovery_cover_4
+    "evening" -> Res.drawable.rhythm_evening
+    "night" -> Res.drawable.onboarding_prayer
+    else -> Res.drawable.rhythm_reflection
 }
 
 /**
@@ -2322,7 +2323,7 @@ private fun ExplorePrayerKeyScreen(
 }
 
 @Composable private fun OriginalProgrammeCard(item: Feature, index: Int, open: () -> Unit) {
-    val cover = listOf(R.drawable.discovery_cover_2, R.drawable.discovery_cover_4, R.drawable.discovery_cover_6)[index % 3]
+    val cover = listOf(Res.drawable.discovery_cover_2, Res.drawable.discovery_cover_4, Res.drawable.discovery_cover_6)[index % 3]
     Surface(
         Modifier.fillMaxWidth().height(188.dp).clickable(onClick = open),
         shape = RoundedCornerShape(26.dp), color = Pk.DeepDark, shadowElevation = 5.dp,
@@ -2386,12 +2387,12 @@ private fun hubTint(hub: Hub): Color = when (hub) {
     ) {
         Box(Modifier.fillMaxSize()) {
             val cover = when (index % 6) {
-                0 -> R.drawable.discovery_cover_1
-                1 -> R.drawable.discovery_cover_2
-                2 -> R.drawable.discovery_cover_3
-                3 -> R.drawable.discovery_cover_4
-                4 -> R.drawable.discovery_cover_5
-                else -> R.drawable.discovery_cover_6
+                0 -> Res.drawable.discovery_cover_1
+                1 -> Res.drawable.discovery_cover_2
+                2 -> Res.drawable.discovery_cover_3
+                3 -> Res.drawable.discovery_cover_4
+                4 -> Res.drawable.discovery_cover_5
+                else -> Res.drawable.discovery_cover_6
             }
             Image(
                 painterResource(cover), null,

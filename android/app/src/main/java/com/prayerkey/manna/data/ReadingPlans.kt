@@ -1,5 +1,6 @@
 package com.prayerkey.manna.data
 
+import org.jetbrains.compose.resources.DrawableResource
 import android.content.Context
 import androidx.annotation.DrawableRes
 import java.time.LocalDate
@@ -39,7 +40,7 @@ data class ReadingPlanDef(
     val blurb: String,
     val verse: String,
     val verseRef: String,
-    @DrawableRes val art: Int,
+    val art: DrawableResource,
     val days: List<PlanDay>,
 ) {
     val length: Int get() = days.size

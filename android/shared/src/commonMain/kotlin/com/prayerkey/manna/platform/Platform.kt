@@ -41,3 +41,6 @@ expect fun PlatformContext.keyValues(name: String): KeyValues
 
 /** A file shipped inside the app (the prayers, the Bible, the devotionals), or null. */
 expect fun PlatformContext.readAsset(path: String): String?
+
+/** Where file reads run: the IO pool on phones; the web has none and uses Default. */
+expect val ioDispatcher: kotlinx.coroutines.CoroutineDispatcher

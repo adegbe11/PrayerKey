@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui.screens
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -21,7 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -32,7 +34,6 @@ import com.prayerkey.manna.data.PrayerTopic
 import com.prayerkey.manna.ui.theme.R
 import com.prayerkey.manna.ui.worlds.VerseWorld
 import com.prayerkey.manna.ui.theme.BookSerif
-import com.prayerkey.manna.R as AppR
 
 private val Ivory = Color(0xFFFDFBF7)
 private val PrayerInk = Color(0xFF241D28)
@@ -140,20 +141,20 @@ fun PrayerDeckFace(
 
 /** The same realistic paper-card world used by the Bible deck. Categories
  * stay visually stable, while individual prayers rotate the scene subtly. */
-private fun prayerArtwork(category: String, slug: String): Int {
+private fun prayerArtwork(category: String, slug: String): DrawableResource {
     val c = category.lowercase()
     return when {
         c.contains("marriage") || c.contains("family") || c.contains("relationship") ->
-            AppR.drawable.verse_card_botanical
+            Res.drawable.verse_card_botanical
         c.contains("grief") || c.contains("mental") || c.contains("night") || c.contains("protection") ->
-            AppR.drawable.verse_card_oxblood
+            Res.drawable.verse_card_oxblood
         c.contains("health") || c.contains("healing") || c.contains("thank") || c.contains("celebration") ->
-            AppR.drawable.verse_card_dawn
+            Res.drawable.verse_card_dawn
         else -> {
-            val cards = intArrayOf(
-                AppR.drawable.verse_card_botanical,
-                AppR.drawable.verse_card_dawn,
-                AppR.drawable.verse_card_oxblood,
+            val cards = listOf(
+                Res.drawable.verse_card_botanical,
+                Res.drawable.verse_card_dawn,
+                Res.drawable.verse_card_oxblood,
             )
             cards[(slug.hashCode() and Int.MAX_VALUE) % cards.size]
         }

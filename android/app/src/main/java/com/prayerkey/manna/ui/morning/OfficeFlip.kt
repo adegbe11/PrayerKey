@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.morning
 
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -12,7 +13,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import android.view.HapticFeedbackConstants
 import com.prayerkey.manna.ui.book.FoldedPage
 import kotlinx.coroutines.launch
@@ -148,7 +149,7 @@ fun OfficeFlip(
     /** Night Prayer closes with the wake panel. */
     closeExtra: @Composable () -> Unit = {},
     /** The brand artwork behind the office, or null for plain paper. */
-    background: Int? = null,
+    background: DrawableResource? = null,
     scale: OfficeScale = DayScale,
     after: Map<String, String> = emptyMap(),
     /** Evening hangs its Day/Night switch here. */
@@ -324,7 +325,7 @@ private fun OfficeLeafHost(
     onStopVoice: () -> Unit,
     closeExtra: @Composable () -> Unit,
     extra: @Composable (String) -> Unit,
-    background: Int?,
+    background: DrawableResource?,
 ) {
     /*
      * The ground belongs to the leaf.

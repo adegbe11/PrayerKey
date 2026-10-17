@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.bibleplan
 
+import com.prayerkey.manna.resources.*
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.speech.tts.TextToSpeech
@@ -69,7 +70,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -80,7 +81,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.data.BibleVerse
 import com.prayerkey.manna.data.OfflineBible
 import com.prayerkey.manna.data.PlanDay
@@ -293,7 +293,7 @@ private fun Welcome(onClose: () -> Unit, onBrowse: () -> Unit) {
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
         Box(Modifier.fillMaxWidth().aspectRatio(1.05f)) {
             Image(
-                painterResource(R.drawable.onboarding_read_v3), null,
+                painterResource(Res.drawable.onboarding_read_v3), null,
                 Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
             )
             Box(
@@ -1057,7 +1057,7 @@ fun BiblePlanCard(refresh: Int, onOpen: () -> Unit) {
         Modifier.fillMaxWidth().height(168.dp).clip(RoundedCornerShape(28.dp)).clickable(onClick = onOpen),
     ) {
         Image(
-            painterResource(plan?.art ?: R.drawable.onboarding_read_v3), null,
+            painterResource(plan?.art ?: Res.drawable.onboarding_read_v3), null,
             Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
         )
         Box(

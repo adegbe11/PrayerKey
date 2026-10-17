@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.morning
 
+import com.prayerkey.manna.resources.*
 import kotlinx.datetime.toKotlinLocalDate
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -76,7 +77,7 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
         speaking = speaking.value,
         colophon = "Morning Prayer opens at first light.\nTomorrow runs the other way — enter, praise,\nconfess, thank, and walk out into it.",
         finishLabel = "Finish prayer",
-        background = com.prayerkey.manna.R.drawable.today_prayer_violet,
+        background = Res.drawable.today_prayer_violet,
         onClose = onClose,
         onFinish = {
             context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)

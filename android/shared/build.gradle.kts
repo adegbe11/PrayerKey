@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 // The code PrayerKey shares between Android and iPhone: the prayers, the
@@ -19,13 +20,16 @@ kotlin {
     // Builds on Windows with no Java at all, exactly as iPhone will: the check
     // that nothing Java-only has slipped into the shared code.
     mingwX64()
+    // The screens module builds for the web as its no-Java check, so this does too.
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs { browser() }
 
     sourceSets {
         commonMain.dependencies {
             // api: shared functions take and return these dates, so the app sees them too
             api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+            api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

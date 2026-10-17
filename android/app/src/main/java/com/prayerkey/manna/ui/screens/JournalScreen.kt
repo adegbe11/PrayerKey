@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,7 +17,7 @@ import android.net.Uri
 import android.view.WindowManager
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Image
@@ -643,7 +644,7 @@ private fun JournalOverview(
                 .background(Pk.DeepDark).clickable(onClick = onWrite),
         ) {
             Image(
-                painterResource(com.prayerkey.manna.R.drawable.today_manuscript_hero),
+                painterResource(Res.drawable.today_manuscript_hero),
                 contentDescription = null,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop,

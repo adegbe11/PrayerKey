@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui.journal
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.prayerkey.manna.resources.*
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -47,14 +49,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.data.JOURNAL_TEMPLATES
 import com.prayerkey.manna.data.JournalTemplate
 import com.prayerkey.manna.data.TEMPLATE_COLLECTIONS
@@ -72,38 +73,38 @@ import com.prayerkey.manna.ui.theme.UtilitySans
  * opens its collection as the same wall, one tile per template. Search
  * answers with tiles too, so the page never changes shape under the reader.
  */
-private data class Look(val colour: Color, @DrawableRes val art: Int)
+private data class Look(val colour: Color, val art: DrawableResource)
 
 private val LOOKS = mapOf(
-    "Prayer" to Look(Color(0xFF6200ED), R.drawable.onboarding_pray_v3),
-    "Daily walk" to Look(Color(0xFFE0782F), R.drawable.welcome_prayer_dawn),
-    "Bible & Scripture" to Look(Color(0xFF2F4FA8), R.drawable.discovery_cover_2),
-    "Answered prayer" to Look(Color(0xFFD69A12), R.drawable.discovery_cover_4),
-    "Gratitude" to Look(Color(0xFFD9406E), R.drawable.discovery_cover_3),
-    "Reflection" to Look(Color(0xFF3C6FB0), R.drawable.rhythm_reflection),
-    "Spiritual warfare" to Look(Color(0xFF7A1FA2), R.drawable.discovery_cover_1),
-    "Spiritual growth" to Look(Color(0xFF2E9459), R.drawable.discovery_cover_5),
-    "Difficult seasons" to Look(Color(0xFF475C84), R.drawable.onboarding_prayer),
-    "Family" to Look(Color(0xFFE25A45), R.drawable.discovery_cover_6),
-    "Purpose & decisions" to Look(Color(0xFF178A86), R.drawable.closing_verse_violet),
-    "Dreams & notes" to Look(Color(0xFF2E2A7A), R.drawable.rhythm_evening),
-    "Sermon & church" to Look(Color(0xFF9C4A1C), R.drawable.onboarding_church_v3),
+    "Prayer" to Look(Color(0xFF6200ED), Res.drawable.onboarding_pray_v3),
+    "Daily walk" to Look(Color(0xFFE0782F), Res.drawable.welcome_prayer_dawn),
+    "Bible & Scripture" to Look(Color(0xFF2F4FA8), Res.drawable.discovery_cover_2),
+    "Answered prayer" to Look(Color(0xFFD69A12), Res.drawable.discovery_cover_4),
+    "Gratitude" to Look(Color(0xFFD9406E), Res.drawable.discovery_cover_3),
+    "Reflection" to Look(Color(0xFF3C6FB0), Res.drawable.rhythm_reflection),
+    "Spiritual warfare" to Look(Color(0xFF7A1FA2), Res.drawable.discovery_cover_1),
+    "Spiritual growth" to Look(Color(0xFF2E9459), Res.drawable.discovery_cover_5),
+    "Difficult seasons" to Look(Color(0xFF475C84), Res.drawable.onboarding_prayer),
+    "Family" to Look(Color(0xFFE25A45), Res.drawable.discovery_cover_6),
+    "Purpose & decisions" to Look(Color(0xFF178A86), Res.drawable.closing_verse_violet),
+    "Dreams & notes" to Look(Color(0xFF2E2A7A), Res.drawable.rhythm_evening),
+    "Sermon & church" to Look(Color(0xFF9C4A1C), Res.drawable.onboarding_church_v3),
 )
 
 /** Every template tile gets its own picture, in its collection's colour. */
 private val ART = listOf(
-    R.drawable.onboarding_pray_v3, R.drawable.welcome_prayer_dawn, R.drawable.discovery_cover_2,
-    R.drawable.discovery_cover_4, R.drawable.discovery_cover_3, R.drawable.rhythm_reflection,
-    R.drawable.discovery_cover_1, R.drawable.discovery_cover_5, R.drawable.onboarding_prayer,
-    R.drawable.discovery_cover_6, R.drawable.closing_verse_violet, R.drawable.rhythm_evening,
-    R.drawable.onboarding_church_v3, R.drawable.rhythm_morning, R.drawable.prayerkey_hero_dawn,
-    R.drawable.onboarding_read_v3, R.drawable.onboarding_journal_v3, R.drawable.onboarding_audio_v3,
-    R.drawable.today_prayer_violet, R.drawable.prayerkey_discovery_world,
+    Res.drawable.onboarding_pray_v3, Res.drawable.welcome_prayer_dawn, Res.drawable.discovery_cover_2,
+    Res.drawable.discovery_cover_4, Res.drawable.discovery_cover_3, Res.drawable.rhythm_reflection,
+    Res.drawable.discovery_cover_1, Res.drawable.discovery_cover_5, Res.drawable.onboarding_prayer,
+    Res.drawable.discovery_cover_6, Res.drawable.closing_verse_violet, Res.drawable.rhythm_evening,
+    Res.drawable.onboarding_church_v3, Res.drawable.rhythm_morning, Res.drawable.prayerkey_hero_dawn,
+    Res.drawable.onboarding_read_v3, Res.drawable.onboarding_journal_v3, Res.drawable.onboarding_audio_v3,
+    Res.drawable.today_prayer_violet, Res.drawable.prayerkey_discovery_world,
 )
 
-private fun lookOf(collection: String) = LOOKS[collection] ?: Look(Pk.Oxblood, R.drawable.onboarding_pray_v3)
+private fun lookOf(collection: String) = LOOKS[collection] ?: Look(Pk.Oxblood, Res.drawable.onboarding_pray_v3)
 
-private fun artOf(t: JournalTemplate): Int {
+private fun artOf(t: JournalTemplate): DrawableResource {
     val inCollection = JOURNAL_TEMPLATES.filter { it.collection == t.collection }
     val base = ART.indexOf(lookOf(t.collection).art).coerceAtLeast(0)
     return ART[(base + inCollection.indexOf(t).coerceAtLeast(0)) % ART.size]
@@ -249,7 +250,7 @@ private fun Featured(t: JournalTemplate, onPick: (JournalTemplate) -> Unit) {
     ) {
         Box(Modifier.fillMaxWidth().aspectRatio(1.55f).clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))) {
             Image(
-                painterResource(R.drawable.prayerkey_discovery_world), null,
+                painterResource(Res.drawable.prayerkey_discovery_world), null,
                 Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
             )
             Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, look.colour.copy(alpha = .55f)))))
@@ -280,7 +281,7 @@ private fun Featured(t: JournalTemplate, onPick: (JournalTemplate) -> Unit) {
 private fun Tile(
     label: String,
     colour: Color,
-    @DrawableRes art: Int,
+    art: DrawableResource,
     /** What is behind the tile - "15 templates". Blank on a template itself. */
     meta: String = "",
     onClick: () -> Unit,

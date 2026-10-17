@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.getValue
@@ -32,12 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.prayerkey.manna.R
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
@@ -98,7 +98,7 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
         onDone(reminders, hour)
     }
     Box(Modifier.fillMaxSize().background(Pk.DeepDark)) {
-        Image(painterResource(R.drawable.welcome_prayer_dawn), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
+        Image(painterResource(Res.drawable.welcome_prayer_dawn), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
         Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = if (step == 3) .36f else .86f)))
         Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 24.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -151,7 +151,7 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
                                            This card is a picture of what will
                                            arrive in the shade, so it has to
                                            keep matching what actually does. */
-                                        Image(painterResource(R.drawable.prayerkey_mark), null, Modifier.size(34.dp))
+                                        Image(painterResource(Res.drawable.prayerkey_mark), null, Modifier.size(34.dp))
                                         Text("PrayerKey", Modifier.padding(start = 12.dp), color = Pk.Crisp, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold)
                                     }
                                     Text("Time for prayer", Modifier.padding(top = 18.dp), color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 24.sp)

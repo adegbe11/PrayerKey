@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui
 
+import com.prayerkey.manna.resources.*
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.togetherWith
 import com.prayerkey.manna.ui.theme.glassSource
 import androidx.compose.animation.AnimatedContent
@@ -55,7 +57,7 @@ import com.prayerkey.manna.ui.theme.Canvas
 import com.prayerkey.manna.ui.theme.Electric
 import com.prayerkey.manna.ui.theme.Muted
 
-private data class Destination(val label: String, val icon: ImageVector, val mark: Int? = null)
+private data class Destination(val label: String, val icon: ImageVector, val mark: DrawableResource? = null)
 
 @Composable
 fun MannaApp(
@@ -111,7 +113,7 @@ fun MannaApp(
         listOf(
             Destination("Home", Icons.Outlined.Home),
             Destination("Bible", Icons.Outlined.MenuBook),
-            Destination("Pray", Icons.Outlined.AutoAwesome, com.prayerkey.manna.R.drawable.ic_notification),
+            Destination("Pray", Icons.Outlined.AutoAwesome, Res.drawable.ic_notification),
             Destination("Church", Icons.Outlined.Church),
             Destination("Journal", Icons.Outlined.EditNote),
         )

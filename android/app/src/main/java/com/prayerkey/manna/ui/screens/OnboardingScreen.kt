@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.resources.*
 import android.view.HapticFeedbackConstants
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -182,7 +183,7 @@ private fun CardBackFace() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             // the brand's mark, matching the launcher icon and Home
             androidx.compose.foundation.Image(
-                androidx.compose.ui.res.painterResource(com.prayerkey.manna.R.drawable.prayerkey_mark),
+                org.jetbrains.compose.resources.painterResource(Res.drawable.prayerkey_mark),
                 contentDescription = null,
                 modifier = Modifier.size(44.dp),
             )

@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.morning
 
+import com.prayerkey.manna.resources.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -39,7 +40,7 @@ fun AfternoonPrayerScreen(onClose: () -> Unit) {
         voice = voice,
         speaking = speaking.value,
         colophon = "Evening Prayer opens when the work is down.\nReview, thanksgiving, confession, release, rest.",
-        background = com.prayerkey.manna.R.drawable.today_prayer_violet,
+        background = Res.drawable.today_prayer_violet,
         onClose = onClose,
         finishLabel = "Finish prayer",
         onFinish = {

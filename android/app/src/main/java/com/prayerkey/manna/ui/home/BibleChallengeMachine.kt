@@ -1,7 +1,7 @@
 package com.prayerkey.manna.ui.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Brush
 import android.app.TimePickerDialog
