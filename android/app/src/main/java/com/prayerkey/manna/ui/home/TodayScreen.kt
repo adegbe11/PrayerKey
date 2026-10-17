@@ -135,7 +135,7 @@ fun TodayScreen(
         Spacer(Modifier.height(Pk.S5))
 
         Text(
-            "VIEW CALENDAR & SAVED",
+            "View calendar & saved",
             color = Pk.Faint,
             style = PkText.SectionLabel,
             modifier = Modifier
@@ -146,7 +146,7 @@ fun TodayScreen(
 
         Spacer(Modifier.height(Pk.S4))
         Text(
-            LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM uuuu")).uppercase(),
+            LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM uuuu")),
             color = Pk.Muted,
             style = PkText.SectionLabel,
         )
@@ -208,7 +208,7 @@ fun TodayScreen(
                 Text(plan.quoteSource, color = Pk.Charcoal, style = PkText.CardTitle)
                 Spacer(Modifier.height(Pk.S3))
                 Text(
-                    "“${plan.quote}”",
+                    plan.quote,
                     color = Pk.Charcoal.copy(alpha = .9f),
                     style = PkText.Scripture,
                 )

@@ -190,7 +190,7 @@ fun RunningHead(
         ) { Icon(Icons.Outlined.Close, "Close", tint = palette.ink, modifier = Modifier.size(16.dp)) }
         Spacer(Modifier.width(8.dp))
         Text(
-            title.uppercase(),
+            title,
             fontFamily = BookSerif,
             fontStyle = FontStyle.Italic,
             fontSize = 13.sp,

@@ -78,7 +78,7 @@ fun DailyPrayerCard(prayer: DailyPrayer, entrance: Int, onComplete: () -> Unit) 
                 Modifier.fillMaxSize().padding(top = 78.dp, bottom = 20.dp)
                     .verticalScroll(rememberScrollState()).padding(horizontal = 26.dp),
             ) {
-                Text(prayer.title.uppercase(), color = world.onScene.copy(alpha = .72f), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp)
+                Text(prayer.title, color = world.onScene.copy(alpha = .72f), fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 Text(prayer.ref, color = world.onScene, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 7.dp))
                 Text(
                     prayer.prayer,
@@ -99,7 +99,7 @@ fun DailyPrayerCard(prayer: DailyPrayer, entrance: Int, onComplete: () -> Unit) 
                     Button(
                         onClick = onComplete, modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = world.onScene, contentColor = Color(0xFF101820)),
-                    ) { Text("COMPLETE", fontWeight = FontWeight.Bold) }
+                    ) { Text("Complete", fontWeight = FontWeight.Bold) }
                 }
                 Spacer(Modifier.height(18.dp))
             }

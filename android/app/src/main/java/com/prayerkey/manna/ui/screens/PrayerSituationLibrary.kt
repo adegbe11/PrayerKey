@@ -105,9 +105,19 @@ fun PrayerSituationLibrary(
                                     rotationZ = 7f; alpha = .92f
                                 }.clip(RoundedCornerShape(14.dp)),
                         )
-                        Box(Modifier.matchParentSize().background(Color.Black.copy(.10f)))
+                        // the tile's colour behind the words, fading off over the picture
+                        Box(
+                            Modifier.matchParentSize().background(
+                                androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                    0f to style.color, .55f to style.color.copy(alpha = .78f), 1f to Color.Transparent,
+                                ),
+                            ),
+                        )
+                        /* The whole width of the tile. The name was held to 84dp,
+                           which broke "Relationships" and "Celebration" in the
+                           middle of the word. */
                         Column(
-                            Modifier.align(Alignment.BottomStart).width(112.dp).padding(14.dp),
+                            Modifier.align(Alignment.BottomStart).fillMaxWidth().padding(14.dp),
                         ) {
                             Text(category, color = Color.White, fontSize = 16.sp, lineHeight = 19.sp,
                                 fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)

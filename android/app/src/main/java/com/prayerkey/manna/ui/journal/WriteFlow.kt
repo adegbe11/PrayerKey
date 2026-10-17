@@ -1,5 +1,14 @@
 package com.prayerkey.manna.ui.journal
 
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.runtime.key
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.border
+import androidx.compose.material.icons.outlined.EditNote
+import androidx.compose.material.icons.outlined.Lightbulb
 import android.content.Intent
 import android.app.DatePickerDialog
 import android.Manifest
@@ -151,76 +160,6 @@ data class WriteResult(
 )
 
 /**
- * The intercept sheet. Tapping Write never lands on a blank page — it lands
- * on things this person already did, turned into questions.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SuggestionSheet(
-    prompts: List<JournalSuggestions.Prompt>,
-    onPick: (JournalSuggestions.Prompt?) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    // the sheet follows the theme too, or a dark journal hands you a white
-    // card the moment you decide to write
-    val cs = MaterialTheme.colorScheme
-    val ink = cs.onBackground
-    val muted = cs.onSurfaceVariant
-    val accent = cs.primary
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = cs.background,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
-    ) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 34.dp)) {
-            Text("What do you want to write about?", color = ink, fontFamily = BookSerif, fontSize = 23.sp)
-
-            Text("TEMPLATES", color = muted, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 15.dp))
-            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                listOf(
-                    JournalSuggestions.Prompt("DAILY", "Reflect on the shape of today", "template", starter = "## Today\n\n## What I noticed\n\n## What I want to carry forward\n"),
-                    JournalSuggestions.Prompt("GRATITUDE", "Name the gifts hidden in this day", "template", starter = "## Three gifts\n\n1. \n2. \n3. \n\n## Why they mattered\n"),
-                    JournalSuggestions.Prompt("PRAYER", "Turn this page into an honest prayer", "template", suggestPrayer = true, starter = "## Praise\n\n## Confession\n\n## Request\n\n## Surrender\n"),
-                    JournalSuggestions.Prompt("SERMON", "Capture Scripture, truth, and response", "template", starter = "## Scripture\n\n## What I heard\n\n## One response\n- [ ] \n"),
-                ).forEach { template -> FilterChip(selected = false, onClick = { onPick(template) }, label = { Text(template.kicker, fontSize = 10.sp) }) }
-            }
-
-            prompts.forEach { prompt ->
-                Box(
-                    Modifier.fillMaxWidth().padding(bottom = 10.dp)
-                        .clip(R.card).background(cs.surface)
-                        .clickable { onPick(prompt) },
-                ) {
-                    Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
-                            Text(prompt.kicker, color = accent, fontSize = 9.5.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold)
-                            Text(prompt.text, color = ink, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 6.dp))
-                        }
-                        Icon(Icons.Outlined.KeyboardArrowRight, null, tint = muted)
-                    }
-                }
-            }
-
-            // the escape hatch, for people who already know what to say
-            Surface(
-                onClick = { onPick(null) },
-                shape = R.card, color = Color.Transparent,
-                border = BorderStroke(1.dp, cs.outlineVariant),
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-            ) {
-                Text(
-                    "Start from a blank page",
-                    fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = accent,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                )
-            }
-        }
-    }
-}
-
-/**
  * The editor. Three things earn their place here beyond a text box:
  * the canvas calms when the mood is heavy, references the person types are
  * recognised on device and offered as attachments, and an entry can be
@@ -253,6 +192,9 @@ fun WriteSheet(
      * The sheet performs the action it was asked for, once, as it opens.
      */
     openWith: String? = null,
+    /** Open the template gallery or the prompt packs instead of this blank page. */
+    onTemplates: (() -> Unit)? = null,
+    onPrompts: (() -> Unit)? = null,
     onDismiss: () -> Unit,
     onSubmit: (WriteResult) -> Unit,
     onDelete: (() -> Unit)? = null,
@@ -261,6 +203,11 @@ fun WriteSheet(
     var body by remember { mutableStateOf(initialBody.ifBlank { prompt?.starter.orEmpty() }) }
     var gratitude by remember { mutableStateOf(initialGratitude) }
     var isPrayer by remember { mutableStateOf(initialIsPrayer || prompt?.suggestPrayer == true) }
+    // a prompt chosen while this page is open lands on it
+    androidx.compose.runtime.LaunchedEffect(prompt) {
+        if (prompt != null && body.isBlank()) body = prompt.starter.orEmpty()
+        if (prompt?.suggestPrayer == true) isPrayer = true
+    }
     var title by remember { mutableStateOf(initialTitle) }
     var tags by remember { mutableStateOf(initialTags.joinToString(", ")) }
     var journal by remember { mutableStateOf(initialJournal) }
@@ -426,7 +373,7 @@ fun WriteSheet(
                 /* Done, in the accent, as text. A filled grey pill reading
                    SAVE was the heaviest object on an empty page and shouted at
                    somebody who had not written a word yet. */
-                val ready = body.isNotBlank()
+                val ready = body.isNotBlank() || title.isNotBlank() || media.isNotEmpty()
                 Text(
                     "Done",
                     color = if (ready) accent else muted.copy(alpha = .5f),
@@ -494,9 +441,12 @@ fun WriteSheet(
                 Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp),
             ) {
                 prompt?.let {
+                    // the question sits above the page as a tag, like a note clipped to it
                     Text(
-                        it.text, color = accent, fontSize = 12.5.sp, lineHeight = 19.sp,
-                        modifier = Modifier.padding(start = 4.dp, top = 2.dp, bottom = 2.dp),
+                        it.text, color = ink, fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(start = 4.dp, top = 6.dp, bottom = 4.dp)
+                            .clip(RoundedCornerShape(12.dp)).background(accent.copy(alpha = .09f))
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
                     )
                 }
 
@@ -533,7 +483,7 @@ fun WriteSheet(
 
                 AnimatedVisibility(detected.isNotEmpty()) {
                     Column(Modifier.padding(top = 10.dp)) {
-                        Text("SCRIPTURE YOU MENTIONED", color = muted, fontSize = 9.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold)
+                        Text("Scripture you mentioned", color = muted, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         Row(Modifier.padding(top = 7.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
                             detected.forEach { ref ->
                                 Surface(
@@ -555,16 +505,12 @@ fun WriteSheet(
                 if (media.isNotEmpty()) {
                     Row(
                         Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(top = 10.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        media.forEachIndexed { index, _ ->
-                            Surface(shape = RoundedCornerShape(10.dp), color = panel, border = BorderStroke(1.dp, line)) {
-                                Row(Modifier.padding(start = 10.dp, top = 7.dp, bottom = 7.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Outlined.InsertDriveFile, null, tint = accent, modifier = Modifier.size(16.dp))
-                                    Text(" " + (index + 1), color = ink, fontSize = 11.sp)
-                                    IconButton(onClick = { media = media.filterIndexed { i, _ -> i != index } }, modifier = Modifier.size(30.dp)) {
-                                        Icon(Icons.Outlined.Close, "Remove attachment", tint = muted, modifier = Modifier.size(15.dp))
-                                    }
+                        media.forEachIndexed { index, value ->
+                            key(value) {
+                                EditorAttachment(value, panel, line, accent) {
+                                    media = media.filterIndexed { i, _ -> i != index }
                                 }
                             }
                         }
@@ -624,7 +570,29 @@ fun WriteSheet(
              * prayer flag becomes a glyph that fills when it is on.
              */
             var marks by remember { mutableStateOf(false) }
+            /* A blank page offers four ways to begin, and steps aside at the
+               first letter typed - the page belongs to the words after that. */
+            val blank = !editing && prompt == null && title.isBlank() && body.isBlank() && media.isEmpty()
             Column(Modifier.fillMaxWidth().background(cs.background).navigationBarsPadding()) {
+                AnimatedVisibility(blank, enter = fadeIn(), exit = fadeOut() + shrinkVertically()) {
+                    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(
+                            Modifier.padding(horizontal = 14.dp).fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .border(1.dp, ink.copy(alpha = .10f), RoundedCornerShape(16.dp))
+                                .background(cs.surface)
+                                .padding(vertical = 10.dp),
+                        ) {
+                            StartTile(Icons.Outlined.Image, "Photos", ink, Modifier.weight(1f)) {
+                                mediaPicker.launch(arrayOf("image/*", "video/*"))
+                            }
+                            if (onTemplates != null) StartTile(Icons.Outlined.EditNote, "Templates", ink, Modifier.weight(1f), onTemplates)
+                            if (onPrompts != null) StartTile(Icons.Outlined.Lightbulb, "Prompts", ink, Modifier.weight(1f), onPrompts)
+                            StartTile(Icons.Outlined.Mic, "Voice", ink, Modifier.weight(1f)) { voiceDisclosure = true }
+                        }
+                        Spacer(Modifier.height(6.dp))
+                    }
+                }
                 AnimatedVisibility(marks) {
                     Row(
                         Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
@@ -687,10 +655,27 @@ fun WriteSheet(
     if (confirmDelete) AlertDialog(
         onDismissRequest = { confirmDelete = false },
         title = { Text("Delete this entry?") },
-        text = { Text("This permanently removes the entry from this device and your next archive. This cannot be undone.") },
+        text = { Text("This cannot be undone.") },
         confirmButton = { TextButton(onClick = { confirmDelete = false; onDelete?.invoke() }) { Text("Delete", color = Color(0xFFB3402A)) } },
         dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Keep entry") } },
     )
+}
+
+@Composable
+private fun StartTile(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    tint: Color,
+    modifier: Modifier,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier.clip(RoundedCornerShape(12.dp)).clickable(onClick = onClick).padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(icon, null, tint = tint, modifier = Modifier.size(24.dp))
+        Text(label, color = tint, fontSize = 13.sp, modifier = Modifier.padding(top = 6.dp))
+    }
 }
 
 @Composable
@@ -699,4 +684,34 @@ private fun ToolGlyph(icon: androidx.compose.ui.graphics.vector.ImageVector, lab
         Modifier.size(44.dp).clip(CircleShape).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) { Icon(icon, label, tint = tint, modifier = Modifier.size(21.dp)) }
+}
+
+
+/** An attachment while writing: the photo itself, or a file mark, with a way to take it off. */
+@Composable
+private fun EditorAttachment(value: String, panel: Color, line: Color, accent: Color, onRemove: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val uri = remember(value) { android.net.Uri.parse(value) }
+    var picture by remember(value) { mutableStateOf<android.graphics.Bitmap?>(null) }
+    LaunchedEffect(value) { picture = loadAttachmentPicture(context, uri, 400) }
+    Box(
+        Modifier.size(96.dp).clip(RoundedCornerShape(14.dp)).background(panel)
+            .border(1.dp, line, RoundedCornerShape(14.dp)),
+        contentAlignment = Alignment.Center,
+    ) {
+        val image = picture
+        if (image != null) {
+            androidx.compose.foundation.Image(
+                image.asImageBitmap(), null, Modifier.matchParentSize(),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+            )
+        } else {
+            Icon(Icons.Outlined.InsertDriveFile, null, tint = accent, modifier = Modifier.size(26.dp))
+        }
+        Box(
+            Modifier.align(Alignment.TopEnd).padding(5.dp).size(24.dp).clip(CircleShape)
+                .background(Color.Black.copy(alpha = .5f)).clickable(onClick = onRemove),
+            contentAlignment = Alignment.Center,
+        ) { Icon(Icons.Outlined.Close, "Remove attachment", tint = Color.White, modifier = Modifier.size(14.dp)) }
+    }
 }

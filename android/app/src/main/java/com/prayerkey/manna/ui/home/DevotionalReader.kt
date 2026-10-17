@@ -105,7 +105,7 @@ fun DevotionalReader(
     val dateLine = remember {
         LocalDate.now()
             .format(DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.getDefault()))
-            .uppercase(Locale.getDefault())
+            
     }
 
     /* Scripture comes out of the KJV asset, never out of the content file, so
@@ -262,8 +262,8 @@ fun DevotionalReader(
                     )
                     Spacer(Modifier.height(34.dp))
                     Text(
-                        "${day.title.uppercase(Locale.getDefault())} · " +
-                            "${day.reading.book.uppercase(Locale.getDefault())} ${day.reading.chapter}",
+                        "${day.title} · " +
+                            "${day.reading.book} ${day.reading.chapter}",
                         color = Color.White.copy(alpha = .5f), style = MonoLabel, fontSize = 8.5.sp,
                     )
                 }

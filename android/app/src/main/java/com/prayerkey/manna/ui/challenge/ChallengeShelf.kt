@@ -134,7 +134,7 @@ private fun ShelfCard(challenge: ChallengePlan, done: Int, onOpen: () -> Unit) {
         Column(Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "${challenge.days} DAYS",
+                    "${challenge.days} days",
                     fontFamily = UtilitySans,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
@@ -144,7 +144,7 @@ private fun ShelfCard(challenge: ChallengePlan, done: Int, onOpen: () -> Unit) {
                 if (started) {
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        if (finished) "FINISHED" else "DAY $done OF ${challenge.days}",
+                        if (finished) "Finished" else "Day $done of ${challenge.days}",
                         fontFamily = UtilitySans,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,

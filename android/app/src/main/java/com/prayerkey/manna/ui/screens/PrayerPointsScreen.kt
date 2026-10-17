@@ -148,7 +148,7 @@ private fun PrayerPointsLibrary(
                 )
             }
             if (query.isBlank()) {
-                item { SectionLabel("PRAY BY SITUATION") }
+                item { SectionLabel("Pray by situation") }
                 items(featuredSituations.chunked(2)) { row ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         row.forEach { label -> SituationCard(label, Modifier.weight(1f)) { onSelect(label) } }
@@ -156,7 +156,7 @@ private fun PrayerPointsLibrary(
                     }
                 }
             } else {
-                item { SectionLabel(if (results.isEmpty()) "NO MATCHES" else "${results.size} RESULTS") }
+                item { SectionLabel(if (results.isEmpty()) "No matches" else "${results.size} RESULTS") }
                 items(results, key = { it.slug }) { topic ->
                     Surface(
                         onClick = { onSelect(topic.title) }, shape = RoundedCornerShape(17.dp),
@@ -221,13 +221,13 @@ private fun PrayerPointsOverview(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item {
-                Text(topic.category.uppercase(), color = Pk.Oxblood, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.6.sp)
+                Text(topic.category, color = Pk.Oxblood, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 Text(cleanTitle(topic.title), Modifier.padding(top = 8.dp), color = PointInk, fontFamily = DisplaySerif, fontSize = 35.sp, lineHeight = 40.sp, fontWeight = FontWeight.Bold)
                 Text("${points.size} Prayers", Modifier.padding(top = 8.dp), color = PointMuted, fontSize = 16.sp)
             }
             item { PreparationCard("SCRIPTURE", scriptureReference(topic), topic.scripture.firstOrNull()?.second.orEmpty()) }
             item {
-                SectionLabel("CHOOSE YOUR PRAYER LENGTH")
+                SectionLabel("Choose your prayer length")
                 Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
                     listOf(points.size.coerceAtMost(5) to "Short", points.size to "Complete")
                         .distinctBy { it.first }.chunked(2).forEach { row ->
@@ -257,7 +257,7 @@ private fun PrayerPointsOverview(
         Button(
             onClick = onStart, shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood),
             modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 18.dp).height(58.dp),
-        ) { Text("START PRAYING", fontWeight = FontWeight.Bold, letterSpacing = .8.sp) }
+        ) { Text("Start praying", fontWeight = FontWeight.Bold) }
     }
 }
 
@@ -309,7 +309,7 @@ private fun PrayerPointMode(topic: PrayerTopic, requested: Int, onBack: () -> Un
                 Button(
                     onClick = { index++; persist(index) }, shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood), modifier = Modifier.weight(.55f).height(58.dp),
-                ) { Text(if (index == points.lastIndex) "AMEN" else "AMEN / NEXT", fontWeight = FontWeight.Bold) }
+                ) { Text(if (index == points.lastIndex) "Amen" else "AMEN / NEXT", fontWeight = FontWeight.Bold) }
             }
         } else {
             val endings = listOf(
@@ -330,7 +330,7 @@ private fun PrayerPointMode(topic: PrayerTopic, requested: Int, onBack: () -> Un
                     }
                 }, shape = CircleShape, colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood),
                 modifier = Modifier.fillMaxWidth().padding(22.dp).height(58.dp),
-            ) { Text(if (ending == endings.lastIndex) "COMPLETE PRAYER" else "CONTINUE", fontWeight = FontWeight.Bold) }
+            ) { Text(if (ending == endings.lastIndex) "Complete prayer" else "Continue", fontWeight = FontWeight.Bold) }
         }
     }
 }

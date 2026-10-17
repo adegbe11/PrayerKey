@@ -110,6 +110,7 @@ fun AwardHomeDashboard(
     onOpenJournal: () -> Unit,
     onOpenChurch: () -> Unit,
     onKeepPrayer: (String, String) -> Unit,
+    onKeepGuidedPrayer: (String, String, String, String?) -> Unit = { _, _, _, _ -> },
     onKeepReflection: (String, String) -> Unit,
     onOpenChallenge: (Challenge) -> Unit,
     onToggleChallenge: (Challenge) -> Unit,
@@ -133,6 +134,7 @@ fun AwardHomeDashboard(
         onOpenJournal = onOpenJournal,
         onOpenChurch = onOpenChurch,
         onKeepPrayer = onKeepPrayer,
+        onKeepGuidedPrayer = onKeepGuidedPrayer,
         onKeepReflection = onKeepReflection,
         onSettings = onSettings,
         initialAction = initialAction,
@@ -173,8 +175,8 @@ private fun QuoteCinema(
             Modifier.align(Alignment.Center).fillMaxWidth().padding(horizontal = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("“$quote”", color = Color.White, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 24.sp, lineHeight = 34.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-            Text(author.uppercase(), color = Color.White, fontFamily = UtilitySans, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 24.dp))
+            Text(quote, color = Color.White, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 24.sp, lineHeight = 34.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            Text(author, color = Color.White, fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 24.dp))
             Icon(Icons.Outlined.FavoriteBorder, "Save quote", tint = Color.White, modifier = Modifier.padding(top = 22.dp).size(30.dp))
         }
 
@@ -187,7 +189,7 @@ private fun QuoteCinema(
                     .background(Color(0xE61A1A1A)).clickable {
                         val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                             type = "text/plain"
-                            putExtra(android.content.Intent.EXTRA_TEXT, "“$quote” — $author\n\nShared from PrayerKey")
+                            putExtra(android.content.Intent.EXTRA_TEXT, "$quote — $author\n\nShared from PrayerKey")
                         }
                         context.startActivity(android.content.Intent.createChooser(intent, "Share quote"))
                     },
@@ -240,7 +242,7 @@ private fun DailyJourneyRow(
         }
         Column(Modifier.weight(1f).padding(start = 13.dp)) {
             Text(title, color = cs.onSurface, fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal)
-            if (active) Text("NEXT STEP", color = cs.primary, fontFamily = UtilitySans, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp, modifier = Modifier.padding(top = 2.dp))
+            if (active) Text("Next step", color = cs.primary, fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
         }
         Text(
             if (done) "DONE" else duration,

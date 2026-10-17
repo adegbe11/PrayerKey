@@ -1,5 +1,12 @@
 package com.prayerkey.manna.ui.screens
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.graphicsLayer
+import com.prayerkey.manna.ui.theme.drift
+import com.prayerkey.manna.ui.theme.pressable
+import com.prayerkey.manna.ui.theme.rise
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -46,7 +53,8 @@ import com.prayerkey.manna.ui.theme.UtilitySans
 fun WelcomeScreen(onContinue: () -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize().background(Pk.DeepDark)) {
         val availableHeight = maxHeight
-        Image(painterResource(R.drawable.welcome_prayer_dawn), null, Modifier.matchParentSize(), contentScale = ContentScale.Crop)
+        // the dawn drifts slowly closer while you read
+        Image(painterResource(R.drawable.welcome_prayer_dawn), null, Modifier.matchParentSize().drift(), contentScale = ContentScale.Crop)
         Box(Modifier.matchParentSize().background(Pk.DeepDark.copy(alpha = .18f)))
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -65,16 +73,16 @@ fun WelcomeScreen(onContinue: () -> Unit) {
             Image(
                 painterResource(R.drawable.prayerkey_mark),
                 contentDescription = "PrayerKey",
-                modifier = Modifier.size(72.dp),
+                modifier = Modifier.size(72.dp).rise(0, distance = 14f),
             )
-            Text("PrayerKey", fontFamily = DisplaySerif, fontSize = 28.sp, color = Color.White)
+            Text("PrayerKey", Modifier.rise(1), fontFamily = DisplaySerif, fontSize = 28.sp, color = Color.White)
             Spacer(Modifier.height(28.dp))
-            Text("A closer walk\nwith God.", color = Color.White, fontFamily = DisplaySerif,
+            Text("A closer walk\nwith God.", Modifier.rise(4, distance = 34f), color = Color.White, fontFamily = DisplaySerif,
                 fontSize = 38.sp, lineHeight = 41.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Medium)
-            Text("Prayer, Scripture, and space to reflect.", Modifier.padding(top = 14.dp), color = Color.White.copy(alpha = .85f),
+            Text("Prayer, Scripture, and space to reflect.", Modifier.padding(top = 14.dp).rise(6), color = Color.White.copy(alpha = .85f),
                 fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height((availableHeight - 570.dp).coerceAtLeast(100.dp)))
-            WelcomeAction("Get started", primary = true, onClick = onContinue)
+            Box(Modifier.rise(9, distance = 40f).pressable()) { WelcomeAction("Get started", primary = true, onClick = onContinue) }
             Spacer(Modifier.height(20.dp))
         }
     }

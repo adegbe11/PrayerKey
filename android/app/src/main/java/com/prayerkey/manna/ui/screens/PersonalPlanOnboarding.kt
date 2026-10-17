@@ -130,7 +130,7 @@ private fun PromiseStep(next: () -> Unit) {
         ) {
             Text("PRAYERKEY", color = Pk.GoldLight, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 12.sp, letterSpacing = 3.sp)
             Text("Prayer for every\npart of life.", Modifier.padding(top = 12.dp), color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 39.sp, lineHeight = 44.sp)
-            Text("Pray with Scripture. Build lasting habits. Remember what God has done.", Modifier.padding(top = 14.dp), color = Color.White.copy(alpha = .82f), fontFamily = UtilitySans, fontSize = 15.sp, lineHeight = 23.sp)
+            Text("Pray. Read. Remember.", Modifier.padding(top = 14.dp), color = Color.White.copy(alpha = .82f), fontFamily = UtilitySans, fontSize = 15.sp, lineHeight = 23.sp)
             PrimaryAction("Continue", Modifier.padding(top = 26.dp), next)
         }
     }
@@ -223,7 +223,7 @@ private fun PlanRevealStep(need: PrayerNeed, journey: FirstJourney, hour: Int, n
     OnboardingPage("Your first journey is ready.", "Built around what you need today.", "Continue", next) {
         Surface(Modifier.fillMaxWidth(), color = Pk.DeepDark, shape = RoundedCornerShape(28.dp)) {
             Column(Modifier.padding(22.dp)) {
-                Text(journey.title.uppercase(), color = Pk.GoldLight, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.8.sp)
+                Text(journey.title, color = Pk.GoldLight, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 Text(if (journey.key == "seven_day") "7 Days of Prayer for ${need.title.removePrefix("My ")}" else need.title, Modifier.padding(top = 10.dp), color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 25.sp, lineHeight = 31.sp)
                 Spacer(Modifier.height(22.dp))
                 PlanItem("1", "Read ${need.scripture}")
@@ -250,7 +250,7 @@ private fun ReminderPermissionStep(hour: Int, chooseHour: (Int) -> Unit, enable:
             Icon(Icons.Outlined.NotificationsActive, null, tint = Pk.Oxblood, modifier = Modifier.size(35.dp))
         }
         Text("Would you like a reminder?", Modifier.padding(top = 25.dp), textAlign = TextAlign.Center, color = Pk.Charcoal, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 30.sp, lineHeight = 36.sp)
-        Text("We’ll remind you once at the time you choose. No promotions.", Modifier.padding(top = 12.dp), textAlign = TextAlign.Center, color = Pk.Muted, fontSize = 14.sp, lineHeight = 21.sp)
+        Text("One reminder, at the time you choose.", Modifier.padding(top = 12.dp), textAlign = TextAlign.Center, color = Pk.Muted, fontSize = 14.sp, lineHeight = 21.sp)
         Row(Modifier.padding(top = 26.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(6, 7, 8, 20).forEach { value ->
                 FilterChip(

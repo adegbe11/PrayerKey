@@ -57,6 +57,33 @@ fun pageWindows(totalLines: Int, linesPerPage: Int): List<PageWindow> {
 }
 
 /**
+ * Cuts a laid-out chapter into pages by the height the lines really take.
+ *
+ * Counting lines against one line height does not survive a page whose lines
+ * differ: the drop cap makes the first line of a chapter nearly twice as tall
+ * as the rest, so measuring by the tallest line gave every page half the room
+ * it had. The window then held half the lines the page drew, and the next
+ * page began in the middle of the last one - every half page was read twice.
+ *
+ * Here a page takes lines while they still fit in [room] pixels, measured from
+ * the top of its first line to the bottom of its last. A line taller than the
+ * whole page still gets a page of its own, so nothing is ever skipped.
+ */
+fun pageWindowsByHeight(lineTops: List<Float>, lineBottoms: List<Float>, room: Float): List<PageWindow> {
+    val total = minOf(lineTops.size, lineBottoms.size)
+    if (total <= 0 || room <= 0f) return listOf(PageWindow(0, 0, total.coerceAtLeast(0)))
+    val windows = mutableListOf<PageWindow>()
+    var start = 0
+    while (start < total) {
+        var end = start + 1
+        while (end < total && lineBottoms[end] - lineTops[start] <= room) end++
+        windows += PageWindow(windows.size, start, end)
+        start = end
+    }
+    return windows
+}
+
+/**
  * Which verses show up in a window of lines.
  *
  * [verseLines] is the line each verse *starts* on, paired with its number,

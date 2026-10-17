@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.book
 
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -42,18 +43,8 @@ fun BibleLibraryScreen(
     onOpenChapter: (String, Int) -> Unit,
 ) {
     val cs = MaterialTheme.colorScheme
-    val view = LocalView.current
-    DisposableEffect(Unit) {
-        val window = (view.context as? android.app.Activity)?.window
-        @Suppress("DEPRECATION")
-        window?.statusBarColor = android.graphics.Color.rgb(249, 246, 240)
-        window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = true }
-        onDispose {
-            @Suppress("DEPRECATION")
-            window?.statusBarColor = android.graphics.Color.rgb(34, 34, 34)
-            window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = false }
-        }
-    }
+    // dark icons over the cream page
+    BarIcons(dark = true)
     var oldTestament by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     var selectedBook by remember { mutableStateOf<BibleBook?>(null) }
@@ -67,6 +58,19 @@ fun BibleLibraryScreen(
 
     Column(Modifier.fillMaxSize().background(cs.background).statusBarsPadding().padding(horizontal = 22.dp)) {
         Row(Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+            // back to the verse cards
+            Box(
+                Modifier.size(42.dp).clip(RoundedCornerShape(21.dp)).background(cs.surface)
+                    .border(1.dp, cs.outlineVariant, RoundedCornerShape(21.dp))
+                    .clickable(onClick = onPull),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowBack,
+                    "Back", tint = cs.onBackground, modifier = Modifier.size(20.dp),
+                )
+            }
+            Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text("PRAYERKEY", color = cs.primary, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.8.sp)
                 Text("Bible Library", color = cs.onBackground, fontFamily = DisplaySerif, fontSize = 31.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 2.dp))
@@ -105,7 +109,7 @@ fun BibleLibraryScreen(
         }
 
         Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(if (oldTestament) "THE OLD TESTAMENT" else "THE NEW TESTAMENT", color = cs.onBackground.copy(alpha = .58f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp, modifier = Modifier.weight(1f))
+            Text(if (oldTestament) "The Old Testament" else "The New Testament", color = cs.onBackground.copy(alpha = .58f), fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             Text("${books.size} BOOKS", color = cs.onBackground.copy(alpha = .42f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Medium, letterSpacing = .8.sp)
         }
 
@@ -143,7 +147,7 @@ fun BibleLibraryScreen(
         ModalBottomSheet(onDismissRequest = { selectedBook = null }, containerColor = cs.surface) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 30.dp)) {
                 Text(book.name, color = cs.onSurface, fontFamily = DisplaySerif, fontSize = 30.sp, fontWeight = FontWeight.Bold)
-                Text("CHOOSE A CHAPTER", color = cs.onSurface.copy(alpha = .50f), fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp, modifier = Modifier.padding(top = 5.dp, bottom = 16.dp))
+                Text("Choose a chapter", color = cs.onSurface.copy(alpha = .50f), fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 5.dp, bottom = 16.dp))
                 androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
                     columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(5),
                     modifier = Modifier.heightIn(max = 470.dp),
@@ -180,7 +184,7 @@ private fun ViewChoice(icon: androidx.compose.ui.graphics.vector.ImageVector, ti
     ) {
         Icon(icon, null, tint = if (active) cs.surface else cs.primary, modifier = Modifier.size(23.dp))
         Text(title, color = if (active) cs.surface else cs.onSurface, fontFamily = UtilitySans, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f).padding(start = 14.dp))
-        if (active) Text("CURRENT", color = cs.surface.copy(alpha = .55f), fontFamily = UtilitySans, fontSize = 8.sp, fontWeight = FontWeight.Bold, letterSpacing = .7.sp)
+        if (active) Text("Current", color = cs.surface.copy(alpha = .55f), fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold)
     }
 }
 

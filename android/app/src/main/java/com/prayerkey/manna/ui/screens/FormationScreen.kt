@@ -117,7 +117,6 @@ fun FormationScreen(state: FormationState, onUpdate: (FormationState) -> Unit, o
     LazyColumn(contentPadding = PaddingValues(bottom = 130.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Text("Practices", fontFamily = BookSerif, fontSize = 27.sp)
-            Text("A quiet rhythm for living the Word—not another scoreboard.", color = Muted, fontSize = 12.5.sp, modifier = Modifier.padding(top = 4.dp, bottom = 8.dp))
         }
         item {
             PracticeCard("RULE OF LIFE", "Build a gentle daily rhythm", Icons.Outlined.Schedule) {

@@ -1,5 +1,15 @@
 package com.prayerkey.manna.ui.screens
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.graphicsLayer
+import com.prayerkey.manna.ui.theme.drift
+import com.prayerkey.manna.ui.theme.pressable
+import com.prayerkey.manna.ui.theme.rise
+import androidx.compose.material.icons.outlined.Handshake
+import androidx.compose.material.icons.outlined.HealthAndSafety
+import androidx.compose.material.icons.outlined.EditNote
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
@@ -40,14 +50,16 @@ private val goals = listOf(
     WelcomeChoice("grow", "Grow in faith", Icons.Outlined.WbSunny),
     WelcomeChoice("church", "Connect with my church", Icons.Outlined.Church),
     WelcomeChoice("remember", "Remember answered prayers", Icons.Outlined.BookmarkBorder),
+    WelcomeChoice("journal", "Keep a prayer journal", Icons.Outlined.EditNote),
 )
 private val topics = listOf(
     WelcomeChoice("family", "Family", Icons.Outlined.PeopleOutline),
-    WelcomeChoice("health", "Health", Icons.Outlined.FavoriteBorder),
+    WelcomeChoice("health", "Health", Icons.Outlined.HealthAndSafety),
     WelcomeChoice("peace", "Peace", Icons.Outlined.Spa),
     WelcomeChoice("guidance", "Guidance", Icons.Outlined.Explore),
     WelcomeChoice("work", "Work & finances", Icons.Outlined.WorkOutline),
-    WelcomeChoice("relationships", "Relationships", Icons.Outlined.PeopleOutline),
+    // its own mark: it shared Family's two people
+    WelcomeChoice("relationships", "Relationships", Icons.Outlined.Handshake),
     WelcomeChoice("gratitude", "Gratitude", Icons.Outlined.WbSunny),
     WelcomeChoice("church", "My church", Icons.Outlined.Church),
 )
@@ -92,7 +104,15 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { back() }) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back", tint = Pk.Crisp) }
                 Row(Modifier.weight(1f).padding(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    repeat(4) { index -> Box(Modifier.weight(1f).height(3.dp).background(if (index <= step) Pk.GoldLight else Pk.Crisp.copy(alpha = .2f), RoundedCornerShape(3.dp))) }
+                    repeat(4) { index ->
+                        val fill by androidx.compose.animation.core.animateFloatAsState(
+                            if (index <= step) 1f else 0f,
+                            androidx.compose.animation.core.spring(dampingRatio = .8f, stiffness = 220f), label = "seg$index",
+                        )
+                        Box(Modifier.weight(1f).height(3.dp).background(Pk.Crisp.copy(alpha = .2f), RoundedCornerShape(3.dp))) {
+                            Box(Modifier.fillMaxWidth(fill).height(3.dp).background(Pk.GoldLight, RoundedCornerShape(3.dp)))
+                        }
+                    }
                 }
                 if (step < 3) TextButton(onClick = {
                     when (step) { 0 -> selectedGoals = arrayListOf(); 1 -> selectedTopics = arrayListOf(); 2 -> reminders = false }
@@ -102,20 +122,20 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
             }
             key(step) {
                 Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(top = 24.dp, bottom = 20.dp)) {
-                    Text(listOf("YOUR GOALS", "YOUR PRAYERS", "YOUR TIME", "PRAYERKEY")[step], color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 11.sp, letterSpacing = 2.sp)
-                    Text(listOf("Where would you\nlike to begin?", "What’s on\nyour heart?", "A moment\nwith God.", "Same God.\nA new day.")[step], Modifier.padding(top = 14.dp), color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 36.sp, lineHeight = 40.sp)
-                    Text(listOf("Choose up to three.", "Choose what matters to you today.", "Choose a time for prayer.", "Let’s pray.")[step], Modifier.padding(top = 12.dp, bottom = 28.dp), color = Pk.Crisp.copy(alpha = .8f), fontFamily = UtilitySans, fontSize = 15.sp)
+                    Text(listOf("Your goals", "Your prayers", "Your time", "PRAYERKEY")[step], Modifier.rise(0), color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 13.sp)
+                    Text(listOf("Where would you\nlike to begin?", "What’s on\nyour heart?", "A moment\nwith God.", "Same God.\nA new day.")[step], Modifier.padding(top = 14.dp).rise(1, distance = 34f), color = Pk.Crisp, fontFamily = DisplaySerif, fontSize = 36.sp, lineHeight = 40.sp)
+                    Text(listOf("Choose up to three.", "Choose what matters to you today.", "Choose a time for prayer.", "Let’s pray.")[step], Modifier.padding(top = 12.dp, bottom = 28.dp).rise(2), color = Pk.Crisp.copy(alpha = .8f), fontFamily = UtilitySans, fontSize = 15.sp)
                     when (step) {
-                        0 -> goals.forEach { item ->
-                            WelcomeOption(item, item.id in selectedGoals) {
+                        0 -> goals.forEachIndexed { i, item ->
+                            WelcomeOption(item, item.id in selectedGoals, order = 3 + i) {
                                 selectedGoals = ArrayList(selectedGoals.toMutableList().apply { if (!remove(item.id) && size < 3) add(item.id) })
                             }
                         }
-                        1 -> topics.chunked(2).forEach { row ->
+                        1 -> topics.chunked(2).forEachIndexed { r, row ->
                             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                row.forEach { item ->
+                                row.forEachIndexed { c, item ->
                                     Box(Modifier.weight(1f)) {
-                                        WelcomeOption(item, item.id in selectedTopics, compact = true) {
+                                        WelcomeOption(item, item.id in selectedTopics, compact = true, order = 3 + r * 2 + c) {
                                             selectedTopics = ArrayList(selectedTopics.toMutableList().apply { if (!remove(item.id)) add(item.id) })
                                         }
                                     }
@@ -142,28 +162,22 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
                                 Text("Daily prayer reminder", Modifier.weight(1f), color = Pk.Crisp, fontFamily = UtilitySans)
                                 Switch(checked = reminders, onCheckedChange = { reminders = it }, colors = SwitchDefaults.colors(checkedTrackColor = Pk.Oxblood, checkedThumbColor = Pk.Crisp))
                             }
+                            /* Dim while the reminder is off - lit gold, it said a
+                               reminder was set when none was. Choosing a time
+                               turns the reminder on. */
+                            val lit = if (reminders) 1f else .4f
                             OutlinedButton(onClick = {
                                 showTime = true
-                            }, Modifier.fillMaxWidth().heightIn(min = 58.dp), border = BorderStroke(1.dp, Pk.GoldLight)) {
-                                Icon(Icons.Outlined.Schedule, null, tint = Pk.GoldLight)
-                                Text("${if (hour % 12 == 0) 12 else hour % 12}:${minute.toString().padStart(2, '0')} ${if (hour < 12) "AM" else "PM"}", Modifier.padding(start = 12.dp), color = Pk.Crisp, fontSize = 20.sp)
+                            }, Modifier.fillMaxWidth().heightIn(min = 58.dp), border = BorderStroke(1.dp, Pk.GoldLight.copy(alpha = lit))) {
+                                Icon(Icons.Outlined.Schedule, null, tint = Pk.GoldLight.copy(alpha = lit))
+                                Text("${if (hour % 12 == 0) 12 else hour % 12}:${minute.toString().padStart(2, '0')} ${if (hour < 12) "AM" else "PM"}", Modifier.padding(start = 12.dp), color = Pk.Crisp.copy(alpha = lit), fontSize = 20.sp)
                             }
                         }
-                        3 -> {
-                            /* The brand mark, not the notification glyph.
-                               The card in step 2 above is a mock notification
-                               and keeps ic_notification, because there it is
-                               showing you what will actually appear in the
-                               shade. This is a logo, and gets the logo. */
-                            Image(
-                                painterResource(R.drawable.prayerkey_mark),
-                                contentDescription = null,
-                                modifier = Modifier.padding(top = 6.dp).size(62.dp),
-                            )
-                            if (selectedGoals.isNotEmpty() || selectedTopics.isNotEmpty()) {
-                                Text((goals.filter { it.id in selectedGoals }.map { it.title } + topics.filter { it.id in selectedTopics }.map { it.title }).joinToString(" · "), Modifier.padding(top = 20.dp), color = Pk.Crisp, fontFamily = UtilitySans, lineHeight = 23.sp)
-                            }
-                        }
+                        /* Only the words. The mark and a line of the choices
+                           sat on the photograph - the key across her hair, the
+                           list across her face, wrapping with a stray dot. The
+                           choices are kept; they shape the app, not this page. */
+                        3 -> Unit
                     }
                 }
             }
@@ -176,8 +190,19 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
 }
 
 @Composable
-private fun WelcomeOption(item: WelcomeChoice, selected: Boolean, compact: Boolean = false, onClick: () -> Unit) {
-    Surface(Modifier.fillMaxWidth().padding(bottom = 10.dp).toggleable(selected, role = Role.Checkbox, onValueChange = { onClick() }),
+private fun WelcomeOption(item: WelcomeChoice, selected: Boolean, compact: Boolean = false, order: Int = 0, onClick: () -> Unit) {
+    // a chosen card swells for a moment, then settles - the choice is felt
+    val pop by androidx.compose.animation.core.animateFloatAsState(
+        if (selected) 1f else 0f,
+        androidx.compose.animation.core.spring(dampingRatio = .45f, stiffness = 500f), label = "chosen",
+    )
+    val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
+    Surface(Modifier.fillMaxWidth().padding(bottom = 10.dp).rise(order).pressable()
+        .graphicsLayer { val s = 1f + .025f * kotlin.math.sin(pop * Math.PI).toFloat(); scaleX = s; scaleY = s }
+        .toggleable(selected, role = Role.Checkbox, onValueChange = {
+            haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+            onClick()
+        }),
         color = if (selected) Pk.Oxblood.copy(alpha = .7f) else Pk.Crisp.copy(alpha = .07f), shape = RoundedCornerShape(20.dp),
         border = BorderStroke(1.dp, if (selected) Pk.GoldLight else Pk.Crisp.copy(alpha = .18f))) {
         if (compact) Column(Modifier.padding(16.dp).heightIn(min = 76.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

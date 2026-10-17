@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui.session
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
@@ -185,7 +187,7 @@ fun PullSessionLoading(title: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                "THE WORD IS OPENING",
+                "The word is opening",
                 fontFamily = UtilitySans,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -384,7 +386,8 @@ fun PullSession(
 private fun PullBody(movement: PullItem, isBible: Boolean, modifier: Modifier) {
     Box(modifier, contentAlignment = Alignment.Center) {
         Column(
-            Modifier.fillMaxWidth().padding(
+            // the full card, so the words below know how much room they have
+            Modifier.fillMaxSize().padding(
                 start = if (isBible) 54.dp else 30.dp,
                 end = if (isBible) 54.dp else 30.dp,
                 top = if (isBible) 185.dp else 190.dp,
@@ -410,13 +413,12 @@ private fun PullBody(movement: PullItem, isBible: Boolean, modifier: Modifier) {
                 color = if (isBible) Pk.Oxblood else Pk.GoldLight,
             )
             Spacer(Modifier.height(20.dp))
-            Text(
+            FittedWords(
                 movement.text,
-                fontFamily = DisplaySerif,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = if (movement.text.length > 190) 23.sp else 29.sp,
-                lineHeight = if (movement.text.length > 190) 33.sp else 40.sp,
                 color = if (isBible) Pk.Charcoal else Color.White,
+                // what sits under the words is subtracted from their room
+                reserve = if (movement.reference != null) 40.dp else 0.dp,
+                modifier = Modifier.weight(1f, fill = false),
             )
             movement.reference?.let { ref ->
                 Spacer(Modifier.height(22.dp))
@@ -437,6 +439,44 @@ private fun PullBody(movement: PullItem, isBible: Boolean, modifier: Modifier) {
                 )
             }
         }
+    }
+}
+
+/**
+ * Words at the largest size that fits the space they are given.
+ *
+ * Tried from 29sp down to 14sp, measured, and the first that fits is used.
+ */
+@Composable
+private fun FittedWords(text: String, color: Color, reserve: androidx.compose.ui.unit.Dp, modifier: Modifier) {
+    val measurer = androidx.compose.ui.text.rememberTextMeasurer()
+    androidx.compose.foundation.layout.BoxWithConstraints(modifier) {
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        val room = constraints.maxHeight - with(density) { reserve.roundToPx() }
+        val width = constraints.maxWidth
+        val size = remember(text, room, width) {
+            (29 downTo 14).firstOrNull { sp ->
+                val style = androidx.compose.ui.text.TextStyle(
+                    fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold,
+                    fontSize = sp.sp, lineHeight = (sp * 1.38f).sp,
+                )
+                measurer.measure(
+                    text, style,
+                    constraints = androidx.compose.ui.unit.Constraints(maxWidth = width.coerceAtLeast(1)),
+                ).size.height <= room
+            } ?: 14
+        }
+        /* No scroll here: the card is pulled down to advance, and a scroll
+           container under the thumb takes that drag for itself. The size
+           search above is what keeps the words inside the card. */
+        Text(
+            text,
+            fontFamily = DisplaySerif,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = size.sp,
+            lineHeight = (size * 1.38f).sp,
+            color = color,
+        )
     }
 }
 
@@ -651,7 +691,7 @@ private fun SessionComplete(
         ) {
             if (isBible) {
                 Text(
-                    "CHAPTER COMPLETE",
+                    "Chapter complete",
                     fontFamily = UtilitySans,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,

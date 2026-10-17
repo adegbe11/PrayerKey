@@ -112,12 +112,6 @@ fun JournalWelcome(onOpen: () -> Unit, modifier: Modifier = Modifier) {
                 exit = fadeOut(tween(500)) + slideOutVertically(tween(500)) { -it / 6 },
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        "“",
-                        color = scheme.primary,
-                        fontFamily = BookSerif, fontSize = 34.sp,
-                    )
-                    Spacer(Modifier.height(4.dp))
                     StreamedVerse(line.text, scheme.onBackground, scheme.primary) { written = true }
                     Spacer(Modifier.height(20.dp))
                     AnimatedVisibility(visible = written, enter = fadeIn(tween(600))) {

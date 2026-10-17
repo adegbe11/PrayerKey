@@ -8,7 +8,7 @@ import com.prayerkey.manna.data.SermonNote
 object MannaPack {
     fun share(context: Context, note: SermonNote) {
         val questions = note.points.take(3).mapIndexed { index, point ->
-            "${index + 1}. Where does “${point.trim().take(100)}” meet ordinary life this week?"
+            "${index + 1}. ${point.trim().take(100)} - where does this meet ordinary life this week?"
         }.ifEmpty { listOf("1. What stayed with you from this message?", "2. What might faithful action look like this week?") }
         val scripture = note.scriptures.joinToString(" · ").ifBlank { "Review the sermon passage" }
         val text = buildString {

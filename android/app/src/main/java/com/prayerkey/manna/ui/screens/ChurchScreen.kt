@@ -117,10 +117,25 @@ fun ChurchScreen(
         else if (stage == Stage.Listening) stage = Stage.Ready
     }
 
-    val micPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) SermonService.start(context)
+    /* One question at a time, then the recording. Both prompts used to be
+       launched together; Android shows one and drops the other, so on a first
+       Sunday Start asked about notifications and then did nothing - the
+       microphone was never asked for and nothing was recorded until Start was
+       tapped a second time. Now: the microphone, then (optionally) the
+       notification that keeps the recording alive, then the recording -
+       whatever is answered to the second. */
+    val notifyPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        SermonService.start(context)
     }
-    val notifyPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
+    fun startRecording() {
+        if (android.os.Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        else SermonService.start(context)
+    }
+    val micPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) startRecording()
+    }
 
     /* Never remember a decision to continue without captions. The old flow
        stored `captions-asked=true` after "Just record", so every later sermon
@@ -132,12 +147,8 @@ fun ChurchScreen(
     fun record() {
         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
         SermonService.setLanguage(language)
-        if (android.os.Build.VERSION.SDK_INT >= 33 &&
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-        ) notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-            SermonService.start(context)
+            startRecording()
         } else micPermission.launch(Manifest.permission.RECORD_AUDIO)
     }
 
@@ -189,9 +200,12 @@ fun ChurchScreen(
             )
             onSaveNote(note, minutes, audio)
             stage = Stage.Ready
+            // only promise the recording when there is one: with the phone's
+            // own recogniser listening, nothing is recorded to go back to
             Toast.makeText(
                 context,
-                "Saved to your sermon notes. Open it to turn the recording into text.",
+                if (!audio.isNullOrBlank()) "Saved to your sermon notes. Open it to turn the recording into text."
+                else "No words were heard. Hold the phone nearer the speaker next time.",
                 Toast.LENGTH_LONG,
             ).show()
             return
@@ -433,46 +447,40 @@ private fun ReadyView(
                 Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 26.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("LIVE SERMON NOTES", color = Ivory.copy(alpha = .60f), fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
                 Text(
-                    "Turn the sermon into notes",
+                    "Sermon notes",
                     color = Ivory, fontFamily = DisplaySerif, fontSize = 28.sp, fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 8.dp),
                 )
                 Spacer(Modifier.height(20.dp))
-                Box(
-                    Modifier.size(106.dp)
-                        .shadow(16.dp, CircleShape, spotColor = Color.Black.copy(alpha = .34f))
-                        .clip(CircleShape)
-                        .background(cs.primary)
-                        .border(1.2.dp, Ivory.copy(alpha = .30f), CircleShape)
-                        .clickable(onClick = onStart),
-                    contentAlignment = Alignment.Center,
+                /* The circle and its word are one button. Only the circle
+                   answered, so tapping "Start" - the word that says what to
+                   do - did nothing. */
+                Column(
+                    Modifier.clip(RoundedCornerShape(28.dp))
+                        .clickable(onClick = onStart)
+                        .padding(horizontal = 20.dp, vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Icon(
-                        Icons.Outlined.Mic, "Listen to the Message",
-                        tint = Ivory, modifier = Modifier.size(42.dp),
+                    Box(
+                        Modifier.size(106.dp)
+                            .shadow(16.dp, CircleShape, spotColor = Color.Black.copy(alpha = .34f))
+                            .clip(CircleShape)
+                            .background(cs.primary)
+                            .border(1.2.dp, Ivory.copy(alpha = .30f), CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            Icons.Outlined.Mic, "Listen to the Message",
+                            tint = Ivory, modifier = Modifier.size(42.dp),
+                        )
+                    }
+                    Text(
+                        "Start",
+                        color = Ivory, fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 14.dp),
                     )
                 }
-                Text(
-                    "Start",
-                    color = Ivory, fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 14.dp),
-                )
             }
-        }
-
-        if (notes.isEmpty()) {
-            /* One line, not a heading over a paragraph. The paragraph went on
-               to describe what the user is about to watch happen on the screen
-               in front of them. The only part they cannot work out for
-               themselves is where to put the phone. */
-            Text(
-                "Place the phone near the preacher.",
-                color = cs.onBackground.copy(alpha = .62f),
-                fontSize = 13.5.sp,
-                modifier = Modifier.padding(top = 30.dp),
-            )
         }
 
         if (notes.isNotEmpty()) {
@@ -486,7 +494,15 @@ private fun ReadyView(
                     Column(Modifier.padding(16.dp)) {
                         Text(note.title, color = cs.onBackground, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         Text(
-                            "${dayLabel(note.createdAt)} · ${note.minutes} min · ${note.scriptures.size} scriptures",
+                            /* Only what the title does not already say: the date
+                               is dropped when the title carries it, and a count
+                               of none is not shown. */
+                            listOfNotNull(
+                                // an untitled note is already named for its day
+                                dayLabel(note.createdAt).takeUnless { note.title.startsWith("Sermon · ") },
+                                "${note.minutes} min",
+                                note.scriptures.size.takeIf { it > 0 }?.let { if (it == 1) "1 scripture" else "$it scriptures" },
+                            ).joinToString(" · "),
                             color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp),
                         )
                         if (note.takeaway.isNotBlank()) Text(
@@ -544,7 +560,8 @@ private fun ListeningView(
     Column(Modifier.fillMaxSize()) {
 
         Column(
-            Modifier.weight(1f).fillMaxWidth().verticalScroll(scroll)
+            // below the status bar: "Listening…" was drawn under the clock
+            Modifier.weight(1f).fillMaxWidth().statusBarsPadding().verticalScroll(scroll)
                 .padding(horizontal = 24.dp).padding(top = 28.dp, bottom = 16.dp),
         ) {
             if (chunks.isEmpty() && partial.isBlank()) {
@@ -650,7 +667,7 @@ private fun NoteView(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState())
             .padding(horizontal = 22.dp).padding(top = 24.dp, bottom = 130.dp),
     ) {
-        Text("SUNDAY NOTES", color = Gold, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+        Text("Sunday notes", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         Text(note.title, fontFamily = BookSerif, fontSize = 33.sp, lineHeight = 38.sp, modifier = Modifier.padding(top = 8.dp))
         Text(
             "${todayLabel()} · $minutes min · ${note.scriptures.size} scriptures caught",
@@ -658,12 +675,12 @@ private fun NoteView(
         )
 
         if (note.scriptures.isNotEmpty()) {
-            SectionLabel("SCRIPTURES PREACHED")
+            SectionLabel("Scriptures preached")
             FlowChips(note.scriptures)
         }
 
         if (note.points.isNotEmpty()) {
-            SectionLabel("THE MAIN POINTS")
+            SectionLabel("The main points")
             note.points.forEachIndexed { i, point ->
                 Row(Modifier.padding(bottom = 13.dp)) {
                     Text("${i + 1}.", color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end = 12.dp))
@@ -673,12 +690,12 @@ private fun NoteView(
         }
 
         if (note.quotes.isNotEmpty()) {
-            SectionLabel("LINES WORTH KEEPING")
+            SectionLabel("Lines worth keeping")
             note.quotes.forEach { quote ->
                 Row(Modifier.padding(bottom = 16.dp)) {
                     Box(Modifier.width(3.dp).height(52.dp).background(Gold))
                     Text(
-                        "“$quote”", fontFamily = BookSerif, fontSize = 19.sp,
+                        quote, fontFamily = BookSerif, fontSize = 19.sp,
                         lineHeight = 27.sp, modifier = Modifier.padding(start = 16.dp),
                     )
                 }
@@ -686,7 +703,7 @@ private fun NoteView(
         }
 
         if (note.takeaway.isNotBlank()) {
-            SectionLabel("CARRY THIS INTO YOUR WEEK")
+            SectionLabel("Carry this into your week")
             Box(Modifier.fillMaxWidth().premiumCard(fill = NightFill).goldEdge()) {
                 Text(
                     note.takeaway, color = Ivory, fontFamily = BookSerif,
@@ -868,9 +885,9 @@ private fun SavedNoteSheet(
                 "${dayLabel(note.createdAt)} · ${note.minutes} min",
                 color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp),
             )
-            if (note.scriptures.isNotEmpty()) { SectionLabel("SCRIPTURES"); FlowChips(note.scriptures) }
+            if (note.scriptures.isNotEmpty()) { SectionLabel("Scriptures"); FlowChips(note.scriptures) }
             if (note.points.isNotEmpty()) {
-                SectionLabel("MAIN POINTS")
+                SectionLabel("Main points")
                 note.points.forEachIndexed { i, p ->
                     Row(Modifier.padding(bottom = 11.dp)) {
                         Text("${i + 1}.", color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end = 11.dp))
@@ -879,11 +896,11 @@ private fun SavedNoteSheet(
                 }
             }
             if (note.quotes.isNotEmpty()) {
-                SectionLabel("LINES WORTH KEEPING")
-                note.quotes.forEach { Text("“$it”", fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(bottom = 11.dp)) }
+                SectionLabel("Lines worth keeping")
+                note.quotes.forEach { Text(it, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(bottom = 11.dp)) }
             }
             if (note.takeaway.isNotBlank()) {
-                SectionLabel("CARRY THIS")
+                SectionLabel("Carry this")
                 Surface(shape = RoundedCornerShape(16.dp), color = Night, modifier = Modifier.fillMaxWidth()) {
                     Text(note.takeaway, color = Ivory, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(18.dp))
                 }
@@ -1009,9 +1026,9 @@ private fun LanguageSheet(current: String, onPick: (String) -> Unit, onClose: ()
                                 // say plainly which languages get the sharper
                                 // treatment rather than being quietly worse
                                 if (SermonArranger.hasCuesFor(lang.tag)) {
-                                    Text("FULL NOTES", color = Gold, fontSize = 10.5.sp)
+                                    Text("Full notes", color = Gold, fontSize = 13.sp)
                                 } else {
-                                    Text("BASIC NOTES", color = Muted, fontSize = 10.5.sp)
+                                    Text("Basic notes", color = Muted, fontSize = 13.sp)
                                 }
                             }
                             if (on) Icon(Icons.Outlined.Check, null, tint = Gold, modifier = Modifier.size(18.dp))

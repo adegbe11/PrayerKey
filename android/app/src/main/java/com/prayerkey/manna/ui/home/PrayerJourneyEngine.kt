@@ -158,7 +158,7 @@ fun PrayerSessionScreen(
                     }
                 }
                 Button({ remaining = minutes * 60; running = true; stage = 1 }, Modifier.fillMaxWidth().padding(top = 28.dp).height(60.dp), shape = RoundedCornerShape(30.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) {
-                    Text("START PRAYING", fontWeight = FontWeight.Bold)
+                    Text("Start praying", fontWeight = FontWeight.Bold)
                 }
             } else {
                 val active = prayerSections[section]
@@ -172,23 +172,23 @@ fun PrayerSessionScreen(
                     }
                 }
                 Row(Modifier.fillMaxWidth().padding(top = 22.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    OutlinedButton({ running = !running }, Modifier.weight(1f).height(52.dp), shape = RoundedCornerShape(16.dp)) { Text(if (running) "PAUSE" else "CONTINUE", color = Pk.Oxblood) }
-                    Button({ if (section < prayerSections.lastIndex) section++ else remaining = 0 }, Modifier.weight(1f).height(52.dp), shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) { Text(if (section == prayerSections.lastIndex) "FINISH" else "NEXT") }
+                    OutlinedButton({ running = !running }, Modifier.weight(1f).height(52.dp), shape = RoundedCornerShape(16.dp)) { Text(if (running) "Pause" else "Continue", color = Pk.Oxblood) }
+                    Button({ if (section < prayerSections.lastIndex) section++ else remaining = 0 }, Modifier.weight(1f).height(52.dp), shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood)) { Text(if (section == prayerSections.lastIndex) "Finish" else "Next") }
                 }
                 TextButton({ section = (section + 1).coerceAtMost(prayerSections.lastIndex) }, Modifier.align(Alignment.CenterHorizontally).padding(top = 12.dp)) { Text("I don't know what to pray next", color = Pk.Oxblood) }
                 Button({
                     store.save(PrayerSessionRecord(startedAt, minutes, mode, true, notes))
                     if (notes.isNotBlank()) onSaveNote(notes)
                     onClose()
-                }, Modifier.fillMaxWidth().padding(top = 22.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Charcoal)) { Text("COMPLETE SESSION") }
+                }, Modifier.fillMaxWidth().padding(top = 22.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.Charcoal)) { Text("Complete session") }
             }
         }
     }
     if (noteOpen) AlertDialog(
         onDismissRequest = { noteOpen = false }, title = { Text("Prayer note", fontFamily = DisplaySerif) },
         text = { OutlinedTextField(notes, { notes = it }, Modifier.fillMaxWidth(), minLines = 5, placeholder = { Text("Write what came to mind while you prayed") }) },
-        confirmButton = { TextButton({ noteOpen = false }) { Text("KEEP NOTE", color = Pk.Oxblood) } },
-        dismissButton = { TextButton({ noteOpen = false }) { Text("CANCEL") } },
+        confirmButton = { TextButton({ noteOpen = false }) { Text("Keep note", color = Pk.Oxblood) } },
+        dismissButton = { TextButton({ noteOpen = false }) { Text("Cancel") } },
     )
 }
 

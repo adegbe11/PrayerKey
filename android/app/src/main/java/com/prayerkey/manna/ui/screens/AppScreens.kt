@@ -172,10 +172,11 @@ fun BibleScreen(
     var bookMode by remember { mutableStateOf(false) }
     var libraryMode by remember { mutableStateOf(false) }
     var audioMode by remember { mutableStateOf(false) }
-    androidx.activity.compose.BackHandler(enabled = bookMode || libraryMode || audioMode) {
+    androidx.activity.compose.BackHandler(enabled = bookMode || libraryMode || audioMode || showMemory) {
         bookMode = false
         libraryMode = false
         audioMode = false
+        showMemory = false
     }
 
     if (audioMode) {
@@ -198,6 +199,7 @@ fun BibleScreen(
             onTextSize = onReaderTextSize,
             ribbon = readerRibbon,
             onRibbon = onReaderRibbon,
+            onClose = { bookMode = false },
             onReadPlain = { book, chapter ->
                 bookMode = false
                 scope.launch {
@@ -474,7 +476,7 @@ private fun VerseDetail(
                     Text(note.source, color = Muted, fontSize = 9.5.sp, modifier = Modifier.padding(top = 3.dp))
                 }
                 HorizontalDivider(Modifier.padding(vertical = 14.dp), color = Hairline)
-                Text("ASK ABOUT THIS PASSAGE", color = Gold, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold)
+                Text("Ask about this passage", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(value = studyQuestion, onValueChange = { studyQuestion = it }, label = { Text("Your question") }, placeholder = { Text("What does this passage say?") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
                 Button(onClick = { studyAnswer = com.prayerkey.manna.data.StudyLens.answer(reference, text, studyQuestion) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), enabled = studyQuestion.isNotBlank()) { Text("Explore carefully") }
@@ -531,7 +533,7 @@ private fun MemoryTrainer(
         }
     }
     if (connections.isNotEmpty()) {
-        Text("WOVEN THROUGH YOUR JOURNEY", color = Gold, fontSize = 9.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp, bottom = 8.dp))
+        Text("Woven through your journey", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp, bottom = 8.dp))
         connections.forEach { connection ->
             Surface(Modifier.fillMaxWidth().padding(bottom = 7.dp), shape = RoundedCornerShape(16.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
                 Column(Modifier.padding(13.dp)) {
@@ -770,7 +772,7 @@ fun LegacyPrayerScreen(
                 androidx.compose.animation.AnimatedVisibility(request.isBlank()) {
                     Column {
                         Text(
-                            "OR START HERE",
+                            "Or start here",
                             color = cs.onBackground.copy(alpha = .5f), fontSize = 10.sp, letterSpacing = 1.6.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(top = Space.block, bottom = 10.dp),
@@ -882,7 +884,7 @@ fun LegacyPrayerScreen(
 
                 if (journal.isNotEmpty()) {
                     Text(
-                        "PRAYERS YOU KEPT",
+                        "Prayers you kept",
                         color = Muted, fontSize = 10.sp, letterSpacing = 1.6.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = Space.loose, bottom = 10.dp),
@@ -924,12 +926,12 @@ fun LegacyPrayerScreen(
                     Text(potd.title, fontFamily = BookSerif, fontSize = 28.sp, modifier = Modifier.padding(top = 6.dp))
                     Text(potd.ref, color = Gold, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.padding(top = 3.dp))
                     Surface(shape = RoundedCornerShape(14.dp), color = Ivory, modifier = Modifier.fillMaxWidth().padding(top = 14.dp)) {
-                        Text("“${potd.verse}”", fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(16.dp))
+                        Text(potd.verse, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, modifier = Modifier.padding(16.dp))
                     }
                     potd.prayer.split("\n\n").forEach { para ->
                         Text(para, fontSize = 15.sp, lineHeight = 24.sp, color = Ink, modifier = Modifier.padding(top = 14.dp))
                     }
-                    Text("SHARE AS A CARD", color = Muted, fontSize = 11.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 26.dp, bottom = 10.dp))
+                    Text("Share as a card", color = Muted, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 26.dp, bottom = 10.dp))
                 }
                 items(com.prayerkey.manna.share.CardFormat.entries.toList(), key = { it.name }) { format ->
                     Surface(
@@ -1168,7 +1170,7 @@ private fun SavedCard(word: SavedWord, canAnswer: Boolean, onAnswer: () -> Unit)
         Column(Modifier.fillMaxWidth().padding(18.dp)) {
             Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
             Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
-            word.testimony?.let { Text("“$it”", color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
+            word.testimony?.let { Text(it, color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
             Text(DateFormat.getDateInstance().format(Date(word.answeredAt ?: word.savedAt)), color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
             if (canAnswer) TextButton(onClick = onAnswer, modifier = Modifier.align(Alignment.End)) { Text("Mark answered") }
         }
@@ -1217,7 +1219,8 @@ fun ProfileScreen(
         Box(Modifier.fillMaxWidth().padding(vertical = 18.dp).clip(R.card).background(NightFill).border(0.7.dp, Pk.GoldLight.copy(alpha = .28f), R.card)) {
             Row(Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { Text(streak.toString(), color = Color.White, fontFamily = BookSerif, fontSize = 48.sp); Text("day streak", color = Color.White.copy(.7f)) }
-                Column(horizontalAlignment = Alignment.End) { Text(savedCount.toString(), color = Pk.GoldLight, fontFamily = DisplaySerif, fontSize = 30.sp); Text("words saved", color = Color.White.copy(.7f)) }
+                // the same figure as the streak beside it: a smaller number in another face read as a footnote
+                Column(horizontalAlignment = Alignment.End) { Text(savedCount.toString(), color = Pk.GoldLight, fontFamily = BookSerif, fontSize = 48.sp); Text("words saved", color = Color.White.copy(.7f)) }
             }
         }
         /* ── Theme ──────────────────────────────────────────────────────
@@ -1352,7 +1355,7 @@ private fun ThemeSetting(prefs: UserPrefs, onUpdate: (UserPrefs) -> Unit) {
     val cs = MaterialTheme.colorScheme
     Column(Modifier.padding(top = 20.dp)) {
         Text(
-            "THEME",
+            "Theme",
             color = cs.onBackground.copy(alpha = .5f), fontSize = 9.5.sp,
             letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold,
         )

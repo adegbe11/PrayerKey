@@ -57,13 +57,13 @@ internal fun EmergencyPrayerEngine(
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onClose) { Icon(Icons.Outlined.Close, "Close", tint = Pk.Charcoal) }
-                Text("PRIVATE PRAYER", Modifier.weight(1f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.4.sp, color = Pk.Oxblood)
+                Text("Private prayer", Modifier.weight(1f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.Oxblood)
             }
             LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(horizontal = 22.dp, vertical = 10.dp)) {
                 item {
                     Text("What do you need prayer for?", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 35.sp, lineHeight = 40.sp, color = Pk.Charcoal)
                     BasicTextField(need, { need = it }, textStyle = TextStyle(fontFamily = BookSerif, fontSize = 18.sp, color = Pk.Charcoal), modifier = Modifier.fillMaxWidth().padding(top = 20.dp).height(94.dp).background(Color.White, RoundedCornerShape(20.dp)).padding(16.dp), decorationBox = { field -> Box { if (need.isBlank()) Text("God, I need help with...", fontFamily = BookSerif, fontSize = 18.sp, color = Pk.Muted); field() } })
-                    Text("CHOOSE THE CLOSEST SITUATION", Modifier.padding(top = 25.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, letterSpacing = 1.2.sp, color = Pk.Oxblood)
+                    Text("Choose the closest situation", Modifier.padding(top = 25.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.Oxblood)
                     BasicTextField(search, { search = it }, singleLine = true, textStyle = TextStyle(fontFamily = UtilitySans, fontSize = 15.sp, color = Pk.Charcoal), modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 12.dp).height(52.dp).background(Color.White, RoundedCornerShape(17.dp)).padding(horizontal = 16.dp, vertical = 15.dp), decorationBox = { field -> Box { if (search.isBlank()) Text("Search health, family, work, fear...", fontFamily = UtilitySans, fontSize = 14.sp, color = Pk.Muted); field() } })
                 }
                 items(filtered, key = { it.slug }) { topic ->
@@ -96,25 +96,25 @@ private fun EmergencyPrayerSession(topic: PrayerTopic, need: String, onBack: () 
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
             Row(Modifier.padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) { Icon(Icons.Outlined.ArrowBackIosNew, "Back", tint = Color.White, modifier = Modifier.size(16.dp)) }
-                Text("PRAY NOW", Modifier.weight(1f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.4.sp, color = Pk.GoldLight)
+                Text("Pray now", Modifier.weight(1f), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.GoldLight)
                 IconButton(onClick = onClose) { Icon(Icons.Outlined.Close, "Close", tint = Color.White) }
             }
             LazyColumn(Modifier.weight(1f), contentPadding = PaddingValues(horizontal = 22.dp, vertical = 10.dp)) {
                 item {
                     Text(topic.title.removePrefix("Prayer for "), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 34.sp, lineHeight = 39.sp, color = Color.White)
-                    if (need.isNotBlank()) Text("“$need”", Modifier.padding(top = 12.dp), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 17.sp, lineHeight = 25.sp, color = Color.White.copy(alpha = .68f))
+                    if (need.isNotBlank()) Text(need, Modifier.padding(top = 12.dp), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 17.sp, lineHeight = 25.sp, color = Color.White.copy(alpha = .68f))
                     Surface(Modifier.fillMaxWidth().padding(top = 22.dp), shape = RoundedCornerShape(20.dp), color = Pk.Gold.copy(alpha = .12f)) {
                         Column(Modifier.padding(18.dp)) {
                             Text(scripture?.second ?: "God is our refuge and strength, a very present help in trouble.", fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 27.sp, color = Color.White)
-                            Text((scripture?.first ?: "Psalm 46:1").uppercase(Locale.getDefault()), Modifier.padding(top = 10.dp), fontFamily = UtilitySans, fontSize = 8.sp, letterSpacing = 1.2.sp, color = Pk.GoldLight)
+                            Text((scripture?.first ?: "Psalm 46:1"), Modifier.padding(top = 10.dp), fontFamily = UtilitySans, fontSize = 8.sp, letterSpacing = 1.2.sp, color = Pk.GoldLight)
                         }
                     }
                     Row(Modifier.fillMaxWidth().padding(top = 18.dp).background(Color.White.copy(alpha = .08f), RoundedCornerShape(18.dp)).clickable { if (seconds == 0) seconds = 300; running = !running }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.Timer, null, tint = Pk.GoldLight)
                         Text("%02d:%02d".format(Locale.US, seconds / 60, seconds % 60), Modifier.weight(1f).padding(start = 12.dp), fontFamily = DisplaySerif, fontSize = 25.sp, color = Color.White)
-                        Text(if (running) "PAUSE" else "START", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, color = Pk.GoldLight)
+                        Text(if (running) "Pause" else "Start", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.GoldLight)
                     }
-                    Text("PRAY EACH POINT", Modifier.padding(top = 25.dp, bottom = 5.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, letterSpacing = 1.3.sp, color = Pk.GoldLight)
+                    Text("Pray each point", Modifier.padding(top = 25.dp, bottom = 5.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.GoldLight)
                 }
                 items(points.size) { index ->
                     val done = index in checked
@@ -126,14 +126,14 @@ private fun EmergencyPrayerSession(topic: PrayerTopic, need: String, onBack: () 
                     HorizontalDivider(color = Color.White.copy(alpha = .09f))
                 }
                 item {
-                    Text("FULL PRAYER", Modifier.padding(top = 26.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, letterSpacing = 1.3.sp, color = Pk.GoldLight)
+                    Text("Full prayer", Modifier.padding(top = 26.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.GoldLight)
                     Text(topic.prayer, Modifier.padding(top = 10.dp), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 19.sp, lineHeight = 29.sp, color = Color.White)
-                    OutlinedButton(onClick = { onSave(topic.title, need.ifBlank { topic.prayer }); saved = true }, enabled = !saved, modifier = Modifier.fillMaxWidth().padding(top = 22.dp).height(52.dp), shape = RoundedCornerShape(17.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Pk.GoldLight), colors = ButtonDefaults.outlinedButtonColors(contentColor = Pk.GoldLight)) { Text(if (saved) "SAVED TO MY PRAYERS" else "SAVE TO MY PRAYERS", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp) }
+                    OutlinedButton(onClick = { onSave(topic.title, need.ifBlank { topic.prayer }); saved = true }, enabled = !saved, modifier = Modifier.fillMaxWidth().padding(top = 22.dp).height(52.dp), shape = RoundedCornerShape(17.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Pk.GoldLight), colors = ButtonDefaults.outlinedButtonColors(contentColor = Pk.GoldLight)) { Text(if (saved) "Saved to my prayers" else "Save to my prayers", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp) }
                     Spacer(Modifier.height(24.dp))
                 }
             }
             Button(onClick = onClose, enabled = checked.size == points.size, modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp).height(56.dp), shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.GoldLight, contentColor = Pk.DeepDark)) {
-                Text(if (checked.size == points.size) "FINISH PRAYER" else "PRAY EACH POINT TO FINISH", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = .7.sp)
+                Text(if (checked.size == points.size) "Finish prayer" else "Pray each point to finish", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
         }
     }

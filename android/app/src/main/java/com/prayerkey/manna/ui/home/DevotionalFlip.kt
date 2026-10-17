@@ -137,7 +137,7 @@ fun DevotionalPageContent(
 ) {
     when (page) {
         DevoPage.Cover -> Page {
-            Text("DEVOTIONAL OF THE DAY", color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+            Text("Devotional of the day", color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(16.dp))
             val words = day.title.split(" ")
             val split = (words.size + 1) / 2
@@ -165,25 +165,25 @@ fun DevotionalPageContent(
                 Text(dateLine, color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 8.5.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 7.dp))
                 Box(Modifier.padding(horizontal = 11.dp).width(1.dp).height(10.dp).background(Pk.Crisp.copy(alpha = .3f)))
                 Icon(Icons.Outlined.WbSunny, null, tint = Pk.GoldDeep, modifier = Modifier.size(12.dp))
-                Text("DAY ${day.seriesDay} OF ${day.seriesOf}", color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 8.5.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 7.dp))
+                Text("Day ${day.seriesDay} of ${day.seriesOf}", color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 8.5.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 7.dp))
             }
             Spacer(Modifier.height(34.dp))
             DevotionalAudioBar(voice)
         }
 
         DevoPage.Scripture -> Page {
-            Text("KEY SCRIPTURE", color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+            Text("Key Scripture", color = Pk.GoldLight, fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(24.dp))
             val opening = scripture[day.reading.ref.label]
             Text(
-                if (opening == null) "…" else "“$opening”",
+                if (opening == null) "…" else opening,
                 color = Pk.Crisp, fontFamily = BookSerif, fontStyle = FontStyle.Italic,
                 fontWeight = FontWeight.Light, fontSize = 26.sp, lineHeight = 40.sp,
                 letterSpacing = (-0.4).sp,
             )
             Spacer(Modifier.height(28.dp))
             Text(
-                "${day.reading.ref.label.uppercase(Locale.getDefault())} · KJV",
+                "${day.reading.ref.label} · KJV",
                 color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 9.sp,
                 letterSpacing = 1.8.sp, fontWeight = FontWeight.Bold,
             )
@@ -210,7 +210,7 @@ fun DevotionalPageContent(
                     )
                     Spacer(Modifier.height(22.dp))
                     Text(
-                        block.ref.label.uppercase(Locale.getDefault()),
+                        block.ref.label,
                         color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 9.sp,
                         letterSpacing = 1.8.sp, fontWeight = FontWeight.Bold,
                     )
@@ -247,7 +247,7 @@ fun DevotionalPageContent(
         }
 
         DevoPage.Prayer -> Page {
-            Text("PRAY IT", color = Pk.GoldDeep, fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+            Text("Pray it", color = Pk.GoldDeep, fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(24.dp))
             Text(
                 buildAnnotatedString {
@@ -268,7 +268,7 @@ fun DevotionalPageContent(
         }
 
         DevoPage.Question -> Page {
-            Text("ONE QUESTION", color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 9.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+            Text("One question", color = Pk.Crisp.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(24.dp))
             Text(
                 day.question, color = Pk.Crisp, fontFamily = DisplaySerif,

@@ -204,22 +204,22 @@ object SermonArranger {
         appendLine("$dateLabel · $minutes min")
         if (note.scriptures.isNotEmpty()) {
             appendLine()
-            appendLine("SCRIPTURES PREACHED")
+            appendLine("Scriptures preached")
             note.scriptures.forEach { appendLine("• $it") }
         }
         if (note.points.isNotEmpty()) {
             appendLine()
-            appendLine("THE MAIN POINTS")
+            appendLine("The main points")
             note.points.forEachIndexed { i, p -> appendLine("${i + 1}. $p") }
         }
         if (note.quotes.isNotEmpty()) {
             appendLine()
-            appendLine("LINES WORTH KEEPING")
-            note.quotes.forEach { appendLine("\"$it\"") }
+            appendLine("Lines worth keeping")
+            note.quotes.forEach { appendLine(it) }
         }
         if (note.takeaway.isNotBlank()) {
             appendLine()
-            appendLine("CARRY THIS INTO YOUR WEEK")
+            appendLine("Carry this into your week")
             appendLine(note.takeaway)
         }
         appendLine()

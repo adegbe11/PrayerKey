@@ -75,6 +75,16 @@ fun PrayerScreen(
         }
     }
 
+    /* Back steps out one level at a time: a deck to its situations, the
+       situations to the prayer page, a written prayer back to the question. */
+    androidx.activity.compose.BackHandler(enabled = deckOpen || generated != null) {
+        when {
+            deckOpen && category != null -> category = null
+            deckOpen -> deckOpen = false
+            else -> generated = null
+        }
+    }
+
     if (deckOpen) {
         if (category == null) {
             PrayerSituationLibrary(topics, topics.isEmpty() && !topicsReady, onLoadTopics, { deckOpen = false }) { category = it }
@@ -101,7 +111,8 @@ fun PrayerScreen(
     Surface(Modifier.fillMaxSize(), color = PrayBlack) {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("PRAYERKEY", Modifier.weight(1f), color = PrayInk, fontFamily = UtilitySans, fontSize = 25.sp, fontWeight = FontWeight.Bold)
+                // titled like every other tab - Church, Journal - not with the app's name
+                Text("Pray", Modifier.weight(1f), color = PrayInk, fontFamily = DisplaySerif, fontSize = 32.sp, fontWeight = FontWeight.Bold)
                 RoundAction(Icons.Outlined.AutoStories, "Prayer decks") { deckOpen = true }
                 Spacer(Modifier.width(9.dp))
             }
@@ -123,26 +134,10 @@ fun PrayerScreen(
                             loading = false
                         }
                     }
-                    /* Cut to the half that is a promise rather than a
-                       tutorial. "You can begin with one honest sentence" is
-                       instruction; the privacy is a fact somebody writing
-                       something painful needs, and it is worth eight words. */
-                    Text(
-                        "Private unless you keep it.",
-                        Modifier.padding(top = 20.dp),
-                        color = PrayMuted,
-                        fontFamily = UtilitySans,
-                        fontSize = 13.sp,
-                        lineHeight = 20.sp,
-                    )
-                    Text(
-                        "BEGIN WITH",
-                        Modifier.padding(top = 28.dp, bottom = 10.dp),
-                        color = PrayMuted, fontFamily = UtilitySans,
-                        fontSize = 10.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold,
-                    )
+                    // the four chips say what they are; a label over them, and a
+                    // line about privacy, were the page talking about itself
                     Row(
-                        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                        Modifier.fillMaxWidth().padding(top = 22.dp).horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(9.dp),
                     ) {
                         listOf("My family", "Healing", "A decision", "Peace today").forEach { prompt ->
@@ -160,12 +155,28 @@ fun PrayerScreen(
                     }
                     error?.let { Text(it, Modifier.padding(top = 12.dp), color = Color(0xFFFF9B9B), fontSize = 12.sp) }
                     if (journal.isNotEmpty()) {
-                        Text("PRAYERS YOU KEPT", Modifier.padding(top = 31.dp, bottom = 10.dp), color = PrayMuted, fontSize = 10.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold)
+                        Text("Prayers you kept", Modifier.padding(top = 31.dp, bottom = 10.dp), color = PrayMuted, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         journal.take(3).forEach { saved ->
                             Surface(onClick = { request = saved.request }, modifier = Modifier.fillMaxWidth().padding(bottom = 9.dp), shape = RoundedCornerShape(22.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine), shadowElevation = 2.dp) {
                                 Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Outlined.BookmarkBorder, null, tint = PrayGold)
-                                    Column(Modifier.weight(1f).padding(start = 13.dp)) { Text(saved.title, color = PrayInk, fontFamily = BookSerif, fontSize = 17.sp); saved.scriptureRef?.let { Text(it, color = PrayMuted, fontSize = 11.sp) } }
+                                    Column(Modifier.weight(1f).padding(start = 13.dp)) {
+                                        Text(
+                                            saved.request.ifBlank { saved.title },
+                                            color = PrayInk, fontFamily = BookSerif, fontSize = 17.sp,
+                                            maxLines = 1,
+                                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                        )
+                                        Text(
+                                            listOfNotNull(
+                                                java.text.SimpleDateFormat("d MMM", java.util.Locale.getDefault())
+                                                    .format(java.util.Date(saved.createdAt)),
+                                                saved.scriptureRef,
+                                            ).joinToString("  \u00b7  "),
+                                            Modifier.padding(top = 3.dp),
+                                            color = PrayMuted, fontSize = 11.5.sp,
+                                        )
+                                    }
                                     Icon(Icons.Outlined.ChevronRight, null, tint = PrayMuted)
                                 }
                             }
@@ -210,12 +221,12 @@ fun PrayerScreen(
 @Composable private fun GeneratedPrayerView(prayer: GeneratedPrayer, speechReady: Boolean, onListen: () -> Unit, onSave: () -> Unit, onAgain: () -> Unit) {
     Text("A prayer for you", Modifier.padding(top = 34.dp), color = PrayGold, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
     Text(prayer.title, Modifier.padding(top = 10.dp), color = PrayInk, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 34.sp, lineHeight = 39.sp)
-    prayer.verses.firstOrNull()?.let { (ref, verse) -> Surface(Modifier.fillMaxWidth().padding(top = 24.dp), shape = RoundedCornerShape(24.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine), shadowElevation = 2.dp) { Column(Modifier.padding(20.dp)) { Text(ref.uppercase(), color = PrayGold, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.1.sp); Text("“$verse”", Modifier.padding(top = 8.dp), color = PrayInk, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 27.sp) } } }
+    prayer.verses.firstOrNull()?.let { (ref, verse) -> Surface(Modifier.fillMaxWidth().padding(top = 24.dp), shape = RoundedCornerShape(24.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine), shadowElevation = 2.dp) { Column(Modifier.padding(20.dp)) { Text(ref, color = PrayGold, fontSize = 13.sp, fontWeight = FontWeight.Bold); Text(verse, Modifier.padding(top = 8.dp), color = PrayInk, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 27.sp) } } }
     Text(prayer.prayer, Modifier.padding(top = 25.dp), color = PrayInk.copy(.9f), fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 31.sp)
     if (prayer.encouragement.isNotBlank()) Text(prayer.encouragement, Modifier.padding(top = 20.dp), color = PrayMuted, fontSize = 14.sp, lineHeight = 22.sp)
     Row(Modifier.fillMaxWidth().padding(top = 28.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         OutlinedButton(onListen, enabled = speechReady, modifier = Modifier.weight(1f), border = BorderStroke(1.dp, PrayLine)) { Icon(Icons.Outlined.VolumeUp, null); Text(" LISTEN") }
         Button(onSave, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = PrayViolet)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" KEEP") }
     }
-    TextButton(onAgain, Modifier.fillMaxWidth().padding(top = 12.dp)) { Text("PRAY ABOUT SOMETHING ELSE", color = PrayGold, fontSize = 11.sp, letterSpacing = .8.sp) }
+    TextButton(onAgain, Modifier.fillMaxWidth().padding(top = 12.dp)) { Text("Pray about something else", color = PrayGold, fontSize = 13.sp) }
 }

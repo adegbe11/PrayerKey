@@ -26,7 +26,10 @@ class SermonCaptureEngine(
     private var capture: Thread? = null
     private var samples = 0L
     private var segmentStart = 0L
-    private var speech: SpeechEngine? = null
+    /* Set from the loader thread once the model is open, read by the capture
+       thread on every buffer. */
+    @Volatile private var speech: SpeechEngine? = null
+    private var loader: Thread? = null
     lateinit var audioFile: File
         private set
     val segments = mutableListOf<SermonSegment>()
@@ -36,15 +39,22 @@ class SermonCaptureEngine(
         if (!running.compareAndSet(false, true)) return
         val dir = SermonSessionStore.directory(app)
         audioFile = File(dir, "sermon_${startedAt}.m4a")
-        prepareSpeech(dir)
         prepareEncoder()
         val min = AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)
         audioRecord = AudioRecord(MediaRecorder.AudioSource.VOICE_RECOGNITION, RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, maxOf(min, 32_000))
         if (audioRecord?.state != AudioRecord.STATE_INITIALIZED) { running.set(false); onStatus("Microphone could not be opened"); return }
         SermonSessionStore.write(audioFile, startedAt, "recording", segments)
         audioRecord?.startRecording()
-        onStatus(if (speech == null) "Recording" else "Listening")
+        onStatus("Recording")
         capture = thread(name = "sermon-capture", isDaemon = true) { captureLoop(startedAt) }
+        /* The model is 70 MB and took seconds to open. Opened here on the
+           main thread it froze the app - Android showed "isn't responding"
+           before a word was heard. It loads beside the recording instead; the
+           recording has started, and the words begin once it is ready. */
+        loader = thread(name = "sermon-speech", isDaemon = true) {
+            prepareSpeech()
+            if (speech != null && running.get()) onStatus("Listening")
+        }
     }
 
     fun stop(startedAt: Long) {
@@ -60,6 +70,9 @@ class SermonCaptureEngine(
            first unblocks that read, and the join makes the ordering certain. */
         runCatching { audioRecord?.stop() }
         runCatching { capture?.join(1_500) }
+        // a model still opening must finish before it is finished and released
+        runCatching { loader?.join(10_000) }
+        loader = null
         capture = null
         runCatching { audioRecord?.release() }; audioRecord = null
         drainEncoder(endOfStream = true)
@@ -106,9 +119,9 @@ class SermonCaptureEngine(
      * partial model dies in native code. [VoskModel.isInstalled] checks for the
      * subfolders Vosk actually reads.
      */
-    private fun prepareSpeech(dir: File) {
+    private fun prepareSpeech() {
         if (!SpeechModel.isInstalled(app, SpeechModel.Kind.Speech)) return
-        speech = SpeechEngine.open(SpeechModel.directory(app, SpeechModel.Kind.Speech))
+        speech = runCatching { SpeechEngine.open(SpeechModel.directory(app, SpeechModel.Kind.Speech)) }.getOrNull()
     }
 
     private fun prepareEncoder() {

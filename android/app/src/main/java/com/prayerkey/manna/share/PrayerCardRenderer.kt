@@ -92,7 +92,7 @@ object PrayerCardRenderer {
         y += 64f * ts
         paint.typeface = Typeface.create(Typeface.SERIF, Typeface.NORMAL)
         paint.color = Color.rgb(42, 42, 42); paint.textSize = 34f * ts
-        y = drawWrapped(canvas, paint, "“${prayer.verse}”", cx, y, w * .82f, 50f * ts, 4)
+        y = drawWrapped(canvas, paint, prayer.verse, cx, y, w * .82f, 50f * ts, 4)
 
         /* short prayer — first sentence, italic */
         y += 40f * ts

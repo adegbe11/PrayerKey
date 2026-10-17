@@ -14,5 +14,9 @@ class ReminderBootReceiver : BroadcastReceiver() {
         val prefs = MannaStore.of(context).preferences()
         ReminderReceiver.scheduleDailySuite(context, prefs.reminderEnabled)
         ReminderReceiver.schedule(context, prefs.reminderHour, prefs.reminderMinute, prefs.reminderEnabled)
+        // prayers still waiting to be asked about
+        PrayerMemoryReceiver.rescheduleAll(context)
+        // the moments of a fast that is still running
+        FastingMilestoneReceiver.rescheduleRunning(context)
     }
 }

@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui
 
+import androidx.compose.animation.togetherWith
 import com.prayerkey.manna.ui.theme.glassSource
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
@@ -54,7 +55,7 @@ import com.prayerkey.manna.ui.theme.Canvas
 import com.prayerkey.manna.ui.theme.Electric
 import com.prayerkey.manna.ui.theme.Muted
 
-private data class Destination(val label: String, val icon: ImageVector)
+private data class Destination(val label: String, val icon: ImageVector, val mark: Int? = null)
 
 @Composable
 fun MannaApp(
@@ -110,15 +111,15 @@ fun MannaApp(
         listOf(
             Destination("Home", Icons.Outlined.Home),
             Destination("Bible", Icons.Outlined.MenuBook),
-            Destination("Pray", Icons.Outlined.AutoAwesome),
+            Destination("Pray", Icons.Outlined.AutoAwesome, com.prayerkey.manna.R.drawable.ic_notification),
             Destination("Church", Icons.Outlined.Church),
             Destination("Journal", Icons.Outlined.EditNote),
         )
     }
-    var selected by remember { mutableIntStateOf(0) }
+    var selected by rememberSaveable { mutableIntStateOf(0) }
     var homeAction by remember { mutableStateOf<String?>(null) }
     var verseIndex by remember { mutableIntStateOf(0) }
-    var showProfile by remember { androidx.compose.runtime.mutableStateOf(false) }
+    var showProfile by rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
     var prayerDraft by rememberSaveable { mutableStateOf<String?>(null) }
     val rootView = LocalView.current
     SideEffect {
@@ -146,7 +147,11 @@ fun MannaApp(
                 selected = 0
                 homeAction = notificationRoute
             }
-            else -> selected = 0
+            else -> {
+                selected = 0
+                // "has God answered?" opens on Home, at that prayer
+                if (notificationRoute.startsWith("answered:")) homeAction = notificationRoute
+            }
         }
         showProfile = false
         onNotificationRouteConsumed()
@@ -203,6 +208,17 @@ fun MannaApp(
        panel that samples its own output smears a little more every frame. */
     val backdrop = com.prayerkey.manna.ui.theme.rememberGlassBackdrop()
 
+    /* Back always goes somewhere inside the app before it leaves it: from You
+       to where it was opened, from any tab to Home. Without this the back
+       gesture on Bible, Pray, Church or Journal closed PrayerKey outright.
+       Screens opened on top of a tab register their own back after this one,
+       so they still close first. */
+    androidx.activity.compose.BackHandler(
+        enabled = hydrated && preferences.onboarded && (showProfile || selected != 0),
+    ) {
+        if (showProfile) showProfile = false else selected = 0
+    }
+
     Box(
         Modifier.fillMaxSize()
             .background(androidx.compose.material3.MaterialTheme.colorScheme.background),
@@ -253,8 +269,19 @@ fun MannaApp(
                     },
                 )
             } else {
-                // instant tab switch — no transition animation, zero delay
-                when (selected) {
+                /* A tab change is a quick soft crossfade with the new screen
+                   settling forward a touch - fast enough to feel instant,
+                   soft enough not to feel like a cut. */
+                androidx.compose.animation.AnimatedContent(
+                    targetState = selected,
+                    transitionSpec = {
+                        (androidx.compose.animation.fadeIn(androidx.compose.animation.core.tween(220, delayMillis = 40)) +
+                            androidx.compose.animation.scaleIn(androidx.compose.animation.core.tween(260), initialScale = .985f))
+                            .togetherWith(androidx.compose.animation.fadeOut(androidx.compose.animation.core.tween(140)))
+                    },
+                    label = "tab",
+                ) { tab ->
+                when (tab) {
                     0 -> {
                         /* Today, built from the design system. The previous
                            dashboard is kept in HomeScreen for reference but is
@@ -284,6 +311,7 @@ fun MannaApp(
                             onKeepPrayer = { title, bringing ->
                                 viewModel.keepDevotionalPrayer(title, bringing)
                             },
+                            onKeepGuidedPrayer = viewModel::keepGuidedPrayer,
                             onKeepReflection = { question, answer ->
                                 viewModel.addEntry("devotional", answer, "", null, question)
                             },
@@ -357,6 +385,7 @@ fun MannaApp(
                     )
                     else -> Unit
                 }
+                }
             }
         }
 
@@ -364,13 +393,9 @@ fun MannaApp(
         if (hydrated && preferences.onboarded && preferences.accountReady && !showProfile) {
             Box(Modifier.align(Alignment.BottomCenter)) {
                 com.prayerkey.manna.ui.components.MannaDock(
-                    items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon) },
+                    items = destinations.map { com.prayerkey.manna.ui.components.DockItem(it.label, it.icon, it.mark) },
                     selected = selected,
-                    // The sampled backdrop could retain a stale crop while
-                    // switching tabs, which visibly pushed dock items off the
-                    // sides on Pray and Journal. The dock already owns a
-                    // translucent theme fill, so keep its geometry stable.
-                    backdrop = null,
+                    backdrop = backdrop,
                     onSelect = { selected = it },
                 )
             }

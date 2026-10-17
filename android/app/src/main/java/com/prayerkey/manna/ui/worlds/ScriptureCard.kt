@@ -70,7 +70,7 @@ fun ScriptureCard(
         ) {
             if (world.isPromise) {
                 Text(
-                    "PROMISE",
+                    "Promise",
                     color = palette.accent, fontSize = 10.sp,
                     letterSpacing = 3.sp, fontWeight = FontWeight.Black,
                 )

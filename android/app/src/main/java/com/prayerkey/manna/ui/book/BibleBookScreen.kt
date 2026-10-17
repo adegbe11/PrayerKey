@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.book
 
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -80,19 +81,70 @@ import kotlin.math.roundToInt
 
 /* A bound Bible, drawn. Not the app's theme — a book is leather and paper
    whichever sky you chose for the rest of Manna. */
-private val Desk = Color(0xFF17130D)
-private val Leather = Color(0xFF3A2116)
-private val LeatherDark = Color(0xFF22120B)
-private val Page = Color(0xFFF6EFDC)
-private val PageEdge = Color(0xFFE6D9B6)
+/**
+ * The colours of one edition of the book.
+ *
+ * Classic is leather and cream paper with gilt and a red rubric. Monochrome
+ * is the black edition: black board, near-black leaves, the text in soft white
+ * and the verse numbers in silver - no colour anywhere, the way a black
+ * leather Bible with dark pages is bound.
+ */
+class BookPalette(
+    val desk: Color, val deskLit: Color,
+    val spine: List<Color>,
+    val pageLit: Color, val page: Color, val pageEdge: Color,
+    val foreEdge: List<Color>, val foreSheen: Color, val foreShade: Color,
+    val gild: Color, val ink: Color, val rubric: Color, val ribbon: Color,
+    /** hairlines and borders in the page chrome */
+    val rule: Color,
+    /** run-head, folio and chrome labels */
+    val caption: Color,
+    val icon: Color,
+    val popup: Color,
+    val gutter: Color,
+    val chromeFill: Color,
+)
+
+enum class BookEdition { Classic, Monochrome }
+
+private val ClassicPalette = BookPalette(
+    desk = Color(0xFF17130D), deskLit = Color(0xFF2A2016),
+    spine = listOf(Color(0xFF1B0E07), Color(0xFF442718), Color(0xFF2B1710)),
+    pageLit = Color(0xFFFDFAF0), page = Color(0xFFF6EFDC), pageEdge = Color(0xFFE6D9B6),
+    foreEdge = listOf(Color(0xFFEFE5C8), Color(0xFFDED0A8), Color(0xFFF4ECD6), Color(0xFFDED0A8)),
+    foreSheen = Color(0xFFFFF0C8), foreShade = Color(0xFFB49B5F),
+    gild = Color(0xFFC9A26D), ink = Color(0xFF221C12), rubric = Color(0xFF9A1B2B), ribbon = Color(0xFF8C1F2B),
+    rule = Color(0xFF8C6E32), caption = Color(0xFF5A4828), icon = Color(0xFF3A2A12),
+    popup = Color(0xFF1E1207), gutter = Color(0xFF6B5A34), chromeFill = Color(0xFFF6EFDC),
+)
+
+private val MonochromePalette = BookPalette(
+    desk = Color(0xFF050505), deskLit = Color(0xFF141414),
+    spine = listOf(Color(0xFF000000), Color(0xFF1C1C1E), Color(0xFF0A0A0A)),
+    pageLit = Color(0xFF232325), page = Color(0xFF1B1B1D), pageEdge = Color(0xFF111113),
+    foreEdge = listOf(Color(0xFF3A3A3C), Color(0xFF232325), Color(0xFF48484A), Color(0xFF232325)),
+    foreSheen = Color(0xFFE5E5EA), foreShade = Color(0xFF000000),
+    gild = Color(0xFFBDBDC2), ink = Color(0xFFEDEDED), rubric = Color(0xFFB9B9BE), ribbon = Color(0xFFD1D1D6),
+    rule = Color(0xFF8E8E93), caption = Color(0xFFAEAEB2), icon = Color(0xFFEDEDED),
+    popup = Color(0xFF000000), gutter = Color(0xFF000000), chromeFill = Color(0xFF2C2C2E),
+)
+
+/* The edition being drawn. One book is on screen at a time, and the screen
+   sets this as it composes, so every leaf, rule and label below follows it. */
+private var P: BookPalette = ClassicPalette
+
+private val Desk get() = P.desk
+private val Page get() = P.page
+private val PageEdge get() = P.pageEdge
 /* Gilt, and it has to actually be gold. This was #5D91F2 — a blue — left
    behind by the app-wide violet pass, which painted the sheen on the fore
    edge of a leather Bible cornflower blue on every page. The book is the one
    surface in the app that does not follow the theme: gilding is a metal. */
-private val Gild = Color(0xFFC9A26D)
-private val BookInk = Color(0xFF221C12)
-private val Rubric = Color(0xFF4A0E17)
-private val Ribbon = Color(0xFF8C1F2B)
+private val Gild get() = P.gild
+private val BookInk get() = P.ink
+// the red of the bookmark; the old near-black maroon disappeared into the ink
+private val Rubric get() = P.rubric
+private val Ribbon get() = P.ribbon
 
 /**
  * The Bible as a book.
@@ -131,15 +183,25 @@ fun BibleBookScreen(
     onTextSize: (Int) -> Unit,
     ribbon: String?,
     onRibbon: (String?) -> Unit,
-    onReadPlain: (String, Int) -> Unit,
+    onReadPlain: ((String, Int) -> Unit)?,
+    onClose: () -> Unit = {},
+    edition: BookEdition = BookEdition.Classic,
+    /** where to keep the chapter you were in, so the book opens there again */
+    placeKey: String? = null,
 ) {
+    P = if (edition == BookEdition.Monochrome) MonochromePalette else ClassicPalette
     val view = LocalView.current
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
     val measurer = rememberTextMeasurer()
 
     val chapters = remember { BibleCanon.chapters }
-    var chapterIndex by remember { mutableIntStateOf(0) }
+    val placeStore = remember(placeKey) {
+        placeKey?.let { view.context.getSharedPreferences("book_place", android.content.Context.MODE_PRIVATE) }
+    }
+    var chapterIndex by remember {
+        mutableIntStateOf(placeStore?.getInt(placeKey, 0)?.coerceIn(0, BibleCanon.chapters.lastIndex) ?: 0)
+    }
     var pageIndex by remember { mutableIntStateOf(0) }
     // set when arriving backwards, so we land on the last leaf of the chapter
     var landOnLast by remember { mutableStateOf(false) }
@@ -171,11 +233,12 @@ fun BibleBookScreen(
     var restoreTo by remember { mutableIntStateOf(-1) }
 
     LaunchedEffect(chapterIndex) {
+        placeStore?.edit()?.putInt(placeKey, chapterIndex)?.apply()
         verses = bible.chapter(here.book.name, here.chapter)
         loadedChapter = chapterIndex
     }
 
-    Box(Modifier.fillMaxSize().background(Brush.radialGradient(listOf(Color(0xFF2A2016), Desk), radius = 1400f))) {
+    Box(Modifier.fillMaxSize().background(Brush.radialGradient(listOf(P.deskLit, Desk), radius = 1400f))) {
 
         // ── the book ──────────────────────────────────────────────────────
         Box(
@@ -193,7 +256,7 @@ fun BibleBookScreen(
             // spine
             Box(
                 Modifier.fillMaxHeight().width(13.dp)
-                    .background(Brush.horizontalGradient(listOf(Color(0xFF1B0E07), Color(0xFF442718), Color(0xFF2B1710)))),
+                    .background(Brush.horizontalGradient(P.spine)),
             )
 
             BoxWithConstraints(
@@ -211,34 +274,56 @@ fun BibleBookScreen(
                         fontWeight = FontWeight.SemiBold,
                         color = BookInk,
                         textAlign = TextAlign.Justify,
+                        /* Justified type on a phone-width measure opens rivers
+                           between words unless long words can break, so the
+                           setting hyphenates and balances the paragraph the
+                           way a printed page does. */
+                        hyphens = androidx.compose.ui.text.style.Hyphens.Auto,
+                        lineBreak = androidx.compose.ui.text.style.LineBreak.Paragraph,
                     )
                 }
 
                 /* One layout for the whole chapter, then windows onto it.
                    Laying out per verse would start every verse on a new line;
                    a Bible flows them. */
-                val flow = remember(verses, textSize) { chapterText(verses) }
-                val layout: TextLayoutResult? = remember(flow, pageW, textSize) {
+                val flow = remember(verses, textSize) { chapterText(verses, textSize) }
+                /* The initial rises from the first line's baseline, about two
+                   and a half times the reading size, the way a printed Bible
+                   opens a chapter. Its place in the line is only as tall as the
+                   line itself: anything taller in the first line makes Android
+                   draw the whole page a line lower than it measured it, which
+                   cut the last line off and repeated it on the next page. The
+                   letter rises into the empty left of the chapter heading. */
+                val initial: TextLayoutResult? = remember(flow, textSize) {
+                    if (flow.initialAt < 0) null
+                    else measurer.measure(
+                        flow.initial,
+                        TextStyle(
+                            fontFamily = BookSerif, fontSize = (textSize * 2.5f).sp,
+                            fontWeight = FontWeight.Bold, color = BookInk,
+                        ),
+                    )
+                }
+                val layout: TextLayoutResult? = remember(flow, pageW, textSize, initial) {
                     if (verses.isEmpty() || pageW <= 0f) null
                     else measurer.measure(
                         flow.text, body,
+                        placeholders = initial?.let { cap ->
+                            listOf(
+                                AnnotatedString.Range(
+                                    androidx.compose.ui.text.Placeholder(
+                                        width = with(density) { (cap.size.width + 1.dp.toPx()).toSp() },
+                                        height = (textSize * .7f).sp,
+                                        placeholderVerticalAlign =
+                                            androidx.compose.ui.text.PlaceholderVerticalAlign.AboveBaseline,
+                                    ),
+                                    flow.initialAt, flow.initialAt + 1,
+                                ),
+                            )
+                        } ?: emptyList(),
                         constraints = Constraints(maxWidth = pageW.roundToInt().coerceAtLeast(1)),
                     )
                 }
-
-                /* The tallest line, not the first. A line carrying a rubric
-                   verse number is a shade taller than one that does not, so
-                   measuring line 0 and assuming uniformity let a page take one
-                   line too many and slice it through the middle. Being a hair
-                   conservative costs at most a sliver of margin. */
-                val lineH = layout?.let { l ->
-                    var tallest = 0f
-                    for (i in 0 until l.lineCount) {
-                        val t = l.getLineBottom(i) - l.getLineTop(i)
-                        if (t > tallest) tallest = t
-                    }
-                    tallest
-                } ?: 0f
 
                 /* Measured, not estimated. Guessing the run-head and folio
                    heights left the window a fraction taller than the box, so
@@ -246,12 +331,18 @@ fun BibleBookScreen(
                    The body box reports its own height instead. */
                 var bodyPx by remember { mutableFloatStateOf(0f) }
 
-                val perPage = if (lineH > 0f && bodyPx > 0f) {
-                    (bodyPx / lineH).toInt().coerceAtLeast(1)
-                } else 1
-
-                val windows = remember(layout, perPage) {
-                    pageWindows(layout?.lineCount ?: 0, perPage)
+                /* Pages by real height: the drop-cap line is far taller than
+                   the rest, so a single line height (the tallest) made every
+                   page think it held half what it drew - see
+                   [pageWindowsByHeight]. */
+                val windows = remember(layout, bodyPx) {
+                    val l = layout
+                    if (l == null || bodyPx <= 0f) pageWindows(l?.lineCount ?: 0, 1)
+                    else pageWindowsByHeight(
+                        List(l.lineCount) { l.getLineTop(it) },
+                        List(l.lineCount) { l.getLineBottom(it) },
+                        bodyPx,
+                    )
                 }
 
                 /* Wait for the chapter you are actually in.
@@ -404,6 +495,7 @@ fun BibleBookScreen(
                             window = win,
                             verses = win?.let { versesInWindow(flow.verseLines(layout), it) },
                             layout = layout,
+                            initial = initial,
                             textSize = textSize,
                             onBodyHeight = { if (win === window) bodyPx = it },
                         )
@@ -438,8 +530,8 @@ fun BibleBookScreen(
                     .clip(RoundedCornerShape(0.dp, 8.dp, 8.dp, 0.dp))
                     .background(
                         Brush.horizontalGradient(
-                            0f to Color(0xFFEFE5C8), .34f to Color(0xFFDED0A8),
-                            .67f to Color(0xFFF4ECD6), 1f to Color(0xFFDED0A8),
+                            0f to P.foreEdge[0], .34f to P.foreEdge[1],
+                            .67f to P.foreEdge[2], 1f to P.foreEdge[3],
                         ),
                     )
                     .pointerInput(Unit) {
@@ -476,8 +568,8 @@ fun BibleBookScreen(
                     Modifier.fillMaxSize().background(
                         Brush.verticalGradient(
                             listOf(
-                                Gild.copy(alpha = .45f), Color(0xFFFFF0C8).copy(alpha = .18f),
-                                Gild.copy(alpha = .35f), Color(0xFFFFF0C8).copy(alpha = .2f),
+                                Gild.copy(alpha = .45f), P.foreSheen.copy(alpha = .18f),
+                                Gild.copy(alpha = .35f), P.foreSheen.copy(alpha = .2f),
                             ),
                         ),
                     ),
@@ -493,7 +585,7 @@ fun BibleBookScreen(
 
             if (!scrubbing) {
                 Text(
-                    "THUMB THE EDGE",
+                    "Thumb the edge",
                     color = Page.copy(alpha = .32f), fontSize = 8.5.sp, letterSpacing = 2.4.sp,
                     modifier = Modifier.align(Alignment.CenterEnd)
                         .padding(end = 26.dp)
@@ -512,9 +604,9 @@ fun BibleBookScreen(
                     Box(
                         Modifier.fillMaxSize().background(
                             Brush.horizontalGradient(
-                                0f to Color(0xFFB49B5F).copy(alpha = .14f),
+                                0f to P.foreShade.copy(alpha = .14f),
                                 .3f to Color.Transparent,
-                                .6f to Color(0xFFB49B5F).copy(alpha = .12f),
+                                .6f to P.foreShade.copy(alpha = .12f),
                                 1f to Color.Transparent,
                             ),
                         ),
@@ -522,7 +614,7 @@ fun BibleBookScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             if (target.book.oldTestament) "OLD TESTAMENT" else "NEW TESTAMENT",
-                            color = Color(0xFF8C6E32).copy(alpha = .85f),
+                            color = P.rule.copy(alpha = .85f),
                             fontSize = 8.sp, letterSpacing = 3.sp, fontWeight = FontWeight.SemiBold,
                         )
                         Spacer(Modifier.height(10.dp))
@@ -533,7 +625,7 @@ fun BibleBookScreen(
                         Spacer(Modifier.height(6.dp))
                         Text(
                             "CHAPTER ${target.chapter}",
-                            color = Color(0xFF5A4828).copy(alpha = .85f),
+                            color = P.caption.copy(alpha = .85f),
                             fontSize = 10.sp, letterSpacing = 3.sp,
                         )
                     }
@@ -554,7 +646,16 @@ fun BibleBookScreen(
                     }
                     .clip(RoundedCornerShape(0.dp)),
             ) {
-                BibleCover(
+                val open = {
+                    view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                    scope.launch {
+                        cover.animateTo(1f, tween(760))
+                        closed = false
+                    }
+                    Unit
+                }
+                if (edition == BookEdition.Monochrome) MonochromeCover(onOpen = open)
+                else BibleCover(
                     onOpen = {
                         view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                         scope.launch {
@@ -583,7 +684,7 @@ fun BibleBookScreen(
             // statusBarsPadding, or the row sits under the clock and battery —
             // it was drawn at a fixed 14dp from the top of the window
             Modifier.fillMaxWidth().statusBarsPadding()
-                .padding(horizontal = 22.dp).padding(top = 10.dp)
+                .padding(start = 66.dp, end = 22.dp).padding(top = 10.dp)
                 .graphicsLayer { alpha = cover.value },
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -600,10 +701,10 @@ fun BibleBookScreen(
             val ribbonHere = ribbon == here.label
             Box(
                 Modifier.size(34.dp).clip(RoundedCornerShape(99.dp))
-                    .background(if (ribbonHere) Color(0xFF8C1F2B).copy(alpha = .14f) else BookInk.copy(alpha = .05f))
+                    .background(if (ribbonHere) Ribbon.copy(alpha = .14f) else BookInk.copy(alpha = .05f))
                     .border(
                         1.dp,
-                        if (ribbonHere) Color(0xFF8C1F2B).copy(alpha = .5f) else Color(0xFF8C6E32).copy(alpha = .4f),
+                        if (ribbonHere) Ribbon.copy(alpha = .5f) else P.rule.copy(alpha = .4f),
                         RoundedCornerShape(99.dp),
                     )
                     .clickable {
@@ -626,14 +727,31 @@ fun BibleBookScreen(
                         ribbon != null -> "Go to $ribbon"
                         else -> "Leave a bookmark here"
                     },
-                    tint = if (ribbon != null) Color(0xFF8C1F2B) else Color(0xFF6B5424),
+                    tint = if (ribbon != null) Ribbon else P.caption,
                     modifier = Modifier.size(17.dp),
                 )
             }
             Spacer(Modifier.width(8.dp))
             EdgeButton("Aa") { sizeOpen = !sizeOpen }
             Spacer(Modifier.width(8.dp))
-            EdgeButton("Read plain") { onReadPlain(here.book.name, here.chapter) }
+            onReadPlain?.let { plain -> EdgeButton("Read plain") { plain(here.book.name, here.chapter) } }
+        }
+
+        /* The way out of the book, on the cover and on every page. The row
+           beside it fades in only once the book is open, so this is drawn on
+           its own. */
+        Box(
+            Modifier.align(Alignment.TopStart).statusBarsPadding().padding(start = 18.dp, top = 8.dp)
+                .size(38.dp).clip(RoundedCornerShape(99.dp))
+                .background(Page.copy(alpha = .82f))
+                .border(1.dp, P.rule.copy(alpha = .4f), RoundedCornerShape(99.dp))
+                .clickable(onClick = onClose),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowBack, "Back",
+                tint = P.icon, modifier = Modifier.size(19.dp),
+            )
         }
 
         // drawn last, or the book paints over it
@@ -641,7 +759,7 @@ fun BibleBookScreen(
             Row(
                 Modifier.align(Alignment.TopEnd).statusBarsPadding().padding(top = 52.dp, end = 20.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF1E1207))
+                    .background(P.popup)
                     .border(1.dp, Gild.copy(alpha = .35f), RoundedCornerShape(14.dp))
                     .padding(horizontal = 6.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -670,12 +788,12 @@ private fun EdgeButton(label: String, onClick: () -> Unit) {
     Box(
         Modifier.clip(RoundedCornerShape(99.dp))
             .background(BookInk.copy(alpha = .05f))
-            .border(1.dp, Color(0xFF8C6E32).copy(alpha = .4f), RoundedCornerShape(99.dp))
+            .border(1.dp, P.rule.copy(alpha = .4f), RoundedCornerShape(99.dp))
             .clickable(onClick = onClick)
             .padding(horizontal = 13.dp, vertical = 7.dp),
     ) {
         Text(
-            label, color = Color(0xFF6B5424), fontFamily = BookSerif,
+            label, color = P.caption, fontFamily = BookSerif,
             fontSize = 10.sp, letterSpacing = 1.4.sp,
         )
     }
@@ -687,7 +805,15 @@ private fun EdgeButton(label: String, onClick: () -> Unit) {
  * Verse numbers are superscript rubric, the way a printed Bible sets them,
  * and the offsets let the run-head say which verses are on the leaf.
  */
-private class ChapterText(val text: AnnotatedString, private val starts: List<Pair<Int, Int>>) {
+private class ChapterText(
+    val text: AnnotatedString,
+    private val starts: List<Pair<Int, Int>>,
+    /** where the chapter's first letter sits in [text], or -1 */
+    val initialAt: Int = -1,
+) {
+    /** the chapter's first letter, drawn large at [initialAt] */
+    val initial: String get() = if (initialAt >= 0) text.text.substring(initialAt, initialAt + 1) else ""
+
     /** verse number to the line it begins on, for the current layout */
     fun verseLines(layout: TextLayoutResult?): List<Pair<Int, Int>> {
         if (layout == null) return emptyList()
@@ -697,32 +823,38 @@ private class ChapterText(val text: AnnotatedString, private val starts: List<Pa
     }
 }
 
-private fun chapterText(verses: List<BibleVerse>): ChapterText {
+private fun chapterText(verses: List<BibleVerse>, textSize: Int): ChapterText {
     val starts = mutableListOf<Pair<Int, Int>>()
+    var initialAt = -1
     val text = buildAnnotatedString {
         verses.forEachIndexed { index, verse ->
             starts += verse.verse to length
             withStyle(
                 SpanStyle(
-                    color = Rubric, fontSize = 10.sp,
-                    baselineShift = BaselineShift.Superscript, fontWeight = FontWeight.Bold,
+                    // in step with the reading size, not a fixed 10sp speck
+                    // raised a third, not a half: a full superscript rose above
+                    // its own line and showed beneath the last line of a page
+                    color = Rubric, fontSize = (textSize * .66f).coerceAtLeast(10f).sp,
+                    baselineShift = BaselineShift(.33f), fontWeight = FontWeight.Bold,
                 ),
             ) { append("${verse.verse}") }
-            append(" ")
+            // a no-break space ties the number to its verse, so a number is
+            // never left alone at the end of a line
+            append("\u00A0")
             /* Words the translators supplied are set in italic, which is what
                printed KJVs have done since 1611. They arrive as character
                ranges from the parser rather than braces in the text. */
             val body = verse.text
             var cursor = 0
+            /* The great initial. The letter stays in the text, but the
+               layout gives its place to a placeholder the size of the initial
+               and the leaf paints the letter into it. Set as a 40sp glyph in
+               the flowing text, Android drew the page lower than it measured
+               it: the last line of every opening leaf was cut in half and the
+               run-head named a verse you could not see. */
             if (index == 0 && body.isNotEmpty()) {
-                withStyle(
-                    SpanStyle(
-                        color = BookInk,
-                        fontSize = 40.sp,
-                        fontWeight = FontWeight.Bold,
-                        baselineShift = BaselineShift(-0.16f),
-                    ),
-                ) { append(body.substring(0, 1)) }
+                initialAt = length
+                append(body.substring(0, 1))
                 cursor = 1
             }
             verse.supplied.sortedBy { it.first }.forEach { range ->
@@ -737,10 +869,10 @@ private fun chapterText(verses: List<BibleVerse>): ChapterText {
                 cursor = to
             }
             if (cursor < body.length) append(body.substring(cursor))
-            if (index != verses.lastIndex) append("  ")
+            if (index != verses.lastIndex) append(" ")
         }
     }
-    return ChapterText(text, starts)
+    return ChapterText(text, starts, initialAt)
 }
 
 /**
@@ -763,6 +895,7 @@ private fun Leaf(
     window: PageWindow?,
     verses: IntRange?,
     layout: TextLayoutResult?,
+    initial: TextLayoutResult?,
     textSize: Int,
     onBodyHeight: (Float) -> Unit,
 ) {
@@ -772,7 +905,7 @@ private fun Leaf(
                cost about a ninth of the height to ornament and put the header
                on top of gold filigree; the board belongs to the cover. */
             Brush.linearGradient(
-                0f to Color(0xFFFDFAF0),
+                0f to P.pageLit,
                 .45f to Page,
                 1f to PageEdge,
             ),
@@ -783,7 +916,7 @@ private fun Leaf(
             Modifier.fillMaxHeight().width(16.dp)
                 .background(
                     Brush.horizontalGradient(
-                        listOf(Color(0xFF6B5A34).copy(alpha = .22f), Color.Transparent),
+                        listOf(P.gutter.copy(alpha = .22f), Color.Transparent),
                     ),
                 ),
         )
@@ -800,18 +933,18 @@ private fun Leaf(
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Text(
-                    book.uppercase(),
-                    color = Color(0xFF5A4828).copy(alpha = .8f), fontFamily = BookSerif,
+                    book,
+                    color = P.caption.copy(alpha = .8f), fontFamily = BookSerif,
                     fontSize = 10.sp, letterSpacing = 2.2.sp,
                     modifier = Modifier.weight(1f),
                 )
                 Text(
                     verses?.let { "$chapter:${it.first}–${it.last}" } ?: "KJV",
-                    color = Color(0xFF5A4828).copy(alpha = .8f), fontFamily = BookSerif,
+                    color = P.caption.copy(alpha = .8f), fontFamily = BookSerif,
                     fontSize = 10.sp, letterSpacing = 1.6.sp,
                 )
             }
-            Box(Modifier.fillMaxWidth().height(0.5.dp).background(Color(0xFF8C6E32).copy(alpha = .3f)))
+            Box(Modifier.fillMaxWidth().height(0.5.dp).background(P.rule.copy(alpha = .3f)))
 
             /* The heading's space is reserved on every leaf, even where it
                draws nothing: a body box that changed height between page one
@@ -834,15 +967,34 @@ private fun Leaf(
             ) {
                 if (layout != null && window != null && window.lines > 0) {
                     val top = layout.getLineTop(window.firstLine)
+                    val bottom = layout.getLineBottom(window.lastLine - 1)
                     Canvas(Modifier.fillMaxSize()) {
-                        clipRect { translate(top = -top) { drawText(layout) } }
+                        // only this leaf's lines: the next leaf's first line
+                        // used to show beneath them, sliced in half
+                        // the opening leaf lets the initial rise above the first line
+                        val rise = if (window.firstLine == 0 && initial != null) initial.firstBaseline else 0f
+                        clipRect(top = -rise, bottom = bottom - top) {
+                            translate(top = -top) {
+                                drawText(layout)
+                                // the initial, standing on the first line's baseline
+                                val place = layout.placeholderRects.firstOrNull()
+                                if (initial != null && place != null) {
+                                    drawText(
+                                        initial,
+                                        topLeft = androidx.compose.ui.geometry.Offset(
+                                            place.left, place.bottom - initial.firstBaseline,
+                                        ),
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
 
             Text(
                 "$folio",
-                color = Color(0xFF785F2D).copy(alpha = .7f), fontFamily = BookSerif,
+                color = P.caption.copy(alpha = .7f), fontFamily = BookSerif,
                 fontSize = 10.sp, textAlign = TextAlign.Center,
                 // clears the floating nav — the folio was landing behind it
                 modifier = Modifier.fillMaxWidth().padding(bottom = 96.dp, top = 6.dp),

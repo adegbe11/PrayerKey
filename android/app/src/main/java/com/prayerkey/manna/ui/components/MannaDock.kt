@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.components
 
+import androidx.compose.ui.draw.drawBehind
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.animateColorAsState
@@ -53,7 +54,12 @@ import com.prayerkey.manna.ui.theme.GlassBackdrop
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.liquidGlass
 
-data class DockItem(val label: String, val icon: ImageVector)
+data class DockItem(
+    val label: String,
+    val icon: ImageVector? = null,
+    /** A drawn mark, tinted like a glyph. The Pray tab wears the key. */
+    @androidx.annotation.DrawableRes val mark: Int? = null,
+)
 
 /**
  * The Manna Dock — a floating glass capsule rather than a flat tab bar, so
@@ -99,10 +105,17 @@ fun MannaDock(
          * knocked out of it. Same idea, right way round.
          */
         val dockShape = RoundedCornerShape(31.dp)
+        /* One white chip that travels. It glides from tab to tab on a spring
+           and stretches a little in flight, like a drop of liquid, instead of
+           one chip fading out while another fades in. */
+        val slide by animateFloatAsState(
+            selected.toFloat(),
+            spring(dampingRatio = .74f, stiffness = 420f), label = "dock-slide",
+        )
         Surface(
             shape = dockShape,
             color = Color.Transparent,
-            border = BorderStroke(0.8.dp, Color.White.copy(alpha = .34f)),
+            border = BorderStroke(0.9.dp, Color.White.copy(alpha = .52f)),
             shadowElevation = 18.dp,
         ) {
             Row(
@@ -114,12 +127,35 @@ fun MannaDock(
                                 shape = dockShape,
                                 blurRadius = 34.dp,
                                 lens = 1.04f,
-                                tint = Pk.Oxblood.copy(alpha = .82f),
+                                /* At .82 the tint was paint with a blur behind
+                                   it: the violet was the bar, and the page
+                                   underneath never showed. Taking it to a third
+                                   lets the artwork and the writing travel under
+                                   the dock, which is the whole point of a
+                                   material - you can see there is a page there,
+                                   without being able to read it. */
+                                tint = Pk.Oxblood.copy(alpha = .58f),
                             )
                         } else {
                             Modifier.background(Pk.Oxblood.copy(alpha = .93f))
                         },
                     )
+                    .drawBehind {
+                        if (items.isEmpty()) return@drawBehind
+                        val pad = 8.dp.toPx()
+                        val gap = 2.dp.toPx()
+                        val cell = (size.width - pad * 2 - gap * (items.size - 1)) / items.size
+                        val flight = kotlin.math.sin((slide - kotlin.math.floor(slide)) * Math.PI).toFloat()
+                        val w = 44.dp.toPx() + 18.dp.toPx() * flight
+                        val h = 32.dp.toPx()
+                        val cx = pad + slide * (cell + gap) + cell / 2
+                        drawRoundRect(
+                            Color.White,
+                            topLeft = androidx.compose.ui.geometry.Offset(cx - w / 2, 12.dp.toPx()),
+                            size = androidx.compose.ui.geometry.Size(w, h),
+                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(11.dp.toPx()),
+                        )
+                    }
                     .padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 11.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -139,7 +175,7 @@ fun MannaDock(
                        out of it. It is the whole of the selected state - no
                        underline, no dot, no second colour. */
                     val chip by animateColorAsState(
-                        if (active) Color.White else Color.Transparent,
+                        Color.Transparent, // the travelling chip is drawn behind the row
                         spring(stiffness = Spring.StiffnessMediumLow), label = "dock-chip",
                     )
 
@@ -173,11 +209,21 @@ fun MannaDock(
                                 .background(chip),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Icon(
-                                item.icon, contentDescription = null,
-                                tint = tint,
-                                modifier = Modifier.size(21.dp).scale(iconScale),
-                            )
+                            if (item.mark != null) {
+                                androidx.compose.foundation.Image(
+                                    androidx.compose.ui.res.painterResource(item.mark),
+                                    contentDescription = null,
+                                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(tint),
+                                    modifier = Modifier.size(23.dp).scale(iconScale),
+                                )
+                            } else if (item.icon != null) {
+                                Icon(
+                                    item.icon,
+                                    contentDescription = null,
+                                    tint = tint,
+                                    modifier = Modifier.size(21.dp).scale(iconScale),
+                                )
+                            }
                         }
                         /* Every tab is named, always. A sparkle and a church
                            glyph are not guessable, and Home carries no other

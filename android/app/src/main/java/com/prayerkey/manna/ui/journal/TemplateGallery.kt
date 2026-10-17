@@ -1,14 +1,17 @@
 package com.prayerkey.manna.ui.journal
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,8 +19,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +30,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,15 +39,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.prayerkey.manna.R
 import com.prayerkey.manna.data.JOURNAL_TEMPLATES
 import com.prayerkey.manna.data.JournalTemplate
 import com.prayerkey.manna.data.TEMPLATE_COLLECTIONS
@@ -51,28 +64,63 @@ import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 
 /**
- * The template gallery.
+ * The template gallery, arranged the way Apple Music arranges Search.
  *
- * Ninety-seven templates is a library, and a library shown as a list of
- * ninety-seven things is a wall. So: a search field, the collections as
- * chips, and the templates of whichever collection is open.
- *
- * Search is over title, summary and the questions themselves, because people
- * look for a template by what they want to write about - "fear", "my
- * daughter", "waiting" - far more often than by its name.
+ * A large title, one rounded search field, one featured card, and then the
+ * library as a two-column wall of picture tiles - each collection its own
+ * colour over its own artwork, named in the corner and nothing else. A tile
+ * opens its collection as the same wall, one tile per template. Search
+ * answers with tiles too, so the page never changes shape under the reader.
  */
+private data class Look(val colour: Color, @DrawableRes val art: Int)
+
+private val LOOKS = mapOf(
+    "Prayer" to Look(Color(0xFF6200ED), R.drawable.onboarding_pray_v3),
+    "Daily walk" to Look(Color(0xFFE0782F), R.drawable.welcome_prayer_dawn),
+    "Bible & Scripture" to Look(Color(0xFF2F4FA8), R.drawable.discovery_cover_2),
+    "Answered prayer" to Look(Color(0xFFD69A12), R.drawable.discovery_cover_4),
+    "Gratitude" to Look(Color(0xFFD9406E), R.drawable.discovery_cover_3),
+    "Reflection" to Look(Color(0xFF3C6FB0), R.drawable.rhythm_reflection),
+    "Spiritual warfare" to Look(Color(0xFF7A1FA2), R.drawable.discovery_cover_1),
+    "Spiritual growth" to Look(Color(0xFF2E9459), R.drawable.discovery_cover_5),
+    "Difficult seasons" to Look(Color(0xFF475C84), R.drawable.onboarding_prayer),
+    "Family" to Look(Color(0xFFE25A45), R.drawable.discovery_cover_6),
+    "Purpose & decisions" to Look(Color(0xFF178A86), R.drawable.closing_verse_violet),
+    "Dreams & notes" to Look(Color(0xFF2E2A7A), R.drawable.rhythm_evening),
+    "Sermon & church" to Look(Color(0xFF9C4A1C), R.drawable.onboarding_church_v3),
+)
+
+/** Every template tile gets its own picture, in its collection's colour. */
+private val ART = listOf(
+    R.drawable.onboarding_pray_v3, R.drawable.welcome_prayer_dawn, R.drawable.discovery_cover_2,
+    R.drawable.discovery_cover_4, R.drawable.discovery_cover_3, R.drawable.rhythm_reflection,
+    R.drawable.discovery_cover_1, R.drawable.discovery_cover_5, R.drawable.onboarding_prayer,
+    R.drawable.discovery_cover_6, R.drawable.closing_verse_violet, R.drawable.rhythm_evening,
+    R.drawable.onboarding_church_v3, R.drawable.rhythm_morning, R.drawable.prayerkey_hero_dawn,
+    R.drawable.onboarding_read_v3, R.drawable.onboarding_journal_v3, R.drawable.onboarding_audio_v3,
+    R.drawable.today_prayer_violet, R.drawable.prayerkey_discovery_world,
+)
+
+private fun lookOf(collection: String) = LOOKS[collection] ?: Look(Pk.Oxblood, R.drawable.onboarding_pray_v3)
+
+private fun artOf(t: JournalTemplate): Int {
+    val inCollection = JOURNAL_TEMPLATES.filter { it.collection == t.collection }
+    val base = ART.indexOf(lookOf(t.collection).art).coerceAtLeast(0)
+    return ART[(base + inCollection.indexOf(t).coerceAtLeast(0)) % ART.size]
+}
+
 @Composable
 fun TemplateGallery(
     recent: List<String>,
     onPick: (JournalTemplate) -> Unit,
     onClose: () -> Unit,
 ) {
-    BackHandler(onBack = onClose)
     var query by remember { mutableStateOf("") }
-    var collection by remember { mutableStateOf<String?>(null) }
+    var collection by rememberSaveable { mutableStateOf<String?>(null) }
+    BackHandler { if (collection != null) collection = null else onClose() }
 
-    val results = remember(query, collection) {
-        val q = query.trim().lowercase()
+    val q = query.trim().lowercase()
+    val results = remember(q, collection) {
         JOURNAL_TEMPLATES.filter { t ->
             (collection == null || t.collection == collection) &&
                 (
@@ -83,168 +131,203 @@ fun TemplateGallery(
                     )
         }
     }
-    val recents = remember(recent) { recent.mapNotNull { id -> JOURNAL_TEMPLATES.find { it.id == id } } }
+    val featured = remember(recent) {
+        recent.firstNotNullOfOrNull { id -> JOURNAL_TEMPLATES.find { it.id == id } }
+            ?: JOURNAL_TEMPLATES.first { it.id == "prayer-morning" }
+    }
+    val full = GridItemSpan(2)
+    val grid = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
+    androidx.compose.runtime.LaunchedEffect(collection) { grid.scrollToItem(0) }
 
-    Column(Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding().navigationBarsPadding()) {
-        Row(
-            Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onClose) { Icon(Icons.Outlined.ArrowBack, "Close", tint = Pk.Charcoal) }
-            Text(
-                "Templates", Modifier.weight(1f),
-                fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp, color = Pk.Charcoal,
-            )
-            Text(
-                "${JOURNAL_TEMPLATES.size}",
-                Modifier.padding(end = 16.dp),
-                fontFamily = UtilitySans, fontSize = 12.sp, color = Pk.Muted,
-            )
-        }
+    // dark status-bar icons on the white page
+    val view = androidx.compose.ui.platform.LocalView.current
+    androidx.compose.runtime.DisposableEffect(view) {
+        val window = (view.parent as? androidx.compose.ui.window.DialogWindowProvider)?.window
+        val bars = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view) }
+        val was = bars?.isAppearanceLightStatusBars
+        bars?.isAppearanceLightStatusBars = true
+        onDispose { if (was != null) bars.isAppearanceLightStatusBars = was }
+    }
 
-        Row(
-            Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(14.dp)).background(Color.White)
-                .padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
+    Box(Modifier.fillMaxSize().background(Color.White)) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            state = grid,
+            modifier = Modifier.fillMaxSize().statusBarsPadding(),
+            contentPadding = PaddingValues(start = 18.dp, end = 18.dp, bottom = 40.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Icon(Icons.Outlined.Search, null, tint = Pk.Muted, modifier = Modifier.size(17.dp))
-            Box(Modifier.weight(1f).padding(start = 10.dp)) {
-                if (query.isEmpty()) {
+            item(span = { full }, key = "title") {
+                Row(Modifier.fillMaxWidth().padding(top = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (collection != null) {
+                        Box(
+                            Modifier.padding(end = 10.dp).size(36.dp).clip(CircleShape)
+                                .background(Color(0xFFF1EFF4)).clickable { collection = null },
+                            contentAlignment = Alignment.Center,
+                        ) { Icon(Icons.Outlined.ArrowBack, "Back", tint = Pk.Charcoal, modifier = Modifier.size(18.dp)) }
+                    }
                     Text(
-                        "Search templates",
-                        color = Pk.Muted, fontFamily = UtilitySans, fontSize = 14.sp,
+                        collection ?: "Templates",
+                        Modifier.weight(1f),
+                        color = Color(0xFF111014), fontFamily = UtilitySans, fontWeight = FontWeight.Bold,
+                        fontSize = if (collection == null) 34.sp else 28.sp, lineHeight = 38.sp,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    )
+                    Box(
+                        Modifier.size(36.dp).clip(CircleShape).background(Color(0xFFF1EFF4)).clickable(onClick = onClose),
+                        contentAlignment = Alignment.Center,
+                    ) { Icon(Icons.Outlined.Close, "Close", tint = Pk.Charcoal, modifier = Modifier.size(18.dp)) }
+                }
+            }
+            item(span = { full }, key = "search") {
+                SearchField(query) { query = it }
+            }
+
+            if (q.isEmpty() && collection == null) {
+                item(span = { full }, key = "featured") { Featured(featured, onPick) }
+                // an odd tile out at the foot runs the full width, so the wall ends square
+                items(
+                    TEMPLATE_COLLECTIONS, key = { "c-" + it.name },
+                    span = { c -> GridItemSpan(if (TEMPLATE_COLLECTIONS.size % 2 == 1 && c == TEMPLATE_COLLECTIONS.last()) 2 else 1) },
+                ) { c ->
+                    val look = lookOf(c.name)
+                    val held = JOURNAL_TEMPLATES.count { it.collection == c.name }
+                    Tile(c.name, look.colour, look.art, meta = "$held templates") { collection = c.name }
+                }
+            } else if (results.isEmpty()) {
+                item(span = { full }, key = "none") {
+                    Text(
+                        "No results",
+                        Modifier.fillMaxWidth().padding(top = 60.dp),
+                        color = Pk.Muted, fontFamily = UtilitySans, fontSize = 15.sp, textAlign = TextAlign.Center,
                     )
                 }
-                BasicTextField(
-                    query, { query = it },
-                    textStyle = TextStyle(color = Pk.Charcoal, fontFamily = UtilitySans, fontSize = 14.sp),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+            } else {
+                items(
+                    results, key = { it.id },
+                    span = { t -> GridItemSpan(if (results.size % 2 == 1 && t == results.last()) 2 else 1) },
+                ) { t ->
+                    Tile(t.title, lookOf(t.collection).colour, artOf(t)) { onPick(t) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchField(query: String, onChange: (String) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().padding(top = 6.dp, bottom = 6.dp)
+            .clip(RoundedCornerShape(99.dp)).background(Color(0xFFF1EFF4))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Outlined.Search, null, tint = Color(0xFF3A3840), modifier = Modifier.size(20.dp))
+        Box(Modifier.weight(1f).padding(start = 10.dp)) {
+            if (query.isEmpty()) {
+                Text("Prayer, gratitude, fear, family…", color = Color(0xFF8E8B94), fontFamily = UtilitySans, fontSize = 16.sp, maxLines = 1)
+            }
+            BasicTextField(
+                query, onChange,
+                textStyle = TextStyle(color = Pk.Charcoal, fontFamily = UtilitySans, fontSize = 16.sp),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+}
+
+/** The one large card: the template you reach for, else Morning prayer. */
+@Composable
+private fun Featured(t: JournalTemplate, onPick: (JournalTemplate) -> Unit) {
+    val look = lookOf(t.collection)
+    Column(
+        Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            .clip(RoundedCornerShape(22.dp)).background(Color.White)
+            .clickable { onPick(t) },
+    ) {
+        Box(Modifier.fillMaxWidth().aspectRatio(1.55f).clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))) {
+            Image(
+                painterResource(R.drawable.prayerkey_discovery_world), null,
+                Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
+            )
+            Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, look.colour.copy(alpha = .55f)))))
+            Text(
+                t.title,
+                Modifier.align(Alignment.Center).padding(horizontal = 20.dp),
+                color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold,
+                fontSize = 38.sp, lineHeight = 42.sp, textAlign = TextAlign.Center,
+            )
+        }
+        Column(
+            Modifier.fillMaxWidth()
+                .background(Color(0xFFF7F6F9), RoundedCornerShape(bottomStart = 22.dp, bottomEnd = 22.dp))
+                .padding(horizontal = 20.dp, vertical = 18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(t.summary, color = Color(0xFF111014), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 19.sp, textAlign = TextAlign.Center)
+            Box(
+                Modifier.padding(top = 14.dp).clip(RoundedCornerShape(99.dp)).background(Pk.Oxblood)
+                    .clickable { onPick(t) }.padding(horizontal = 30.dp, vertical = 11.dp),
+            ) { Text("Begin", color = Color.White, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp) }
+        }
+    }
+}
+
+/** A picture in a colour, named in the corner. */
+@Composable
+private fun Tile(
+    label: String,
+    colour: Color,
+    @DrawableRes art: Int,
+    /** What is behind the tile - "15 templates". Blank on a template itself. */
+    meta: String = "",
+    onClick: () -> Unit,
+) {
+    Box(
+        Modifier.fillMaxWidth().height(112.dp)
+            .clip(RoundedCornerShape(14.dp)).background(colour)
+            .clickable(onClick = onClick),
+    ) {
+        Image(
+            painterResource(art), null,
+            Modifier.fillMaxSize(), contentScale = ContentScale.Crop, alpha = .88f,
+        )
+        // the collection's colour, held to a trace so the artwork stays itself
+        Box(Modifier.fillMaxSize().background(colour.copy(alpha = .22f)))
+        /* The band the words sit on. A wash over the whole tile dulled the
+           picture and still left a pale photograph beating the label; a short
+           dark band at the foot does the legibility work where the words
+           actually are, and the top two thirds of the art stay bright. */
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    0f to Color.Transparent,
+                    .42f to Color.Transparent,
+                    .72f to Color(0xFF14061F).copy(alpha = .42f),
+                    1f to Color(0xFF14061F).copy(alpha = .88f),
+                ),
+            ),
+        )
+        Column(
+            Modifier.align(Alignment.BottomStart).padding(start = 14.dp, end = 10.dp, bottom = 10.dp),
+        ) {
+            Text(
+                label,
+                color = Color.White, fontFamily = UtilitySans, fontWeight = FontWeight.Bold,
+                fontSize = if (label.length > 22) 14.sp else 16.sp, lineHeight = 18.sp,
+                maxLines = 2, overflow = TextOverflow.Ellipsis,
+            )
+            if (meta.isNotBlank()) {
+                Text(
+                    meta,
+                    Modifier.padding(top = 2.dp),
+                    color = Color.White.copy(alpha = .74f), fontFamily = UtilitySans,
+                    fontSize = 11.5.sp,
                 )
             }
         }
-
-        LazyColumn(Modifier.weight(1f), contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)) {
-            if (query.isBlank() && collection == null && recents.isNotEmpty()) {
-                item {
-                    Text(
-                        "RECENTLY USED",
-                        color = Pk.Muted, fontFamily = UtilitySans, fontSize = 9.sp,
-                        letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 10.dp),
-                    )
-                }
-                items(recents, key = { "recent-" + it.id }) { TemplateRow(it, onPick) }
-                item { Spacer(Modifier.height(22.dp)) }
-            }
-            if (results.isEmpty()) {
-                item {
-                    Text(
-                        "Nothing matches “" + query.trim() + "”",
-                        color = Pk.Muted, fontFamily = UtilitySans, fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 30.dp),
-                    )
-                }
-            }
-            if (query.isBlank() && collection == null) {
-                item {
-                    Text("Recommended", fontFamily = DisplaySerif, fontSize = 25.sp, fontWeight = FontWeight.Bold, color = Pk.Charcoal, modifier = Modifier.padding(bottom = 12.dp))
-                    JOURNAL_TEMPLATES.firstOrNull { it.id == "prayer-morning" }?.let { TemplateFeatureCard(it, onPick) }
-                    Text("Browse by purpose", fontFamily = DisplaySerif, fontSize = 23.sp, fontWeight = FontWeight.Bold, color = Pk.Charcoal, modifier = Modifier.padding(top = 26.dp, bottom = 12.dp))
-                }
-                TEMPLATE_COLLECTIONS.take(9).forEach { c ->
-                    val cards = JOURNAL_TEMPLATES.filter { it.collection == c.name }.take(3)
-                    if (cards.isNotEmpty()) {
-                        item(key = "section-${c.name}") {
-                            Row(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 9.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text(c.emoji + "  " + c.name, Modifier.weight(1f), fontFamily = DisplaySerif, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Pk.Charcoal)
-                                Text("See all", color = Pk.Oxblood, fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.clickable { collection = c.name })
-                            }
-                        }
-                        items(cards, key = { "card-${it.id}" }) { TemplateCard(it, onPick) }
-                    }
-                }
-            } else {
-                items(results, key = { it.id }) { TemplateRow(it, onPick) }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TemplateFeatureCard(template: JournalTemplate, onPick: (JournalTemplate) -> Unit) {
-    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Pk.DeepDark).clickable { onPick(template) }.padding(22.dp)) {
-        Text("PRAYER", color = Pk.Gold, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
-        Text(template.title, color = Color.White, fontFamily = DisplaySerif, fontSize = 27.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
-        Text(template.summary, color = Color.White.copy(alpha = .72f), fontFamily = UtilitySans, fontSize = 13.sp, modifier = Modifier.padding(top = 5.dp))
-        Text("Use now  →", color = Color.White, fontFamily = UtilitySans, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp))
-    }
-}
-
-@Composable
-private fun TemplateCard(template: JournalTemplate, onPick: (JournalTemplate) -> Unit) {
-    val tint = when (template.collection) {
-        "Prayer" -> Color(0xFF5B22C7)
-        "Bible & Scripture" -> Color(0xFF1E6A68)
-        "Answered prayer" -> Color(0xFF8A5A16)
-        "Difficult seasons" -> Color(0xFF394B70)
-        else -> Pk.Oxblood
-    }
-    Row(Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(18.dp)).background(tint.copy(alpha = .10f)).clickable { onPick(template) }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(48.dp).clip(RoundedCornerShape(14.dp)).background(tint), contentAlignment = Alignment.Center) { Text(TEMPLATE_COLLECTIONS.find { it.name == template.collection }?.emoji.orEmpty(), fontSize = 22.sp) }
-        Column(Modifier.weight(1f).padding(start = 14.dp)) { Text(template.title, color = Pk.Charcoal, fontFamily = UtilitySans, fontSize = 15.sp, fontWeight = FontWeight.SemiBold); Text(template.summary, color = Pk.Muted, fontFamily = UtilitySans, fontSize = 11.5.sp, maxLines = 1, modifier = Modifier.padding(top = 3.dp)) }
-        Text("${template.prompts.size} pages", color = tint, fontFamily = UtilitySans, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-private fun Chip(label: String, on: Boolean, onClick: () -> Unit) {
-    Box(
-        Modifier.clip(RoundedCornerShape(99.dp))
-            .background(if (on) Pk.Oxblood else Color.White)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 9.dp),
-    ) {
-        Text(
-            label,
-            color = if (on) Color.White else Pk.Charcoal,
-            fontFamily = UtilitySans, fontSize = 12.sp,
-            fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal,
-        )
-    }
-}
-
-@Composable
-private fun TemplateRow(t: JournalTemplate, onPick: (JournalTemplate) -> Unit) {
-    val emoji = TEMPLATE_COLLECTIONS.find { it.name == t.collection }?.emoji.orEmpty()
-    Row(
-        Modifier.fillMaxWidth().padding(bottom = 10.dp)
-            .clip(RoundedCornerShape(16.dp)).background(Color.White)
-            .clickable { onPick(t) }
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            Modifier.size(42.dp).clip(RoundedCornerShape(13.dp))
-                .background(Pk.Oxblood.copy(alpha = .08f)),
-            contentAlignment = Alignment.Center,
-        ) { Text(emoji, fontSize = 19.sp) }
-        Column(Modifier.weight(1f).padding(start = 13.dp)) {
-            Text(
-                t.title, color = Pk.Charcoal, fontFamily = UtilitySans,
-                fontSize = 14.5.sp, fontWeight = FontWeight.SemiBold,
-            )
-            Text(
-                t.summary, Modifier.padding(top = 2.dp), color = Pk.Muted,
-                fontFamily = UtilitySans, fontSize = 11.5.sp, lineHeight = 16.sp,
-            )
-        }
-        Text(
-            "${t.prompts.size}",
-            color = Pk.Muted, fontFamily = UtilitySans, fontSize = 11.sp,
-        )
     }
 }
 

@@ -135,7 +135,7 @@ fun PkTag(text: String, kind: PkTagKind, modifier: Modifier = Modifier) {
             .background(fill)
             .padding(horizontal = if (kind == PkTagKind.Plain) 0.dp else 10.dp, vertical = 4.dp),
     ) {
-        Text(text.uppercase(), color = ink, style = PkText.Meta)
+        Text(text, color = ink, style = PkText.Meta)
     }
 }
 
@@ -266,7 +266,7 @@ fun PkScripture(
         PkLabel(label, color = Pk.Oxblood.copy(alpha = .85f))
         Spacer(Modifier.height(Pk.S2))
         Text(
-            "“$verse”",
+            verse,
             color = Pk.Charcoal.copy(alpha = .9f),
             style = PkText.Scripture.copy(fontSize = 16.sp, lineHeight = 25.sp),
         )

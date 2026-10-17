@@ -37,17 +37,38 @@ class SermonService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
+        /* A null intent is the system restarting us on its own, with nobody
+           on the screen. From Android 15 a microphone service started that way
+           is not allowed to start at all, so there is nothing to do but stop.
+           Listening is a thing a person begins, in Church, by tapping Start. */
+        if (intent == null) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+        when (intent.action) {
             ACTION_STOP -> { stopListening(); return START_NOT_STICKY }
             else -> startListening()
         }
-        return START_STICKY
+        /* Not sticky: if the system kills this, the sermon is over. Asking to
+           be restarted would mean starting a microphone service unattended. */
+        return START_NOT_STICKY
     }
 
     private fun startListening() {
         if (_listening.value) return
 
-        startForeground(NOTIFICATION_ID, buildNotification(0))
+        /* Even from the foreground this can be refused - a race with the app
+           going to background, a device policy, a manufacturer rule. Refused
+           is not a crash: the service stops and Church shows its Start button
+           again. */
+        try {
+            startForeground(NOTIFICATION_ID, buildNotification(0))
+        } catch (e: Exception) {
+            android.util.Log.w("SermonService", "foreground start refused", e)
+            _listening.value = false
+            stopSelf()
+            return
+        }
 
         wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "manna:sermon")

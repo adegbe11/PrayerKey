@@ -92,7 +92,9 @@ object PrayerKeyApi {
                 else -> "I Place This in Your Hands"
             },
             prayer = "Father, I come to You honestly and without pretending.$feeling\n\nYou know this concern completely: $need\n\nLet Your Word steady my heart. Give me wisdom for what I must do, courage for what I must face, and peace about what I must leave in Your hands. Close every path that would lead me away from Your will, and make the next faithful step clear.\n\nGuard my heart from fear and impatience. Help me notice Your grace today and respond with obedience. I trust Your character even while I wait for the answer.\n\nIn the name of Jesus, amen.",
-            encouragement = "Your prayer is ready offline. Pray it slowly, then remain quiet for a moment and write down the next faithful step.",
+            // The prayer is the thing. Telling somebody how to pray it was
+            // the app talking over the prayer it had just written.
+            encouragement = "",
             verses = listOf(reference to verse),
         )
     }

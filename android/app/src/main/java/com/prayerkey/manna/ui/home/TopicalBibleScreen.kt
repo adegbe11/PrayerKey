@@ -153,10 +153,10 @@ internal fun TopicalBibleScreen(onClose: () -> Unit) {
     }
     if (loading) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Pk.Oxblood) }
     else LazyColumn(contentPadding = PaddingValues(20.dp, 8.dp, 20.dp, 100.dp), verticalArrangement = Arrangement.spacedBy(11.dp)) {
-        item { Text("${verses.size} VERSES ABOUT ${topic.uppercase()}", fontSize = 10.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold, color = Pk.GoldDeep, modifier = Modifier.padding(bottom = 5.dp)) }
+        item { Text("${verses.size} VERSES ABOUT ${topic}", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Pk.GoldDeep, modifier = Modifier.padding(bottom = 5.dp)) }
         items(verses, key = { it.reference }) { verse ->
             Surface(shape = RoundedCornerShape(22.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Pk.Hair)) {
-                Column(Modifier.padding(20.dp)) { Text(verse.reference.uppercase(), color = Pk.Oxblood, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.2.sp); Text("“${verse.text}”", Modifier.padding(top = 11.dp), fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 27.sp, color = Pk.Charcoal) }
+                Column(Modifier.padding(20.dp)) { Text(verse.reference, color = Pk.Oxblood, fontWeight = FontWeight.Bold, fontSize = 13.sp); Text(verse.text, Modifier.padding(top = 11.dp), fontFamily = BookSerif, fontSize = 18.sp, lineHeight = 27.sp, color = Pk.Charcoal) }
             }
         }
     }

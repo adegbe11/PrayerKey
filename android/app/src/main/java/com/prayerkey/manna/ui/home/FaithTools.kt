@@ -71,7 +71,7 @@ fun PrayerPointsScreen(reference: String, onClose: () -> Unit) {
                 Modifier.fillMaxWidth().padding(bottom = 14.dp).clip(RoundedCornerShape(20.dp))
                     .background(cs.onBackground).padding(20.dp),
             ) {
-                Text("TODAY’S PRAYER BATTLE", color = cs.primary, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
+                Text("Today’s prayer battle", color = cs.primary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 Text("Stand firm. Pray the Word. Refuse fear.", color = cs.background, fontFamily = BookSerif, fontSize = 23.sp, lineHeight = 29.sp, modifier = Modifier.padding(top = 8.dp))
                 Text(reference, color = cs.primary, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 12.dp))
             }
@@ -117,12 +117,12 @@ fun PrayForSomeoneScreen(onClose: () -> Unit) {
                         prayer = "Heavenly Father, I bring ${name.trim()} before You today. You know them completely and You see their need concerning ${need.trim()}. Please come near to them, give them strength, wisdom, protection, and peace. Make a way where they cannot see one. Provide the right help at the right time, guard their heart from fear, and let them know they are not alone. According to Your perfect will, bring healing, restoration, favour, and a testimony from this situation. Show me how I can support them with love and patience. In Jesus’ name, Amen."
                     },
                     modifier = Modifier.fillMaxWidth().padding(top = 18.dp).height(54.dp),
-                ) { Text("WRITE THE PRAYER") }
+                ) { Text("Write the prayer") }
             } else {
                 Icon(Icons.Outlined.SelfImprovement, null, tint = cs.primary, modifier = Modifier.size(28.dp))
                 Text("A prayer for ${name.trim()}", color = cs.onBackground, fontFamily = BookSerif, fontSize = 28.sp, modifier = Modifier.padding(top = 14.dp))
                 Text(prayer!!, color = cs.onBackground, fontSize = 18.sp, lineHeight = 29.sp, modifier = Modifier.padding(top = 22.dp))
-                OutlinedButton(onClick = { prayer = null }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp)) { Text("PRAY FOR SOMEONE ELSE") }
+                OutlinedButton(onClick = { prayer = null }, modifier = Modifier.fillMaxWidth().padding(top = 24.dp)) { Text("Pray for someone else") }
             }
         }
     }

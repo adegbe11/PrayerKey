@@ -1,5 +1,14 @@
 package com.prayerkey.manna.ui.screens
 
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.AttachFile
+import androidx.compose.foundation.layout.aspectRatio
+import kotlinx.coroutines.launch
 import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
@@ -161,9 +170,8 @@ fun JournalScreen(
     var viewing by remember { mutableStateOf<JournalEntry?>(null) }
     var answering by remember { mutableStateOf<SavedWord?>(null) }
     var query by remember { mutableStateOf("") }
-    // Write is two steps now: pick a prompt, then write. `picking` is the
-    // suggestion sheet; `writing` holds the chosen prompt (null = blank page).
-    var picking by remember { mutableStateOf(false) }
+    // + opens a blank page; templates and prompts have their own doors on the
+    // journal home. `chosen` holds a prompt when one was picked there.
     var writing by remember { mutableStateOf(false) }
     /* Which of Voice, Photo or Bible opened the page, so the sheet can do that
        thing as it appears rather than showing a blank page with the tool
@@ -183,6 +191,10 @@ fun JournalScreen(
     var reviewingPrayer by remember { mutableStateOf<JournalEntry?>(null) }
     var libraryOpen by remember { mutableStateOf(false) }
     var promptLibraryOpen by remember { mutableStateOf(false) }
+    /* Screens here are separate windows. Closing one and opening the next in
+       the same frame let the journal home flash between them, so the new one
+       is laid on top first and the old one leaves once it is covered. */
+    val handoff = rememberCoroutineScope()
 
     BackHandler(enabled = tab != JournalTab.Journey) {
         tab = JournalTab.Journey
@@ -199,7 +211,8 @@ fun JournalScreen(
         // journals immediately.
         val emptyJourney = false
 
-        Column(Modifier.fillMaxSize().padding(horizontal = 22.dp).padding(top = 24.dp)) {
+        // below the status bar: the title was drawn under the clock
+        Column(Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 22.dp).padding(top = 16.dp)) {
             // Home is bare now, so Settings lives here — the one screen
             // that is already about the user rather than today's word.
             /* Over the full-bleed welcome sky the chrome has to switch to
@@ -232,7 +245,7 @@ fun JournalScreen(
                     entries = entries, streak = journalStreak, query = query,
                     onQuery = { query = it }, onEdit = { viewing = it },
                     onAnswer = { reviewingPrayer = it },
-                    onWelcomeTap = { chosen = null; picking = true },
+                    onWelcomeTap = { chosen = null; writing = true },
                     onQuickStart = { key ->
                         chosen = null
                         if (key == "template") browsingTemplates = true
@@ -266,7 +279,7 @@ fun JournalScreen(
                     Modifier.size(58.dp)
                         .shadow(5.dp, CircleShape, spotColor = Color.Black.copy(alpha = .16f))
                         .clip(CircleShape).background(accent)
-                        .clickable { chosen = null; picking = true },
+                        .clickable { chosen = null; writing = true },
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -278,20 +291,6 @@ fun JournalScreen(
         }
     }
 
-    if (picking) {
-        val prompts = remember(sermonNotes, prayers, words) {
-            com.prayerkey.manna.ui.journal.JournalSuggestions.build(
-                sermons = sermonNotes, prayers = prayers, savedWords = words,
-                nowMillis = System.currentTimeMillis(),
-            )
-        }
-        com.prayerkey.manna.ui.journal.SuggestionSheet(
-            prompts = prompts,
-            onPick = { prompt -> chosen = prompt; picking = false; writing = true },
-            onDismiss = { picking = false },
-        )
-    }
-
     if (promptLibraryOpen) {
         androidx.compose.ui.window.Dialog(
             onDismissRequest = { promptLibraryOpen = false },
@@ -300,9 +299,9 @@ fun JournalScreen(
             com.prayerkey.manna.ui.journal.PromptLibrary(
                 onClose = { promptLibraryOpen = false },
                 onPrompt = { question, pack ->
-                    chosen = com.prayerkey.manna.ui.journal.JournalSuggestions.Prompt(pack.uppercase(), question, "prompt", suggestPrayer = pack.equals("Prayer", true))
-                    promptLibraryOpen = false
+                    chosen = com.prayerkey.manna.ui.journal.JournalSuggestions.Prompt(pack.uppercase(), question, "prompt", suggestPrayer = pack in setOf("My Requests", "Intercession", "Family Prayer", "Waiting on God", "Spiritual Warfare"))
                     writing = true
+                    handoff.launch { kotlinx.coroutines.delay(320); promptLibraryOpen = false }
                 },
             )
         }
@@ -316,6 +315,8 @@ fun JournalScreen(
         initialBody = seeded?.let { com.prayerkey.manna.data.starterFor(it) }.orEmpty(),
         initialJournal = seeded?.journal ?: "My Journey",
         initialIsPrayer = seeded?.prayer == true,
+        onTemplates = { quickStart = null; browsingTemplates = true },
+        onPrompts = { quickStart = null; promptLibraryOpen = true },
         onDismiss = { writing = false; chosen = null; quickStart = null; seeded = null },
         onSubmit = { result -> onAdd2(result); writing = false; chosen = null; quickStart = null; seeded = null },
     )
@@ -350,8 +351,7 @@ fun JournalScreen(
                        pages you turn; handing its questions to a scrolling form
                        was the thing that made it a questionnaire. */
                     reading = it
-                    previewing = null
-                    browsingTemplates = false
+                    handoff.launch { kotlinx.coroutines.delay(320); previewing = null; browsingTemplates = false }
                 },
                 onClose = { previewing = null },
             )
@@ -363,7 +363,7 @@ fun JournalScreen(
             onDismissRequest = { reading = null },
             properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
         ) {
-            com.prayerkey.manna.ui.journal.TemplateBook(
+            com.prayerkey.manna.ui.journal.TemplateSheet(
                 template = template,
                 onClose = { reading = null },
                 onFinish = { title, body, journalName, isPrayer ->
@@ -381,6 +381,7 @@ fun JournalScreen(
                         ),
                     )
                     reading = null
+                    writing = false; chosen = null; quickStart = null; seeded = null
                 },
             )
         }
@@ -477,6 +478,15 @@ private fun JournalTimeline(
     var selectedTag by remember { mutableStateOf<String?>(null) }
     var selectedCollection by remember { mutableStateOf<String?>(null) }
     var searchOpen by remember { mutableStateOf(false) }
+    /* A collection filters the pages below the overview, off the bottom of
+       the screen - so the tap scrolls down to them, or it looks like nothing
+       happened. Back clears a filter or a search before it leaves Journal. */
+    val listTop = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
+    val reveal = rememberCoroutineScope()
+    BackHandler(enabled = selectedCollection != null || searchOpen) {
+        selectedCollection = null
+        searchOpen = false
+    }
     val today = LocalDate.now().toEpochDay()
     val memory = remember(entries) {
         entries.firstOrNull { it.entryDay == today - 365 } ?: entries.firstOrNull { it.entryDay == today - 30 }
@@ -499,7 +509,10 @@ private fun JournalTimeline(
     }
     val grouped = remember(shown) { shown.groupBy { it.entryDay }.toSortedMap(compareByDescending { it }) }
 
-    Column(Modifier.fillMaxSize()) {
+    /* One scroll for the whole page. The overview used to sit above a list
+       with its own scroll, filled the screen, and left the list no height at
+       all: nothing under Continue writing could be reached. */
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = Space.dock)) {
         /* An empty journal should be an invitation, not a dashboard. No
            stats, no filters, no search until there is something to count,
            sort or find — just the line that makes someone want to write. */
@@ -511,7 +524,10 @@ private fun JournalTimeline(
             memory = memory,
             onWrite = onWelcomeTap,
             onOpen = onEdit,
-            onCollection = { collection -> selectedCollection = collection },
+            onCollection = { collection ->
+                selectedCollection = collection
+                reveal.launch { kotlinx.coroutines.delay(60); listTop.bringIntoView(androidx.compose.ui.geometry.Rect(0f, 0f, 1f, 4000f)) }
+            },
             onQuickStart = onQuickStart,
         )
 
@@ -531,7 +547,11 @@ private fun JournalTimeline(
             }
         }
 
-        Row(Modifier.fillMaxWidth().padding(top = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            Modifier.fillMaxWidth().padding(top = 18.dp)
+                .bringIntoViewRequester(listTop),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Surface(shape = RoundedCornerShape(16.dp), color = AppleGray, modifier = Modifier.weight(1f)) {
                 Row(Modifier.padding(4.dp), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                     JourneyView.entries.forEach { option ->
@@ -563,20 +583,22 @@ private fun JournalTimeline(
         }
 
         when (view) {
-        JourneyView.Entries -> LazyColumn(
+        JourneyView.Entries -> Column(
+            Modifier.padding(top = Space.block),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(top = Space.block, bottom = Space.dock),
         ) {
             grouped.forEach { (day, dayEntries) ->
-                item(key = "day-$day") {
+                key("day-$day") {
                     Text(
                         dayLabel(day, today),
                         color = Muted, fontSize = 11.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(top = 6.dp),
                     )
                 }
-                items(dayEntries, key = { it.id }) { entry ->
-                    EntryCard(entry, conceal = concealPreviews, onAnswer = { onAnswer(entry) }) { onEdit(entry) }
+                dayEntries.forEach { entry ->
+                    key(entry.id) {
+                        EntryCard(entry, conceal = concealPreviews, onAnswer = { onAnswer(entry) }) { onEdit(entry) }
+                    }
                 }
             }
         }
@@ -639,7 +661,7 @@ private fun JournalOverview(
                     color = Color.White.copy(alpha = .60f), fontFamily = UtilitySans, fontSize = 11.5.sp,
                 )
                 Text(
-                    "“" + HOME_QUESTIONS[Math.floorMod(today.toEpochDay(), HOME_QUESTIONS.size.toLong()).toInt()] + "”",
+                    HOME_QUESTIONS[Math.floorMod(today.toEpochDay(), HOME_QUESTIONS.size.toLong()).toInt()],
                     color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold,
                     fontSize = 28.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 14.dp),
                 )
@@ -685,20 +707,20 @@ private fun JournalOverview(
            to count. */
         if (entries.isNotEmpty()) Row(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
-                Column(Modifier.padding(16.dp)) { Text(entries.size.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("PAGES", color = muted, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold) }
+                Column(Modifier.padding(16.dp)) { Text(entries.size.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("Pages", color = muted, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
             }
             Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
-                Column(Modifier.padding(16.dp)) { Text(streak.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("DAY STREAK", color = muted, fontSize = 9.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold) }
+                Column(Modifier.padding(16.dp)) { Text(streak.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("Day streak", color = muted, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
             }
             Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
-                Column(Modifier.padding(16.dp)) { Text(entries.count { it.favorite }.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("FAVOURITES", color = muted, fontSize = 9.sp, letterSpacing = 1.0.sp, fontWeight = FontWeight.Bold) }
+                Column(Modifier.padding(16.dp)) { Text(entries.count { it.favorite }.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("Favourites", color = muted, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
             }
         }
 
         /* A shelf of collections that all read "0 pages" is a table of contents
            for a book nobody has written yet. Each appears when it has a page. */
         val filled = collections.filter { it.count > 0 }
-        if (filled.isNotEmpty()) Text("YOUR PRAYER JOURNEY", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
+        if (filled.isNotEmpty()) Text("Your prayer journey", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
         if (filled.isNotEmpty()) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             filled.forEach { item ->
                 Surface(
@@ -714,7 +736,7 @@ private fun JournalOverview(
         }
 
         latest?.let { entry ->
-            Text("CONTINUE WRITING", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
+            Text("Continue writing", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
             Surface(Modifier.fillMaxWidth().clickable { onOpen(entry) }, shape = RoundedCornerShape(22.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .12f))) {
                 Column(Modifier.padding(18.dp)) {
                     Text(entry.title.ifBlank { "Your latest page" }, color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 19.sp)
@@ -723,7 +745,7 @@ private fun JournalOverview(
             }
         }
         memory?.let { entry ->
-            Text("ON THIS DAY", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.4.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
+            Text("On this day", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
             Surface(Modifier.fillMaxWidth().clickable { onOpen(entry) }, shape = RoundedCornerShape(22.dp), color = ink) {
                 Column(Modifier.padding(20.dp)) { Text(entry.title.ifBlank { "A page from your story" }, color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 20.sp); Text(entry.body, color = Color.White.copy(alpha = .70f), fontFamily = BookSerif, fontSize = 13.sp, lineHeight = 20.sp, maxLines = 3, modifier = Modifier.padding(top = 7.dp)) }
             }
@@ -737,19 +759,19 @@ private fun JournalMemories(
     onEdit: (JournalEntry) -> Unit, onAnswer: (JournalEntry) -> Unit,
 ) {
     val meaningful = remember(entries, onThisDay) { entries.filter { it.favorite || it.media.isNotEmpty() || it.answeredAt != null }.filterNot { it.id == onThisDay?.id } }
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 16.dp, bottom = Space.dock), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        onThisDay?.let { memory -> item(key = "on-this-day") {
+    Column(Modifier.fillMaxWidth().padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        onThisDay?.let { memory -> run {
             Surface(onClick = { onEdit(memory) }, shape = R.card, color = Night, modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp)) {
-                    Text("ON THIS DAY", color = Gold, fontSize = 9.sp, letterSpacing = 1.8.sp, fontWeight = FontWeight.Bold)
+                    Text("On this day", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     Text(memory.title.ifBlank { "A page from your story" }, color = Color.White, fontFamily = BookSerif, fontSize = 21.sp, modifier = Modifier.padding(top = 8.dp))
                     Text(if (conceal) "Private entry · Tap to open" else memory.body, color = Color.White.copy(alpha = .72f), fontSize = 12.5.sp, lineHeight = 19.sp, maxLines = 3, modifier = Modifier.padding(top = 7.dp))
                 }
             }
         } }
-        insight?.let { item(key = "insight") { JourneyInsightCard(it) } }
-        if (meaningful.isEmpty() && onThisDay == null && insight == null) item { Box(Modifier.fillParentMaxHeight(.65f).fillMaxWidth(), contentAlignment = Alignment.Center) { Text("No saved moments", color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center) } }
-        items(meaningful, key = { "memory-${it.id}" }) { EntryCard(it, conceal, { onAnswer(it) }) { onEdit(it) } }
+        insight?.let { JourneyInsightCard(it) }
+        if (meaningful.isEmpty() && onThisDay == null && insight == null) Box(Modifier.fillMaxWidth().padding(vertical = 80.dp), contentAlignment = Alignment.Center) { Text("No saved moments", color = Muted, fontSize = 13.sp, textAlign = TextAlign.Center) }
+        meaningful.forEach { key("memory-${it.id}") { EntryCard(it, conceal, { onAnswer(it) }) { onEdit(it) } } }
     }
 }
 
@@ -768,7 +790,7 @@ private fun JournalCalendar(entries: List<JournalEntry>, conceal: Boolean, onEdi
     val first = month.atDay(1)
     val leading = first.dayOfWeek.value - 1
     val cells = List(leading) { null } + (1..month.lengthOfMonth()).map { month.atDay(it) }
-    Column(Modifier.fillMaxSize().padding(top = 12.dp)) {
+    Column(Modifier.fillMaxWidth().padding(top = 12.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { month = month.minusMonths(1) }) { Icon(Icons.Outlined.ChevronLeft, "Previous month") }
             Text("${month.month.name.lowercase().replaceFirstChar(Char::uppercase)} ${month.year}", fontFamily = BookSerif, fontSize = 19.sp, textAlign = TextAlign.Center, modifier = Modifier.weight(1f))
@@ -804,11 +826,10 @@ private fun JourneyInsightCard(insight: JourneyInsight) {
                 modifier = Modifier.fillMaxWidth().padding(top = 13.dp),
             ) {
                 Column(Modifier.padding(12.dp)) {
-                    Text("ONE NEXT STEP", color = Gold, fontSize = 8.5.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold)
+                    Text("One next step", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     Text(insight.nextStep, color = Color.White, fontSize = 12.5.sp, lineHeight = 18.sp, modifier = Modifier.padding(top = 5.dp))
                 }
             }
-            Text("Patterns in your own writing — not a word from God.", color = Color.White.copy(alpha = .48f), fontSize = 9.5.sp, lineHeight = 14.sp, modifier = Modifier.padding(top = 10.dp))
         }
     }
 
@@ -868,7 +889,7 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 38.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(entry.journal.uppercase(), color = Gold, fontSize = 9.sp, letterSpacing = 1.6.sp, fontWeight = FontWeight.Bold)
+                    Text(entry.journal, color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                     Text(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(Date(entry.createdAt)), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp))
                 }
                 if (entry.favorite) Icon(Icons.Outlined.Favorite, "Favourite", tint = Gold, modifier = Modifier.size(20.dp))
@@ -878,11 +899,11 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
             if (entry.gratitude.isNotBlank()) Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFEAF5EC), modifier = Modifier.fillMaxWidth().padding(top = 18.dp)) { Text("Grateful for · ${entry.gratitude}", color = Color(0xFF257345), fontSize = 13.sp, modifier = Modifier.padding(14.dp)) }
             entry.verseRef?.let { ref -> Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFF4EDDC), modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) { Column(Modifier.padding(14.dp)) { Text(ref, color = Gold, fontWeight = FontWeight.Bold); entry.verseText?.let { Text(it, fontFamily = BookSerif, fontSize = 14.sp, lineHeight = 21.sp, modifier = Modifier.padding(top = 6.dp)) } } } }
             if (entry.media.isNotEmpty()) {
-                Text("ATTACHMENTS", color = Muted, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 20.dp, bottom = 7.dp))
-                entry.media.forEachIndexed { index, value ->
-                    Surface(onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(value)).apply { addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) }) } }, shape = RoundedCornerShape(13.dp), color = Color.White, border = BorderStroke(1.dp, Hairline), modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)) {
-                        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) { Text("▣", color = Gold); Text("  Attachment ${index + 1}", fontSize = 12.5.sp, modifier = Modifier.weight(1f)); Text("Open", color = Electric, fontSize = 11.sp) }
-                    }
+                /* Photos and videos are shown, not listed. They were rows reading
+                   "Attachment 1 - Open", which asked someone to leave the page to
+                   see the picture they had put on it. */
+                Column(Modifier.padding(top = 18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    entry.media.forEach { value -> AttachmentView(value) }
                 }
             }
             if (entry.tags.isNotEmpty() || entry.location.isNotBlank() || entry.weather.isNotBlank()) Text(buildList { addAll(entry.tags.map { "#$it" }); if (entry.location.isNotBlank()) add("⌖ ${entry.location}"); if (entry.weather.isNotBlank()) add(entry.weather) }.joinToString("  "), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 14.dp))
@@ -899,7 +920,7 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
     if (showReflection) AlertDialog(
         onDismissRequest = { showReflection = false },
         title = { Text("Reflect deeper", fontFamily = BookSerif) },
-        text = { Column { Text("PRIVATE REFLECTION", color = Gold, fontSize = 9.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.Bold); Text(reflection.suggestedTitle, fontFamily = BookSerif, fontSize = 20.sp, modifier = Modifier.padding(top = 7.dp)); Text(reflection.highlight, color = Muted, fontSize = 12.5.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 8.dp)); reflection.questions.forEach { Text("•  $it", fontSize = 13.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 10.dp)) }; Text("This reflection uses only words from this entry.", color = Muted, fontSize = 9.5.sp, modifier = Modifier.padding(top = 14.dp)) } },
+        text = { Column { Text("Private reflection", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold); Text(reflection.suggestedTitle, fontFamily = BookSerif, fontSize = 20.sp, modifier = Modifier.padding(top = 7.dp)); Text(reflection.highlight, color = Muted, fontSize = 13.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 8.dp)); reflection.questions.forEach { Text("•  $it", fontSize = 13.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 10.dp)) } } },
         confirmButton = { TextButton(onClick = { showReflection = false }) { Text("Done") } },
     )
 }
@@ -1157,7 +1178,7 @@ private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, on
                 Column(Modifier.fillMaxWidth().padding(18.dp)) {
                     Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
                     Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
-                    word.testimony?.let { Text("“$it”", color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
+                    word.testimony?.let { Text(it, color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
                     TextButton(
                         onClick = { AnsweredPrayerCardRenderer.share(context, word.verse, word.testimony.orEmpty(), word.answeredAt ?: word.savedAt) },
                         modifier = Modifier.align(Alignment.End),
@@ -1182,7 +1203,7 @@ private fun WordList(words: List<SavedWord>, canAnswer: Boolean, onAnswer: (Save
                 Column(Modifier.fillMaxWidth().padding(18.dp)) {
                     Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
                     Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
-                    word.testimony?.let { Text("“$it”", color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
+                    word.testimony?.let { Text(it, color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
                     Text(DateFormat.getDateInstance().format(Date(word.answeredAt ?: word.savedAt)), color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
                     if (canAnswer) TextButton(onClick = { onAnswer(word) }, modifier = Modifier.align(Alignment.End)) { Text("Mark answered") }
                 }
@@ -1207,3 +1228,78 @@ private val HOME_QUESTIONS = listOf(
     "What are you carrying that you could put down?",
     "What is one way you have seen His faithfulness?",
 )
+
+
+/**
+ * One attachment on a journal page.
+ *
+ * A photo or video is drawn from the system's own thumbnail, off the main
+ * thread, at a size a phone screen can use; tapping it opens it full size. A
+ * document or recording, which has no picture, is a quiet row naming what it
+ * is. If the file has since been deleted or its permission lost, the row says
+ * so instead of showing a broken image.
+ */
+@Composable
+private fun AttachmentView(value: String) {
+    val context = LocalContext.current
+    val uri = remember(value) { Uri.parse(value) }
+    val type = remember(value) { com.prayerkey.manna.ui.journal.attachmentType(context, uri) }
+    val visual = type.startsWith("image/") || type.startsWith("video/")
+    var picture by remember(value) { mutableStateOf<android.graphics.Bitmap?>(null) }
+    var missing by remember(value) { mutableStateOf(false) }
+    if (visual) {
+        LaunchedEffect(value) {
+            picture = com.prayerkey.manna.ui.journal.loadAttachmentPicture(context, uri)
+            missing = picture == null
+        }
+    }
+    val open = {
+        runCatching {
+            context.startActivity(Intent(Intent.ACTION_VIEW, uri).apply { addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) })
+        }
+        Unit
+    }
+    val image = picture
+    if (visual && image != null) {
+        Box(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).clickable(onClick = open),
+            contentAlignment = Alignment.Center,
+        ) {
+            androidx.compose.foundation.Image(
+                image.asImageBitmap(), null,
+                Modifier.fillMaxWidth().aspectRatio((image.width.toFloat() / image.height).coerceIn(.6f, 1.8f)),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+            )
+            if (type.startsWith("video/")) {
+                Box(
+                    Modifier.size(54.dp).clip(CircleShape).background(Color.Black.copy(alpha = .45f)),
+                    contentAlignment = Alignment.Center,
+                ) { Icon(Icons.Outlined.PlayArrow, "Play", tint = Color.White, modifier = Modifier.size(28.dp)) }
+            }
+        }
+    } else if (!visual || missing) {
+        val label = when {
+            missing -> "This file is no longer available"
+            type == "application/pdf" -> "PDF document"
+            type.startsWith("audio/") -> "Voice recording"
+            else -> "Attached file"
+        }
+        Surface(
+            onClick = open, enabled = !missing,
+            shape = RoundedCornerShape(13.dp), color = Color.White, border = BorderStroke(1.dp, Hairline),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    if (type.startsWith("audio/")) Icons.Outlined.Mic else Icons.Outlined.AttachFile, null,
+                    tint = Gold, modifier = Modifier.size(19.dp),
+                )
+                Text(label, fontSize = 13.5.sp, modifier = Modifier.weight(1f).padding(start = 12.dp))
+                if (!missing) Text("Open", color = Electric, fontSize = 12.sp)
+            }
+        }
+    } else {
+        // still loading: hold the space so the page does not jump
+        Box(Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(18.dp)).background(Hairline.copy(alpha = .4f)))
+    }
+}

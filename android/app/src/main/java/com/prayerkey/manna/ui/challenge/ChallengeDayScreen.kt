@@ -119,7 +119,7 @@ fun ChallengeDayScreen(
             }
             Spacer(Modifier.width(14.dp))
             Text(
-                challenge.title.uppercase(),
+                challenge.title,
                 fontFamily = UtilitySans,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -149,7 +149,7 @@ fun ChallengeDayScreen(
         ) {
             Spacer(Modifier.height(22.dp))
             Text(
-                "DAY $day OF ${challenge.days}",
+                "Day $day of ${challenge.days}",
                 fontFamily = UtilitySans,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -175,7 +175,7 @@ fun ChallengeDayScreen(
             ) {
                 Column(Modifier.padding(18.dp)) {
                     Text(
-                        "READ",
+                        "Read",
                         fontFamily = UtilitySans,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
@@ -198,7 +198,7 @@ fun ChallengeDayScreen(
                         /* DevoReading.rangeLabel always prints from-to, which
                            reads "MATTHEW 4:4-4" on a single verse. A range of
                            one is not a range. */
-                        spanLabel(today.read).uppercase() + " · KJV",
+                        spanLabel(today.read) + " · KJV",
                         fontFamily = UtilitySans,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -229,7 +229,7 @@ fun ChallengeDayScreen(
             ) {
                 Column(Modifier.padding(18.dp)) {
                     Text(
-                        "PRAY THIS ALOUD",
+                        "Pray this aloud",
                         fontFamily = UtilitySans,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
@@ -257,7 +257,7 @@ fun ChallengeDayScreen(
                 ) {
                     Column(Modifier.padding(18.dp)) {
                         Text(
-                            "SIT WITH THIS",
+                            "Sit with this",
                             fontFamily = UtilitySans,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
@@ -286,7 +286,7 @@ fun ChallengeDayScreen(
                 ) {
                     Column(Modifier.padding(18.dp)) {
                         Text(
-                            "FOR THE HOUSE",
+                            "For the house",
                             fontFamily = UtilitySans,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,

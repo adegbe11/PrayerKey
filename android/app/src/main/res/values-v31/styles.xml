@@ -15,5 +15,10 @@
         <item name="android:windowBackground">#6200ED</item>
         <item name="android:enforceStatusBarContrast">false</item>
         <item name="android:enforceNavigationBarContrast">false</item>
+        <!-- Android's own launch screen, shown before the app draws a frame.
+             Left unset it is white with the icon in a circle, so every launch
+             began with a white flash before the violet. -->
+        <item name="android:windowSplashScreenBackground">#6200ED</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#6200ED</item>
     </style>
 </resources>

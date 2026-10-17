@@ -192,7 +192,7 @@ private fun ProgrammeSetup(spec: FaithProgramme, selected: String, hour: Int, on
                         fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.2.sp, color = Pk.Muted,
                     )
                     Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf(0 to "MIDNIGHT", 6 to "MORNING", 12 to "MIDDAY", 21 to "EVENING").forEach { (value, label) ->
+                        listOf(0 to "Midnight", 6 to "Morning", 12 to "Midday", 21 to "Evening").forEach { (value, label) ->
                             FilterChip(selected = hour == value, onClick = { onHour(value) }, label = { Text(label, fontSize = 9.sp) })
                         }
                     }
@@ -212,7 +212,7 @@ private fun ProgrammeSetup(spec: FaithProgramme, selected: String, hour: Int, on
                     colors = ButtonDefaults.buttonColors(containerColor = Pk.Oxblood),
                 ) {
                     Text(
-                        if (selected.isBlank()) "CHOOSE A FOCUS TO BEGIN" else "BEGIN \u00B7 ${selected.uppercase()}",
+                        if (selected.isBlank()) "Choose a focus to begin" else "Begin \u00B7 $selected",
                         fontFamily = UtilitySans, fontWeight = FontWeight.Bold,
                         fontSize = 11.sp, letterSpacing = .7.sp,
                     )
@@ -280,8 +280,8 @@ private fun FaithProgrammeDay(spec: FaithProgramme, day: Int, content: FaithDay,
             ProgrammeBar(onBack, "DAY $day OF ${spec.days}")
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 24.dp)) {
                 Text(content.title, Modifier.padding(top = 18.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 34.sp, lineHeight = 39.sp, color = Pk.Charcoal)
-                Text(content.reference.uppercase(), Modifier.padding(top = 24.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.2.sp, color = Pk.Oxblood)
-                Text("“${content.scripture}”", Modifier.padding(top = 10.dp), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 22.sp, lineHeight = 32.sp, color = Pk.Charcoal)
+                Text(content.reference, Modifier.padding(top = 24.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.Oxblood)
+                Text(content.scripture, Modifier.padding(top = 10.dp), fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 22.sp, lineHeight = 32.sp, color = Pk.Charcoal)
                 HorizontalDivider(Modifier.padding(vertical = 24.dp), color = Pk.Hair)
                 Text("Pray through each point", Modifier.padding(bottom = 8.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.GoldDeep)
                 content.actions.forEachIndexed { index, action ->
@@ -306,7 +306,7 @@ private fun FaithProgrammeDay(spec: FaithProgramme, day: Int, content: FaithDay,
 
 @Composable private fun ProgrammeBar(onBack: () -> Unit, title: String) = Row(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
     IconButton(onBack) { Icon(Icons.Outlined.ArrowBackIosNew, "Back", tint = Pk.Charcoal, modifier = Modifier.size(18.dp)) }
-    Text(title.uppercase(), Modifier.weight(1f), textAlign = TextAlign.Center, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.3.sp, color = Pk.Charcoal)
+    Text(title, Modifier.weight(1f), textAlign = TextAlign.Center, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.Charcoal)
     Spacer(Modifier.width(48.dp))
 }
 

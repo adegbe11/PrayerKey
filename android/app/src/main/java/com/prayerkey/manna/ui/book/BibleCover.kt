@@ -80,20 +80,8 @@ private val GoldDim = Color(0xFF7A5A15)
  */
 @Composable
 fun BibleCover(onOpen: () -> Unit, modifier: Modifier = Modifier) {
-    val view = LocalView.current
-    DisposableEffect(Unit) {
-        val window = (view.context as? android.app.Activity)?.window
-        @Suppress("DEPRECATION")
-        window?.statusBarColor = android.graphics.Color.rgb(90, 30, 24)
-        @Suppress("DEPRECATION")
-        window?.navigationBarColor = android.graphics.Color.rgb(90, 30, 24)
-        onDispose {
-            @Suppress("DEPRECATION")
-            window?.statusBarColor = android.graphics.Color.rgb(34, 34, 34)
-            @Suppress("DEPRECATION")
-            window?.navigationBarColor = android.graphics.Color.rgb(34, 34, 34)
-        }
-    }
+    // light icons over the red leather
+    BarIcons(dark = false)
     Box(modifier.fillMaxSize().background(Color(0xFF8B0909)), contentAlignment = Alignment.Center) {
         // One cover, edge to edge. A second illustrated board behind the
         // photograph competed with its border and made the cover look pasted

@@ -60,7 +60,7 @@ fun DailyPassageReader(passage: DailyPassage, onComplete: () -> Unit) {
             if (page == -1) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.Center) {
                     Text(passage.title, color = cs.onSurface, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                    Text(passage.reference.uppercase(), color = cs.onSurface.copy(alpha = .58f), fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
+                    Text(passage.reference, color = cs.onSurface.copy(alpha = .58f), fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp))
                     Text(passage.introduction, color = cs.onSurface, fontSize = 20.sp, lineHeight = 31.sp, modifier = Modifier.padding(top = 28.dp))
                 }
             } else if (verses.isNotEmpty()) {
@@ -71,7 +71,7 @@ fun DailyPassageReader(passage: DailyPassage, onComplete: () -> Unit) {
                 }
             } else Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = cs.primary) }
 
-            Text(if (page == -1) "TAP ANYWHERE TO CONTINUE" else "BIBLE VERSION: KJV", color = cs.onSurface.copy(alpha = .72f), fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 14.dp))
+            Text(if (page == -1) "Tap anywhere to continue" else "BIBLE VERSION: KJV", color = cs.onSurface.copy(alpha = .72f), fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 14.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text("Aa", color = cs.onSurface, fontSize = 24.sp, modifier = Modifier.clickable { largeText = !largeText })
                 Spacer(Modifier.weight(1f))

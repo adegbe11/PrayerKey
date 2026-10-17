@@ -197,7 +197,7 @@ fun AudioBibleScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("AUDIO", color = Pk.Cream.copy(alpha = .65f), style = PkText.SectionLabel, modifier = Modifier.weight(1f))
+                Text("Audio", color = Pk.Cream.copy(alpha = .65f), style = PkText.SectionLabel, modifier = Modifier.weight(1f))
                 IconButton(onClick = onClose) {
                     Icon(Icons.Outlined.Close, "Close audio", tint = Pk.Cream)
                 }
@@ -229,12 +229,12 @@ fun AudioBibleScreen(
                         .clickable { error = null; loading = true; retry++ }
                         .padding(horizontal = 22.dp, vertical = 14.dp),
                 ) {
-                    Text("TRY AGAIN", color = Pk.Cream, style = PkText.SectionLabel)
+                    Text("Try again", color = Pk.Cream, style = PkText.SectionLabel)
                 }
             } else {
                 if (builtInNarration) {
                     Text(
-                        "BUILT-IN CHAPTER NARRATION",
+                        "Built-in chapter narration",
                         color = Pk.Cream.copy(alpha = .55f),
                         style = PkText.Meta,
                         modifier = Modifier.padding(vertical = 18.dp),

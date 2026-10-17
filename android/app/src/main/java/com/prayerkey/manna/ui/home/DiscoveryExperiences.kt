@@ -245,7 +245,7 @@ private fun experience(title: String): Experience = when (title) {
 
 @Composable private fun CourseProgress(done: Int, total: Int) {
     Column(Modifier.padding(bottom = 18.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("YOUR PROGRESS", style = MaterialTheme.typography.labelSmall, color = Pk.Muted); Text("$done of $total", style = MaterialTheme.typography.labelSmall, color = Pk.Oxblood) }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) { Text("Your progress", style = MaterialTheme.typography.labelSmall, color = Pk.Muted); Text("$done of $total", style = MaterialTheme.typography.labelSmall, color = Pk.Oxblood) }
         LinearProgressIndicator(progress = { if (total == 0) 0f else done.toFloat() / total }, Modifier.fillMaxWidth().padding(top = 8.dp).height(6.dp), color = Pk.Oxblood, trackColor = Pk.Hair)
     }
 }

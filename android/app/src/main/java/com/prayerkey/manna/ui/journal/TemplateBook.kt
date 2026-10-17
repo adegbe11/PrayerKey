@@ -413,7 +413,7 @@ private fun Leaf(
             Spacer(Modifier.height(30.dp))
             if (template.verse.isNotBlank()) {
                 Text(
-                    "“" + template.verse + "”",
+                    template.verse,
                     color = Pk.Charcoal, fontFamily = BookSerif, fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Light, fontSize = 19.sp, lineHeight = 31.sp,
                     textAlign = TextAlign.Center,
@@ -447,7 +447,7 @@ private fun Leaf(
             HeldSilence(page.seconds)
             Spacer(Modifier.height(40.dp))
             Text(
-                "“Be still, and know that I am God.”",
+                "Be still, and know that I am God.",
                 color = Pk.Muted, fontFamily = BookSerif, fontStyle = FontStyle.Italic,
                 fontSize = 14.sp, textAlign = TextAlign.Center,
             )

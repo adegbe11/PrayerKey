@@ -1,6 +1,7 @@
 package com.prayerkey.manna
 
 import com.prayerkey.manna.ui.book.pageWindows
+import com.prayerkey.manna.ui.book.pageWindowsByHeight
 import com.prayerkey.manna.ui.book.versesInWindow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -116,5 +117,25 @@ class PaginationTest {
         val verses = listOf(9 to 0, 10 to 2)
         val windows = pageWindows(totalLines = 4, linesPerPage = 20)
         assertEquals(9..10, versesInWindow(verses, windows[0]))
+    }
+
+    @Test
+    fun `a tall first line does not halve every page`() {
+        // a 70px drop-cap line, then 40px lines; the page holds 400px
+        val heights = listOf(70f) + List(59) { 40f }
+        val tops = heights.runningFold(0f) { acc, h -> acc + h }.dropLast(1)
+        val bottoms = tops.zip(heights) { t, h -> t + h }
+        val windows = pageWindowsByHeight(tops, bottoms, 400f)
+        // 70 + 8 * 40 = 390 fits; the second page is ten plain lines
+        assertEquals(9, windows[0].lines)
+        assertEquals(10, windows[1].lines)
+        // every line on exactly one page, none twice
+        assertEquals((0 until 60).toList(), windows.flatMap { it.firstLine until it.lastLine })
+    }
+
+    @Test
+    fun `a line taller than the page still gets a page`() {
+        val windows = pageWindowsByHeight(listOf(0f, 500f), listOf(500f, 540f), 400f)
+        assertEquals(listOf(0 to 1, 1 to 2), windows.map { it.firstLine to it.lastLine })
     }
 }

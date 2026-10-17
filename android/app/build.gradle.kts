@@ -19,8 +19,8 @@ android {
         applicationId = "com.prayerkey.manna"
         minSdk = 26
         targetSdk = 36
-        versionCode = 21
-        versionName = "3.0.2"
+        versionCode = 25
+        versionName = "3.4.0"
 
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -135,7 +135,6 @@ dependencies {
        platform can read neither, so this unpacks it. Chosen over hosting a zip
        ourselves because the app has no server and should not need one. */
     implementation("org.apache.commons:commons-compress:1.27.1")
-    implementation("androidx.work:work-runtime-ktx:2.10.1")
 
     testImplementation("junit:junit:4.13.2")
     /* android.jar's org.json is a stub that throws "not mocked" off-device, so

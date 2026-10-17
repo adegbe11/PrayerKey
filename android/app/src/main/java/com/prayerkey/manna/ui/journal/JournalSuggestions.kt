@@ -55,7 +55,7 @@ object JournalSuggestions {
             out += Prompt(
                 kicker = "FROM SUNDAY",
                 text = buildString {
-                    append("You captured “${note.title}”")
+                    append("You captured ${note.title}")
                     if (scripture != null) append(" on $scripture")
                     append(". What is the one thing you want to carry into this week?")
                 },
@@ -65,7 +65,7 @@ object JournalSuggestions {
             if (note.takeaway.isNotBlank()) {
                 out += Prompt(
                     kicker = "FROM SUNDAY",
-                    text = "“${note.takeaway}” — did you do it?",
+                    text = "${note.takeaway} — did you do it?",
                     source = "sermon",
                 )
             }
@@ -75,7 +75,7 @@ object JournalSuggestions {
         prayers.firstOrNull { nowMillis - it.createdAt <= TWO_DAYS * 4 }?.let { prayer ->
             out += Prompt(
                 kicker = "YOU PRAYED",
-                text = "You prayed about “${prayer.title}”. How does your heart feel about it today?",
+                text = "You prayed about ${prayer.title}. How does your heart feel about it today?",
                 source = "prayer",
                 verseRef = prayer.scriptureRef,
                 suggestPrayer = true,

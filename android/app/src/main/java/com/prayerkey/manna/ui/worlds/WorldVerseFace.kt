@@ -87,7 +87,7 @@ fun WorldVerseFace(
                         .padding(horizontal = 14.dp, vertical = 6.dp),
                 ) {
                     Text(
-                        "PROMISE CARD",
+                        "Promise card",
                         color = Oxblood, fontSize = 9.sp,
                         letterSpacing = 2.6.sp, fontWeight = FontWeight.Bold,
                     )
@@ -96,7 +96,7 @@ fun WorldVerseFace(
             }
 
             Text(
-                "“$text”",
+                text,
                 color = Ink,
                 fontFamily = BookSerif,
                 fontSize = when {

@@ -239,6 +239,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
      * actually go there — a confirmation that only changes a button's colour is
      * worse than no button.
      */
+    /** A prayer prayed through the guided prayer, kept with what was brought. */
+    fun keepGuidedPrayer(request: String, title: String, prayer: String, scriptureRef: String?) = io {
+        store.savePrayer(title, request, prayer, scriptureRef)
+        _journal.value = store.prayerJournal()
+    }
+
     fun keepDevotionalPrayer(title: String, bringing: String) = io {
         store.savePrayer(title, bringing, "", null)
         _journal.value = store.prayerJournal()

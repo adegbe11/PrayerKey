@@ -122,8 +122,8 @@ class ChurchNotesTest {
         val found = ReferenceDetector.scan(sermon.replace(" | ", " ")).map { it.reference }
         val note = SermonArranger.arrange(sermon, found)
         val text = SermonArranger.asShareText(note, "Sunday, July 26", 62)
-        assertTrue(text.contains("SCRIPTURES PREACHED"))
-        assertTrue(text.contains("THE MAIN POINTS"))
+        assertTrue(text.contains("Scriptures preached"))
+        assertTrue(text.contains("The main points"))
         assertTrue(text.contains("62 min"))
         // the share text is the line that lands in somebody else's inbox,
         // so it carries the app's actual name

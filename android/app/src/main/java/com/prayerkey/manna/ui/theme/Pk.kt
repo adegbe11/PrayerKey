@@ -175,10 +175,15 @@ object PkText {
         fontWeight = FontWeight.Medium, letterSpacing = 3.2.sp,
     )
 
-    /** TODAY'S DEVOTION, GO DEEPER — tracked caps that organise the page. */
+    /**
+     * Today's devotion, Go deeper - the labels that organise a page.
+     *
+     * They were tracked capitals at 11sp. Sentence case at 13sp reads at a
+     * glance and stops every section shouting at the writing under it.
+     */
     val SectionLabel = TextStyle(
-        fontFamily = Spectral, fontSize = 11.sp,
-        fontWeight = FontWeight.Normal, letterSpacing = 1.8.sp,
+        fontFamily = Spectral, fontSize = 13.sp,
+        fontWeight = FontWeight.Medium, letterSpacing = 0.sp,
     )
 
     /** The dated headline. */

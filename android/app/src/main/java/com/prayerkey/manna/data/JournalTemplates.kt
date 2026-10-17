@@ -144,15 +144,6 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
                 starter = "Father, You are faithful…",
             ),
             TemplatePrompt(
-                "SURRENDER", "What are you carrying this morning?",
-                "Leave it here before you carry it all day.",
-            ),
-            TemplatePrompt(
-                "CONFESSION", "Search my heart, O God.",
-                "Anything you need to bring to Him honestly.",
-                private = true, skippable = true,
-            ),
-            TemplatePrompt(
                 "GRATITUDE", "Before I ask, I remember.",
                 "Three things you are thankful for this morning.",
                 starter = "Today, thank You for…",
@@ -169,11 +160,6 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
             TemplatePrompt(
                 "I AM ASKING", "What do you need from God today?",
                 "Plainly. He is not put off by a direct request.",
-            ),
-            TemplatePrompt(
-                "I SURRENDER", "What will you stop trying to control today?",
-                "Different from confession. This is letting go.",
-                starter = "I place this in Your hands…",
             ),
             TemplatePrompt(
                 "MY PRAYER", "Father, this morning…",

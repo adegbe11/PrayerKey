@@ -108,8 +108,14 @@ class MainActivity : ComponentActivity() {
                 var previewJournal by remember { mutableStateOf(BuildConfig.DEBUG && intent.getBooleanExtra("preview_journal", false)) }
                 var previewWelcome by remember { mutableStateOf(BuildConfig.DEBUG && intent.getBooleanExtra("preview_welcome", false)) }
                 if (previewJournal) {
-                    com.prayerkey.manna.ui.journal.TemplateBook(
-                        template = com.prayerkey.manna.data.JOURNAL_TEMPLATES.first { it.id == "prayer-morning" },
+                    val previewId = intent.getStringExtra("template") ?: "prayer-morning"
+                    if (previewId == "prompts") com.prayerkey.manna.ui.journal.PromptLibrary(
+                        onClose = { previewJournal = false }, onPrompt = { _, _ -> },
+                    ) else if (previewId == "gallery") com.prayerkey.manna.ui.journal.TemplateGallery(
+                        recent = emptyList(), onPick = {}, onClose = { previewJournal = false },
+                    ) else com.prayerkey.manna.ui.journal.TemplateSheet(
+                        template = com.prayerkey.manna.data.JOURNAL_TEMPLATES.firstOrNull { it.id == previewId }
+                            ?: com.prayerkey.manna.data.JOURNAL_TEMPLATES.first(),
                         onClose = { previewJournal = false }, onFinish = { _, _, _, _ -> previewJournal = false },
                     )
                 } else if (previewWelcome) {
