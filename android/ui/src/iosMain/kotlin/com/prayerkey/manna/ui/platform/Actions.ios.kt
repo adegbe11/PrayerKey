@@ -63,6 +63,7 @@ import platform.UIKit.UIImageJPEGRepresentation
 import platform.UIKit.UIImageWriteToSavedPhotosAlbum
 import platform.UIKit.UIViewController
 import platform.UniformTypeIdentifiers.UTTypeData
+import platform.UniformTypeIdentifiers.UTTypeItem
 import platform.UniformTypeIdentifiers.UTTypeJSON
 import platform.UniformTypeIdentifiers.UTTypePlainText
 import platform.UserNotifications.UNAuthorizationOptionAlert
@@ -132,6 +133,7 @@ actual fun showToast(context: PlatformContext, message: String, long: Boolean) {
 @Composable
 actual fun PlatformOverlay() {
     DictationPanel()
+    PickerHost()
     Toast()
 }
 
@@ -221,7 +223,7 @@ private fun mediaFolder(): String {
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun rememberMediaPicker(onPicked: (List<String>) -> Unit): Launcher {
+actual fun rememberMediaPicker(onPicked: (List<String>) -> Unit): MediaPicker {
     val callback = rememberUpdatedState(onPicked)
     val delegate = remember {
         object : NSObject(), PHPickerViewControllerDelegateProtocol {
@@ -253,8 +255,27 @@ actual fun rememberMediaPicker(onPicked: (List<String>) -> Unit): Launcher {
             }
         }
     }
+    // any file comes through the Files app, copied in as the photos are
+    val files = remember {
+        object : NSObject(), UIDocumentPickerDelegateProtocol {
+            override fun documentPicker(controller: UIDocumentPickerViewController, didPickDocumentsAtURLs: List<*>) {
+                val kept = didPickDocumentsAtURLs.filterIsInstance<NSURL>().mapNotNull { source ->
+                    val target = "${mediaFolder()}/${NSUUID().UUIDString}.${source.pathExtension ?: "dat"}"
+                    if (NSFileManager.defaultManager.copyItemAtPath(source.path!!, target, null)) NSURL.fileURLWithPath(target).absoluteString else null
+                }
+                callback.value(kept)
+            }
+        }
+    }
     return remember {
-        Launcher {
+        MediaPicker { kind ->
+            if (kind == MediaKind.AnyFile) {
+                val picker = UIDocumentPickerViewController(forOpeningContentTypes = listOf(UTTypeItem), asCopy = true)
+                picker.allowsMultipleSelection = true
+                picker.delegate = files
+                topController()?.presentViewController(picker, animated = true, completion = null)
+                return@MediaPicker
+            }
             val config = PHPickerConfiguration().apply {
                 selectionLimit = 30
                 filter = PHPickerFilter.imagesFilter

@@ -1,7 +1,10 @@
 package com.prayerkey.manna.ui.challenge
 
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.ui.platform.Reminders
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -66,7 +69,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -103,7 +105,7 @@ private enum class FastStage { Length, Type, Purpose, When, Rhythm, Summary, Act
 
 @Composable
 fun FastingChallengeRoute(onClose: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     var fast by remember { mutableStateOf(FastingStore.load(context)) }
     var stage by remember {
         mutableStateOf(if (FastingStore.load(context).running) FastStage.Active else FastStage.Length)
@@ -138,12 +140,12 @@ fun FastingChallengeRoute(onClose: () -> Unit) {
                 fast,
                 onBack = { stage = FastStage.Rhythm },
                 onBegin = {
-                    val begun = fast.copy(startedAt = System.currentTimeMillis() / 1000)
+                    val begun = fast.copy(startedAt = kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000)
                     keep(begun)
                     // the machine speaks at the moments of the fast, if reminders are on
-                    if (begun.reminders) com.prayerkey.manna.reminder.FastingMilestoneReceiver.schedule(context, begun)
+                    if (begun.reminders) Reminders.scheduleFast(context, begun)
                     val first = fast.rhythms.minByOrNull { it.hour }
-                    com.prayerkey.manna.reminder.ReminderReceiver.scheduleFor(
+                    Reminders.scheduleFor(
                         context, "fast", first?.hour ?: 12, 0, fast.reminders && first != null,
                     )
                     stage = FastStage.Active
@@ -176,7 +178,7 @@ fun FastingChallengeRoute(onClose: () -> Unit) {
                     val kept = fast.kept + day
                     keep(fast.copy(kept = kept))
                     // every day kept: nothing left for the machine to say
-                    if (kept.size >= fast.days) com.prayerkey.manna.reminder.FastingMilestoneReceiver.cancel(context)
+                    if (kept.size >= fast.days) Reminders.cancelFast(context)
                     stage = if (kept.size >= fast.days) FastStage.Done else FastStage.Active
                 },
             )
@@ -185,8 +187,8 @@ fun FastingChallengeRoute(onClose: () -> Unit) {
                 onTestimony = { keep(fast.copy(testimony = it)) },
                 onAnswered = { keep(fast.copy(answered = it)) },
                 onAgain = {
-                    com.prayerkey.manna.reminder.ReminderReceiver.scheduleFor(context, "fast", 12, 0, false)
-                    com.prayerkey.manna.reminder.FastingMilestoneReceiver.cancel(context)
+                    Reminders.scheduleFor(context, "fast", 12, 0, false)
+                    Reminders.cancelFast(context)
                     FastingStore.clear(context)
                     fast = FastingStore.load(context)
                     stage = FastStage.Length
@@ -569,11 +571,11 @@ private fun ActiveFast(
     onBreak: () -> Unit,
     onDone: () -> Unit,
 ) {
-    var now by remember { mutableLongStateOf(System.currentTimeMillis() / 1000) }
+    var now by remember { mutableLongStateOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000) }
     LaunchedEffect(Unit) {
         while (true) {
             delay(1000)
-            now = System.currentTimeMillis() / 1000
+            now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000
         }
     }
     val day = fast.dayOf(now).coerceAtMost(fast.days)
@@ -637,7 +639,7 @@ private fun ActiveFast(
                         color = Color.White.copy(alpha = .62f), fontFamily = UtilitySans, fontSize = 12.sp,
                     )
                     Text(
-                        "%02d:%02d:%02d".format(remaining / 3600, (remaining % 3600) / 60, remaining % 60),
+                        "${(remaining / 3600).pad2()}:${((remaining % 3600) / 60).pad2()}:${(remaining % 60).pad2()}",
                         Modifier.padding(top = 6.dp),
                         color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 36.sp,
                     )
@@ -721,7 +723,7 @@ private fun FastAction(icon: ImageVector, label: String, modifier: Modifier, onC
 
 @Composable
 private fun FastPrayer(fast: FastingChallenge, onClose: () -> Unit, onPrayed: () -> Unit) {
-    val day = fast.dayOf(System.currentTimeMillis() / 1000).coerceAtMost(fast.days)
+    val day = fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000).coerceAtMost(fast.days)
     val moment = remember(day) { fastMoment(fast, day) }
     var seconds by remember { mutableIntStateOf(0) }
     var praying by remember { mutableStateOf(false) }
@@ -790,7 +792,7 @@ private fun FastPrayer(fast: FastingChallenge, onClose: () -> Unit, onPrayed: ()
                             color = Color.White, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 15.sp,
                         )
                         Text(
-                            "%d:%02d".format(seconds / 60, seconds % 60),
+                            "${seconds / 60}:${(seconds % 60).pad2()}",
                             Modifier.padding(top = 4.dp),
                             color = Color.White.copy(alpha = .86f), fontFamily = DisplaySerif, fontSize = 22.sp,
                         )
@@ -820,8 +822,8 @@ private fun FastPrayer(fast: FastingChallenge, onClose: () -> Unit, onPrayed: ()
 
 @Composable
 private fun FastJournal(fast: FastingChallenge, onBack: () -> Unit, onSaved: () -> Unit) {
-    val context = LocalContext.current
-    val day = fast.dayOf(System.currentTimeMillis() / 1000).coerceAtMost(fast.days)
+    val context = platformContext()
+    val day = fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000).coerceAtMost(fast.days)
     var text by remember { mutableStateOf(FastingStore.journal(context, day)) }
 
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()) {
@@ -878,7 +880,7 @@ private fun FastJournal(fast: FastingChallenge, onBack: () -> Unit, onSaved: () 
 
 @Composable
 private fun FastProgress(fast: FastingChallenge, onBack: () -> Unit) {
-    val day = fast.dayOf(System.currentTimeMillis() / 1000).coerceAtMost(fast.days)
+    val day = fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000).coerceAtMost(fast.days)
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         Row(Modifier.fillMaxWidth().padding(start = 8.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -948,8 +950,8 @@ private fun FastProgress(fast: FastingChallenge, onBack: () -> Unit) {
 
 @Composable
 private fun BreakingFast(fast: FastingChallenge, onBack: () -> Unit, onBreak: (Int) -> Unit) {
-    val context = LocalContext.current
-    val day = fast.dayOf(System.currentTimeMillis() / 1000).coerceAtMost(fast.days)
+    val context = platformContext()
+    val day = fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000).coerceAtMost(fast.days)
     var text by remember { mutableStateOf("") }
 
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()) {
@@ -1207,7 +1209,7 @@ fun ChallengeChooser(
         StartFastCard(
             running = fast.running,
             title = fast.title,
-            day = fast.dayOf(System.currentTimeMillis() / 1000),
+            day = fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000),
             of = fast.days,
             onOpen = onFast,
         )

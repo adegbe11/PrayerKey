@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Box
@@ -11,8 +13,7 @@ import com.prayerkey.manna.ui.theme.rise
 import androidx.compose.material.icons.outlined.Handshake
 import androidx.compose.material.icons.outlined.HealthAndSafety
 import androidx.compose.material.icons.outlined.EditNote
-import android.content.Context
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -32,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -68,7 +68,7 @@ private val topics = listOf(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean, Int) -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     var step by rememberSaveable { mutableIntStateOf(0) }
     var selectedGoals by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
     var selectedTopics by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
@@ -90,7 +90,7 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
     fun back() { if (step == 0) onBack() else step-- }
     BackHandler { back() }
     fun finish() {
-        if (!preview) context.getSharedPreferences("onboarding_plan", Context.MODE_PRIVATE).edit()
+        if (!preview) context.keyValues("onboarding_plan").edit()
             .putStringSet("goals", selectedGoals.toSet())
             .putStringSet("topics", selectedTopics.toSet())
             .putBoolean("single_reminder", true)
@@ -198,7 +198,7 @@ private fun WelcomeOption(item: WelcomeChoice, selected: Boolean, compact: Boole
     )
     val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
     Surface(Modifier.fillMaxWidth().padding(bottom = 10.dp).rise(order).pressable()
-        .graphicsLayer { val s = 1f + .025f * kotlin.math.sin(pop * Math.PI).toFloat(); scaleX = s; scaleY = s }
+        .graphicsLayer { val s = 1f + .025f * kotlin.math.sin(pop * kotlin.math.PI).toFloat(); scaleX = s; scaleY = s }
         .toggleable(selected, role = Role.Checkbox, onValueChange = {
             haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
             onClick()

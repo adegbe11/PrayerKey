@@ -112,7 +112,7 @@ actual fun rememberTextFilePicker(onPicked: (String?) -> Unit): Launcher {
 }
 
 @Composable
-actual fun rememberMediaPicker(onPicked: (List<String>) -> Unit): Launcher {
+actual fun rememberMediaPicker(onPicked: (List<String>) -> Unit): MediaPicker {
     val context = LocalContext.current
     val callback = rememberUpdatedState(onPicked)
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
@@ -120,7 +120,17 @@ actual fun rememberMediaPicker(onPicked: (List<String>) -> Unit): Launcher {
         uris.forEach { uri -> runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) } }
         callback.value(uris.map { it.toString() })
     }
-    return remember(launcher) { Launcher { launcher.launch(arrayOf("image/*", "video/*", "audio/*", "application/pdf")) } }
+    return remember(launcher) {
+        MediaPicker { kind ->
+            launcher.launch(
+                when (kind) {
+                    MediaKind.Photos -> arrayOf("image/*", "video/*")
+                    MediaKind.Attachments -> arrayOf("image/*", "video/*", "audio/*", "application/pdf")
+                    MediaKind.AnyFile -> arrayOf("*/*")
+                },
+            )
+        }
+    }
 }
 
 actual suspend fun loadThumbnail(context: PlatformContext, address: String, edge: Int): ImageBitmap? =

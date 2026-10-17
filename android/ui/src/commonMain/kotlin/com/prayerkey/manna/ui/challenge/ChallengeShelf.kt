@@ -1,6 +1,8 @@
 package com.prayerkey.manna.ui.challenge
 
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.ui.platform.platformContext
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,9 +71,9 @@ fun ChallengeShelf(
        with the shelf skipped. The arrow returned to the shelf correctly, so
        the two controls disagreed about where you were. */
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
+    val context = platformContext()
     var challenges by remember { mutableStateOf<List<ChallengePlan>>(emptyList()) }
-    LaunchedEffect(Unit) { challenges = withContext(Dispatchers.IO) { Challenges.all(context) } }
+    LaunchedEffect(Unit) { challenges = withContext(ioDispatcher) { Challenges.all(context) } }
 
     Column(Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding()) {
         Row(

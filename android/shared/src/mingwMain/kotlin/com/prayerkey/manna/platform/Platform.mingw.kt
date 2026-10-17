@@ -8,3 +8,4 @@ actual fun PlatformContext.writeFile(name: String, text: String) = Unit
 actual fun deleteFile(path: String) = Unit
 actual suspend fun httpRequest(url: String, method: String, body: String?, headers: Map<String, String>): HttpResult =
     error("not a shipping target")
+actual fun fileExists(path: String): Boolean = false

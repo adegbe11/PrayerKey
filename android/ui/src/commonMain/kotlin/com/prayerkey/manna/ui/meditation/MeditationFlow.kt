@@ -1,9 +1,11 @@
 package com.prayerkey.manna.ui.meditation
 
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.ui.platform.platformContext
 import org.jetbrains.compose.resources.DrawableResource
 import com.prayerkey.manna.resources.*
-import android.speech.tts.TextToSpeech
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -70,7 +72,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -96,7 +97,6 @@ import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import kotlinx.coroutines.delay
-import java.util.Locale
 
 /**
  * Christian meditation.
@@ -114,7 +114,7 @@ fun MeditationRoute(
     /** Keeps a reflection in the journal: a heading, then what was written. */
     onKeep: (String, String) -> Unit,
 ) {
-    val context = LocalContext.current
+    val context = platformContext()
     var setup by remember { mutableStateOf(MeditationStore.setup(context)) }
     var stage by remember { mutableStateOf(MedStage.Welcome) }
     var sat by remember { mutableIntStateOf(0) }
@@ -122,12 +122,12 @@ fun MeditationRoute(
     // one speech engine for the whole flow: previews and the session share it
     var speechReady by remember { mutableStateOf(false) }
     val speaker = remember {
-        TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS }
+        Speaker(context) { speechReady = it == Speaker.SUCCESS }
     }
     DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
     LaunchedEffect(speechReady, setup.voice) {
         if (speechReady) {
-            speaker.language = Locale.getDefault()
+            speaker.language = null
             speaker.setPitch(setup.voice.pitch)
             speaker.setSpeechRate(setup.voice.rate)
         }
@@ -164,7 +164,7 @@ fun MeditationRoute(
                     if (speechReady) {
                         speaker.setPitch(voice.pitch)
                         speaker.setSpeechRate(voice.rate)
-                        speaker.speak("Be still, and know that I am God.", TextToSpeech.QUEUE_FLUSH, null, "preview")
+                        speaker.speak("Be still, and know that I am God.", Speaker.QUEUE_FLUSH, null, "preview")
                     }
                 },
                 onBack = { speaker.stop(); stage = MedStage.Length },
@@ -527,7 +527,7 @@ private fun Summary(setup: MeditationSetup, onBack: () -> Unit, onStart: () -> U
 @Composable
 private fun Session(
     setup: MeditationSetup,
-    speaker: TextToSpeech,
+    speaker: Speaker,
     speechReady: Boolean,
     onEnd: (Int) -> Unit,
 ) {
@@ -565,7 +565,7 @@ private fun Session(
             if (speechReady) {
                 schedule.forEachIndexed { i, (at, line) ->
                     if (i !in spoken && elapsed >= at && elapsed < at + 4) {
-                        speaker.speak(line, TextToSpeech.QUEUE_ADD, null, "m$i")
+                        speaker.speak(line, Speaker.QUEUE_ADD, null, "m$i")
                         spoken = spoken + i
                     }
                 }
@@ -749,7 +749,7 @@ private fun Session(
     }
 }
 
-private fun clock(seconds: Int) = "%d:%02d".format(seconds / 60, seconds % 60)
+private fun clock(seconds: Int) = "${seconds / 60}:${(seconds % 60).pad2()}"
 
 @Composable
 private fun Seek(label: String, onClick: () -> Unit) {
@@ -892,7 +892,7 @@ private fun Reflect(setup: MeditationSetup, onSave: (String, String, Boolean) ->
 
 @Composable
 private fun Done(setup: MeditationSetup, seconds: Int, onAgain: () -> Unit, onClose: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     val record = remember { MeditationStore.record(context) }
     val minutes = (seconds + 30) / 60
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {

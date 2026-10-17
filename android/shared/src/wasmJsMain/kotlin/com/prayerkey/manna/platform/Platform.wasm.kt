@@ -52,3 +52,5 @@ actual fun deleteFile(path: String) { files.remove(path) }
 
 actual suspend fun httpRequest(url: String, method: String, body: String?, headers: Map<String, String>): HttpResult =
     error("the web build is a compile check")
+
+actual fun fileExists(path: String): Boolean = path in files

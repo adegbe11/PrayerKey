@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.home
 
-import android.content.Context
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -153,8 +153,8 @@ private fun experience(title: String): Experience = when (title) {
         return
     }
     val spec = remember(title) { experience(title) }
-    val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("discovery_experiences", Context.MODE_PRIVATE) }
+    val context = platformContext()
+    val prefs = remember { context.keyValues("discovery_experiences") }
     var note by remember(title) { mutableStateOf(prefs.getString("note_$title", "").orEmpty()) }
     var completed by remember(title) { mutableStateOf(prefs.getStringSet("done_$title", emptySet()).orEmpty()) }
     var confirmation by remember(title) { mutableStateOf<String?>(null) }

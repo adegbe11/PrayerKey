@@ -1,6 +1,9 @@
 package com.prayerkey.manna.ui.journal
 
-import androidx.activity.compose.BackHandler
+import kotlinx.datetime.isoDayNumber
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.platform.today
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -60,9 +63,7 @@ import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 /**
  * A template, as one printed page.
@@ -111,7 +112,7 @@ private val FIELDS = setOf(
 )
 
 private fun blockFor(p: TemplatePrompt): Block {
-    val q = p.question.trim().lowercase(Locale.UK)
+    val q = p.question.trim().lowercase()
     return when {
         q in FIELDS -> Block.Field
         p.heading == "TODAY'S WORD" || q.startsWith("scripture") || q == "the verse" -> Block.Scripture
@@ -119,7 +120,7 @@ private fun blockFor(p: TemplatePrompt): Block {
             q.startsWith("who am i praying") || q.startsWith("who needs my prayers") ||
             q.startsWith("who is praying") || q.startsWith("who or what am i") ||
             q.startsWith("what am i asking god for") -> Block.Checklist
-        p.heading == "GRATITUDE" || q.contains("three things") || p.guide.lowercase(Locale.UK).contains("three things") -> Block.Numbered
+        p.heading == "GRATITUDE" || q.contains("three things") || p.guide.lowercase().contains("three things") -> Block.Numbered
         else -> Block.Ruled
     }
 }
@@ -129,7 +130,7 @@ private fun sectionsOf(t: JournalTemplate): List<Section> {
     val merged = mutableListOf<Pair<Int, TemplatePrompt>>()
     var ordinals = 0
     t.prompts.forEachIndexed { i, p ->
-        if (p.question.trim().lowercase(Locale.UK) in ORDINALS && p.heading.isBlank()) ordinals++
+        if (p.question.trim().lowercase() in ORDINALS && p.heading.isBlank()) ordinals++
         else merged += i to p
     }
     val raw = mutableListOf<Section>()
@@ -138,7 +139,7 @@ private fun sectionsOf(t: JournalTemplate): List<Section> {
         val block = blockFor(p)
         raw += Section(
             key = i,
-            label = (p.heading.ifBlank { p.question }).uppercase(Locale.UK),
+            label = (p.heading.ifBlank { p.question }).uppercase(),
             sub = if (p.heading.isNotBlank()) p.question else p.guide,
             block = block,
             rows = when (block) { Block.Field -> 1; Block.Checklist, Block.Numbered -> 3; else -> 0 },
@@ -193,7 +194,7 @@ fun TemplateSheet(
         save = { m: SnapshotStateMap<Int, String> -> m.mapKeys { it.key.toString() } },
         restore = { saved -> mutableStateMapOf<Int, String>().apply { saved.forEach { (k, v) -> put(k.toInt(), v as String) } } },
     )) { mutableStateMapOf<Int, String>() }
-    val today = remember { LocalDate.now() }
+    val today = remember { today() }
     val written = answers.values.any { it.isNotBlank() }
 
     fun done() {
@@ -201,7 +202,7 @@ fun TemplateSheet(
             sections.forEach { s ->
                 val a = answers[s.key].orEmpty().trim()
                 if (a.isEmpty()) return@forEach
-                if (s.label.isNotBlank()) append("## ").append(s.label.lowercase(Locale.UK).replaceFirstChar { it.titlecase(Locale.UK) }).append("\n\n")
+                if (s.label.isNotBlank()) append("## ").append(s.label.lowercase().replaceFirstChar { it.titlecase() }).append("\n\n")
                 append(a).append("\n\n")
             }
         }.trim()
@@ -230,12 +231,12 @@ fun TemplateSheet(
             Spacer(Modifier.height(14.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "Date  " + today.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.UK)),
+                    "Date  " + today.format("d MMMM yyyy"),
                     Modifier.weight(1f),
                     color = Pk.JournalInk.copy(alpha = .75f), fontFamily = BookSerif, fontSize = 13.sp,
                 )
                 listOf("M", "T", "W", "T", "F", "S", "S").forEachIndexed { i, d ->
-                    val on = today.dayOfWeek.value - 1 == i
+                    val on = today.dayOfWeek.isoDayNumber - 1 == i
                     Box(
                         Modifier.size(19.dp).clip(CircleShape)
                             .then(if (on) Modifier.border(1.dp, Pk.Oxblood.copy(alpha = .7f), CircleShape) else Modifier),

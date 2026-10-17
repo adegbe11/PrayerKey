@@ -1,8 +1,12 @@
 package com.prayerkey.manna.ui.home
 
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import android.speech.tts.TextToSpeech
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -52,7 +56,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -70,9 +73,7 @@ import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -100,11 +101,11 @@ fun DevotionalReader(
     onComplete: () -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
+    val context = platformContext()
 
     val dateLine = remember {
-        LocalDate.now()
-            .format(DateTimeFormatter.ofPattern("EEEE d MMMM", Locale.getDefault()))
+        today()
+            .format("EEEE d MMMM")
             
     }
 
@@ -114,7 +115,7 @@ fun DevotionalReader(
     var rangeLabel by remember(day.day) { mutableStateOf(day.reading.rangeLabel) }
     LaunchedEffect(day.day) {
         val bible = OfflineBible(context)
-        scripture = withContext(Dispatchers.IO) { resolveScripture(bible, day) }
+        scripture = withContext(ioDispatcher) { resolveScripture(bible, day) }
         rangeLabel = availableRange(bible, day.reading)
     }
 

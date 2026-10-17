@@ -8,6 +8,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 
 /*
  * The java.time calls the screens were written with, on kotlinx-datetime, so
@@ -41,3 +42,16 @@ fun LocalDate.atStartOfDay(): LocalDateTime = LocalDateTime(year, monthNumber, d
 
 fun localDateOfEpochDay(day: Long): LocalDate = LocalDate.fromEpochDays(day.toInt())
 fun localDateOfEpochDay(day: Int): LocalDate = LocalDate.fromEpochDays(day)
+
+fun LocalDateTime.toLocalDate(): LocalDate = date
+
+/** The calendar day a moment fell on, on this phone. */
+fun localDateOfMillis(millis: Long): LocalDate =
+    kotlinx.datetime.Instant.fromEpochMilliseconds(millis).toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+/** Milliseconds from now until the next midnight on this phone, at least one second. */
+fun millisUntilMidnight(): Long {
+    val zone = TimeZone.currentSystemDefault()
+    val next = today().plusDays(1).atStartOfDayIn(zone)
+    return (next - kotlinx.datetime.Clock.System.now()).inWholeMilliseconds.coerceAtLeast(1_000L)
+}

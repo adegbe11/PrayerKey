@@ -1,20 +1,37 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.platform.localDateOfEpochDay
+import com.prayerkey.manna.platform.withDayOfMonth
+import com.prayerkey.manna.ui.platform.openAttachment
+import com.prayerkey.manna.ui.platform.loadThumbnail
+import com.prayerkey.manna.ui.platform.mimeTypeOf
+import com.prayerkey.manna.ui.platform.shareText
+import com.prayerkey.manna.ui.platform.rememberDeviceUnlock
+import com.prayerkey.manna.ui.platform.SecureScreen
+import com.prayerkey.manna.ui.platform.fullScreenDialog
+import kotlinx.datetime.isoDayNumber
+import com.prayerkey.manna.platform.lengthOfMonth
+import com.prayerkey.manna.platform.minusMonths
+import com.prayerkey.manna.platform.plusMonths
+import com.prayerkey.manna.data.mannaStore
+import com.prayerkey.manna.platform.longDateShortTime
+import com.prayerkey.manna.platform.shortTime
+import com.prayerkey.manna.platform.mediumDate
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.ui.share.Share
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.foundation.layout.aspectRatio
 import kotlinx.coroutines.launch
-import android.app.KeyguardManager
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.view.WindowManager
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import org.jetbrains.compose.resources.painterResource
@@ -63,11 +80,7 @@ import androidx.compose.material.icons.outlined.SelfImprovement
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.BackHandler
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -90,14 +103,10 @@ import com.prayerkey.manna.data.SavedWord
 import com.prayerkey.manna.data.JourneyInsight
 import com.prayerkey.manna.data.JourneyInsights
 import com.prayerkey.manna.data.PrayerStage
-import com.prayerkey.manna.data.MannaStore
-import com.prayerkey.manna.share.AnsweredPrayerCardRenderer
 import com.prayerkey.manna.data.FormationState
 import com.prayerkey.manna.model.VerseCard
 import com.prayerkey.manna.ui.theme.*
-import java.text.DateFormat
-import java.time.LocalDate
-import java.util.Date
+import kotlinx.datetime.LocalDate
 
 private data class JournalMood(val key: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 private val MOODS = listOf(
@@ -140,26 +149,18 @@ fun JournalScreen(
     journalLocked: Boolean = false,
     concealPreviews: Boolean = false,
 ) {
-    val context = LocalContext.current
-    val view = LocalView.current
-    DisposableEffect(journalLocked, view) {
-        val window = (view.context as? android.app.Activity)?.window
-        if (journalLocked) window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        onDispose { window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) }
-    }
+    val context = platformContext()
+    SecureScreen(journalLocked)
     var unlocked by remember(journalLocked) { mutableStateOf(!journalLocked) }
-    val unlock = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == android.app.Activity.RESULT_OK) unlocked = true
-    }
+    val unlock = rememberDeviceUnlock("Your journal is protected by your device lock") { ok -> if (ok) unlocked = true }
     if (!unlocked) {
         Box(Modifier.fillMaxSize().background(dayWash()), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
                 JournalMark()
                 Text("Your Journal is private", fontFamily = BookSerif, fontSize = 24.sp, modifier = Modifier.padding(top = 18.dp))
                 Button(onClick = {
-                    val manager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
-                    manager.createConfirmDeviceCredentialIntent("Unlock PrayerKey Journal", "Your journal is protected by your device lock")?.let(unlock::launch)
-                        ?: run { unlocked = true }
+                    // a phone with no lock set has nothing to unlock with, so the journal opens
+                    if (unlock.available) unlock.unlock() else unlocked = true
                 }, modifier = Modifier.padding(top = 20.dp)) { Text("Unlock Journal") }
             }
         }
@@ -183,7 +184,7 @@ fun JournalScreen(
     var previewing by remember { mutableStateOf<com.prayerkey.manna.data.JournalTemplate?>(null) }
     var reading by remember { mutableStateOf<com.prayerkey.manna.data.JournalTemplate?>(null) }
     var seeded by remember { mutableStateOf<com.prayerkey.manna.data.JournalTemplate?>(null) }
-    val templatePrefs = remember { context.getSharedPreferences("journal_templates", android.content.Context.MODE_PRIVATE) }
+    val templatePrefs = remember { context.keyValues("journal_templates") }
     var recentTemplates by remember {
         mutableStateOf(templatePrefs.getString("recent", "").orEmpty().split(",").filter { it.isNotBlank() })
     }
@@ -295,7 +296,7 @@ fun JournalScreen(
     if (promptLibraryOpen) {
         androidx.compose.ui.window.Dialog(
             onDismissRequest = { promptLibraryOpen = false },
-            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             com.prayerkey.manna.ui.journal.PromptLibrary(
                 onClose = { promptLibraryOpen = false },
@@ -325,7 +326,7 @@ fun JournalScreen(
     if (browsingTemplates) {
         androidx.compose.ui.window.Dialog(
             onDismissRequest = { browsingTemplates = false },
-            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             com.prayerkey.manna.ui.journal.TemplateGallery(
                 recent = recentTemplates,
@@ -338,7 +339,7 @@ fun JournalScreen(
     previewing?.let { template ->
         androidx.compose.ui.window.Dialog(
             onDismissRequest = { previewing = null },
-            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             com.prayerkey.manna.ui.journal.TemplatePreview(
                 template = template,
@@ -362,7 +363,7 @@ fun JournalScreen(
     reading?.let { template ->
         androidx.compose.ui.window.Dialog(
             onDismissRequest = { reading = null },
-            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             com.prayerkey.manna.ui.journal.TemplateSheet(
                 template = template,
@@ -488,7 +489,7 @@ private fun JournalTimeline(
         selectedCollection = null
         searchOpen = false
     }
-    val today = LocalDate.now().toEpochDay()
+    val today = today().toEpochDays().toLong()
     val memory = remember(entries) {
         entries.firstOrNull { it.entryDay == today - 365 } ?: entries.firstOrNull { it.entryDay == today - 30 }
     }
@@ -508,7 +509,7 @@ private fun JournalTimeline(
                 it.journal.contains(query, true) || it.location.contains(query, true))
         }
     }
-    val grouped = remember(shown) { shown.groupBy { it.entryDay }.toSortedMap(compareByDescending { it }) }
+    val grouped = remember(shown) { shown.groupBy { it.entryDay }.entries.sortedByDescending { it.key }.associate { it.key to it.value } }
 
     /* One scroll for the whole page. The overview used to sit above a list
        with its own scroll, filled the screen, and left the list no height at
@@ -629,7 +630,7 @@ private fun JournalOverview(
         JournalCollection("Sermon notes", entries.count { it.source == "sermon" }, Icons.Outlined.GraphicEq, Color(0xFF8A3D72)),
         JournalCollection("All pages", entries.size, Icons.Outlined.AutoStories, ink),
     )
-    val today = remember { java.time.LocalDate.now() }
+    val today = remember { today() }
     Column(Modifier.padding(top = 18.dp)) {
         /*
          * The hero carries the artwork and the day, not a flat violet block.
@@ -657,12 +658,12 @@ private fun JournalOverview(
                     fontWeight = FontWeight.Bold, fontSize = 10.sp, letterSpacing = 1.5.sp,
                 )
                 Text(
-                    today.format(java.time.format.DateTimeFormatter.ofPattern("EEE, MMM d", java.util.Locale.UK)),
+                    today.format("EEE, MMM d"),
                     Modifier.padding(top = 4.dp),
                     color = Color.White.copy(alpha = .60f), fontFamily = UtilitySans, fontSize = 11.5.sp,
                 )
                 Text(
-                    HOME_QUESTIONS[Math.floorMod(today.toEpochDay(), HOME_QUESTIONS.size.toLong()).toInt()],
+                    HOME_QUESTIONS[(today.toEpochDays().toLong()).mod(HOME_QUESTIONS.size.toLong()).toInt()],
                     color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold,
                     fontSize = 28.sp, lineHeight = 34.sp, modifier = Modifier.padding(top = 14.dp),
                 )
@@ -786,11 +787,12 @@ private fun JournalSubset(entries: List<JournalEntry>, empty: String, conceal: B
 
 @Composable
 private fun JournalCalendar(entries: List<JournalEntry>, conceal: Boolean, onEdit: (JournalEntry) -> Unit) {
-    var month by remember { mutableStateOf(java.time.YearMonth.now()) }
-    val byDay = remember(entries) { entries.groupBy { java.time.Instant.ofEpochMilli(it.createdAt).atZone(java.time.ZoneId.systemDefault()).toLocalDate() } }
-    val first = month.atDay(1)
-    val leading = first.dayOfWeek.value - 1
-    val cells = List(leading) { null } + (1..month.lengthOfMonth()).map { month.atDay(it) }
+    // the month shown, as its first day
+    var month by remember { mutableStateOf(today().withDayOfMonth(1)) }
+    val byDay = remember(entries) { entries.groupBy { com.prayerkey.manna.platform.localDateOfMillis(it.createdAt) } }
+    val first = month
+    val leading = first.dayOfWeek.isoDayNumber - 1
+    val cells = List(leading) { null } + (1..month.lengthOfMonth()).map { month.withDayOfMonth(it) }
     Column(Modifier.fillMaxWidth().padding(top = 12.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { month = month.minusMonths(1) }) { Icon(Icons.Outlined.ChevronLeft, "Previous month") }
@@ -806,7 +808,7 @@ private fun JournalCalendar(entries: List<JournalEntry>, conceal: Boolean, onEdi
                 }
             }
         }
-        val monthEntries = entries.filter { java.time.Instant.ofEpochMilli(it.createdAt).atZone(java.time.ZoneId.systemDefault()).toLocalDate().let { d -> d.year == month.year && d.monthValue == month.monthValue } }
+        val monthEntries = entries.filter { com.prayerkey.manna.platform.localDateOfMillis(it.createdAt).let { d -> d.year == month.year && d.monthNumber == month.monthNumber } }
         Text("${monthEntries.size} ${if (monthEntries.size == 1) "entry" else "entries"} this month", color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 8.dp))
         monthEntries.firstOrNull()?.let { EntryCard(it, conceal, {}) { onEdit(it) } }
     }
@@ -883,7 +885,7 @@ private fun PrayerJourneyDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     var showReflection by remember { mutableStateOf(false) }
     val reflection = remember(entry) { com.prayerkey.manna.data.JournalCoach.reflect(entry) }
     ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Color(0xFFFFFCF4), sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
@@ -891,7 +893,7 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(entry.journal, color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Text(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(Date(entry.createdAt)), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp))
+                    Text(longDateShortTime(entry.createdAt), color = Muted, fontSize = 11.sp, modifier = Modifier.padding(top = 3.dp))
                 }
                 if (entry.favorite) Icon(Icons.Outlined.Favorite, "Favourite", tint = Gold, modifier = Modifier.size(20.dp))
             }
@@ -912,7 +914,7 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
                 OutlinedButton(onClick = { showReflection = true }, modifier = Modifier.weight(1f)) { Text("Reflect") }
                 OutlinedButton(onClick = {
                     val text = buildString { if (entry.title.isNotBlank()) appendLine(entry.title); appendLine(entry.body); if (entry.gratitude.isNotBlank()) appendLine("Grateful for: ${entry.gratitude}"); entry.verseRef?.let { appendLine(it) } }
-                    context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply { type = "text/plain"; putExtra(Intent.EXTRA_TEXT, text) }, "Share this entry"))
+                    shareText(context, text, "Share this entry")
                 }, modifier = Modifier.weight(1f)) { Text("Share") }
                 Button(onClick = onEdit, modifier = Modifier.weight(1f)) { Text("Edit entry") }
             }
@@ -929,7 +931,7 @@ private fun EntryDetailSheet(entry: JournalEntry, onDismiss: () -> Unit, onEdit:
 private fun dayLabel(day: Long, today: Long): String = when (day) {
     today -> "TODAY"
     today - 1 -> "YESTERDAY"
-    else -> DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(day * 86_400_000L)).uppercase()
+    else -> localDateOfEpochDay(day).format("MMM d, yyyy").uppercase()
 }
 
 @Composable
@@ -978,8 +980,8 @@ private fun JournalMark() {
 
 @Composable
 private fun EntryCard(entry: JournalEntry, conceal: Boolean = false, onAnswer: () -> Unit, onClick: () -> Unit) {
-    val context = LocalContext.current
-    val prayerStore = remember { MannaStore.of(context) }
+    val context = platformContext()
+    val prayerStore = remember { context.mannaStore() }
     var prayedCount by remember(entry.id) {
         mutableIntStateOf(prayerStore.prayerSessions(500).count { it.challenge == "Prayer ledger" && it.focus == entry.body })
     }
@@ -1005,7 +1007,7 @@ private fun EntryCard(entry: JournalEntry, conceal: Boolean = false, onAnswer: (
                 Spacer(Modifier.weight(1f))
                 if (entry.favorite) Text("★", color = Gold, fontSize = 13.sp, modifier = Modifier.padding(end = 7.dp))
                 Text(
-                    DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(entry.createdAt)),
+                    shortTime(entry.createdAt),
                     color = Muted, fontSize = 10.sp,
                 )
             }
@@ -1154,7 +1156,7 @@ private fun EntryComposer(
 /** Everything God answered, whichever screen it was asked on. */
 @Composable
 private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, onEdit: (JournalEntry) -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     if (entries.isEmpty() && words.isEmpty()) {
         Column(Modifier.fillMaxWidth().padding(top = 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Nothing marked answered yet", fontWeight = FontWeight.SemiBold)
@@ -1169,7 +1171,7 @@ private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, on
             Column {
                 EntryCard(entry, onAnswer = {}) { onEdit(entry) }
                 TextButton(
-                    onClick = { AnsweredPrayerCardRenderer.share(context, entry.body, entry.testimony.orEmpty(), entry.answeredAt ?: entry.updatedAt) },
+                    onClick = { Share.cards.shareAnswered(context, entry.body, entry.testimony.orEmpty(), entry.answeredAt ?: entry.updatedAt) },
                     modifier = Modifier.align(Alignment.End),
                 ) { Text("Share answer") }
             }
@@ -1181,7 +1183,7 @@ private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, on
                     Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
                     word.testimony?.let { Text(it, color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
                     TextButton(
-                        onClick = { AnsweredPrayerCardRenderer.share(context, word.verse, word.testimony.orEmpty(), word.answeredAt ?: word.savedAt) },
+                        onClick = { Share.cards.shareAnswered(context, word.verse, word.testimony.orEmpty(), word.answeredAt ?: word.savedAt) },
                         modifier = Modifier.align(Alignment.End),
                     ) { Text("Share answer") }
                 }
@@ -1205,7 +1207,7 @@ private fun WordList(words: List<SavedWord>, canAnswer: Boolean, onAnswer: (Save
                     Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
                     Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
                     word.testimony?.let { Text(it, color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
-                    Text(DateFormat.getDateInstance().format(Date(word.answeredAt ?: word.savedAt)), color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
+                    Text(mediumDate(word.answeredAt ?: word.savedAt), color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
                     if (canAnswer) TextButton(onClick = { onAnswer(word) }, modifier = Modifier.align(Alignment.End)) { Text("Mark answered") }
                 }
             }
@@ -1242,22 +1244,19 @@ private val HOME_QUESTIONS = listOf(
  */
 @Composable
 private fun AttachmentView(value: String) {
-    val context = LocalContext.current
-    val uri = remember(value) { Uri.parse(value) }
-    val type = remember(value) { com.prayerkey.manna.ui.journal.attachmentType(context, uri) }
+    val context = platformContext()
+    val type = remember(value) { mimeTypeOf(context, value) }
     val visual = type.startsWith("image/") || type.startsWith("video/")
-    var picture by remember(value) { mutableStateOf<android.graphics.Bitmap?>(null) }
+    var picture by remember(value) { mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null) }
     var missing by remember(value) { mutableStateOf(false) }
     if (visual) {
         LaunchedEffect(value) {
-            picture = com.prayerkey.manna.ui.journal.loadAttachmentPicture(context, uri)
+            picture = loadThumbnail(context, value, 1080)
             missing = picture == null
         }
     }
     val open = {
-        runCatching {
-            context.startActivity(Intent(Intent.ACTION_VIEW, uri).apply { addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) })
-        }
+        openAttachment(context, value)
         Unit
     }
     val image = picture
@@ -1267,7 +1266,7 @@ private fun AttachmentView(value: String) {
             contentAlignment = Alignment.Center,
         ) {
             androidx.compose.foundation.Image(
-                image.asImageBitmap(), null,
+                image, null,
                 Modifier.fillMaxWidth().aspectRatio((image.width.toFloat() / image.height).coerceIn(.6f, 1.8f)),
                 contentScale = androidx.compose.ui.layout.ContentScale.Crop,
             )

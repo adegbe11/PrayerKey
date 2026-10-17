@@ -1,5 +1,7 @@
 package com.prayerkey.manna.ui.morning
 
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -12,9 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalView
 import org.jetbrains.compose.resources.painterResource
-import android.view.HapticFeedbackConstants
 import com.prayerkey.manna.ui.book.FoldedPage
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
@@ -158,7 +158,7 @@ fun OfficeFlip(
 ) {
     val pages = remember(movements) { officePages(movements, after) }
     val scope = rememberCoroutineScope()
-    val view = LocalView.current
+    val haptics = rememberHaptics()
 
     /*
      * A leaf going over, not a pane sliding sideways.
@@ -194,7 +194,7 @@ fun OfficeFlip(
             crease.animateTo(if (commit) 1f else 0f, tween(330))
             if (commit) {
                 index = (index + if (forward) 1 else -1).coerceIn(0, pages.lastIndex)
-                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                haptics.perform(Haptic.Click)
             }
             direction = 0
             crease.snapTo(0f)

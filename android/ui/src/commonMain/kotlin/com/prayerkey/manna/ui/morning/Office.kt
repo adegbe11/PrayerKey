@@ -1,7 +1,8 @@
 package com.prayerkey.manna.ui.morning
 
-import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
+import com.prayerkey.manna.ui.platform.UtteranceListener
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.ui.platform.platformContext
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -50,8 +50,6 @@ import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 /**
  * The furniture both daily offices are printed on.
@@ -590,7 +588,7 @@ fun OfficeClose(colophon: String, palette: OfficePalette) {
  * tells you what you are about to do.
  */
 class OfficeVoice(private val speaking: MutableState<Boolean>) {
-    var engine: TextToSpeech? = null
+    var engine: Speaker? = null
     var ready = false
 
     /**
@@ -618,22 +616,22 @@ class OfficeVoice(private val speaking: MutableState<Boolean>) {
         val tts = engine ?: return
         if (!ready) return
         speaking.value = true
-        tts.speak(movement.rubric, TextToSpeech.QUEUE_FLUSH, null, null)
-        movement.body.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
-        movement.scripture?.let { tts.speak(it.text, TextToSpeech.QUEUE_ADD, null, null) }
-        movement.after.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
-        movement.declarations.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
-        movement.points.forEach { tts.speak(it, TextToSpeech.QUEUE_ADD, null, null) }
+        tts.speak(movement.rubric, Speaker.QUEUE_FLUSH, null, null)
+        movement.body.forEach { tts.speak(it, Speaker.QUEUE_ADD, null, null) }
+        movement.scripture?.let { tts.speak(it.text, Speaker.QUEUE_ADD, null, null) }
+        movement.after.forEach { tts.speak(it, Speaker.QUEUE_ADD, null, null) }
+        movement.declarations.forEach { tts.speak(it, Speaker.QUEUE_ADD, null, null) }
+        movement.points.forEach { tts.speak(it, Speaker.QUEUE_ADD, null, null) }
         /* A silent tail carries the id, so onDone fires once at the end of the
            movement rather than after each paragraph inside it. */
-        tts.speak(" ", TextToSpeech.QUEUE_ADD, null, MOVEMENT_END)
+        tts.speak(" ", Speaker.QUEUE_ADD, null, MOVEMENT_END)
     }
 
     /** The close: the office signs off rather than stopping mid-air. */
     fun finish() {
         val tts = engine ?: return
         speaking.value = true
-        tts.speak("Amen.", TextToSpeech.QUEUE_FLUSH, null, OFFICE_END)
+        tts.speak("Amen.", Speaker.QUEUE_FLUSH, null, OFFICE_END)
     }
 
     /** Begin reading from wherever the reader currently is. */
@@ -659,11 +657,11 @@ class OfficeVoice(private val speaking: MutableState<Boolean>) {
 
 @Composable
 fun rememberOfficeVoice(speaking: MutableState<Boolean>): OfficeVoice {
-    val context = LocalContext.current
+    val context = platformContext()
     val voice = remember { OfficeVoice(speaking) }
     DisposableEffect(Unit) {
-        val tts = TextToSpeech(context) { status -> voice.ready = status == TextToSpeech.SUCCESS }
-        tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+        val tts = Speaker(context) { status -> voice.ready = status == Speaker.SUCCESS }
+        tts.setOnUtteranceProgressListener(object : UtteranceListener() {
             override fun onStart(utteranceId: String?) {}
             override fun onDone(utteranceId: String?) {
                 when (utteranceId) {

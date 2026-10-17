@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.guided
 
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.ui.platform.StatusBarIcons
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -59,12 +60,10 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
 import com.prayerkey.manna.data.PrayerMachine
 import com.prayerkey.manna.data.PrayerMachine.Kind
 import com.prayerkey.manna.ui.theme.BookSerif
@@ -75,12 +74,12 @@ import kotlin.math.PI
 import kotlin.math.sin
 import kotlin.random.Random
 
-internal val Night = Color(0xFF0B0620)
-internal val Deep = Color(0xFF1C0B4A)
+val Night = Color(0xFF0B0620)
+val Deep = Color(0xFF1C0B4A)
 private val Violet = Color(0xFF6200ED)
-internal val Halo = Color(0xFFB79CFF)
-internal val Gold = Color(0xFFE9C46A)
-internal val GoldPale = Color(0xFFFFF1C9)
+val Halo = Color(0xFFB79CFF)
+val Gold = Color(0xFFE9C46A)
+val GoldPale = Color(0xFFFFF1C9)
 
 /** The pattern a guided prayer teaches, in the order it is prayed. */
 private val Pattern = listOf(Kind.Worship, Kind.Confess, Kind.Ask, Kind.Listen)
@@ -299,7 +298,7 @@ private fun Progress(count: Int, at: Int, glow: Color) {
 }
 
 @Composable
-internal fun Pill(label: String, filled: Boolean, gold: Boolean = false, onClick: () -> Unit) {
+fun Pill(label: String, filled: Boolean, gold: Boolean = false, onClick: () -> Unit) {
     val shine = rememberInfiniteTransition(label = "shine")
     val sweep by shine.animateFloat(-0.3f, 1.3f, infiniteRepeatable(tween(2800, delayMillis = 1200)), label = "sweep")
     Box(
@@ -332,7 +331,7 @@ internal fun Pill(label: String, filled: Boolean, gold: Boolean = false, onClick
  * and motes of light drifting up. At the Amen the light turns gold and opens.
  */
 @Composable
-internal fun Heaven(breath: Float, glow: Color, seal: Float) {
+fun Heaven(breath: Float, glow: Color, seal: Float) {
     val time = rememberInfiniteTransition(label = "heaven")
     val turn by time.animateFloat(0f, 360f, infiniteRepeatable(tween(90_000, easing = LinearEasing)), label = "turn")
     val drift by time.animateFloat(0f, 1f, infiniteRepeatable(tween(24_000, easing = LinearEasing)), label = "drift")
@@ -378,13 +377,6 @@ internal fun Heaven(breath: Float, glow: Color, seal: Float) {
 
 /** Light clock and battery icons over the night sky, restored on leaving. */
 @Composable
-internal fun LightIcons() {
-    val view = LocalView.current
-    DisposableEffect(Unit) {
-        val window = (view.context as? android.app.Activity)?.window
-        val c = window?.let { WindowCompat.getInsetsController(it, view) }
-        val before = c?.isAppearanceLightStatusBars
-        c?.isAppearanceLightStatusBars = false
-        onDispose { if (before != null) c.isAppearanceLightStatusBars = before }
-    }
+fun LightIcons() {
+    StatusBarIcons(dark = false)
 }

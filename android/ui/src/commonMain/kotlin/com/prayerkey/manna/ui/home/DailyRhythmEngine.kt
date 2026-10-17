@@ -1,8 +1,12 @@
 package com.prayerkey.manna.ui.home
 
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import android.content.Context
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -21,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -32,13 +35,11 @@ import com.prayerkey.manna.data.*
 import com.prayerkey.manna.ui.theme.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 @Composable
-internal fun DailyRhythmExperience(moment: String, onClose: () -> Unit, onComplete: () -> Unit) {
-    val today = remember { LocalDate.now() }
+fun DailyRhythmExperience(moment: String, onClose: () -> Unit, onComplete: () -> Unit) {
+    val today = remember { today() }
     val passage = remember(today) { passageFor(today) }
     CinematicDailyRhythmPage(moment, today, passage, onClose, onComplete)
 }
@@ -52,11 +53,11 @@ private fun CinematicDailyRhythmPage(
     onComplete: () -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("daily_rhythm_notes", Context.MODE_PRIVATE) }
+    val context = platformContext()
+    val prefs = remember { context.keyValues("daily_rhythm_notes") }
     var topics by remember { mutableStateOf<List<PrayerTopic>>(emptyList()) }
     var note by remember(moment, date) { mutableStateOf(prefs.getString("${date}_$moment", "").orEmpty()) }
-    LaunchedEffect(Unit) { topics = withContext(Dispatchers.IO) { LocalPrayerTopics.load(context) } }
+    LaunchedEffect(Unit) { topics = withContext(ioDispatcher) { LocalPrayerTopics.load(context) } }
     val prayer = remember(date, topics) { dailyPrayerFor(date, topics) }
     val title = when (moment) {
         "morning" -> "Morning prayer"
@@ -94,7 +95,7 @@ private fun CinematicDailyRhythmPage(
                         Icon(Icons.Outlined.ArrowBackIosNew, "Back", tint = Color.White, modifier = Modifier.size(17.dp))
                     }
                     Column(Modifier.align(Alignment.BottomStart).padding(24.dp)) {
-                        Text(date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.getDefault())), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, letterSpacing = 1.4.sp, color = Pk.GoldLight)
+                        Text(date.format("EEEE, d MMMM"), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 9.sp, letterSpacing = 1.4.sp, color = Pk.GoldLight)
                         Text(title, Modifier.padding(top = 8.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 36.sp, lineHeight = 39.sp, color = Color.White)
                         Text(reference, Modifier.padding(top = 12.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = Color.White.copy(.82f))
                     }
@@ -131,14 +132,14 @@ private fun DailyRhythmPage(
     onComplete: () -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("daily_rhythm_notes", Context.MODE_PRIVATE) }
+    val context = platformContext()
+    val prefs = remember { context.keyValues("daily_rhythm_notes") }
     var topics by remember { mutableStateOf<List<PrayerTopic>>(emptyList()) }
     var verses by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
     var note by remember(moment, date) { mutableStateOf(prefs.getString("${date}_$moment", "").orEmpty()) }
-    LaunchedEffect(Unit) { topics = withContext(Dispatchers.IO) { LocalPrayerTopics.load(context) } }
+    LaunchedEffect(Unit) { topics = withContext(ioDispatcher) { LocalPrayerTopics.load(context) } }
     LaunchedEffect(passage.book, passage.chapter) {
-        verses = withContext(Dispatchers.IO) { OfflineBible(context).chapter(passage.book, passage.chapter) }
+        verses = withContext(ioDispatcher) { OfflineBible(context).chapter(passage.book, passage.chapter) }
     }
     val prayer = remember(date, topics) { dailyPrayerFor(date, topics) }
     val title = when (moment) {
@@ -148,7 +149,7 @@ private fun DailyRhythmPage(
         "reflection" -> "Guided reflection"
         else -> "Evening prayer"
     }
-    val subtitle = date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.getDefault()))
+    val subtitle = date.format("EEEE, d MMMM")
 
     Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
         Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {

@@ -30,3 +30,10 @@ expect val noFontPadding: androidx.compose.ui.text.PlatformTextStyle?
 /** The screen's height in dp, as the screens measured it on Android. */
 @Composable
 expect fun screenHeightDp(): Int
+
+/** A dialog that covers the whole screen, edge to edge: no platform width, no system insets of its own. */
+expect fun fullScreenDialog(): androidx.compose.ui.window.DialogProperties
+
+/** Keeps this screen out of screenshots and the recent-apps preview while [enabled]. Android only; iOS gives apps no way to block a screenshot. */
+@Composable
+expect fun SecureScreen(enabled: Boolean)

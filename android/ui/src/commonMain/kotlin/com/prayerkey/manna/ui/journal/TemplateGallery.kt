@@ -1,9 +1,9 @@
 package com.prayerkey.manna.ui.journal
 
+import com.prayerkey.manna.ui.platform.StatusBarIcons
 import org.jetbrains.compose.resources.DrawableResource
 import com.prayerkey.manna.resources.*
-import androidx.activity.compose.BackHandler
-import androidx.annotation.DrawableRes
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -141,14 +141,7 @@ fun TemplateGallery(
     androidx.compose.runtime.LaunchedEffect(collection) { grid.scrollToItem(0) }
 
     // dark status-bar icons on the white page
-    val view = androidx.compose.ui.platform.LocalView.current
-    androidx.compose.runtime.DisposableEffect(view) {
-        val window = (view.parent as? androidx.compose.ui.window.DialogWindowProvider)?.window
-        val bars = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view) }
-        val was = bars?.isAppearanceLightStatusBars
-        bars?.isAppearanceLightStatusBars = true
-        onDispose { if (was != null) bars.isAppearanceLightStatusBars = was }
-    }
+    StatusBarIcons(dark = true, inDialog = true)
 
     Box(Modifier.fillMaxSize().background(Color.White)) {
         LazyVerticalGrid(

@@ -105,3 +105,5 @@ actual suspend fun httpRequest(url: String, method: String, body: String?, heade
         cont.invokeOnCancellation { task.cancel() }
         task.resume()
     }
+
+actual fun fileExists(path: String): Boolean = platform.Foundation.NSFileManager.defaultManager.fileExistsAtPath(path)

@@ -1,9 +1,13 @@
 package com.prayerkey.manna.ui.home
 
+import kotlinx.datetime.daysUntil
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.Reminders
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.platformContext
 import org.jetbrains.compose.resources.DrawableResource
 import com.prayerkey.manna.resources.*
-import android.content.Context
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,13 +34,11 @@ import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.background
 import androidx.compose.ui.draw.clip
-import com.prayerkey.manna.reminder.ReminderReceiver
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import kotlinx.datetime.LocalDate
 
 private data class FaithDay(
     val title: String,
@@ -79,16 +80,16 @@ private fun programme(name: String): FaithProgramme = when (name) {
 }
 
 @Composable
-internal fun FaithProgrammeMachine(title: String, onClose: () -> Unit) {
+fun FaithProgrammeMachine(title: String, onClose: () -> Unit) {
     val spec = remember(title) { programme(title) }
-    val context = LocalContext.current
-    val prefs = remember(title) { context.getSharedPreferences("faith_programme_${title.lowercase().replace(' ', '_')}", Context.MODE_PRIVATE) }
+    val context = platformContext()
+    val prefs = remember(title) { context.keyValues("faith_programme_${title.lowercase().replace(' ', '_')}") }
     var selected by remember { mutableStateOf(prefs.getString("selected", "").orEmpty()) }
     var started by remember { mutableStateOf(prefs.getBoolean("started", false)) }
     var openDay by remember { mutableStateOf<Int?>(null) }
     var done by remember { mutableStateOf(prefs.getStringSet("done", emptySet()).orEmpty().mapNotNull(String::toIntOrNull).toSet()) }
     var hour by remember { mutableIntStateOf(prefs.getInt("hour", if (title == "Midnight prayer") 0 else 6)) }
-    var startedOn by remember { mutableStateOf(LocalDate.parse(prefs.getString("started_on", LocalDate.now().toString()))) }
+    var startedOn by remember { mutableStateOf(LocalDate.parse(prefs.getString("started_on", today().toString()) ?: today().toString())) }
     var lastCompletedOn by remember { mutableStateOf(prefs.getString("last_completed_on", "").orEmpty()) }
 
     BackHandler {
@@ -100,7 +101,7 @@ internal fun FaithProgrammeMachine(title: String, onClose: () -> Unit) {
         val personalised = if (selected.isBlank()) base else base.copy(closing = "Father, concerning $selected: ${base.closing}")
         FaithProgrammeDay(spec, day, personalised, onBack = { openDay = null }) {
             done = done + day
-            lastCompletedOn = LocalDate.now().toString()
+            lastCompletedOn = today().toString()
             prefs.edit().putStringSet("done", done.map(Int::toString).toSet()).putString("last_completed_on", lastCompletedOn).apply()
             openDay = null
         }
@@ -111,10 +112,10 @@ internal fun FaithProgrammeMachine(title: String, onClose: () -> Unit) {
         ProgrammeSetup(spec, selected, hour, onSelect = { selected = it }, onHour = { hour = it }, onClose = onClose) {
             if (selected.isNotBlank()) {
                 started = true
-                startedOn = LocalDate.now()
+                startedOn = today()
                 lastCompletedOn = ""
                 prefs.edit().putString("selected", selected).putInt("hour", hour).putBoolean("started", true).putString("started_on", startedOn.toString()).putString("last_completed_on", "").apply()
-                ReminderReceiver.schedule(context, hour, 0, true)
+                Reminders.schedule(context, hour, 0, true)
             }
         }
     } else {
@@ -237,8 +238,8 @@ private fun programmeArt(title: String): DrawableResource = when (title) {
 @Composable
 private fun ProgrammeHome(spec: FaithProgramme, selected: String, done: Set<Int>, startedOn: LocalDate, lastCompletedOn: String, onClose: () -> Unit, onReset: () -> Unit, onDay: (Int) -> Unit) {
     val next = (done.size + 1).coerceAtMost(spec.days)
-    val calendarDay = (ChronoUnit.DAYS.between(startedOn, LocalDate.now()).toInt() + 1).coerceIn(1, spec.days)
-    val availableToday = done.size < spec.days && next <= calendarDay && lastCompletedOn != LocalDate.now().toString()
+    val calendarDay = ((startedOn).daysUntil(today()).toLong().toInt() + 1).coerceIn(1, spec.days)
+    val availableToday = done.size < spec.days && next <= calendarDay && lastCompletedOn != today().toString()
     Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
             ProgrammeBar(onClose, spec.title)

@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.home
 
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.platform.today
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -62,7 +63,7 @@ private val prayerPoints = listOf(
 fun PrayerPointsScreen(reference: String, onClose: () -> Unit) {
     BackHandler(onBack = onClose)
     val cs = MaterialTheme.colorScheme
-    val points = remember(reference) { com.prayerkey.manna.data.prayerPointsFor(java.time.LocalDate.now(), reference) }
+    val points = remember(reference) { com.prayerkey.manna.data.prayerPointsFor(today(), reference) }
     val checked = remember(reference) { mutableStateListOf<Int>() }
     Column(Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(cs.primary.copy(alpha = .20f), cs.background, cs.background)))) {
         ToolHeader("50 powerful prayer points", "Pray each one aloud and with faith", onClose)

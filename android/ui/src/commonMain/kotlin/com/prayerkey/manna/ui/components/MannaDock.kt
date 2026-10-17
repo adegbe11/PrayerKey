@@ -1,8 +1,10 @@
 package com.prayerkey.manna.ui.components
 
+import com.prayerkey.manna.ui.platform.noFontPadding
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.ui.draw.drawBehind
-import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -35,7 +37,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -77,7 +78,7 @@ fun MannaDock(
     backdrop: GlassBackdrop? = null,
     onSelect: (Int) -> Unit,
 ) {
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     val cs = androidx.compose.material3.MaterialTheme.colorScheme
     Box(
         Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 14.dp, vertical = 8.dp),
@@ -146,7 +147,7 @@ fun MannaDock(
                         val pad = 8.dp.toPx()
                         val gap = 2.dp.toPx()
                         val cell = (size.width - pad * 2 - gap * (items.size - 1)) / items.size
-                        val flight = kotlin.math.sin((slide - kotlin.math.floor(slide)) * Math.PI).toFloat()
+                        val flight = kotlin.math.sin((slide - kotlin.math.floor(slide)) * kotlin.math.PI).toFloat()
                         val w = 44.dp.toPx() + 18.dp.toPx() * flight
                         val h = 32.dp.toPx()
                         val cx = pad + slide * (cell + gap) + cell / 2
@@ -197,7 +198,7 @@ fun MannaDock(
                                 indication = null,
                             ) {
                                 if (!active) {
-                                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                                    haptics.perform(Haptic.Click)
                                     onSelect(index)
                                 }
                             }
@@ -242,7 +243,7 @@ fun MannaDock(
                             // kill Android's font padding so the label sits
                             // optically centred under the icon
                             style = androidx.compose.ui.text.TextStyle(
-                                platformStyle = androidx.compose.ui.text.PlatformTextStyle(includeFontPadding = false),
+                                platformStyle = noFontPadding,
                             ),
                         )
                     }

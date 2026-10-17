@@ -51,7 +51,15 @@ expect fun rememberTextFilePicker(onPicked: (String?) -> Unit): Launcher
  * grant; on iPhone, copies kept in the app's own files.
  */
 @Composable
-expect fun rememberMediaPicker(onPicked: (List<String>) -> Unit): Launcher
+expect fun rememberMediaPicker(onPicked: (List<String>) -> Unit): MediaPicker
+
+/** What a journal page can take: photos and videos; those plus audio and PDFs; or any file at all. */
+enum class MediaKind { Photos, Attachments, AnyFile }
+
+fun interface MediaPicker {
+    fun launch(kind: MediaKind)
+    fun launch() = launch(MediaKind.Attachments)
+}
 
 /** A small preview of an attachment, or null when it is not an image. */
 expect suspend fun loadThumbnail(context: PlatformContext, address: String, edge: Int): ImageBitmap?

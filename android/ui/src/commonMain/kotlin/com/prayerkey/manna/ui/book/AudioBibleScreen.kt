@@ -1,13 +1,13 @@
 package com.prayerkey.manna.ui.book
 
-import android.media.AudioAttributes
-import android.media.MediaPlayer
-import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
-import android.net.Uri
-import android.os.Handler
-import android.os.Looper
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.ui.platform.postToMain
+import com.prayerkey.manna.ui.platform.StreamPlayer
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.ui.platform.UtteranceListener
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.ui.platform.platformContext
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -55,8 +54,6 @@ import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.PkText
 import com.prayerkey.manna.ui.theme.Spectral
 import com.prayerkey.manna.data.OfflineBible
-import java.util.Locale
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 private const val PUBLIC_DOMAIN_KJV_BASE = "https://publicdomainaudiobibles.com/content/mp3/KJV"
@@ -81,8 +78,8 @@ private val audioBookCodes = mapOf(
     "2 John" to "2JN", "3 John" to "3JN", "Jude" to "JUD", "Revelation" to "REV",
 )
 
-private fun publicDomainChapterUrl(book: String, chapter: Int): Uri? =
-    audioBookCodes[book]?.let { Uri.parse("$PUBLIC_DOMAIN_KJV_BASE/$it${chapter.toString().padStart(2, '0')}.mp3") }
+private fun publicDomainChapterUrl(book: String, chapter: Int): String? =
+    audioBookCodes[book]?.let { "$PUBLIC_DOMAIN_KJV_BASE/$it${chapter.toString().padStart(2, '0')}.mp3" }
 
 @Composable
 fun AudioBibleScreen(
@@ -91,13 +88,13 @@ fun AudioBibleScreen(
     onClose: () -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
-    var player by remember { mutableStateOf<MediaPlayer?>(null) }
-    var narrator by remember { mutableStateOf<TextToSpeech?>(null) }
+    val context = platformContext()
+    var player by remember { mutableStateOf<StreamPlayer?>(null) }
+    var narrator by remember { mutableStateOf<Speaker?>(null) }
     var narratorReady by remember { mutableStateOf(false) }
     var narration by remember { mutableStateOf<List<String>>(emptyList()) }
     var builtInNarration by remember { mutableStateOf(false) }
-    var chapterUri by remember { mutableStateOf<Uri?>(null) }
+    var chapterUri by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(false) }
     var playing by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -105,19 +102,17 @@ fun AudioBibleScreen(
     var duration by remember { mutableIntStateOf(1) }
     var speed by remember { mutableFloatStateOf(1f) }
     var retry by remember { mutableIntStateOf(0) }
-    val handler = remember { Handler(Looper.getMainLooper()) }
 
     DisposableEffect(context) {
-        val engine = TextToSpeech(context) { status ->
-            narratorReady = status == TextToSpeech.SUCCESS
+        val engine = Speaker(context) { status ->
+            narratorReady = status == Speaker.SUCCESS
         }
-        engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-            override fun onStart(utteranceId: String?) { handler.post { playing = true } }
+        engine.setOnUtteranceProgressListener(object : UtteranceListener() {
+            override fun onStart(utteranceId: String?) { postToMain { playing = true } }
             override fun onDone(utteranceId: String?) {
-                if (utteranceId == "chapter-end") handler.post { playing = false }
+                if (utteranceId == "chapter-end") postToMain { playing = false }
             }
-            @Deprecated("Deprecated in Java")
-            override fun onError(utteranceId: String?) { handler.post { playing = false } }
+            override fun onError(utteranceId: String?) { postToMain { playing = false } }
         })
         narrator = engine
         onDispose {
@@ -135,7 +130,7 @@ fun AudioBibleScreen(
         duration = 1
         error = null
         chapterUri = null
-        narration = withContext(Dispatchers.IO) {
+        narration = withContext(ioDispatcher) {
             OfflineBible(context).chapter(book, chapter).map { "Verse ${it.verse}. ${it.text}" }
         }
         loading = true
@@ -153,33 +148,23 @@ fun AudioBibleScreen(
     DisposableEffect(chapterUri, retry) {
         val source = chapterUri
         if (source == null) return@DisposableEffect onDispose { }
-        val media = MediaPlayer().apply {
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build(),
-            )
-            setOnPreparedListener {
-                duration = it.duration.coerceAtLeast(1)
-                loading = false
-                it.start()
-                playing = true
-            }
-            setOnCompletionListener { playing = false; position = duration }
-            setOnErrorListener { _, _, _ ->
-                loading = false
-                playing = false
-                error = "Audio is unavailable for this chapter."
-                true
-            }
-            setDataSource(context, source)
-            prepareAsync()
+        val media = StreamPlayer()
+        media.setOnPreparedListener {
+            duration = media.duration.coerceAtLeast(1)
+            loading = false
+            media.start()
+            playing = true
         }
+        media.setOnCompletionListener { playing = false; position = duration }
+        media.setOnErrorListener {
+            loading = false
+            playing = false
+            error = "Audio is unavailable for this chapter."
+        }
+        media.prepare(source)
         player = media
         onDispose {
-            handler.removeCallbacksAndMessages(null)
-            runCatching { media.release() }
+            media.release()
             player = null
         }
     }
@@ -263,7 +248,7 @@ fun AudioBibleScreen(
                         Modifier.clip(RoundedCornerShape(20.dp)).background(Pk.Cream.copy(alpha = .1f))
                             .clickable {
                                 speed = when (speed) { 1f -> 1.25f; 1.25f -> 1.5f; else -> 1f }
-                                runCatching { player?.playbackParams = player!!.playbackParams.setSpeed(speed) }
+                                player?.setSpeed(speed)
                                 narrator?.setSpeechRate(speed)
                             }
                             .padding(horizontal = 14.dp, vertical = 10.dp),
@@ -323,13 +308,13 @@ fun AudioBibleScreen(
     }
 }
 
-private fun speakChapter(engine: TextToSpeech?, verses: List<String>) {
+private fun speakChapter(engine: Speaker?, verses: List<String>) {
     if (engine == null || verses.isEmpty()) return
     engine.stop()
     verses.forEachIndexed { index, verse ->
         engine.speak(
             verse,
-            if (index == 0) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD,
+            if (index == 0) Speaker.QUEUE_FLUSH else Speaker.QUEUE_ADD,
             null,
             if (index == verses.lastIndex) "chapter-end" else "verse-$index",
         )
@@ -338,5 +323,5 @@ private fun speakChapter(engine: TextToSpeech?, verses: List<String>) {
 
 private fun time(milliseconds: Int): String {
     val seconds = milliseconds.coerceAtLeast(0) / 1000
-    return "%d:%02d".format(Locale.US, seconds / 60, seconds % 60)
+    return "${seconds / 60}:${(seconds % 60).pad2()}"
 }

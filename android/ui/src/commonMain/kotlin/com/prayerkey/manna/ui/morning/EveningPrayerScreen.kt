@@ -1,8 +1,12 @@
 package com.prayerkey.manna.ui.morning
 
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import kotlinx.datetime.toKotlinLocalDate
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -22,13 +26,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.OfficeStore
 import com.prayerkey.manna.ui.theme.BookSerif
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * Evening Prayer, the office run the other way.
@@ -53,24 +56,24 @@ import java.time.LocalDate
 @Composable
 fun EveningPrayerScreen(onClose: () -> Unit) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
-    val today = remember { LocalDate.now() }
+    val context = platformContext()
+    val today = remember { today() }
 
     /* On by default after dark. Somebody opening this at half past nine should
        not have to find the switch first. */
-    var night by remember { mutableStateOf(OfficeStore.isEvening(java.time.LocalTime.now().hour)) }
+    var night by remember { mutableStateOf(OfficeStore.isEvening(now().hour)) }
     val palette = if (night) NightPalette else DawnPalette
 
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
 
-    val morningAsk = remember { OfficeStore.morningAsk(context, today.toKotlinLocalDate()) }
-    var release by remember { mutableStateOf(OfficeStore.eveningRelease(context, today.toKotlinLocalDate())) }
-    DisposableEffect(Unit) { onDispose { OfficeStore.setEveningRelease(context, release, today.toKotlinLocalDate()) } }
+    val morningAsk = remember { OfficeStore.morningAsk(context, today) }
+    var release by remember { mutableStateOf(OfficeStore.eveningRelease(context, today)) }
+    DisposableEffect(Unit) { onDispose { OfficeStore.setEveningRelease(context, release, today) } }
 
     OfficeFlip(
         title = "Evening Prayer",
-        dateLine = today.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d MMMM", java.util.Locale.UK)),
+        dateLine = today.format("EEEE, d MMMM"),
         movements = EVENING,
         palette = palette,
         voice = voice,
@@ -80,7 +83,7 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
         background = Res.drawable.today_prayer_violet,
         onClose = onClose,
         onFinish = {
-            context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)
+            context.keyValues("home_completed")
                 .edit().putBoolean("${today}:evening", true).apply()
             onClose()
         },

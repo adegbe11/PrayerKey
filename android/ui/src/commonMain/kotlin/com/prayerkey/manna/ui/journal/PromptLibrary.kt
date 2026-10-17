@@ -1,6 +1,10 @@
 package com.prayerkey.manna.ui.journal
 
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.ui.platform.StatusBarIcons
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.platformContext
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -66,7 +70,7 @@ import com.prayerkey.manna.data.PromptPack
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * Prompts.
@@ -103,7 +107,7 @@ private fun iconOf(pack: String): ImageVector = when (pack) {
  * for on the welcome screens.
  */
 private fun recommended(asked: List<String>): List<String> {
-    val hour = java.time.LocalTime.now().hour
+    val hour = now().hour
     val first = if (hour in 4..11) "Morning Prayer" else if (hour >= 18 || hour < 4) "Evening Prayer" else "Praise & Adoration"
     val rest = (asked + listOf("Thanksgiving", "Intercession", "Waiting on God", "Praying Scripture"))
         .filter { it != first }.distinct().take(4)
@@ -117,16 +121,9 @@ fun PromptLibrary(onClose: () -> Unit, onPrompt: (String, String) -> Unit) {
     BackHandler { if (open != null) open = null else onClose() }
 
     // dark status-bar icons on the white page
-    val view = androidx.compose.ui.platform.LocalView.current
-    androidx.compose.runtime.DisposableEffect(view) {
-        val window = (view.parent as? androidx.compose.ui.window.DialogWindowProvider)?.window
-        val bars = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view) }
-        val was = bars?.isAppearanceLightStatusBars
-        bars?.isAppearanceLightStatusBars = true
-        onDispose { if (was != null) bars.isAppearanceLightStatusBars = was }
-    }
+    StatusBarIcons(dark = true, inDialog = true)
 
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = platformContext()
     val asked = remember { recommended(com.prayerkey.manna.data.OnboardingPlan.packs(context)) }
 
     Box(Modifier.fillMaxSize().background(Color.White)) {
@@ -195,7 +192,7 @@ private fun Heading(text: String) {
 /** A question on its pack's colour. The arrow in the corner offers another one. */
 @Composable
 private fun PromptCard(pack: PromptPack, onOpen: () -> Unit, onPrompt: (String) -> Unit) {
-    var index by rememberSaveable(pack.name) { mutableIntStateOf(LocalDate.now().dayOfYear % pack.prompts.size) }
+    var index by rememberSaveable(pack.name) { mutableIntStateOf(today().dayOfYear % pack.prompts.size) }
     val question = pack.prompts[index]
     val colour = Color(pack.colour)
     Column(

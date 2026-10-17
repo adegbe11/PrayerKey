@@ -1,7 +1,9 @@
 package com.prayerkey.manna.ui.challenge
 
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.ui.platform.platformContext
 import androidx.compose.foundation.BorderStroke
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -85,7 +86,7 @@ fun ChallengeDayScreen(
        with the shelf skipped. The arrow returned to the shelf correctly, so
        the two controls disagreed about where you were. */
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
+    val context = platformContext()
     var day by remember(challenge.id) {
         mutableIntStateOf(ChallengeProgress.resumeDay(context, challenge))
     }
@@ -94,7 +95,7 @@ fun ChallengeDayScreen(
 
     LaunchedEffect(challenge.id) { ChallengeProgress.start(context, challenge.id) }
     LaunchedEffect(today.day) {
-        val verses = withContext(Dispatchers.IO) {
+        val verses = withContext(ioDispatcher) {
             OfflineBible(context).chapter(today.read.book, today.read.chapter)
         }
         passage = verses

@@ -1,7 +1,24 @@
 package com.prayerkey.manna.ui.home
 
-import android.content.Context
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.platform.localDateOfEpochDay
+import com.prayerkey.manna.platform.pad2
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.long
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.Json
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,12 +43,7 @@ import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import kotlinx.coroutines.delay
-import org.json.JSONArray
-import org.json.JSONObject
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.LocalDate
 
 data class PrayerSessionRecord(
     val startedAt: Long,
@@ -42,28 +53,30 @@ data class PrayerSessionRecord(
     val notes: String,
 )
 
-class PrayerJourneyStore(context: Context) {
-    private val prefs = context.getSharedPreferences("prayer_journey", Context.MODE_PRIVATE)
+class PrayerJourneyStore(context: PlatformContext) {
+    private val prefs = context.keyValues("prayer_journey")
 
     fun records(): List<PrayerSessionRecord> = runCatching {
-        val array = JSONArray(prefs.getString("sessions", "[]"))
-        (0 until array.length()).map { index ->
-            val item = array.getJSONObject(index)
+        val array = Json.parseToJsonElement(prefs.getString("sessions", "[]") ?: "[]").jsonArray
+        array.map { element ->
+            val item = element.jsonObject
             PrayerSessionRecord(
-                item.getLong("startedAt"), item.getInt("minutes"), item.getString("mode"),
-                item.optBoolean("completed"), item.optString("notes"),
+                item.getValue("startedAt").jsonPrimitive.long, item.getValue("minutes").jsonPrimitive.int,
+                item.getValue("mode").jsonPrimitive.content,
+                item["completed"]?.jsonPrimitive?.booleanOrNull ?: false, item["notes"]?.jsonPrimitive?.contentOrNull.orEmpty(),
             )
         }
     }.getOrDefault(emptyList())
 
     fun save(record: PrayerSessionRecord) {
         val all = records().toMutableList().apply { add(0, record) }.take(400)
-        val array = JSONArray()
-        all.forEach { record ->
-            array.put(JSONObject().apply {
-                put("startedAt", record.startedAt); put("minutes", record.minutes)
-                put("mode", record.mode); put("completed", record.completed); put("notes", record.notes)
-            })
+        val array = buildJsonArray {
+            all.forEach { record ->
+                add(buildJsonObject {
+                    put("startedAt", record.startedAt); put("minutes", record.minutes)
+                    put("mode", record.mode); put("completed", record.completed); put("notes", record.notes)
+                })
+            }
         }
         prefs.edit().putString("sessions", array.toString()).apply()
     }
@@ -83,7 +96,7 @@ fun PrayerSessionScreen(
     onClose: () -> Unit,
     onSaveNote: (String) -> Unit,
 ) {
-    val context = LocalContext.current
+    val context = platformContext()
     val store = remember { PrayerJourneyStore(context) }
     var stage by remember { mutableIntStateOf(0) }
     var minutes by remember { mutableIntStateOf(10) }
@@ -93,7 +106,7 @@ fun PrayerSessionScreen(
     var section by remember { mutableIntStateOf(0) }
     var notes by remember { mutableStateOf("") }
     var noteOpen by remember { mutableStateOf(false) }
-    val startedAt = remember { System.currentTimeMillis() }
+    val startedAt = remember { kotlinx.datetime.Clock.System.now().toEpochMilliseconds() }
     BackHandler { if (stage == 0) onClose() else stage = 0 }
 
     LaunchedEffect(running, remaining) {
@@ -162,7 +175,7 @@ fun PrayerSessionScreen(
                 }
             } else {
                 val active = prayerSections[section]
-                Text(String.format(java.util.Locale.US, "%02d:%02d", remaining / 60, remaining % 60), Modifier.align(Alignment.CenterHorizontally), fontFamily = DisplaySerif, fontSize = 58.sp, fontWeight = FontWeight.Bold, color = Pk.Oxblood)
+                Text("${(remaining / 60).pad2()}:${(remaining % 60).pad2()}", Modifier.align(Alignment.CenterHorizontally), fontFamily = DisplaySerif, fontSize = 58.sp, fontWeight = FontWeight.Bold, color = Pk.Oxblood)
                 LinearProgressIndicator({ 1f - remaining.toFloat() / (minutes * 60).coerceAtLeast(1) }, Modifier.fillMaxWidth().padding(top = 14.dp).height(5.dp), color = Pk.Oxblood, trackColor = Pk.Oxblood.copy(alpha = .1f))
                 Surface(Modifier.fillMaxWidth().padding(top = 30.dp), shape = RoundedCornerShape(30.dp), color = Pk.DeepDark) {
                     Column(Modifier.padding(26.dp)) {
@@ -194,10 +207,9 @@ fun PrayerSessionScreen(
 
 @Composable
 fun PrayerCalendarScreen(onClose: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     val records = remember(context) { PrayerJourneyStore(context).records() }
-    val zone = remember { ZoneId.systemDefault() }
-    val grouped = remember(records) { records.groupBy { Instant.ofEpochMilli(it.startedAt).atZone(zone).toLocalDate() } }
+    val grouped = remember(records) { records.groupBy { localDateOfEpochDay(com.prayerkey.manna.data.epochDayOf(it.startedAt)) } }
     BackHandler(onBack = onClose)
     Column(Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding().verticalScroll(rememberScrollState()).padding(22.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -213,12 +225,12 @@ fun PrayerCalendarScreen(onClose: () -> Unit) {
             }
         }
         Text("Your prayer history", Modifier.padding(top = 30.dp, bottom = 8.dp), fontFamily = DisplaySerif, fontSize = 23.sp, fontWeight = FontWeight.Bold, color = Pk.Charcoal)
-        grouped.toSortedMap(compareByDescending { it }).forEach { (date, sessions) ->
+        grouped.entries.sortedByDescending { it.key }.forEach { (date, sessions) ->
             Surface(Modifier.fillMaxWidth().padding(top = 12.dp), shape = RoundedCornerShape(22.dp), color = Color.White, border = BorderStroke(1.dp, Pk.Hair)) {
                 Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(48.dp).clip(CircleShape).background(Pk.Oxblood.copy(alpha = .09f)), contentAlignment = Alignment.Center) { Icon(Icons.Outlined.Check, null, tint = Pk.Oxblood) }
                     Column(Modifier.weight(1f).padding(start = 14.dp)) {
-                        Text(date.format(DateTimeFormatter.ofPattern("EEEE, MMMM d")), fontWeight = FontWeight.SemiBold, color = Pk.Charcoal)
+                        Text(date.format("EEEE, MMMM d"), fontWeight = FontWeight.SemiBold, color = Pk.Charcoal)
                         Text("${sessions.size} session${if (sessions.size == 1) "" else "s"} · ${sessions.sumOf { it.minutes }} minutes", Modifier.padding(top = 4.dp), fontSize = 12.sp, color = Pk.Muted)
                     }
                 }

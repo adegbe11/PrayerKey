@@ -1,7 +1,9 @@
 package com.prayerkey.manna.ui.morning
 
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.platform.today
 import com.prayerkey.manna.resources.*
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -24,9 +26,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.ui.theme.BookSerif
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 /**
  * Night Prayer — two minutes, and the last thing you read.
@@ -50,7 +50,7 @@ import java.util.Locale
 @Composable
 fun NightPrayerScreen(onClose: () -> Unit) {
     BackHandler(onBack = onClose)
-    val today = remember { LocalDate.now() }
+    val today = remember { today() }
     var day by remember { mutableStateOf(false) }
     val palette = if (day) DawnPalette else NightPalette
 
@@ -59,7 +59,7 @@ fun NightPrayerScreen(onClose: () -> Unit) {
 
     OfficeFlip(
         title = "Night Prayer",
-        dateLine = today.format(DateTimeFormatter.ofPattern("EEEE", Locale.UK)),
+        dateLine = today.format("EEEE"),
         movements = NIGHT,
         palette = palette,
         voice = voice,

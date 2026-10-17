@@ -1,7 +1,8 @@
 package com.prayerkey.manna.ui.home
 
-import android.speech.tts.TextToSpeech
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.ui.platform.platformContext
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -25,25 +26,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.model.DailyPrayer
 import com.prayerkey.manna.ui.worlds.VerseWorld
 import com.prayerkey.manna.ui.worlds.WorldScene
-import java.util.Locale
 
 @Composable
 fun DailyPrayerCard(prayer: DailyPrayer, entrance: Int, onComplete: () -> Unit) {
     BackHandler(onBack = onComplete)
-    val context = LocalContext.current
+    val context = platformContext()
     var speechReady by remember { mutableStateOf(false) }
-    val speaker = remember { TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS } }
+    val speaker = remember { Speaker(context) { speechReady = it == Speaker.SUCCESS } }
     DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
-    LaunchedEffect(speechReady) { if (speechReady) { speaker.language = Locale.getDefault(); speaker.setSpeechRate(.82f) } }
+    LaunchedEffect(speechReady) { if (speechReady) { speaker.language = null; speaker.setSpeechRate(.82f) } }
     val worlds = VerseWorld.entries
-    val world = worlds[Math.floorMod(entrance * 5 + prayer.ref.hashCode(), worlds.size)]
+    val world = worlds[(entrance * 5 + prayer.ref.hashCode()).mod(worlds.size)]
     val shape = RoundedCornerShape(30.dp)
 
     Box(Modifier.fillMaxSize().background(Color(0xFF091421)).padding(14.dp)) {
@@ -88,7 +87,7 @@ fun DailyPrayerCard(prayer: DailyPrayer, entrance: Int, onComplete: () -> Unit) 
                 Row(Modifier.fillMaxWidth().padding(top = 28.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(
                         enabled = speechReady,
-                        onClick = { speaker.speak(prayer.prayer, TextToSpeech.QUEUE_FLUSH, null, prayer.ref) },
+                        onClick = { speaker.speak(prayer.prayer, Speaker.QUEUE_FLUSH, null, prayer.ref) },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = world.onScene),
                         border = androidx.compose.foundation.BorderStroke(1.dp, world.onScene.copy(alpha = .48f)),

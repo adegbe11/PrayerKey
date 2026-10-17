@@ -1,6 +1,9 @@
 package com.prayerkey.manna.ui.screens
 
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.ui.platform.platformContext
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,7 +21,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,7 +52,7 @@ private val featuredSituations = listOf(
 
 @Composable
 fun PrayerPointsScreen(onClose: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     var topics by remember { mutableStateOf<List<PrayerTopic>>(emptyList()) }
     var page by remember { mutableStateOf(PointPage.LIBRARY) }
     var selected by remember { mutableStateOf<PrayerTopic?>(null) }
@@ -59,7 +61,7 @@ fun PrayerPointsScreen(onClose: () -> Unit) {
     var length by remember { mutableIntStateOf(40) }
 
     LaunchedEffect(Unit) {
-        topics = withContext(Dispatchers.IO) { LocalPrayerTopics.load(context) }
+        topics = withContext(ioDispatcher) { LocalPrayerTopics.load(context) }
     }
 
     fun openTopic(label: String) {
@@ -273,8 +275,8 @@ private fun PrayerPointsOverview(
 
 @Composable
 private fun PrayerPointMode(topic: PrayerTopic, requested: Int, onBack: () -> Unit, onComplete: () -> Unit) {
-    val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("prayer-points-progress", 0) }
+    val context = platformContext()
+    val prefs = remember { context.keyValues("prayer-points-progress") }
     val canonical = remember(topic) { PrayerPointEngine.sessionPointsFor(topic) }
     val points = remember(canonical, requested) { canonical.take(requested.coerceAtMost(canonical.size)) }
     val saved = remember(topic.slug) { prefs.getInt("${topic.slug}-$requested", 0).coerceIn(0, points.size) }
@@ -282,7 +284,7 @@ private fun PrayerPointMode(topic: PrayerTopic, requested: Int, onBack: () -> Un
     var ending by remember { mutableIntStateOf(0) }
 
     fun persist(next: Int) {
-        prefs.edit().putInt("${topic.slug}-$requested", next).putLong("${topic.slug}-last", System.currentTimeMillis()).apply()
+        prefs.edit().putInt("${topic.slug}-$requested", next).putLong("${topic.slug}-last", kotlinx.datetime.Clock.System.now().toEpochMilliseconds()).apply()
     }
 
     Column(Modifier.fillMaxSize().background(Color(0xFF17051F)).statusBarsPadding()) {

@@ -1,6 +1,8 @@
 package com.prayerkey.manna.ui.home
 
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.ui.platform.platformContext
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -70,7 +71,7 @@ private val topicalGroups = listOf(
 )
 
 @Composable
-internal fun TopicalBibleScreen(onClose: () -> Unit) {
+fun TopicalBibleScreen(onClose: () -> Unit) {
     var group by remember { mutableStateOf<TopicGroup?>(null) }
     var topic by remember { mutableStateOf<String?>(null) }
     var query by remember { mutableStateOf("") }
@@ -142,12 +143,12 @@ internal fun TopicalBibleScreen(onClose: () -> Unit) {
 }
 
 @Composable private fun TopicVerses(topic: String) {
-    val context = LocalContext.current
+    val context = platformContext()
     var verses by remember(topic) { mutableStateOf<List<BibleVerse>>(emptyList()) }
     var loading by remember(topic) { mutableStateOf(true) }
     LaunchedEffect(topic) {
         val bible = OfflineBible(context)
-        verses = withContext(Dispatchers.IO) { bible.search(searchTerm(topic), 22) }
+        verses = withContext(ioDispatcher) { bible.search(searchTerm(topic), 22) }
         if (verses.isEmpty()) verses = bible.search("God", 12)
         loading = false
     }

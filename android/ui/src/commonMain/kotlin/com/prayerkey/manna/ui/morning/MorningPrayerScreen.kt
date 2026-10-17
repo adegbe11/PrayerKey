@@ -1,8 +1,12 @@
 package com.prayerkey.manna.ui.morning
 
+import com.prayerkey.manna.data.mannaStore
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import kotlinx.datetime.toKotlinLocalDate
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,15 +24,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.prayerkey.manna.data.MannaStore
 import com.prayerkey.manna.data.OfficeStore
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 /**
  * Morning Prayer, set as a printed office rather than a screen.
@@ -51,26 +49,26 @@ import java.util.Locale
 @Composable
 fun MorningPrayerScreen(onClose: () -> Unit) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
-    val today = remember { LocalDate.now() }
+    val context = platformContext()
+    val today = remember { today() }
     val palette = DawnPalette
 
     val speaking = rememberSpeaking()
     val voice = rememberOfficeVoice(speaking)
 
-    var ask by remember { mutableStateOf(OfficeStore.morningAsk(context, today.toKotlinLocalDate())) }
-    DisposableEffect(Unit) { onDispose { OfficeStore.setMorningAsk(context, ask, today.toKotlinLocalDate()) } }
+    var ask by remember { mutableStateOf(OfficeStore.morningAsk(context, today)) }
+    DisposableEffect(Unit) { onDispose { OfficeStore.setMorningAsk(context, ask, today) } }
 
     /* The most recent thing this person actually asked God for. Absent on a
        first run, and the movement simply omits the note rather than inventing
        one — a fabricated memory would be worse than none. */
     val ledger = remember {
-        runCatching { MannaStore.of(context).prayerJournal().firstOrNull() }.getOrNull()
+        runCatching { context.mannaStore().prayerJournal().firstOrNull() }.getOrNull()
     }
 
     OfficeFlip(
         title = "Morning Prayer",
-        dateLine = today.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.UK)),
+        dateLine = today.format("EEEE, d MMMM"),
         movements = MORNING,
         palette = palette,
         voice = voice,
@@ -80,7 +78,7 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
         background = Res.drawable.today_prayer_violet,
         onClose = onClose,
         onFinish = {
-            context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)
+            context.keyValues("home_completed")
                 .edit().putBoolean("${today}:morning", true).apply()
             onClose()
         },
@@ -101,8 +99,7 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
     ) { key ->
         when (key) {
             "ledger" -> ledger?.let {
-                val when_ = Instant.ofEpochMilli(it.createdAt).atZone(ZoneId.systemDefault())
-                    .toLocalDate().format(DateTimeFormatter.ofPattern("d MMMM", Locale.UK))
+                val when_ = com.prayerkey.manna.platform.formatMillis(it.createdAt, "d MMMM")
                 LedgerNote(
                     label = "From your ledger, $when_",
                     entry = it.request.ifBlank { it.title },

@@ -1,10 +1,16 @@
 package com.prayerkey.manna.ui.bibleplan
 
+import com.prayerkey.manna.ui.platform.pickDate
+import com.prayerkey.manna.platform.plusDays
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.ui.platform.Reminders
+import com.prayerkey.manna.ui.platform.shareText
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import android.app.DatePickerDialog
-import android.content.Intent
-import android.speech.tts.TextToSpeech
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -69,7 +75,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -88,7 +93,6 @@ import com.prayerkey.manna.data.PlanProgress
 import com.prayerkey.manna.data.READING_PLANS
 import com.prayerkey.manna.data.ReadingPlanDef
 import com.prayerkey.manna.data.ReadingPlanStore
-import com.prayerkey.manna.reminder.ReminderReceiver
 import com.prayerkey.manna.ui.challenge.Ink
 import com.prayerkey.manna.ui.challenge.Line
 import com.prayerkey.manna.ui.challenge.PrimaryButton
@@ -97,9 +101,7 @@ import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 /**
  * Bible plans.
@@ -118,7 +120,7 @@ fun BiblePlanRoute(
     /** Keeps a reflection in the journal: a heading, then what was written. */
     onKeep: (String, String) -> Unit,
 ) {
-    val context = LocalContext.current
+    val context = platformContext()
     var progress by remember { mutableStateOf(ReadingPlanStore.load(context)) }
     val active = remember(progress.planId) { ReadingPlanStore.plan(progress.planId) }
     var chosen by remember { mutableStateOf<ReadingPlanDef?>(active) }
@@ -166,7 +168,7 @@ fun BiblePlanRoute(
                 onBack = { stage = PlanStage.Details },
             ) { date, reminder ->
                 ReadingPlanStore.start(context, plan.id, date, reminder)
-                ReminderReceiver.scheduleBibleReading(context, reminder)
+                Reminders.scheduleBibleReading(context, reminder)
                 progress = ReadingPlanStore.load(context)
                 day = 1
                 stage = PlanStage.Day
@@ -333,7 +335,7 @@ private fun Welcome(onClose: () -> Unit, onBrowse: () -> Unit) {
 
 @Composable
 private fun Library(current: ReadingPlanDef?, onBack: () -> Unit, onPick: (ReadingPlanDef) -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     val finished = remember { ReadingPlanStore.finished(context) }
     var query by remember { mutableStateOf("") }
     var filter by remember { mutableStateOf("All") }
@@ -512,9 +514,9 @@ private fun Included(icon: ImageVector, label: String) {
 
 @Composable
 private fun StartStep(onBack: () -> Unit, onBegin: (LocalDate, Boolean) -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     var choice by remember { mutableStateOf("today") }
-    var date by remember { mutableStateOf(LocalDate.now()) }
+    var date by remember { mutableStateOf(today()) }
     var reminder by remember { mutableStateOf(true) }
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         TopBar(onBack)
@@ -532,22 +534,18 @@ private fun StartStep(onBack: () -> Unit, onBegin: (LocalDate, Boolean) -> Unit)
             )
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 StartOption(Icons.Outlined.WbSunny, "Start today", "Begin your plan now", choice == "today") {
-                    choice = "today"; date = LocalDate.now()
+                    choice = "today"; date = today()
                 }
                 StartOption(Icons.Outlined.CalendarMonth, "Tomorrow", "Start fresh in the morning", choice == "tomorrow") {
-                    choice = "tomorrow"; date = LocalDate.now().plusDays(1)
+                    choice = "tomorrow"; date = today().plusDays(1)
                 }
                 StartOption(
                     Icons.Outlined.CalendarMonth,
                     "Choose a date",
-                    if (choice == "date") date.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.getDefault())) else "Pick any date",
+                    if (choice == "date") date.format("EEEE, d MMMM") else "Pick any date",
                     choice == "date",
                 ) {
-                    DatePickerDialog(
-                        context,
-                        { _, y, m, d -> date = LocalDate.of(y, m + 1, d); choice = "date" },
-                        date.year, date.monthValue - 1, date.dayOfMonth,
-                    ).apply { datePicker.minDate = System.currentTimeMillis() - 1000 }.show()
+                    pickDate(context, date, earliest = today()) { picked -> date = picked; choice = "date" }
                 }
             }
             Row(
@@ -689,14 +687,14 @@ private fun DayPage(
 
 @Composable
 private fun Reader(page: PlanDay, onBack: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     var verses by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
     LaunchedEffect(page) {
         verses = OfflineBible(context).chapter(page.book, page.chapter).filter { it.verse in page.from..page.to }
     }
     var speechReady by remember { mutableStateOf(false) }
     var speaking by remember { mutableStateOf(false) }
-    val speaker = remember { TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS } }
+    val speaker = remember { Speaker(context) { speechReady = it == Speaker.SUCCESS } }
     DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
     var size by remember { mutableIntStateOf(19) }
 
@@ -741,20 +739,15 @@ private fun Reader(page: PlanDay, onBack: () -> Unit) {
                 if (speaking) {
                     speaker.stop(); speaking = false
                 } else if (speechReady && verses.isNotEmpty()) {
-                    speaker.language = Locale.getDefault()
+                    speaker.language = null
                     speaker.setSpeechRate(.9f)
-                    speaker.speak(verses.joinToString(" ") { it.text }, TextToSpeech.QUEUE_FLUSH, null, "plan")
+                    speaker.speak(verses.joinToString(" ") { it.text }, Speaker.QUEUE_FLUSH, null, "plan")
                     speaking = true
                 }
             }
             ReaderAction(Icons.Outlined.Share, "Share", Modifier.weight(1f)) {
                 val text = verses.joinToString(" ") { it.text } + "\n\n" + page.reference + " (KJV)"
-                context.startActivity(
-                    Intent.createChooser(
-                        Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text),
-                        "Share",
-                    ),
-                )
+                shareText(context, text, "Share")
             }
         }
     }
@@ -970,7 +963,7 @@ private fun Progress(
 
 @Composable
 private fun Finished(plan: ReadingPlanDef, progress: PlanProgress, onAnother: () -> Unit, onClose: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     Column(Modifier.fillMaxSize().navigationBarsPadding()) {
         Box(Modifier.fillMaxWidth().aspectRatio(1.3f)) {
             Image(painterResource(plan.art), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
@@ -1024,15 +1017,7 @@ private fun Finished(plan: ReadingPlanDef, progress: PlanProgress, onAnother: ()
             Box(
                 Modifier.fillMaxWidth().padding(top = 8.dp).clip(RoundedCornerShape(99.dp))
                     .clickable {
-                        context.startActivity(
-                            Intent.createChooser(
-                                Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(
-                                    Intent.EXTRA_TEXT,
-                                    "I just finished the ${plan.length}-day ${plan.title} Bible plan on PrayerKey.",
-                                ),
-                                "Share",
-                            ),
-                        )
+                        shareText(context, "I just finished the ${plan.length}-day ${plan.title} Bible plan on PrayerKey.", "Share")
                     }
                     .padding(vertical = 13.dp),
                 contentAlignment = Alignment.Center,
@@ -1047,7 +1032,7 @@ private fun Finished(plan: ReadingPlanDef, progress: PlanProgress, onAnother: ()
 /** The card on Home: the plan being read and the day, or an invitation. */
 @Composable
 fun BiblePlanCard(refresh: Int, onOpen: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     val state = remember(refresh) {
         val progress = ReadingPlanStore.load(context)
         progress to ReadingPlanStore.plan(progress.planId)

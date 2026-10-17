@@ -1,13 +1,14 @@
 package com.prayerkey.manna.ui.morning
 
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 /**
  * Afternoon Prayer — the middle of the day.
@@ -25,8 +26,8 @@ import java.util.Locale
 @Composable
 fun AfternoonPrayerScreen(onClose: () -> Unit) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
-    val today = remember { LocalDate.now() }
+    val context = platformContext()
+    val today = remember { today() }
     val palette = DawnPalette
 
     val speaking = rememberSpeaking()
@@ -34,7 +35,7 @@ fun AfternoonPrayerScreen(onClose: () -> Unit) {
 
     OfficeFlip(
         title = "Afternoon Prayer",
-        dateLine = today.format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.UK)),
+        dateLine = today.format("EEEE, d MMMM"),
         movements = AFTERNOON,
         palette = palette,
         voice = voice,
@@ -44,7 +45,7 @@ fun AfternoonPrayerScreen(onClose: () -> Unit) {
         onClose = onClose,
         finishLabel = "Finish prayer",
         onFinish = {
-            context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)
+            context.keyValues("home_completed")
                 .edit().putBoolean("${today}:afternoon", true).apply()
             onClose()
         },

@@ -1,5 +1,11 @@
 package com.prayerkey.manna.ui.home
 
+import com.prayerkey.manna.ui.platform.shareText
+import com.prayerkey.manna.platform.minusDays
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.ui.platform.platformContext
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -58,15 +64,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.platform.LocalContext
-import android.view.HapticFeedbackConstants
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -83,8 +86,8 @@ import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.UtilitySans
 import com.prayerkey.manna.ui.worlds.VerseWorld
 import com.prayerkey.manna.ui.worlds.WorldScene
-import java.time.LocalDate
-import java.time.LocalTime
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 
 /**
  * The editorial Home: one greeting, one daily focus and the practices that
@@ -149,8 +152,8 @@ private fun QuoteCinema(
     backdropIndex: Int,
     onComplete: () -> Unit,
 ) {
-    androidx.activity.compose.BackHandler(onBack = onComplete)
-    val context = LocalContext.current
+    androidx.compose.ui.backhandler.BackHandler(onBack = onComplete)
+    val context = platformContext()
     val worlds = VerseWorld.entries
     val overlays = listOf(
         Color(0xFF07111F), Color(0xFF15243A), Color(0xFF251B2C),
@@ -186,11 +189,7 @@ private fun QuoteCinema(
             Box(
                 Modifier.fillMaxWidth().height(56.dp).clip(RoundedCornerShape(16.dp))
                     .background(Color(0xE61A1A1A)).clickable {
-                        val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(android.content.Intent.EXTRA_TEXT, "$quote — $author\n\nShared from PrayerKey")
-                        }
-                        context.startActivity(android.content.Intent.createChooser(intent, "Share quote"))
+                        shareText(context, "$quote — $author\n\nShared from PrayerKey", "Share quote")
                     },
                 contentAlignment = Alignment.Center,
             ) {
@@ -411,7 +410,7 @@ private fun QuietAction(label: String, icon: androidx.compose.ui.graphics.vector
 private fun PracticeRow(challenge: Challenge, onOpen: () -> Unit, onToggle: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     val done = challenge.today.done
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     val checkScale = remember { Animatable(1f) }
     LaunchedEffect(done) {
         if (done) {
@@ -442,7 +441,7 @@ private fun PracticeRow(challenge: Challenge, onOpen: () -> Unit, onToggle: () -
                 .background(if (done) cs.primary else androidx.compose.ui.graphics.Color.Transparent)
                 .border(1.dp, if (done) cs.primary else cs.outlineVariant, CircleShape)
                 .clickable {
-                    view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                    haptics.perform(Haptic.Tick)
                     onToggle()
                 }
                 .scale(checkScale.value),
@@ -458,7 +457,7 @@ private fun PracticeRow(challenge: Challenge, onOpen: () -> Unit, onToggle: () -
     }
 }
 
-private fun greetingLine(): String = when (LocalTime.now().hour) {
+private fun greetingLine(): String = when (now().hour) {
     in 0..4 -> "Still awake"
     in 5..11 -> "Good morning"
     in 12..17 -> "Good afternoon"

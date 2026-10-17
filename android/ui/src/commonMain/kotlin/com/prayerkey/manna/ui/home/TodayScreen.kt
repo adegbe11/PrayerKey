@@ -1,6 +1,9 @@
 package com.prayerkey.manna.ui.home
 
-import android.view.HapticFeedbackConstants
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -30,7 +33,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.PkButton
@@ -45,8 +47,7 @@ import com.prayerkey.manna.ui.theme.PkStep
 import com.prayerkey.manna.ui.theme.PkTag
 import com.prayerkey.manna.ui.theme.PkTagKind
 import com.prayerkey.manna.ui.theme.PkText
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.LocalDate
 
 /**
  * Today.
@@ -110,7 +111,7 @@ fun TodayScreen(
     onJournal: () -> Unit,
     onCalendar: () -> Unit,
 ) {
-    val view = LocalView.current
+    val haptics = rememberHaptics()
 
     /* The completion moment: the journey card's hairline warms to gold and the
        phone gives one tick. No confetti — this is meant to feel reverent, and
@@ -121,7 +122,7 @@ fun TodayScreen(
         tween(700), label = "journey-border",
     )
     LaunchedEffect(plan.complete) {
-        if (plan.complete) view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        if (plan.complete) haptics.perform(Haptic.Confirm)
     }
 
     Column(
@@ -146,7 +147,7 @@ fun TodayScreen(
 
         Spacer(Modifier.height(Pk.S4))
         Text(
-            LocalDate.now().format(DateTimeFormatter.ofPattern("d MMM uuuu")),
+            today().format("d MMM uuuu"),
             color = Pk.Muted,
             style = PkText.SectionLabel,
         )

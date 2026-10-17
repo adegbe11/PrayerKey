@@ -1,7 +1,8 @@
 package com.prayerkey.manna.ui.home
 
-import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
+import com.prayerkey.manna.ui.platform.UtteranceListener
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.ui.platform.platformContext
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -38,13 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.util.Locale
 
 /**
  * The devotional read aloud.
@@ -79,16 +78,16 @@ private const val WORDS_PER_MINUTE = 155f
 private val SPEEDS = listOf(0.75f, 1f, 1.25f, 1.5f)
 
 class DevotionalVoice internal constructor(private val text: String) {
-    internal var engine: TextToSpeech? = null
+    var engine: Speaker? = null
 
     var ready by mutableStateOf(false)
-        internal set
+        set
     var speaking by mutableStateOf(false)
-        internal set
+        set
     var spokenChars by mutableIntStateOf(0)
-        internal set
+        set
     var speed by mutableFloatStateOf(1f)
-        internal set
+        set
 
     val total: Int get() = text.length.coerceAtLeast(1)
     val fraction: Float get() = (spokenChars.toFloat() / total).coerceIn(0f, 1f)
@@ -109,7 +108,7 @@ class DevotionalVoice internal constructor(private val text: String) {
             if (spokenChars >= text.length) spokenChars = 0
             tts.speak(
                 text.substring(spokenChars.coerceIn(0, text.length)),
-                TextToSpeech.QUEUE_FLUSH, null, UTTERANCE,
+                Speaker.QUEUE_FLUSH, null, UTTERANCE,
             )
             speaking = true
         }
@@ -123,12 +122,12 @@ class DevotionalVoice internal constructor(private val text: String) {
             // re-issue at the new rate, from where the voice had reached
             engine?.speak(
                 text.substring(spokenChars.coerceIn(0, text.length)),
-                TextToSpeech.QUEUE_FLUSH, null, UTTERANCE,
+                Speaker.QUEUE_FLUSH, null, UTTERANCE,
             )
         }
     }
 
-    internal companion object {
+    companion object {
         const val UTTERANCE = "devotional-voice"
         const val BASE_RATE = .88f
     }
@@ -136,7 +135,7 @@ class DevotionalVoice internal constructor(private val text: String) {
 
 @Composable
 fun rememberDevotionalVoice(text: String): DevotionalVoice {
-    val context = LocalContext.current
+    val context = platformContext()
     val voice = remember(text) { DevotionalVoice(text) }
 
     DisposableEffect(text) {
@@ -144,10 +143,10 @@ fun rememberDevotionalVoice(text: String): DevotionalVoice {
            speak(), which after a resume is a substring - so the base is added
            back to keep progress absolute. */
         var base = 0
-        val tts = TextToSpeech(context.applicationContext) { status ->
-            voice.ready = status == TextToSpeech.SUCCESS
+        val tts = Speaker(context) { status ->
+            voice.ready = status == Speaker.SUCCESS
         }
-        tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+        tts.setOnUtteranceProgressListener(object : UtteranceListener() {
             override fun onStart(utteranceId: String?) {
                 base = voice.spokenChars
             }
@@ -161,7 +160,7 @@ fun rememberDevotionalVoice(text: String): DevotionalVoice {
                 voice.speaking = false
             }
 
-            @Deprecated("required by UtteranceProgressListener")
+            @Deprecated("required by UtteranceListener")
             override fun onError(utteranceId: String?) {
                 voice.speaking = false
             }
@@ -176,7 +175,7 @@ fun rememberDevotionalVoice(text: String): DevotionalVoice {
 
     LaunchedEffect(voice.ready) {
         if (voice.ready) {
-            voice.engine?.language = Locale.getDefault()
+            voice.engine?.language = null
             voice.engine?.setSpeechRate(DevotionalVoice.BASE_RATE * voice.speed)
             voice.engine?.setPitch(.97f)
         }

@@ -80,3 +80,6 @@ fun encodeUrlComponent(value: String): String = buildString {
         else { append('%'); append("0123456789ABCDEF"[c shr 4]); append("0123456789ABCDEF"[c and 15]) }
     }
 }
+
+/** Whether a file is at this full path. */
+expect fun fileExists(path: String): Boolean

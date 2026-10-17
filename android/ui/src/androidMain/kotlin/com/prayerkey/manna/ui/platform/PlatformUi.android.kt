@@ -35,3 +35,16 @@ actual val noFontPadding: androidx.compose.ui.text.PlatformTextStyle? = androidx
 
 @Composable
 actual fun screenHeightDp(): Int = androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp
+
+actual fun fullScreenDialog(): androidx.compose.ui.window.DialogProperties =
+    androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
+
+@Composable
+actual fun SecureScreen(enabled: Boolean) {
+    val view = LocalView.current
+    androidx.compose.runtime.DisposableEffect(enabled, view) {
+        val window = (view.context as? android.app.Activity)?.window
+        if (enabled) window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
+        onDispose { window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE) }
+    }
+}

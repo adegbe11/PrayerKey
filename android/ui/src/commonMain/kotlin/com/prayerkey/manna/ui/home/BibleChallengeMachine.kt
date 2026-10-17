@@ -1,17 +1,25 @@
 package com.prayerkey.manna.ui.home
 
+import kotlinx.datetime.daysUntil
+import com.prayerkey.manna.ui.platform.postToMain
+import com.prayerkey.manna.ui.platform.pickTime
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.ui.share.Share
+import com.prayerkey.manna.ui.platform.Reminders
+import com.prayerkey.manna.ui.platform.UtteranceListener
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import androidx.compose.foundation.Image
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.Brush
-import android.app.TimePickerDialog
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.speech.tts.TextToSpeech
-import android.speech.tts.UtteranceProgressListener
-import android.view.HapticFeedbackConstants
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,8 +65,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -66,17 +72,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.BibleVerse
 import com.prayerkey.manna.data.OfflineBible
-import com.prayerkey.manna.reminder.ReminderReceiver
-import com.prayerkey.manna.share.ChallengeBadgeRenderer
 import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 private data class ReadingPlan(val id: String, val title: String, val detail: String, val chapters: Int, val minutes: Int, val days: Int)
 private data class BiblePortion(val lane: String, val book: String, val chapter: Int)
@@ -113,15 +115,15 @@ private fun portionsFor(plan: String, day: Int): List<BiblePortion> {
 }
 
 @Composable
-internal fun BibleChallengeMachine(onClose: () -> Unit) {
-    val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences("bible_challenge_machine", Context.MODE_PRIVATE) }
+fun BibleChallengeMachine(onClose: () -> Unit) {
+    val context = platformContext()
+    val prefs = remember { context.keyValues("bible_challenge_machine") }
     var active by remember { mutableStateOf(prefs.getBoolean("active", false)) }
     var step by remember { mutableIntStateOf(0) }
     var planId by remember { mutableStateOf(prefs.getString("plan", "blended").orEmpty()) }
     var hour by remember { mutableIntStateOf(prefs.getInt("hour", 6)) }
     var minute by remember { mutableIntStateOf(prefs.getInt("minute", 30)) }
-    var startedOn by remember { mutableStateOf(LocalDate.parse(prefs.getString("started_on", LocalDate.now().toString()))) }
+    var startedOn by remember { mutableStateOf(LocalDate.parse(prefs.getString("started_on", today().toString()) ?: today().toString())) }
     var lastCompletedOn by remember { mutableStateOf(prefs.getString("last_completed_on", "").orEmpty()) }
     var completedDays by remember {
         mutableStateOf(prefs.getStringSet("completed", emptySet()).orEmpty().mapNotNull(String::toIntOrNull).toSet())
@@ -140,7 +142,7 @@ internal fun BibleChallengeMachine(onClose: () -> Unit) {
     readerDay?.let { day ->
         BibleChallengeReader(day, plan, portionsFor(plan.id, day), onBack = { readerDay = null }) {
             completedDays = completedDays + day
-            lastCompletedOn = LocalDate.now().toString()
+            lastCompletedOn = today().toString()
             prefs.edit().putStringSet("completed", completedDays.map(Int::toString).toSet()).putString("last_completed_on", lastCompletedOn).apply()
             readerDay = null
         }
@@ -154,24 +156,24 @@ internal fun BibleChallengeMachine(onClose: () -> Unit) {
             hour = hour,
             minute = minute,
             onPlan = { planId = it },
-            onTime = { TimePickerDialog(context, { _, h, m -> hour = h; minute = m }, hour, minute, false).show() },
+            onTime = { pickTime(context, hour, minute) { h, m -> hour = h; minute = m } },
             onBack = { if (step > 0) step-- else onClose() },
             onClose = onClose,
             onContinue = {
                 if (step < 2) step++ else {
                     active = true
                     completedDays = emptySet()
-                    startedOn = LocalDate.now()
+                    startedOn = today()
                     lastCompletedOn = ""
                     prefs.edit().putBoolean("active", true).putString("plan", planId).putInt("hour", hour)
                         .putInt("minute", minute).putString("started_on", startedOn.toString()).putString("last_completed_on", "").putStringSet("completed", emptySet()).apply()
-                    ReminderReceiver.schedule(context, hour, minute, true)
+                    Reminders.schedule(context, hour, minute, true)
                 }
             },
         )
     } else {
         BibleChallengeLanding(plan, hour, minute, completedDays, startedOn, lastCompletedOn, onClose, onUseGrace = {
-            val month = java.time.YearMonth.now().toString()
+            val month = today().let { "${it.year}-${it.monthNumber.pad2()}" }
             if (prefs.getString("grace_month", "") != month) {
                 val missed = completedDays.size + 1
                 completedDays = completedDays + missed
@@ -278,12 +280,12 @@ private fun BibleChallengeLanding(
     onUseGrace: () -> Unit,
     onRead: (Int) -> Unit,
 ) {
-    val context = LocalContext.current
+    val context = platformContext()
     val nextDay = completed.size + 1
-    val calendarDay = (ChronoUnit.DAYS.between(startDate, LocalDate.now()).toInt() + 1).coerceIn(1, plan.days)
+    val calendarDay = (startDate.daysUntil(today()) + 1).coerceIn(1, plan.days)
     val day = nextDay.coerceAtMost(plan.days)
     val finished = completed.size >= plan.days
-    val availableToday = !finished && nextDay <= calendarDay && lastCompletedOn != LocalDate.now().toString()
+    val availableToday = !finished && nextDay <= calendarDay && lastCompletedOn != today().toString()
     val missedDay = calendarDay > nextDay
     val portions = portionsFor(plan.id, day)
     Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
@@ -316,7 +318,7 @@ private fun BibleChallengeLanding(
 
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
                 if (finished) Button(
-                    onClick = { ChallengeBadgeRenderer.share(context, plan.title, "${plan.days} days completed") },
+                    onClick = { Share.cards.shareBadge(context, plan.title, "${plan.days} days completed") },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp).height(54.dp),
                     shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.VioletDeep),
                 ) { Text("Share my unlocked badge", fontWeight = FontWeight.Bold) }
@@ -387,31 +389,31 @@ private fun BibleChallengeReader(
     onBack: () -> Unit,
     onComplete: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val view = LocalView.current
+    val context = platformContext()
+    val haptics = rememberHaptics()
     var selected by remember(day) { mutableIntStateOf(0) }
     var opened by remember(day) { mutableStateOf(setOf(0)) }
     var verses by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
     var speaking by remember { mutableStateOf(false) }
     var spokenIndex by remember { mutableIntStateOf(-1) }
     var ttsReady by remember { mutableStateOf(false) }
-    val tts = remember { TextToSpeech(context) { status -> ttsReady = status == TextToSpeech.SUCCESS } }
+    val tts = remember { Speaker(context) { status -> ttsReady = status == Speaker.SUCCESS } }
     DisposableEffect(Unit) { onDispose { tts.stop(); tts.shutdown() } }
-    LaunchedEffect(ttsReady) { if (ttsReady) { tts.language = Locale.US; tts.setSpeechRate(.86f); tts.setPitch(.92f) } }
+    LaunchedEffect(ttsReady) { if (ttsReady) { tts.language = "en-US"; tts.setSpeechRate(.86f); tts.setPitch(.92f) } }
     LaunchedEffect(speaking, spokenIndex, verses) {
         if (speaking && ttsReady && spokenIndex in verses.indices) {
             val index = spokenIndex
-            tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            tts.setOnUtteranceProgressListener(object : UtteranceListener() {
                 override fun onStart(utteranceId: String?) = Unit
                 override fun onError(utteranceId: String?) = onDone(utteranceId)
-                override fun onDone(utteranceId: String?) { Handler(Looper.getMainLooper()).post { if (index < verses.lastIndex) spokenIndex = index + 1 else speaking = false } }
+                override fun onDone(utteranceId: String?) { postToMain { if (index < verses.lastIndex) spokenIndex = index + 1 else speaking = false } }
             })
-            tts.speak("Verse ${verses[index].verse}. ${verses[index].text}", TextToSpeech.QUEUE_FLUSH, null, "bible-$day-$selected-$index")
+            tts.speak("Verse ${verses[index].verse}. ${verses[index].text}", Speaker.QUEUE_FLUSH, null, "bible-$day-$selected-$index")
         }
     }
     val portion = portions[selected]
     LaunchedEffect(portion.book, portion.chapter) {
-        verses = withContext(Dispatchers.IO) { OfflineBible(context).chapter(portion.book, portion.chapter) }
+        verses = withContext(ioDispatcher) { OfflineBible(context).chapter(portion.book, portion.chapter) }
     }
 
     Surface(Modifier.fillMaxSize(), color = Pk.Cream) {
@@ -477,7 +479,7 @@ private fun BibleChallengeReader(
             }
 
             Button(
-                onClick = { view.performHapticFeedback(HapticFeedbackConstants.CONFIRM); onComplete() },
+                onClick = { haptics.perform(Haptic.Confirm); onComplete() },
                 enabled = opened.size == portions.size,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 16.dp).height(56.dp),
                 shape = RoundedCornerShape(18.dp),
@@ -499,6 +501,6 @@ private fun bibleChallengePrompt(book: String): String = when (book) {
 
 private fun timeLabelBible(hour: Int, minute: Int): String {
     val h = if (hour % 12 == 0) 12 else hour % 12
-    return "%d:%02d %s".format(Locale.US, h, minute, if (hour < 12) "AM" else "PM")
+    return "$h:${minute.pad2()} ${if (hour < 12) "AM" else "PM"}"
 }
 

@@ -1,5 +1,18 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.ui.platform.openVoiceSettings
+import com.prayerkey.manna.ui.platform.pickTime
+import com.prayerkey.manna.ui.platform.Permission
+import com.prayerkey.manna.ui.platform.rememberPermissionRequest
+import com.prayerkey.manna.ui.platform.rememberTextFilePicker
+import com.prayerkey.manna.platform.mediumDate
+import com.prayerkey.manna.ui.share.Share
+import com.prayerkey.manna.ui.platform.Reminders
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.platformContext
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.rememberScrollState
@@ -36,7 +49,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.platform.LocalContext
 import com.prayerkey.manna.data.SavedWord
 import com.prayerkey.manna.data.GeneratedPrayer
 import com.prayerkey.manna.data.PrayerKeyApi
@@ -48,19 +60,10 @@ import com.prayerkey.manna.data.MemoryVerse
 import com.prayerkey.manna.model.VerseCard
 import com.prayerkey.manna.model.DailyVerses
 import com.prayerkey.manna.ui.theme.*
-import java.text.DateFormat
-import java.util.Date
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import com.prayerkey.manna.data.DetectedVerse
-import com.prayerkey.manna.ui.church.SermonRecognizer
 import com.prayerkey.manna.data.UserPrefs
-import com.prayerkey.manna.reminder.ReminderReceiver
 import com.prayerkey.manna.data.SermonSession
 import com.prayerkey.manna.data.JournalPrayer
 import com.prayerkey.manna.data.JournalEntry
@@ -73,11 +76,6 @@ import com.prayerkey.manna.data.versionOf
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import android.app.TimePickerDialog
-import android.content.Intent
-import android.os.Build
-import android.speech.tts.TextToSpeech
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,7 +117,7 @@ fun BibleScreen(
     var related by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
     var chapterVerses by remember { mutableStateOf<List<BibleVerse>>(emptyList()) }
     var chapterTitle by remember { mutableStateOf("") }
-    val context = LocalContext.current.applicationContext
+    val context = platformContext()
     val bible = remember(context) { OfflineBible(context) }
     val scope = rememberCoroutineScope()
     val version = versionOf(translation)
@@ -164,7 +162,7 @@ fun BibleScreen(
     /* TINDER ANATOMY: the card IS the screen — full-bleed, edge to edge.
        Search + version chips FLOAT on top of it; five action buttons
        float at the bottom. Nothing stacks above the card. */
-    val shareContext = LocalContext.current
+    val shareContext = platformContext()
     var searchOpen by remember { mutableStateOf(false) }
 
     /* Two ways to be in the Bible, and they are different acts. The deck
@@ -172,7 +170,7 @@ fun BibleScreen(
     var bookMode by remember { mutableStateOf(false) }
     var libraryMode by remember { mutableStateOf(false) }
     var audioMode by remember { mutableStateOf(false) }
-    androidx.activity.compose.BackHandler(enabled = bookMode || libraryMode || audioMode || showMemory) {
+    androidx.compose.ui.backhandler.BackHandler(enabled = bookMode || libraryMode || audioMode || showMemory) {
         bookMode = false
         libraryMode = false
         audioMode = false
@@ -267,7 +265,7 @@ fun BibleScreen(
                             }
                         },
                         onMemorize = { currentVerse?.let { onMemorize(VerseCard(it.reference, it.translation, it.text, "")) } },
-                        onShare = { currentVerse?.let { com.prayerkey.manna.share.CardShareRenderer.share(shareContext, VerseCard(it.reference, it.translation, it.text, "")) } },
+                        onShare = { currentVerse?.let { Share.cards.shareVerse(shareContext, VerseCard(it.reference, it.translation, it.text, "")) } },
                     )
                 },
             ) {
@@ -290,7 +288,7 @@ fun BibleScreen(
                 },
                 onSave = { onSave(VerseCard(it.reference, it.translation, it.text, "")) },
                 onMemorize = { onMemorize(VerseCard(it.reference, it.translation, it.text, "")) },
-                onShare = { com.prayerkey.manna.share.CardShareRenderer.share(shareContext, VerseCard(it.reference, it.translation, it.text, "")) },
+                onShare = { Share.cards.shareVerse(shareContext, VerseCard(it.reference, it.translation, it.text, "")) },
                 onOpen = { selectedVerse = it },
                 onCurrentChanged = { currentVerse = it },
             )
@@ -504,7 +502,7 @@ private fun MemoryTrainer(
         EmptySaved(false)
         return
     }
-    val now = System.currentTimeMillis()
+    val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
     val memory = memories.firstOrNull { it.nextReviewAt <= now } ?: memories.first()
     val connections = remember(memory, saved, entries, prayers, sermons) {
         com.prayerkey.manna.data.MemoryGraph.connections(memory, saved, entries, prayers, sermons)
@@ -568,10 +566,10 @@ fun LegacyPrayerScreen(
     var potdOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val potd = remember { com.prayerkey.manna.model.todaysPrayer() }
-    val prayerContext = LocalContext.current
+    val prayerContext = platformContext()
     var prayerSpeechReady by remember { mutableStateOf(false) }
-    val prayerSpeaker = remember { TextToSpeech(prayerContext.applicationContext) { prayerSpeechReady = it == TextToSpeech.SUCCESS } }
-    LaunchedEffect(prayerSpeechReady) { if (prayerSpeechReady) { prayerSpeaker.language = Locale.getDefault(); prayerSpeaker.setSpeechRate(.86f) } }
+    val prayerSpeaker = remember { Speaker(prayerContext) { prayerSpeechReady = it == Speaker.SUCCESS } }
+    LaunchedEffect(prayerSpeechReady) { if (prayerSpeechReady) { prayerSpeaker.language = null; prayerSpeaker.setSpeechRate(.86f) } }
     DisposableEffect(prayerSpeaker) { onDispose { prayerSpeaker.stop(); prayerSpeaker.shutdown() } }
     // decks come from the app-wide cache — instant after first load
     LaunchedEffect(Unit) { onLoadTopics() }
@@ -580,7 +578,7 @@ fun LegacyPrayerScreen(
        the same thing on screen — an spinner that never stopped. */
     val topicsLoading = deckMode && topics.isEmpty() && !topicsReady
 
-    androidx.activity.compose.BackHandler(enabled = deckMode) {
+    androidx.compose.ui.backhandler.BackHandler(enabled = deckMode) {
         if (selectedPrayerCategory != null) selectedPrayerCategory = null else deckMode = false
     }
 
@@ -904,7 +902,7 @@ fun LegacyPrayerScreen(
                         generated!!.verses.firstOrNull()?.let { Text(it.first, color = Gold, modifier = Modifier.padding(top = 20.dp)) }
                         if (generated!!.encouragement.isNotBlank()) Text(generated!!.encouragement, color = Muted, modifier = Modifier.padding(top = 14.dp))
                         TextButton(
-                            onClick = { generated?.let { prayerSpeaker.speak("${it.title}. ${it.prayer}", TextToSpeech.QUEUE_FLUSH, null, it.id) } },
+                            onClick = { generated?.let { prayerSpeaker.speak("${it.title}. ${it.prayer}", Speaker.QUEUE_FLUSH, null, it.id) } },
                             enabled = prayerSpeechReady, modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
                         ) { Icon(Icons.Outlined.VolumeUp, "Listen to this prayer"); Spacer(Modifier.width(7.dp)); Text("Listen prayerfully") }
                         Row(Modifier.fillMaxWidth().padding(top = 22.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -918,7 +916,7 @@ fun LegacyPrayerScreen(
     }
 
     if (potdOpen) {
-        val shareContext = LocalContext.current
+        val shareContext = platformContext()
         ModalBottomSheet(onDismissRequest = { potdOpen = false }, containerColor = Canvas) {
             LazyColumn(Modifier.fillMaxWidth().padding(horizontal = 24.dp), contentPadding = PaddingValues(bottom = 44.dp)) {
                 item {
@@ -935,7 +933,7 @@ fun LegacyPrayerScreen(
                 }
                 items(com.prayerkey.manna.ui.share.CardFormat.entries.toList(), key = { it.name }) { format ->
                     Surface(
-                        onClick = { com.prayerkey.manna.share.PrayerCardRenderer.share(shareContext, potd, format) },
+                        onClick = { Share.cards.sharePrayerCard(shareContext, potd, format) },
                         shape = RoundedCornerShape(16.dp), color = Color.White,
                         border = androidx.compose.foundation.BorderStroke(1.dp, Hairline),
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
@@ -1171,7 +1169,7 @@ private fun SavedCard(word: SavedWord, canAnswer: Boolean, onAnswer: () -> Unit)
             Row { Text(word.reference, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Text(word.translation, color = Muted, fontSize = 11.sp) }
             Text(word.verse, fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 27.sp, modifier = Modifier.padding(top = 12.dp))
             word.testimony?.let { Text(it, color = Color(0xFF257345), modifier = Modifier.padding(top = 15.dp)) }
-            Text(DateFormat.getDateInstance().format(Date(word.answeredAt ?: word.savedAt)), color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
+            Text(mediumDate(word.answeredAt ?: word.savedAt), color = Muted, fontSize = 10.sp, modifier = Modifier.padding(top = 10.dp))
             if (canAnswer) TextButton(onClick = onAnswer, modifier = Modifier.align(Alignment.End)) { Text("Mark answered") }
         }
     }
@@ -1193,20 +1191,15 @@ fun ProfileScreen(
     onRestoreArchive: (String) -> Unit,
     onBack: () -> Unit, onUpdate: (UserPrefs) -> Unit,
 ) {
-    androidx.activity.compose.BackHandler(onBack = onBack)
-    val context = LocalContext.current
+    androidx.compose.ui.backhandler.BackHandler(onBack = onBack)
+    val context = platformContext()
     var confirmRestore by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
-    val restoreArchive = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        uri?.let {
-            runCatching { context.contentResolver.openInputStream(it)?.bufferedReader()?.use { reader -> reader.readText() } }
-                .getOrNull()?.let(onRestoreArchive)
-        }
-    }
-    val notifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+    val restoreArchive = rememberTextFilePicker { text -> text?.let(onRestoreArchive) }
+    val notifications = rememberPermissionRequest(Permission.Notifications) { granted ->
         if (granted) {
             val next = prefs.copy(reminderEnabled = true); onUpdate(next)
-            ReminderReceiver.schedule(context, next.reminderHour, next.reminderMinute, true)
+            Reminders.schedule(context, next.reminderHour, next.reminderMinute, true)
         }
     }
     Column(Modifier.fillMaxSize().background(Pk.Cream).statusBarsPadding()) {
@@ -1229,14 +1222,14 @@ fun ProfileScreen(
            choice about how the app looks can be changed on a whim. */
         ThemeSetting(prefs, onUpdate)
 
-        SettingRow("Daily reminder", String.format(java.util.Locale.getDefault(), "%02d:%02d", prefs.reminderHour, prefs.reminderMinute), onClick = {
-            TimePickerDialog(context, { _, hour, minute ->
+        SettingRow("Daily reminder", "${prefs.reminderHour.pad2()}:${prefs.reminderMinute.pad2()}", onClick = {
+            pickTime(context, prefs.reminderHour, prefs.reminderMinute) { hour, minute ->
                 val next = prefs.copy(reminderHour = hour, reminderMinute = minute); onUpdate(next)
-                ReminderReceiver.schedule(context, hour, minute, next.reminderEnabled)
-            }, prefs.reminderHour, prefs.reminderMinute, false).show()
+                Reminders.schedule(context, hour, minute, next.reminderEnabled)
+            }
         }) { Switch(prefs.reminderEnabled, onCheckedChange = { enabled ->
-            if (enabled && Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) notifications.launch(Manifest.permission.POST_NOTIFICATIONS)
-            else { val next = prefs.copy(reminderEnabled = enabled); onUpdate(next); ReminderReceiver.schedule(context, next.reminderHour, next.reminderMinute, enabled) }
+            if (enabled && !notifications.granted()) notifications.request()
+            else { val next = prefs.copy(reminderEnabled = enabled); onUpdate(next); Reminders.schedule(context, next.reminderHour, next.reminderMinute, enabled) }
         }) }
         var versionMenu by remember { mutableStateOf(false) }
         Box {
@@ -1268,14 +1261,13 @@ fun ProfileScreen(
             Switch(prefs.concealJournalPreviews, onCheckedChange = { onUpdate(prefs.copy(concealJournalPreviews = it)) })
         }
         SettingRow("Offline voices", "Manage Bible and prayer voices", onClick = {
-            runCatching { context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)) }
-                .recoverCatching { context.startActivity(Intent("com.android.settings.TTS_SETTINGS")) }
+            openVoiceSettings(context)
         }) { Icon(Icons.Outlined.RecordVoiceOver, null, tint = Gold) }
-        SettingRow("Year in review", "Create my ${java.time.LocalDate.now().year} PDF", onClick = {
-            com.prayerkey.manna.share.RemembranceBook.share(context, prefs.name, entries, sermons, prayers, saved)
+        SettingRow("Year in review", "Create my ${today().year} PDF", onClick = {
+            Share.cards.shareRemembranceBook(context, prefs.name, entries, sermons, prayers, saved)
         }) { Icon(Icons.Outlined.AutoStories, null, tint = Gold) }
         SettingRow("Export my data", "Save a private backup", onClick = {
-            com.prayerkey.manna.share.JourneyArchive.share(context, entries, sermons, prayers, saved, memory, formation)
+            Share.cards.exportArchive(context, entries, sermons, prayers, saved, memory, formation)
         }) { Icon(Icons.Outlined.FileDownload, null, tint = Electric) }
         SettingRow("Restore my data", "Choose a saved backup", onClick = { confirmRestore = true }) {
             Icon(Icons.Outlined.Restore, null, tint = Muted)
@@ -1289,7 +1281,7 @@ fun ProfileScreen(
         onDismissRequest = { confirmRestore = false },
         title = { Text("Restore your Journey?") },
         text = { Text("This replaces the current Journey, prayers, sermon notes, saved words, and memory progress on this device. Export the current archive first if you may need it.") },
-        confirmButton = { TextButton(onClick = { confirmRestore = false; restoreArchive.launch(arrayOf("application/json", "text/plain")) }) { Text("Choose archive") } },
+        confirmButton = { TextButton(onClick = { confirmRestore = false; restoreArchive.launch() }) { Text("Choose archive") } },
         dismissButton = { TextButton(onClick = { confirmRestore = false }) { Text("Cancel") } },
     )
     if (showAbout) AlertDialog(

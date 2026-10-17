@@ -1,8 +1,12 @@
 package com.prayerkey.manna.ui.challenge
 
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.ui.platform.Reminders
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import kotlinx.datetime.toKotlinLocalDate
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -72,7 +76,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -92,7 +95,7 @@ import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import kotlinx.coroutines.delay
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * Prayer + Challenge.
@@ -106,19 +109,19 @@ import java.time.LocalDate
  */
 private enum class Stage { Welcome, Length, Focus, Practice, Time, Summary, Day, Praying, Reflect, Progress }
 
-internal val Ink = Pk.Charcoal
-internal val Line = Color(0xFFE6E2EC)
+val Ink = Pk.Charcoal
+val Line = Color(0xFFE6E2EC)
 
 @Composable
 fun PrayerChallengeRoute(onClose: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     var challenge by remember { mutableStateOf(PrayerChallengeStore.load(context)) }
     var stage by remember {
         mutableStateOf(if (PrayerChallengeStore.load(context).started) Stage.Day else Stage.Welcome)
     }
     var prayedSeconds by remember { mutableIntStateOf(0) }
-    val today = remember { LocalDate.now() }
-    val day = challenge.dayFor(today.toKotlinLocalDate())
+    val today = remember { today() }
+    val day = challenge.dayFor(today)
 
     fun keep(next: PrayerChallenge) {
         challenge = next
@@ -152,8 +155,8 @@ fun PrayerChallengeRoute(onClose: () -> Unit) {
                 onEdit = { stage = Stage.Length },
                 onBack = { stage = Stage.Time },
                 onBegin = {
-                    keep(challenge.copy(startedOn = today.toEpochDay()))
-                    com.prayerkey.manna.reminder.ReminderReceiver.scheduleFor(
+                    keep(challenge.copy(startedOn = today.toEpochDays().toLong()))
+                    Reminders.scheduleFor(
                         context, "prayer_challenge", challenge.hour, challenge.minute, challenge.reminder,
                     )
                     stage = Stage.Day
@@ -197,7 +200,7 @@ fun PrayerChallengeRoute(onClose: () -> Unit) {
 // ── the frame every setup step shares ───────────────────────────────────
 
 @Composable
-internal fun StepFrame(
+fun StepFrame(
     step: Int,
     of: Int = 5,
     title: String,
@@ -257,7 +260,7 @@ internal fun StepFrame(
 }
 
 @Composable
-internal fun PrimaryButton(label: String, enabled: Boolean = true, onClick: () -> Unit) {
+fun PrimaryButton(label: String, enabled: Boolean = true, onClick: () -> Unit) {
     val haptics = LocalHapticFeedback.current
     Box(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(99.dp))
@@ -561,7 +564,7 @@ private fun TimeStep(
                 keep(challenge.copy(hour = (challenge.hour + it + 24) % 24))
             }
             Text(":", Modifier.padding(horizontal = 6.dp), color = Ink, fontFamily = DisplaySerif, fontSize = 30.sp)
-            Stepper("%02d".format(challenge.minute)) {
+            Stepper("${(challenge.minute).pad2()}") {
                 keep(challenge.copy(minute = (challenge.minute + it * 5 + 60) % 60))
             }
             Text(
@@ -664,7 +667,7 @@ private fun Summary(
 }
 
 @Composable
-internal fun SummaryLine(icon: ImageVector, value: String, label: String) {
+fun SummaryLine(icon: ImageVector, value: String, label: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(
             Modifier.size(38.dp).clip(RoundedCornerShape(12.dp)).background(Pk.Oxblood.copy(alpha = .08f)),
@@ -725,7 +728,7 @@ private fun DayHome(
                 color = Ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 30.sp,
             )
             Text(
-                LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d MMMM")),
+                today().format("EEEE, d MMMM"),
                 Modifier.padding(top = 4.dp),
                 color = Pk.Muted, fontFamily = UtilitySans, fontSize = 13.sp,
             )
@@ -817,7 +820,7 @@ private fun DayHome(
 }
 
 @Composable
-internal fun DayCard(label: String, content: @Composable () -> Unit) {
+fun DayCard(label: String, content: @Composable () -> Unit) {
     Column(
         Modifier.fillMaxWidth().padding(top = 16.dp).clip(RoundedCornerShape(22.dp))
             .background(Color.White).border(1.dp, Line, RoundedCornerShape(22.dp)).padding(18.dp),
@@ -839,7 +842,7 @@ internal fun DayCard(label: String, content: @Composable () -> Unit) {
  * beginning to pray takes a second of intent rather than a stray touch.
  */
 @Composable
-internal fun HoldToPray(done: Boolean, onPray: () -> Unit) {
+fun HoldToPray(done: Boolean, onPray: () -> Unit) {
     var holding by remember { mutableStateOf(false) }
     val fill by animateFloatAsState(if (holding) 1f else 0f, tween(if (holding) 900 else 220), label = "hold")
     val haptics = LocalHapticFeedback.current
@@ -951,7 +954,7 @@ private fun PrayingSession(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Outlined.VolunteerActivism, null, tint = Pk.GoldLight, modifier = Modifier.size(28.dp))
                     Text(
-                        "%d:%02d".format(seconds / 60, seconds % 60),
+                        "${seconds / 60}:${(seconds % 60).pad2()}",
                         Modifier.padding(top = 8.dp),
                         color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 44.sp,
                     )
@@ -986,7 +989,7 @@ private fun PrayingSession(
 }
 
 @Composable
-internal fun SessionAction(icon: ImageVector, label: String, colour: Color, onClick: () -> Unit) {
+fun SessionAction(icon: ImageVector, label: String, colour: Color, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             Modifier.size(64.dp).clip(CircleShape).background(colour).clickable(onClick = onClick),
@@ -1045,7 +1048,7 @@ private fun Reflection(
             )
 
             Row(Modifier.padding(top = 18.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Fact(Icons.Outlined.Schedule, "%d:%02d".format(seconds / 60, seconds % 60), "Prayer time")
+                Fact(Icons.Outlined.Schedule, "${seconds / 60}:${(seconds % 60).pad2()}", "Prayer time")
                 if (challenge.practice.readsScripture) {
                     Fact(Icons.Outlined.MenuBook, content.reading, "Scripture")
                 }
@@ -1106,7 +1109,7 @@ private fun Reflection(
 }
 
 @Composable
-internal fun Fact(icon: ImageVector, value: String, label: String) {
+fun Fact(icon: ImageVector, value: String, label: String) {
     Row(
         Modifier.clip(RoundedCornerShape(16.dp)).background(Color.White)
             .border(1.dp, Line, RoundedCornerShape(16.dp))
@@ -1131,7 +1134,7 @@ private fun Progress(
     onContinue: () -> Unit,
     onClose: () -> Unit,
 ) {
-    val context = LocalContext.current
+    val context = platformContext()
     val minutes = remember(challenge.done) { PrayerChallengeStore.minutesPrayed(context, challenge.days) }
     Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
         Row(Modifier.fillMaxWidth().padding(start = 8.dp, end = 20.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -1250,7 +1253,7 @@ private fun Progress(
         Box(Modifier.padding(horizontal = 22.dp, vertical = 14.dp)) {
             PrimaryButton(if (challenge.complete) "Start another challenge" else "Continue tomorrow") {
                 if (challenge.complete) {
-                    com.prayerkey.manna.reminder.ReminderReceiver.scheduleFor(context, "prayer_challenge", 6, 30, false)
+                    Reminders.scheduleFor(context, "prayer_challenge", 6, 30, false)
                     PrayerChallengeStore.clear(context)
                     onClose()
                 } else {
@@ -1262,7 +1265,7 @@ private fun Progress(
 }
 
 @Composable
-internal fun Stat(value: String, label: String, modifier: Modifier) {
+fun Stat(value: String, label: String, modifier: Modifier) {
     Column(
         modifier.clip(RoundedCornerShape(18.dp)).background(Color.White)
             .border(1.dp, Line, RoundedCornerShape(18.dp)).padding(vertical = 16.dp),

@@ -1,7 +1,6 @@
 package com.prayerkey.manna.ui.screens
 
-import android.content.Intent
-import android.net.Uri
+import com.prayerkey.manna.ui.platform.platformContext
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,10 +24,10 @@ import com.prayerkey.manna.data.FormationState
 import com.prayerkey.manna.ui.journal.WriteResult
 import com.prayerkey.manna.ui.theme.*
 
-internal data class PilgrimageDay(val title: String, val reference: String, val reflection: String, val action: String)
-internal data class Pilgrimage(val id: String, val title: String, val subtitle: String, val days: List<PilgrimageDay>)
+data class PilgrimageDay(val title: String, val reference: String, val reflection: String, val action: String)
+data class Pilgrimage(val id: String, val title: String, val subtitle: String, val days: List<PilgrimageDay>)
 
-internal val PILGRIMAGES = listOf(
+val PILGRIMAGES = listOf(
     Pilgrimage("peace", "Seven Days of Peace", "Release anxiety without denying reality.", listOf(
         PilgrimageDay("Name the weight", "1 Peter 5:7", "God welcomes the care you have been carrying alone.", "Write the one burden you most need to release."),
         PilgrimageDay("Return to the present", "Matthew 6:34", "Grace is given for today, not every imagined tomorrow.", "Take five slow breaths before your next decision."),
@@ -199,6 +197,6 @@ fun FormationScreen(state: FormationState, onUpdate: (FormationState) -> Unit, o
 }
 
 @Composable private fun CrisisDialog(state: FormationState, onUpdate: (FormationState) -> Unit, onDismiss: () -> Unit) {
-    val context = LocalContext.current; var phone by remember { mutableStateOf(state.trustedPhone) }
-    AlertDialog(onDismissRequest = onDismiss, icon = { Icon(Icons.Outlined.HealthAndSafety, null, tint = Color(0xFF9C4A35)) }, title = { Text("You do not have to carry this alone") }, text = { Column { Text("Put both feet on the floor. Name five things you can see, four you can feel, three you can hear, two you can smell, and one you can taste.", fontSize = 13.5.sp, lineHeight = 21.sp); Text("If you may hurt yourself or someone else, contact local emergency services or a crisis professional now. PrayerKey is not an emergency service.", color = Color(0xFF9C4A35), fontSize = 12.sp, lineHeight = 18.sp, modifier = Modifier.padding(top = 14.dp)); OutlinedTextField(phone, { phone = it; onUpdate(state.copy(trustedPhone = it)) }, label = { Text("Trusted person's phone") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 14.dp)); if (phone.isNotBlank()) Button(onClick = { context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${Uri.encode(phone)}"))) }, modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) { Text("Call my trusted person") } } }, confirmButton = { TextButton(onClick = onDismiss) { Text("I am here") } })
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current; var phone by remember { mutableStateOf(state.trustedPhone) }
+    AlertDialog(onDismissRequest = onDismiss, icon = { Icon(Icons.Outlined.HealthAndSafety, null, tint = Color(0xFF9C4A35)) }, title = { Text("You do not have to carry this alone") }, text = { Column { Text("Put both feet on the floor. Name five things you can see, four you can feel, three you can hear, two you can smell, and one you can taste.", fontSize = 13.5.sp, lineHeight = 21.sp); Text("If you may hurt yourself or someone else, contact local emergency services or a crisis professional now. PrayerKey is not an emergency service.", color = Color(0xFF9C4A35), fontSize = 12.sp, lineHeight = 18.sp, modifier = Modifier.padding(top = 14.dp)); OutlinedTextField(phone, { phone = it; onUpdate(state.copy(trustedPhone = it)) }, label = { Text("Trusted person's phone") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 14.dp)); if (phone.isNotBlank()) Button(onClick = { uriHandler.openUri("tel:" + com.prayerkey.manna.platform.encodeUrlComponent(phone)) }, modifier = Modifier.fillMaxWidth().padding(top = 10.dp)) { Text("Call my trusted person") } } }, confirmButton = { TextButton(onClick = onDismiss) { Text("I am here") } })
 }

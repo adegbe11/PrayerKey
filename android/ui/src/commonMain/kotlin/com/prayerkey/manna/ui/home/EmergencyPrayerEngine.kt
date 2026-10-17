@@ -1,6 +1,10 @@
 package com.prayerkey.manna.ui.home
 
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.platformContext
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,7 +20,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -29,21 +32,20 @@ import com.prayerkey.manna.ui.theme.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 @Composable
-internal fun EmergencyPrayerEngine(
+fun EmergencyPrayerEngine(
     onClose: () -> Unit,
     onSave: (String, String) -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
+    val context = platformContext()
     var topics by remember { mutableStateOf<List<PrayerTopic>>(emptyList()) }
     var search by remember { mutableStateOf("") }
     var need by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf<PrayerTopic?>(null) }
-    LaunchedEffect(Unit) { topics = withContext(Dispatchers.IO) { LocalPrayerTopics.load(context) } }
+    LaunchedEffect(Unit) { topics = withContext(ioDispatcher) { LocalPrayerTopics.load(context) } }
     selected?.let { topic ->
         EmergencyPrayerSession(topic, need, onBack = { selected = null }, onClose = onClose, onSave = onSave)
         return
@@ -85,7 +87,7 @@ internal fun EmergencyPrayerEngine(
 
 @Composable
 private fun EmergencyPrayerSession(topic: PrayerTopic, need: String, onBack: () -> Unit, onClose: () -> Unit, onSave: (String, String) -> Unit) {
-    val points = remember(topic.slug) { PrayerPointEngine.pointsFor(topic, LocalDate.now().dayOfYear).take(10) }
+    val points = remember(topic.slug) { PrayerPointEngine.pointsFor(topic, today().dayOfYear).take(10) }
     val scripture = topic.scripture.firstOrNull()
     var checked by remember(topic.slug) { mutableStateOf(emptySet<Int>()) }
     var seconds by remember { mutableIntStateOf(5 * 60) }
@@ -111,7 +113,7 @@ private fun EmergencyPrayerSession(topic: PrayerTopic, need: String, onBack: () 
                     }
                     Row(Modifier.fillMaxWidth().padding(top = 18.dp).background(Color.White.copy(alpha = .08f), RoundedCornerShape(18.dp)).clickable { if (seconds == 0) seconds = 300; running = !running }.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.Timer, null, tint = Pk.GoldLight)
-                        Text("%02d:%02d".format(Locale.US, seconds / 60, seconds % 60), Modifier.weight(1f).padding(start = 12.dp), fontFamily = DisplaySerif, fontSize = 25.sp, color = Color.White)
+                        Text("${(seconds / 60).pad2()}:${(seconds % 60).pad2()}", Modifier.weight(1f).padding(start = 12.dp), fontFamily = DisplaySerif, fontSize = 25.sp, color = Color.White)
                         Text(if (running) "Pause" else "Start", fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.GoldLight)
                     }
                     Text("Pray each point", Modifier.padding(top = 25.dp, bottom = 5.dp), fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Pk.GoldLight)

@@ -1,7 +1,9 @@
 package com.prayerkey.manna.ui.home
 
-import android.speech.tts.TextToSpeech
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.ui.platform.platformContext
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,21 +23,20 @@ import com.prayerkey.manna.data.DailyPassage
 import com.prayerkey.manna.data.OfflineBible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 @Composable
 fun DailyPassageReader(passage: DailyPassage, onComplete: () -> Unit) {
     BackHandler(onBack = onComplete)
-    val context = LocalContext.current
+    val context = platformContext()
     var verses by remember(passage.reference) { mutableStateOf<List<BibleVerse>>(emptyList()) }
     var page by remember(passage.reference) { mutableIntStateOf(-1) }
     var largeText by remember { mutableStateOf(false) }
     var speechReady by remember { mutableStateOf(false) }
-    val speaker = remember { TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS } }
+    val speaker = remember { Speaker(context) { speechReady = it == Speaker.SUCCESS } }
     DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
-    LaunchedEffect(speechReady) { if (speechReady) { speaker.language = Locale.getDefault(); speaker.setSpeechRate(.86f) } }
+    LaunchedEffect(speechReady) { if (speechReady) { speaker.language = null; speaker.setSpeechRate(.86f) } }
     LaunchedEffect(passage.reference) {
-        verses = withContext(Dispatchers.IO) {
+        verses = withContext(ioDispatcher) {
             OfflineBible(context).chapter(passage.book, passage.chapter)
                 .filter { it.verse in passage.firstVerse..passage.lastVerse }
         }
@@ -79,7 +79,7 @@ fun DailyPassageReader(passage: DailyPassage, onComplete: () -> Unit) {
                     enabled = speechReady && page >= 0 && verses.isNotEmpty(),
                     onClick = {
                         val text = verses.getOrNull(page)?.let { "Verse ${it.verse}. ${it.text}" }.orEmpty()
-                        speaker.speak(text, TextToSpeech.QUEUE_FLUSH, null, passage.reference)
+                        speaker.speak(text, Speaker.QUEUE_FLUSH, null, passage.reference)
                     },
                 ) { Icon(Icons.Outlined.VolumeUp, "Listen") }
             }

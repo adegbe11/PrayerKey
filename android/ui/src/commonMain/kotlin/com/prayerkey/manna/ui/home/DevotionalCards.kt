@@ -1,9 +1,11 @@
 package com.prayerkey.manna.ui.home
 
+import com.prayerkey.manna.ui.share.Share
+import com.prayerkey.manna.ui.platform.shareText
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.ui.platform.platformContext
 import androidx.compose.ui.text.withStyle
-import android.content.Intent
-import android.speech.tts.TextToSpeech
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
@@ -53,7 +55,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -67,7 +68,6 @@ import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 /**
  * The day's devotional, as two cards.
@@ -90,7 +90,7 @@ fun DevotionalCards(
     onComplete: () -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
+    val context = platformContext()
     val scope = rememberCoroutineScope()
 
     // the verse the day is built on, and the one quoted inside it
@@ -115,7 +115,7 @@ fun DevotionalCards(
 
     var speechReady by remember { mutableStateOf(false) }
     var speaking by remember { mutableStateOf(false) }
-    val speaker = remember { TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS } }
+    val speaker = remember { Speaker(context) { speechReady = it == Speaker.SUCCESS } }
     DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
 
     val reference = day.reading.ref.label.replace("Psalms ", "Psalm ")
@@ -186,7 +186,7 @@ fun DevotionalCards(
                         if (speaking) {
                             speaker.stop(); speaking = false
                         } else if (speechReady) {
-                            speaker.language = Locale.getDefault()
+                            speaker.language = null
                             speaker.setSpeechRate(.9f)
                             val text = buildString {
                                 append(day.title).append(". ")
@@ -194,18 +194,13 @@ fun DevotionalCards(
                                 day.body.forEach { b -> if (b is DevoBlock.Para) append(b.text).append(" ") }
                                 append(day.prayer)
                             }
-                            speaker.speak(text, TextToSpeech.QUEUE_FLUSH, null, "devotional")
+                            speaker.speak(text, Speaker.QUEUE_FLUSH, null, "devotional")
                             speaking = true
                         }
                     }
                     CardAction(Icons.Outlined.Share, "Share", Modifier.weight(1f)) {
                         val text = "${day.line.plain}\n\n$verse\n$reference (KJV)\n\n— PrayerKey"
-                        context.startActivity(
-                            Intent.createChooser(
-                                Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text),
-                                "Share",
-                            ),
-                        )
+                        shareText(context, text, "Share")
                     }
                     CardAction(Icons.Outlined.Check, "Done", Modifier.weight(1f), filled = true) {
                         speaker.stop()
@@ -347,7 +342,7 @@ private fun BackCard(
                 fontSize = 15.sp, lineHeight = 22.sp, textAlign = TextAlign.Center,
             )
             Text(
-                reference.uppercase(Locale.getDefault()) + " KJV",
+                reference.uppercase() + " KJV",
                 Modifier.padding(top = 6.dp),
                 color = Pk.GoldDeep, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold,
                 fontSize = 11.sp, letterSpacing = 1.2.sp,
@@ -460,7 +455,7 @@ fun ChapterCards(
     onDone: () -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
+    val context = platformContext()
     val scope = rememberCoroutineScope()
     var verses by remember(reading) { mutableStateOf<List<com.prayerkey.manna.data.BibleVerse>>(emptyList()) }
     LaunchedEffect(reading) {
@@ -479,7 +474,7 @@ fun ChapterCards(
 
     var speechReady by remember { mutableStateOf(false) }
     var speaking by remember { mutableStateOf(false) }
-    val speaker = remember { TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS } }
+    val speaker = remember { Speaker(context) { speechReady = it == Speaker.SUCCESS } }
     DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
 
     Box(
@@ -643,21 +638,16 @@ fun ChapterCards(
                         if (speaking) {
                             speaker.stop(); speaking = false
                         } else if (speechReady && verses.isNotEmpty()) {
-                            speaker.language = Locale.getDefault()
+                            speaker.language = null
                             speaker.setSpeechRate(.9f)
-                            speaker.speak("$name. " + verses.joinToString(" ") { it.text }, TextToSpeech.QUEUE_FLUSH, null, "chapter")
+                            speaker.speak("$name. " + verses.joinToString(" ") { it.text }, Speaker.QUEUE_FLUSH, null, "chapter")
                             speaking = true
                         }
                     }
                     CardAction(Icons.Outlined.Share, "Share", Modifier.weight(1f)) {
                         val text = (key?.text ?: verses.firstOrNull()?.text.orEmpty()) +
                             "\n$name:${key?.verse ?: 1} (KJV)\n\n— PrayerKey"
-                        context.startActivity(
-                            Intent.createChooser(
-                                Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text),
-                                "Share",
-                            ),
-                        )
+                        shareText(context, text, "Share")
                     }
                     CardAction(Icons.Outlined.Check, "Done", Modifier.weight(1f), filled = true) {
                         speaker.stop()
@@ -691,7 +681,7 @@ fun MorningPrayerCards(
     onDone: () -> Unit,
 ) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
+    val context = platformContext()
     val scope = rememberCoroutineScope()
     val words = prayer.prayer.trim().removeSuffix("Amen.").removeSuffix("Amen").trim()
     val reference = prayer.ref.replace("Psalms ", "Psalm ")
@@ -704,7 +694,7 @@ fun MorningPrayerCards(
 
     var speechReady by remember { mutableStateOf(false) }
     var speaking by remember { mutableStateOf(false) }
-    val speaker = remember { TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS } }
+    val speaker = remember { Speaker(context) { speechReady = it == Speaker.SUCCESS } }
     DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
 
     Box(
@@ -853,14 +843,14 @@ fun MorningPrayerCards(
                         if (speaking) {
                             speaker.stop(); speaking = false
                         } else if (speechReady) {
-                            speaker.language = Locale.getDefault()
+                            speaker.language = null
                             speaker.setSpeechRate(.86f)
-                            speaker.speak("$words Amen.", TextToSpeech.QUEUE_FLUSH, null, "morning")
+                            speaker.speak("$words Amen.", Speaker.QUEUE_FLUSH, null, "morning")
                             speaking = true
                         }
                     }
                     CardAction(Icons.Outlined.Share, "Share", Modifier.weight(1f)) {
-                        com.prayerkey.manna.share.CardShareRenderer.sharePrayerStatus(context, "$words Amen.")
+                        Share.cards.sharePrayerStatus(context, "$words Amen.")
                     }
                     CardAction(Icons.Outlined.Check, "Amen", Modifier.weight(1f), filled = true) {
                         speaker.stop()

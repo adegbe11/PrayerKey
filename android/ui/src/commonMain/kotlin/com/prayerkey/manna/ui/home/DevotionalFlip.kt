@@ -41,7 +41,6 @@ import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.util.Locale
 
 /**
  * The devotional as pages you turn, not a page you scroll.

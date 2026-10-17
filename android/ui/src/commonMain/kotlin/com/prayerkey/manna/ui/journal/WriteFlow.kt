@@ -1,6 +1,18 @@
 package com.prayerkey.manna.ui.journal
 
-import androidx.compose.ui.graphics.asImageBitmap
+import com.prayerkey.manna.ui.platform.MediaKind
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.ui.platform.loadThumbnail
+import com.prayerkey.manna.ui.platform.pickDate
+import com.prayerkey.manna.ui.platform.rememberDictation
+import com.prayerkey.manna.ui.platform.rememberMediaPicker
+import com.prayerkey.manna.ui.platform.fullScreenDialog
+import com.prayerkey.manna.platform.withDayOfMonth
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.ui.platform.platformContext
 import androidx.compose.runtime.key
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.animation.fadeIn
@@ -9,15 +21,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.border
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.Lightbulb
-import android.content.Intent
-import android.app.DatePickerDialog
-import android.Manifest
-import android.content.pm.PackageManager
-import android.media.MediaRecorder
-import android.os.Build
-import android.speech.RecognizerIntent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -84,7 +87,6 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -92,9 +94,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
-import java.io.File
 import com.prayerkey.manna.model.VerseCard
 import com.prayerkey.manna.ui.church.ReferenceDetector
 import com.prayerkey.manna.ui.theme.premiumCard
@@ -165,7 +164,7 @@ fun WriteSheet(
     initialLocation: String = "",
     initialWeather: String = "",
     initialMedia: List<String> = emptyList(),
-    initialEntryAt: Long = System.currentTimeMillis(),
+    initialEntryAt: Long = kotlinx.datetime.Clock.System.now().toEpochMilliseconds(),
     editing: Boolean = false,
     /**
      * What the sheet was opened to do: "media", "voice" or "verse".
@@ -207,34 +206,13 @@ fun WriteSheet(
     var confirmDelete by remember { mutableStateOf(false) }
     var showDetails by remember { mutableStateOf(editing) }
     var moodOpen by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    var recorder by remember { mutableStateOf<MediaRecorder?>(null) }
-    var recordingUri by remember { mutableStateOf<String?>(null) }
-    fun startAudioRecording() {
-        val dir = File(context.filesDir, "journal_audio").apply { mkdirs() }
-        val file = File(dir, "reflection-${System.currentTimeMillis()}.m4a")
-        val next = if (Build.VERSION.SDK_INT >= 31) MediaRecorder(context) else @Suppress("DEPRECATION") MediaRecorder()
-        runCatching {
-            next.setAudioSource(MediaRecorder.AudioSource.MIC)
-            next.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            next.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            next.setAudioEncodingBitRate(96_000)
-            next.setAudioSamplingRate(44_100)
-            next.setOutputFile(file.absolutePath)
-            next.prepare(); next.start()
-            recorder = next
-            recordingUri = FileProvider.getUriForFile(context, "${context.packageName}.files", file).toString()
-        }.onFailure { next.release(); file.delete() }
-    }
-    val audioPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted -> if (granted) startAudioRecording() }
-    DisposableEffect(Unit) { onDispose { runCatching { recorder?.stop() }; recorder?.release() } }
-    val mediaPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
-        uris.forEach { uri -> runCatching { context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) } }
-        media = (media + uris.map { it.toString() }).distinct().take(30)
+    val context = platformContext()
+    val mediaPicker = rememberMediaPicker { picked ->
+        media = (media + picked).distinct().take(30)
     }
     androidx.compose.runtime.LaunchedEffect(openWith) {
         when (openWith) {
-            "media" -> mediaPicker.launch(arrayOf("image/*", "video/*", "audio/*", "application/pdf"))
+            "media" -> mediaPicker.launch()
             "voice" -> voiceDisclosure = true
             /* Details too, or the tick lands inside a panel that is closed by
                default on a new entry - so Bible would set something true and
@@ -244,10 +222,8 @@ fun WriteSheet(
         }
     }
 
-    val voiceInput = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()?.let { spoken ->
-            body = if (body.isBlank()) spoken else "$body\n$spoken"
-        }
+    val voiceInput = rememberDictation("Speak what is on your heart") { spoken ->
+        body = if (body.isBlank()) spoken else "$body\n$spoken"
     }
 
     val heavy = mood in HEAVY
@@ -278,13 +254,15 @@ fun WriteSheet(
     }
 
     val entryDate = remember(entryAt) {
-        java.time.Instant.ofEpochMilli(entryAt).atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+        com.prayerkey.manna.platform.localDateOfMillis(entryAt)
     }
     val openDatePicker = {
-        DatePickerDialog(context, { _, year, month, day ->
-            val old = java.time.Instant.ofEpochMilli(entryAt).atZone(java.time.ZoneId.systemDefault())
-            entryAt = old.withYear(year).withMonth(month + 1).withDayOfMonth(day).toInstant().toEpochMilli()
-        }, entryDate.year, entryDate.monthValue - 1, entryDate.dayOfMonth).show()
+        pickDate(context, entryDate, earliest = null) { picked ->
+            // the new day, at the same time of day the entry already had
+            val zone = kotlinx.datetime.TimeZone.currentSystemDefault()
+            val old = kotlinx.datetime.Instant.fromEpochMilliseconds(entryAt).toLocalDateTime(zone)
+            entryAt = kotlinx.datetime.LocalDateTime(picked, old.time).toInstant(zone).toEpochMilliseconds()
+        }
     }
 
     // borderless fields — a boxed input inside a page reads as a form
@@ -329,7 +307,7 @@ fun WriteSheet(
        gives Back the meaning it should have here: close the page. */
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+        properties = fullScreenDialog(),
     ) {
     Box(Modifier.fillMaxSize().background(paper)) {
         Column(Modifier.fillMaxSize().statusBarsPadding().imePadding()) {
@@ -380,12 +358,12 @@ fun WriteSheet(
                     verticalAlignment = Alignment.Bottom,
                 ) {
                     Text(
-                        "%02d".format(entryDate.dayOfMonth),
+                        "${(entryDate.dayOfMonth).pad2()}",
                         color = ink, fontSize = 34.sp, fontWeight = FontWeight.Bold,
                         letterSpacing = (-1).sp,
                     )
                     Text(
-                        "  " + entryDate.month.getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.getDefault()) +
+                        "  " + entryDate.format("MMM") +
                             " " + entryDate.year,
                         color = muted, fontSize = 13.sp,
                         modifier = Modifier.padding(bottom = 6.dp),
@@ -568,7 +546,7 @@ fun WriteSheet(
                                 .padding(vertical = 10.dp),
                         ) {
                             StartTile(Icons.Outlined.Image, "Photos", ink, Modifier.weight(1f)) {
-                                mediaPicker.launch(arrayOf("image/*", "video/*"))
+                                mediaPicker.launch(MediaKind.Photos)
                             }
                             if (onTemplates != null) StartTile(Icons.Outlined.EditNote, "Templates", ink, Modifier.weight(1f), onTemplates)
                             if (onPrompts != null) StartTile(Icons.Outlined.Lightbulb, "Prompts", ink, Modifier.weight(1f), onPrompts)
@@ -597,7 +575,7 @@ fun WriteSheet(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     ToolGlyph(Icons.Outlined.Image, "Add photo", muted) {
-                        mediaPicker.launch(arrayOf("image/*", "video/*"))
+                        mediaPicker.launch(MediaKind.Photos)
                     }
                     ToolGlyph(Icons.Outlined.Mic, "Dictate", muted) { voiceDisclosure = true }
                     ToolGlyph(Icons.Outlined.MenuBook, "Attach today's verse", if (attachToday) accent else muted) {
@@ -607,7 +585,7 @@ fun WriteSheet(
                         isPrayer = !isPrayer
                     }
                     ToolGlyph(Icons.Outlined.AttachFile, "Attach a file", muted) {
-                        mediaPicker.launch(arrayOf("*/*"))
+                        mediaPicker.launch(MediaKind.AnyFile)
                     }
                     Spacer(Modifier.weight(1f))
                     Text(
@@ -629,10 +607,7 @@ fun WriteSheet(
         text = { Text("Your phone's speech-recognition service may process audio online. PrayerKey does not receive or store the recording. Only the returned words are placed in this entry.") },
         confirmButton = { TextButton(onClick = {
             voiceDisclosure = false
-            voiceInput.launch(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak what is on your heart")
-            })
+            voiceInput.launch()
         }) { Text("Start dictation") } },
         dismissButton = { TextButton(onClick = { voiceDisclosure = false }) { Text("Cancel") } },
     )
@@ -674,10 +649,9 @@ private fun ToolGlyph(icon: androidx.compose.ui.graphics.vector.ImageVector, lab
 /** An attachment while writing: the photo itself, or a file mark, with a way to take it off. */
 @Composable
 private fun EditorAttachment(value: String, panel: Color, line: Color, accent: Color, onRemove: () -> Unit) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val uri = remember(value) { android.net.Uri.parse(value) }
-    var picture by remember(value) { mutableStateOf<android.graphics.Bitmap?>(null) }
-    LaunchedEffect(value) { picture = loadAttachmentPicture(context, uri, 400) }
+    val context = platformContext()
+    var picture by remember(value) { mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null) }
+    LaunchedEffect(value) { picture = loadThumbnail(context, value, 400) }
     Box(
         Modifier.size(96.dp).clip(RoundedCornerShape(14.dp)).background(panel)
             .border(1.dp, line, RoundedCornerShape(14.dp)),
@@ -686,7 +660,7 @@ private fun EditorAttachment(value: String, panel: Color, line: Color, accent: C
         val image = picture
         if (image != null) {
             androidx.compose.foundation.Image(
-                image.asImageBitmap(), null, Modifier.matchParentSize(),
+                image, null, Modifier.matchParentSize(),
                 contentScale = androidx.compose.ui.layout.ContentScale.Crop,
             )
         } else {

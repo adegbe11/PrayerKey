@@ -1,15 +1,20 @@
 package com.prayerkey.manna.ui.screens
 
-import android.Manifest
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
-import android.content.pm.PackageManager
-import android.view.HapticFeedbackConstants
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.BackHandler
-import androidx.activity.result.contract.ActivityResultContracts
+import com.prayerkey.manna.platform.fileExists
+import com.prayerkey.manna.ui.platform.shareText
+import com.prayerkey.manna.ui.platform.showToast
+import com.prayerkey.manna.ui.platform.Permission
+import com.prayerkey.manna.ui.platform.rememberPermissionRequest
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.ui.church.Sermons
+import com.prayerkey.manna.ui.share.Share
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.platformContext
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -55,30 +60,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import com.prayerkey.manna.data.SermonNote
 import com.prayerkey.manna.ui.church.SermonArranger
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
-import com.prayerkey.manna.ui.church.SermonRefiner
-import com.prayerkey.manna.ui.church.SermonService
-import com.prayerkey.manna.ui.church.SpeechModel
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 import com.prayerkey.manna.ui.theme.*
 import kotlinx.coroutines.delay
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.LocalDate
 
 private enum class Stage { Ready, Listening, Arranging, Note }
 
@@ -91,14 +87,14 @@ fun ChurchScreen(
     onRefineNote: (Long, String) -> Unit,
     onDeleteNote: (Long) -> Unit,
 ) {
-    val context = LocalContext.current
-    val view = LocalView.current
-    val listening by SermonService.listening.collectAsState()
-    val caught by SermonService.references.collectAsState()
-    val partial by SermonService.partial.collectAsState()
-    val chunks by SermonService.chunks.collectAsState()
-    val captureStatus by SermonService.status.collectAsState()
-    val startedAt by SermonService.startedAt.collectAsState()
+    val context = platformContext()
+    val haptics = rememberHaptics()
+    val listening by Sermons.engine.listening.collectAsState()
+    val caught by Sermons.engine.references.collectAsState()
+    val partial by Sermons.engine.partial.collectAsState()
+    val chunks by Sermons.engine.chunks.collectAsState()
+    val captureStatus by Sermons.engine.status.collectAsState()
+    val startedAt by Sermons.engine.startedAt.collectAsState()
 
     var stage by remember { mutableStateOf(Stage.Ready) }
     var arranged by remember { mutableStateOf<SermonArranger.Note?>(null) }
@@ -124,16 +120,14 @@ fun ChurchScreen(
        tapped a second time. Now: the microphone, then (optionally) the
        notification that keeps the recording alive, then the recording -
        whatever is answered to the second. */
-    val notifyPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-        SermonService.start(context)
+    val notifyPermission = rememberPermissionRequest(Permission.Notifications) {
+        Sermons.engine.start(context)
     }
     fun startRecording() {
-        if (android.os.Build.VERSION.SDK_INT >= 33 &&
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-        ) notifyPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-        else SermonService.start(context)
+        if (!notifyPermission.granted()) notifyPermission.request()
+        else Sermons.engine.start(context)
     }
-    val micPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+    val micPermission = rememberPermissionRequest(Permission.Microphone) { granted ->
         if (granted) startRecording()
     }
 
@@ -145,11 +139,9 @@ fun ChurchScreen(
     var offerCaptions by remember { mutableStateOf(false) }
 
     fun record() {
-        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-        SermonService.setLanguage(language)
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-            startRecording()
-        } else micPermission.launch(Manifest.permission.RECORD_AUDIO)
+        haptics.perform(Haptic.Confirm)
+        Sermons.engine.setLanguage(language)
+        if (micPermission.granted()) startRecording() else micPermission.request()
     }
 
     fun begin() {
@@ -175,13 +167,13 @@ fun ChurchScreen(
     fun end() {
         if (stage != Stage.Listening) return
         stage = Stage.Arranging
-        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-        minutes = SermonService.elapsedMinutes()
-        val transcript = SermonService.transcript(context)
+        haptics.perform(Haptic.Confirm)
+        minutes = Sermons.engine.elapsedMinutes()
+        val transcript = Sermons.engine.transcript(context)
         val refs = caught.map { it.reference }
         // read before stop() clears it — the note needs it to be re-transcribed later
-        val audio = SermonService.audioPath.value
-        SermonService.stop(context)
+        val audio = Sermons.engine.audioPath.value
+        Sermons.engine.stop(context)
         if (transcript.isBlank()) {
             /* A service still happened. Discarding it because the recogniser
                produced nothing threw away the recording, the duration and any
@@ -202,12 +194,12 @@ fun ChurchScreen(
             stage = Stage.Ready
             // only promise the recording when there is one: with the phone's
             // own recogniser listening, nothing is recorded to go back to
-            Toast.makeText(
+            showToast(
                 context,
                 if (!audio.isNullOrBlank()) "Saved to your sermon notes. Open it to turn the recording into text."
                 else "No words were heard. Hold the phone nearer the speaker next time.",
-                Toast.LENGTH_LONG,
-            ).show()
+                long = true,
+            )
             return
         }
         arranged = SermonArranger.arrange(transcript, refs, language).also { onSaveNote(it, minutes, audio) }
@@ -249,25 +241,16 @@ fun ChurchScreen(
                         // the references live in the note itself; we don't mint
                         // saved-word cards here because detection gives us the
                         // reference, not the verse text — an empty card is junk
-                        SermonService.reset()
+                        Sermons.engine.reset()
                         arranged = null
                         stage = Stage.Ready
-                        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                        haptics.perform(Haptic.Confirm)
                     },
                     onShare = {
                         val text = SermonArranger.asShareText(note, todayLabel(), minutes)
-                        context.startActivity(
-                            Intent.createChooser(
-                                Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_SUBJECT, note.title)
-                                    putExtra(Intent.EXTRA_TEXT, text)
-                                },
-                                "Send my notes",
-                            ),
-                        )
+                        shareText(context, text, "Send my notes")
                     },
-                    onDiscard = { SermonService.reset(); arranged = null; stage = Stage.Ready },
+                    onDiscard = { Sermons.engine.reset(); arranged = null; stage = Stage.Ready },
                 )
             }
         }
@@ -303,10 +286,10 @@ fun ChurchScreen(
  */
 @Composable
 private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     val scope = rememberCoroutineScope()
-    val state by SpeechModel.state(SpeechModel.Kind.Speech).collectAsState()
-    LaunchedEffect(Unit) { SpeechModel.refresh(context, SpeechModel.Kind.Speech) }
+    val state by Sermons.engine.model.collectAsState()
+    LaunchedEffect(Unit) { Sermons.engine.refreshModel(context) }
     // installing is the answer to the question; go straight on to recording
     LaunchedEffect(state) { if (state is com.prayerkey.manna.ui.church.ModelState.Ready) onReady() }
 
@@ -349,7 +332,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "Downloading · ${(s.fraction * SpeechModel.Kind.Speech.megabytes).toInt()} of ${SpeechModel.Kind.Speech.megabytes} MB",
+                    "Downloading · ${(s.fraction * Sermons.engine.modelMegabytes).toInt()} of ${Sermons.engine.modelMegabytes} MB",
                     color = cs.onBackground.copy(alpha = .5f), fontSize = 12.sp,
                 )
             }
@@ -362,12 +345,12 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         Modifier.clip(Corners.pill).background(cs.primary)
-                            .clickable { scope.launch { SpeechModel.install(context, SpeechModel.Kind.Speech) } }
+                            .clickable { scope.launch { Sermons.engine.installModel(context) } }
                             .padding(horizontal = 18.dp, vertical = 11.dp),
                     ) {
                         Text(
                             if (state is com.prayerkey.manna.ui.church.ModelState.Failed) "Try again"
-                            else "Turn on · ${SpeechModel.Kind.Speech.megabytes} MB",
+                            else "Turn on · ${Sermons.engine.modelMegabytes} MB",
                             color = cs.onPrimary, fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold,
                         )
                     }
@@ -545,9 +528,9 @@ private fun ListeningView(
     captureStatus: String,
     onEnd: () -> Unit,
 ) {
-    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    var now by remember { mutableLongStateOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds()) }
     LaunchedEffect(startedAt) {
-        while (true) { now = System.currentTimeMillis(); delay(1000) }
+        while (true) { now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds(); delay(1000) }
     }
     val secs = if (startedAt == 0L) 0 else ((now - startedAt) / 1000L).toInt().coerceAtLeast(0)
 
@@ -612,7 +595,7 @@ private fun ListeningView(
                     .background(cs.primary.copy(alpha = pulse)),
             )
             Text(
-                "%02d:%02d".format(secs / 60, secs % 60),
+                "${(secs / 60).pad2()}:${(secs % 60).pad2()}",
                 color = Muted, fontSize = 13.sp, fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(start = 10.dp),
             )
@@ -791,26 +774,26 @@ private fun NoteView(
  */
 @Composable
 private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, String) -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     val scope = rememberCoroutineScope()
     val cs = MaterialTheme.colorScheme
-    val model by SpeechModel.state(SpeechModel.Kind.Speech).collectAsState()
+    val model by Sermons.engine.model.collectAsState()
     var progress by remember(note.id) { mutableStateOf<Float?>(null) }
     var failure by remember(note.id) { mutableStateOf<String?>(null) }
-    LaunchedEffect(Unit) { SpeechModel.refresh(context, SpeechModel.Kind.Speech) }
+    LaunchedEffect(Unit) { Sermons.engine.refreshModel(context) }
 
-    if (note.refined || note.audioPath.isBlank() || !java.io.File(note.audioPath).isFile) return
+    if (note.refined || note.audioPath.isBlank() || !fileExists(note.audioPath)) return
 
     fun run() = scope.launch {
         failure = null
-        if (!SpeechModel.isInstalled(context, SpeechModel.Kind.Speech)) {
-            if (!SpeechModel.install(context, SpeechModel.Kind.Speech)) {
+        if (!Sermons.engine.isModelInstalled(context)) {
+            if (!Sermons.engine.installModel(context)) {
                 failure = "the download did not finish"
                 return@launch
             }
         }
         progress = 0f
-        SermonRefiner.refine(context, java.io.File(note.audioPath)) { progress = it }
+        Sermons.engine.refine(context, note.audioPath) { progress = it }
             .onSuccess { onRefine(note.id, it) }
             .onFailure { failure = it.message ?: "it could not be read" }
         progress = null
@@ -837,7 +820,7 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                     modifier = Modifier.fillMaxWidth().height(4.dp).clip(Corners.pill),
                 )
                 Text(
-                    "Getting ready · ${(f * SpeechModel.Kind.Speech.megabytes).toInt()} of ${SpeechModel.Kind.Speech.megabytes} MB",
+                    "Getting ready · ${(f * Sermons.engine.modelMegabytes).toInt()} of ${Sermons.engine.modelMegabytes} MB",
                     color = Muted, fontSize = 11.5.sp, modifier = Modifier.padding(top = 7.dp),
                 )
             }
@@ -848,8 +831,8 @@ private fun RefineRow(note: SermonNote, language: String, onRefine: (Long, Strin
                         .padding(horizontal = 14.dp, vertical = 9.dp),
                 ) {
                     Text(
-                        if (SpeechModel.isInstalled(context, SpeechModel.Kind.Speech)) "Improve this transcript"
-                        else "Improve this transcript · ${SpeechModel.Kind.Speech.megabytes} MB once",
+                        if (Sermons.engine.isModelInstalled(context)) "Improve this transcript"
+                        else "Improve this transcript · ${Sermons.engine.modelMegabytes} MB once",
                         color = cs.primary, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold,
                     )
                 }
@@ -873,7 +856,7 @@ private fun SavedNoteSheet(
     onClose: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    val context = LocalContext.current
+    val context = platformContext()
     androidx.compose.material3.ModalBottomSheet(onDismissRequest = onClose, containerColor = Canvas) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
@@ -906,7 +889,7 @@ private fun SavedNoteSheet(
                 }
             }
             Button(
-                onClick = { com.prayerkey.manna.share.MannaPack.share(context, note) },
+                onClick = { Share.cards.shareSundayNotes(context, note) },
                 modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
             ) {
                 Icon(Icons.Outlined.Share, "Share these Sunday notes")
@@ -981,15 +964,14 @@ private fun Wave(active: Boolean, modifier: Modifier = Modifier) {
 }
 
 private fun todayLabel(): String =
-    LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d"))
+    today().format("EEEE, MMMM d")
 
 private fun dayLabel(millis: Long): String =
-    Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
-        .format(DateTimeFormatter.ofPattern("MMM d, yyyy"))
+    com.prayerkey.manna.platform.localDateOfMillis(millis)
+        .format("MMM d, yyyy")
 
 private fun clockLabel(millis: Long): String =
-    Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
-        .format(DateTimeFormatter.ofPattern("h:mm a"))
+    com.prayerkey.manna.platform.formatMillis(millis, "h:mm a")
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
@@ -1083,7 +1065,7 @@ private fun Sanctuary(accent: Color, ink: Color, modifier: Modifier = Modifier) 
             center = Offset(w / 2f, h * .21f), style = Stroke(width = 1.4f),
         )
         for (i in 0 until 8) {
-            val a = i * Math.PI.toFloat() / 4f
+            val a = i * kotlin.math.PI.toFloat() / 4f
             drawLine(
                 accent.copy(alpha = .22f),
                 Offset(w / 2f, h * .21f),

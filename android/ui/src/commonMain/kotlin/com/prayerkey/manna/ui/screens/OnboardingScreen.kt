@@ -1,8 +1,9 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import com.prayerkey.manna.resources.*
-import android.view.HapticFeedbackConstants
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -43,7 +44,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -87,7 +87,7 @@ fun OnboardingScreen(onDone: (remindersEnabled: Boolean, hour: Int) -> Unit) {
 
 @Composable
 private fun PullToLearn(onPulled: () -> Unit, onSkip: () -> Unit) {
-    val view = LocalView.current
+    val haptics = rememberHaptics()
     val density = LocalDensity.current
     val card = remember {
         VerseCard(
@@ -130,7 +130,7 @@ private fun PullToLearn(onPulled: () -> Unit, onSkip: () -> Unit) {
                         onDragEnd = {
                             if (dragY >= threshold) {
                                 revealed = true
-                                view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                                haptics.perform(Haptic.Confirm)
                             } else dragY = 0f
                         },
                     ) { change, amount ->

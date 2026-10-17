@@ -1,6 +1,7 @@
 package com.prayerkey.manna.ui.screens
 
-import android.speech.tts.TextToSpeech
+import com.prayerkey.manna.ui.platform.Speaker
+import com.prayerkey.manna.ui.platform.platformContext
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -16,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,7 +31,6 @@ import com.prayerkey.manna.ui.theme.BookSerif
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.util.Locale
 import kotlinx.coroutines.launch
 
 private val PrayBlack = Pk.Cream
@@ -61,10 +60,10 @@ fun PrayerScreen(
     var category by remember { mutableStateOf<String?>(null) }
     var selectedTopic by remember { mutableStateOf<PrayerTopic?>(null) }
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val context = platformContext()
     var speechReady by remember { mutableStateOf(false) }
-    val speaker = remember { TextToSpeech(context.applicationContext) { speechReady = it == TextToSpeech.SUCCESS } }
-    LaunchedEffect(speechReady) { if (speechReady) { speaker.language = Locale.getDefault(); speaker.setSpeechRate(.86f) } }
+    val speaker = remember { Speaker(context) { speechReady = it == Speaker.SUCCESS } }
+    LaunchedEffect(speechReady) { if (speechReady) { speaker.language = null; speaker.setSpeechRate(.86f) } }
     DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
     LaunchedEffect(Unit) { onLoadTopics() }
     LaunchedEffect(initialRequest) {
@@ -77,7 +76,7 @@ fun PrayerScreen(
 
     /* Back steps out one level at a time: a deck to its situations, the
        situations to the prayer page, a written prayer back to the question. */
-    androidx.activity.compose.BackHandler(enabled = deckOpen || generated != null) {
+    androidx.compose.ui.backhandler.BackHandler(enabled = deckOpen || generated != null) {
         when {
             deckOpen && category != null -> category = null
             deckOpen -> deckOpen = false
@@ -169,8 +168,7 @@ fun PrayerScreen(
                                         )
                                         Text(
                                             listOfNotNull(
-                                                java.text.SimpleDateFormat("d MMM", java.util.Locale.getDefault())
-                                                    .format(java.util.Date(saved.createdAt)),
+                                                com.prayerkey.manna.platform.formatMillis(saved.createdAt, "d MMM"),
                                                 saved.scriptureRef,
                                             ).joinToString("  \u00b7  "),
                                             Modifier.padding(top = 3.dp),
@@ -183,7 +181,7 @@ fun PrayerScreen(
                         }
                     }
                 } else {
-                    GeneratedPrayerView(generated!!, speechReady, onListen = { speaker.speak("${generated!!.title}. ${generated!!.prayer}", TextToSpeech.QUEUE_FLUSH, null, generated!!.id) }, onSave = { onSavePrayer(request, generated!!) }, onAgain = { generated = null; request = "" })
+                    GeneratedPrayerView(generated!!, speechReady, onListen = { speaker.speak("${generated!!.title}. ${generated!!.prayer}", Speaker.QUEUE_FLUSH, null, generated!!.id) }, onSave = { onSavePrayer(request, generated!!) }, onAgain = { generated = null; request = "" })
                 }
             }
         }

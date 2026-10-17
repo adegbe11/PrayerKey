@@ -24,7 +24,7 @@ actual fun rememberPermissionRequest(permission: Permission, onResult: (Boolean)
 actual fun rememberTextFilePicker(onPicked: (String?) -> Unit): Launcher = Launcher { onPicked(null) }
 
 @Composable
-actual fun rememberMediaPicker(onPicked: (List<String>) -> Unit): Launcher = Launcher { onPicked(emptyList()) }
+actual fun rememberMediaPicker(onPicked: (List<String>) -> Unit): MediaPicker = MediaPicker { onPicked(emptyList()) }
 
 actual suspend fun loadThumbnail(context: PlatformContext, address: String, edge: Int): ImageBitmap? = null
 actual fun mimeTypeOf(context: PlatformContext, address: String): String = ""

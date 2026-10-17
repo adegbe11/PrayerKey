@@ -10,9 +10,8 @@ actual fun voiceEngine(context: PlatformContext, onReady: (Boolean) -> Unit, lis
     AndroidVoice(context, onReady, listener)
 
 actual fun openVoiceSettings(context: PlatformContext) {
-    runCatching {
-        context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }
+    runCatching { context.startActivity(Intent(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+        .recoverCatching { context.startActivity(Intent("com.android.settings.TTS_SETTINGS").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
 }
 
 private class AndroidVoice(

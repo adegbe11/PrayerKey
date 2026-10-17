@@ -1,7 +1,10 @@
 package com.prayerkey.manna.ui.book
 
+import com.prayerkey.manna.ui.platform.platformContext
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -54,7 +57,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
@@ -190,17 +192,18 @@ fun BibleBookScreen(
     placeKey: String? = null,
 ) {
     P = if (edition == BookEdition.Monochrome) MonochromePalette else ClassicPalette
-    val view = LocalView.current
+    val placeContext = platformContext()
+    val haptics = rememberHaptics()
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
     val measurer = rememberTextMeasurer()
 
     val chapters = remember { BibleCanon.chapters }
     val placeStore = remember(placeKey) {
-        placeKey?.let { view.context.getSharedPreferences("book_place", android.content.Context.MODE_PRIVATE) }
+        placeKey?.let { placeContext.keyValues("book_place") }
     }
     var chapterIndex by remember {
-        mutableIntStateOf(placeStore?.getInt(placeKey, 0)?.coerceIn(0, BibleCanon.chapters.lastIndex) ?: 0)
+        mutableIntStateOf(placeStore?.getInt(placeKey!!, 0)?.coerceIn(0, BibleCanon.chapters.lastIndex) ?: 0)
     }
     var pageIndex by remember { mutableIntStateOf(0) }
     // set when arriving backwards, so we land on the last leaf of the chapter
@@ -233,7 +236,7 @@ fun BibleBookScreen(
     var restoreTo by remember { mutableIntStateOf(-1) }
 
     LaunchedEffect(chapterIndex) {
-        placeStore?.edit()?.putInt(placeKey, chapterIndex)?.apply()
+        placeStore?.edit()?.putInt(placeKey!!, chapterIndex)?.apply()
         verses = bible.chapter(here.book.name, here.chapter)
         loadedChapter = chapterIndex
     }
@@ -415,7 +418,7 @@ fun BibleBookScreen(
                                 if (pageIndex > 0) pageIndex--
                                 else if (chapterIndex > 0) { chapterIndex--; landOnLast = true }
                             }
-                            view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                            haptics.perform(Haptic.Click)
                         }
                         direction = 0
                         crease.snapTo(0f)
@@ -436,11 +439,11 @@ fun BibleBookScreen(
                             detectDragGestures(
                                 onDragStart = {
                                     travelled = 0f
-                                    startedAt = System.currentTimeMillis()
+                                    startedAt = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                                 },
                                 onDragEnd = {
                                     val went = travelled
-                                    val quick = System.currentTimeMillis() - startedAt < 320
+                                    val quick = kotlinx.datetime.Clock.System.now().toEpochMilliseconds() - startedAt < 320
                                     val far = pageW * .28f
                                     val flick = 20f
                                     val forward = direction >= 0
@@ -543,7 +546,7 @@ fun BibleBookScreen(
                             },
                             onDragEnd = {
                                 scrubbing = false
-                                view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                                haptics.perform(Haptic.Confirm)
                                 chapterIndex = scrubTarget
                                 pageIndex = 0
                             },
@@ -556,7 +559,7 @@ fun BibleBookScreen(
                                 scrubTarget = next
                                 // a tick per chapter, the way pages click past a thumb
                                 if (next != lastTick) {
-                                    view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                                    haptics.perform(Haptic.Tick)
                                     lastTick = next
                                 }
                             }
@@ -647,7 +650,7 @@ fun BibleBookScreen(
                     .clip(RoundedCornerShape(0.dp)),
             ) {
                 val open = {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                    haptics.perform(Haptic.Confirm)
                     scope.launch {
                         cover.animateTo(1f, tween(760))
                         closed = false
@@ -657,7 +660,7 @@ fun BibleBookScreen(
                 if (edition == BookEdition.Monochrome) MonochromeCover(onOpen = open)
                 else BibleCover(
                     onOpen = {
-                        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                        haptics.perform(Haptic.Confirm)
                         scope.launch {
                             cover.animateTo(1f, tween(760))
                             closed = false
@@ -667,7 +670,7 @@ fun BibleBookScreen(
                 Box(
                     Modifier.fillMaxSize()
                         .clickable {
-                            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                            haptics.perform(Haptic.Confirm)
                             scope.launch {
                                 cover.animateTo(1f, tween(760))
                                 closed = false
@@ -708,7 +711,7 @@ fun BibleBookScreen(
                         RoundedCornerShape(99.dp),
                     )
                     .clickable {
-                        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                        haptics.perform(Haptic.Confirm)
                         if (ribbon == null || ribbonHere) {
                             onRibbon(if (ribbonHere) null else here.label)
                         } else {

@@ -1,9 +1,8 @@
 package com.prayerkey.manna.ui.give
 
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import android.content.Intent
-import android.net.Uri
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,7 +47,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -80,7 +78,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun GiveScreen(onClose: () -> Unit) {
     BackHandler(onBack = onClose)
-    val context = LocalContext.current
+    val context = platformContext()
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
     val scope = rememberCoroutineScope()
 
     var monthly by rememberSaveable { mutableStateOf(false) }
@@ -201,12 +200,13 @@ fun GiveScreen(onClose: () -> Unit) {
                     loading = true; error = null
                     scope.launch {
                         try {
-                            val url = Uri.parse(PrayerKeyApi.createDonationCheckout(chosen, monthly))
+                            val url = PrayerKeyApi.createDonationCheckout(chosen, monthly)
                             /* Stripe or nothing. Opening whatever the server
                                returned would let a compromised response send
                                somebody to a page that looks like checkout. */
-                            require(url.scheme == "https" && url.host == "checkout.stripe.com")
-                            context.startActivity(Intent(Intent.ACTION_VIEW, url))
+                            require(url.startsWith("https://checkout.stripe.com/"))
+                            // Safari on iPhone, the browser on Android: giving happens outside the app
+                            uriHandler.openUri(url)
                         } catch (cancelled: kotlinx.coroutines.CancellationException) {
                             throw cancelled
                         } catch (_: Exception) {

@@ -1,7 +1,12 @@
 package com.prayerkey.manna.ui.journal
 
-import android.view.HapticFeedbackConstants
-import androidx.activity.compose.BackHandler
+import com.prayerkey.manna.platform.pad2
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.ui.platform.rememberHaptics
+import com.prayerkey.manna.ui.platform.Haptic
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -55,7 +60,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -71,9 +75,7 @@ import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import kotlinx.datetime.LocalDate
 
 /**
  * A template, as a book.
@@ -149,21 +151,11 @@ fun TemplateBook(
         save = { state: androidx.compose.runtime.snapshots.SnapshotStateMap<Int, String> -> state.mapKeys { it.key.toString() } },
         restore = { saved -> mutableStateMapOf<Int, String>().apply { saved.forEach { (key, value) -> put(key.toInt(), value as String) } } },
     )) { mutableStateMapOf<Int, String>() }
-    val startedAt = rememberSaveable(template.id) { System.currentTimeMillis() }
+    val startedAt = rememberSaveable(template.id) { kotlinx.datetime.Clock.System.now().toEpochMilliseconds() }
     val scope = rememberCoroutineScope()
-    val view = LocalView.current
-    DisposableEffect(view) {
-        val window = (view.context as? android.app.Activity)?.window
-        val controller = window?.let { androidx.core.view.WindowCompat.getInsetsController(it, view) }
-        val previousStatus = controller?.isAppearanceLightStatusBars
-        val previousNavigation = controller?.isAppearanceLightNavigationBars
-        controller?.isAppearanceLightStatusBars = true
-        controller?.isAppearanceLightNavigationBars = true
-        onDispose {
-            previousStatus?.let { controller?.isAppearanceLightStatusBars = it }
-            previousNavigation?.let { controller?.isAppearanceLightNavigationBars = it }
-        }
-    }
+    val haptics = rememberHaptics()
+    // dark clock and battery on the paper, put back on leaving
+    com.prayerkey.manna.ui.book.BarIcons(dark = true)
 
     var index by rememberSaveable(template.id) { mutableIntStateOf(0) }
     val crease = remember { Animatable(0f) }
@@ -175,7 +167,7 @@ fun TemplateBook(
             crease.animateTo(if (commit) 1f else 0f, tween(330))
             if (commit) {
                 index = (index + if (forward) 1 else -1).coerceIn(0, pages.lastIndex)
-                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                haptics.perform(Haptic.Click)
             }
             direction = 0
             crease.snapTo(0f)
@@ -404,7 +396,7 @@ private fun Leaf(
                 textAlign = TextAlign.Center,
             )
             Text(
-                LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.UK)),
+                today().format("EEEE, d MMMM"),
                 Modifier.padding(top = 10.dp),
                 color = Pk.Muted, fontFamily = BookSerif, fontSize = 13.sp,
             )
@@ -582,10 +574,10 @@ private fun Leaf(
             )
             Spacer(Modifier.height(44.dp))
             Text(
-                LocalDate.now().format(DateTimeFormatter.ofPattern("d MMMM", Locale.UK)).uppercase(Locale.UK),
+                today().format("d MMMM").uppercase(),
                 color = Pk.Muted, fontFamily = UtilitySans, fontSize = 10.sp, letterSpacing = 2.sp,
             )
-            val minutes = ((System.currentTimeMillis() - startedAt) / 60000L).toInt()
+            val minutes = ((kotlinx.datetime.Clock.System.now().toEpochMilliseconds() - startedAt) / 60000L).toInt()
             Text(
                 if (minutes < 1) "LESS THAN A MINUTE" else "$minutes MINUTE" + (if (minutes == 1) "" else "S"),
                 Modifier.padding(top = 7.dp),
@@ -615,7 +607,7 @@ private fun Leaf(
 
 @Composable private fun Numeral(n: Int) {
     Text(
-        "%02d".format(n),
+        "${(n).pad2()}",
         color = Pk.GoldDeep, fontFamily = UtilitySans,
         fontSize = 12.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold,
     )
@@ -698,7 +690,7 @@ private fun Leaf(
     }
 
     Text(
-        "%d:%02d".format(left / 60, left % 60),
+        "${left / 60}:${(left % 60).pad2()}",
         color = if (running) Pk.Oxblood else Pk.Charcoal,
         fontFamily = DisplaySerif, fontWeight = FontWeight.Light, fontSize = 44.sp,
     )

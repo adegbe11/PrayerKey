@@ -1,8 +1,19 @@
 package com.prayerkey.manna.ui.home
 
+import com.prayerkey.manna.platform.toLocalDate
+import com.prayerkey.manna.ui.platform.fullScreenDialog
+import com.prayerkey.manna.platform.atStartOfDay
+import com.prayerkey.manna.platform.plusDays
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.platform.format
+import com.prayerkey.manna.ui.share.Share
+import com.prayerkey.manna.ui.platform.Reminders
+import com.prayerkey.manna.platform.now
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import org.jetbrains.compose.resources.DrawableResource
 import com.prayerkey.manna.resources.*
-import kotlinx.datetime.toKotlinLocalDate
 import com.prayerkey.manna.ui.theme.pressable
 import androidx.compose.material.icons.outlined.VolunteerActivism
 import androidx.compose.runtime.derivedStateOf
@@ -30,8 +41,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.width
 import com.prayerkey.manna.model.todaysPrayer
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -63,7 +72,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.text.font.FontWeight
@@ -76,7 +84,6 @@ import com.prayerkey.manna.data.Devotion
 import com.prayerkey.manna.data.PrayerKeyApi
 import com.prayerkey.manna.data.passageFor
 import com.prayerkey.manna.model.VerseCard
-import com.prayerkey.manna.share.CardShareRenderer
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import androidx.compose.ui.text.font.FontStyle
 import com.prayerkey.manna.ui.theme.BookSerif
@@ -84,9 +91,8 @@ import com.prayerkey.manna.ui.theme.litSurface
 import com.prayerkey.manna.ui.theme.litTile
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
 import kotlinx.coroutines.launch
 
 private enum class Hub { BIBLE, PRAY, CHURCH, JOURNAL }
@@ -121,14 +127,11 @@ fun PrayerKeyOperatingHome(
     /* Keep an already-open Home screen honest across midnight. Without this,
        date-keyed content changed on the next app launch but could show
        yesterday's prayer and chapter while the app remained in memory. */
-    var today by remember { mutableStateOf(LocalDate.now()) }
+    var today by remember { mutableStateOf(today()) }
     LaunchedEffect(Unit) {
         while (true) {
-            val now = java.time.ZonedDateTime.now()
-            val nextMidnight = now.toLocalDate().plusDays(1).atStartOfDay(now.zone)
-            val wait = java.time.Duration.between(now, nextMidnight).toMillis().coerceAtLeast(1_000L)
-            kotlinx.coroutines.delay(wait)
-            today = LocalDate.now()
+            kotlinx.coroutines.delay(com.prayerkey.manna.platform.millisUntilMidnight())
+            today = today()
         }
     }
     val dailyPassage = remember(today) { passageFor(today) }
@@ -165,16 +168,16 @@ fun PrayerKeyOperatingHome(
 
     /* The written year walks from the day you started, not from 1 January, so
        somebody installing in November gets day 1 rather than day 318. */
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = platformContext()
     val startedOn = remember {
-        val prefs = context.getSharedPreferences("daily_journey", android.content.Context.MODE_PRIVATE)
+        val prefs = context.keyValues("daily_journey")
         prefs.getString("devotional-started", null)?.let(LocalDate::parse)
             ?: today.also { prefs.edit().putString("devotional-started", it.toString()).apply() }
     }
     var written by remember(today) { mutableStateOf<com.prayerkey.manna.data.Devotional?>(null) }
     var writtenNext by remember(today) { mutableStateOf<com.prayerkey.manna.data.Devotional?>(null) }
     LaunchedEffect(today, startedOn) {
-        written = com.prayerkey.manna.data.Devotionals.forDate(context, today.toKotlinLocalDate(), startedOn.toKotlinLocalDate())
+        written = com.prayerkey.manna.data.Devotionals.forDate(context, today, startedOn)
         written?.let { writtenNext = com.prayerkey.manna.data.Devotionals.after(context, it) }
     }
 
@@ -186,19 +189,19 @@ fun PrayerKeyOperatingHome(
        draws the frame. */
     var prayerTopics by remember { mutableStateOf<List<com.prayerkey.manna.data.PrayerTopic>>(emptyList()) }
     LaunchedEffect(Unit) {
-        prayerTopics = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        prayerTopics = kotlinx.coroutines.withContext(com.prayerkey.manna.platform.ioDispatcher) {
             com.prayerkey.manna.data.LocalPrayerTopics.load(context)
         }
     }
     val plan = remember(written, prayerTopics, today) {
-        written?.let { com.prayerkey.manna.data.planFor(it, prayerTopics, today.toKotlinLocalDate()) }
+        written?.let { com.prayerkey.manna.data.planFor(it, prayerTopics, today) }
     }
     /* Read rather than remembered: the session is usually prayed from the
        notification, so Home is recomposed after the fact and a cached value
        would show 0/10 for a morning that is already done. */
     var todayBadgeText by remember(today) { mutableStateOf<String?>(null) }
     LaunchedEffect(today, todayPullsOpen, biblePullsOpen) {
-        todayBadgeText = com.prayerkey.manna.data.PullsProgress.Prayer.badge(context, today.toKotlinLocalDate())
+        todayBadgeText = com.prayerkey.manna.data.PullsProgress.Prayer.badge(context, today)
     }
     val morningPrayer = remember(prayerTopics, today) { com.prayerkey.manna.data.dailyPrayerFor(today, prayerTopics) }
     var todayVerse by remember(plan) { mutableStateOf<VerseCard?>(null) }
@@ -206,7 +209,7 @@ fun PrayerKeyOperatingHome(
     var chapterMinutes by remember(plan) { mutableStateOf(4) }
     LaunchedEffect(plan) {
         val reading = plan?.reading ?: return@LaunchedEffect
-        val chapter = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+        val chapter = kotlinx.coroutines.withContext(com.prayerkey.manna.platform.ioDispatcher) {
             com.prayerkey.manna.data.OfflineBible(context).chapter(reading.book, reading.chapter)
         }
         if (chapter.isNotEmpty()) {
@@ -221,7 +224,7 @@ fun PrayerKeyOperatingHome(
     if (devotionalOpen) {
         Dialog(
             onDismissRequest = { devotionalOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             val day = written
             if (day != null) {
@@ -229,7 +232,7 @@ fun PrayerKeyOperatingHome(
                     day = day,
                     onClose = { devotionalOpen = false },
                     onComplete = {
-                        context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)
+                        context.keyValues("home_completed")
                             .edit().putBoolean("${today}:devotional", true).apply()
                         devotionalOpen = false
                     },
@@ -240,13 +243,13 @@ fun PrayerKeyOperatingHome(
     if (topicalBibleOpen) {
         Dialog(
             onDismissRequest = { topicalBibleOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) { TopicalBibleScreen { topicalBibleOpen = false } }
     }
     if (emergencyPrayerOpen) {
         Dialog(
             onDismissRequest = { emergencyPrayerOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             EmergencyPrayerEngine(
                 onClose = { emergencyPrayerOpen = false },
@@ -257,13 +260,13 @@ fun PrayerKeyOperatingHome(
     if (morningPrayerOpen) {
         Dialog(
             onDismissRequest = { morningPrayerOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             /* One card, four offices. The hour decides which - morning, evening,
                night, or the midnight watch. Four entry points on Home for what
                is one habit at four points of a day would be the clutter; being
                asked to choose between them at eleven at night would be worse. */
-            val now = java.time.LocalTime.now()
+            val now = com.prayerkey.manna.platform.now()
             val close = { morningPrayerOpen = false }
             when (requestedOffice?.let { com.prayerkey.manna.data.OfficeStore.Office.valueOf(it) } ?: com.prayerkey.manna.data.OfficeStore.officeFor(now.hour, now.minute)) {
                 com.prayerkey.manna.data.OfficeStore.Office.MORNING ->
@@ -282,7 +285,7 @@ fun PrayerKeyOperatingHome(
     if (prayerSessionOpen) {
         Dialog(
             onDismissRequest = { prayerSessionOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             PrayerSessionScreen(
                 onClose = { prayerSessionOpen = false },
@@ -300,7 +303,7 @@ fun PrayerKeyOperatingHome(
         }
         Dialog(
             onDismissRequest = { todayPullsOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             com.prayerkey.manna.ui.session.DailyPrayerSession(
                 session = session,
@@ -316,7 +319,7 @@ fun PrayerKeyOperatingHome(
            back. Done counts the day's reading kept. */
         Dialog(
             onDismissRequest = { biblePullsOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             val where = plan?.reading
             if (where != null) {
@@ -337,7 +340,7 @@ fun PrayerKeyOperatingHome(
            through. Amen ticks the hour on Home. */
         Dialog(
             onDismissRequest = { hourCard = null },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             val (label, mark) = when (hour) {
                 "afternoon" -> "Afternoon prayer" to "\u263C"
@@ -352,7 +355,7 @@ fun PrayerKeyOperatingHome(
                 mark = mark,
                 onClose = { hourCard = null },
                 onDone = {
-                    context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE)
+                    context.keyValues("home_completed")
                         .edit().putBoolean("${today}:$hour", true).apply()
                     hourCard = null
                 },
@@ -362,7 +365,7 @@ fun PrayerKeyOperatingHome(
     if (giveOpen) {
         Dialog(
             onDismissRequest = { giveOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             com.prayerkey.manna.ui.give.GiveScreen(onClose = { giveOpen = false })
         }
@@ -370,13 +373,13 @@ fun PrayerKeyOperatingHome(
     openChallengeId?.let { id ->
         var challenge by remember(id) { mutableStateOf<com.prayerkey.manna.data.ChallengePlan?>(null) }
         LaunchedEffect(id) {
-            challenge = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            challenge = kotlinx.coroutines.withContext(com.prayerkey.manna.platform.ioDispatcher) {
                 com.prayerkey.manna.data.Challenges.byId(context, id)
             }
         }
         Dialog(
             onDismissRequest = { openChallengeId = null },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             challenge?.let { plan ->
                 com.prayerkey.manna.ui.challenge.ChallengeDayScreen(
@@ -389,7 +392,7 @@ fun PrayerKeyOperatingHome(
     if (prayerCalendarOpen) {
         Dialog(
             onDismissRequest = { prayerCalendarOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) { PrayerCalendarScreen { prayerCalendarOpen = false } }
     }
     /* Six of these have finished screens already built. They were opening a
@@ -407,7 +410,7 @@ fun PrayerKeyOperatingHome(
         }
     }
     selectedFeature?.let { feature ->
-        Dialog(onDismissRequest = { selectedFeature = null }, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        Dialog(onDismissRequest = { selectedFeature = null }, properties = fullScreenDialog()) {
             FeatureDestination(feature, onKeep = onKeepPrayer, onClose = { selectedFeature = null }) { }
         }
     }
@@ -420,7 +423,7 @@ fun PrayerKeyOperatingHome(
     if (exploreOpen) {
         Dialog(
             onDismissRequest = { exploreOpen = false },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) {
             ExplorePrayerKeyScreen(
                 categories = programmes,
@@ -453,7 +456,7 @@ fun PrayerKeyOperatingHome(
     val underneath by remember { derivedStateOf { (scroll.value / 140f).coerceIn(0f, 1f) } }
 
     var challengeOpen by rememberSaveable { mutableStateOf(false) }
-    val challengeContext = LocalContext.current
+    val challengeContext = platformContext()
     /* Re-read on every open, so the card shows the day the flow left behind. */
     val challenge = remember(challengeOpen) {
         com.prayerkey.manna.data.PrayerChallengeStore.load(challengeContext)
@@ -533,7 +536,7 @@ fun PrayerKeyOperatingHome(
             Box(Modifier.pressable()) { com.prayerkey.manna.ui.challenge.StartFastCard(
                 running = fast.running,
                 title = fast.title,
-                day = fast.dayOf(System.currentTimeMillis() / 1000),
+                day = fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000),
                 of = fast.days,
             ) { fastOpen = true } }
             Spacer(Modifier.height(14.dp))
@@ -576,10 +579,7 @@ fun PrayerKeyOperatingHome(
         if (challengeOpen) {
             androidx.compose.ui.window.Dialog(
                 onDismissRequest = { challengeOpen = false },
-                properties = androidx.compose.ui.window.DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    decorFitsSystemWindows = false,
-                ),
+                properties = fullScreenDialog(),
             ) {
                 com.prayerkey.manna.ui.challenge.PrayerChallengeRoute { challengeOpen = false }
             }
@@ -588,10 +588,7 @@ fun PrayerKeyOperatingHome(
         if (fastOpen) {
             androidx.compose.ui.window.Dialog(
                 onDismissRequest = { fastOpen = false },
-                properties = androidx.compose.ui.window.DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    decorFitsSystemWindows = false,
-                ),
+                properties = fullScreenDialog(),
             ) {
                 com.prayerkey.manna.ui.challenge.FastingChallengeRoute { fastOpen = false }
             }
@@ -600,7 +597,7 @@ fun PrayerKeyOperatingHome(
         if (challengeShelfOpen) {
             Dialog(
                 onDismissRequest = { challengeShelfOpen = false },
-                properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+                properties = fullScreenDialog(),
             ) {
                 com.prayerkey.manna.ui.challenge.ChallengeChooser(
                     prayer = challenge,
@@ -617,10 +614,7 @@ fun PrayerKeyOperatingHome(
             val guided = remember(request, prayerTopics) { com.prayerkey.manna.data.PrayerMachine.guide(request, prayerTopics) }
             if (guided != null) androidx.compose.ui.window.Dialog(
                 onDismissRequest = { guidedRequest = null },
-                properties = androidx.compose.ui.window.DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    decorFitsSystemWindows = false,
-                ),
+                properties = fullScreenDialog(),
             ) {
                 com.prayerkey.manna.ui.guided.GuidedPrayerFlow(
                     guided = guided,
@@ -631,7 +625,7 @@ fun PrayerKeyOperatingHome(
                         )
                         // remembered, and asked about in a week
                         val kept = com.prayerkey.manna.data.PrayerMemory.remember(challengeContext, guided.request, guided.topic.title)
-                        com.prayerkey.manna.reminder.PrayerMemoryReceiver.schedule(challengeContext, kept)
+                        Reminders.schedulePrayerMemory(challengeContext, kept)
                     },
                     onClose = { guidedRequest = null },
                 )
@@ -644,20 +638,17 @@ fun PrayerKeyOperatingHome(
                 LaunchedEffect(id) { answeredId = null }
             } else androidx.compose.ui.window.Dialog(
                 onDismissRequest = { answeredId = null },
-                properties = androidx.compose.ui.window.DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    decorFitsSystemWindows = false,
-                ),
+                properties = fullScreenDialog(),
             ) {
                 com.prayerkey.manna.ui.guided.AnsweredFlow(
                     kept = kept,
                     onAnswered = {
                         com.prayerkey.manna.data.PrayerMemory.markAnswered(challengeContext, id)
-                        com.prayerkey.manna.reminder.PrayerMemoryReceiver.cancel(challengeContext, id)
+                        Reminders.cancelPrayerMemory(challengeContext, id)
                         // the answer becomes a testimony in the journal
                         onKeepReflection(
                             "Answered prayer",
-                            "${kept.request.replaceFirstChar { it.uppercase() }}\n\nPrayed on ${kept.prayedLabel()}. Answered on ${java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("EEEE d MMMM", java.util.Locale.UK))}.",
+                            "${kept.request.replaceFirstChar { it.uppercase() }}\n\nPrayed on ${kept.prayedLabel()}. Answered on ${today().format("EEEE d MMMM")}.",
                         )
                     },
                     onStillPraying = {
@@ -673,12 +664,9 @@ fun PrayerKeyOperatingHome(
         if (monoBibleOpen) {
             androidx.compose.ui.window.Dialog(
                 onDismissRequest = { monoBibleOpen = false },
-                properties = androidx.compose.ui.window.DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    decorFitsSystemWindows = false,
-                ),
+                properties = fullScreenDialog(),
             ) {
-                val bookPrefs = remember { context.getSharedPreferences("mono_bible", android.content.Context.MODE_PRIVATE) }
+                val bookPrefs = remember { context.keyValues("mono_bible") }
                 var monoSize by remember { mutableIntStateOf(bookPrefs.getInt("size", 18)) }
                 var monoRibbon by remember { mutableStateOf(bookPrefs.getString("ribbon", null)) }
                 com.prayerkey.manna.ui.book.BibleBookScreen(
@@ -698,10 +686,7 @@ fun PrayerKeyOperatingHome(
         if (biblePlanOpen) {
             androidx.compose.ui.window.Dialog(
                 onDismissRequest = { biblePlanOpen = false; biblePlanSeen++ },
-                properties = androidx.compose.ui.window.DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    decorFitsSystemWindows = false,
-                ),
+                properties = fullScreenDialog(),
             ) {
                 com.prayerkey.manna.ui.bibleplan.BiblePlanRoute(
                     onClose = { biblePlanOpen = false; biblePlanSeen++ },
@@ -713,10 +698,7 @@ fun PrayerKeyOperatingHome(
         if (meditationOpen) {
             androidx.compose.ui.window.Dialog(
                 onDismissRequest = { meditationOpen = false },
-                properties = androidx.compose.ui.window.DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    decorFitsSystemWindows = false,
-                ),
+                properties = fullScreenDialog(),
             ) {
                 com.prayerkey.manna.ui.meditation.MeditationRoute(
                     onClose = { meditationOpen = false },
@@ -811,16 +793,15 @@ private fun CompactPrayerPrompt(onSubmit: (String) -> Unit) {
 
 @Composable
 private fun DailyPrayerGoal(streak: Int, startPrayer: () -> Unit) {
-    val context = LocalContext.current
-    val today = LocalDate.now()
+    val context = platformContext()
+    val today = today()
     val sessions = remember { PrayerJourneyStore(context).records() }
     val prayedToday = remember(sessions, today) {
         sessions.filter { record ->
-            java.time.Instant.ofEpochMilli(record.startedAt)
-                .atZone(java.time.ZoneId.systemDefault()).toLocalDate() == today && record.completed
+            com.prayerkey.manna.platform.localDateOfMillis(record.startedAt) == today && record.completed
         }.sumOf { it.minutes }
     }
-    val prefs = remember { context.getSharedPreferences("daily_prayer_goal", android.content.Context.MODE_PRIVATE) }
+    val prefs = remember { context.keyValues("daily_prayer_goal") }
     val target = remember { prefs.getInt("minutes", 10).coerceIn(5, 120) }
     val shown = prayedToday.coerceAtMost(target)
     val remaining = (target - prayedToday).coerceAtLeast(0)
@@ -888,8 +869,8 @@ private fun DailyPrayerGoal(streak: Int, startPrayer: () -> Unit) {
 
 @Composable
 private fun ActiveChallengeCard(open: () -> Unit) {
-    val context = LocalContext.current
-    val prefs = context.getSharedPreferences("prayer_challenge_machine", android.content.Context.MODE_PRIVATE)
+    val context = platformContext()
+    val prefs = context.keyValues("prayer_challenge_machine")
     val active = prefs.getBoolean("active", false)
     val duration = prefs.getInt("duration", 21).coerceAtLeast(1)
     val completed = prefs.getStringSet("done", emptySet()).orEmpty().size.coerceAtMost(duration)
@@ -988,7 +969,7 @@ private fun ContinueRow(icon: ImageVector, title: String, detail: String, open: 
         Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
             Text("PRAYERKEY", fontFamily = DisplaySerif, fontWeight = FontWeight.Normal, fontSize = markSize, letterSpacing = tracking, color = Pk.Charcoal)
             Text(
-                date.format(DateTimeFormatter.ofPattern("EEEE, MMM d")),
+                date.format("EEEE, MMM d"),
                 Modifier.padding(top = (5f - 4f * t).dp).graphicsLayer { alpha = (1f - t * 1.6f).coerceAtLeast(0f) },
                 fontFamily = UtilitySans, fontSize = (12f - 2f * t).sp, color = Pk.Muted,
             )
@@ -1162,7 +1143,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
  * never empty on a cold start.
  */
 @Composable private fun VerseCard(today: VerseCard?, open: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     /* The reference and the quote below used to be literal strings, while
        `card` was passed only to SAVE and SHARE. So the card drew Matthew 7:7 on
        every day of the year, and once the day's verse started arriving the two
@@ -1201,8 +1182,8 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
                 Row(Modifier.padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    StatusAction(Icons.Outlined.Download, "Save") { CardShareRenderer.saveStatus(context, card) }
-                    StatusAction(Icons.Outlined.Share, "Share") { CardShareRenderer.shareStatus(context, card) }
+                    StatusAction(Icons.Outlined.Download, "Save") { Share.cards.saveStatus(context, card) }
+                    StatusAction(Icons.Outlined.Share, "Share") { Share.cards.shareStatus(context, card) }
                 }
             }
         }
@@ -1227,7 +1208,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
  * the same thing rather than three unrelated things sharing a date.
  */
 @Composable private fun PrayerNowCard(prayer: com.prayerkey.manna.model.DailyPrayer, open: () -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     val words = prayer.prayer /*
         ?: "Lord, according to Your Word, order my steps today. Let this day be a blessing to me. Give me wisdom for every decision, peace in every pressure, favour in the work of my hands, and protection wherever I go. Keep my heart close to You and let my life bring hope to someone today. In Jesus’ name, Amen."
     */
@@ -1271,8 +1252,8 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(9.dp), verticalAlignment = Alignment.CenterVertically) {
-                    PrayerImageAction(Icons.Outlined.Download, "Save") { CardShareRenderer.savePrayerStatus(context, words) }
-                    PrayerImageAction(Icons.Outlined.Share, "Share") { CardShareRenderer.sharePrayerStatus(context, words) }
+                    PrayerImageAction(Icons.Outlined.Download, "Save") { Share.cards.savePrayerStatus(context, words) }
+                    PrayerImageAction(Icons.Outlined.Share, "Share") { Share.cards.sharePrayerStatus(context, words) }
                     PrayerImageAction(Icons.Outlined.VolunteerActivism, "Pray", open)
                 }
             }
@@ -1412,9 +1393,9 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     morningPrayer: () -> Unit, devotional: () -> Unit, bible: () -> Unit,
     reflection: () -> Unit, eveningPrayer: () -> Unit, history: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val dateKey = LocalDate.now().toString()
-    val prefs = remember { context.getSharedPreferences("today_rhythm", android.content.Context.MODE_PRIVATE) }
+    val context = platformContext()
+    val dateKey = today().toString()
+    val prefs = remember { context.keyValues("today_rhythm") }
     var completed by remember(dateKey) { mutableStateOf(prefs.getStringSet(dateKey, emptySet()).orEmpty()) }
     var openMoment by remember { mutableStateOf<String?>(null) }
     /* Morning and Evening open the daily office rather than a card of their
@@ -1434,7 +1415,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
         Triple("evening", "Father, I return this day to You", "Evening prayer") to Pair(Icons.Outlined.NightsStay, eveningPrayer),
     )
     openMoment?.let { moment ->
-        Dialog(onDismissRequest = { openMoment = null }, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        Dialog(onDismissRequest = { openMoment = null }, properties = fullScreenDialog()) {
             DailyRhythmExperience(moment, onClose = { openMoment = null }, onComplete = { finish(moment) })
         }
     }
@@ -1447,7 +1428,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
         Column(Modifier.padding(vertical = 8.dp)) {
             Row(Modifier.padding(horizontal = 20.dp, vertical = 15.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Today, ${LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d"))}", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 25.sp, color = Pk.Charcoal)
+                    Text("Today, ${today().format("MMM d")}", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 25.sp, color = Pk.Charcoal)
                 }
                 Box(Modifier.size(44.dp).clip(CircleShape).background(Pk.Oxblood.copy(alpha = .08f)), contentAlignment = Alignment.Center) {
                     Icon(Icons.Outlined.CalendarToday, null, tint = Pk.Oxblood, modifier = Modifier.size(21.dp))
@@ -1592,25 +1573,25 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
     eveningPrayer: () -> Unit,
     calendar: () -> Unit,
 ) {
-    val context = LocalContext.current
-    var clockNow by remember { mutableStateOf(java.time.LocalDateTime.now()) }
+    val context = platformContext()
+    var clockNow by remember { mutableStateOf(now()) }
     val today = clockNow.toLocalDate()
     val dateKey = today.toString()
-    val prefs = remember { context.getSharedPreferences("home_completed", android.content.Context.MODE_PRIVATE) }
+    val prefs = remember { context.keyValues("home_completed") }
     fun keptOn(date: LocalDate): Set<String> = buildSet {
         listOf("morning", "afternoon", "evening", "night", "midnight", "devotional").forEach { if (prefs.getBoolean("${date}:$it", false)) add(it) }
-        if (com.prayerkey.manna.data.PullsProgress.Bible.isComplete(context, date.toKotlinLocalDate())) add("bible")
+        if (com.prayerkey.manna.data.PullsProgress.Bible.isComplete(context, date)) add("bible")
     }
     // read now, not a second from now: an empty first frame made every kept
     // stop "complete" again - and celebrate - each time Home was opened
-    var completed by remember { mutableStateOf(keptOn(LocalDate.now())) }
+    var completed by remember { mutableStateOf(keptOn(today())) }
     val hour = clockNow.hour
     LaunchedEffect(Unit) {
         while (true) {
             /* Checked every second, changed once a minute: the whole panel
                used to rebuild each second for a clock it only reads by the
                hour. A kept stop is still picked up within the second. */
-            val now = java.time.LocalDateTime.now()
+            val now = now()
             if (now.hour != clockNow.hour || now.minute != clockNow.minute || now.toLocalDate() != clockNow.toLocalDate()) clockNow = now
             completed = keptOn(now.toLocalDate())
             kotlinx.coroutines.delay(1_000)
@@ -1712,13 +1693,13 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Today, " + today.format(DateTimeFormatter.ofPattern("MMM d", java.util.Locale.UK)),
+                        "Today, " + today.format("MMM d"),
                         fontFamily = DisplaySerif,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 26.sp,
                         color = Color.White,
                     )
-                    val weekday = today.format(DateTimeFormatter.ofPattern("EEEE", java.util.Locale.UK))
+                    val weekday = today.format("EEEE")
                     Text(
                         if (complete) "$weekday  ·  The day is kept" else weekday,
                         Modifier.padding(top = 3.dp),
@@ -1919,7 +1900,7 @@ private fun artOf(id: String): DrawableResource = when (id) {
                             if (burst.value < 1f) {
                                 val t = burst.value
                                 repeat(10) { i ->
-                                    val angle = Math.toRadians(i * 36.0 + 18.0)
+                                    val angle = ((i * 36.0 + 18.0) * kotlin.math.PI / 180.0)
                                     val dist = (10f + 26f * t).dp.toPx()
                                     drawCircle(
                                         (if (i % 2 == 0) Pk.GoldLight else Color.White).copy(alpha = 1f - t),
@@ -2286,7 +2267,7 @@ private fun ExplorePrayerKeyScreen(
     selectedCategory?.let { category ->
         Dialog(
             onDismissRequest = { selectedCategory = null },
-            properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
+            properties = fullScreenDialog(),
         ) { ProgrammeCategoryScreen(category, { selectedCategory = null }, go) }
     }
     Column(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 12.dp)) {
@@ -2590,7 +2571,7 @@ private fun conditionalFeatures(today: LocalDate): List<Feature> = emptyList()
 }
 
 /** One list, so the head of the Today card and the closing card agree. */
-internal fun verseOfDay(date: LocalDate): Pair<String, String> {
+fun verseOfDay(date: LocalDate): Pair<String, String> {
     val words = listOf(
         "Psalm 121:8" to "The LORD shall preserve thy going out and thy coming in from this time forth, and even for evermore.",
         "Psalm 23:1" to "The LORD is my shepherd; I shall not want.",
@@ -2600,5 +2581,5 @@ internal fun verseOfDay(date: LocalDate): Pair<String, String> {
         "Psalm 119:105" to "Thy word is a lamp unto my feet, and a light unto my path.",
         "Psalm 56:3" to "What time I am afraid, I will trust in thee.",
     )
-    return words[Math.floorMod(date.toEpochDay(), words.size.toLong()).toInt()]
+    return words[(date.toEpochDays().toLong()).mod(words.size.toLong()).toInt()]
 }

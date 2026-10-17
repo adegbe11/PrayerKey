@@ -1,9 +1,9 @@
 package com.prayerkey.manna.data
 
+import com.prayerkey.manna.platform.PlatformContext
+import com.prayerkey.manna.platform.keyValues
 import org.jetbrains.compose.resources.DrawableResource
-import android.content.Context
-import androidx.annotation.DrawableRes
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 /**
  * Bible plans: a short journey through Scripture on one theme.
@@ -64,11 +64,11 @@ data class PlanProgress(
 }
 
 object ReadingPlanStore {
-    private fun prefs(context: Context) = context.getSharedPreferences("reading_plans", Context.MODE_PRIVATE)
+    private fun prefs(context: PlatformContext) = context.keyValues("reading_plans")
 
     fun plan(id: String): ReadingPlanDef? = READING_PLANS.firstOrNull { it.id == id }
 
-    fun load(context: Context): PlanProgress {
+    fun load(context: PlatformContext): PlanProgress {
         val p = prefs(context)
         return PlanProgress(
             planId = p.getString("plan", "").orEmpty(),
@@ -80,7 +80,7 @@ object ReadingPlanStore {
         )
     }
 
-    fun save(context: Context, progress: PlanProgress) {
+    fun save(context: PlatformContext, progress: PlanProgress) {
         prefs(context).edit()
             .putString("plan", progress.planId)
             .putLong("started", progress.startedOn)
@@ -91,17 +91,17 @@ object ReadingPlanStore {
             .apply()
     }
 
-    fun start(context: Context, id: String, on: LocalDate, reminder: Boolean) =
-        save(context, PlanProgress(planId = id, startedOn = on.toEpochDay(), reminder = reminder))
+    fun start(context: PlatformContext, id: String, on: LocalDate, reminder: Boolean) =
+        save(context, PlanProgress(planId = id, startedOn = on.toEpochDays().toLong(), reminder = reminder))
 
     /** Plans finished, so a finished plan shows as such in the library. */
-    fun finished(context: Context): Set<String> = prefs(context).getStringSet("finished", emptySet()).orEmpty()
+    fun finished(context: PlatformContext): Set<String> = prefs(context).getStringSet("finished", emptySet()).orEmpty()
 
-    fun markFinished(context: Context, id: String) {
+    fun markFinished(context: PlatformContext, id: String) {
         prefs(context).edit().putStringSet("finished", finished(context) + id).apply()
     }
 
-    fun clear(context: Context) {
+    fun clear(context: PlatformContext) {
         val kept = finished(context)
         prefs(context).edit().clear().putStringSet("finished", kept).apply()
     }

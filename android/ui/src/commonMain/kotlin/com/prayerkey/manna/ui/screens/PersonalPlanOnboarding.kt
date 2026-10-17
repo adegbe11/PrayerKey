@@ -1,7 +1,9 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.resources.*
-import androidx.activity.compose.BackHandler
+import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -24,7 +26,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,7 +57,7 @@ private val firstJourneys = listOf(
 
 @Composable
 fun PersonalPlanOnboarding(onDone: (remindersEnabled: Boolean, hour: Int) -> Unit) {
-    val context = LocalContext.current
+    val context = platformContext()
     var step by remember { mutableIntStateOf(0) }
     var need by remember { mutableStateOf(prayerNeeds.first()) }
     var rhythm by remember { mutableStateOf("Morning") }
@@ -65,7 +66,7 @@ fun PersonalPlanOnboarding(onDone: (remindersEnabled: Boolean, hour: Int) -> Uni
     BackHandler(enabled = step > 0) { step-- }
 
     fun finish(reminders: Boolean) {
-        context.getSharedPreferences("onboarding_plan", android.content.Context.MODE_PRIVATE).edit()
+        context.keyValues("onboarding_plan").edit()
             .putString("need", need.key)
             .putString("need_title", need.title)
             .putString("scripture", need.scripture)
@@ -75,10 +76,10 @@ fun PersonalPlanOnboarding(onDone: (remindersEnabled: Boolean, hour: Int) -> Uni
             .putInt("prayer_minutes", journey.minutes)
             .putInt("reminder_hour", reminderHour)
             .apply()
-        context.getSharedPreferences("daily_prayer_goal", android.content.Context.MODE_PRIVATE).edit()
+        context.keyValues("daily_prayer_goal").edit()
             .putInt("minutes", journey.minutes).apply()
         if (journey.key == "seven_day") {
-            context.getSharedPreferences("prayer_challenge_machine", android.content.Context.MODE_PRIVATE).edit()
+            context.keyValues("prayer_challenge_machine").edit()
                 .putBoolean("active", true)
                 .putInt("duration", 7)
                 .putString("focus", "Prayer for ${need.title.removePrefix("My ")}")

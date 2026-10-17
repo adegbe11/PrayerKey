@@ -61,3 +61,5 @@ actual suspend fun httpRequest(url: String, method: String, body: String?, heade
         val stream = if (code in 200..299) connection.inputStream else connection.errorStream
         HttpResult(code, stream?.bufferedReader()?.use { it.readText() }.orEmpty())
     }
+
+actual fun fileExists(path: String): Boolean = java.io.File(path).isFile

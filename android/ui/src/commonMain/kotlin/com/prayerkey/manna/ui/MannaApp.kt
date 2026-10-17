@@ -1,5 +1,13 @@
 package com.prayerkey.manna.ui
 
+import com.prayerkey.manna.platform.localDateOfEpochDay
+import com.prayerkey.manna.ui.platform.Permission
+import com.prayerkey.manna.ui.platform.rememberPermissionRequest
+import com.prayerkey.manna.platform.ioDispatcher
+import com.prayerkey.manna.ui.platform.Reminders
+import com.prayerkey.manna.platform.today
+import com.prayerkey.manna.platform.keyValues
+import com.prayerkey.manna.ui.platform.platformContext
 import com.prayerkey.manna.data.mannaStore
 import com.prayerkey.manna.resources.*
 import org.jetbrains.compose.resources.DrawableResource
@@ -35,15 +43,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import android.content.Intent
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
-import com.prayerkey.manna.share.CardShareRenderer
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -66,7 +65,7 @@ fun MannaApp(
     notificationRoute: String? = null,
     onNotificationRouteConsumed: () -> Unit = {},
 ) {
-    val storeContext = LocalContext.current.applicationContext
+    val storeContext = platformContext()
     val viewModel: AppViewModel = androidx.lifecycle.viewmodel.compose.viewModel {
         AppViewModel(storeContext, storeContext.mannaStore())
     }
@@ -90,25 +89,24 @@ fun MannaApp(
     val hydrated by viewModel.hydrated.collectAsState()
     val sermonNotes by viewModel.sermonNotes.collectAsState()
     val formation by viewModel.formation.collectAsState()
-    val context = LocalContext.current
-    val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
+    val context = platformContext()
+    val notificationPermission = rememberPermissionRequest(Permission.Notifications) { }
     LaunchedEffect(hydrated, preferences.onboarded, preferences.reminderEnabled, preferences.reminderHour, preferences.reminderMinute) {
         if (hydrated && preferences.onboarded) {
             /* Scheduling touches AlarmManager and the reminder preferences, and
                a LaunchedEffect runs on the main dispatcher - so this was disk
                work on the thread drawing the first frame. Nothing here needs to
                finish before the app is usable. */
-            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                com.prayerkey.manna.reminder.ReminderReceiver.scheduleDailySuite(context, preferences.reminderEnabled)
-                com.prayerkey.manna.reminder.ReminderReceiver.schedule(
+            kotlinx.coroutines.withContext(com.prayerkey.manna.platform.ioDispatcher) {
+                Reminders.scheduleDailySuite(context, preferences.reminderEnabled)
+                Reminders.schedule(
                     context, preferences.reminderHour, preferences.reminderMinute, preferences.reminderEnabled,
                 )
             }
         }
-        if (hydrated && preferences.onboarded && preferences.reminderEnabled &&
-            android.os.Build.VERSION.SDK_INT >= 33 &&
-            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
-        ) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        if (hydrated && preferences.onboarded && preferences.reminderEnabled && !notificationPermission.granted()) {
+            notificationPermission.request()
+        }
     }
     LaunchedEffect(hydrated, preferences.themeId, preferences.followSystemTheme) {
         if (hydrated) onThemeChange(preferences.themeId, preferences.followSystemTheme)
@@ -127,17 +125,8 @@ fun MannaApp(
     var verseIndex by remember { mutableIntStateOf(0) }
     var showProfile by rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
     var prayerDraft by rememberSaveable { mutableStateOf<String?>(null) }
-    val rootView = LocalView.current
-    SideEffect {
-        val window = (rootView.context as? android.app.Activity)?.window
-        val lightSystemChrome = preferences.onboarded && selected != 1
-        window?.let {
-            androidx.core.view.WindowCompat.getInsetsController(it, rootView).apply {
-                isAppearanceLightStatusBars = lightSystemChrome
-                isAppearanceLightNavigationBars = lightSystemChrome
-            }
-        }
-    }
+    // dark clock and battery over the light screens; the Bible tab is dark
+    com.prayerkey.manna.ui.book.BarIcons(dark = preferences.onboarded && selected != 1)
     LaunchedEffect(notificationRoute, hydrated, preferences.onboarded) {
         if (!hydrated || !preferences.onboarded || notificationRoute == null) return@LaunchedEffect
         when (notificationRoute) {
@@ -170,11 +159,10 @@ fun MannaApp(
        off like the rest of the app. */
     val activeDays = remember(entries) {
         entries.map {
-            java.time.Instant.ofEpochMilli(it.createdAt)
-                .atZone(java.time.ZoneId.systemDefault()).toLocalDate()
+            localDateOfEpochDay(com.prayerkey.manna.data.epochDayOf(it.createdAt))
         }.toSet()
     }
-    val today = remember { java.time.LocalDate.now() }
+    val today = remember { today() }
     val devotion = remember(topics, today) {
         com.prayerkey.manna.data.devotionFor(
             today,
@@ -219,7 +207,7 @@ fun MannaApp(
        gesture on Bible, Pray, Church or Journal closed PrayerKey outright.
        Screens opened on top of a tab register their own back after this one,
        so they still close first. */
-    androidx.activity.compose.BackHandler(
+    androidx.compose.ui.backhandler.BackHandler(
         enabled = hydrated && preferences.onboarded && (showProfile || selected != 0),
     ) {
         if (showProfile) showProfile = false else selected = 0
@@ -254,7 +242,7 @@ fun MannaApp(
                             accountKind = "local",
                             reminderEnabled = remindersEnabled,
                             reminderHour = reminderHour,
-                            reminderMinute = context.getSharedPreferences("onboarding_plan", android.content.Context.MODE_PRIVATE).getInt("reminder_minute", 0),
+                            reminderMinute = context.keyValues("onboarding_plan").getInt("reminder_minute", 0),
                         ),
                     )
                 }
