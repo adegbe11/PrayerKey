@@ -65,6 +65,8 @@ jobs:
     name: Build the iPhone app and run it in the simulator
     needs: kotlin
     runs-on: macos-15
+    permissions:
+      contents: write
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
@@ -136,12 +138,22 @@ jobs:
             xcrun simctl io "$DEVICE" screenshot "screenshots/$n-$route.png"
             n=$((n + 1))
           done
-          # small copies as annotations, so the run can be looked at without signing in
-          for f in screenshots/*.png; do
-            sips -Z 420 -s format jpeg -s formatOptions 45 "$f" --out small.jpg > /dev/null
-            echo "::notice title=$(basename "$f")::data:image/jpeg;base64,$(base64 -i small.jpg | tr -d '
-')"
-          done
+
+      - name: Publish the screenshots to the ios-screenshots branch
+        if: always()
+        working-directory: iosApp
+        run: |
+          # full-size PNGs, readable at raw.githubusercontent.com without signing in
+          ls screenshots/*.png > /dev/null 2>&1 || exit 0
+          cp -r screenshots /tmp/shots
+          cp console.log /tmp/shots/ || true
+          cd /tmp/shots
+          git init -q -b ios-screenshots
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Simulator screenshots for ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ios-screenshots
 
       - uses: actions/upload-artifact@v4
         if: always()
