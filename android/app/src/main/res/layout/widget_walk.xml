@@ -3,11 +3,11 @@
     android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
     android:background="@drawable/widget_bg" android:gravity="center" android:orientation="vertical" android:padding="12dp">
     <ImageView android:layout_width="26dp" android:layout_height="26dp" android:src="@drawable/widget_flame" android:contentDescription="@null" />
-    <TextView android:id="@+id/walk_days" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp"
+    <TextView android:id="@+id/walk_days" android:text="7" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp"
         android:fontFamily="serif" android:textStyle="bold" android:textColor="#FFFFFF" android:textSize="38sp" android:includeFontPadding="false" />
-    <TextView android:id="@+id/walk_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp"
+    <TextView android:id="@+id/walk_label" android:text="days with God" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp"
         android:textColor="#D9FFFFFF" android:textSize="12sp" android:maxLines="1" />
-    <TextView android:id="@+id/walk_action" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp"
+    <TextView android:id="@+id/walk_action" android:text="Pray today" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10dp"
         android:background="@drawable/widget_pill" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="5dp" android:paddingBottom="5dp"
         android:textColor="#2E0078" android:textSize="12sp" android:textStyle="bold" android:maxLines="1" />
 </LinearLayout>

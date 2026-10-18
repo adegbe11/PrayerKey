@@ -7,12 +7,12 @@
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp"
             android:text="VERSE OF THE DAY" android:textColor="#FFD68C" android:textSize="11sp" android:textStyle="bold" android:letterSpacing="0.16" android:maxLines="1" />
         <ImageView android:id="@+id/walk_flame" android:layout_width="14dp" android:layout_height="14dp" android:src="@drawable/widget_flame" android:contentDescription="@null" />
-        <TextView android:id="@+id/walk_days" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="4dp"
+        <TextView android:id="@+id/walk_days" android:text="7" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="4dp"
             android:textColor="#FFD68C" android:textSize="12sp" android:textStyle="bold" />
     </LinearLayout>
-    <TextView android:id="@+id/verse" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="10dp"
+    <TextView android:id="@+id/verse" android:text="The LORD is my shepherd; I shall not want." android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="10dp"
         android:gravity="center_vertical" android:fontFamily="serif" android:textColor="#FFFFFF" android:textSize="17sp" android:lineSpacingMultiplier="1.12"
         android:ellipsize="end" android:maxLines="5" />
-    <TextView android:id="@+id/ref" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+    <TextView android:id="@+id/ref" android:text="Psalm 23:1 · KJV" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
         android:fontFamily="serif" android:textStyle="italic" android:textColor="#FFD68C" android:textSize="14sp" android:maxLines="1" />
 </LinearLayout>

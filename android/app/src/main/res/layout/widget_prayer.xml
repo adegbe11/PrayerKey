@@ -7,9 +7,9 @@
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp"
             android:text="TODAY\'S PRAYER" android:textColor="#FFD68C" android:textSize="11sp" android:textStyle="bold" android:letterSpacing="0.16" android:maxLines="1" />
     </LinearLayout>
-    <TextView android:id="@+id/title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp"
+    <TextView android:id="@+id/title" android:text="Morning Offering" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp"
         android:fontFamily="serif" android:textStyle="bold" android:textColor="#FFFFFF" android:textSize="21sp" android:maxLines="2" android:ellipsize="end" />
-    <TextView android:id="@+id/body" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="6dp"
+    <TextView android:id="@+id/body" android:text="Lord, before this day begins I give it to You. Order my steps and guard my words." android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="6dp"
         android:textColor="#D9FFFFFF" android:textSize="13sp" android:lineSpacingMultiplier="1.15" android:ellipsize="end" android:maxLines="3" />
     <TextView android:id="@+id/action" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp"
         android:background="@drawable/widget_pill" android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingTop="6dp" android:paddingBottom="6dp"
