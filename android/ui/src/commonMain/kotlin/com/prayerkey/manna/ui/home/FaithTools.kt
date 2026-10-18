@@ -29,6 +29,7 @@ enum class FaithTool { Midnight, Points, Someone }
 fun midnightPrayer(base: DailyPrayer): DailyPrayer = base.copy(
     title = "Midnight Prayer",
     ref = "Psalm 91:1–2",
+    verse = "He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty. I will say of the LORD, He is my refuge and my fortress: my God; in him will I trust.",
     prayer = """Heavenly Father,
 
 As this day becomes quiet, I come under the shelter of the Most High and choose to rest in the shadow of the Almighty. You are my refuge, my fortress, and my God. I place my complete trust in You tonight.
