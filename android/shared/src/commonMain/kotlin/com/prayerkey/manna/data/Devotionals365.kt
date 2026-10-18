@@ -236,8 +236,10 @@ data class TodayPlan(
  * prayer rather than a wrong one.
  */
 fun planFor(devotional: Devotional, topics: List<PrayerTopic>, date: LocalDate): TodayPlan {
-    val pool = topics.filter { it.category.equals(devotional.prayerCategory, ignoreCase = true) }
-        .ifEmpty { topics }
+    // never a feast or a birthday prayer on an ordinary day
+    val everyday = topics.filterNot { it.isOccasion() }.ifEmpty { topics }
+    val pool = everyday.filter { it.category.equals(devotional.prayerCategory, ignoreCase = true) }
+        .ifEmpty { everyday }
     val prayer = pool.takeIf { it.isNotEmpty() }?.let {
         /* Stable for the date so everyone praying together gets the same one,
            and stepped rather than sequential so a category with six prayers

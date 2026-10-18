@@ -130,7 +130,8 @@ fun prayerChallenge(
     if (topics.isEmpty()) return null
     val total = 21
     val day = (0 until total).firstOrNull { it !in doneDays } ?: (total - 1)
-    val topic = topics[(day * 13).mod(topics.size)]
+    val everyday = topics.filterNot { it.isOccasion() }.ifEmpty { topics }
+    val topic = everyday[(day * 13).mod(everyday.size)]
     return Challenge(
         id = "twenty-one-days",
         title = "21 days of prayer",
