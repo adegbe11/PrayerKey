@@ -22,6 +22,14 @@ import java.util.Calendar
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         val kind = ReminderKind.from(intent?.getStringExtra(EXTRA_KIND))
+        // every reminder is also a moment to bring the home-screen widgets up to today
+        runCatching { com.prayerkey.manna.widget.PrayerKeyWidget.refresh(context) }
+        if (kind == ReminderKind.WALK) {
+            // only when the walk is alive and today is still open; never to scold
+            val day = com.prayerkey.manna.platform.today().toEpochDays().toLong()
+            val walk = com.prayerkey.manna.data.Walk.load(context)
+            if (!walk.waitingToday(day)) { scheduleKind(context, kind, true); return }
+        }
         if (kind == ReminderKind.PRAYER_CHALLENGE) {
             val challenge = com.prayerkey.manna.data.PrayerChallengeStore.load(context)
             if (!challenge.started || challenge.complete) return
@@ -56,6 +64,10 @@ class ReminderReceiver : BroadcastReceiver() {
                 val moment = com.prayerkey.manna.data.fastMoment(fast, day)
                 "Day $day of ${fast.days} · your fast" to "${moment.focus}. ${moment.verse} ${moment.ref}"
             }
+            ReminderKind.WALK -> {
+                val days = com.prayerkey.manna.data.Walk.load(context).days
+                "Keep your $days-day walk" to "One moment with God today keeps it going. Today's prayer takes about four minutes."
+            }
             ReminderKind.MIDNIGHT -> {
                 val p = com.prayerkey.manna.data.hourPrayer("midnight")
                 "Midnight prayer · ${p.title}" to "${p.verse} ${p.ref}"
@@ -63,7 +75,7 @@ class ReminderReceiver : BroadcastReceiver() {
             else -> kind.message
         }
         val stateful = kind == ReminderKind.CALENDAR || kind == ReminderKind.PRAYER || kind == ReminderKind.BIBLE ||
-            kind == ReminderKind.PRAYER_CHALLENGE || kind == ReminderKind.FAST || kind == ReminderKind.MIDNIGHT
+            kind == ReminderKind.PRAYER_CHALLENGE || kind == ReminderKind.FAST || kind == ReminderKind.MIDNIGHT || kind == ReminderKind.WALK
         val headline = if (stateful) message.first else kind.title
         val openIntent = Intent(context, MainActivity::class.java).apply {
             putExtra(DESTINATION, kind.destination)
@@ -248,6 +260,9 @@ private enum class ReminderKind(
     CHURCH("church", "Sunday worship", "" to "Church begins with a ready heart.", "church", "church_calendar", 8, 30, Calendar.SUNDAY),
     CALENDAR("calendar", "PrayerKey", "" to "", "home", "church_calendar", 9, 0),
     FAST("fast", "Your fast", "" to "Take a moment to pray.", "fasting", "prayer", 12, 0),
+    /* The evening word for a walk that is still open today. Silent on a day
+       already walked, and when there is no walk to keep. */
+    WALK("walk", "Your walk", "" to "", "prayer", "prayer", 19, 30),
     ;
 
     companion object {

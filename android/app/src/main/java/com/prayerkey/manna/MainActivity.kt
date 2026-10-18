@@ -60,6 +60,8 @@ class MainActivity : ComponentActivity() {
         com.prayerkey.manna.ui.platform.Reminders.scheduler = com.prayerkey.manna.reminder.AndroidReminders
         com.prayerkey.manna.ui.share.Share.cards = com.prayerkey.manna.share.AndroidShareCards
         com.prayerkey.manna.ui.church.Sermons.engine = com.prayerkey.manna.ui.church.AndroidSermonEngine
+        // the home-screen widgets redraw the moment the walk or today's verse changes
+        com.prayerkey.manna.data.Today.onChange = { com.prayerkey.manna.widget.PrayerKeyWidget.refresh(it) }
         super.onCreate(savedInstanceState)
         notificationRoute = intent?.getStringExtra("prayerkey_destination")
         /*
@@ -134,6 +136,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        runCatching { com.prayerkey.manna.widget.PrayerKeyWidget.refresh(this) }
     }
 
     override fun onNewIntent(intent: Intent) {

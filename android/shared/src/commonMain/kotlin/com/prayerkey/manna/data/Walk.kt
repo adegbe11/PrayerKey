@@ -94,6 +94,7 @@ object Walk {
         if (step.grew) {
             _state.value = step.state
             write(context.keyValues("walk"), step.state)
+            Today.changed(context)
             if (step.milestone != null) _celebrate.value = step
         }
         return step

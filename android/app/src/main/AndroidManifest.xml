@@ -40,6 +40,18 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".widget.VerseWidget" android:label="@string/widget_verse_label" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_verse_info" />
+        </receiver>
+        <receiver android:name=".widget.WalkWidget" android:label="@string/widget_walk_label" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_walk_info" />
+        </receiver>
+        <receiver android:name=".widget.PrayerWidget" android:label="@string/widget_prayer_label" android:exported="false">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_prayer_info" />
+        </receiver>
         <service
             android:name=".ui.church.SermonService"
             android:exported="false"

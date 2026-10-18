@@ -73,15 +73,27 @@ data class ChallengeSeason(
         else -> null
     }
 
+    /** This year's season, or next year's once this year's has passed. */
+    fun upcoming(today: LocalDate): Pair<LocalDate, LocalDate>? {
+        val now = window(today.year) ?: return null
+        return if (now.second >= today) now else window(today.year + 1)
+    }
+
     /** True from a week before the season until its last day. */
     fun isNear(today: LocalDate): Boolean {
-        val (start, end) = window(today.year) ?: return false
+        val (start, end) = upcoming(today) ?: return false
         return today >= start.minus(7, DateTimeUnit.DAY) && today <= end
     }
 
-    /** The line on the card: Begins Wednesday 18 February, or In season until 24 December. */
+    /** True while the season itself is running. */
+    fun isOn(today: LocalDate): Boolean {
+        val (start, end) = upcoming(today) ?: return false
+        return today >= start && today <= end
+    }
+
+    /** The line on the card: Begins 1 December, or In season until 24 December. */
     fun label(today: LocalDate): String {
-        val (start, end) = window(today.year) ?: return ""
+        val (start, end) = upcoming(today) ?: return ""
         fun d(x: LocalDate) = "${x.dayOfMonth} ${x.month.name.lowercase().replaceFirstChar { it.uppercase() }}"
         return if (today < start) "Begins ${d(start)}" else "In season until ${d(end)}"
     }
@@ -148,7 +160,7 @@ object Challenges {
     /** Every challenge whose season is near, soonest first. */
     suspend fun inSeason(context: PlatformContext, today: LocalDate): List<ChallengePlan> =
         all(context).filter { it.season?.isNear(today) == true }
-            .sortedBy { it.season?.window(today.year)?.first }
+            .sortedBy { it.season?.upcoming(today)?.first }
 
     private fun parse(context: PlatformContext, asset: String): List<ChallengePlan> = runCatching {
         val raw = context.readAsset(asset) ?: return emptyList()

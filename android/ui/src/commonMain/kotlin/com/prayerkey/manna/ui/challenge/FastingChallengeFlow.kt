@@ -1217,16 +1217,32 @@ fun ChallengeChooser(
         )
         /* The written challenges - three to twenty-one days, each day read,
            reflect and pray - were built and had no door. */
-        Row(
-            Modifier.padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Color.White)
-                .clickable(onClick = onShort).padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        Spacer(Modifier.height(14.dp))
+        Box(
+            Modifier.fillMaxWidth().height(168.dp).clip(RoundedCornerShape(28.dp)).clickable(onClick = onShort),
         ) {
-            Column(Modifier.weight(1f)) {
-                Text("Written challenges", color = Ink, fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
-                Text("Standing Against Fear, The Midnight Watch, 21 days of prayer and fasting, and more", Modifier.padding(top = 4.dp), color = Pk.Muted, fontFamily = UtilitySans, fontSize = 13.5.sp, lineHeight = 19.sp)
+            Image(
+                painterResource(Res.drawable.discovery_cover_4), null,
+                Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
+            )
+            Box(
+                Modifier.fillMaxSize().background(
+                    Brush.horizontalGradient(listOf(Pk.DeepDark.copy(alpha = .92f), Color(0xFF6200ED).copy(alpha = .35f))),
+                ),
+            )
+            Column(Modifier.align(Alignment.CenterStart).padding(horizontal = 24.dp)) {
+                Text("Advent, Lent and the whole year", color = Pk.GoldLight, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                Text(
+                    "Walk through a season",
+                    Modifier.padding(top = 8.dp),
+                    color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 25.sp, lineHeight = 30.sp,
+                )
+                Text(
+                    "13 written journeys. Read, reflect, pray.",
+                    Modifier.padding(top = 10.dp),
+                    color = Color.White.copy(alpha = .82f), fontFamily = UtilitySans, fontSize = 13.sp,
+                )
             }
-            Text("›", Modifier.padding(start = 12.dp), color = Pk.Oxblood, fontSize = 28.sp)
         }
     }
 }

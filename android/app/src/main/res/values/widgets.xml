@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_verse_description">Today\'s verse from the King James Bible</string>
+    <string name="widget_walk_description">How many days you have walked with God</string>
+    <string name="widget_prayer_description">Today\'s prayer, one tap from praying it</string>
+    <string name="widget_verse_label">Verse of the Day</string>
+    <string name="widget_walk_label">Your walk</string>
+    <string name="widget_prayer_label">Today\'s Prayer</string>
+</resources>

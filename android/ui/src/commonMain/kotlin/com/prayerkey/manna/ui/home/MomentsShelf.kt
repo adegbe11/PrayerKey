@@ -80,9 +80,9 @@ fun prayerMoments(
     Moment("Right now", "I need prayer", Res.drawable.welcome_prayer_dawn, emergency),
     Moment("Morning", "Morning Prayer", Res.drawable.rhythm_morning, { office("MORNING") }),
     Moment("Ten minutes", "Ten quiet minutes", Res.drawable.onboarding_pray_v3, tenMinutes),
-    Moment("Afternoon", "Midday Prayer", Res.drawable.verse_card_dawn, { office("AFTERNOON") }),
+    Moment("Afternoon", "Midday Prayer", Res.drawable.prayerkey_hero_dawn, { office("AFTERNOON") }),
     Moment("Evening", "Evening Prayer", Res.drawable.rhythm_evening, { office("EVENING") }),
     Moment("Night", "Night Prayer", Res.drawable.rhythm_reflection, { office("NIGHT") }),
-    Moment("The watch", "Midnight Prayer", Res.drawable.today_prayer_violet, { office("MIDNIGHT") }),
-    Moment("Declare", "Prayer points", Res.drawable.verse_card_botanical, prayerPoints),
+    Moment("The watch", "Midnight Prayer", Res.drawable.discovery_cover_2, { office("MIDNIGHT") }),
+    Moment("Declare", "Prayer points", Res.drawable.today_prayer_violet, prayerPoints),
 )

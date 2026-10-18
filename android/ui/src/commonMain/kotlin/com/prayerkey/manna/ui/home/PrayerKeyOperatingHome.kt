@@ -220,6 +220,11 @@ fun PrayerKeyOperatingHome(
         val text = chapter.firstOrNull { it.verse == reading.verse }?.text
         if (text != null) {
             todayVerse = VerseCard(reading.ref.label, "KJV", text, "")
+            // the home-screen widget shows the same verse, without opening the Bible
+            com.prayerkey.manna.data.Today.save(
+                context,
+                com.prayerkey.manna.data.TodayCard(today.toString(), reading.ref.label, text, written?.title.orEmpty()),
+            )
         }
     }
 
