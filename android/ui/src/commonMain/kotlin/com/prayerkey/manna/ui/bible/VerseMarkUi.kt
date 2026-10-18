@@ -268,7 +268,8 @@ fun MyBibleScreen(onClose: () -> Unit) {
         }
         LazyColumn(
             Modifier.fillMaxSize().navigationBarsPadding(),
-            contentPadding = PaddingValues(start = 18.dp, end = 18.dp, bottom = 30.dp),
+            // clear of the floating dock
+            contentPadding = PaddingValues(start = 18.dp, end = 18.dp, bottom = 130.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             items(shown, key = { it.ref }) { m ->
