@@ -278,7 +278,7 @@ private fun PaintedCard(c: ChallengePlan, w: Dp, h: Dp, kicker: String, done: In
  * each picture says what the challenge is for; the asset's own cover is the
  * fallback for anything added later.
  */
-private fun challengeArt(c: ChallengePlan): DrawableResource = when (c.id) {
+internal fun challengeArt(c: ChallengePlan): DrawableResource = when (c.id) {
     "three-days-before-a-decision" -> Res.drawable.discovery_cover_5
     "standing-against-fear" -> Res.drawable.rhythm_evening
     "the-midnight-watch" -> Res.drawable.discovery_cover_2

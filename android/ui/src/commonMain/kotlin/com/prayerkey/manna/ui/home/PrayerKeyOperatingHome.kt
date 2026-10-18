@@ -569,24 +569,21 @@ fun PrayerKeyOperatingHome(
             )
         }
 
-        /* Prayer + Challenge: a number of days, a thing to ask God for, and
-           a time to show up. The card says which day you are on once it has
-           begun, because at that point the question is not whether to start. */
+        // someone on the Praying For list, still waiting for today's prayer
+        PrayForTodayCard { prayingForOpen = true }
+
+        /* The longer ways to seek God, seen at once rather than stacked. The
+           card for each says which day you are on once it has begun. */
+        Spacer(Modifier.height(10.dp))
+        GoDeeperGrid(
+            challengeLine = if (challenge.started) "Day ${challenge.dayFor()} of ${challenge.days}" else "Pray with purpose",
+            fastLine = if (fast.running) "Day ${fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000)} of ${fast.days}" else "Fasting",
+            onChallenge = { challengeOpen = true },
+            onFast = { fastOpen = true },
+            onStill = { meditationOpen = true },
+            onSeason = { namedChallengesOpen = true },
+        )
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 4.dp)) {
-            Box(Modifier.pressable()) { com.prayerkey.manna.ui.challenge.StartChallengeCard(
-                started = challenge.started,
-                day = challenge.dayFor(),
-                of = challenge.days,
-            ) { challengeOpen = true } }
-            Spacer(Modifier.height(14.dp))
-            Box(Modifier.pressable()) { com.prayerkey.manna.ui.challenge.StartFastCard(
-                running = fast.running,
-                title = fast.title,
-                day = fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000),
-                of = fast.days,
-            ) { fastOpen = true } }
-            Spacer(Modifier.height(14.dp))
-            Box(Modifier.pressable()) { com.prayerkey.manna.ui.meditation.MeditationCard { meditationOpen = true } }
             Spacer(Modifier.height(14.dp))
             Box(Modifier.pressable()) { com.prayerkey.manna.ui.bibleplan.BiblePlanCard(refresh = biblePlanSeen) { biblePlanOpen = true } }
             // the same 14dp to the prayer card as between every card above
@@ -639,6 +636,7 @@ fun PrayerKeyOperatingHome(
                 modifier = Modifier.fillMaxWidth().aspectRatio(.78f).pressable(.98f),
             )
         }
+        HomeBenediction()
         }
 
         if (challengeOpen) {
@@ -1232,18 +1230,19 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
         shape = RoundedCornerShape(30.dp), color = Pk.DeepDark,
         border = BorderStroke(1.dp, Pk.Oxblood.copy(alpha = .14f)), shadowElevation = 4.dp,
     ) {
-        Box(Modifier.fillMaxWidth().aspectRatio(.56f)) {
+        Box(Modifier.fillMaxWidth().aspectRatio(.66f)) {
             Image(
                 painterResource(Res.drawable.verse_card_oxblood), null,
                 Modifier.fillMaxSize(), contentScale = ContentScale.Crop,
             )
             Column(
                 // inside the paper's own margins: at 46dp the words touched its torn edges
-                Modifier.fillMaxWidth().padding(horizontal = 62.dp).padding(top = 120.dp, bottom = 105.dp),
+                // the whole height of the paper, so the verse sits in its middle
+                Modifier.fillMaxSize().padding(horizontal = 62.dp).padding(top = 80.dp, bottom = 80.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text("Verse of the day", style = labelStyle(), color = Pk.GoldDeep)
+                Text("Verse of the day", style = labelStyle(), color = Pk.Oxblood.copy(alpha = .75f))
                 Text(card.reference, Modifier.padding(top = 17.dp), fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 27.sp, color = Pk.Oxblood, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 Row(Modifier.padding(vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
                     HorizontalDivider(Modifier.width(42.dp), color = Pk.Gold.copy(alpha = .72f))
