@@ -32,7 +32,11 @@ const nextConfig = {
 
   // Security headers + CWV caching
   async headers() {
+    // Long caching is for the live site only. In development the bundle names
+    // do not change between edits, so a cached copy would load stale code.
+    const prod = process.env.NODE_ENV === "production";
     return [
+      ...(prod ? [
       // ── Immutable cache for hashed Next.js bundles ───────────────────────
       // These filenames contain a content hash, so "immutable" is safe.
       {
@@ -48,6 +52,7 @@ const nextConfig = {
           { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
         ],
       },
+      ] : []),
       {
         source: "/(.*)",
         headers: [

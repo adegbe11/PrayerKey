@@ -48,8 +48,9 @@
 
 /* ── Includes ── */
 .dl-includes { background: var(--pk-bg); padding: clamp(80px, 10vw, 130px) 0; }
-.dl-includes__list { margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-.dl-includes__item { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-radius: 18px; background: var(--pk-card); box-shadow: var(--pk-shadow-sm); font: 500 15px/1.35 var(--pk-font-sans); color: var(--pk-text); }
+/* a plain list, ruled like a page, instead of a wall of tiles */
+.dl-includes__list { margin-top: 44px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); column-gap: clamp(24px, 4vw, 56px); }
+.dl-includes__item { display: flex; align-items: center; gap: 12px; padding: 16px 2px; border-bottom: 1px solid var(--pk-border); font: 500 16px/1.4 var(--pk-font-sans); color: var(--pk-text); }
 .dl-includes__item svg { flex-shrink: 0; color: var(--pk-accent); }
 
 /* ── Private ── */
@@ -111,3 +112,6 @@
   .dl-private__grid { grid-template-columns: 1fr; }
   .dl-faq details p { padding-right: 4px; }
 }
+
+/* the small word above each chapter title */
+.dl-kicker { display: block; margin-bottom: 16px; font: 700 13px/1 var(--pk-font-sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--pk-violet); }

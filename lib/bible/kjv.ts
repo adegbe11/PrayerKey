@@ -11,8 +11,15 @@ type KjvBook = { abbrev: string; chapters: string[][] };
 const KJV = kjvData as KjvBook[];
 
 /* Books are in standard order in both datasets — zip by index.
-   Source marks translator-added words with {braces} — strip them. */
-const clean = (s: string) => s.replace(/[{}]/g, "");
+   Source uses {braces} for two things: words the translators supplied
+   ({is}), which stay in the text, and margin notes ({firmament: Heb.
+   expansion}), which always contain a colon and are dropped. */
+const clean = (s: string) =>
+  s.replace(/\s*\{[^{}]*:[^{}]*\}/g, "")
+    .replace(/[{}]/g, "")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 const TEXT_BY_SLUG = new Map<string, string[][]>(
   BIBLE_BOOKS.map((b, i) => [
     b.slug,

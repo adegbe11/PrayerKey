@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
-import "@/components/article/article.css";
+import "@/components/prayer/cards.css";
+import "@/components/prayer/post.css";
 import type { Metadata } from "next";
-import Link from "next/link";
-import PrayerComposer from "@/components/PrayerComposer";
-import { PRAYER_TOPICS, TOPIC_MAP, ALL_SLUGS } from "@/lib/seo/prayer-topics";
+import PrayerPost from "@/components/prayer/PrayerPost";
+import { TOPIC_MAP, ALL_SLUGS } from "@/lib/seo/prayer-topics";
 
 /* ── Static generation ─────────────────────────────────────────────── */
 export function generateStaticParams() {
@@ -35,10 +35,6 @@ export async function generateMetadata(
 export default function PrayerTopicPage({ params }: { params: { slug: string } }) {
   const topic = TOPIC_MAP.get(params.slug);
   if (!topic) notFound();
-
-  const related = topic.related
-    .map((s) => TOPIC_MAP.get(s))
-    .filter(Boolean) as typeof PRAYER_TOPICS;
 
   // JSON-LD structured data
   const jsonLd = {
@@ -83,44 +79,7 @@ export default function PrayerTopicPage({ params }: { params: { slug: string } }
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <article className="ar">
-        <nav aria-label="Breadcrumb" className="ar-crumbs">
-          <Link href="/">Home</Link><span>/</span>
-          <Link href="/pray">Pray</Link>
-        </nav>
-
-        <p className="ar-eyebrow">{topic.category}</p>
-        <h1 className="ar-h1">{topic.title}</h1>
-        <p className="ar-lede">{topic.metaDesc}</p>
-
-        <section aria-label={topic.title} className="ar-prayer">
-          <p>{topic.samplePrayer}</p>
-          <ul className="ar-verses">
-            {topic.scripture.map((v) => (
-              <li key={v.ref}><q>{v.text}</q><span className="ar-ref">{v.ref}</span></li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="ar-own" aria-labelledby="own">
-          <h2 id="own" className="ar-h2">Pray about your own situation</h2>
-          <p>Write what you are facing, in your own words, and pray it with Scripture.</p>
-          <PrayerComposer seedTopic={topic.title} compact />
-        </section>
-
-        {related.length > 0 && (
-          <section className="ar-section" aria-labelledby="related">
-            <h2 id="related" className="ar-h2">Related prayers</h2>
-            <ul className="ar-links">
-              {related.map((r) => (
-                <li key={r.slug}><Link href={`/pray/${r.slug}`}>{r.title}</Link></li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        <Link href="/pray/topics" className="ar-more">Browse all {ALL_SLUGS.length} prayer topics →</Link>
-      </article>
+      <PrayerPost topic={topic} base="/pray" full={false} />
     </>
   );
 }

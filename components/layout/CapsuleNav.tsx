@@ -14,7 +14,7 @@ const LINKS = [
   { href: "/pray",   label: "Pray" },
   { href: "/bible",  label: "Bible" },
   { href: "/prayer", label: "Prayers" },
-  { href: "/pray/topics", label: "Topics" },
+  { href: "/verse-of-the-day", label: "Verse of the Day" },
   { href: "/live",   label: "Live Sermon" },
   { href: "/guides", label: "Guides" },
   { href: "/download", label: "App" },
@@ -69,9 +69,12 @@ export default function CapsuleNav() {
     };
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(check); };
     check();
+    // the page below may still be laying out on the first frame; look again shortly after
+    const later = [setTimeout(check, 120), setTimeout(check, 600)];
+    window.addEventListener("load", onScroll);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    return () => { cancelAnimationFrame(frame); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); };
+    return () => { cancelAnimationFrame(frame); later.forEach(clearTimeout); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); window.removeEventListener("load", onScroll); };
   }, [path]);
 
   if (BARE.some((p) => path.startsWith(p))) return null;
@@ -114,8 +117,9 @@ export default function CapsuleNav() {
         </nav>
       </div>
 
-      {/* The app's tab bar, on the web. */}
-      <nav className="pk-dock" aria-label="Tabs">
+      {/* The app's tab bar, on the web - but not on the home page, which is
+          a story about the app and has one thing to say, not five places to go. */}
+      {path !== "/" && <nav className="pk-dock" aria-label="Tabs">
         {DOCK.map(({ href, label, Icon }) => {
           const on = activeTab === href;
           return (
@@ -125,7 +129,7 @@ export default function CapsuleNav() {
             </Link>
           );
         })}
-      </nav>
+      </nav>}
     </>
   );
 }

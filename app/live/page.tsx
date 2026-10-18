@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import LiveStory from "./LiveStory";
+import "./live.css";
 
 interface DetectedVerse {
   verseRef: string; verseText: string; translation: string;
@@ -123,7 +125,7 @@ function VerseScreen({
             fontFamily:"'New York','Times New Roman',Georgia,serif",
             fontStyle:"italic", lineHeight:1.7, margin:0, fontWeight:400,
             letterSpacing:"-0.005em" }}>
-            &ldquo;{verse.verseText}&rdquo;
+            {verse.verseText}
           </p>
 
         </div>
@@ -140,277 +142,6 @@ function VerseScreen({
         </div>
       )}
     </div>
-  );
-}
-
-// ── SEO content shown on the idle screen — pure server-renderable JSX ────────
-// Targets: free church projector software, real-time bible verse detection,
-// Pewbeam alternative, ProPresenter alternative, automatic verse display, etc.
-function SEOContent() {
-  const COMP_ROW: React.CSSProperties = {
-    display:"grid", gridTemplateColumns:"1.4fr 1fr 1fr 1fr 1fr", gap:"0",
-    fontSize:"13px", lineHeight:1.5,
-  };
-  const cell: React.CSSProperties = {
-    padding:"14px 16px", borderBottom:"1px solid rgba(255,255,255,0.08)",
-    color:"rgba(255,255,255,0.78)",
-  };
-  const headCell: React.CSSProperties = {
-    ...cell, color:"#FFFFFF", fontWeight:700, fontSize:"12px",
-    letterSpacing:"0.08em", textTransform:"uppercase",
-    borderBottom:"1px solid rgba(255,255,255,0.16)",
-  };
-  const labelCell: React.CSSProperties = {
-    ...cell, color:"rgba(255,255,255,0.92)", fontWeight:600,
-  };
-  const wrap: React.CSSProperties = {
-    maxWidth:"880px", margin:"0 auto", padding:"80px 24px 60px",
-    color:"rgba(255,255,255,0.78)",
-  };
-  const h2: React.CSSProperties = {
-    fontSize:"clamp(26px,3.4vw,38px)", fontWeight:800,
-    color:"#FFFFFF", letterSpacing:"-0.025em", lineHeight:1.15,
-    margin:"56px 0 18px",
-  };
-  const h3: React.CSSProperties = {
-    fontSize:"18px", fontWeight:700, color:"#FFFFFF",
-    margin:"28px 0 8px", letterSpacing:"-0.01em",
-  };
-  const p: React.CSSProperties = {
-    fontSize:"16px", color:"rgba(255,255,255,0.78)", lineHeight:1.75,
-    margin:"0 0 14px",
-  };
-  const FAQ_ITEMS = [
-    { q: "How does PrayerKey detect Bible verses during a sermon?",
-      a: "PrayerKey listens through your laptop or USB microphone, transcribes the sermon in real time, and matches what's spoken against the entire Bible using an AI semantic engine. Direct references like \"John 3:16\" are matched almost instantly. Paraphrased quotes are caught by a separate similarity model that understands theme and meaning." },
-    { q: "Is PrayerKey really free for churches?",
-      a: "Yes. PrayerKey is 100% free, with no subscription, no premium tier, no ads, and no account. Open prayerkey.com/live and start using it." },
-    { q: "Pewbeam vs PrayerKey — what's the difference?",
-      a: "Pewbeam is paid software starting around $20/month per church. PrayerKey provides the same automatic verse detection and projection workflow for $0. Both run in a browser. PrayerKey requires no account, no install, and no credit card." },
-    { q: "Do I need a tech operator to run PrayerKey during the sermon?",
-      a: "No. PrayerKey can run in fully automatic mode — press Start Listening, enable Auto, and every verse the pastor quotes appears on the projector with no clicks needed. A volunteer can also run it manually if your service prefers human pacing." },
-    { q: "What if my pastor paraphrases instead of quoting Bible verses directly?",
-      a: "PrayerKey runs two detection layers. The first matches direct references and exact quotes. The second uses semantic AI embeddings that understand paraphrases — so \"God will never leave you\" is correctly matched to Hebrews 13:5 even though those exact words don't appear in the verse." },
-    { q: "Will it work on a Chromebook, Mac, or Windows laptop?",
-      a: "Yes. PrayerKey works in any Chromium browser (Chrome, Edge, Brave) on Mac, Windows, Chromebook, and Linux. There's nothing to install. Mobile devices can use the prayer generator and Bible search but the live sermon dashboard is desktop-first because it needs a microphone and a second display." },
-    { q: "Does PrayerKey work for Catholic, Baptist, Methodist, or Pentecostal services?",
-      a: "PrayerKey is denomination-neutral and used by Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, Reformed, and non-denominational churches around the world. It supports 11 Bible translations to fit every tradition." },
-    { q: "How accurate is the AI Bible verse detection?",
-      a: "Direct references are matched with near-100% accuracy. Paraphrases typically score 70 to 95% confidence. Each detection card shows a colored confidence dot — green for 90%+, yellow for 70–89%, orange for 60–69%." },
-    { q: "Is PrayerKey a free alternative to ProPresenter or EasyWorship?",
-      a: "Yes. ProPresenter, EasyWorship, and MediaShout cost between $200 and $2,000 per year and require a trained operator typing or clicking each verse. PrayerKey is free and detects verses automatically." },
-    { q: "What microphone do I need?",
-      a: "Any clear microphone works. Best options: a USB lapel mic worn by the pastor or a line-in feed from your church PA. Built-in laptop mics work if the laptop is within ten feet of the speaker." },
-    { q: "Does PrayerKey record or store my sermon audio?",
-      a: "No. Audio is processed in real time inside your browser via the Web Speech API and never leaves the device. Only the transcribed text is sent for verse matching, and that text is discarded the moment your session ends." },
-    { q: "Can I use this for small churches or home churches?",
-      a: "Absolutely. PrayerKey was built specifically so small churches, house churches, and independent ministries get the same quality of tools as well-funded megachurches — without paying $200 to $2,000 per year for traditional church software." },
-  ];
-
-  return (
-    <section style={{ background:VOID, color:T2, position:"relative", zIndex:1,
-      margin:"0 calc(-1 * clamp(20px,4vw,80px)) -100px",
-      padding:"0 clamp(20px,4vw,80px) 80px",
-      borderTop:"1px solid rgba(255,255,255,0.08)" }}>
-      <div style={wrap}>
-
-        {/* ── Lede ── */}
-        <h2 style={{ ...h2, fontSize:"clamp(30px,4vw,44px)", margin:"40px 0 18px" }}>
-          The free, real-time Bible verse projector for live sermons.
-        </h2>
-        <p style={{ ...p, fontSize:"18px", color:"rgba(255,255,255,0.86)" }}>
-          PrayerKey Live is an AI-powered, browser-based church projection tool that
-          automatically detects every Bible verse a pastor quotes during a sermon and
-          displays it on a connected projector or second screen — in real time, with
-          no operator, no install, and no cost. It's the free alternative to{" "}
-          <strong>Pewbeam</strong>, <strong>ProPresenter</strong>,{" "}
-          <strong>EasyWorship</strong>, and <strong>MediaShout</strong>, built
-          specifically for churches that don't have a $2,000-a-year software budget.
-        </p>
-
-        {/* ── How it works ── */}
-        <h2 style={h2} id="how-it-works">How real-time Bible verse detection works</h2>
-        <p style={p}>
-          PrayerKey turns any laptop with a microphone into a fully automatic verse
-          display tool. The workflow is dead simple:
-        </p>
-        <ol style={{ ...p, paddingLeft:"22px" }}>
-          <li style={{ ...p, margin:"0 0 8px" }}>
-            <strong>Open prayerkey.com/live</strong> in Chrome, Edge, or Brave on the
-            laptop you'll connect to your projector.
-          </li>
-          <li style={{ ...p, margin:"0 0 8px" }}>
-            <strong>Allow microphone access</strong> when the browser prompts.
-          </li>
-          <li style={{ ...p, margin:"0 0 8px" }}>
-            <strong>Click "Projector ↗"</strong> to open a clean fullscreen verse window
-            and drag it to your second display.
-          </li>
-          <li style={{ ...p, margin:"0 0 8px" }}>
-            <strong>Press Start Listening</strong> when the pastor begins preaching.
-          </li>
-          <li style={{ ...p, margin:"0 0 8px" }}>
-            PrayerKey transcribes the sermon, identifies every Bible verse the pastor
-            quotes (direct references <em>and</em> paraphrases), and presents them on
-            the projector — automatically.
-          </li>
-        </ol>
-
-        {/* ── Comparison table ── */}
-        <h2 style={h2} id="alternatives">PrayerKey vs Pewbeam vs ProPresenter vs EasyWorship</h2>
-        <p style={p}>
-          Honest comparison — features, pricing, and what each tool does well:
-        </p>
-        <div style={{ ...card, borderRadius:"14px", overflow:"hidden", margin:"18px 0 24px" }}>
-          <div style={COMP_ROW}>
-            <div style={headCell}>Feature</div>
-            <div style={{ ...headCell, color:GOLD }}>PrayerKey</div>
-            <div style={headCell}>Pewbeam</div>
-            <div style={headCell}>ProPresenter</div>
-            <div style={headCell}>EasyWorship</div>
-
-            <div style={labelCell}>Price</div>
-            <div style={{ ...cell, color:GREEN, fontWeight:700 }}>Free forever</div>
-            <div style={cell}>$20+/mo</div>
-            <div style={cell}>$399/yr</div>
-            <div style={cell}>$396/yr</div>
-
-            <div style={labelCell}>Auto verse detection</div>
-            <div style={{ ...cell, color:GREEN }}>✓ AI real-time</div>
-            <div style={cell}>✓ AI</div>
-            <div style={{ ...cell, color:RED }}>✗ Manual only</div>
-            <div style={{ ...cell, color:RED }}>✗ Manual only</div>
-
-            <div style={labelCell}>Operator required</div>
-            <div style={{ ...cell, color:GREEN }}>No</div>
-            <div style={cell}>Optional</div>
-            <div style={{ ...cell, color:RED }}>Yes</div>
-            <div style={{ ...cell, color:RED }}>Yes</div>
-
-            <div style={labelCell}>Account / sign-up</div>
-            <div style={{ ...cell, color:GREEN }}>Not required</div>
-            <div style={cell}>Required</div>
-            <div style={cell}>Required</div>
-            <div style={cell}>Required</div>
-
-            <div style={labelCell}>Install software</div>
-            <div style={{ ...cell, color:GREEN }}>None — browser</div>
-            <div style={cell}>Browser</div>
-            <div style={cell}>Desktop app</div>
-            <div style={cell}>Desktop app</div>
-
-            <div style={labelCell}>Bible translations</div>
-            <div style={cell}>11</div>
-            <div style={cell}>20+</div>
-            <div style={cell}>30+ (paid)</div>
-            <div style={cell}>20+</div>
-
-            <div style={labelCell}>Setup time</div>
-            <div style={{ ...cell, color:GREEN }}>~3 min</div>
-            <div style={cell}>~10 min</div>
-            <div style={cell}>~1 hour</div>
-            <div style={cell}>~1 hour</div>
-
-            <div style={{ ...labelCell, borderBottom:"none" }}>Best for</div>
-            <div style={{ ...cell, borderBottom:"none" }}>Small to mid churches</div>
-            <div style={{ ...cell, borderBottom:"none" }}>Mid churches with budget</div>
-            <div style={{ ...cell, borderBottom:"none" }}>Megachurches</div>
-            <div style={{ ...cell, borderBottom:"none" }}>Traditional churches</div>
-          </div>
-        </div>
-        <p style={p}>
-          PrayerKey was built specifically for the churches that <em>can't</em> spend
-          $400 to $2,000 per year on software. Independent pastors, house churches,
-          rural ministries, and small congregations get the same quality of tooling
-          as a megachurch tech booth — at zero cost.
-        </p>
-
-        {/* ── Use cases ── */}
-        <h2 style={h2} id="who">Who PrayerKey Live is for</h2>
-        <ul style={{ ...p, paddingLeft:"22px" }}>
-          <li style={{ ...p, margin:"0 0 6px" }}>
-            <strong>Small churches</strong> that can't afford ProPresenter or EasyWorship.
-          </li>
-          <li style={{ ...p, margin:"0 0 6px" }}>
-            <strong>Home churches and house fellowships</strong> that meet in living rooms.
-          </li>
-          <li style={{ ...p, margin:"0 0 6px" }}>
-            <strong>Bible study and small groups</strong> — show every verse referenced.
-          </li>
-          <li style={{ ...p, margin:"0 0 6px" }}>
-            <strong>Sunday school and youth ministries</strong> — keep kids following along.
-          </li>
-          <li style={{ ...p, margin:"0 0 6px" }}>
-            <strong>Funerals, weddings, and special services</strong> — display verses without a tech operator.
-          </li>
-          <li style={{ ...p, margin:"0 0 6px" }}>
-            <strong>Online streaming churches</strong> — verses overlay on the broadcast feed.
-          </li>
-          <li style={{ ...p, margin:"0 0 6px" }}>
-            <strong>Congregants who miss the verses pastors quote</strong> — look up later.
-          </li>
-        </ul>
-
-        {/* ── Translations ── */}
-        <h2 style={h2} id="translations">11 Bible translations supported</h2>
-        <p style={p}>
-          Choose any translation from the dropdown — every detection, projection, and
-          search result respects your selection. Supported translations include{" "}
-          <strong>King James Version (KJV)</strong>,{" "}
-          <strong>New International Version (NIV)</strong>,{" "}
-          <strong>English Standard Version (ESV)</strong>,{" "}
-          <strong>New King James Version (NKJV)</strong>,{" "}
-          <strong>New Living Translation (NLT)</strong>,{" "}
-          <strong>New American Standard Bible (NASB)</strong>,{" "}
-          <strong>Amplified Bible (AMP)</strong>,{" "}
-          <strong>Christian Standard Bible (CSB)</strong>,{" "}
-          <strong>The Message (MSG)</strong>,{" "}
-          <strong>Contemporary English Version (CEV)</strong>, and{" "}
-          <strong>Good News Translation (GNT)</strong>.
-        </p>
-
-        {/* ── Privacy ── */}
-        <h2 style={h2} id="privacy">Privacy: we don't record your sermons</h2>
-        <p style={p}>
-          PrayerKey processes your microphone audio inside your browser using the
-          native Web Speech API. Audio never leaves your device. Only the transcribed
-          text is sent for verse matching, and that text is discarded the moment your
-          session ends. No accounts, no storage, no analytics tied to your sermons.
-        </p>
-
-        {/* ── FAQ ── */}
-        <h2 style={h2} id="faq">Frequently asked questions</h2>
-        {FAQ_ITEMS.map((item, i) => (
-          <details key={i} style={{
-            border:"1px solid rgba(255,255,255,0.10)", borderRadius:"10px",
-            padding:"14px 18px", marginBottom:"10px",
-            background:"rgba(255,255,255,0.02)",
-          }}>
-            <summary style={{
-              fontSize:"16px", fontWeight:600, color:"#FFFFFF",
-              listStyle:"none", outline:"none", cursor:"pointer",
-            }}>{item.q}</summary>
-            <p style={{ ...p, marginTop:"10px", marginBottom:0,
-              color:"rgba(255,255,255,0.74)" }}>{item.a}</p>
-          </details>
-        ))}
-
-        {/* ── Footer cross-links ── */}
-        <h2 style={{ ...h2, fontSize:"clamp(20px,2.5vw,26px)" }}>Continue exploring PrayerKey</h2>
-        <p style={p}>
-          <a href="/docs" style={{ color:GOLD, textDecoration:"none" }}>How to Use PrayerKey — Full Documentation</a> ·{" "}
-          <a href="/pray" style={{ color:GOLD, textDecoration:"none" }}>AI Prayer Generator</a> ·{" "}
-          <a href="/bible" style={{ color:GOLD, textDecoration:"none" }}>Bible Search & Cross-References</a> ·{" "}
-          <a href="/prayer" style={{ color:GOLD, textDecoration:"none" }}>544+ Prayer Library</a> ·{" "}
-          <a href="/about" style={{ color:GOLD, textDecoration:"none" }}>About PrayerKey</a>
-        </p>
-
-        <style>{`
-          details summary::-webkit-details-marker { display: none; }
-          details[open] summary { color: ${GOLD} !important; }
-        `}</style>
-      </div>
-    </section>
   );
 }
 
@@ -644,107 +375,76 @@ export default function LivePage() {
         .pk-power-btn:hover{transform:scale(1.02)}
         .pk-power-btn:active{transform:scale(0.98)}
       `}</style>
-      <div style={{ minHeight:"calc(100vh - 64px)",
+      <section id="live-top" className="lv-hero pk-bleed" data-nav="dark" style={{ minHeight:"calc(100vh - 64px)",
         background:`
-          radial-gradient(ellipse 80% 60% at 50% 30%, rgba(40,80,150,0.18) 0%, transparent 65%),
-          radial-gradient(ellipse 60% 50% at 50% 100%, rgba(20,40,90,0.20) 0%, transparent 60%),
+          radial-gradient(ellipse 80% 60% at 50% 30%, rgba(122,31,255,0.20) 0%, transparent 65%),
+          radial-gradient(ellipse 60% 50% at 50% 100%, rgba(60,0,150,0.22) 0%, transparent 60%),
           ${VOID}
         `,
         display:"flex", flexDirection:"column" as const,
         alignItems:"center", justifyContent:"center",
-        margin:"calc(-1 * clamp(32px,5vw,64px)) calc(-1 * clamp(20px,4vw,80px)) 0",
-        position:"relative" as const, overflow:"hidden", padding:"60px 40px" }}>
+        position:"relative" as const, overflow:"hidden", padding:"120px 24px 80px" }}>
 
-        {/* Dotted-globe pattern — VPN-app signature */}
+        {/* faint star field */}
         <div style={{ position:"absolute" as const, inset:0, opacity:0.06,
-          backgroundImage:"radial-gradient(rgba(180,200,255,0.5) 1px, transparent 1px)",
+          backgroundImage:"radial-gradient(rgba(220,200,255,0.5) 1px, transparent 1px)",
           backgroundSize:"18px 18px",
           maskImage:"radial-gradient(ellipse 60% 60% at 50% 50%, black 30%, transparent 80%)",
           WebkitMaskImage:"radial-gradient(ellipse 60% 60% at 50% 50%, black 30%, transparent 80%)" }} />
 
-        <div style={{ textAlign:"center", maxWidth:"560px", position:"relative" as const, zIndex:1, animation:"fadeInUp 700ms cubic-bezier(.22,1,.36,1) both" }}>
+        <div style={{ textAlign:"center", maxWidth:"620px", position:"relative" as const, zIndex:1, animation:"fadeInUp 700ms cubic-bezier(.22,1,.36,1) both" }}>
 
-          {/* Premium-style status pill — yellow */}
-          <div style={{ display:"inline-flex", alignItems:"center", gap:"7px", padding:"6px 14px",
-            border:`1px solid ${YELLOW}40`, borderRadius:"100px",
-            background:`linear-gradient(135deg, ${YELLOW}1F 0%, ${YELLOW}10 100%)`,
-            boxShadow:`0 0 24px ${YELLOW}25, ${HILITE}`,
-            marginBottom:"36px" }}>
-            <span style={{ width:"5px", height:"5px", borderRadius:"50%", background:YELLOW, animation:"subtlePulse 2.2s ease infinite" }} />
-            <span style={{ fontSize:"10px", fontWeight:700, color:YELLOW, letterSpacing:"0.18em", textTransform:"uppercase" as const }}>Live Sermon AI · Ready</span>
-          </div>
+          <p style={{ margin:"0 0 22px", fontSize:"13px", fontWeight:700, color:"#ffd68c", letterSpacing:"0.16em", textTransform:"uppercase" as const, fontFamily:"var(--pk-font-sans)" }}>Live Sermon</p>
 
-          {/* Massive serif wordmark */}
-          <h1 style={{ fontSize:"clamp(54px,9vw,96px)", fontWeight:700, color:T1, margin:0,
-            fontFamily:SERIF, letterSpacing:"-0.04em", lineHeight:0.98 }}>
-            Prayer<span style={{ fontStyle:"italic", color:GOLD }}>Key</span>
+          {/* the wordmark */}
+          <h1 style={{ fontSize:"clamp(56px,9vw,104px)", fontWeight:600, color:T1, margin:0,
+            fontFamily:"var(--pk-font-display)", letterSpacing:"-0.035em", lineHeight:0.98 }}>
+            Prayer<span style={{ fontStyle:"italic", color:"#ffd68c" }}>Key</span>
           </h1>
+          <p style={{ margin:"22px auto 0", maxWidth:"440px", fontSize:"clamp(17px,1.6vw,20px)", lineHeight:1.55, color:T2, fontFamily:"var(--pk-font-sans)" }}>
+            Every verse the preacher quotes, on the screen by itself.
+          </p>
 
-          {/* Power button — VPN signature element */}
-          <div style={{ position:"relative" as const, width:"180px", height:"180px", margin:"40px auto 28px" }}>
-            {/* Outer dashed ring */}
+          {/* the start button */}
+          <div style={{ position:"relative" as const, width:"180px", height:"180px", margin:"44px auto 26px" }}>
             <div style={{ position:"absolute" as const, inset:0, borderRadius:"50%",
-              border:"1px dashed rgba(255,255,255,0.18)" }} />
-            {/* Soft glow halo */}
+              border:"1px solid rgba(255,255,255,0.12)" }} />
             <div className="pk-power-glow" style={{ position:"absolute" as const, inset:"-20px", borderRadius:"50%",
-              background:`radial-gradient(circle, ${BLUE}30 0%, transparent 60%)`,
+              background:"radial-gradient(circle, rgba(122,31,255,0.35) 0%, transparent 60%)",
               opacity:0.6, transition:"opacity 300ms", pointerEvents:"none" as const }} />
-            {/* Power button */}
-            <button onClick={startService} className="pk-power-btn" style={{
+            <button onClick={startService} className="pk-power-btn" aria-label="Start the live sermon" style={{
               position:"absolute" as const, inset:"22px", borderRadius:"50%",
-              background:"radial-gradient(circle at 30% 30%, #1A2A42 0%, #0A1626 70%, #06101C 100%)",
-              border:"1px solid rgba(255,255,255,0.10)",
-              boxShadow:"0 14px 40px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -10px 20px rgba(0,0,0,0.4)",
+              background:"radial-gradient(circle at 30% 30%, #3a1470 0%, #1e0638 70%, #120022 100%)",
+              border:"1px solid rgba(255,255,255,0.12)",
+              boxShadow:"0 14px 40px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -10px 20px rgba(0,0,0,0.4)",
               color:T1, cursor:"pointer",
               display:"flex", alignItems:"center", justifyContent:"center",
               transition:"transform 200ms cubic-bezier(0.22,1,0.36,1)" }}>
-              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter:`drop-shadow(0 0 8px ${BLUE}80)` }}>
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter:"drop-shadow(0 0 8px rgba(255,214,140,0.55))" }}>
                 <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
                 <line x1="12" y1="2" x2="12" y2="12" />
               </svg>
             </button>
           </div>
 
-          <p style={{ fontSize:"15px", color:T1, margin:"0 0 6px", fontWeight:500, letterSpacing:"-0.01em" }}>Tap to Live Sermon</p>
-          <p style={{ fontSize:"11px", color:T3, margin:"0 0 32px", letterSpacing:"0.04em" }}>Listening · Detecting · Projecting</p>
+          <p style={{ fontSize:"16px", color:T1, margin:"0 0 6px", fontWeight:600, letterSpacing:"-0.01em", fontFamily:"var(--pk-font-sans)" }}>Tap to start listening</p>
+          <p style={{ fontSize:"13px", color:T3, margin:"0 0 30px", fontFamily:"var(--pk-font-sans)" }}>It listens, finds the verse, and puts it on the screen.</p>
 
-          {micError && <div style={{ marginBottom:"20px", padding:"10px 16px", borderRadius:"10px", background:"rgba(255,69,58,0.10)", border:"1px solid rgba(255,69,58,0.30)", color:RED, fontSize:"12px" }}>{micError}</div>}
+          {micError && <div style={{ marginBottom:"20px", padding:"10px 16px", borderRadius:"10px", background:"rgba(255,69,58,0.10)", border:"1px solid rgba(255,69,58,0.30)", color:RED, fontSize:"13px" }}>{micError}</div>}
 
-          {/* Bottom stat strip — DOWNLOAD/UPLOAD style */}
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px", maxWidth:"420px", margin:"0 auto" }}>
-            <div className="pk-card-hover" style={{ ...card, padding:"14px 16px", borderRadius:"14px", textAlign:"left" }}>
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"6px" }}>
-                <span style={{ fontSize:"9px", fontWeight:700, color:T3, letterSpacing:"0.14em", textTransform:"uppercase" as const }}>Translation</span>
-                <span style={{ fontSize:"10px", color:T3 }}>⌄</span>
-              </div>
-              <select value={translation} onChange={e => setTranslation(e.target.value)}
-                style={{ width:"100%", padding:0, background:"transparent", border:"none",
-                  color:T1, fontSize:"22px", fontFamily:SERIF, fontWeight:700, outline:"none",
-                  letterSpacing:"-0.02em", cursor:"pointer" }}>
-                {TRANSLATIONS.map(t => <option key={t} style={{ background:"#0a0a0c" }}>{t}</option>)}
-              </select>
-            </div>
-            <div className="pk-card-hover" style={{ ...card, padding:"14px 16px", borderRadius:"14px", textAlign:"left" }}>
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"6px" }}>
-                <span style={{ fontSize:"9px", fontWeight:700, color:T3, letterSpacing:"0.14em", textTransform:"uppercase" as const }}>Status</span>
-                <span style={{ width:"6px", height:"6px", borderRadius:"50%", background:GREEN, boxShadow:`0 0 8px ${GREEN}` }} />
-              </div>
-              <div style={{ fontSize:"22px", color:T1, fontFamily:SERIF, fontWeight:700, letterSpacing:"-0.02em" }}>Ready</div>
-            </div>
+          {/* translation */}
+          <div className="lv-hero__select">
+            <label htmlFor="lv-translation">Translation</label>
+            <select id="lv-translation" value={translation} onChange={e => setTranslation(e.target.value)}>
+              {TRANSLATIONS.map(t => <option key={t}>{t}</option>)}
+            </select>
           </div>
 
-          <p style={{ marginTop:"28px", fontSize:"10px", color:T3, letterSpacing:"0.08em" }}>Chrome · Edge · Microphone access required</p>
+          <p style={{ marginTop:"26px", fontSize:"12px", color:T3, letterSpacing:"0.02em", fontFamily:"var(--pk-font-sans)" }}>Works in Chrome or Edge, with microphone access.</p>
         </div>
-      </div>
+      </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          SEO CONTENT — keyword-rich rich text for ranking on:
-          • free church projector software
-          • automatic bible verse display sermon
-          • Pewbeam / ProPresenter / EasyWorship alternative
-          • real-time bible verse detection
-          ═══════════════════════════════════════════════════════════════════ */}
-      <SEOContent />
+      <LiveStory />
     </>
   );
 

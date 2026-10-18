@@ -1,0 +1,227 @@
+/* The curtain: the page is a sheet resting on the sky. The sky is pinned under
+   the last screen of the page, and scrolling on lifts the sheet off it. */
+.pk-stage { position: relative; isolation: isolate; display: flow-root; --sky-h: 100svh; }
+.pk-curtain {
+  position: relative;
+  z-index: 2;
+  background: var(--pk-bg);
+  border-radius: 0 0 clamp(28px, 4vw, 48px) clamp(28px, 4vw, 48px);
+  box-shadow: 0 40px 80px -30px rgba(10, 0, 30, 0.55);
+  transition: background 250ms ease;
+}
+.pk-stage::after { content: ""; display: block; height: var(--sky-h); }
+.sky {
+  --lift: 1;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin-top: calc(-1 * var(--sky-h));
+  min-height: var(--sky-h);
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(120% 70% at 50% 0%, #2a0a58 0%, #12002a 45%, #07000f 100%);
+  color: #fff;
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pk-curtain { border-radius: 0; box-shadow: none; }
+  .pk-stage::after { display: none; }
+  .sky { position: relative; margin-top: 0; }
+}
+
+/* the sky: words far back, the lanterns on the canvas, the key in front */
+.sky__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 420px;
+  touch-action: manipulation;
+  /* as the curtain lifts, the sky comes forward out of the dark */
+  transform: scale(calc(0.94 + 0.06 * var(--lift)));
+  opacity: calc(0.35 + 0.65 * var(--lift));
+  transform-origin: 50% 100%;
+  will-change: transform, opacity;
+}
+.sky__canvas { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+
+.sky__words {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.06em;
+  font: 700 clamp(56px, 9.2vw, 150px)/0.92 var(--pk-font-display);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 78%, transparent 100%);
+}
+.sky__row {
+  display: flex;
+  width: max-content;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.07);
+  /* rows slide apart as the curtain lifts, then drift for good */
+  translate: calc((1 - var(--lift)) * (var(--i) - 3) * 60px) 0;
+  animation: sky-drift 90s linear infinite;
+  margin-left: calc(var(--i) * -1.7em);
+}
+.sky__row--back { animation-direction: reverse; }
+.sky__row--lit { color: rgba(255, 255, 255, 0.045); -webkit-text-stroke-color: rgba(255, 214, 140, 0.16); }
+.sky__row span { padding-right: 0.3em; }
+@keyframes sky-drift { to { transform: translateX(-50%); } }
+
+.sky__center {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  translate: 0 calc((1 - var(--lift)) * 90px);
+}
+.sky__key {
+  position: relative;
+  pointer-events: auto;
+  width: clamp(92px, 9vw, 128px);
+  aspect-ratio: 146 / 256;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transform-style: preserve-3d;
+  animation: sky-float 5.5s ease-in-out infinite;
+}
+.sky__key img { position: relative; z-index: 1; display: block; width: 100%; height: 100%; filter: drop-shadow(0 0 18px rgba(255, 196, 110, 0.35)) drop-shadow(0 18px 30px rgba(0, 0, 0, 0.5)); transition: filter 300ms ease; pointer-events: none; }
+.sky__key:hover img { filter: drop-shadow(0 0 30px rgba(255, 206, 130, 0.7)) drop-shadow(0 18px 30px rgba(0, 0, 0, 0.5)); }
+.sky__key:focus-visible { outline: 2px solid #ffd68c; outline-offset: 14px; border-radius: 24px; }
+.sky__halo {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 260%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 190, 100, 0.28) 0%, rgba(160, 80, 255, 0.12) 38%, transparent 68%);
+  animation: sky-breathe 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes sky-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+@keyframes sky-breathe { 0%, 100% { scale: 0.9; opacity: 0.75; } 50% { scale: 1.08; opacity: 1; } }
+
+.sky__hint {
+  margin-top: 22px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 214, 140, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 140, 0.32);
+  font: 600 13px/1 var(--pk-font-sans);
+  letter-spacing: 0.02em;
+  color: #ffe2ad;
+  animation: sky-nudge 2.6s ease-in-out infinite;
+  transition: opacity 400ms ease, transform 400ms ease;
+}
+.sky__hint.is-gone { opacity: 0; transform: translateY(6px) scale(0.9); }
+@keyframes sky-nudge { 0%, 70%, 100% { rotate: 0deg; } 76% { rotate: -5deg; } 84% { rotate: 4deg; } 92% { rotate: -2deg; } }
+
+.sky__verse { margin: 18px 0 0; text-align: center; display: flex; flex-direction: column; gap: 6px; }
+.sky__count { font: 500 clamp(20px, 2vw, 26px)/1.2 var(--pk-font-display); color: #fff; }
+.sky__ref { font: 600 12px/1 var(--pk-font-sans); letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 226, 173, 0.7); }
+
+.sky__sound {
+  position: absolute;
+  left: clamp(16px, 3vw, 36px);
+  bottom: 18px;
+  z-index: 4;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  transition: background 200ms ease, color 200ms ease, transform 200ms var(--pk-spring, ease);
+}
+.sky__sound:hover { background: rgba(255, 255, 255, 0.18); }
+.sky__sound:active { transform: scale(0.92); }
+.sky__sound.is-on { color: #1a0033; background: #ffd68c; }
+
+/* one way to get it */
+.sky__get {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 0 clamp(12px, 1.6vw, 24px);
+}
+.sky__panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(22px, 2.6vw, 34px) clamp(24px, 3.4vw, 48px);
+  border-radius: clamp(22px, 2.4vw, 32px);
+  background: radial-gradient(120% 140% at 0% 0%, #8a3dff 0%, #6200ed 50%, #4a00b8 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 30px 60px -30px rgba(98, 0, 237, 0.8);
+}
+.sky__title { margin: 0; font: 600 clamp(30px, 3.6vw, 52px)/1 var(--pk-font-display); letter-spacing: -0.02em; }
+.sky__sub { margin: 10px 0 0; font: 400 clamp(14px, 1.2vw, 17px)/1.4 var(--pk-font-sans); color: rgba(255, 255, 255, 0.82); }
+.sky__qr {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 14px;
+  border-radius: clamp(22px, 2.4vw, 32px);
+  background: #fff;
+}
+.sky__qr img { display: block; width: clamp(84px, 7.4vw, 112px); height: auto; }
+
+.sky__links {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 24px;
+  padding: 10px clamp(20px, 4vw, 48px) 14px;
+  font: 500 12px/1 var(--pk-font-sans);
+  letter-spacing: 0.02em;
+}
+.sky__copy { color: rgba(255, 255, 255, 0.5); }
+.sky__links div { display: flex; flex-wrap: wrap; gap: 0 24px; }
+.sky__links a { display: inline-block; padding: 13px 0; color: rgba(255, 255, 255, 0.62); text-decoration: none; transition: color 150ms ease; }
+.sky__links a:hover { color: #fff; }
+
+@media (max-width: 760px) {
+  /* on a phone the sky gets most of the screen; the nav floats over its top */
+  .sky__stage { flex: none; height: max(440px, 64svh); min-height: 0; }
+  .sky__center { padding-top: 56px; }
+  .sky__key { width: 78px; }
+  .sky__words { font-size: 64px; }
+  .sky__title { font-size: 30px; }
+  .sky__sub { font-size: 14px; margin-top: 8px; }
+  .sky__get { grid-template-columns: 1fr; }
+  .sky__qr { display: none; }
+  .sky__panel { flex-direction: column; align-items: flex-start; gap: 18px; }
+  .sky__links { justify-content: center; text-align: center; }
+  .sky__links div { justify-content: center; gap: 0 18px; }
+  .sky__copy { order: 2; width: 100%; padding-bottom: 4px; }
+  .sky__sound { bottom: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky__stage, .sky__center, .sky__row { transform: none; translate: none; opacity: 1; }
+}

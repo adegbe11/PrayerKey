@@ -40,3 +40,8 @@
 @keyframes hh-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
 .hh-in { animation: hh-up .8s cubic-bezier(.2,.9,.25,1) both; }
 @media (prefers-reduced-motion: reduce) { .hh-in { animation: none; } }
+
+/* the web prayer, offered quietly under the one real action */
+.hh__web { display: inline-block; margin-top: 18px; font: 600 15px/1 var(--pk-font-sans); color: rgba(255,255,255,0.86); text-decoration: none; }
+.hh__web:hover { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 860px) { .hh__web { margin-top: 14px; } }

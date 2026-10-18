@@ -4,14 +4,14 @@ const BASE_URL = "https://www.prayerkey.com";
 const LIVE_URL = `${BASE_URL}/live`;
 
 export const metadata: Metadata = {
-  title:       "Free Live Sermon Bible Verse Projector — AI Real-Time Detection | PrayerKey",
+  title:       "Free Live Sermon Bible Verse Projector — Real-Time Verse Detection | PrayerKey",
   description: "Automatically detect and project Bible verses on screen as your pastor preaches. Free forever, no operator needed, no software install. Works in any browser with a microphone. The free alternative to Pewbeam, ProPresenter, and EasyWorship.",
   keywords: [
     "free church projector software",
     "live sermon bible verse projector",
     "automatic bible verse display sermon",
     "real-time bible verse detection",
-    "AI bible verse projector",
+    "automatic bible verse projector",
     "sermon verse tracker",
     "Pewbeam alternative",
     "Pewbeam free alternative",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: LIVE_URL },
   openGraph: {
-    title:       "Free Live Sermon Bible Verse Projector — Real-Time AI Detection",
+    title:       "Free Live Sermon Bible Verse Projector — Real-Time Verse Detection",
     description: "Project Bible verses on screen automatically as your pastor preaches. No operator, no software, no cost. The free Pewbeam alternative used by Catholic, Protestant, and independent churches worldwide.",
     url:         LIVE_URL,
     type:        "website",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   twitter: {
     card:        "summary_large_image",
     title:       "Free Live Sermon Bible Verse Projector",
-    description: "Real-time AI Bible verse detection. Free forever. No account needed.",
+    description: "Real-time Bible verse detection for live sermons. Free forever. No account needed.",
     images:      ["/og-image.png"],
   },
   robots: {
@@ -52,7 +52,7 @@ const softwareLd = {
   applicationCategory: "BusinessApplication",
   applicationSubCategory: "Church Software",
   operatingSystem: "Web Browser (Chrome, Edge, Brave)",
-  description: "Free real-time AI Bible verse detector for live sermons. Listens to a pastor's microphone and projects every quoted verse automatically.",
+  description: "Free real-time Bible verse detector for live sermons. Listens to a pastor's microphone with speech recognition and projects every quoted verse automatically.",
   url: LIVE_URL,
   offers: {
     "@type":        "Offer",
@@ -92,7 +92,7 @@ const faqLd = {
   mainEntity: [
     { "@type": "Question",
       name: "How does PrayerKey detect Bible verses during a sermon?",
-      acceptedAnswer: { "@type": "Answer", text: "PrayerKey listens through your laptop or USB microphone, transcribes the sermon in real time using the Web Speech API, and matches the spoken words against the entire Bible using an AI semantic engine. Direct references like 'John 3:16' are matched almost instantly, and paraphrased quotes are caught by a dedicated similarity model." } },
+      acceptedAnswer: { "@type": "Answer", text: "PrayerKey listens through your laptop or USB microphone, transcribes the sermon in real time using the Web Speech API, and matches the spoken words against the entire Bible. Direct references like 'John 3:16' are matched almost instantly, and paraphrased quotes are caught by a second pass that compares the meaning of what was said with every verse." } },
     { "@type": "Question",
       name: "Is PrayerKey really free for churches?",
       acceptedAnswer: { "@type": "Answer", text: "Yes. PrayerKey is 100% free with no subscription, no premium tier, no ads, and no account required. You open prayerkey.com/live and start using it." } },
@@ -104,7 +104,7 @@ const faqLd = {
       acceptedAnswer: { "@type": "Answer", text: "No. PrayerKey can run in fully automatic mode. Press Start Listening, enable Auto, and every verse the pastor quotes appears on the projector with no clicks needed. A volunteer can also run it manually with one button press per verse." } },
     { "@type": "Question",
       name: "What if my pastor paraphrases instead of quoting verses directly?",
-      acceptedAnswer: { "@type": "Answer", text: "PrayerKey runs two detection layers. The first matches direct references and exact quotes. The second uses semantic AI embeddings that understand paraphrases and thematic references, so a pastor saying 'God will never leave you' is correctly matched to Hebrews 13:5." } },
+      acceptedAnswer: { "@type": "Answer", text: "PrayerKey runs two detection layers. The first matches direct references and exact quotes. The second compares the meaning of what was said with every verse in the Bible, so paraphrases and thematic references are caught too: a pastor saying 'God will never leave you' is correctly matched to Hebrews 13:5." } },
     { "@type": "Question",
       name: "Will PrayerKey work on a Chromebook, Mac, or Windows laptop?",
       acceptedAnswer: { "@type": "Answer", text: "Yes. PrayerKey works on any device with Chrome, Edge, or Brave — Mac, Windows, Chromebook, and Linux. No installation required. Mobile devices can use the prayer generator and Bible search but the live sermon dashboard is desktop-first." } },
@@ -112,7 +112,7 @@ const faqLd = {
       name: "Does PrayerKey work for Catholic, Baptist, Methodist, or Pentecostal services?",
       acceptedAnswer: { "@type": "Answer", text: "PrayerKey is denomination-neutral and used by Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, Reformed, and non-denominational churches around the world. It supports 11 Bible translations to match every tradition." } },
     { "@type": "Question",
-      name: "How accurate is the AI Bible verse detection?",
+      name: "How accurate is the Bible verse detection?",
       acceptedAnswer: { "@type": "Answer", text: "Direct verse references are matched with near-100% accuracy. Paraphrases typically score 70 to 95% confidence. Each detection card shows a colored confidence dot — green for 90%+, yellow for 70 to 89%, orange for 60 to 69%." } },
     { "@type": "Question",
       name: "Is PrayerKey a free alternative to ProPresenter or EasyWorship?",
@@ -122,7 +122,7 @@ const faqLd = {
       acceptedAnswer: { "@type": "Answer", text: "Any clear microphone works. The best options are a USB lapel mic worn by the pastor or a line-in feed from your church's existing PA system. Built-in laptop microphones work if the laptop sits within ten feet of the speaker." } },
     { "@type": "Question",
       name: "Does PrayerKey record or store sermon audio?",
-      acceptedAnswer: { "@type": "Answer", text: "No. Audio is processed in real time by the Web Speech API inside your browser and is never sent to our servers or stored. Only the transcribed text is used for verse matching, and that text is discarded the moment your session ends." } },
+      acceptedAnswer: { "@type": "Answer", text: "No. PrayerKey never records, stores or receives your audio. Your browser's built-in speech recognition turns the sermon into text as it is spoken (in Chrome and Edge this is done by the browser maker's speech service). Only that text is sent to PrayerKey for verse matching, and it is discarded the moment your session ends." } },
   ],
 };
 

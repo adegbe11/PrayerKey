@@ -84,7 +84,7 @@ export default function PrayerCardModal({ prayer, onClose }: Props) {
   }
 
   async function copyText() {
-    const full = `${prayer.title}\n\n${prayer.prayer}\n\n${prayer.encouragement}\n\n${prayer.verses.map(v => `${v.ref} — ${v.text}`).join("\n")}`;
+    const full = `${prayer.title}\n\n${prayer.prayer}\n\n${prayer.encouragement ? `${prayer.encouragement}\n\n` : ""}${prayer.verses.map(v => `${v.ref} — ${v.text}`).join("\n")}`;
     await navigator.clipboard.writeText(full);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -305,7 +305,7 @@ export default function PrayerCardModal({ prayer, onClose }: Props) {
               </p>
 
               {/* ── Encouragement ── */}
-              <div style={{
+              {prayer.encouragement && <div style={{
                 padding:    "14px 18px",
                 background: T.goldDim,
                 borderLeft: `3px solid ${T.gold}`,
@@ -314,7 +314,7 @@ export default function PrayerCardModal({ prayer, onClose }: Props) {
                 <p style={{ fontSize: "12px", color: T.text2, margin: 0, lineHeight: 1.75, fontStyle: "italic", fontFamily: "Georgia, serif" }}>
                   {prayer.encouragement}
                 </p>
-              </div>
+              </div>}
 
               {/* ── Scripture rows ── */}
               {prayer.verses?.length > 0 && (

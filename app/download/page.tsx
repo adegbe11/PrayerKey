@@ -83,7 +83,7 @@ export default function DownloadPage() {
             <div className={`dl-wrap dl-chapter__grid ${i % 2 ? "dl-chapter__grid--flip" : ""}`}>
               <Reveal className="dl-chapter__shot" y={48}><Phone src={c.shot} alt={`PrayerKey app: ${c.chip}`} /></Reveal>
               <Reveal className="dl-chapter__copy" delay={0.1}>
-                <span className="pk-chip pk-chip--violet">{c.chip}</span>
+                <span className="dl-kicker">{c.chip}</span>
                 <h2 className="pk-display dl-h2">{c.title}</h2>
                 <p>{c.body}</p>
               </Reveal>

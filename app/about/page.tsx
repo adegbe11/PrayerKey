@@ -1,16 +1,19 @@
-import type { ReactNode } from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
+import InView from "@/components/home/InView";
+import AboutMission from "./AboutMission";
+import "./about.css";
 
 const BASE_URL  = "https://www.prayerkey.com";
 const ABOUT_URL = `${BASE_URL}/about`;
 
 export const metadata: Metadata = {
-  title:       "About PrayerKey — Free AI Church Companion | Built by Collins Asein",
-  description: "PrayerKey is a free AI-powered church companion built for every pastor and believer. Live sermon verse detection, AI prayers, and Bible search — free forever. Built by Collins Omoikhudu Asein.",
+  title:       "About PrayerKey — Free Prayer, Bible and Church Companion | Built by Collins Asein",
+  description: "PrayerKey is a free church companion built for every pastor and believer: live sermon verse detection, prayers built on Scripture, and Bible search. No account, free forever. Built by Collins Omoikhudu Asein.",
   alternates:  { canonical: ABOUT_URL },
   openGraph: {
-    title:       "About PrayerKey — Free AI Church Companion",
-    description: "Free AI-powered church technology for every pastor and believer. Built by Collins Omoikhudu Asein.",
+    title:       "About PrayerKey — For Every Church, Not Just the Big Ones",
+    description: "Free prayer, Bible and church tools for every pastor and believer. Built by Collins Omoikhudu Asein.",
     url:         ABOUT_URL,
     type:        "website",
     siteName:    "PrayerKey",
@@ -24,7 +27,7 @@ const organizationLd = {
   name:       "PrayerKey",
   url:        BASE_URL,
   logo:       `${BASE_URL}/og-image.png`,
-  description: "Free AI-powered church companion: live sermon Bible-verse detection, AI prayer generator, and Bible search.",
+  description: "Free church companion: live sermon Bible-verse detection, a prayer generator built on Scripture, and Bible search.",
   founder: {
     "@type": "Person",
     name:    "Collins Omoikhudu Asein",
@@ -43,140 +46,149 @@ const breadcrumbLd = {
   ],
 };
 
+// why PrayerKey exists, a line at a time
+const MISSION = [
+  "For too long, the best ministry tools belonged to the biggest churches.",
+  "Small congregations, home churches and independent pastors made do with whatever they could piece together.",
+  "Every pastor behind a pulpit deserves the same tools,",
+  "whatever the budget, whatever the size of the room.",
+  "PrayerKey exists to make them free.",
+];
+
+// what it is: one idea each
+const PARTS = [
+  {
+    kicker: "Pray",
+    title: "A prayer for today.",
+    line: "Each day is one prayer in ten short pulls. Or tell PrayerKey what you are carrying and the free prayer generator writes a prayer for it from Scripture, with the verses it stands on and a word of encouragement.",
+    href: "/pray", cta: "Write a prayer",
+  },
+  {
+    kicker: "Read",
+    title: "The whole Bible.",
+    line: "Search by reference, keyword, topic, or a verse you only half remember. Open any verse and its cross-references are a tap away, across all 66 books.",
+    href: "/bible", cta: "Open the Bible",
+  },
+  {
+    kicker: "Remember",
+    title: "A private journal.",
+    line: "Write down what you are praying for. Mark it answered when God does. It stays on your phone.",
+    href: "/download", cta: "Get the app",
+  },
+  {
+    kicker: "Church",
+    title: "Sermon notes that write themselves.",
+    line: "Tap Start and PrayerKey writes your notes as the preacher speaks, with the scriptures caught along the way.",
+    href: "/download", cta: "Get the app",
+  },
+  {
+    kicker: "PrayerKey Live",
+    title: "Preach. The verse is already up.",
+    line: "PrayerKey listens through the microphone and matches what is said against the whole Bible, even a paraphrase. Each verse appears on the projector with no operator and no typing, with a confidence score and eleven translations including KJV, NIV, ESV, NKJV and NLT.",
+    href: "/live", cta: "Open PrayerKey Live",
+  },
+];
+
+const PEOPLE = [
+  "Pastors who want every listener to follow the scripture.",
+  "Church leaders without the budget for expensive software.",
+  "Ministers preparing a funeral, a wedding or a dedication.",
+  "Believers who pray every day and want to go deeper in the Word.",
+  "Bible study leaders who need to find and connect scriptures faster.",
+];
+
+const TRADITIONS = ["Catholic", "Protestant", "Pentecostal", "Baptist", "Anglican", "Methodist", "Non-denominational"];
+
 export default function AboutPage() {
   return (
-    <article style={{ maxWidth: "760px", margin: "0 auto", padding: "0 0 100px" }}>
+    <div className="ab">
       <script type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationLd) }} />
       <script type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <InView />
 
-
-      {/* ── Hero ── */}
-      <div className="animate-fadeUp" style={{ marginBottom: "64px" }}>
-        <div style={{
-          display:      "inline-flex",
-          alignItems:   "center",
-          padding:      "4px 12px",
-          border:       "1.5px solid var(--pk-accent-border)",
-          borderRadius: "4px",
-          marginBottom: "24px",
-          background:   "var(--pk-accent-dim)",
-          boxShadow:    "3px 3px 0 0 var(--pk-accent-border)",
-        }}>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-accent)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            About PrayerKey
-          </span>
+      {/* an open door: that is the whole idea */}
+      <section className="ab-hero pk-bleed" data-nav="dark">
+        <img className="ab-hero__art" src="/art/open-door.webp" alt="" width={1122} height={1402} decoding="async" fetchPriority="high" />
+        <div className="ab-hero__in">
+          <p className="ab-hero__kicker">About PrayerKey</p>
+          <h1 className="ab-hero__title"><span>For every church,</span><span>not just the big ones.</span></h1>
+          <p className="ab-hero__line">
+            PrayerKey is a free companion for prayer, the Bible and Sunday service. It helps pastors preach,
+            believers pray deeper, and congregations stay close to the Word of God.
+          </p>
         </div>
+      </section>
 
-        <h1 style={{
-          fontSize:      "clamp(32px, 5vw, 56px)",
-          fontWeight:    800,
-          color:         "var(--pk-text)",
-          margin:        "0 0 20px",
-          letterSpacing: "-0.03em",
-          lineHeight:    1.08,
-        }}>
-          We built PrayerKey for every church, not just the big ones.
-        </h1>
-        <p style={{
-          fontSize:   "clamp(16px, 1.5vw, 19px)",
-          color:      "var(--pk-text-2)",
-          lineHeight: 1.75,
-          margin:     0,
-          maxWidth:   "640px",
-        }}>
-          PrayerKey is a free AI-powered church companion built to help pastors preach better, believers pray deeper, and congregations stay connected with the Word of God.
+      {/* the signature moment: the mission, lit line by line */}
+      <section className="ab-mission" aria-labelledby="ab-mission-title">
+        <h2 id="ab-mission-title" className="ab-kicker">Why it exists</h2>
+        <AboutMission lines={MISSION} />
+      </section>
+
+      {/* what it is */}
+      <section className="ab-parts" aria-labelledby="ab-parts-title">
+        <h2 id="ab-parts-title" className="ab-h2" data-in="">One companion,<br />from Monday to Sunday.</h2>
+        <ol className="ab-parts__list">
+          {PARTS.map((p) => (
+            <li key={p.kicker} className="ab-part" data-in="">
+              <p className="ab-part__kicker">{p.kicker}</p>
+              <h3 className="ab-part__title">{p.title}</h3>
+              <div className="ab-part__body">
+                <p>{p.line}</p>
+                <Link href={p.href}>{p.cta}</Link>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* who it is for */}
+      <section className="ab-who" aria-labelledby="ab-who-title" data-in="">
+        <h2 id="ab-who-title" className="ab-h2">For pastors,<br />and anyone who prays.</h2>
+        <ul className="ab-who__people">
+          {PEOPLE.map((p, i) => <li key={p} style={{ "--i": i } as React.CSSProperties}>{p}</li>)}
+        </ul>
+        <p className="ab-who__traditions">
+          {TRADITIONS.map((t) => <span key={t}>{t}</span>)}
+          <span>and every Christian tradition.</span>
         </p>
-      </div>
+      </section>
 
-      {/* ── Sections ── */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+      {/* free */}
+      <section className="ab-free pk-bleed" data-nav="dark" data-in="" aria-labelledby="ab-free-title">
+        <h2 id="ab-free-title" className="ab-free__title"><span>No account.</span><span>No payment.</span><span>No barrier.</span></h2>
+        <p className="ab-free__line">
+          You open PrayerKey and you begin. No sign-up, no login, no payment of any kind. A pastor in a rural
+          village deserves the same access as a pastor in a city megachurch, and a registration wall would keep
+          out the people who need it most. PrayerKey is, and will remain, free to use.
+        </p>
+      </section>
 
-        <Section title="Our Mission" tag="01">
-          For too long, the most powerful ministry tools have only been available to large, well-funded churches. Small congregations, home churches, and independent pastors have been left to manage Sunday services with whatever they can piece together. PrayerKey exists to change that. We believe every pastor who stands behind a pulpit deserves the same quality of tools as the biggest churches in the world, regardless of their budget or the size of their congregation. Our mission is to make AI-powered church technology completely free and accessible to anyone who needs it.
-        </Section>
-
-        <Section title="What PrayerKey Does" tag="02">
-          PrayerKey is built around three core features that work together to serve the full life of a church.
-
-          {"\n\n"}The first is Live Sermon Verse Detection. When a pastor is preaching, PrayerKey listens through the microphone and automatically identifies every Bible verse being quoted or referenced in real time. The moment a verse is detected, it appears on a connected projector screen for the congregation to read along. There is no operator required and no manual typing. The pastor simply preaches and the technology does the rest. Every verse comes with a confidence score so you always know how strong the match is, and the feature supports eleven major Bible translations including NIV, KJV, ESV, NKJV and NLT.
-
-          {"\n\n"}The second is the AI Prayer Generator. A pastor preparing for a service, a believer going through a difficult season, or a church member who simply does not know how to put their heart into words can type what they are feeling and PrayerKey writes a full, scripture-grounded prayer tailored to exactly what they described. Every generated prayer includes relevant Bible verses and an encouragement note. The prayers are personal, meaningful and ready to use in under ten seconds.
-
-          {"\n\n"}The third is Bible Search with Cross-References. PrayerKey lets you search the entire Bible by verse reference, keyword, topic or even a loose paraphrase of a scripture you half-remember. When you find a verse, you can instantly load four to six deeply related cross-references that share the same theme, doctrine or wording. This makes PrayerKey useful not just on Sunday mornings but throughout the week for sermon preparation, Bible study and personal devotion.
-        </Section>
-
-        <Section title="Who PrayerKey Is For" tag="03">
-          PrayerKey is for pastors who want to make their sermons more accessible and engaging. It is for church leaders who want their congregation to follow along with scripture without the cost of expensive software. It is for ministers preparing a funeral, a wedding, a dedication or any special ceremony who need the right words quickly. It is for believers who pray daily and want their prayers to go deeper and be grounded in the Word. It is for Bible study leaders who need to find and connect scriptures faster. PrayerKey is denomination-neutral and works for Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, non-denominational and all other Christian traditions.
-        </Section>
-
-        <Section title="No Account. No Payment. No Barrier." tag="04">
-          PrayerKey requires no sign-up, no login and no payment of any kind. You open the website and you start using it. We made this decision intentionally because we believe a pastor in a rural village deserves the same access as a pastor in a city megachurch. Adding a subscription or a registration wall would mean that the people who need this tool the most would be the ones least likely to access it. PrayerKey is and will remain free to use.
-        </Section>
-
-        <Section title="The Technology Behind PrayerKey" tag="05">
-          PrayerKey is built on modern AI infrastructure designed for reliability and speed. Verse detection uses a combination of real-time speech recognition and a semantic Bible matching engine that understands not just exact quotes but paraphrases and thematic references. The prayer generator uses a large language model trained to write with theological sensitivity, drawing from scripture to produce prayers that feel genuinely personal rather than generic. The Bible search engine understands natural language queries and connects results to a comprehensive cross-reference database covering all 66 books of the Bible.
-        </Section>
-
-        <Section title="Built by Collins Omoikhudu Asein" tag="06" last>
-          PrayerKey was designed and built by Collins Omoikhudu Asein. The vision behind PrayerKey came from a simple observation: the church community around the world is full of dedicated, passionate people serving God with limited resources. Technology should be a blessing to the church, not a business model built on top of it. PrayerKey is an independent platform with no investor pressure and no agenda other than to serve pastors and believers well.
-        </Section>
-
-      </div>
-    </article>
-  );
-}
-
-function Section({ title, tag, children, last = false }: { title: string; tag: string; children: ReactNode; last?: boolean }) {
-  return (
-    <div style={{
-      display:       "grid",
-      gridTemplateColumns: "auto 1fr",
-      gap:           "clamp(20px, 4vw, 48px)",
-      padding:       "clamp(32px, 5vw, 52px) 0",
-      borderBottom:  last ? "none" : "1px solid var(--pk-border)",
-    }}>
-      {/* Tag column */}
-      <div style={{ paddingTop: "4px" }}>
-        <span style={{
-          display:       "block",
-          fontSize:      "10px",
-          fontWeight:    700,
-          color:         "var(--pk-accent)",
-          letterSpacing: "0.1em",
-          border:        "1px solid var(--pk-accent-border)",
-          padding:       "4px 8px",
-          borderRadius:  "3px",
-          textAlign:     "center",
-          whiteSpace:    "nowrap",
-          background:    "var(--pk-accent-dim)",
-        }}>
-          {tag}
-        </span>
-      </div>
-
-      {/* Content column */}
-      <div>
-        <h2 style={{
-          fontSize:      "clamp(18px, 2.2vw, 24px)",
-          fontWeight:    700,
-          color:         "var(--pk-text)",
-          margin:        "0 0 16px",
-          letterSpacing: "-0.02em",
-          lineHeight:    1.2,
-        }}>
-          {title}
-        </h2>
-        <div style={{
-          fontSize:    "clamp(14px, 1.3vw, 16px)",
-          color:       "var(--pk-text-2)",
-          lineHeight:  1.85,
-          whiteSpace:  "pre-wrap",
-        }}>
-          {children}
+      {/* privacy */}
+      <section className="ab-quiet" data-in="" aria-labelledby="ab-private-title">
+        <h2 id="ab-private-title" className="ab-h2">What you pray<br />is yours.</h2>
+        <div className="ab-quiet__body">
+          <p>With no account there is nothing to sign in to and no profile to build. Your journal stays on your phone, where you wrote it.</p>
+          <Link href="/privacy">Read the privacy policy</Link>
         </div>
-      </div>
+      </section>
+
+      {/* who built it */}
+      <section className="ab-maker" data-in="" aria-labelledby="ab-maker-title">
+        <img className="ab-maker__mark" src="/pk-mark.png" alt="" width={44} height={80} />
+        <h2 id="ab-maker-title" className="ab-maker__title">Built by Collins Omoikhudu Asein.</h2>
+        <p className="ab-maker__line">
+          It began with a simple observation: the church around the world is full of devoted people serving God
+          with little. Technology should be a blessing to the church, not a business built on top of it.
+          PrayerKey is independent, with no investor pressure and no agenda but to serve pastors and believers well.
+        </p>
+        <nav className="ab-maker__links" aria-label="Next">
+          <Link href="/download" className="ab-maker__cta">Get PrayerKey</Link>
+          <Link href="/author/collins-asein" className="ab-maker__more">About Collins</Link>
+        </nav>
+      </section>
     </div>
   );
 }

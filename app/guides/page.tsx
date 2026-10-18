@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import InView from "@/components/home/InView";
+import GuideCover from "@/components/guides/GuideCover";
+import { guideArt } from "@/lib/seo/guide-art";
 import { GUIDES } from "@/lib/seo/guides";
+import "@/components/guides/guides.css";
 
 const BASE_URL = "https://www.prayerkey.com";
 
@@ -39,66 +42,28 @@ const jsonLd = {
 };
 
 export default function GuidesHubPage() {
+  const [first, ...rest] = GUIDES;
   return (
-    <>
+    <div className="gh">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <InView />
 
-      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "0 24px 100px" }}>
+      <section className="gh-hero">
+        <p className="gh-kicker">Guides</p>
+        <h1 className="gh-title"><span>Learn to pray,</span><span>for real life.</span></h1>
+      </section>
 
-        {/* ── Hero ── */}
-        <div style={{ textAlign: "center", marginBottom: "48px", paddingTop: "8px" }}>
-          <div style={{
-            display: "inline-block", padding: "4px 14px", borderRadius: "4px",
-            border: "1.5px solid var(--pk-accent-border)", background: "var(--pk-accent-dim)",
-            fontSize: "10px", fontWeight: 700, color: "var(--pk-accent)",
-            letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "20px",
-          }}>
-            ✦ Prayer Guides
-          </div>
-          <h1 style={{
-            fontSize: "clamp(32px, 6vw, 56px)", fontWeight: 800,
-            color: "var(--pk-text)", margin: "0 0 16px",
-            letterSpacing: "-0.035em", lineHeight: 1.05,
-          }}>
-            Learn to pray —<br />for real life
-          </h1>
-          <p style={{
-            fontSize: "clamp(15px, 1.5vw, 17px)", color: "var(--pk-text-2)",
-            margin: "0 auto", lineHeight: 1.7, maxWidth: "540px",
-          }}>
-            In-depth, scripture-based guides on prayer and the Bible — written for
-            beginners and lifelong believers alike. Free, practical, no fluff.
-          </p>
-        </div>
+      {/* the guide most people start with, then the rest */}
+      <section className="gh-feature" data-in="">
+        <GuideCover big href={`/guides/${first.slug}`} art={guideArt(first.slug)} title={first.title} minutes={first.readMinutes} />
+        <p className="gh-feature__intro">{first.intro}</p>
+      </section>
 
-        {/* ── Guide cards ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
-          {GUIDES.map((g) => (
-            <Link key={g.slug} href={`/guides/${g.slug}`} style={{
-              display: "block", padding: "24px",
-              background: "var(--pk-surface)", border: "1.5px solid var(--pk-border)",
-              borderRadius: "16px", textDecoration: "none",
-              transition: "border-color 150ms ease, transform 150ms ease",
-            }}>
-              <div style={{
-                fontSize: "10px", fontWeight: 700, color: "var(--pk-accent)",
-                letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "10px",
-              }}>
-                {g.readMinutes} min read
-              </div>
-              <div style={{
-                fontSize: "18px", fontWeight: 700, color: "var(--pk-text)",
-                marginBottom: "8px", lineHeight: 1.35, letterSpacing: "-0.01em",
-              }}>
-                {g.title}
-              </div>
-              <p style={{ fontSize: "13px", color: "var(--pk-text-3)", lineHeight: 1.65, margin: 0 }}>
-                {g.metaDesc}
-              </p>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </>
+      <section className="gh-grid" data-in="" aria-label="All guides">
+        {rest.map((g, i) => (
+          <GuideCover key={g.slug} href={`/guides/${g.slug}`} art={guideArt(g.slug)} title={g.title} minutes={g.readMinutes} style={{ "--i": i } as React.CSSProperties} />
+        ))}
+      </section>
+    </div>
   );
 }

@@ -1,9 +1,13 @@
 import { notFound } from "next/navigation";
-import "@/components/article/article.css";
+import "@/components/guides/guides.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 import PrayerComposer from "@/components/PrayerComposer";
 import { GUIDES, GUIDE_MAP, GUIDE_SLUGS } from "@/lib/seo/guides";
+import { guideArt } from "@/lib/seo/guide-art";
+import InView from "@/components/home/InView";
+import GuideCover from "@/components/guides/GuideCover";
+import GuideToc from "@/components/guides/GuideToc";
 
 const BASE_URL = "https://www.prayerkey.com";
 const AUTHOR   = "Collins Asein";
@@ -83,73 +87,63 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <article className="ar">
-        <nav aria-label="Breadcrumb" className="ar-crumbs">
-          <Link href="/">Home</Link><span>/</span>
-          <Link href="/guides">Guides</Link>
-        </nav>
+      <InView />
+      <article className="gd">
+        {/* the cover, opened */}
+        <header className="gd-hero pk-bleed" data-nav="dark">
+          <img src={guideArt(guide.slug)} alt="" className="gd-hero__art" />
+          <div className="gd-hero__in">
+            <nav aria-label="Breadcrumb" className="gd-crumbs">
+              <Link href="/">Home</Link><span>/</span><Link href="/guides">Guides</Link>
+            </nav>
+            <h1 className="gd-title">{guide.title}</h1>
+            <p className="gd-meta"><Link href="/author/collins-asein">{AUTHOR}</Link><span>{guide.readMinutes} min read</span></p>
+          </div>
+        </header>
 
-        <p className="ar-eyebrow">Prayer guide · {guide.readMinutes} min read</p>
-        <h1 className="ar-h1">{guide.title}</h1>
-        <p className="ar-lede">{guide.intro}</p>
+        <div className="gd-layout">
+          <GuideToc headings={guide.sections.map((s) => s.heading)} />
 
-        <div className="ar-byline">
-          <span className="ar-byline__face" aria-hidden>CA</span>
-          <div>
-            <Link href="/author/collins-asein">{AUTHOR}</Link>
-            <br /><span>PrayerKey Editorial</span>
+          <div className="gd-body">
+            <p className="gd-intro">{guide.intro}</p>
+
+            {guide.sections.map((section, i) => (
+              <section key={section.heading} id={`s${i + 1}`} className="gd-section" data-in="">
+                <span className="gd-num" aria-hidden>{String(i + 1).padStart(2, "0")}</span>
+                <h2 className="gd-h2">{section.heading}</h2>
+                {section.body.split("\n\n").map((para, j) => <p key={j} className="gd-p">{para}</p>)}
+                {section.links && section.links.length > 0 && (
+                  <ul className="gd-links">
+                    {section.links.map((l) => <li key={l.href}><Link href={l.href}>{l.label}</Link></li>)}
+                  </ul>
+                )}
+              </section>
+            ))}
+
+            <section className="gd-own" data-in="" aria-labelledby="own">
+              <h2 id="own" className="gd-h2">Pray now</h2>
+              <PrayerComposer compact />
+            </section>
+
+            <section className="gd-faq" data-in="" aria-labelledby="faq">
+              <h2 id="faq" className="gd-h2">Questions</h2>
+              {guide.faqs.map((faq) => (
+                <details key={faq.q}>
+                  <summary><span>{faq.q}</span><span aria-hidden className="gd-faq__plus" /></summary>
+                  <p>{faq.a}</p>
+                </details>
+              ))}
+            </section>
           </div>
         </div>
 
-        {/* On this page: the guide's sections, numbered, so it can be read in any order */}
-        <nav className="ar-toc" aria-label="On this page">
-          <p className="ar-eyebrow">On this page</p>
-          <ol>
-            {guide.sections.map((section, i) => (
-              <li key={section.heading}><a href={`#s${i + 1}`}>{section.heading}</a></li>
+        <section className="gd-more" data-in="" aria-labelledby="more">
+          <h2 id="more" className="gd-h2">Keep reading</h2>
+          <div className="gd-more__grid">
+            {otherGuides.slice(0, 3).map((g, i) => (
+              <GuideCover key={g.slug} href={`/guides/${g.slug}`} art={guideArt(g.slug)} title={g.title} minutes={g.readMinutes} style={{ "--i": i } as React.CSSProperties} />
             ))}
-          </ol>
-        </nav>
-
-        {guide.sections.map((section, i) => (
-          <section key={section.heading} id={`s${i + 1}`} className="ar-section">
-            <h2 className="ar-h2"><span className="ar-num">{i + 1}.</span> {section.heading}</h2>
-            {section.body.split("\n\n").map((para, j) => (
-              <p key={j} className="ar-p">{para}</p>
-            ))}
-            {section.links && section.links.length > 0 && (
-              <ul className="ar-links">
-                {section.links.map((l) => (
-                  <li key={l.href}><Link href={l.href}>{l.label}</Link></li>
-                ))}
-              </ul>
-            )}
-          </section>
-        ))}
-
-        <section className="ar-own" aria-labelledby="own">
-          <h2 id="own" className="ar-h2">Pray now</h2>
-          <p>Write what is on your heart and pray it with Scripture.</p>
-          <PrayerComposer compact />
-        </section>
-
-        <section className="ar-section ar-faq" aria-labelledby="faq">
-          <h2 id="faq" className="ar-h2">Questions</h2>
-          {guide.faqs.map((faq) => (
-            <details key={faq.q}>
-              <summary>{faq.q}</summary>
-              <p>{faq.a}</p>
-            </details>
-          ))}
-        </section>
-
-        <section className="ar-section" aria-labelledby="more">
-          <h2 id="more" className="ar-h2">More guides</h2>
-          <ul className="ar-links">
-            {otherGuides.map((g) => (
-              <li key={g.slug}><Link href={`/guides/${g.slug}`}>{g.title}</Link></li>
-            ))}
-          </ul>
+          </div>
         </section>
       </article>
     </>

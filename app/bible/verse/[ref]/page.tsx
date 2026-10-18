@@ -12,6 +12,21 @@ const BASE_URL = "https://www.prayerkey.com";
 
 /* ── Static KJV engine — no API, no fetch, instant ─────────────── */
 import { getVerseText, getCrossRefs } from "@/lib/bible/kjv";
+import { leatherOf } from "@/lib/bible/leather";
+import InView from "@/components/home/InView";
+import ChapterWindow from "@/components/bible/ChapterWindow";
+import VerseTools from "@/components/bible/VerseTools";
+import PrayerCard from "@/components/prayer/PrayerCard";
+import "@/components/prayer/cards.css";
+import "./verse.css";
+
+// "ecclesiastes-3-2" -> the verse's text, cut short for a preview
+function verseAt(ref: string) {
+  const p = parseRef(ref);
+  const t = p ? getVerseText(p.book.slug, p.chapter, p.verse) : null;
+  if (!t) return null;
+  return t.length > 110 ? t.slice(0, 110).replace(/\s+\S*$/, "") + "…" : t;
+}
 
 interface VerseResult { ref: string; text: string; match: string }
 
@@ -146,317 +161,115 @@ export default async function BibleVersePage({ params }: { params: { ref: string
     ],
   };
 
+  // the whole chapter, with this verse in its place
+  const chapterText = Array.from({ length: vCount }, (_, i) => ({ n: i + 1, text: getVerseText(book.slug, chapter, i + 1) ?? "" }));
+  const prevText = prevVerse ? verseAt(prevVerse) : null;
+  const nextText = nextVerse ? verseAt(nextVerse) : null;
+  const url = `${BASE_URL}/bible/verse/${params.ref}`;
+  const words = verseData ? verseData.text.split(/\s+/) : [];
+  const step = words.length ? Math.min(90, 2400 / words.length) : 0;
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <InView />
 
-      <div style={{ maxWidth: "840px", margin: "0 auto", padding: "0 24px 100px" }}>
+      <article className="vs" style={{ "--leather": leatherOf(book.slug) } as React.CSSProperties}>
+        {/* the verse, alone, lit */}
+        <header className="vs-hero pk-bleed" data-nav="dark">
+          <nav aria-label="Breadcrumb" className="vs-crumbs">
+            <Link href="/">Home</Link><span>/</span><Link href="/bible">Bible</Link><span>/</span>
+            <Link href={`/bible/${book.slug}`}>{book.name}</Link><span>/</span><span>Chapter {chapter}</span>
+          </nav>
+          <div className="vs-hero__in">
+            <h1 className="vs-ref">{display}</h1>
+            {verseData ? (
+              <blockquote className="vs-verse">
+                {words.map((w, i) => <span key={i} style={{ animationDelay: `${0.35 + (i * step) / 1000}s` }}>{w} </span>)}
+              </blockquote>
+            ) : (
+              <p className="vs-verse vs-verse--missing">This verse could not be found. Try the <Link href="/bible">Bible search</Link>.</p>
+            )}
+            <p className="vs-kjv">King James Version</p>
+            {verseData && <VerseTools text={verseData.text} display={display} url={url} />}
+          </div>
+        </header>
 
-        {/* ── Breadcrumb ── */}
-        <nav style={{ marginBottom: "32px", fontSize: "13px", color: "var(--pk-text-3)", display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
-          <Link href="/"       style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Home</Link>
-          <span>/</span>
-          <Link href="/bible"  style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Bible</Link>
-          <span>/</span>
-          <Link href={`/bible/${book.slug}`} style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>{book.name}</Link>
-          <span>/</span>
-          <span style={{ color: "var(--pk-gold)" }}>{display}</span>
+        {/* read it in its place */}
+        {chapterText.length > 0 && (
+          <section className="vs-context" data-in="" aria-labelledby="vs-context">
+            <h2 id="vs-context" className="vs-h2">{book.name} {chapter}</h2>
+            <ChapterWindow total={chapterText.length} label={`${book.name} ${chapter}`}>
+              {chapterText.map((v) => (
+                <span key={v.n} className={`vs-v ${v.n === verse ? "is-here" : ""} ${Math.abs(v.n - verse) > 4 ? "vs-far" : ""}`}>
+                  <Link href={`/bible/verse/${book.slug}-${chapter}-${v.n}`} className="vs-v__n" aria-label={`${book.name} ${chapter}:${v.n}`}>{v.n}</Link>
+                  {v.text}{" "}
+                </span>
+              ))}
+            </ChapterWindow>
+          </section>
+        )}
+
+        {/* where else the Bible says it */}
+        {crossRefs.length > 0 && (
+          <section className="vs-cross" data-in="" aria-labelledby="vs-cross">
+            <h2 id="vs-cross" className="vs-h2">The Bible says it again</h2>
+            <ul>
+              {crossRefs.map((cr, i) => (
+                <li key={cr.ref} style={{ "--i": i } as React.CSSProperties}>
+                  <Link href={`/bible/verse/${cr.ref.toLowerCase().replace(/[\s:]/g, "-").replace(/[^a-z0-9-]/g, "")}`}>
+                    {cr.text && <span className="vs-cross__text">{cr.text}</span>}
+                    <span className="vs-cross__ref">{cr.ref}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* the book it comes from */}
+        {bookContent && (
+          <section className="vs-book" data-in="">
+            <Link href={`/bible/${book.slug}`} className="vs-book__cover" aria-label={`The Book of ${book.name}`}>
+              <small>The Book of</small>
+              <span>{book.name}</span>
+            </Link>
+            <div className="vs-book__about">
+              <p>{bookContent.overview}</p>
+              <Link href={`/bible/${book.slug}`} className="vs-book__open">Open {book.name}</Link>
+            </div>
+          </section>
+        )}
+
+        {relatedPrayers.length > 0 && (
+          <section className="vs-prayers" data-in="" aria-labelledby="vs-prayers">
+            <h2 id="vs-prayers" className="vs-h2">Pray it</h2>
+            <ul>
+              {relatedPrayers.slice(0, 4).map((p, i) => p && (
+                <li key={p.slug} style={{ "--i": i } as React.CSSProperties}><PrayerCard slug={p.slug} title={p.title} href={`/pray/${p.slug}`} /></li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* keep reading */}
+        <nav className="vs-turn" aria-label="Previous and next verse">
+          {prevVerse ? (
+            <Link href={`/bible/verse/${prevVerse}`}>
+              <small>Before · {refToDisplay(prevVerse)}</small>
+              {prevText && <span>{prevText}</span>}
+            </Link>
+          ) : <span />}
+          {nextVerse ? (
+            <Link href={`/bible/verse/${nextVerse}`} className="vs-turn__next">
+              <small>Next · {refToDisplay(nextVerse)}</small>
+              {nextText && <span>{nextText}</span>}
+            </Link>
+          ) : <span />}
         </nav>
 
-        {/* ── Header ── */}
-        <div style={{ marginBottom: "36px" }}>
-          <div style={{ display: "inline-flex", gap: "8px", marginBottom: "16px" }}>
-            <span style={{
-              padding: "4px 12px", borderRadius: "4px",
-              border: "1.5px solid var(--pk-gold-border)", background: "var(--pk-gold-dim)",
-              fontSize: "10px", fontWeight: 700, color: "var(--pk-gold)",
-              letterSpacing: "0.1em", textTransform: "uppercase",
-            }}>
-              {book.testament === "old" ? "Old Testament" : "New Testament"}
-            </span>
-            <span style={{
-              padding: "4px 12px", borderRadius: "4px",
-              border: "1.5px solid var(--pk-border)", background: "var(--pk-card)",
-              fontSize: "10px", fontWeight: 700, color: "var(--pk-text-3)",
-              letterSpacing: "0.08em", textTransform: "uppercase",
-            }}>
-              {book.name} · Chapter {chapter}
-            </span>
-          </div>
-
-          <h1 style={{
-            fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 800,
-            color: "var(--pk-text)", margin: "0 0 12px", letterSpacing: "-0.03em", lineHeight: 1.1,
-          }}>
-            {display}
-          </h1>
-          <p style={{ fontSize: "16px", color: "var(--pk-text-2)", margin: 0, lineHeight: 1.7 }}>
-            Meaning, cross-references, and a prayer for {display} — by{" "}
-            <Link href="/author/collins-asein" style={{ color: "var(--pk-gold)", textDecoration: "none", fontWeight: 600 }}>
-              Collins Asein
-            </Link>
-          </p>
-        </div>
-
-        {/* ── TL;DR (AI Overview bait) ── */}
-        <div style={{
-          background: "var(--pk-gold-dim)", border: "1.5px solid var(--pk-gold-border)",
-          borderLeft: "4px solid var(--pk-gold)", borderRadius: "0 12px 12px 0",
-          padding: "16px 20px", marginBottom: "32px",
-        }}>
-          <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 6px" }}>
-            Quick Summary
-          </p>
-          <p style={{ fontSize: "15px", color: "var(--pk-text)", margin: 0, lineHeight: 1.7 }}>
-            {display} is a verse from the book of {book.name} in the {book.testament === "old" ? "Old" : "New"} Testament.
-            {verseData ? ` The KJV reads: "${verseData.text.slice(0, 120)}${verseData.text.length > 120 ? "..." : ""}"` : ""}
-            {" "}Below you will find the full verse text, cross-references, meaning, and a prayer based on this scripture.
-          </p>
-        </div>
-
-        {/* ── Verse Card ── */}
-        <section style={{ marginBottom: "40px" }}>
-          <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px" }}>
-            {display} — KJV
-          </h2>
-          <div style={{
-            background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)",
-            borderRadius: "16px", padding: "clamp(24px,4vw,40px)",
-            boxShadow: "4px 4px 0 0 var(--pk-gold-border)",
-          }}>
-            {verseData ? (
-              <>
-                <p style={{
-                  fontSize: "clamp(18px, 2.5vw, 26px)", color: "var(--pk-text)",
-                  lineHeight: 1.75, fontStyle: "italic", margin: "0 0 20px",
-                  letterSpacing: "-0.01em",
-                }}>
-                  &ldquo;{verseData.text}&rdquo;
-                </p>
-                <p style={{ fontSize: "13px", color: "var(--pk-gold)", fontWeight: 700, margin: 0 }}>
-                  — {display} (KJV)
-                </p>
-              </>
-            ) : (
-              <p style={{ fontSize: "16px", color: "var(--pk-text-2)", fontStyle: "italic", margin: 0 }}>
-                Search for {display} using our Bible search above to see the full verse text.
-              </p>
-            )}
-          </div>
-        </section>
-
-        {/* ── About the Book — static unique context (no API) ── */}
-        {bookContent && (
-          <section style={{ marginBottom: "40px" }}>
-            <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px" }}>
-              {display} in Context — About the Book of {book.name}
-            </h2>
-            <div style={{
-              padding: "20px 24px", borderRadius: "14px",
-              border: "1.5px solid var(--pk-border)", background: "var(--pk-card)",
-            }}>
-              <p style={{ fontSize: "15px", color: "var(--pk-text-2)", lineHeight: 1.8, margin: "0 0 14px" }}>
-                {bookContent.overview}
-              </p>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "14px" }}>
-                {bookContent.themes.map((t) => (
-                  <span key={t} style={{
-                    padding: "4px 12px", borderRadius: "999px",
-                    border: "1px solid var(--pk-gold-border)", background: "var(--pk-gold-dim)",
-                    fontSize: "11px", fontWeight: 600, color: "var(--pk-gold)",
-                  }}>
-                    {t}
-                  </span>
-                ))}
-              </div>
-              <Link href={`/bible/${book.slug}`} style={{
-                fontSize: "13px", fontWeight: 700, color: "var(--pk-gold)", textDecoration: "none",
-              }}>
-                Explore the full Book of {book.name} — all {book.chapters} chapter{book.chapters > 1 ? "s" : ""} →
-              </Link>
-            </div>
-          </section>
-        )}
-
-        {/* ── Cross References ── */}
-        {crossRefs.length > 0 && (
-          <section style={{ marginBottom: "40px" }}>
-            <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px" }}>
-              Cross-References for {display}
-            </h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {crossRefs.map((cr) => {
-                const crRef = cr.ref.toLowerCase().replace(/[\s:]/g, "-").replace(/[^a-z0-9-]/g, "");
-                return (
-                  <div key={cr.ref} style={{
-                    padding: "16px 20px", borderRadius: "10px",
-                    border: "1.5px solid var(--pk-border)",
-                    background: "var(--pk-card)",
-                  }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px", marginBottom: "8px" }}>
-                      <Link
-                        href={`/bible/verse/${crRef}`}
-                        style={{ fontSize: "13px", fontWeight: 700, color: "var(--pk-gold)", textDecoration: "none" }}
-                      >
-                        {cr.ref} →
-                      </Link>
-                      <span style={{ fontSize: "11px", color: "var(--pk-text-3)", flexShrink: 0 }}>
-                        related
-                      </span>
-                    </div>
-                    {cr.text && (
-                      <p style={{ fontSize: "14px", color: "var(--pk-text-2)", margin: "0 0 6px", fontStyle: "italic", lineHeight: 1.65 }}>
-                        &ldquo;{cr.text}&rdquo;
-                      </p>
-                    )}
-                    {cr.reason && (
-                      <p style={{ fontSize: "12px", color: "var(--pk-text-3)", margin: 0 }}>
-                        {cr.reason}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
-        {/* ── Pray This Verse ── */}
-        <section style={{ marginBottom: "40px" }}>
-          <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px" }}>
-            Pray {display}
-          </h2>
-          <div style={{
-            background: "var(--pk-purple-dim)",
-            border: "1.5px solid var(--pk-purple-border)",
-            borderRadius: "16px", padding: "clamp(24px,4vw,36px)", textAlign: "center",
-          }}>
-            <div style={{ fontSize: "18px", marginBottom: "12px", color: "var(--pk-purple)", fontWeight: 700, letterSpacing: "0.1em" }}>✦</div>
-            <h3 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 10px" }}>
-              Generate a Prayer from {display}
-            </h3>
-            <p style={{ fontSize: "14px", color: "var(--pk-text-2)", margin: "0 0 20px", lineHeight: 1.7 }}>
-              Our AI will write a personal prayer inspired by this scripture — tailored to your situation. Free, instant, no account needed.
-            </p>
-            <Link
-              href={`/pray?q=${encodeURIComponent(`Based on ${display}: ${verseData?.text ?? display}`)}`}
-              style={{
-                display: "inline-block", padding: "14px 32px", borderRadius: "6px",
-                background: "var(--pk-purple)", color: "#fff", textDecoration: "none",
-                fontSize: "15px", fontWeight: 800, letterSpacing: "-0.01em",
-                boxShadow: "4px 4px 0 0 var(--pk-purple-border)",
-              }}
-            >
-              ✦ Pray This Verse
-            </Link>
-          </div>
-        </section>
-
-        {/* ── Related Prayers ── */}
-        {relatedPrayers.length > 0 && (
-          <section style={{ marginBottom: "40px" }}>
-            <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px" }}>
-              Prayers Related to {book.name}
-            </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "10px" }}>
-              {relatedPrayers.map((p) => p && (
-                <Link
-                  key={p.slug}
-                  href={`/pray/${p.slug}`}
-                  style={{
-                    display: "block", padding: "14px 18px", borderRadius: "10px",
-                    border: "1.5px solid var(--pk-border)",
-                    background: "var(--pk-card)",
-                    color: "var(--pk-text-2)", textDecoration: "none",
-                    fontSize: "13px", fontWeight: 600,
-                  }}
-                >
-                  {p.title} →
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── Chapter Navigation ── */}
-        <section style={{ marginBottom: "40px" }}>
-          <h2 style={{ fontSize: "18px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px" }}>
-            More from {book.name} {chapter}
-          </h2>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            {Array.from({ length: Math.min(book.verses[chapter - 1] ?? 0, 12) }, (_, i) => i + 1).map((v) => (
-              <Link
-                key={v}
-                href={`/bible/verse/${book.slug}-${chapter}-${v}`}
-                style={{
-                  padding: "8px 14px", borderRadius: "8px",
-                  border: v === verse ? "1.5px solid var(--pk-gold)" : "1.5px solid var(--pk-border)",
-                  background: v === verse ? "var(--pk-gold-dim)" : "var(--pk-card)",
-                  color: v === verse ? "var(--pk-gold)" : "var(--pk-text-2)",
-                  textDecoration: "none", fontSize: "13px", fontWeight: v === verse ? 700 : 500,
-                }}
-              >
-                v{v}
-              </Link>
-            ))}
-            {(book.verses[chapter - 1] ?? 0) > 12 && (
-              <span style={{ padding: "8px 14px", fontSize: "13px", color: "var(--pk-text-3)" }}>
-                +{(book.verses[chapter - 1] ?? 0) - 12} more
-              </span>
-            )}
-          </div>
-        </section>
-
-        {/* ── Prev / Next Navigation ── */}
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "48px" }}>
-          {prevVerse ? (
-            <Link href={`/bible/verse/${prevVerse}`} style={{
-              padding: "12px 20px", borderRadius: "8px",
-              border: "1.5px solid var(--pk-border)",
-              background: "var(--pk-card)",
-              color: "var(--pk-text-2)", textDecoration: "none",
-              fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px",
-            }}>
-              ← {refToDisplay(prevVerse)}
-            </Link>
-          ) : <div />}
-          {nextVerse ? (
-            <Link href={`/bible/verse/${nextVerse}`} style={{
-              padding: "12px 20px", borderRadius: "8px",
-              border: "1.5px solid var(--pk-border)",
-              background: "var(--pk-card)",
-              color: "var(--pk-text-2)", textDecoration: "none",
-              fontSize: "13px", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px",
-            }}>
-              {refToDisplay(nextVerse)} →
-            </Link>
-          ) : <div />}
-        </div>
-
-        {/* ── Author Attribution ── */}
-        <div style={{
-          padding: "20px 24px", borderRadius: "12px",
-          border: "1.5px solid var(--pk-border)",
-          background: "var(--pk-card)",
-          display: "flex", gap: "16px", alignItems: "center",
-        }}>
-          <div style={{
-            width: "44px", height: "44px", borderRadius: "50%", flexShrink: 0,
-            background: "linear-gradient(135deg, var(--pk-purple) 0%, var(--pk-gold) 100%)",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px",
-          }}>✝</div>
-          <div>
-            <p style={{ fontSize: "13px", color: "var(--pk-text-3)", margin: "0 0 2px" }}>
-              Curated by
-            </p>
-            <Link href="/author/collins-asein" style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)", textDecoration: "none" }}>
-              Collins Asein
-            </Link>
-            <span style={{ fontSize: "13px", color: "var(--pk-text-3)" }}> — Christian Author & Founder of PrayerKey</span>
-          </div>
-        </div>
-
-      </div>
+        <p className="vs-note">Curated by <Link href="/author/collins-asein">Collins Asein</Link>. Bible text: King James Version.</p>
+      </article>
     </>
   );
 }

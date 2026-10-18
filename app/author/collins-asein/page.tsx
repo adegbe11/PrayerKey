@@ -1,17 +1,25 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import InView from "@/components/home/InView";
+import PrayerCard from "@/components/prayer/PrayerCard";
+import GuideCover from "@/components/guides/GuideCover";
 import { PRAYER_TOPICS } from "@/lib/seo/prayer-topics";
+import { GUIDES } from "@/lib/seo/guides";
+import { guideArt } from "@/lib/seo/guide-art";
+import "@/components/prayer/cards.css";
+import "@/components/guides/guides.css";
+import "./author.css";
 
 const BASE_URL = "https://www.prayerkey.com";
 
 export const metadata: Metadata = {
   title: "Collins Asein — Christian Author & Founder of PrayerKey",
   description:
-    "Collins Asein is a Christian author, faith technologist, and the founder of PrayerKey — the AI-powered prayer and Bible tool serving believers worldwide.",
+    "Collins Asein is a Christian author, faith technologist, and the founder of PrayerKey, the free prayer and Bible companion serving believers worldwide.",
   alternates: { canonical: `${BASE_URL}/author/collins-asein` },
   openGraph: {
     title:       "Collins Asein — Christian Author & Founder of PrayerKey",
-    description: "Collins Asein is a Christian author, faith technologist, and the founder of PrayerKey — the AI-powered prayer and Bible tool serving believers worldwide.",
+    description: "Collins Asein is a Christian author, faith technologist, and the founder of PrayerKey, the free prayer and Bible companion serving believers worldwide.",
     url:         `${BASE_URL}/author/collins-asein`,
     siteName:    "PrayerKey",
     images:      [{ url: "/og-image.png", width: 1200, height: 630, alt: "Collins Asein" }],
@@ -26,11 +34,24 @@ export const metadata: Metadata = {
 
 const FEATURED_PRAYERS = PRAYER_TOPICS.slice(0, 8);
 
-const ARTICLES = [
-  { title: "How AI Is Transforming the Way Christians Pray",    href: "/pray",         date: "March 2026" },
-  { title: "Why Every Church Needs a Live Bible Verse Tracker", href: "/live",         date: "February 2026" },
-  { title: "120 Powerful Prayers for Every Situation",          href: "/pray/topics",  date: "January 2026" },
-  { title: "The Science and Spirit of Prayer",                  href: "/pray/morning", date: "December 2025" },
+// what he writes about, said as a sentence rather than a row of boxes
+const SUBJECTS = [
+  "prayer and intercession",
+  "Bible study",
+  "devotional writing",
+  "sermon preparation",
+  "church technology",
+  "apologetics and theology",
+  "carrying the Gospel to every nation",
+];
+
+// the rest of his work on PrayerKey
+const MORE = [
+  { label: "Write a prayer",        href: "/pray" },
+  { label: "Morning prayer",        href: "/pray/morning" },
+  { label: "PrayerKey Live",        href: "/live" },
+  { label: "Every prayer topic",    href: "/pray/topics" },
+  { label: "Search the Bible",      href: "/bible" },
 ];
 
 export default function CollinsAseinPage() {
@@ -43,8 +64,8 @@ export default function CollinsAseinPage() {
         "name":        "Collins Asein",
         "url":         `${BASE_URL}/author/collins-asein`,
         "jobTitle":    "Christian Author & Faith Technologist",
-        "description": "Collins Asein is a Christian author, faith technologist, and the founder of PrayerKey — an AI-powered prayer generation and Bible study platform serving believers worldwide.",
-        "knowsAbout":  ["Christian Prayer", "Bible Study", "Faith Technology", "AI Tools for Christians", "Worship", "Sermon Preparation"],
+        "description": "Collins Asein is a Christian author, faith technologist, and the founder of PrayerKey, a free prayer and Bible study platform serving believers worldwide.",
+        "knowsAbout":  ["Christian Prayer", "Bible Study", "Faith Technology", "Church Technology", "Worship", "Sermon Preparation"],
         "worksFor": {
           "@type": "Organization",
           "name":  "PrayerKey",
@@ -71,310 +92,98 @@ export default function CollinsAseinPage() {
   };
 
   return (
-    <>
+    <div className="au">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <InView />
 
-      <div style={{ maxWidth: "860px", margin: "0 auto", padding: "0 24px 100px" }}>
-
-        {/* ── Breadcrumb ── */}
-        <nav style={{ marginBottom: "40px", fontSize: "13px", color: "var(--pk-text-3)", display: "flex", gap: "6px", alignItems: "center" }}>
-          <Link href="/" style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Home</Link>
-          <span>/</span>
-          <span style={{ color: "var(--pk-text-3)" }}>Author</span>
-          <span>/</span>
-          <span style={{ color: "var(--pk-gold)" }}>Collins Asein</span>
+      {/* the name, and who he is */}
+      <header className="au-hero">
+        <nav className="au-crumbs" aria-label="Breadcrumb">
+          <Link href="/">Home</Link><span>/</span><span>Author</span>
         </nav>
+        <img className="au-hero__mark" src="/pk-mark.png" alt="" width={44} height={80} />
+        <h1 className="au-hero__name"><span>Collins</span><span>Asein</span></h1>
+        <p className="au-hero__role">Christian author, faith technologist, and the founder of <Link href="/">PrayerKey</Link>.</p>
+      </header>
 
-        {/* ── Hero ── */}
-        <div style={{
-          display:       "flex",
-          gap:           "clamp(24px, 4vw, 48px)",
-          alignItems:    "flex-start",
-          marginBottom:  "60px",
-          flexWrap:      "wrap",
-        }}>
-          {/* Avatar */}
-          <div style={{
-            width:        "clamp(80px, 12vw, 120px)",
-            height:       "clamp(80px, 12vw, 120px)",
-            borderRadius: "50%",
-            background:   "linear-gradient(135deg, var(--pk-purple) 0%, var(--pk-gold) 100%)",
-            display:      "flex",
-            alignItems:   "center",
-            justifyContent: "center",
-            fontSize:     "clamp(32px, 5vw, 52px)",
-            flexShrink:   0,
-            border:       "3px solid var(--pk-gold-border)",
-            boxShadow:    "0 0 40px var(--pk-purple-dim)",
-          }}>
-            ✝
-          </div>
-
-          {/* Bio */}
-          <div style={{ flex: 1, minWidth: "240px" }}>
-            {/* Badge */}
-            <div style={{
-              display:      "inline-block",
-              padding:      "4px 12px",
-              borderRadius: "4px",
-              border:       "1.5px solid var(--pk-gold-border)",
-              background:   "var(--pk-gold-dim)",
-              fontSize:     "10px",
-              fontWeight:   700,
-              color:        "var(--pk-gold)",
-              letterSpacing:"0.1em",
-              textTransform:"uppercase",
-              marginBottom: "14px",
-            }}>
-              Christian Author · Faith Technologist
-            </div>
-
-            <h1 style={{
-              fontSize:      "clamp(28px, 5vw, 48px)",
-              fontWeight:    800,
-              color:         "var(--pk-text)",
-              margin:        "0 0 12px",
-              letterSpacing: "-0.03em",
-              lineHeight:    1.1,
-            }}>
-              Collins Asein
-            </h1>
-
-            <p style={{
-              fontSize:   "clamp(15px, 1.5vw, 17px)",
-              color:      "var(--pk-text-2)",
-              lineHeight: 1.75,
-              margin:     "0 0 20px",
-            }}>
-              Collins Asein is a Christian author, faith technologist, and the founder of{" "}
-              <Link href="/" style={{ color: "var(--pk-gold)", textDecoration: "none", fontWeight: 700 }}>
-                PrayerKey
-              </Link>{" "}
-              — an AI-powered prayer and Bible platform serving believers worldwide. His work sits at the
-              intersection of deep Christian faith and modern technology, believing that the tools of today
-              should amplify the Gospel, not replace it.
-            </p>
-
-            {/* Stats */}
-            <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
-              {[
-                { label: "Prayer Topics",    value: `${PRAYER_TOPICS.length}+` },
-                { label: "Bible Verses",     value: "31,102" },
-                { label: "Prayers Generated", value: "Thousands" },
-                { label: "Faith",            value: "Christian" },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <div style={{ fontSize: "22px", fontWeight: 800, color: "var(--pk-text)", letterSpacing: "-0.02em" }}>
-                    {stat.value}
-                  </div>
-                  <div style={{ fontSize: "11px", color: "var(--pk-text-3)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* ── About ── */}
-        <section style={{ marginBottom: "60px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
-            About Collins
-          </h2>
-          <div style={{
-            background:   "var(--pk-card)",
-            border:       "1.5px solid var(--pk-border)",
-            borderRadius: "16px",
-            padding:      "clamp(24px,4vw,40px)",
-          }}>
-            <p style={{ fontSize: "16px", color: "var(--pk-text-2)", lineHeight: 1.85, margin: "0 0 16px" }}>
-              Collins Asein built PrayerKey from a deeply personal conviction: that prayer is the most
-              powerful force available to a believer, and that technology should make it more accessible —
-              not less meaningful. As a Christian who has seen prayer transform lives, families, and
-              communities, Collins wanted to create a tool that meets people exactly where they are —
-              whether they&apos;re a new believer who doesn&apos;t know how to pray, or a pastor preparing a
-              sermon at midnight.
-            </p>
-            <p style={{ fontSize: "16px", color: "var(--pk-text-2)", lineHeight: 1.85, margin: "0 0 16px" }}>
-              PrayerKey was born from that vision: a platform where AI serves the Spirit, where every
-              generated prayer is grounded in Scripture, and where technology bows to theology. Collins
-              writes extensively on faith, prayer, and the intersection of Christianity with the modern world.
-            </p>
-            <p style={{ fontSize: "16px", color: "var(--pk-text-2)", lineHeight: 1.85, margin: 0 }}>
-              His belief is simple: <em style={{ color: "var(--pk-text)", fontStyle: "italic" }}>&ldquo;The Gospel doesn&apos;t need technology to be powerful. But technology,
-              when surrendered to God, can carry the Gospel further than we ever imagined.&rdquo;</em>
-            </p>
-          </div>
-        </section>
-
-        {/* ── Expertise ── */}
-        <section style={{ marginBottom: "60px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
-            Areas of Expertise
-          </h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "12px" }}>
-            {[
-              "Christian Prayer & Intercession",
-              "Bible Study & Scripture",
-              "Church Technology",
-              "AI Tools for Faith",
-              "Sermon Preparation",
-              "Devotional Writing",
-              "Global Christian Outreach",
-              "Apologetics & Theology",
-            ].map((label, i) => (
-              <div key={label} style={{
-                display:      "flex",
-                alignItems:   "center",
-                gap:          "14px",
-                padding:      "14px 18px",
-                borderRadius: "10px",
-                border:       "1.5px solid var(--pk-gold-border)",
-                background:   "var(--pk-gold-dim)",
-              }}>
-                <span style={{
-                  fontSize:      "10px",
-                  fontWeight:    800,
-                  color:         "var(--pk-gold)",
-                  letterSpacing: "0.1em",
-                  flexShrink:    0,
-                  fontVariantNumeric: "tabular-nums",
-                }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)", letterSpacing: "-0.01em" }}>{label}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Prayers by Collins ── */}
-        <section style={{ marginBottom: "60px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
-            Prayers Written by Collins Asein
-          </h2>
-          <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: "0 0 20px" }}>
-            Every prayer on PrayerKey is rooted in Scripture and written with pastoral care.
+      {/* his story */}
+      <section className="au-story" data-in="" aria-label="About Collins">
+        <p className="au-story__lead">
+          Collins built PrayerKey from a personal conviction: prayer is the most powerful force available to a
+          believer, and technology should make it more accessible, not less meaningful.
+        </p>
+        <div className="au-story__body">
+          <p>
+            As a Christian who has seen prayer change lives, families and communities, he wanted a tool that meets
+            people where they are, whether a new believer who does not yet know how to pray, or a pastor preparing a
+            sermon at midnight.
           </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "10px" }}>
-            {FEATURED_PRAYERS.map((topic) => (
-              <Link
-                key={topic.slug}
-                href={`/pray/${topic.slug}`}
-                style={{
-                  display:      "block",
-                  padding:      "16px 18px",
-                  borderRadius: "10px",
-                  border:       "1.5px solid var(--pk-border)",
-                  background:   "var(--pk-card)",
-                  textDecoration:"none",
-                  transition:   "all 150ms",
-                }}
-              >
-                <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "6px" }}>
-                  {topic.category}
-                </div>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: "var(--pk-text-2)", letterSpacing: "-0.01em" }}>
-                  {topic.title} →
-                </div>
-              </Link>
-            ))}
-          </div>
-          <div style={{ marginTop: "16px", textAlign: "center" }}>
-            <Link href="/pray/topics" style={{ color: "var(--pk-gold)", fontSize: "13px", fontWeight: 600, textDecoration: "none" }}>
-              View all {PRAYER_TOPICS.length}+ prayers →
-            </Link>
-          </div>
-        </section>
-
-        {/* ── Articles ── */}
-        <section style={{ marginBottom: "60px" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 20px", letterSpacing: "-0.02em" }}>
-            Featured Writing
-          </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {ARTICLES.map((article) => (
-              <Link
-                key={article.href}
-                href={article.href}
-                style={{
-                  display:        "flex",
-                  justifyContent: "space-between",
-                  alignItems:     "center",
-                  padding:        "18px 24px",
-                  borderRadius:   "12px",
-                  border:         "1.5px solid var(--pk-border)",
-                  background:     "var(--pk-card)",
-                  textDecoration: "none",
-                  gap:            "16px",
-                  transition:     "all 150ms",
-                }}
-              >
-                <span style={{ fontSize: "15px", fontWeight: 600, color: "var(--pk-text-2)" }}>
-                  {article.title}
-                </span>
-                <span style={{ fontSize: "12px", color: "var(--pk-text-3)", flexShrink: 0 }}>
-                  {article.date}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* ── CTA ── */}
-        <div style={{
-          background:   "var(--pk-accent-dim)",
-          border:       "1.5px solid var(--pk-accent-border)",
-          borderRadius: "20px",
-          padding:      "clamp(28px,5vw,48px)",
-          textAlign:    "center",
-        }}>
-          <h2 style={{ fontSize: "24px", fontWeight: 800, color: "var(--pk-text)", margin: "0 0 12px", letterSpacing: "-0.02em" }}>
-            Experience PrayerKey
-          </h2>
-          <p style={{ fontSize: "15px", color: "var(--pk-text-2)", margin: "0 0 24px", lineHeight: 1.7 }}>
-            Generate a scripture-based prayer for any situation — free, instant, no account needed.
+          <p>
+            PrayerKey grew from that vision: a place where every prayer is grounded in Scripture and where technology
+            bows to theology. Collins writes on faith, prayer, and how the Christian life meets the modern world.
           </p>
-          <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
-            <Link
-              href="/pray"
-              style={{
-                display:      "inline-block",
-                padding:      "14px 32px",
-                borderRadius: "6px",
-                background:   "var(--pk-accent)",
-                color:        "#fff",
-                textDecoration:"none",
-                fontSize:     "15px",
-                fontWeight:   800,
-                boxShadow:    "4px 4px 0 0 var(--pk-accent-border)",
-              }}
-            >
-              ✦ Generate a Prayer
-            </Link>
-            <Link
-              href="/bible"
-              style={{
-                display:      "inline-block",
-                padding:      "14px 32px",
-                borderRadius: "6px",
-                border:       "1.5px solid var(--pk-gold-border)",
-                background:   "var(--pk-gold-dim)",
-                color:        "var(--pk-gold)",
-                textDecoration:"none",
-                fontSize:     "15px",
-                fontWeight:   700,
-              }}
-            >
-              Search the Bible →
-            </Link>
-          </div>
         </div>
+      </section>
 
-      </div>
-    </>
+      {/* what he believes */}
+      <section className="au-belief" data-in="" aria-label="His conviction">
+        <p className="au-belief__text">
+          <span>The Gospel does not need technology to be powerful.</span>{" "}
+          <span>But technology, when surrendered to God, can carry the Gospel further than we ever imagined.</span>
+        </p>
+      </section>
+
+      {/* what he writes about */}
+      <section className="au-subjects" data-in="" aria-labelledby="au-subjects-title">
+        <h2 id="au-subjects-title" className="au-kicker">He writes about</h2>
+        <p className="au-subjects__text">
+          {SUBJECTS.map((s, i) => (
+            <span key={s} style={{ "--i": i } as React.CSSProperties}>
+              {s}{i < SUBJECTS.length - 2 ? ", " : i === SUBJECTS.length - 2 ? ", and " : "."}
+            </span>
+          ))}
+        </p>
+      </section>
+
+      {/* prayers he has written */}
+      <section className="au-prayers" data-in="" aria-labelledby="au-prayers-title">
+        <div className="au-head">
+          <h2 id="au-prayers-title" className="au-h2">Prayers by Collins.</h2>
+          <p className="au-head__line">Each one rooted in Scripture and written with pastoral care.</p>
+        </div>
+        <div className="au-prayers__grid">
+          {FEATURED_PRAYERS.map((t, i) => (
+            <PrayerCard key={t.slug} slug={t.slug} title={t.title} href={`/pray/${t.slug}`} style={{ "--i": i } as React.CSSProperties} />
+          ))}
+        </div>
+        <Link href="/prayer" className="au-more">See every prayer</Link>
+      </section>
+
+      {/* guides he has written */}
+      <section className="au-guides" data-in="" aria-labelledby="au-guides-title">
+        <div className="au-head">
+          <h2 id="au-guides-title" className="au-h2">Guides by Collins.</h2>
+          <p className="au-head__line">Longer reads on prayer and the Bible, for beginners and for those coming back.</p>
+        </div>
+        <div className="au-guides__grid">
+          {GUIDES.map((g, i) => (
+            <GuideCover key={g.slug} href={`/guides/${g.slug}`} art={guideArt(g.slug)} title={g.title} minutes={g.readMinutes} style={{ "--i": i } as React.CSSProperties} />
+          ))}
+        </div>
+        <Link href="/guides" className="au-more">All guides</Link>
+      </section>
+
+      {/* a quiet ending */}
+      <section className="au-end" data-in="" aria-labelledby="au-end-title">
+        <h2 id="au-end-title" className="au-end__title">Pray with PrayerKey.</h2>
+        <p className="au-end__line">Free, built on Scripture, and no account needed.</p>
+        <nav className="au-end__links" aria-label="More from PrayerKey">
+          {MORE.map((m) => <Link key={m.href} href={m.href}>{m.label}</Link>)}
+        </nav>
+      </section>
+    </div>
   );
 }

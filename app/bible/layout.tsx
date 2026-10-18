@@ -45,7 +45,7 @@ const websiteLd = {
   name:       "PrayerKey Bible Search",
   applicationCategory: "ReferenceApplication",
   operatingSystem: "Any (browser-based)",
-  description: "Free Bible search engine with keyword, phrase, and reference lookup plus AI-powered cross-references across 11 translations.",
+  description: "Free Bible search engine with keyword, phrase, and reference lookup plus cross-references across 11 translations.",
   url: BIBLE_URL,
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
 };

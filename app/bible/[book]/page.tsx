@@ -4,9 +4,23 @@ import Link from "next/link";
 import { BIBLE_BOOKS, BOOK_MAP } from "@/lib/seo/bible-books";
 import { getBookContent } from "@/lib/seo/bible-book-content";
 import { TOPIC_MAP } from "@/lib/seo/prayer-topics";
+import { getVerseText } from "@/lib/bible/kjv";
+import { leatherOf, spineHeight } from "@/lib/bible/leather";
+import InView from "@/components/home/InView";
+import ShelfHere from "@/components/bible/ShelfHere";
+import PrayerCard from "@/components/prayer/PrayerCard";
+import "@/components/prayer/cards.css";
+import "./book.css";
 
 const BASE_URL = "https://www.prayerkey.com";
 const AUTHOR   = "Collins Asein";
+
+// "The words of the Preacher, the son of David, king in Jerusalem." -> the first few words
+function firstWords(text: string, max = 64) {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:]$/, "") + "…";
+}
 
 /* ── Static generation: all 66 books at build time ─────────────────── */
 export function generateStaticParams() {
@@ -111,219 +125,117 @@ export default function BibleBookPage({ params }: { params: { book: string } }) 
     ],
   };
 
+  // the opening words of each chapter, for books short enough to show them
+  const openings = book.chapters <= 50
+    ? Array.from({ length: book.chapters }, (_, i) => firstWords(getVerseText(book.slug, i + 1, 1) ?? ""))
+    : [];
+  const loved = content.keyVerses.map((kv) => {
+    const m = kv.ref.match(/-(\d+)-(\d+)$/);
+    return { ...kv, text: m ? getVerseText(book.slug, Number(m[1]), Number(m[2])) : null };
+  });
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <InView />
 
-      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "0 24px 100px" }}>
-
-        {/* ── Breadcrumb ── */}
-        <nav aria-label="Breadcrumb" style={{
-          marginBottom: "28px", fontSize: "13px", color: "var(--pk-text-3)",
-          display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap",
-        }}>
-          <Link href="/" style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Home</Link>
-          <span>/</span>
-          <Link href="/bible" style={{ color: "var(--pk-text-3)", textDecoration: "none" }}>Bible</Link>
-          <span>/</span>
-          <span style={{ color: "var(--pk-accent)" }}>{book.name}</span>
-        </nav>
-
-        {/* ── Header ── */}
-        <div style={{ marginBottom: "36px" }}>
-          <div style={{
-            display: "inline-block", padding: "4px 12px", borderRadius: "4px",
-            border: "1.5px solid var(--pk-accent-border)", background: "var(--pk-accent-dim)",
-            fontSize: "10px", fontWeight: 700, color: "var(--pk-accent)",
-            letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "16px",
-          }}>
-            {testament} · Book {bookIndex + 1} of 66
+      <article className="bk" style={{ "--leather": leatherOf(book.slug) } as React.CSSProperties}>
+        {/* the book, opened: its own leather, its name in gold */}
+        <header className="bk-cover pk-bleed" data-nav="dark">
+          <nav aria-label="Breadcrumb" className="bk-crumbs">
+            <Link href="/">Home</Link><span>/</span><Link href="/bible">Bible</Link><span>/</span><span>{book.name}</span>
+          </nav>
+          <div className="bk-cover__in">
+            <span className="bk-rule" aria-hidden />
+            <h1 className="bk-title">
+              <span className="bk-title__the">The Book of</span>
+              <span className="bk-title__name">{book.name}</span>
+            </h1>
+            <span className="bk-rule" aria-hidden />
+            <p className="bk-facts">
+              {testament} · Book {bookIndex + 1} of 66 · {book.chapters} chapter{book.chapters > 1 ? "s" : ""} · {totalVerses.toLocaleString()} verses
+            </p>
           </div>
+        </header>
 
-          <h1 style={{
-            fontSize: "clamp(32px, 5.5vw, 52px)", fontWeight: 800,
-            color: "var(--pk-text)", margin: "0 0 14px",
-            letterSpacing: "-0.03em", lineHeight: 1.08,
-          }}>
-            The Book of {book.name}
-          </h1>
-
-          {/* Stats */}
-          <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", marginBottom: "20px" }}>
-            {[
-              { n: book.chapters, label: book.chapters > 1 ? "Chapters" : "Chapter" },
-              { n: totalVerses.toLocaleString(), label: "Verses" },
-              { n: content.themes.length, label: "Key Themes" },
-              { n: content.keyVerses.length, label: "Famous Verses" },
-            ].map((s) => (
-              <div key={s.label}>
-                <span style={{ fontSize: "20px", fontWeight: 800, color: "var(--pk-accent)" }}>{s.n}</span>{" "}
-                <span style={{ fontSize: "12px", color: "var(--pk-text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>{s.label}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Overview — unique per book */}
-          <p style={{ fontSize: "17px", color: "var(--pk-text-2)", lineHeight: 1.8, margin: 0 }}>
-            {content.overview}
+        <section className="bk-open" data-in="">
+          <p className="bk-overview">{content.overview}</p>
+          <p className="bk-themes">
+            {content.themes.map((t, i) => <span key={t} style={{ "--i": i } as React.CSSProperties}>{t}</span>)}
           </p>
-        </div>
-
-        {/* ── Themes ── */}
-        <section style={{ marginBottom: "40px" }}>
-          <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 14px", letterSpacing: "-0.02em" }}>
-            Key Themes in {book.name}
-          </h2>
-          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {content.themes.map((theme) => (
-              <span key={theme} style={{
-                padding: "7px 16px", borderRadius: "999px",
-                border: "1.5px solid var(--pk-accent-border)", background: "var(--pk-accent-dim)",
-                fontSize: "13px", fontWeight: 600, color: "var(--pk-accent)",
-              }}>
-                {theme}
-              </span>
-            ))}
-          </div>
         </section>
 
-        {/* ── Key verses ── */}
-        <section style={{ marginBottom: "40px" }}>
-          <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px", letterSpacing: "-0.02em" }}>
-            Most Famous Verses in {book.name}
-          </h2>
-          <div style={{ display: "grid", gap: "12px" }}>
-            {content.keyVerses.map((kv) => (
-              <Link key={kv.ref} href={`/bible/verse/${kv.ref}`} style={{
-                display: "block", padding: "18px 22px",
-                background: "var(--pk-surface)", border: "1.5px solid var(--pk-border)",
-                borderRadius: "14px", textDecoration: "none",
-                transition: "border-color 150ms ease",
-              }}>
-                <div style={{ fontSize: "15px", fontWeight: 800, color: "var(--pk-accent)", marginBottom: "4px" }}>
-                  {kv.display} →
-                </div>
-                <div style={{ fontSize: "14px", color: "var(--pk-text-2)", lineHeight: 1.6 }}>
-                  {kv.note}
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Chapter grid ── */}
-        <section style={{ marginBottom: "40px" }}>
-          <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 6px", letterSpacing: "-0.02em" }}>
-            All {book.chapters} Chapter{book.chapters > 1 ? "s" : ""} of {book.name}
-          </h2>
-          <p style={{ fontSize: "13px", color: "var(--pk-text-3)", margin: "0 0 16px" }}>
-            Select a chapter to start reading verse by verse.
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(52px, 1fr))", gap: "8px" }}>
-            {Array.from({ length: book.chapters }, (_, i) => i + 1).map((ch) => (
-              <Link key={ch} href={`/bible/verse/${book.slug}-${ch}-1`} style={{
-                display: "flex", alignItems: "center", justifyContent: "center",
-                aspectRatio: "1", borderRadius: "10px",
-                border: "1.5px solid var(--pk-border)", background: "var(--pk-surface)",
-                fontSize: "14px", fontWeight: 700, color: "var(--pk-text-2)",
-                textDecoration: "none", transition: "all 130ms ease",
-              }}>
-                {ch}
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Related prayers (verse → prayer internal links) ── */}
-        {relatedPrayers.length > 0 && (
-          <section style={{ marginBottom: "40px" }}>
-            <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 16px", letterSpacing: "-0.02em" }}>
-              Prayers Inspired by {book.name}
-            </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "12px" }}>
-              {relatedPrayers.map((p) => p && (
-                <Link key={p.slug} href={`/prayer/${p.slug}`} style={{
-                  display: "block", padding: "16px 18px",
-                  background: "var(--pk-surface)", border: "1.5px solid var(--pk-border)",
-                  borderRadius: "12px", textDecoration: "none",
-                }}>
-                  <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)", marginBottom: "4px" }}>
-                    ✦ {p.title}
-                  </div>
-                  <div style={{ fontSize: "12px", color: "var(--pk-text-3)" }}>{p.category}</div>
-                </Link>
+        {loved.length > 0 && (
+          <section className="bk-loved" data-in="" aria-labelledby="bk-loved">
+            <h2 id="bk-loved" className="bk-h2">Its most loved verses</h2>
+            <ul>
+              {loved.map((kv, i) => (
+                <li key={kv.ref} style={{ "--i": i } as React.CSSProperties}>
+                  <Link href={`/bible/verse/${kv.ref}`}>
+                    {kv.text && <span className="bk-loved__text">{kv.text}</span>}
+                    <span className="bk-loved__ref">{kv.display}</span>
+                    <span className="bk-loved__note">{kv.note}</span>
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </section>
         )}
 
-        {/* ── Prev / next book nav ── */}
-        <nav style={{ display: "flex", justifyContent: "space-between", gap: "12px", marginBottom: "40px" }}>
-          {prevBook ? (
-            <Link href={`/bible/${prevBook.slug}`} style={{
-              padding: "12px 20px", borderRadius: "10px",
-              border: "1.5px solid var(--pk-border)", background: "var(--pk-surface)",
-              fontSize: "13px", fontWeight: 700, color: "var(--pk-text-2)", textDecoration: "none",
-            }}>
-              ← {prevBook.name}
-            </Link>
-          ) : <span />}
-          {nextBook ? (
-            <Link href={`/bible/${nextBook.slug}`} style={{
-              padding: "12px 20px", borderRadius: "10px",
-              border: "1.5px solid var(--pk-border)", background: "var(--pk-surface)",
-              fontSize: "13px", fontWeight: 700, color: "var(--pk-text-2)", textDecoration: "none",
-            }}>
-              {nextBook.name} →
-            </Link>
-          ) : <span />}
-        </nav>
+        <section className="bk-chapters" data-in="" aria-labelledby="bk-chapters">
+          <h2 id="bk-chapters" className="bk-h2">{book.chapters === 1 ? "The chapter" : `${book.chapters} chapters`}</h2>
+          <ol className={openings.length ? "bk-ch" : "bk-ch bk-ch--compact"}>
+            {Array.from({ length: book.chapters }, (_, i) => i + 1).map((ch) => (
+              <li key={ch} style={{ "--i": Math.min(ch - 1, 24) } as React.CSSProperties}>
+                <Link href={`/bible/verse/${book.slug}-${ch}-1`} aria-label={`${book.name} chapter ${ch}`}>
+                  <span className="bk-ch__n">{ch}</span>
+                  {openings.length > 0 && <span className="bk-ch__first">{openings[ch - 1]}</span>}
+                  <span className="bk-ch__count">{book.verses[ch - 1]} verses</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
 
-        {/* ── All books (hub linking — every book reachable from every book) ── */}
-        <section>
-          <h2 style={{ fontSize: "16px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 14px" }}>
-            Explore All 66 Books of the Bible
-          </h2>
-          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+        {relatedPrayers.length > 0 && (
+          <section className="bk-prayers" data-in="" aria-labelledby="bk-prayers">
+            <h2 id="bk-prayers" className="bk-h2">Pray with {book.name}</h2>
+            <ul>
+              {relatedPrayers.map((p, i) => p && (
+                <li key={p.slug} style={{ "--i": i } as React.CSSProperties}><PrayerCard slug={p.slug} title={p.title} href={`/prayer/${p.slug}`} /></li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* back on the shelf, with this one lifted out */}
+        <section className="bk-shelf" aria-label="All 66 books">
+          <nav className="bk-turn" aria-label="Previous and next book">
+            {prevBook ? <Link href={`/bible/${prevBook.slug}`} style={{ "--c": leatherOf(prevBook.slug) } as React.CSSProperties}><small>Before</small>{prevBook.name}</Link> : <span />}
+            {nextBook ? <Link href={`/bible/${nextBook.slug}`} style={{ "--c": leatherOf(nextBook.slug) } as React.CSSProperties}><small>Next</small>{nextBook.name}</Link> : <span />}
+          </nav>
+          <div className="bk-spines">
             {BIBLE_BOOKS.map((b) => (
-              <Link key={b.slug} href={`/bible/${b.slug}`} style={{
-                padding: "5px 12px", borderRadius: "999px",
-                border: b.slug === book.slug ? "1.5px solid var(--pk-accent)" : "1px solid var(--pk-border)",
-                background: b.slug === book.slug ? "var(--pk-accent-dim)" : "transparent",
-                fontSize: "11px", fontWeight: 600,
-                color: b.slug === book.slug ? "var(--pk-accent)" : "var(--pk-text-3)",
-                textDecoration: "none",
-              }}>
-                {b.name}
+              <Link
+                key={b.slug}
+                href={`/bible/${b.slug}`}
+                className={`bk-spine ${b.slug === book.slug ? "is-here" : ""}`}
+                aria-current={b.slug === book.slug ? "page" : undefined}
+                title={b.name}
+                style={{ "--c": leatherOf(b.slug), "--h": `${spineHeight(b.chapters, 0.55)}px` } as React.CSSProperties}
+              >
+                <span>{b.name}</span>
               </Link>
             ))}
           </div>
+          <ShelfHere />
         </section>
 
-        {/* ── Author / E-E-A-T ── */}
-        <div style={{
-          marginTop: "48px", padding: "20px 24px",
-          background: "var(--pk-surface)", border: "1.5px solid var(--pk-border)",
-          borderRadius: "14px", display: "flex", gap: "14px", alignItems: "center", flexWrap: "wrap",
-        }}>
-          <div style={{
-            width: "44px", height: "44px", borderRadius: "50%",
-            background: "linear-gradient(135deg, var(--pk-accent), var(--pk-purple))",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "15px", fontWeight: 800, color: "#fff", flexShrink: 0,
-          }}>CA</div>
-          <div>
-            <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-text)" }}>
-              <Link href="/author/collins-asein" style={{ color: "var(--pk-text)", textDecoration: "none" }}>{AUTHOR}</Link>
-              <span style={{ color: "var(--pk-text-3)", fontWeight: 400 }}> · Christian Author & Faith Technologist</span>
-            </div>
-            <div style={{ fontSize: "12px", color: "var(--pk-text-3)" }}>
-              Book overviews written and scripture-verified by PrayerKey Editorial.
-            </div>
-          </div>
-        </div>
-      </div>
+        <p className="bk-note">
+          Book overviews written by <Link href="/author/collins-asein">{AUTHOR}</Link> and checked against Scripture by the PrayerKey editorial team. Bible text: King James Version.
+        </p>
+      </article>
     </>
   );
 }

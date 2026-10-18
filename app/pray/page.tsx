@@ -1,481 +1,239 @@
 "use client";
-import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { composePrayer } from "@/lib/prayer-engine/compose";
+import "./pray.css";
 
 const PrayerCardModal = dynamic(() => import("@/components/ui/PrayerCardModal"), { ssr: false });
 
 const MOODS = ["Grateful", "Anxious", "Sad", "Hopeful", "Confused", "Joyful", "Sick", "Tired"];
 
+// what the empty page suggests, one at a time
+const EXAMPLES = [
+  "My mother goes into surgery on Friday.",
+  "I start a new job on Monday and I am nervous.",
+  "Thank You for bringing my son home safely.",
+  "I can't sleep. My mind won't stop racing.",
+  "We have been praying for a child for three years.",
+  "Rent is due and I don't know how we'll pay it.",
+];
+
+// "a", "a and b", "a, b and c"
+function listOf(items: string[]) {
+  return items.length < 2 ? items.join("") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
+type Prayer = { title: string; prayer: string; encouragement: string; verses: { ref: string; text: string }[] };
+type Stage = "idle" | "rising" | "writing" | "done";
+
+// a few dozen sparks for the moment the words are carried up
+const SPARKS = Array.from({ length: 34 }, (_, i) => ({
+  x: (i * 37) % 100,
+  y: 30 + ((i * 53) % 60),
+  dx: ((i * 29) % 60) - 30,
+  d: (i % 9) * 0.06,
+  s: 2 + (i % 4),
+}));
+
 export default function PrayPage() {
-  const [input,     setInput]     = useState("");
-  const [moods,     setMoods]     = useState<string[]>([]);
-  const [prayer,    setPrayer]    = useState<{ title: string; prayer: string; encouragement: string; verses: { ref: string; text: string }[] } | null>(null);
-  const [showCard,  setShowCard]  = useState(false);
-  const [loading,   setLoading]   = useState(false);
-  const [error,     setError]     = useState("");
-  const [copied,    setCopied]    = useState(false);
+  const [input, setInput] = useState("");
+  const [moods, setMoods] = useState<string[]>([]);
+  const [prayer, setPrayer] = useState<Prayer | null>(null);
+  const [stage, setStage] = useState<Stage>("idle");
+  const [lifted, setLifted] = useState("");
+  const [example, setExample] = useState(0);
+  const [showCard, setShowCard] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const [canSpeak, setCanSpeak] = useState(false);
+  const page = useRef<HTMLDivElement>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
 
-  function toggleMood(m: string) {
-    setMoods((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
-  }
+  // the suggestion under the cursor changes every few seconds while the page is empty
+  useEffect(() => {
+    if (input) return;
+    const t = setInterval(() => setExample((e) => (e + 1) % EXAMPLES.length), 3600);
+    return () => clearInterval(t);
+  }, [input]);
 
-  // Links from the home page and verses arrive as /pray?topic=…; pray it straight away.
+  useEffect(() => {
+    setCanSpeak("speechSynthesis" in window);
+    return () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); };
+  }, []);
+
+  // links from elsewhere arrive as /pray?topic=...; pray it straight away
   useEffect(() => {
     const topic = new URLSearchParams(window.location.search).get("topic")?.trim().slice(0, 500);
-    if (topic) { setInput(topic); generate(topic); }
+    if (topic) { setInput(topic); pray(topic); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function generate(text: string = input) {
-    if (!text.trim()) return;
-    setLoading(true);
-    setError("");
-    setPrayer(null);
-    // Compose entirely on-device — no API, no server, nothing leaves the page.
-    // Moods are folded into the input so the keyword engine can score them.
+  function pray(text: string = input) {
+    const words = text.trim();
+    if (!words || stage === "rising") return;
+    window.speechSynthesis?.cancel();
+    setSpeaking(false);
+    // composed on the device from prayer patterns built on Scripture; nothing leaves the page
     const moodText = moods.length ? ` I am feeling ${moods.join(" and ").toLowerCase()}.` : "";
-    const result   = composePrayer(text + moodText);
-    setPrayer({
-      title:         `A Prayer for ${result.topics.join(" & ")}`,
-      prayer:        result.prayer + "\n\nAmen.",
-      encouragement: "Composed on your device from scripture-based prayer patterns. Pray it aloud and make it your own.",
-      verses:        result.verses,
-    });
-    setShowCard(true);
-    setLoading(false);
+    const result = composePrayer(words + moodText);
+    const next: Prayer = {
+      title: `A prayer for ${listOf(result.topics.map((t) => t.toLowerCase()))}`,
+      prayer: result.prayer + "\n\nAmen.",
+      encouragement: "",
+      verses: result.verses,
+    };
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setLifted(words);
+    setPrayer(null);
+    setStage(still ? "writing" : "rising");
+    // the words rise, and then the prayer is written
+    setTimeout(() => {
+      setPrayer(next);
+      setStage("writing");
+      requestAnimationFrame(() => page.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    }, still ? 0 : 1300);
+  }
+
+  const paragraphs = useMemo(() => {
+    if (!prayer) return [];
+    let n = 0;
+    return prayer.prayer.split(/\n\n+/).map((p) => p.split(/\s+/).map((w) => ({ w, i: n++ })));
+  }, [prayer]);
+  const total = paragraphs.reduce((a, p) => a + p.length, 0);
+  // the whole prayer is written in about six seconds, however long it is
+  const step = total ? Math.min(55, 6000 / total) : 0;
+
+  useEffect(() => {
+    if (stage !== "writing" || !total) return;
+    const t = setTimeout(() => setStage("done"), total * step + 700);
+    return () => clearTimeout(t);
+  }, [stage, total, step]);
+
+  function listen() {
+    if (!prayer) return;
+    const synth = window.speechSynthesis;
+    if (speaking) { synth.cancel(); setSpeaking(false); return; }
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(prayer.prayer.replace(/\n+/g, " "));
+    const voices = synth.getVoices().filter((v) => v.lang.startsWith("en"));
+    const v = voices.find((x) => /Google UK English Female|Samantha|Serena|Daniel|Google US English/.test(x.name)) ?? voices[0];
+    if (v) u.voice = v;
+    u.rate = 0.92;
+    u.onend = () => setSpeaking(false);
+    u.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    synth.speak(u);
   }
 
   async function copy() {
     if (!prayer) return;
-    await navigator.clipboard.writeText(prayer.prayer);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(`${prayer.prayer}\n\n${prayer.verses.map((v) => `${v.text} ${v.ref}`).join("\n")}\n\nprayerkey.com/pray`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch { /* clipboard refused */ }
+  }
+
+  function again() {
+    window.speechSynthesis?.cancel();
+    setSpeaking(false);
+    setPrayer(null);
+    setStage("idle");
+    setInput("");
+    setMoods([]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => field.current?.focus(), 500);
   }
 
   return (
-    <div style={{ maxWidth: "680px", margin: "0 auto", padding: "0 0 80px" }}>
+    <div className="py">
+      <section className="py-stage pk-bleed" data-nav="dark">
+        <div className="py-glow" aria-hidden />
 
-      {/* ── Page header ── */}
-      <div className="animate-fadeUp" style={{ textAlign: "center", marginBottom: "48px" }}>
-        {/* Label */}
-        <div style={{
-          display:      "inline-flex",
-          alignItems:   "center",
-          gap:          "8px",
-          padding:      "4px 12px",
-          border:       "1.5px solid var(--pk-purple-border)",
-          borderRadius: "4px",
-          marginBottom: "20px",
-          background:   "var(--pk-purple-dim)",
-          boxShadow:    "3px 3px 0 0 var(--pk-purple-border)",
-        }}>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-purple)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            Prayer Generator
-          </span>
-        </div>
+        <div className={`py-ask ${stage === "rising" ? "is-rising" : ""}`}>
+          <h1 className="py-title">What&apos;s on your heart?</h1>
 
-        <h1 style={{
-          fontSize:      "clamp(32px, 6vw, 56px)",
-          fontWeight:    800,
-          color:         "var(--pk-text)",
-          margin:        "0 0 14px",
-          letterSpacing: "-0.03em",
-          lineHeight:    1.05,
-        }}>
-          Tell me what to<br />pray about.
-        </h1>
-        <p style={{
-          fontSize:    "clamp(15px, 1.4vw, 17px)",
-          color:       "var(--pk-text-2)",
-          margin:      0,
-          lineHeight:  1.65,
-          maxWidth:    "420px",
-          marginInline: "auto",
-        }}>
-          Type anything — a worry, a thank you, a situation — and we&apos;ll write a full prayer for you in seconds.
-        </p>
-      </div>
-
-      {/* ── Input card ── */}
-      <div className="animate-fadeUp delay-100" style={{
-        background:   "var(--pk-card)",
-        border:       "1.5px solid var(--pk-border)",
-        borderRadius: "20px",
-        padding:      "clamp(20px,4vw,32px)",
-        marginBottom: "16px",
-        boxShadow:    "var(--pk-shadow-sm)",
-      }}>
-
-        {/* Textarea */}
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="e.g. I'm worried about my job. Please pray for my family. I'm thankful for healing..."
-          rows={5}
-          style={{
-            width:        "100%",
-            background:   "transparent",
-            border:       "none",
-            padding:      "0",
-            fontSize:     "clamp(16px, 1.4vw, 17px)",
-            color:        "var(--pk-text)",
-            resize:       "none",
-            outline:      "none",
-            boxSizing:    "border-box",
-            fontFamily:   "inherit",
-            lineHeight:   1.7,
-          }}
-        />
-
-        <div style={{ height: "1px", background: "var(--pk-border)", margin: "16px 0" }} />
-
-        {/* Mood chips */}
-        <div>
-          <p style={{
-            fontSize:     "11px",
-            fontWeight:   700,
-            letterSpacing:"0.08em",
-            textTransform:"uppercase",
-            color:        "var(--pk-text-3)",
-            marginBottom: "10px",
-          }}>
-            How are you feeling? (optional)
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {MOODS.map((m) => {
-              const active = moods.includes(m);
-              return (
-                <button
-                  key={m}
-                  onClick={() => toggleMood(m)}
-                  style={{
-                    padding:      "8px 16px",
-                    minHeight:    "36px",
-                    borderRadius: "4px",
-                    border:       active ? "1.5px solid var(--pk-purple)" : "1.5px solid var(--pk-border)",
-                    background:   active ? "var(--pk-purple-dim)" : "var(--pk-card)",
-                    color:        active ? "var(--pk-purple)" : "var(--pk-text-3)",
-                    fontSize:     "12px",
-                    fontWeight:   active ? 700 : 500,
-                    cursor:       "pointer",
-                    transition:   "all 150ms ease",
-                    boxShadow:    active ? "2px 2px 0 0 var(--pk-purple-border)" : "none",
-                    letterSpacing:"-0.01em",
-                  }}
-                >
-                  {m}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Generate button ── */}
-      <button
-        onClick={() => generate()}
-        disabled={loading || !input.trim()}
-        style={{
-          width:        "100%",
-          padding:      "16px 28px",
-          minHeight:    "56px",
-          borderRadius: "6px",
-          border:       "2px solid",
-          borderColor:  loading || !input.trim() ? "var(--pk-purple-border)" : "var(--pk-purple)",
-          background:   loading || !input.trim() ? "var(--pk-purple-dim)" : "var(--pk-purple)",
-          color:        loading || !input.trim() ? "var(--pk-text-3)" : "#fff",
-          fontSize:     "16px",
-          fontWeight:   800,
-          cursor:       loading || !input.trim() ? "not-allowed" : "pointer",
-          transition:   "all 200ms ease",
-          letterSpacing:"-0.01em",
-          boxShadow:    loading || !input.trim() ? "none" : "4px 4px 0 0 var(--pk-purple-border)",
-        }}
-        onMouseEnter={e => {
-          if (loading || !input.trim()) return;
-          (e.currentTarget as HTMLButtonElement).style.transform = "translate(-2px,-2px)";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = "6px 6px 0 0 var(--pk-purple-border)";
-        }}
-        onMouseLeave={e => {
-          (e.currentTarget as HTMLButtonElement).style.transform = "translate(0,0)";
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = loading || !input.trim() ? "none" : "4px 4px 0 0 var(--pk-purple-border)";
-        }}
-      >
-        {loading ? (
-          <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
-            <span style={{ width: "16px", height: "16px", border: "2px solid var(--pk-purple-border)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
-            Writing your prayer...
-          </span>
-        ) : "✦ Generate Prayer"}
-      </button>
-
-      {/* ── Error ── */}
-      {error && (
-        <div style={{ marginTop: "16px", padding: "14px 18px", borderRadius: "8px", background: "rgba(255,59,48,0.08)", border: "1.5px solid rgba(255,59,48,0.25)", color: "var(--pk-red)", fontSize: "14px", boxShadow: "3px 3px 0 0 rgba(255,59,48,0.15)" }}>
-          {error}
-        </div>
-      )}
-
-      {/* ── Prayer result ── */}
-      {prayer && (
-        <div style={{ marginTop: "32px", animation: "prayerIn 480ms cubic-bezier(0.22,1,0.36,1)" }}>
-
-          {/* ── Receipt Header ── */}
-          <div style={{
-            display:        "flex",
-            alignItems:     "center",
-            justifyContent: "space-between",
-            padding:        "14px 24px",
-            background:     "var(--pk-gold-dim)",
-            border:         "1.5px solid var(--pk-gold-border)",
-            borderRadius:   "16px 16px 0 0",
-          }}>
-            <span style={{ fontSize: "13px", fontWeight: 800, color: "var(--pk-gold)", letterSpacing: "0.06em" }}>
-              ✦ PrayerKey
-            </span>
-            <span style={{ fontSize: "11px", color: "var(--pk-text-3)", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-              {new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
-              {" · "}
-              {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-            </span>
-          </div>
-
-          {/* ── Receipt Title ── */}
-          <div style={{
-            padding:      "20px 24px 16px",
-            background:   "var(--pk-card)",
-            border:       "1.5px solid var(--pk-gold-border)",
-            borderTop:    "none",
-            textAlign:    "center",
-          }}>
-            <h2 style={{ fontSize: "22px", fontWeight: 800, color: "var(--pk-text)", margin: "0 0 4px", letterSpacing: "-0.02em" }}>
-              Prayer Receipt
-            </h2>
-            <p style={{ fontSize: "12px", color: "var(--pk-text-3)", margin: 0, letterSpacing: "0.02em" }}>
-              Generated from PrayerKey on{" "}
-              {new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}
-            </p>
-          </div>
-
-          {/* ── Receipt Meta Rows ── */}
-          <div style={{ background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)", borderTop: "none" }}>
-            {[
-              { label: "Topic",  value: prayer.title,           accent: false },
-              { label: "Type",   value: "Scripture-Based Prayer", accent: false },
-              { label: "Status", value: "Prayer Generated  ✓",  accent: true  },
-            ].map(({ label, value, accent }, i, arr) => (
-              <div key={label} style={{
-                display:       "flex",
-                gap:           "16px",
-                padding:       "13px 24px",
-                borderBottom:  i < arr.length - 1 ? "1px solid var(--pk-gold-border)" : "none",
-                alignItems:    "center",
-              }}>
-                <span style={{
-                  fontSize:     "12px",
-                  fontWeight:   700,
-                  color:        "var(--pk-gold)",
-                  minWidth:     "72px",
-                  letterSpacing:"0.04em",
-                  textTransform:"uppercase",
-                  flexShrink:   0,
-                }}>
-                  {label}
-                </span>
-                <span style={{
-                  fontSize:   "14px",
-                  color:      accent ? "#34C759" : "var(--pk-text)",
-                  fontWeight: accent ? 700 : 500,
-                }}>
-                  {value}
-                </span>
+          <div className="py-field">
+            <label htmlFor="py-q" className="sr-only">What do you want to pray about?</label>
+            <textarea
+              id="py-q"
+              ref={field}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) pray(); }}
+              rows={3}
+              maxLength={500}
+            />
+            {!input && (
+              <span key={example} className="py-example" aria-hidden>{EXAMPLES[example]}</span>
+            )}
+            {/* the words, carried up */}
+            {stage === "rising" && (
+              <div className="py-lift" aria-hidden>
+                <p>{lifted}</p>
+                {SPARKS.map((s, i) => (
+                  <i key={i} style={{ "--x": `${s.x}%`, "--y": `${s.y}%`, "--dx": `${s.dx}px`, "--d": `${s.d}s`, "--s": `${s.s}px` } as React.CSSProperties} />
+                ))}
               </div>
+            )}
+          </div>
+
+          <div className="py-moods" role="group" aria-label="How are you feeling">
+            {MOODS.map((m) => (
+              <button key={m} type="button" aria-pressed={moods.includes(m)} className={moods.includes(m) ? "is-on" : ""}
+                onClick={() => setMoods((p) => (p.includes(m) ? p.filter((x) => x !== m) : [...p, m]))}>
+                {m}
+              </button>
             ))}
           </div>
 
-          {/* ── Divider ── */}
-          <div style={{ background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)", borderTop: "none", padding: "0 24px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "14px", padding: "18px 0" }}>
-              <div style={{ flex: 1, height: "1px", background: "var(--pk-gold-border)" }} />
-              <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--pk-gold)", letterSpacing: "0.16em", textTransform: "uppercase", flexShrink: 0 }}>
-                Your Prayer
-              </span>
-              <div style={{ flex: 1, height: "1px", background: "var(--pk-gold-border)" }} />
-            </div>
-          </div>
+          <button type="button" className="py-go" onClick={() => pray()} disabled={!input.trim() || stage === "rising"}>
+            Pray
+          </button>
+        </div>
+      </section>
 
-          {/* ── Prayer Title + Body ── */}
-          <div style={{
-            background: "var(--pk-card)",
-            border:     "1.5px solid var(--pk-gold-border)",
-            borderTop:  "none",
-            padding:    "0 clamp(24px,5vw,48px) clamp(28px,5vw,40px)",
-          }}>
-            <h3 style={{
-              fontSize:      "clamp(17px, 2vw, 21px)",
-              fontWeight:    800,
-              color:         "var(--pk-text)",
-              margin:        "0 0 20px",
-              textAlign:     "center",
-              letterSpacing: "-0.02em",
-              lineHeight:    1.2,
-            }}>
-              {prayer.title}
-            </h3>
-            <p style={{
-              fontSize:   "clamp(15px, 1.4vw, 17px)",
-              color:      "var(--pk-text)",
-              lineHeight: 1.95,
-              whiteSpace: "pre-wrap",
-              margin:     0,
-              fontStyle:  "italic",
-            }}>
-              {prayer.prayer}
-            </p>
-          </div>
-
-          {/* ── Encouragement ── */}
-          <div style={{
-            padding:    "16px 24px",
-            background: "var(--pk-gold-dim)",
-            border:     "1.5px solid var(--pk-gold-border)",
-            borderTop:  "none",
-            borderLeft: "4px solid var(--pk-gold)",
-          }}>
-            <p style={{ fontSize: "13px", color: "var(--pk-text-2)", margin: 0, lineHeight: 1.75, fontStyle: "italic" }}>
-              {prayer.encouragement}
-            </p>
-          </div>
-
-          {/* ── Scripture Rows ── */}
-          {prayer.verses?.length > 0 && (
-            <div style={{ background: "var(--pk-card)", border: "1.5px solid var(--pk-gold-border)", borderTop: "none" }}>
-
-              {/* Scripture label row */}
-              <div style={{ padding: "11px 24px", borderBottom: "1px solid var(--pk-gold-border)", background: "var(--pk-gold-dim)" }}>
-                <span style={{ fontSize: "10px", fontWeight: 800, color: "var(--pk-gold)", letterSpacing: "0.14em", textTransform: "uppercase" }}>
-                  Scripture
-                </span>
-              </div>
-
-              {/* Verse rows */}
-              {prayer.verses.map((v, i) => (
-                <div key={v.ref} style={{
-                  display:       "flex",
-                  gap:           "0",
-                  borderBottom:  i < prayer.verses.length - 1 ? "1px solid var(--pk-gold-border)" : "none",
-                  alignItems:    "stretch",
-                }}>
-                  {/* Ref column */}
-                  <div style={{
-                    padding:     "14px 16px 14px 24px",
-                    minWidth:    "110px",
-                    flexShrink:  0,
-                    borderRight: "1px solid var(--pk-gold-border)",
-                    display:     "flex",
-                    alignItems:  "center",
-                  }}>
-                    <span style={{ fontSize: "12px", fontWeight: 700, color: "var(--pk-gold)", lineHeight: 1.3 }}>
-                      {v.ref}
-                    </span>
-                  </div>
-                  {/* Text column */}
-                  <div style={{ padding: "14px 24px 14px 16px", flex: 1 }}>
-                    <span style={{ fontSize: "13px", color: "var(--pk-text-2)", lineHeight: 1.7, fontStyle: "italic" }}>
-                      {v.text}
-                    </span>
-                  </div>
-                </div>
+      {/* the prayer, written onto the page */}
+      {prayer && (
+        <section ref={page} className="py-result" aria-live="polite">
+          <article className={`py-page ${stage === "done" ? "is-done" : ""}`}>
+            <p className="py-page__kicker">{prayer.title}</p>
+            <div className="py-words">
+              {paragraphs.map((p, k) => (
+                <p key={k}>
+                  {p.map(({ w, i }) => (
+                    <span key={i} style={{ animationDelay: `${(i * step) / 1000}s` }}>{w} </span>
+                  ))}
+                </p>
               ))}
             </div>
-          )}
 
-          {/* ── Action Footer ── */}
-          <div style={{
-            display:      "flex",
-            gap:          "10px",
-            padding:      "14px 20px",
-            background:   "var(--pk-card)",
-            border:       "1.5px solid var(--pk-gold-border)",
-            borderTop:    "1px solid var(--pk-gold-border)",
-            borderRadius: "0 0 16px 16px",
-            flexWrap:     "wrap",
-            alignItems:   "center",
-          }}>
-            <button
-              onClick={() => setShowCard(true)}
-              style={{
-                padding:      "10px 20px",
-                minHeight:    "44px",
-                borderRadius: "6px",
-                border:       "1.5px solid var(--pk-gold-border)",
-                background:   "var(--pk-gold-dim)",
-                color:        "var(--pk-gold)",
-                fontSize:     "13px",
-                fontWeight:   700,
-                cursor:       "pointer",
-                transition:   "all 180ms ease",
-                display:      "flex",
-                alignItems:   "center",
-                gap:          "6px",
-                boxShadow:    "2px 2px 0 0 var(--pk-gold-border)",
-              }}
-            >
-              ✦ Download Card
-            </button>
-            <button
-              onClick={copy}
-              style={{
-                padding:      "10px 20px",
-                minHeight:    "44px",
-                borderRadius: "6px",
-                border:       "1.5px solid var(--pk-border)",
-                background:   copied ? "rgba(52,199,89,0.08)" : "transparent",
-                color:        copied ? "#34C759" : "var(--pk-text-2)",
-                fontSize:     "13px",
-                fontWeight:   600,
-                cursor:       "pointer",
-                transition:   "all 180ms ease",
-              }}
-            >
-              {copied ? "✓ Copied" : "Copy Text"}
-            </button>
-            <button
-              onClick={() => { setPrayer(null); setInput(""); setMoods([]); }}
-              style={{
-                padding:      "10px 20px",
-                minHeight:    "44px",
-                borderRadius: "6px",
-                border:       "1.5px solid var(--pk-border)",
-                background:   "transparent",
-                color:        "var(--pk-text-3)",
-                fontSize:     "13px",
-                cursor:       "pointer",
-                transition:   "all 180ms ease",
-                marginLeft:   "auto",
-              }}
-            >
-              New Prayer
-            </button>
+            {prayer.verses.length > 0 && (
+              <ul className="py-verses" style={{ "--after": `${(total * step) / 1000 + 0.2}s` } as React.CSSProperties}>
+                {prayer.verses.map((v, i) => (
+                  <li key={v.ref} style={{ "--i": i } as React.CSSProperties}>
+                    <p>{v.text}</p>
+                    <span>{v.ref}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </article>
+
+          <div className={`py-actions ${stage === "done" ? "is-on" : ""}`}>
+            {canSpeak && (
+              <button type="button" onClick={listen} className="py-actions__main" aria-pressed={speaking}>
+                {speaking ? "Pause" : "Listen"}
+              </button>
+            )}
+            <button type="button" onClick={copy}>{copied ? "Copied" : "Copy"}</button>
+            <button type="button" onClick={() => setShowCard(true)}>Make a card</button>
+            <button type="button" onClick={again}>Pray again</button>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* ── Prayer Card Modal ── */}
-      {showCard && prayer && (
-        <PrayerCardModal prayer={prayer} onClose={() => setShowCard(false)} />
-      )}
-
-      <style>{`
-        textarea:focus { border-color: var(--pk-purple-border) !important; }
-        textarea::placeholder { color: var(--pk-text-3); }
-        @keyframes spin    { to { transform: rotate(360deg); } }
-        @keyframes prayerIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+      {showCard && prayer && <PrayerCardModal prayer={prayer} onClose={() => setShowCard(false)} />}
     </div>
   );
 }

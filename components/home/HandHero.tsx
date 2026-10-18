@@ -1,19 +1,9 @@
-"use client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import PlayBadge from "@/components/app/PlayBadge";
 
 // The opening, the way the best app sites do it: one bold promise, the real app
 // in a hand, and one way to get it - on the brand's own violet.
 export default function HandHero() {
-  const router = useRouter();
-  const [heart, setHeart] = useState("");
-  const pray = (event: React.FormEvent) => {
-    event.preventDefault();
-    const topic = heart.trim();
-    router.push(topic ? `/pray?topic=${encodeURIComponent(topic)}` : "/pray");
-  };
   // entrances are CSS (hand-hero.css): visible without JavaScript
   const rise = (delay: number) => ({ style: { animationDelay: `${delay}s` } as React.CSSProperties });
 
@@ -32,11 +22,8 @@ export default function HandHero() {
             <PlayBadge source="home" size="lg" />
           </div>
 
-          <form className="hh__ask hh-in" onSubmit={pray} {...rise(0.35)}>
-            <label htmlFor="hh-heart" className="sr-only">What do you want to pray about?</label>
-            <input id="hh-heart" value={heart} onChange={(e) => setHeart(e.target.value)} maxLength={500} placeholder="Or pray now: what is on your heart?" autoComplete="off" />
-            <button type="submit" aria-label="Pray"><ArrowRight size={18} /></button>
-          </form>
+          {/* one action on this screen: the app. The web prayer stays a quiet link. */}
+          <Link href="/pray" className="hh__web hh-in" {...rise(0.35)}>Or pray now on the web</Link>
         </div>
 
         {/* A CSS entrance, not a script one: the image must show even before the

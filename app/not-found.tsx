@@ -1,98 +1,39 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import "./not-found.css";
 
 export const metadata: Metadata = {
   title:       "Page Not Found — PrayerKey",
-  description: "We couldn't find that page. Try the AI prayer generator, Bible search, live sermon dashboard, or the full documentation.",
+  description: "We couldn't find that page. Try the free prayer generator, Bible search, the live sermon projector, or the full documentation.",
   robots:      { index: false, follow: true },
 };
 
+// where most people were heading
+const WAYS: [string, string][] = [
+  ["/prayer", "Prayers"],
+  ["/bible", "The Bible"],
+  ["/pray", "Write a prayer"],
+  ["/live", "Live Sermon"],
+  ["/docs", "Documentation"],
+];
+
 export default function NotFound() {
   return (
-    <div style={{
-      minHeight:      "60vh",
-      display:        "flex",
-      flexDirection:  "column",
-      alignItems:     "center",
-      justifyContent: "center",
-      textAlign:      "center",
-      padding:        "60px 20px",
-    }}>
-      <div style={{
-        display:      "inline-flex",
-        alignItems:   "center",
-        padding:      "4px 12px",
-        border:       "1.5px solid var(--pk-accent-border)",
-        borderRadius: "4px",
-        marginBottom: "24px",
-        background:   "var(--pk-accent-dim)",
-        boxShadow:    "3px 3px 0 0 var(--pk-accent-border)",
-      }}>
-        <span style={{
-          fontSize:       "10px",
-          fontWeight:     700,
-          color:          "var(--pk-accent)",
-          letterSpacing:  "0.12em",
-          textTransform:  "uppercase",
-        }}>
-          404 · Not Found
-        </span>
-      </div>
-
-      <h1 style={{
-        fontSize:      "clamp(36px, 5vw, 56px)",
-        fontWeight:    800,
-        color:         "var(--pk-text)",
-        margin:        "0 0 16px",
-        letterSpacing: "-0.03em",
-        lineHeight:    1.1,
-      }}>
-        We couldn't find that page.
+    <section className="nf" aria-labelledby="nf-title">
+      <img className="nf-mark" src="/pk-mark.png" alt="" width={56} height={56} />
+      <p className="nf-kicker">404</p>
+      <h1 id="nf-title" className="nf-title">
+        <span>This page</span> <span>is not here.</span>
       </h1>
-
-      <p style={{
-        fontSize:   "17px",
-        color:      "var(--pk-text-2)",
-        lineHeight: 1.7,
-        margin:     "0 0 32px",
-        maxWidth:   "520px",
-      }}>
-        The link may be broken, or the page may have moved. Here are the things
-        most people are looking for:
+      <p className="nf-line">
+        The link may be broken, or the page may have moved. Here are a few good places to go instead.
       </p>
-
-      <div style={{
-        display:        "flex",
-        flexWrap:       "wrap",
-        gap:            "12px",
-        justifyContent: "center",
-      }}>
-        {[
-          { href: "/",      label: "Home" },
-          { href: "/pray",  label: "AI Prayer Generator" },
-          { href: "/live",  label: "Live Sermon" },
-          { href: "/bible", label: "Bible Search" },
-          { href: "/prayer",label: "Prayer Library" },
-          { href: "/docs",  label: "Documentation" },
-        ].map((l) => (
-          <Link key={l.href} href={l.href} style={{
-            display:        "inline-flex",
-            alignItems:     "center",
-            padding:        "10px 18px",
-            fontSize:       "14px",
-            fontWeight:     600,
-            color:          "var(--pk-text)",
-            border:         "1.5px solid var(--pk-border)",
-            borderRadius:   "8px",
-            background:     "var(--pk-surface)",
-            boxShadow:      "3px 3px 0 0 var(--pk-border)",
-            textDecoration: "none",
-            letterSpacing:  "-0.005em",
-          }}>
-            {l.label}
-          </Link>
+      <Link href="/" className="nf-home">Back to home</Link>
+      <nav className="nf-ways" aria-label="Where to go instead">
+        {WAYS.map(([href, label]) => (
+          <Link key={href} href={href}>{label}</Link>
         ))}
-      </div>
-    </div>
+      </nav>
+    </section>
   );
 }

@@ -1,3 +1,4 @@
+import { DEVOTIONALS } from "@/lib/devotionals";
 import { MetadataRoute } from "next";
 import { ALL_SLUGS } from "@/lib/seo/prayer-topics";
 import { getAllVerseRefs, BIBLE_BOOKS } from "@/lib/seo/bible-books";
@@ -86,8 +87,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority:        0.65,
   }));
 
+  /* ── verse of the day: today's page, and one page for each day of the year ── */
+  const dailyPages: MetadataRoute.Sitemap = [
+    { url: `${base}/verse-of-the-day`, lastModified: now, changeFrequency: "daily" as const, priority: 0.95 },
+    ...DEVOTIONALS.map((d) => ({ url: `${base}/verse-of-the-day/${d.slug}`, lastModified: now, changeFrequency: "yearly" as const, priority: 0.7 })),
+  ];
+
   return [
     ...staticPages,
+    ...dailyPages,
     ...prayerHub,
     ...prayerSlugPages,
     ...topicPages,

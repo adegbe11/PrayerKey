@@ -14,7 +14,9 @@ import { playUrl } from "@/lib/app-store";
 const KEY = "pk-app-invite";
 const SNOOZE_DAYS = 14;
 const AFTER_INSTALL_DAYS = 30;
+// the home page is itself the invitation, so it never shows a second one
 const HIDDEN_ON = ["/download", "/live/projector"];
+const hiddenOn = (path: string) => path === "/" || HIDDEN_ON.some((p) => path.startsWith(p));
 
 type Kind = "android" | "desktop";
 
@@ -53,7 +55,7 @@ export default function AppInvite() {
 
   // Wait for interest: a few seconds on the site, or a third of the way down a page.
   useEffect(() => {
-    if (!kind || open || HIDDEN_ON.some((p) => path.startsWith(p)) || snoozed()) return;
+    if (!kind || open || hiddenOn(path) || snoozed()) return;
     let done = false;
     const show = () => { if (done || snoozed()) return; done = true; setCopy(moment()); setOpen(true); };
     const timer = window.setTimeout(show, 8000);
@@ -65,7 +67,7 @@ export default function AppInvite() {
     return () => { window.clearTimeout(timer); window.removeEventListener("scroll", onScroll); };
   }, [kind, path, open]);
 
-  useEffect(() => { if (HIDDEN_ON.some((p) => path.startsWith(p))) setOpen(false); }, [path]);
+  useEffect(() => { if (hiddenOn(path)) setOpen(false); }, [path]);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { snooze(SNOOZE_DAYS); setOpen(false); } };

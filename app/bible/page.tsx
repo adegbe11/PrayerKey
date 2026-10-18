@@ -1,40 +1,124 @@
 "use client";
-import { useState } from "react";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import InView from "@/components/home/InView";
+import { leatherOf, spineHeight } from "@/lib/bible/leather";
 import { BIBLE_BOOKS } from "@/lib/seo/bible-books";
+import "./bible.css";
 
-type Result   = { ref: string; text: string; match: string };
+type Result = { ref: string; text: string; match: string };
 type CrossRef = { ref: string; text: string; reason: string };
 
+// the page the lamp moves over: a few verses about the Word itself (KJV)
+const PAGE = [
+  "In the beginning was the Word, and the Word was with God, and the Word was God.",
+  "Thy word is a lamp unto my feet, and a light unto my path.",
+  "The grass withereth, the flower fadeth: but the word of our God shall stand for ever.",
+  "Heaven and earth shall pass away, but my words shall not pass away.",
+  "All scripture is given by inspiration of God, and is profitable for doctrine, for reproof, for correction, for instruction in righteousness.",
+  "For the word of God is quick, and powerful, and sharper than any twoedged sword.",
+  "Man shall not live by bread alone, but by every word that proceedeth out of the mouth of God.",
+  "The entrance of thy words giveth light; it giveth understanding unto the simple.",
+  "Thy word have I hid in mine heart, that I might not sin against thee.",
+  "So shall my word be that goeth forth out of my mouth: it shall not return unto me void.",
+  "Every word of God is pure: he is a shield unto them that put their trust in him.",
+  "Sanctify them through thy truth: thy word is truth.",
+].join("  ·  ");
+
+const HINTS = ["John 3:16", "do not fear", "Psalm 23", "grace", "peace"];
+
+function Shelf({ books }: { books: typeof BIBLE_BOOKS }) {
+  return (
+    <div className="bh-shelf">
+      <div className="bh-shelf__books">
+        {books.map((b, i) => (
+          <Link
+            key={b.slug}
+            href={`/bible/${b.slug}`}
+            className="bh-spine"
+            title={`${b.name}, ${b.chapters} chapter${b.chapters === 1 ? "" : "s"}`}
+            style={{
+              "--h": `${spineHeight(b.chapters)}px`,
+              "--c": leatherOf(b.slug),
+              "--i": i,
+            } as React.CSSProperties}
+          >
+            <span className="bh-spine__name">{b.name}</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function BiblePage() {
-  const [query,     setQuery]     = useState("");
-  const [results,   setResults]   = useState<Result[]>([]);
-  const [loading,   setLoading]   = useState(false);
-  const [selected,  setSelected]  = useState<Result | null>(null);
+  const [query, setQuery] = useState("");
+  const [asked, setAsked] = useState("");
+  const [results, setResults] = useState<Result[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState<string | null>(null);
   const [crossRefs, setCrossRefs] = useState<CrossRef[]>([]);
   const [crLoading, setCrLoading] = useState(false);
+  const hero = useRef<HTMLElement>(null);
+  const resultsRef = useRef<HTMLElement>(null);
 
-  async function search() {
-    if (!query.trim()) return;
+  // the lamp: follows the pointer, and drifts on its own when nothing is guiding it
+  useEffect(() => {
+    const el = hero.current;
+    if (!el) return;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let tx = 0.5, ty = 0.55, x = 0.5, y = 0.55, guided = 0, raf = 0, visible = true;
+    const move = (e: PointerEvent) => {
+      const r = el.getBoundingClientRect();
+      tx = (e.clientX - r.left) / r.width; ty = (e.clientY - r.top) / r.height;
+      guided = performance.now();
+    };
+    const tick = (t: number) => {
+      raf = 0;
+      if (performance.now() - guided > 2500) {
+        // a slow figure of eight across the page
+        tx = 0.5 + Math.sin(t / 3400) * 0.34; ty = 0.55 + Math.sin(t / 1700) * 0.2;
+      }
+      x += (tx - x) * 0.08; y += (ty - y) * 0.08;
+      el.style.setProperty("--mx", `${(x * 100).toFixed(2)}%`);
+      el.style.setProperty("--my", `${(y * 100).toFixed(2)}%`);
+      if (visible && !still) raf = requestAnimationFrame(tick);
+    };
+    const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible && !raf && !still) raf = requestAnimationFrame(tick); });
+    io.observe(el);
+    el.addEventListener("pointermove", move);
+    if (still) { el.style.setProperty("--mx", "50%"); el.style.setProperty("--my", "50%"); }
+    return () => { cancelAnimationFrame(raf); io.disconnect(); el.removeEventListener("pointermove", move); };
+  }, []);
+
+  async function search(q = query) {
+    const term = q.trim();
+    if (!term) return;
+    setQuery(term);
+    setAsked(term);
     setLoading(true);
     setResults([]);
-    setSelected(null);
+    setOpen(null);
     setCrossRefs([]);
+    requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
     try {
-      const res  = await fetch(`/api/bible/search?q=${encodeURIComponent(query)}&translation=NIV`);
+      const res = await fetch(`/api/bible/search?q=${encodeURIComponent(term)}&translation=NIV`);
       const data = await res.json();
       setResults(data.results ?? []);
+    } catch {
+      setResults([]);
     } finally {
       setLoading(false);
     }
   }
 
-  async function loadCrossRefs(v: Result) {
-    setSelected(v);
+  async function related(v: Result) {
+    if (open === v.ref) { setOpen(null); return; }
+    setOpen(v.ref);
     setCrossRefs([]);
     setCrLoading(true);
     try {
-      const res  = await fetch(`/api/bible/cross-refs?ref=${encodeURIComponent(v.ref)}&translation=NIV`);
+      const res = await fetch(`/api/bible/cross-refs?ref=${encodeURIComponent(v.ref)}&translation=NIV`);
       const data = await res.json();
       setCrossRefs(data.refs ?? []);
     } finally {
@@ -42,277 +126,81 @@ export default function BiblePage() {
     }
   }
 
+  const ot = BIBLE_BOOKS.filter((b) => b.testament === "old");
+  const nt = BIBLE_BOOKS.filter((b) => b.testament === "new");
+
   return (
-    <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 0 80px" }}>
+    <div className="bh">
+      <InView />
 
-      {/* ── Page header ── */}
-      <div className="animate-fadeUp" style={{ textAlign: "center", marginBottom: "48px" }}>
-        <div style={{
-          display:      "inline-flex",
-          alignItems:   "center",
-          gap:          "8px",
-          padding:      "4px 12px",
-          border:       "1.5px solid var(--pk-gold-border)",
-          borderRadius: "4px",
-          marginBottom: "20px",
-          background:   "var(--pk-gold-dim)",
-          boxShadow:    "3px 3px 0 0 var(--pk-gold-border)",
-        }}>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            Bible Search
-          </span>
-        </div>
+      {/* a page of scripture in the dark, and a lamp over it */}
+      <section ref={hero} className="bh-hero pk-bleed" data-nav="dark">
+        <div className="bh-page" aria-hidden>{PAGE}  ·  {PAGE}</div>
+        <div className="bh-page bh-page--lit" aria-hidden>{PAGE}  ·  {PAGE}</div>
+        <div className="bh-lamp" aria-hidden />
 
-        <h1 style={{
-          fontSize:      "clamp(32px, 6vw, 56px)",
-          fontWeight:    800,
-          color:         "var(--pk-text)",
-          margin:        "0 0 14px",
-          letterSpacing: "-0.03em",
-          lineHeight:    1.05,
-        }}>
-          Find any verse,<br />any topic.
-        </h1>
-        <p style={{
-          fontSize:    "clamp(15px, 1.4vw, 17px)",
-          color:       "var(--pk-text-2)",
-          margin:      0,
-          lineHeight:  1.65,
-          maxWidth:    "420px",
-          marginInline:"auto",
-        }}>
-          Search all 66 books of the Bible by reference, keyword, or topic — then see related scriptures instantly.
-        </p>
-      </div>
-
-      {/* ── Search bar ── */}
-      <div className="animate-fadeUp delay-100" style={{
-        display:      "flex",
-        gap:          "8px",
-        marginBottom: "28px",
-        background:   "var(--pk-card)",
-        border:       "1.5px solid var(--pk-border)",
-        borderRadius: "8px",
-        padding:      "8px",
-        boxShadow:    "var(--pk-shadow-sm)",
-      }}>
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && search()}
-          placeholder='e.g. "John 3:16" or "do not fear" or "peace"'
-          style={{
-            flex:       1,
-            padding:    "12px 16px",
-            minHeight:  "48px",
-            background: "transparent",
-            border:     "none",
-            color:      "var(--pk-text)",
-            fontSize:   "clamp(14px, 1.4vw, 16px)",
-            outline:    "none",
-            fontFamily: "inherit",
-          }}
-        />
-        <button
-          onClick={search}
-          disabled={loading || !query.trim()}
-          style={{
-            padding:      "12px 24px",
-            minHeight:    "48px",
-            borderRadius: "4px",
-            border:       "1.5px solid",
-            borderColor:  loading || !query.trim() ? "var(--pk-gold-border)" : "var(--pk-gold)",
-            background:   loading || !query.trim() ? "var(--pk-gold-dim)" : "var(--pk-gold)",
-            color:        loading || !query.trim() ? "var(--pk-text-3)" : "#fff",
-            fontSize:     "14px",
-            fontWeight:   800,
-            cursor:       loading || !query.trim() ? "not-allowed" : "pointer",
-            letterSpacing:"-0.01em",
-            boxShadow:    loading || !query.trim() ? "none" : "3px 3px 0 0 var(--pk-gold-border)",
-            transition:   "all 150ms ease",
-            flexShrink:   0,
-          }}
-          onMouseEnter={e => {
-            if (loading || !query.trim()) return;
-            (e.currentTarget as HTMLButtonElement).style.transform = "translate(-1px,-1px)";
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = "5px 5px 0 0 var(--pk-gold-border)";
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.transform = "translate(0,0)";
-            (e.currentTarget as HTMLButtonElement).style.boxShadow = loading || !query.trim() ? "none" : "3px 3px 0 0 var(--pk-gold-border)";
-          }}
-        >
-          {loading ? (
-            <span style={{ width: "14px", height: "14px", border: "2px solid var(--pk-gold-border)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
-          ) : "Search →"}
-        </button>
-      </div>
-
-      {/* ── Results ── */}
-      {results.length > 0 && (
-        <div className="animate-fadeUp" style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "24px" }}>
-          <p style={{ fontSize: "11px", fontWeight: 700, color: "var(--pk-text-3)", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 8px" }}>
-            {results.length} Result{results.length !== 1 ? "s" : ""}
-          </p>
-          {results.map((r) => {
-            const isSelected = selected?.ref === r.ref;
-            return (
-              <button
-                key={r.ref}
-                onClick={() => loadCrossRefs(r)}
-                style={{
-                  textAlign:    "left",
-                  padding:      "18px 20px",
-                  minHeight:    "44px",
-                  borderRadius: "8px",
-                  border:       `1.5px solid ${isSelected ? "var(--pk-gold-border)" : "var(--pk-border)"}`,
-                  background:   isSelected ? "var(--pk-gold-dim)" : "var(--pk-card)",
-                  cursor:       "pointer",
-                  transition:   "all 150ms ease",
-                  boxShadow:    isSelected ? "3px 3px 0 0 var(--pk-gold-border)" : "none",
-                }}
-                onMouseEnter={e => {
-                  if (isSelected) return;
-                  (e.currentTarget as HTMLButtonElement).style.background = "var(--pk-card-hover)";
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--pk-border-2)";
-                }}
-                onMouseLeave={e => {
-                  if (isSelected) return;
-                  (e.currentTarget as HTMLButtonElement).style.background = "var(--pk-card)";
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--pk-border)";
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "-0.01em" }}>{r.ref}</span>
-                  <span style={{ fontSize: "10px", fontWeight: 700, color: isSelected ? "var(--pk-gold)" : "var(--pk-text-3)", letterSpacing: "0.08em", textTransform: "uppercase", background: isSelected ? "var(--pk-gold-dim)" : "var(--pk-card)", padding: "2px 8px", borderRadius: "3px" }}>
-                    {r.match === "direct" ? "Exact" : "Related"}
-                  </span>
-                </div>
-                <p style={{ fontSize: "14px", color: "var(--pk-text-2)", lineHeight: 1.65, margin: 0 }}>{r.text}</p>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Empty state */}
-      {results.length === 0 && !loading && query && (
-        <div style={{ textAlign: "center", padding: "48px 20px", color: "var(--pk-text-3)" }}>
-          <p style={{ fontSize: "13px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 8px", color: "var(--pk-text-3)" }}>No Results</p>
-          <p style={{ fontSize: "15px", margin: 0 }}>Try different keywords or a direct reference like &ldquo;Romans 8:28&rdquo;.</p>
-        </div>
-      )}
-
-      {/* Default hint (no search yet) */}
-      {!query && results.length === 0 && (
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center" }}>
-          {["John 3:16", "faith", "do not fear", "Psalm 23", "grace"].map((hint) => (
-            <button
-              key={hint}
-              onClick={() => { setQuery(hint); }}
-              style={{
-                padding:      "8px 16px",
-                minHeight:    "36px",
-                borderRadius: "4px",
-                border:       "1px solid var(--pk-gold-border)",
-                background:   "var(--pk-gold-dim)",
-                color:        "var(--pk-gold)",
-                fontSize:     "13px",
-                fontWeight:   500,
-                cursor:       "pointer",
-                transition:   "all 150ms ease",
-              }}
-            >
-              {hint}
+        <div className="bh-hero__in">
+          <p className="bh-kicker">The Bible</p>
+          <h1 className="bh-title"><span>Search the</span> <span>whole Bible.</span></h1>
+          <form className="bh-search" onSubmit={(e) => { e.preventDefault(); search(); }} role="search">
+            <label htmlFor="bh-q" className="sr-only">Search the Bible</label>
+            <svg className="bh-search__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+            <input id="bh-q" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="A verse, a word, or a feeling" autoComplete="off" />
+            <button type="submit" disabled={!query.trim() || loading} aria-label="Search">
+              {loading ? <span className="bh-spin" /> : <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>}
             </button>
-          ))}
+          </form>
+          <p className="bh-hints">
+            {HINTS.map((h) => <button key={h} type="button" onClick={() => search(h)}>{h}</button>)}
+          </p>
         </div>
-      )}
-
-      {/* ── Cross references ── */}
-      {selected && (
-        <div className="animate-fadeUp" style={{
-          marginTop:    "8px",
-          background:   "var(--pk-gold-dim)",
-          border:       "1.5px solid var(--pk-gold-border)",
-          borderRadius: "12px",
-          overflow:     "hidden",
-          boxShadow:    "4px 4px 0 0 var(--pk-gold-border)",
-        }}>
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--pk-gold-border)", background: "var(--pk-gold-dim)", display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-gold)", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              Related Verses
-            </span>
-            <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--pk-text-2)" }}>
-              for {selected.ref}
-            </span>
-          </div>
-
-          <div style={{ padding: "16px 20px" }}>
-            {crLoading && (
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 0" }}>
-                <span style={{ width: "14px", height: "14px", border: "2px solid var(--pk-gold-border)", borderTopColor: "var(--pk-gold)", borderRadius: "50%", display: "inline-block", animation: "spin 700ms linear infinite" }} />
-                <span style={{ fontSize: "13px", color: "var(--pk-text-3)" }}>Loading related scriptures...</span>
-              </div>
-            )}
-            {crossRefs.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                {crossRefs.map((c) => (
-                  <div key={c.ref} style={{
-                    padding:      "14px 16px",
-                    background:   "var(--pk-card)",
-                    border:       "1px solid var(--pk-border)",
-                    borderRadius: "8px",
-                  }}>
-                    <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--pk-gold)", marginBottom: "6px" }}>{c.ref}</div>
-                    <div style={{ fontSize: "14px", color: "var(--pk-text-2)", lineHeight: 1.65, marginBottom: "8px" }}>{c.text}</div>
-                    <div style={{ fontSize: "12px", color: "var(--pk-text-3)", fontStyle: "italic", borderTop: "1px solid var(--pk-border)", paddingTop: "6px" }}>{c.reason}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── Browse all 66 books — crawl path to book hub pages ── */}
-      <section style={{ marginTop: "64px" }}>
-        <h2 style={{ fontSize: "20px", fontWeight: 700, color: "var(--pk-text)", margin: "0 0 6px", letterSpacing: "-0.02em", textAlign: "center" }}>
-          Browse All 66 Books of the Bible
-        </h2>
-        <p style={{ fontSize: "13px", color: "var(--pk-text-3)", margin: "0 0 24px", textAlign: "center" }}>
-          Summaries, key themes, famous verses, and every chapter — book by book.
-        </p>
-
-        {(["old", "new"] as const).map((testament) => (
-          <div key={testament} style={{ marginBottom: "28px" }}>
-            <h3 style={{
-              fontSize: "11px", fontWeight: 800, color: "var(--pk-gold)",
-              letterSpacing: "0.14em", textTransform: "uppercase", margin: "0 0 12px",
-            }}>
-              {testament === "old" ? "Old Testament — 39 Books" : "New Testament — 27 Books"}
-            </h3>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              {BIBLE_BOOKS.filter((b) => b.testament === testament).map((b) => (
-                <Link key={b.slug} href={`/bible/${b.slug}`} style={{
-                  padding: "7px 14px", borderRadius: "999px",
-                  border: "1px solid var(--pk-border)", background: "var(--pk-card)",
-                  fontSize: "12px", fontWeight: 600, color: "var(--pk-text-2)",
-                  textDecoration: "none", transition: "all 130ms ease",
-                }}>
-                  {b.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
       </section>
 
-      <style>{`
-        input:focus { outline: none; }
-        input::placeholder { color: var(--pk-text-3); }
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
+      {/* what was found */}
+      <section ref={resultsRef} className={`bh-results ${asked ? "is-on" : ""}`} aria-live="polite">
+        {loading && (
+          <div className="bh-skeleton" aria-label="Searching">
+            {[0, 1, 2].map((i) => <div key={i} style={{ "--i": i } as React.CSSProperties}><i /><i /><i /></div>)}
+          </div>
+        )}
+        {!loading && asked && results.length === 0 && (
+          <p className="bh-empty">Nothing found for {asked}. Try a reference like Romans 8:28, or a single word.</p>
+        )}
+        {!loading && results.length > 0 && (
+          <ol className="bh-verses">
+            {results.map((r, i) => (
+              <li key={r.ref} style={{ "--i": i } as React.CSSProperties} className={open === r.ref ? "is-open" : ""}>
+                <button type="button" className="bh-verse" onClick={() => related(r)} aria-expanded={open === r.ref}>
+                  <span className="bh-verse__ref">{r.ref}</span>
+                  <span className="bh-verse__text">{r.text}</span>
+                  <span className="bh-verse__more">{open === r.ref ? "Close" : "Related verses"}</span>
+                </button>
+                {open === r.ref && (
+                  <div className="bh-related">
+                    {crLoading && <p className="bh-related__wait"><span className="bh-spin bh-spin--dark" /> Finding verses that speak to it</p>}
+                    {crossRefs.map((c, j) => (
+                      <div key={c.ref} className="bh-related__item" style={{ "--j": j } as React.CSSProperties}>
+                        <span className="bh-verse__ref">{c.ref}</span>
+                        <span className="bh-related__text">{c.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
+      {/* the library */}
+      <section className="bh-books" data-in="" aria-labelledby="bh-books">
+        <h2 id="bh-books" className="bh-h2">66 books.</h2>
+        <p className="bh-shelf__label">Old Testament</p>
+        <Shelf books={ot.slice(0, 20)} />
+        <Shelf books={ot.slice(20)} />
+        <p className="bh-shelf__label">New Testament</p>
+        <Shelf books={nt} />
+      </section>
     </div>
   );
 }

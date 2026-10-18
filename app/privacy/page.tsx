@@ -1,140 +1,192 @@
-import type { ReactNode } from "react";
+import InView from "@/components/home/InView";
+import { ReadingHero, ReadingLayout, Section } from "@/components/reading/Reading";
+import "@/components/reading/reading.css";
 
 export const metadata = {
   title: "Privacy Policy — PrayerKey",
   description: "PrayerKey privacy policy. No account, no tracking, no data stored.",
 };
 
+const TOC = [
+  { id: "commitment",  label: "Our Commitment" },
+  { id: "not-collected", label: "What We Do Not Collect" },
+  { id: "processed",   label: "What Is Processed During Use" },
+  { id: "app",         label: "The PrayerKey App" },
+  { id: "cookies",     label: "Cookies and Local Storage" },
+  { id: "third-party", label: "Third-Party Services" },
+  { id: "children",    label: "Children's Privacy" },
+  { id: "security",    label: "Data Security" },
+  { id: "rights",      label: "Your Rights" },
+  { id: "links",       label: "Links to Other Websites" },
+  { id: "changes",     label: "Changes to This Policy" },
+  { id: "contact",     label: "Contact Us" },
+];
+
 export default function PrivacyPage() {
   return (
-    <article style={{ maxWidth: "760px", margin: "0 auto", padding: "0 0 100px" }}>
+    <div className="rd">
+      <InView />
+      <ReadingHero
+        crumbs={[{ href: "/", label: "Home" }, { label: "Privacy Policy" }]}
+        title="Privacy Policy"
+        meta="Last updated: October 2026"
+      />
 
-      {/* ── Hero ── */}
-      <div className="animate-fadeUp" style={{ marginBottom: "64px" }}>
-        <div style={{
-          display:      "inline-flex",
-          alignItems:   "center",
-          padding:      "4px 12px",
-          border:       "1.5px solid var(--pk-border-2)",
-          borderRadius: "4px",
-          marginBottom: "24px",
-          background:   "var(--pk-card)",
-          boxShadow:    "3px 3px 0 0 var(--pk-border)",
-        }}>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--pk-text-3)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            Legal
-          </span>
-        </div>
+      <ReadingLayout toc={TOC}>
 
-        <h1 style={{
-          fontSize:      "clamp(32px, 5vw, 56px)",
-          fontWeight:    800,
-          color:         "var(--pk-text)",
-          margin:        "0 0 16px",
-          letterSpacing: "-0.03em",
-          lineHeight:    1.05,
-        }}>
-          Privacy Policy
-        </h1>
-        <p style={{ fontSize: "14px", color: "var(--pk-text-3)", margin: 0, letterSpacing: "0.02em" }}>
-          Last updated: October 2026
+        <Section id="commitment" title="Our Commitment to Your Privacy">
+          <p>
+            PrayerKey is built on a simple principle: you should be able to use a church tool without handing over
+            your personal information to do it. We do not require you to create an account. We do not ask for your
+            name, email address or phone number. We designed PrayerKey from the ground up to be as
+            privacy-respecting as possible while still delivering useful features. This Privacy Policy explains
+            what information is processed when you use PrayerKey, how it is used, and what your rights are.
+          </p>
+        </Section>
+
+        <Section id="not-collected" title="Information We Do Not Collect">
+          <p>
+            Because PrayerKey requires no account or registration, we do not collect or store your name, email
+            address, phone number, date of birth or any other personal identifier. We do not build a user profile
+            for you. We do not store your prayer requests or the text of prayers generated for you after your
+            session ends. We do not retain audio from live sermon sessions. Your personal faith journey is your own
+            and PrayerKey has no interest in recording or monetising it.
+          </p>
+        </Section>
+
+        <Section id="processed" title="Information That Is Processed During Use">
+          <p>When you use PrayerKey, certain information is necessarily processed in order to deliver the service.</p>
+          <p>
+            When you use the prayer generator on the website, your prayer is composed in your browser from
+            Scripture-based prayer patterns, and the text you type is not sent to PrayerKey to do this. Where a
+            prayer is composed on our servers instead, the text you provide is processed in real time to produce
+            the response you see on screen. It is not stored by PrayerKey after the request is completed.
+          </p>
+          <p>
+            When you use the live sermon verse detection feature, audio from your microphone is processed by a
+            speech recognition service that converts it to text. That text is then analysed to detect Bible verse
+            references. The audio itself is not recorded or stored. The transcription is processed in memory and
+            used only to identify verses in the moment.
+          </p>
+          <p>
+            When you use Bible search, your search query is sent to our servers and, for some translations, to a
+            third-party search service, to retrieve relevant Bible verses and cross-references. The query is not
+            stored after the response is returned.
+          </p>
+        </Section>
+
+        <Section id="app" title="The PrayerKey App (iPhone and Android)">
+          <p>
+            The PrayerKey app has no account and no sign-in. Everything you write or keep in it, your journal,
+            prayers, sermon notes, saved verses, memory verses, photos you attach, streaks and settings, is stored
+            only on your phone. PrayerKey does not upload it, cannot see it, and has no copy of it. Deleting the app
+            deletes it. If you want a copy, the app can create a backup file that you save or share yourself.
+          </p>
+          <p>
+            A few features need the internet. When you ask for a prayer, the words you type are sent to
+            prayerkey.com, a prayer is composed from Scripture and sent back, and the request is not stored. Bible
+            search sends your search words to prayerkey.com. Translations other than the King James Version are
+            fetched from bible-api.com using the verse reference. The audio Bible streams public-domain recordings
+            from publicdomainaudiobibles.com. None of these requests carries your name or any account, because
+            there is none.
+          </p>
+          <p>
+            Church notes and spoken journal entries use the microphone, only while you are recording, and only
+            after you allow it. Speech is turned into text by your phone: on iPhone by Apple&apos;s speech
+            recognition, on the device itself where your iPhone supports it; on Android by your phone&apos;s speech
+            service or an offline model downloaded once to your phone. A recording of the sermon is kept on your
+            phone so the transcript can be improved later, and deleting the note deletes the recording. PrayerKey
+            never receives your audio.
+          </p>
+          <p>
+            Reminders are scheduled on your phone. If you turn on the journal lock, your phone&apos;s own Face ID,
+            Touch ID or passcode check is used; PrayerKey never sees biometric data. The app contains no
+            advertising, no analytics and no tracking of any kind, and it does not share data with anyone.
+          </p>
+        </Section>
+
+        <Section id="cookies" title="Cookies and Local Storage">
+          <p>
+            PrayerKey may use browser cookies or local storage for basic session functionality, such as remembering
+            your preferred Bible translation during a live sermon session. These are functional cookies only. We do
+            not use tracking cookies. We do not use advertising cookies. We do not use cookies to follow you across
+            other websites or build a behavioural profile of you.
+          </p>
+        </Section>
+
+        <Section id="third-party" title="Third-Party Services">
+          <p>
+            PrayerKey uses third-party services, such as speech recognition and search providers, to power some of
+            its features. These providers receive the minimum data necessary to process your request, specifically
+            the text you provide or the audio from your microphone during a live session. These providers are bound
+            by their own privacy policies and do not use your data to train their public models based on your
+            individual requests. PrayerKey does not share your data with advertisers, data brokers or any unrelated
+            third parties.
+          </p>
+        </Section>
+
+        <Section id="children" title="Children's Privacy">
+          <p>
+            PrayerKey does not knowingly collect any information from children under the age of 13. The platform is
+            intended for use by adults and church leaders. If you believe a child has submitted personal information
+            through PrayerKey, please contact us and we will take appropriate action.
+          </p>
+        </Section>
+
+        <Section id="security" title="Data Security">
+          <p>
+            All communication between your browser and PrayerKey is encrypted using HTTPS. We take reasonable
+            technical measures to protect any data that passes through our systems. Because we do not store personal
+            user data, the risk of a data breach exposing your information is significantly lower than platforms that
+            build and maintain user databases.
+          </p>
+        </Section>
+
+        <Section id="rights" title="Your Rights">
+          <p>
+            Because PrayerKey does not store personal data linked to your identity, there is generally no personal
+            data for us to retrieve, correct or delete on your behalf. If you have used PrayerKey and have a specific
+            concern about data that may have been retained, you may contact us at prayerkey.com and we will respond
+            to your request in good faith.
+          </p>
+          <p>
+            If you are located in the European Union or United Kingdom, you have rights under the GDPR and UK GDPR
+            including the right to access, rectify and erase personal data. If you are located in California, you
+            have rights under the CCPA. We respect these rights and will respond to legitimate requests.
+          </p>
+        </Section>
+
+        <Section id="links" title="Links to Other Websites">
+          <p>
+            PrayerKey may contain links to external websites or resources. We are not responsible for the privacy
+            practices of those sites. We encourage you to read the privacy policies of any external site you visit
+            from a link on PrayerKey.
+          </p>
+        </Section>
+
+        <Section id="changes" title="Changes to This Privacy Policy">
+          <p>
+            We may update this Privacy Policy from time to time to reflect changes in the service or in applicable
+            law. When we make changes, we will update the date at the top of this page. We encourage you to review
+            this page periodically. Continued use of PrayerKey after changes are posted means you accept the updated
+            policy.
+          </p>
+        </Section>
+
+        <Section id="contact" title="Contact Us">
+          <p>
+            If you have any questions about this Privacy Policy or how your data is handled when you use PrayerKey,
+            please reach out to us through the PrayerKey website at prayerkey.com. We take privacy seriously and
+            will respond to all genuine enquiries.
+          </p>
+        </Section>
+
+        <p className="rd-after">
+          Questions about this policy? Write to <a href="mailto:support@prayerkey.com">support@prayerkey.com</a>, or read
+          the <a href="/terms">Terms of Service</a>.
         </p>
-      </div>
 
-      {/* ── Sections ── */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-
-        <LegalSection title="Our Commitment to Your Privacy">
-          PrayerKey is built on a simple principle: you should be able to use a church tool without handing over your personal information to do it. We do not require you to create an account. We do not ask for your name, email address or phone number. We designed PrayerKey from the ground up to be as privacy-respecting as possible while still delivering powerful AI-driven features. This Privacy Policy explains what information is processed when you use PrayerKey, how it is used, and what your rights are.
-        </LegalSection>
-
-        <LegalSection title="Information We Do Not Collect">
-          Because PrayerKey requires no account or registration, we do not collect or store your name, email address, phone number, date of birth or any other personal identifier. We do not build a user profile for you. We do not store your prayer requests or the text of prayers generated for you after your session ends. We do not retain audio from live sermon sessions. Your personal faith journey is your own and PrayerKey has no interest in recording or monetising it.
-        </LegalSection>
-
-        <LegalSection title="Information That Is Processed During Use">
-          When you use PrayerKey, certain information is necessarily processed in order to deliver the service.
-
-          {"\n\n"}When you use the prayer generator, the text you type is sent to an AI language model to generate your prayer. This text is processed in real time to produce the response you see on screen. It is not stored by PrayerKey after the request is completed.
-
-          {"\n\n"}When you use the live sermon verse detection feature, audio from your microphone is processed by a speech recognition service that converts it to text. That text is then analysed to detect Bible verse references. The audio itself is not recorded or stored. The transcription is processed in memory and used only to identify verses in the moment.
-
-          {"\n\n"}When you use Bible search, your search query is sent to an AI service to retrieve relevant Bible verses and cross-references. The query is not stored after the response is returned.
-        </LegalSection>
-
-        <LegalSection title="The PrayerKey App (iPhone and Android)">
-          The PrayerKey app has no account and no sign-in. Everything you write or keep in it, your journal, prayers, sermon notes, saved verses, memory verses, photos you attach, streaks and settings, is stored only on your phone. PrayerKey does not upload it, cannot see it, and has no copy of it. Deleting the app deletes it. If you want a copy, the app can create a backup file that you save or share yourself.
-
-          {"\n\n"}A few features need the internet. When you ask for a prayer, the words you type are sent to prayerkey.com, a prayer is composed from Scripture and sent back, and the request is not stored. Bible search sends your search words to prayerkey.com. Translations other than the King James Version are fetched from bible-api.com using the verse reference. The audio Bible streams public-domain recordings from publicdomainaudiobibles.com. None of these requests carries your name or any account, because there is none.
-
-          {"\n\n"}Church notes and spoken journal entries use the microphone, only while you are recording, and only after you allow it. Speech is turned into text by your phone: on iPhone by Apple's speech recognition, on the device itself where your iPhone supports it; on Android by your phone's speech service or an offline model downloaded once to your phone. A recording of the sermon is kept on your phone so the transcript can be improved later, and deleting the note deletes the recording. PrayerKey never receives your audio.
-
-          {"\n\n"}Reminders are scheduled on your phone. If you turn on the journal lock, your phone's own Face ID, Touch ID or passcode check is used; PrayerKey never sees biometric data. The app contains no advertising, no analytics and no tracking of any kind, and it does not share data with anyone.
-        </LegalSection>
-
-        <LegalSection title="Cookies and Local Storage">
-          PrayerKey may use browser cookies or local storage for basic session functionality, such as remembering your preferred Bible translation during a live sermon session. These are functional cookies only. We do not use tracking cookies. We do not use advertising cookies. We do not use cookies to follow you across other websites or build a behavioural profile of you.
-        </LegalSection>
-
-        <LegalSection title="Third-Party AI Services">
-          PrayerKey uses third-party artificial intelligence services to power its features. These providers receive the minimum data necessary to process your request, specifically the text you provide or the audio from your microphone during a live session. These providers are bound by their own privacy policies and do not use your data to train their public models based on your individual requests. PrayerKey does not share your data with advertisers, data brokers or any unrelated third parties.
-        </LegalSection>
-
-        <LegalSection title="Children's Privacy">
-          PrayerKey does not knowingly collect any information from children under the age of 13. The platform is intended for use by adults and church leaders. If you believe a child has submitted personal information through PrayerKey, please contact us and we will take appropriate action.
-        </LegalSection>
-
-        <LegalSection title="Data Security">
-          All communication between your browser and PrayerKey is encrypted using HTTPS. We take reasonable technical measures to protect any data that passes through our systems. Because we do not store personal user data, the risk of a data breach exposing your information is significantly lower than platforms that build and maintain user databases.
-        </LegalSection>
-
-        <LegalSection title="Your Rights">
-          Because PrayerKey does not store personal data linked to your identity, there is generally no personal data for us to retrieve, correct or delete on your behalf. If you have used PrayerKey and have a specific concern about data that may have been retained, you may contact us at prayerkey.com and we will respond to your request in good faith.
-
-          {"\n\n"}If you are located in the European Union or United Kingdom, you have rights under the GDPR and UK GDPR including the right to access, rectify and erase personal data. If you are located in California, you have rights under the CCPA. We respect these rights and will respond to legitimate requests.
-        </LegalSection>
-
-        <LegalSection title="Links to Other Websites">
-          PrayerKey may contain links to external websites or resources. We are not responsible for the privacy practices of those sites. We encourage you to read the privacy policies of any external site you visit from a link on PrayerKey.
-        </LegalSection>
-
-        <LegalSection title="Changes to This Privacy Policy">
-          We may update this Privacy Policy from time to time to reflect changes in the service or in applicable law. When we make changes, we will update the date at the top of this page. We encourage you to review this page periodically. Continued use of PrayerKey after changes are posted means you accept the updated policy.
-        </LegalSection>
-
-        <LegalSection title="Contact Us" last>
-          If you have any questions about this Privacy Policy or how your data is handled when you use PrayerKey, please reach out to us through the PrayerKey website at prayerkey.com. We take privacy seriously and will respond to all genuine enquiries.
-        </LegalSection>
-
-      </div>
-    </article>
-  );
-}
-
-function LegalSection({ title, children, last = false }: { title: string; children: ReactNode; last?: boolean }) {
-  return (
-    <div style={{
-      padding:      "clamp(28px, 4vw, 44px) 0",
-      borderBottom: last ? "none" : "1px solid var(--pk-border)",
-    }}>
-      <h2 style={{
-        fontSize:      "clamp(17px, 2vw, 21px)",
-        fontWeight:    700,
-        color:         "var(--pk-text)",
-        margin:        "0 0 14px",
-        letterSpacing: "-0.02em",
-        lineHeight:    1.25,
-      }}>
-        {title}
-      </h2>
-      <div style={{
-        fontSize:   "clamp(14px, 1.3vw, 16px)",
-        color:      "var(--pk-text-2)",
-        lineHeight: 1.85,
-        whiteSpace: "pre-wrap",
-      }}>
-        {children}
-      </div>
+      </ReadingLayout>
     </div>
   );
 }
