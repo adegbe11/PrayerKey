@@ -19,8 +19,8 @@ android {
         applicationId = "com.prayerkey.manna"
         minSdk = 26
         targetSdk = 36
-        versionCode = 25
-        versionName = "3.4.0"
+        versionCode = 26
+        versionName = "3.5.0"
 
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
