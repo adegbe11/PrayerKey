@@ -61,10 +61,13 @@ enum class PrayerRhythm(val label: String, val blurb: String, val hour: Int) {
 }
 
 data class FastingChallenge(
-    val length: FastLength = FastLength.SEVEN,
+    /* The starting choice is the traditional church fast: sunrise to sunset,
+       nothing until evening. It was seven days on water, so tapping Next
+       through the setup began a fast that needs a doctor's advice. */
+    val length: FastLength = FastLength.SUNRISE,
     /** Hours, when the length is custom. */
     val customHours: Int = 24,
-    val type: FastType = FastType.WATER,
+    val type: FastType = FastType.EVENING,
     val purpose: String = "Breakthrough",
     val note: String = "",
     /** When the fast begins, as epoch seconds. 0 means not begun. */

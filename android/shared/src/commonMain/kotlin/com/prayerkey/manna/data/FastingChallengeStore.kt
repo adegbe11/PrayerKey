@@ -10,11 +10,11 @@ object FastingStore {
     fun load(context: PlatformContext): FastingChallenge {
         val p = prefs(context)
         return FastingChallenge(
-            length = runCatching { FastLength.valueOf(p.getString("length", "SEVEN").orEmpty()) }
-                .getOrDefault(FastLength.SEVEN),
+            length = runCatching { FastLength.valueOf(p.getString("length", "SUNRISE").orEmpty()) }
+                .getOrDefault(FastLength.SUNRISE),
             customHours = p.getInt("customHours", 24),
-            type = runCatching { FastType.valueOf(p.getString("type", "WATER").orEmpty()) }
-                .getOrDefault(FastType.WATER),
+            type = runCatching { FastType.valueOf(p.getString("type", "EVENING").orEmpty()) }
+                .getOrDefault(FastType.EVENING),
             purpose = p.getString("purpose", "Breakthrough").orEmpty(),
             note = p.getString("note", "").orEmpty(),
             startedAt = p.getLong("startedAt", 0L),

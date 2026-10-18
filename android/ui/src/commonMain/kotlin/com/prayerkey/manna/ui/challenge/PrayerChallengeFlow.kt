@@ -991,9 +991,13 @@ private fun PrayingSession(
 
 @Composable
 fun SessionAction(icon: ImageVector, label: String, colour: Color, onClick: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    // the circle and its word are one button: people tap the word as often as the circle
+    Column(
+        Modifier.clip(RoundedCornerShape(20.dp)).clickable(onClick = onClick).padding(6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Box(
-            Modifier.size(64.dp).clip(CircleShape).background(colour).clickable(onClick = onClick),
+            Modifier.size(64.dp).clip(CircleShape).background(colour),
             contentAlignment = Alignment.Center,
         ) { Icon(icon, null, tint = Color.White, modifier = Modifier.size(26.dp)) }
         Text(

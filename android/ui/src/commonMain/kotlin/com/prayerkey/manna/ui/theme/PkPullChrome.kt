@@ -1,5 +1,8 @@
 package com.prayerkey.manna.ui.theme
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -145,7 +148,9 @@ fun PullToReveal(
                should also answer a tap. */
             Column(
                 Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(top = 10.dp)
-                    .clickable {
+                    // read aloud by TalkBack: the grip says nothing on its own
+                    .semantics { contentDescription = "Bible options" }
+                    .clickable(onClickLabel = if (open) "Hide Bible options" else "Show Bible options") {
                         haptics.perform(Haptic.Click)
                         open = !open
                         scope.launch { pull.animateTo(if (open) barHeight else 0f, tween(260)) }

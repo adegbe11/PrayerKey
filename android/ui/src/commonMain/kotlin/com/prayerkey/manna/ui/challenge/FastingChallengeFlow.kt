@@ -552,7 +552,12 @@ private fun FastSummary(fast: FastingChallenge, onBack: () -> Unit, onBegin: () 
         ) {
             Icon(Icons.Outlined.HealthAndSafety, null, tint = Pk.GoldDeep, modifier = Modifier.size(19.dp))
             Text(
-                "Fasting does not suit everyone. Choose a fast that fits your health, and ask a doctor if you are unsure.",
+                /* Water alone for more than a day is a medical decision, and it
+                   should be named as one before Begin. */
+                if (fast.type == com.prayerkey.manna.data.FastType.WATER && fast.hours > 24)
+                    "A water fast longer than a day is serious for the body. Please speak to a doctor first, drink plenty of water, and stop and eat if you feel faint or unwell. Pregnant or nursing mothers, anyone diabetic or on medication, and children should choose a Daniel or partial fast instead."
+                else
+                    "Fasting does not suit everyone. Choose a fast that fits your health, and ask a doctor if you are unsure.",
                 Modifier.padding(start = 12.dp),
                 color = Ink.copy(alpha = .78f), fontFamily = UtilitySans, fontSize = 13.sp, lineHeight = 19.sp,
             )

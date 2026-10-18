@@ -72,7 +72,8 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
     var step by rememberSaveable { mutableIntStateOf(0) }
     var selectedGoals by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
     var selectedTopics by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
-    var reminders by rememberSaveable { mutableStateOf(false) }
+    // on unless they turn it off: the reminder is what brings anyone back tomorrow
+    var reminders by rememberSaveable { mutableStateOf(true) }
     var hour by rememberSaveable { mutableIntStateOf(7) }
     var minute by rememberSaveable { mutableIntStateOf(0) }
     var showTime by rememberSaveable { mutableStateOf(false) }
