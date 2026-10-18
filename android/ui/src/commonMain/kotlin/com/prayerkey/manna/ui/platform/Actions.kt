@@ -18,6 +18,12 @@ expect fun shareImage(context: PlatformContext, png: ByteArray, caption: String,
 /** Saves a PNG to the phone's photos. Returns false when it could not. */
 expect fun saveImageToPhotos(context: PlatformContext, png: ByteArray, name: String): Boolean
 
+/**
+ * Asks the phone to place PrayerKey's verse of the day on the home screen.
+ * Returns false where the platform cannot, so the caller can explain how.
+ */
+expect fun pinHomeWidget(context: PlatformContext): Boolean
+
 /** A short message over the app: Android's toast; a small pill on iPhone. */
 expect fun showToast(context: PlatformContext, message: String, long: Boolean = false)
 

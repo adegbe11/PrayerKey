@@ -1216,6 +1216,8 @@ fun ProfileScreen(
     val context = platformContext()
     var confirmRestore by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
+    var myBibleOpen by remember { mutableStateOf(false) }
+    var prayingForOpen by remember { mutableStateOf(false) }
     val restoreArchive = rememberTextFilePicker { text -> text?.let(onRestoreArchive) }
     val notifications = rememberPermissionRequest(Permission.Notifications) { granted ->
         if (granted) {
@@ -1232,7 +1234,7 @@ fun ProfileScreen(
         OutlinedTextField(prefs.name, { onUpdate(prefs.copy(name = it)) }, placeholder = { Text("Your name") }, singleLine = true, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White, focusedBorderColor = Pk.Oxblood, unfocusedBorderColor = Pk.Hair))
         Box(Modifier.fillMaxWidth().padding(vertical = 18.dp).clip(Corners.card).background(NightFill).border(0.7.dp, Pk.GoldLight.copy(alpha = .28f), Corners.card)) {
             Row(Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { Text(streak.toString(), color = Color.White, fontFamily = BookSerif, fontSize = 48.sp); Text("day streak", color = Color.White.copy(.7f)) }
+                Column(Modifier.weight(1f)) { Text(streak.toString(), color = Color.White, fontFamily = BookSerif, fontSize = 48.sp); Text(if (streak == 1) "day with God" else "days with God", color = Color.White.copy(.7f)) }
                 // the same figure as the streak beside it: a smaller number in another face read as a footnote
                 Column(horizontalAlignment = Alignment.End) { Text(savedCount.toString(), color = Pk.GoldLight, fontFamily = BookSerif, fontSize = 48.sp); Text("words saved", color = Color.White.copy(.7f)) }
             }
@@ -1281,6 +1283,18 @@ fun ProfileScreen(
         }) {
             Switch(prefs.concealJournalPreviews, onCheckedChange = { onUpdate(prefs.copy(concealJournalPreviews = it)) })
         }
+        /* The things PrayerKey keeps for you, findable from here as well. */
+        SettingRow("My Bible", "Your highlights, notes and bookmarks", onClick = { myBibleOpen = true }) {
+            Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted)
+        }
+        SettingRow("Praying for", "The people you promised to pray for", onClick = { prayingForOpen = true }) {
+            Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted)
+        }
+        SettingRow("Add to home screen", "The verse of the day, without opening the app", onClick = {
+            if (!com.prayerkey.manna.ui.platform.pinHomeWidget(context)) {
+                com.prayerkey.manna.ui.platform.showToast(context, "Press and hold your home screen, tap Widgets, then choose PrayerKey.", long = true)
+            }
+        }) { Icon(Icons.Outlined.KeyboardArrowRight, null, tint = Muted) }
         SettingRow("Offline voices", "Manage Bible and prayer voices", onClick = {
             openVoiceSettings(context)
         }) { Icon(Icons.Outlined.RecordVoiceOver, null, tint = Gold) }
@@ -1305,6 +1319,12 @@ fun ProfileScreen(
         confirmButton = { TextButton(onClick = { confirmRestore = false; restoreArchive.launch() }) { Text("Choose archive") } },
         dismissButton = { TextButton(onClick = { confirmRestore = false }) { Text("Cancel") } },
     )
+    if (myBibleOpen) androidx.compose.ui.window.Dialog({ myBibleOpen = false }, com.prayerkey.manna.ui.platform.fullScreenDialog()) {
+        com.prayerkey.manna.ui.bible.MyBibleScreen(onClose = { myBibleOpen = false })
+    }
+    if (prayingForOpen) androidx.compose.ui.window.Dialog({ prayingForOpen = false }, com.prayerkey.manna.ui.platform.fullScreenDialog()) {
+        com.prayerkey.manna.ui.others.PrayingForScreen(onClose = { prayingForOpen = false })
+    }
     if (showAbout) AlertDialog(
         onDismissRequest = { showAbout = false },
         icon = { Icon(Icons.Outlined.AutoStories, null, tint = Pk.Oxblood) },

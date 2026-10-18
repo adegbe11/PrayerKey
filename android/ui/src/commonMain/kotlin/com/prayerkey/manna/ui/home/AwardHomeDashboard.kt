@@ -319,7 +319,7 @@ private fun PrayerFocusCard(
 private fun FaithSnapshot(streak: Int, saved: Int, journal: Int) {
     val cs = MaterialTheme.colorScheme
     Row(Modifier.fillMaxWidth().padding(top = 18.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        listOf(streak to "day streak", saved to "verses saved", journal to "journal entries").forEach { (value, label) ->
+        listOf(streak to "days with God", saved to "verses saved", journal to "journal entries").forEach { (value, label) ->
             Column(
                 Modifier.weight(1f).clip(RoundedCornerShape(14.dp))
                     .background(cs.surface.copy(alpha = .72f)).padding(vertical = 12.dp),

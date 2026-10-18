@@ -352,3 +352,5 @@ actual fun rememberDeviceUnlock(reason: String, onResult: (Boolean) -> Unit): De
         }
     }
 }
+
+actual fun pinHomeWidget(context: PlatformContext): Boolean = false

@@ -183,3 +183,12 @@ actual fun rememberDeviceUnlock(reason: String, onResult: (Boolean) -> Unit): De
         }
     }
 }
+
+actual fun pinHomeWidget(context: PlatformContext): Boolean {
+    if (android.os.Build.VERSION.SDK_INT < 26) return false
+    val manager = context.getSystemService(android.appwidget.AppWidgetManager::class.java) ?: return false
+    if (!manager.isRequestPinAppWidgetSupported) return false
+    // named rather than imported: the widget lives in the app module
+    val widget = android.content.ComponentName(context.packageName, "com.prayerkey.manna.widget.VerseWidget")
+    return runCatching { manager.requestPinAppWidget(widget, null, null) }.getOrDefault(false)
+}

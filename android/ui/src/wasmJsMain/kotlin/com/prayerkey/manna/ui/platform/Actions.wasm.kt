@@ -36,3 +36,5 @@ actual fun rememberDeviceUnlock(reason: String, onResult: (Boolean) -> Unit): De
         override val available = false
         override fun unlock() = onResult(true)
     }
+
+actual fun pinHomeWidget(context: PlatformContext): Boolean = false
