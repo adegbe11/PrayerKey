@@ -170,11 +170,18 @@ fun BibleScreen(
     var bookMode by remember { mutableStateOf(false) }
     var libraryMode by remember { mutableStateOf(false) }
     var audioMode by remember { mutableStateOf(false) }
+    var myBibleMode by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { com.prayerkey.manna.data.VerseMarks.load(shareContext) }
     androidx.compose.ui.backhandler.BackHandler(enabled = bookMode || libraryMode || audioMode || showMemory) {
         bookMode = false
         libraryMode = false
         audioMode = false
         showMemory = false
+    }
+
+    if (myBibleMode) {
+        com.prayerkey.manna.ui.bible.MyBibleScreen(onClose = { myBibleMode = false })
+        return
     }
 
     if (audioMode) {
@@ -183,8 +190,8 @@ fun BibleScreen(
         val activeChapter = active.reference.substringAfterLast(' ')
             .substringBefore(':').toIntOrNull() ?: 1
         com.prayerkey.manna.ui.book.AudioBibleScreen(
-            book = activeBook,
-            chapter = activeChapter,
+            startBook = activeBook,
+            startChapter = activeChapter,
             onClose = { audioMode = false },
         )
         return
@@ -266,6 +273,7 @@ fun BibleScreen(
                         },
                         onMemorize = { currentVerse?.let { onMemorize(VerseCard(it.reference, it.translation, it.text, "")) } },
                         onShare = { currentVerse?.let { Share.cards.shareVerse(shareContext, VerseCard(it.reference, it.translation, it.text, "")) } },
+                        onMyBible = { myBibleMode = true },
                     )
                 },
             ) {
@@ -360,6 +368,7 @@ fun BibleScreen(
             )
         }
     }
+    val marks by com.prayerkey.manna.data.VerseMarks.all.collectAsState()
     if (chapterTitle.isNotBlank()) {
         ModalBottomSheet(onDismissRequest = { chapterTitle = ""; chapterVerses = emptyList() }, containerColor = Canvas) {
             Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 36.dp)) {
@@ -367,9 +376,19 @@ fun BibleScreen(
                 Spacer(Modifier.height(18.dp))
                 LazyColumn(Modifier.heightIn(max = 620.dp)) {
                     items(chapterVerses, key = { it.reference }) { item ->
+                        val mark = marks.firstOrNull { it.ref == item.reference }
+                        val tint = com.prayerkey.manna.ui.bible.markColor(mark)
                         Row(Modifier.fillMaxWidth().clickable { chapterTitle = ""; selectedVerse = RemoteVerse(item.reference, item.text, "KJV") }.padding(vertical = 8.dp)) {
                             Text(item.verse.toString(), color = Gold, fontWeight = FontWeight.Bold, modifier = Modifier.width(34.dp))
-                            Text(item.text, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 27.sp)
+                            Column {
+                                Text(
+                                    item.text, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 27.sp,
+                                    modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(tint ?: Color.Transparent),
+                                )
+                                if (mark != null && mark.note.isNotBlank()) {
+                                    Text(mark.note, fontFamily = BookSerif, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, fontSize = 15.sp, color = Muted, modifier = Modifier.padding(top = 4.dp))
+                                }
+                            }
                         }
                     }
                 }
@@ -439,6 +458,8 @@ private fun VerseDetail(
         Text(reference, fontFamily = BookSerif, fontSize = 30.sp)
         Text("$versionName ($versionId)", color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 3.dp))
         Text(text, fontFamily = BookSerif, fontSize = 28.sp, lineHeight = 38.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(vertical = 34.dp))
+        // colour it, keep a ribbon in it, write beside it
+        com.prayerkey.manna.ui.bible.MarkStrip(reference, text, Modifier.padding(bottom = 16.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
             Button(onClick = onSave, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" Save") }
             OutlinedButton(onClick = onMemorize, modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.School, null); Text(" Memorize") }

@@ -44,7 +44,50 @@ class OfflineBible(private val context: PlatformContext) {
      * Bible deck while it was actually cycling through ten verses.
      */
     suspend fun pullDeck(): List<BibleVerse> = withContext(ioDispatcher) {
-        verses().shuffled()
+        /* A card has to be able to stand alone. The whole Bible shuffled put
+           genealogies and the cleansing laws of Leviticus on the card that is
+           meant to meet someone on their way to work. The deck is now the
+           verses the app's own devotionals and challenges chose, and the
+           chapters people turn to, with anything that needs its context to be
+           read rightly left in the book. */
+        val all = verses()
+        val chosen = chosenReferences()
+        val (mine, beloved) = all.filter { v ->
+            v.reference in chosen ||
+                (Beloved[v.book]?.contains(v.chapter) == true && v.text.length in 40..260 &&
+                    v.text.trimEnd().last() in ".?!" &&
+                    Blocked.none { v.text.contains(it, ignoreCase = true) })
+        }.partition { it.reference in chosen }
+        if (mine.isEmpty() && beloved.isEmpty()) return@withContext all.shuffled()
+        // two hand-chosen verses for every one from the chapters around them
+        val a = mine.shuffled().iterator()
+        val b = beloved.shuffled().iterator()
+        buildList {
+            while (a.hasNext() || b.hasNext()) {
+                repeat(2) { if (a.hasNext()) add(a.next()) }
+                if (b.hasNext()) add(b.next())
+            }
+        }
+    }
+
+    /** The key verse of every devotional, challenge and season day. */
+    private fun chosenReferences(): Set<String> = buildSet {
+        fun walk(e: kotlinx.serialization.json.JsonElement) {
+            when (e) {
+                is kotlinx.serialization.json.JsonObject -> {
+                    val book = (e["book"] as? kotlinx.serialization.json.JsonPrimitive)?.content
+                    val chapter = (e["chapter"] as? kotlinx.serialization.json.JsonPrimitive)?.content
+                    val verse = (e["verse"] as? kotlinx.serialization.json.JsonPrimitive)?.content
+                    if (book != null && chapter != null && verse != null) add("$book $chapter:$verse")
+                    e.values.forEach(::walk)
+                }
+                is kotlinx.serialization.json.JsonArray -> e.forEach(::walk)
+                else -> Unit
+            }
+        }
+        listOf("devotionals.json", "challenges.json", "seasons.json").forEach { asset ->
+            context.readAsset(asset)?.let { raw -> runCatching { walk(Json.parseToJsonElement(raw)) } }
+        }
     }
 
     suspend fun related(source: BibleVerse, limit: Int = 5): List<BibleVerse> = withContext(Dispatchers.Default) {
@@ -110,6 +153,39 @@ class OfflineBible(private val context: PlatformContext) {
     companion object {
         @Volatile private var cached: List<BibleVerse>? = null
         private val lock = Mutex()
+
+        /** The chapters people turn to, by book. */
+        private val Beloved: Map<String, Set<Int>> = mapOf(
+            "Psalms" to setOf(1, 4, 8, 16, 19, 23, 27, 31, 32, 34, 37, 40, 42, 46, 51, 55, 57, 62, 63, 84, 86, 90, 91, 96, 100, 103, 116, 118, 121, 130, 138, 139, 145, 146, 147),
+            "Proverbs" to setOf(3, 4, 16),
+            "Isaiah" to setOf(26, 40, 41, 43, 53, 55, 61),
+            "Lamentations" to setOf(3),
+            "Jeremiah" to setOf(29, 31),
+            "Zephaniah" to setOf(3),
+            "Matthew" to setOf(5, 6, 7, 11, 28),
+            "John" to setOf(1, 3, 6, 10, 11, 14, 15, 16),
+            "Romans" to setOf(5, 8, 12, 15),
+            "1 Corinthians" to setOf(13),
+            "2 Corinthians" to setOf(4, 5, 12),
+            "Galatians" to setOf(2, 5),
+            "Ephesians" to setOf(1, 2, 3, 6),
+            "Philippians" to setOf(1, 2, 3, 4),
+            "Colossians" to setOf(1, 3),
+            "1 Thessalonians" to setOf(5),
+            "2 Timothy" to setOf(1),
+            "Hebrews" to setOf(4, 10, 12, 13),
+            "James" to setOf(1),
+            "1 Peter" to setOf(1, 2, 5),
+            "1 John" to setOf(1, 3, 4),
+            "Revelation" to setOf(3),
+        )
+
+        /** Words that mean a verse needs its chapter around it. */
+        private val Blocked = listOf(
+            "piss", "dung", "harlot", "whore", "concubine", "foreskin", "uncircumcised",
+            "slew", "smite", "smote", "slain", "dash", "begat", "hate", "curse", "vengeance",
+            "enemies be", "destroy them", "break their teeth", "wicked shall be turned",
+        )
     }
 }
 

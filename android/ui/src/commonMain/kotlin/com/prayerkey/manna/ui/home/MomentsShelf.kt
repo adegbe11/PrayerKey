@@ -76,6 +76,7 @@ fun prayerMoments(
     office: (String) -> Unit,
     tenMinutes: () -> Unit,
     prayerPoints: () -> Unit,
+    bedtime: () -> Unit,
 ): List<Moment> = listOf(
     Moment("Right now", "I need prayer", Res.drawable.welcome_prayer_dawn, emergency),
     Moment("Morning", "Morning Prayer", Res.drawable.rhythm_morning, { office("MORNING") }),
@@ -83,6 +84,7 @@ fun prayerMoments(
     Moment("Afternoon", "Midday Prayer", Res.drawable.prayerkey_hero_dawn, { office("AFTERNOON") }),
     Moment("Evening", "Evening Prayer", Res.drawable.rhythm_evening, { office("EVENING") }),
     Moment("Night", "Night Prayer", Res.drawable.rhythm_reflection, { office("NIGHT") }),
+    Moment("Sleep", "Bedtime", Res.drawable.onboarding_prayer, bedtime),
     Moment("The watch", "Midnight Prayer", Res.drawable.discovery_cover_2, { office("MIDNIGHT") }),
     Moment("Declare", "Prayer points", Res.drawable.today_prayer_violet, prayerPoints),
 )

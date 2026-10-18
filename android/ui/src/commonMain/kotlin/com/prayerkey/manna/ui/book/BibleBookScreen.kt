@@ -36,8 +36,10 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -225,6 +227,17 @@ fun BibleBookScreen(
        old chapter's. Anything that reasons about page counts has to know that. */
     var loadedChapter by remember { mutableIntStateOf(-1) }
 
+    /* Marks: colours drawn into the page, and a long press to make one. */
+    val allMarks by com.prayerkey.manna.data.VerseMarks.all.collectAsState()
+    LaunchedEffect(Unit) { com.prayerkey.manna.data.VerseMarks.load(placeContext) }
+    val chapterMarks = remember(allMarks, here) {
+        com.prayerkey.manna.data.VerseMarks.inChapter(here.book.name, here.chapter)
+            .mapNotNull { (v, m) -> com.prayerkey.manna.ui.bible.markColor(m)?.let { v to it.copy(alpha = .7f) } }.toMap()
+    }
+    var pickVerses by remember { mutableStateOf<IntRange?>(null) }
+    var pickOpen by remember { mutableStateOf(false) }
+    var markVerse by remember { mutableStateOf<BibleVerse?>(null) }
+
     /* Where you are, in characters rather than pages.
        Changing the type size relaid the chapter and sent you back to page one,
        which is the one thing a reader will not forgive: you changed the size
@@ -289,7 +302,7 @@ fun BibleBookScreen(
                 /* One layout for the whole chapter, then windows onto it.
                    Laying out per verse would start every verse on a new line;
                    a Bible flows them. */
-                val flow = remember(verses, textSize) { chapterText(verses, textSize) }
+                val flow = remember(verses, textSize, chapterMarks) { chapterText(verses, textSize, chapterMarks) }
                 /* The initial rises from the first line's baseline, about two
                    and a half times the reading size, the way a printed Bible
                    opens a chapter. Its place in the line is only as tall as the
@@ -379,6 +392,7 @@ fun BibleBookScreen(
                     layout?.let { readingAt = it.getLineStart(window.firstLine) }
                 }
                 val shown = versesInWindow(flow.verseLines(layout), window)
+                val shownNow by androidx.compose.runtime.rememberUpdatedState(shown)
 
                 val canGoForward = pageIndex < windows.lastIndex || chapterIndex < chapters.lastIndex
                 val canGoBack = pageIndex > 0 || chapterIndex > 0
@@ -482,7 +496,14 @@ fun BibleBookScreen(
                            real e-reader gives you tap-to-turn for the same
                            reason, and it is the quicker gesture anyway. */
                         .pointerInput(chapterIndex, pageIndex, windows, pageW) {
-                            detectTapGestures { at ->
+                            detectTapGestures(
+                                // press and hold to mark a verse on this leaf
+                                onLongPress = {
+                                    haptics.perform(Haptic.Click)
+                                    pickVerses = shownNow
+                                    pickOpen = true
+                                },
+                            ) { at ->
                                 when {
                                     at.x > size.width * .62f -> animateTurn(forward = true)
                                     at.x < size.width * .38f -> animateTurn(forward = false)
@@ -757,6 +778,19 @@ fun BibleBookScreen(
             )
         }
 
+        if (pickOpen) {
+            VersePicker(
+                title = "${here.book.name} ${here.chapter}",
+                verses = verses.filter { v -> pickVerses?.let { v.verse in it } ?: true },
+                marks = chapterMarks,
+                onPick = { pickOpen = false; markVerse = it },
+                onDismiss = { pickOpen = false },
+            )
+        }
+        markVerse?.let { v ->
+            com.prayerkey.manna.ui.bible.MarkSheet("${here.book.name} ${here.chapter}:${v.verse}", v.text) { markVerse = null }
+        }
+
         // drawn last, or the book paints over it
         if (sizeOpen) {
             Row(
@@ -826,7 +860,7 @@ private class ChapterText(
     }
 }
 
-private fun chapterText(verses: List<BibleVerse>, textSize: Int): ChapterText {
+private fun chapterText(verses: List<BibleVerse>, textSize: Int, marks: Map<Int, androidx.compose.ui.graphics.Color> = emptyMap()): ChapterText {
     val starts = mutableListOf<Pair<Int, Int>>()
     var initialAt = -1
     val text = buildAnnotatedString {
@@ -848,6 +882,7 @@ private fun chapterText(verses: List<BibleVerse>, textSize: Int): ChapterText {
                printed KJVs have done since 1611. They arrive as character
                ranges from the parser rather than braces in the text. */
             val body = verse.text
+            val bodyStart = length
             var cursor = 0
             /* The great initial. The letter stays in the text, but the
                layout gives its place to a placeholder the size of the initial
@@ -872,6 +907,8 @@ private fun chapterText(verses: List<BibleVerse>, textSize: Int): ChapterText {
                 cursor = to
             }
             if (cursor < body.length) append(body.substring(cursor))
+            // a verse coloured in, the way a highlighter crosses a printed page
+            marks[verse.verse]?.let { addStyle(SpanStyle(background = it), bodyStart, length) }
             if (index != verses.lastIndex) append(" ")
         }
     }
@@ -1002,6 +1039,36 @@ private fun Leaf(
                 // clears the floating nav — the folio was landing behind it
                 modifier = Modifier.fillMaxWidth().padding(bottom = 96.dp, top = 6.dp),
             )
+        }
+    }
+}
+
+/** Which verse on this leaf to mark. */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun VersePicker(
+    title: String,
+    verses: List<BibleVerse>,
+    marks: Map<Int, androidx.compose.ui.graphics.Color>,
+    onPick: (BibleVerse) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    androidx.compose.material3.ModalBottomSheet(onDismissRequest = onDismiss, containerColor = androidx.compose.ui.graphics.Color(0xFFF7F4FC)) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 30.dp)) {
+            Text(title, fontFamily = BookSerif, fontWeight = FontWeight.SemiBold, fontSize = 24.sp, color = BookInk)
+            Text("Choose a verse to mark", fontSize = 14.sp, color = androidx.compose.ui.graphics.Color(0xFF6E6E73), modifier = Modifier.padding(top = 2.dp, bottom = 12.dp))
+            androidx.compose.foundation.lazy.LazyColumn(Modifier.heightIn(max = 520.dp)) {
+                items(verses.size) { i ->
+                    val v = verses[i]
+                    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable { onPick(v) }.padding(vertical = 10.dp, horizontal = 4.dp)) {
+                        Text(v.verse.toString(), color = Rubric, fontWeight = FontWeight.Bold, modifier = Modifier.width(32.dp))
+                        Text(
+                            v.text, fontFamily = BookSerif, fontSize = 17.sp, lineHeight = 25.sp, color = BookInk,
+                            modifier = Modifier.background(marks[v.verse] ?: androidx.compose.ui.graphics.Color.Transparent),
+                        )
+                    }
+                }
+            }
         }
     }
 }

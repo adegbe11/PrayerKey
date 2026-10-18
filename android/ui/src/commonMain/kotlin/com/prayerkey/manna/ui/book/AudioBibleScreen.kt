@@ -28,6 +28,9 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Headphones
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.SkipNext
+import androidx.compose.material.icons.outlined.Bedtime
+import androidx.compose.material.icons.outlined.Spa
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -83,12 +86,34 @@ private fun publicDomainChapterUrl(book: String, chapter: Int): String? =
 
 @Composable
 fun AudioBibleScreen(
-    book: String,
-    chapter: Int,
+    startBook: String,
+    startChapter: Int,
     onClose: () -> Unit,
+    /** minutes until the reading stops by itself, for falling asleep; 0 for none */
+    sleepMinutes: Int = 0,
+    /** the sound under the voice */
+    ambience: com.prayerkey.manna.data.Ambience = com.prayerkey.manna.data.Ambience.NONE,
+    /** the line under the chapter, when the screen was opened for a reason */
+    subtitle: String = "Listen without leaving the page",
 ) {
     BackHandler(onBack = onClose)
     val context = platformContext()
+    /* The reading carries on into the next chapter the way a narrated Bible
+       does, until the sleep timer or the end of the chapter says stop. */
+    var book by remember { mutableStateOf(startBook) }
+    var chapter by remember { mutableIntStateOf(startChapter) }
+    var sleepAt by remember { mutableStateOf<Long?>(if (sleepMinutes > 0) nowMs() + sleepMinutes * 60_000L else null) }
+    var sleepAtChapterEnd by remember { mutableStateOf(false) }
+    var sleepLeft by remember { mutableStateOf("") }
+    var sound by remember { mutableStateOf(ambience) }
+    var scape by remember { mutableStateOf<com.prayerkey.manna.ui.meditation.Soundscape?>(null) }
+    fun advance() {
+        if (sleepAtChapterEnd) { sleepAtChapterEnd = false; return }
+        val i = com.prayerkey.manna.data.BibleCanon.indexOf(book, chapter)
+        val next = com.prayerkey.manna.data.BibleCanon.chapters.getOrNull(i + 1) ?: return
+        book = next.book.name
+        chapter = next.chapter
+    }
     var player by remember { mutableStateOf<StreamPlayer?>(null) }
     var narrator by remember { mutableStateOf<Speaker?>(null) }
     var narratorReady by remember { mutableStateOf(false) }
@@ -114,7 +139,7 @@ fun AudioBibleScreen(
         engine.setOnUtteranceProgressListener(object : UtteranceListener() {
             override fun onStart(utteranceId: String?) { postToMain { playing = true } }
             override fun onDone(utteranceId: String?) {
-                if (utteranceId == "chapter-end") postToMain { playing = false }
+                if (utteranceId == "chapter-end") postToMain { playing = false; advance() }
             }
             override fun onError(utteranceId: String?) { postToMain { playing = false } }
         })
@@ -159,7 +184,7 @@ fun AudioBibleScreen(
             media.start()
             playing = true
         }
-        media.setOnCompletionListener { playing = false; position = duration; com.prayerkey.manna.data.Walk.mark(context) }
+        media.setOnCompletionListener { playing = false; position = duration; com.prayerkey.manna.data.Walk.mark(context); advance() }
         media.setOnErrorListener {
             loading = false
             playing = false
@@ -171,6 +196,31 @@ fun AudioBibleScreen(
             media.release()
             player = null
         }
+    }
+
+    // the sound under the voice: plays while the reading plays
+    DisposableEffect(sound) {
+        val s = com.prayerkey.manna.ui.meditation.Soundscape(sound)
+        scape = s
+        onDispose { s.stop(); scape = null }
+    }
+    LaunchedEffect(playing, scape) {
+        val s = scape ?: return@LaunchedEffect
+        if (playing) { s.start(); s.pause(false) } else s.pause(true)
+    }
+    // the sleep timer: when it runs out, everything goes quiet
+    LaunchedEffect(sleepAt) {
+        val end = sleepAt ?: run { sleepLeft = ""; return@LaunchedEffect }
+        while (true) {
+            val left = end - nowMs()
+            if (left <= 0) break
+            sleepLeft = time(left.toInt())
+            kotlinx.coroutines.delay(1_000)
+        }
+        runCatching { player?.pause() }
+        narrator?.stop()
+        playing = false
+        sleepAt = null
     }
 
     LaunchedEffect(playing, player) {
@@ -203,7 +253,7 @@ fun AudioBibleScreen(
             Text(book, color = Pk.Cream, fontFamily = Spectral, fontSize = 34.sp, fontWeight = FontWeight.Medium)
             Text("CHAPTER $chapter · KJV", color = Pk.Cream.copy(alpha = .58f), style = PkText.Reference, modifier = Modifier.padding(top = 8.dp))
             Text(
-                "Listen without leaving the page",
+                subtitle,
                 color = Pk.Cream.copy(alpha = .7f),
                 fontFamily = Spectral,
                 fontSize = 16.sp,
@@ -295,9 +345,36 @@ fun AudioBibleScreen(
                     }
                     Box(
                         Modifier.clip(RoundedCornerShape(20.dp)).background(Pk.Cream.copy(alpha = .1f))
-                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                            .clickable { sleepAtChapterEnd = false; narrator?.stop(); advance() }
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
                     ) {
-                        Text("KJV", color = Pk.Cream, style = PkText.Meta)
+                        Icon(Icons.Outlined.SkipNext, "Next chapter", tint = Pk.Cream, modifier = Modifier.size(22.dp))
+                    }
+                }
+
+                /* Two quiet choices for the night: when to stop, and what to
+                   hear under the voice. Each tap moves to the next option. */
+                Spacer(Modifier.height(28.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    val sleepLabel = when {
+                        sleepAtChapterEnd -> "Stops at chapter end"
+                        sleepAt != null -> "Sleep in $sleepLeft"
+                        else -> "Sleep timer"
+                    }
+                    AudioChip(Icons.Outlined.Bedtime, sleepLabel, on = sleepAt != null || sleepAtChapterEnd) {
+                        val minutes = sleepAt?.let { ((it - nowMs()) / 60_000L).toInt() + 1 }
+                        when {
+                            sleepAtChapterEnd -> sleepAtChapterEnd = false
+                            minutes == null -> sleepAt = nowMs() + 15 * 60_000L
+                            minutes <= 15 -> sleepAt = nowMs() + 30 * 60_000L
+                            minutes <= 30 -> sleepAt = nowMs() + 45 * 60_000L
+                            minutes <= 45 -> sleepAt = nowMs() + 60 * 60_000L
+                            else -> { sleepAt = null; sleepAtChapterEnd = true }
+                        }
+                    }
+                    AudioChip(Icons.Outlined.Spa, if (sound == com.prayerkey.manna.data.Ambience.NONE) "No sound" else sound.label, on = sound != com.prayerkey.manna.data.Ambience.NONE) {
+                        val all = com.prayerkey.manna.data.Ambience.entries
+                        sound = all[(all.indexOf(sound) + 1) % all.size]
                     }
                 }
             }
@@ -311,6 +388,21 @@ fun AudioBibleScreen(
         }
     }
 }
+
+@Composable
+private fun AudioChip(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, on: Boolean, onClick: () -> Unit) {
+    Row(
+        Modifier.clip(RoundedCornerShape(99.dp))
+            .background(if (on) Pk.Gold.copy(alpha = .22f) else Pk.Cream.copy(alpha = .08f))
+            .clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 11.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, null, tint = if (on) Pk.Gold else Pk.Cream.copy(alpha = .7f), modifier = Modifier.size(17.dp))
+        Text(label, color = if (on) Pk.Gold else Pk.Cream.copy(alpha = .8f), style = PkText.Meta, modifier = Modifier.padding(start = 8.dp))
+    }
+}
+
+private fun nowMs(): Long = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
 
 private fun speakChapter(engine: Speaker?, verses: List<String>) {
     if (engine == null || verses.isEmpty()) return

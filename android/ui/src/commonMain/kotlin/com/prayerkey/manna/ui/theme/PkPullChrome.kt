@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ExpandMore
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.School
+import androidx.compose.material.icons.outlined.CollectionsBookmark
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -185,6 +186,7 @@ fun BibleModeBar(
     onMode: (BibleMode) -> Unit,
     onMemorize: () -> Unit,
     onShare: () -> Unit,
+    onMyBible: () -> Unit = {},
 ) {
     Column(
         Modifier.fillMaxWidth()
@@ -221,6 +223,13 @@ fun BibleModeBar(
                 Spacer(Modifier.width(2.dp))
                 // Memorize and Share had no gesture on the card, so they live
                 // here rather than as permanent floating chips
+                // every highlight, note and ribbon, in one place
+                androidx.compose.material3.IconButton(onClick = onMyBible) {
+                    Icon(
+                        Icons.Outlined.CollectionsBookmark, "My highlights, notes and bookmarks",
+                        tint = Pk.Gold, modifier = Modifier.size(20.dp),
+                    )
+                }
                 androidx.compose.material3.IconButton(onClick = onMemorize) {
                     Icon(
                         Icons.Outlined.School, "Memorize this verse",

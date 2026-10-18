@@ -154,6 +154,7 @@ fun PrayerKeyOperatingHome(
     var prayerCalendarOpen by rememberSaveable { mutableStateOf(false) }
     var exploreOpen by rememberSaveable { mutableStateOf(false) }
     var prayerPointsOpen by rememberSaveable { mutableStateOf(false) }
+    var bedtimeOpen by rememberSaveable { mutableStateOf(false) }
     var namedChallengesOpen by rememberSaveable { mutableStateOf(false) }
     var selectedFeature by remember { mutableStateOf<Feature?>(null) }
 
@@ -401,6 +402,11 @@ fun PrayerKeyOperatingHome(
             com.prayerkey.manna.ui.screens.PrayerPointsScreen(onClose = { prayerPointsOpen = false })
         }
     }
+    if (bedtimeOpen) {
+        Dialog(onDismissRequest = { bedtimeOpen = false }, properties = fullScreenDialog()) {
+            BedtimeScreen(onClose = { bedtimeOpen = false })
+        }
+    }
     if (namedChallengesOpen) {
         Dialog(onDismissRequest = { namedChallengesOpen = false }, properties = fullScreenDialog()) {
             com.prayerkey.manna.ui.challenge.ChallengeShelfRoute(onClose = { namedChallengesOpen = false })
@@ -574,6 +580,7 @@ fun PrayerKeyOperatingHome(
                     office = { requestedOffice = it; morningPrayerOpen = true },
                     tenMinutes = { prayerSessionOpen = true },
                     prayerPoints = { prayerPointsOpen = true },
+                    bedtime = { bedtimeOpen = true },
                 )
             },
         )
