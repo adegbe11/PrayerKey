@@ -712,7 +712,7 @@ private fun JournalOverview(
                 Column(Modifier.padding(16.dp)) { Text(entries.size.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("Pages", color = muted, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
             }
             Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
-                Column(Modifier.padding(16.dp)) { Text(streak.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("Day streak", color = muted, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                Column(Modifier.padding(16.dp)) { Text(streak.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("Days writing", color = muted, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
             }
             Surface(Modifier.weight(1f), shape = RoundedCornerShape(18.dp), color = Color.White, border = BorderStroke(1.dp, violet.copy(alpha = .10f))) {
                 Column(Modifier.padding(16.dp)) { Text(entries.count { it.favorite }.toString(), color = ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp); Text("Favourites", color = muted, fontSize = 13.sp, fontWeight = FontWeight.Bold) }

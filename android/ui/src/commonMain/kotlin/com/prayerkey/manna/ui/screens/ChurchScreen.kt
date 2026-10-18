@@ -1,5 +1,6 @@
 package com.prayerkey.manna.ui.screens
 
+import com.prayerkey.manna.resources.onboarding_church_v3
 import com.prayerkey.manna.platform.fileExists
 import com.prayerkey.manna.ui.platform.shareText
 import com.prayerkey.manna.ui.platform.showToast
@@ -423,8 +424,21 @@ private fun ReadyView(
                 .border(1.dp, Ivory.copy(alpha = .12f), Corners.card),
             contentAlignment = Alignment.BottomCenter,
         ) {
-            Sanctuary(GiltLine, Ivory, Modifier.fillMaxWidth().height(390.dp).graphicsLayer(alpha = .18f))
-            Box(Modifier.fillMaxWidth().height(390.dp).background(TopSheen))
+            /* The service itself, painted: the preacher, the people, a phone
+               taking the notes. The flat violet with a ghosted line drawing
+               said nothing about what the button does. */
+            androidx.compose.foundation.Image(
+                org.jetbrains.compose.resources.painterResource(com.prayerkey.manna.resources.Res.drawable.onboarding_church_v3), null,
+                Modifier.fillMaxWidth().height(390.dp),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+            )
+            Box(
+                Modifier.fillMaxWidth().height(390.dp).background(
+                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                        listOf(Color(0x5512002A), Color(0x9912002A), Color(0xEE12002A)),
+                    ),
+                ),
+            )
 
             Column(
                 Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 26.dp),
@@ -432,9 +446,14 @@ private fun ReadyView(
             ) {
                 Text(
                     "Sermon notes",
-                    color = Ivory, fontFamily = DisplaySerif, fontSize = 28.sp, fontWeight = FontWeight.Bold,
+                    color = Ivory, fontFamily = DisplaySerif, fontSize = 30.sp, fontWeight = FontWeight.Bold,
                 )
-                Spacer(Modifier.height(20.dp))
+                Text(
+                    "Tap Start when the preacher begins. Keep every word.",
+                    Modifier.padding(top = 6.dp),
+                    color = Ivory.copy(alpha = .8f), fontSize = 14.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                )
+                Spacer(Modifier.height(22.dp))
                 /* The circle and its word are one button. Only the circle
                    answered, so tapping "Start" - the word that says what to
                    do - did nothing. */
@@ -467,7 +486,7 @@ private fun ReadyView(
         }
 
         if (notes.isNotEmpty()) {
-            Text("Your Sundays", color = cs.onBackground, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 40.dp, bottom = 10.dp))
+            Text("Your sermons", color = cs.onBackground, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 40.dp, bottom = 10.dp))
             notes.take(6).forEach { note ->
                 Box(
                     Modifier.fillMaxWidth().padding(bottom = 10.dp)
