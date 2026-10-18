@@ -77,7 +77,9 @@ fun MannaApp(
         return
     }
     val saved by viewModel.saved.collectAsState()
-    val streak by viewModel.streak.collectAsState()
+    // the walk: any moment with God counts, and a rest day covers a missed one
+    val walk by com.prayerkey.manna.data.Walk.state.collectAsState()
+    val streak = walk.current(today().toEpochDays().toLong())
     val memory by viewModel.memory.collectAsState()
     val preferences by viewModel.preferences.collectAsState()
     val sermons by viewModel.sermons.collectAsState()
@@ -382,6 +384,9 @@ fun MannaApp(
                 }
             }
         }
+
+        // a milestone on the walk, celebrated once wherever it was reached
+        if (hydrated && preferences.onboarded) com.prayerkey.manna.ui.walk.WalkCelebration()
 
         // no dock during onboarding — the first screen stays undistracted
         if (hydrated && preferences.onboarded && preferences.accountReady && !showProfile) {

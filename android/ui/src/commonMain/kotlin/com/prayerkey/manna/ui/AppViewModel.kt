@@ -79,6 +79,7 @@ class AppViewModel(private val context: PlatformContext, private val store: Mann
             }
             val saved = safe(emptyList<SavedWord>()) { store.all() }
             val streak = safe(0) { store.streak() }
+            safe(Unit) { com.prayerkey.manna.data.Walk.load(context, legacyStreak = streak) }
             val memory = safe(emptyList<MemoryVerse>()) { store.memoryVerses() }
             val prefs = safe(UserPrefs()) { store.preferences() }
             val sermons = safe(emptyList<SermonSession>()) { store.sermons() }
@@ -168,7 +169,7 @@ class AppViewModel(private val context: PlatformContext, private val store: Mann
         else if (!done && day == current.maxOrNull()) current.remove(day)
         else return
         _challengeDays.value = _challengeDays.value + (id to current)
-        io { store.setChallengeDay(id, day, done) }
+        io { store.setChallengeDay(id, day, done); if (done) walked() }
     }
 
     /** Every mutation writes on the IO dispatcher and publishes on Main,
@@ -177,9 +178,11 @@ class AppViewModel(private val context: PlatformContext, private val store: Mann
 
     fun save(card: VerseCard) = io { store.save(card); val r = store.all(); _saved.value = r }
     fun markAnswered(id: Long, testimony: String) = io { store.markAnswered(id, testimony); _saved.value = store.all() }
-    fun recordDailyPull() { io { val s = store.recordDailyPull(); _streak.value = s } }
-    fun memorize(card: VerseCard) = io { store.memorize(card); _memory.value = store.memoryVerses() }
-    fun reviewMemory(reference: String, correct: Boolean) = io { store.reviewMemory(reference, correct); _memory.value = store.memoryVerses() }
+    fun recordDailyPull() { io { val s = store.recordDailyPull(); _streak.value = s; walked() } }
+    /** Any real moment with God keeps the walk going. */
+    private fun walked() { runCatching { com.prayerkey.manna.data.Walk.mark(context) } }
+    fun memorize(card: VerseCard) = io { store.memorize(card); _memory.value = store.memoryVerses(); walked() }
+    fun reviewMemory(reference: String, correct: Boolean) = io { store.reviewMemory(reference, correct); _memory.value = store.memoryVerses(); walked() }
     fun updatePreferences(prefs: UserPrefs) {
         // publish immediately so the UI reacts on this frame; persist behind it
         _preferences.value = prefs
@@ -198,6 +201,7 @@ class AppViewModel(private val context: PlatformContext, private val store: Mann
             minutes = minutes, audioPath = audioPath,
         )
         _sermonNotes.value = store.sermonNotes()
+        walked()
 
         /* Sunday also becomes a journal page, so the whole walk lives in one
            place instead of the sermon sitting in its own silo. */
@@ -253,21 +257,24 @@ class AppViewModel(private val context: PlatformContext, private val store: Mann
     fun keepGuidedPrayer(request: String, title: String, prayer: String, scriptureRef: String?) = io {
         store.savePrayer(title, request, prayer, scriptureRef)
         _journal.value = store.prayerJournal()
+        walked()
     }
 
     fun keepDevotionalPrayer(title: String, bringing: String) = io {
         store.savePrayer(title, bringing, "", null)
         _journal.value = store.prayerJournal()
+        walked()
     }
 
     fun addEntry(mood: String, body: String, gratitude: String, verseRef: String?, verseText: String?) = io {
-        store.addJournalEntry(mood, body, gratitude, verseRef, verseText); refreshEntries()
+        store.addJournalEntry(mood, body, gratitude, verseRef, verseText); refreshEntries(); walked()
     }
 
     /** The richer write flow: carries the entry's origin and prayer flag. */
     fun addWrite(r: com.prayerkey.manna.ui.journal.WriteResult) = io {
         store.addJournalEntry(r.mood, r.body, r.gratitude, r.verseRef, r.verseText, r.source, r.isPrayer, r.title, r.tags, r.journal, r.favorite, r.location, r.weather, r.media, r.entryAt)
         refreshEntries()
+        walked()
     }
 
     fun updateWrite(id: Long, r: com.prayerkey.manna.ui.journal.WriteResult) = io {
@@ -299,5 +306,6 @@ class AppViewModel(private val context: PlatformContext, private val store: Mann
         store.save(VerseCard(prayer.verses.firstOrNull()?.first ?: prayer.title, "PRAYER", prayer.prayer, ""))
         _journal.value = store.prayerJournal()
         _saved.value = store.all()
+        walked()
     }
 }

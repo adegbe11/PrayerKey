@@ -183,6 +183,7 @@ fun PrayerChallengeRoute(onClose: () -> Unit) {
                 onComplete = { text, feeling ->
                     PrayerChallengeStore.saveReflection(context, day, text, feeling, prayedSeconds)
                     keep(challenge.copy(done = challenge.done + day))
+                    com.prayerkey.manna.data.Walk.mark(context)
                     stage = Stage.Progress
                 },
             )

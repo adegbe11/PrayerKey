@@ -324,6 +324,7 @@ fun ChallengeDayScreen(
                 last = day >= challenge.days,
                 onDone = {
                     ChallengeProgress.complete(context, challenge.id, day)
+                    com.prayerkey.manna.data.Walk.mark(context)
                     if (day < challenge.days) day++ else onClose()
                 },
             )

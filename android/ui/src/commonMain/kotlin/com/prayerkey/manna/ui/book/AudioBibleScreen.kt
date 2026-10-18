@@ -103,6 +103,10 @@ fun AudioBibleScreen(
     var speed by remember { mutableFloatStateOf(1f) }
     var retry by remember { mutableIntStateOf(0) }
 
+    // a minute of listening to Scripture is a day met with God
+    LaunchedEffect(playing) {
+        if (playing) { kotlinx.coroutines.delay(60_000); if (playing) com.prayerkey.manna.data.Walk.mark(context) }
+    }
     DisposableEffect(context) {
         val engine = Speaker(context) { status ->
             narratorReady = status == Speaker.SUCCESS
@@ -155,7 +159,7 @@ fun AudioBibleScreen(
             media.start()
             playing = true
         }
-        media.setOnCompletionListener { playing = false; position = duration }
+        media.setOnCompletionListener { playing = false; position = duration; com.prayerkey.manna.data.Walk.mark(context) }
         media.setOnErrorListener {
             loading = false
             playing = false

@@ -183,6 +183,7 @@ fun BiblePlanRoute(
                 onProgress = { stage = PlanStage.Progress },
                 onComplete = {
                     keep(progress.copy(done = progress.done + day))
+                    com.prayerkey.manna.data.Walk.mark(context)
                     stage = if (progress.complete(plan.length)) {
                         ReadingPlanStore.markFinished(context, plan.id)
                         PlanStage.Finished

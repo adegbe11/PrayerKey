@@ -190,6 +190,7 @@ fun MeditationRoute(
                         val heading = "Meditation · ${setup.focus.label}" + if (mood.isNotBlank()) " · $mood" else ""
                         onKeep(heading, text.ifBlank { mood })
                     }
+                    com.prayerkey.manna.data.Walk.mark(context)
                     stage = MedStage.Done
                 },
             )

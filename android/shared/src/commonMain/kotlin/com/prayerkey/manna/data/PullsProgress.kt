@@ -53,6 +53,8 @@ sealed class PullsProgress(private val file: String, private val noun: String) {
         val now = done.coerceIn(0, outOf.takeIf { it > 0 } ?: done)
         if (now > progress(context, date)) editor.putInt(at(date), now)
         editor.apply()
+        // a few cards prayed or read is a day met with God
+        if (now >= minOf(3, outOf.takeIf { it > 0 } ?: 3)) Walk.mark(context)
     }
 
     fun isComplete(context: PlatformContext, date: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())): Boolean {

@@ -493,7 +493,9 @@ fun PrayerKeyOperatingHome(
             Modifier.fillMaxSize().statusBarsPadding()
                 .verticalScroll(scroll).padding(bottom = Pk.NavClearance)
         ) {
-        Spacer(Modifier.height(74.dp))
+        // room for the walk under the date, only once there is a walk to show
+        val walkShown = com.prayerkey.manna.data.Walk.state.collectAsState().value.current(today.toEpochDays().toLong()) > 0
+        Spacer(Modifier.height(if (walkShown) 98.dp else 74.dp))
         ShortcutRail(
             todayBadge = todayBadgeText,
             todayPulls = { todayPullsOpen = true },
@@ -952,7 +954,11 @@ private fun ContinueRow(icon: ImageVector, title: String, detail: String, open: 
     val t = androidx.compose.animation.core.FastOutSlowInEasing.transform(condensed)
     val markSize = (24f - 7f * t).sp
     val tracking = (1.45f - 0.5f * t).sp
-    val barHeight = (74f - 18f * t).dp
+    val walk by com.prayerkey.manna.data.Walk.state.collectAsState()
+    val walkShown = walk.current(date.toEpochDays().toLong()) > 0
+    val barHeight = ((if (walkShown) 98f else 74f) - (if (walkShown) 42f else 18f) * t).dp
+    var walkOpen by remember { mutableStateOf(false) }
+    if (walkOpen) com.prayerkey.manna.ui.walk.WalkSheet(walk) { walkOpen = false }
     Box(Modifier.fillMaxWidth().height(barHeight).padding(horizontal = 20.dp)) {
         Surface(
             onClick = settings,
@@ -972,6 +978,10 @@ private fun ContinueRow(icon: ImageVector, title: String, detail: String, open: 
                 date.format("EEEE, MMM d"),
                 Modifier.padding(top = (5f - 4f * t).dp).graphicsLayer { alpha = (1f - t * 1.6f).coerceAtLeast(0f) },
                 fontFamily = UtilitySans, fontSize = (12f - 2f * t).sp, color = Pk.Muted,
+            )
+            com.prayerkey.manna.ui.walk.WalkChip(
+                walk, onClick = { walkOpen = true },
+                modifier = Modifier.padding(top = 6.dp).graphicsLayer { alpha = (1f - t * 1.6f).coerceAtLeast(0f) },
             )
         }
         Surface(
@@ -1594,6 +1604,8 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
             val now = now()
             if (now.hour != clockNow.hour || now.minute != clockNow.minute || now.toLocalDate() != clockNow.toLocalDate()) clockNow = now
             completed = keptOn(now.toLocalDate())
+            // a kept stop on today's path is a day walked with God
+            if (completed.isNotEmpty()) com.prayerkey.manna.data.Walk.mark(context)
             kotlinx.coroutines.delay(1_000)
         }
     }

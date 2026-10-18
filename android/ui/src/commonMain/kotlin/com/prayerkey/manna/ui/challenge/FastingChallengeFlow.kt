@@ -177,6 +177,7 @@ fun FastingChallengeRoute(onClose: () -> Unit) {
                 onBreak = { day ->
                     val kept = fast.kept + day
                     keep(fast.copy(kept = kept))
+                    com.prayerkey.manna.data.Walk.mark(context)
                     // every day kept: nothing left for the machine to say
                     if (kept.size >= fast.days) Reminders.cancelFast(context)
                     stage = if (kept.size >= fast.days) FastStage.Done else FastStage.Active
