@@ -34,8 +34,8 @@ export const FAQS = [
     a: "PrayerKey listens through speech recognition and matches what it hears against the whole Bible. It shows a confidence score (0–100%) for every detected verse. Verses above 90% confidence are highlighted in green. You can set the threshold to only show high-confidence matches.",
   },
   {
-    q: "What Bible translations does PrayerKey support?",
-    a: "PrayerKey supports 11 major Bible translations including NIV, KJV, ESV, NKJV, NLT, AMP, CSB, NASB, MSG, CEV, and GNT. You can switch translations at any time during a live session.",
+    q: "Which Bible translation does PrayerKey use?",
+    a: "PrayerKey uses the King James Version, the complete text of all 66 books. It is in the public domain, so churches can project any verse freely during a live session.",
   },
   {
     q: "Can I use PrayerKey on my phone or tablet?",
@@ -83,7 +83,7 @@ export const FAQS = [
   },
   {
     q: "Is PrayerKey better than PewBeam?",
-    a: "PrayerKey and PewBeam both display Bible verses during sermons, but PrayerKey goes significantly further. PewBeam focuses on manual verse display — a pastor or operator selects verses to push to the screen. PrayerKey does this automatically: it listens to the sermon and detects verses in real time with no manual input. On top of that, PrayerKey adds prayers built on Scripture, full Bible search with cross-references, 11 translations, and a live projector designer — all completely free with no account required. For churches that want a hands-free, all-in-one tool, PrayerKey is the stronger choice.",
+    a: "PrayerKey and PewBeam both display Bible verses during sermons, but PrayerKey goes significantly further. PewBeam focuses on manual verse display — a pastor or operator selects verses to push to the screen. PrayerKey does this automatically: it listens to the sermon and detects verses in real time with no manual input. On top of that, PrayerKey adds prayers built on Scripture, full Bible search with cross-references, the complete King James text, and a live projector designer — all completely free with no account required. For churches that want a hands-free, all-in-one tool, PrayerKey is the stronger choice.",
   },
   {
     q: "Can I use PrayerKey for funerals, weddings, or special church ceremonies?",

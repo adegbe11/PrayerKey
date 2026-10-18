@@ -84,7 +84,7 @@ const PARTS = [
   {
     kicker: "PrayerKey Live",
     title: "Preach. The verse is already up.",
-    line: "PrayerKey listens through the microphone and matches what is said against the whole Bible, even a paraphrase. Each verse appears on the projector with no operator and no typing, with a confidence score and eleven translations including KJV, NIV, ESV, NKJV and NLT.",
+    line: "PrayerKey listens through the microphone and matches what is said against the whole Bible, even a paraphrase. Each verse appears on the projector with no operator and no typing, with a confidence score, in the King James Version.",
     href: "/live", cta: "Open PrayerKey Live",
   },
 ];

@@ -68,7 +68,7 @@ const softwareLd = {
   },
   featureList: [
     "Real-time speech-to-text Bible verse detection",
-    "11 Bible translations (KJV, NIV, ESV, NKJV, NLT, NASB, AMP, CSB, MSG, CEV, GNT)",
+    "Full King James Version text",
     "Auto and manual modes",
     "Verse queue with sequenced playback",
     "Projector / second-screen window",
@@ -110,7 +110,7 @@ const faqLd = {
       acceptedAnswer: { "@type": "Answer", text: "Yes. PrayerKey works on any device with Chrome, Edge, or Brave — Mac, Windows, Chromebook, and Linux. No installation required. Mobile devices can use the prayer generator and Bible search but the live sermon dashboard is desktop-first." } },
     { "@type": "Question",
       name: "Does PrayerKey work for Catholic, Baptist, Methodist, or Pentecostal services?",
-      acceptedAnswer: { "@type": "Answer", text: "PrayerKey is denomination-neutral and used by Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, Reformed, and non-denominational churches around the world. It supports 11 Bible translations to match every tradition." } },
+      acceptedAnswer: { "@type": "Answer", text: "PrayerKey is denomination-neutral and used by Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, Reformed, and non-denominational churches around the world. Verses are shown in the King James Version, which is read in churches of every tradition." } },
     { "@type": "Question",
       name: "How accurate is the Bible verse detection?",
       acceptedAnswer: { "@type": "Answer", text: "Direct verse references are matched with near-100% accuracy. Paraphrases typically score 70 to 95% confidence. Each detection card shows a colored confidence dot — green for 90%+, yellow for 70 to 89%, orange for 60 to 69%." } },

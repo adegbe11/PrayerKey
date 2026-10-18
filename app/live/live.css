@@ -186,3 +186,8 @@
   .lv-faq details::details-content { transition: none; }
   .lv-tr li:hover, .lv-more a:hover, .lv-end__cta:hover { transform: none; }
 }
+
+/* the translation, shown rather than chosen */
+.lv-hero__select span { font: 600 12px/1 var(--pk-font-sans); letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255, 255, 255, 0.5); }
+.lv-hero__select strong { display: inline-flex; align-items: center; height: 34px; padding: 0 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); color: #fff; font: 600 15px/1 var(--pk-font-sans); letter-spacing: 0.02em; }
+.lv-hero__select:hover { background: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1); }

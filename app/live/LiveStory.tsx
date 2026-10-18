@@ -18,7 +18,7 @@ const COMPARE: [string, string, string, string, string][] = [
   ["Operator required", "No", "Optional", "Yes", "Yes"],
   ["Account / sign-up", "Not required", "Required", "Required", "Required"],
   ["Install software", "None, runs in the browser", "Browser", "Desktop app", "Desktop app"],
-  ["Bible translations", "11", "20+", "30+ (paid)", "20+"],
+  ["Bible translations", "King James Version", "20+", "30+ (paid)", "20+"],
   ["Setup time", "~3 min", "~10 min", "~1 hour", "~1 hour"],
   ["Best for", "Small to mid churches", "Mid churches with budget", "Megachurches", "Traditional churches"],
 ];
@@ -31,20 +31,6 @@ const WHO: [string, string][] = [
   ["Funerals, weddings, and special services", "display verses without a tech operator."],
   ["Online streaming churches", "verses overlay on the broadcast feed."],
   ["Congregants who miss the verses pastors quote", "look them up later."],
-];
-
-const TRANSLATIONS: [string, string][] = [
-  ["KJV", "King James Version"],
-  ["NIV", "New International Version"],
-  ["ESV", "English Standard Version"],
-  ["NKJV", "New King James Version"],
-  ["NLT", "New Living Translation"],
-  ["NASB", "New American Standard Bible"],
-  ["AMP", "Amplified Bible"],
-  ["CSB", "Christian Standard Bible"],
-  ["MSG", "The Message"],
-  ["CEV", "Contemporary English Version"],
-  ["GNT", "Good News Translation"],
 ];
 
 const FAQ: { q: string; a: string }[] = [
@@ -61,7 +47,7 @@ const FAQ: { q: string; a: string }[] = [
   { q: "Will it work on a Chromebook, Mac, or Windows laptop?",
     a: "Yes. PrayerKey works in any Chromium browser (Chrome, Edge, Brave) on Mac, Windows, Chromebook, and Linux. There's nothing to install. Mobile devices can use the prayer generator and Bible search, but the live sermon dashboard is desktop-first because it needs a microphone and a second display." },
   { q: "Does PrayerKey work for Catholic, Baptist, Methodist, or Pentecostal services?",
-    a: "PrayerKey is denomination-neutral and used by Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, Reformed, and non-denominational churches around the world. It supports 11 Bible translations to fit every tradition." },
+    a: "PrayerKey is denomination-neutral and used by Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, Reformed, and non-denominational churches around the world. Verses are shown in the King James Version, which is read in churches of every tradition." },
   { q: "How accurate is the Bible verse detection?",
     a: "Direct references are matched with near-100% accuracy. Paraphrases typically score 70 to 95% confidence. Each detection card shows a colored confidence dot: green for 90%+, yellow for 70 to 89%, orange for 60 to 69%." },
   { q: "Is PrayerKey a free alternative to ProPresenter or EasyWorship?",
@@ -166,18 +152,11 @@ export default function LiveStory() {
 
       {/* translations */}
       <section className="lv-sec lv-sec--wide" id="translations" data-in="">
-        <h2 className="lv-h2">11 Bible translations supported</h2>
+        <h2 className="lv-h2">The King James Version, in full</h2>
         <p className="lv-body lv-center">
-          Choose any translation from the dropdown. Every detection, projection, and search result respects your selection.
+          Every verse PrayerKey finds and puts on the screen comes from the King James Version, all 66 books,
+          word for word. It is in the public domain, so any church can project it freely.
         </p>
-        <ul className="lv-tr">
-          {TRANSLATIONS.map(([abbr, name], i) => (
-            <li key={abbr} style={{ "--i": i } as React.CSSProperties}>
-              <span className="lv-tr__abbr">{abbr}</span>
-              <span className="lv-tr__name">{name}</span>
-            </li>
-          ))}
-        </ul>
       </section>
 
       {/* privacy */}

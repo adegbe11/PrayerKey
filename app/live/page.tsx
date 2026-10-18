@@ -148,7 +148,8 @@ function VerseScreen({
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function LivePage() {
   const [state,         setState]         = useState<ServiceState>("idle");
-  const [translation,   setTranslation]   = useState("KJV");
+  // verses come from the bundled public-domain King James text
+  const translation = "KJV";
   const [elapsed,       setElapsed]       = useState(0);
   const [transcript,    setTranscript]    = useState("");
   const [transcriptLog, setTranscriptLog] = useState<{ text: string; detected: boolean }[]>([]);
@@ -356,7 +357,6 @@ export default function LivePage() {
     if (detectRef.current) clearTimeout(detectRef.current);
   }, []);
 
-  const TRANSLATIONS = ["KJV","NKJV","NIV","ESV","NLT","AMP","AMPC","MSG","CSB","NASB","NASB95","RSV","NRSV","ASV","NET","NCV","CEV","GNT","ICB","NLV","ERV","WEB","YLT","DARBY","BBE","CEB","EXB","VOICE","TLV","MEV","TPT","CJB"];
 
   const SERIF = "'New York','Times New Roman',Georgia,serif";
 
@@ -432,12 +432,10 @@ export default function LivePage() {
 
           {micError && <div style={{ marginBottom:"20px", padding:"10px 16px", borderRadius:"10px", background:"rgba(255,69,58,0.10)", border:"1px solid rgba(255,69,58,0.30)", color:RED, fontSize:"13px" }}>{micError}</div>}
 
-          {/* translation */}
+          {/* the one translation the tool shows: the public-domain King James text */}
           <div className="lv-hero__select">
-            <label htmlFor="lv-translation">Translation</label>
-            <select id="lv-translation" value={translation} onChange={e => setTranslation(e.target.value)}>
-              {TRANSLATIONS.map(t => <option key={t}>{t}</option>)}
-            </select>
+            <span>Translation</span>
+            <strong>King James Version</strong>
           </div>
 
           <p style={{ marginTop:"26px", fontSize:"12px", color:T3, letterSpacing:"0.02em", fontFamily:"var(--pk-font-sans)" }}>Works in Chrome or Edge, with microphone access.</p>
@@ -555,12 +553,12 @@ export default function LivePage() {
           </button>
 
           {/* Translation pill */}
-          <select value={translation} onChange={e => setTranslation(e.target.value)}
+          <span title="King James Version"
             style={{ padding:"7px 12px", background:"rgba(255,255,255,0.04)", backdropFilter:"blur(12px)",
               border:`1px solid ${BORDER}`, borderRadius:"100px",
-              color:T1, fontSize:"11px", fontWeight:700, outline:"none", boxShadow:HILITE }}>
-            {TRANSLATIONS.map(t => <option key={t} style={{ background:"#160022" }}>{t}</option>)}
-          </select>
+              color:T1, fontSize:"11px", fontWeight:700, boxShadow:HILITE }}>
+            KJV
+          </span>
 
           {/* Projector */}
           <a href="/live/projector" target="_blank" style={{
@@ -727,12 +725,12 @@ export default function LivePage() {
                 style={{ flex:1, padding:"7px 14px", background:"rgba(255,255,255,0.04)",
                   border:`1px solid ${BORDER}`, borderRadius:"100px", color:T1, fontSize:"11px", outline:"none",
                   boxShadow:HILITE }} />
-              <select value={translation} onChange={e => setTranslation(e.target.value)}
+              <span title="King James Version"
                 style={{ padding:"7px 12px", background:"rgba(255,255,255,0.04)",
-                  border:`1px solid ${BORDER}`, borderRadius:"100px", color:T1, fontSize:"11px", fontWeight:700, outline:"none",
+                  border:`1px solid ${BORDER}`, borderRadius:"100px", color:T1, fontSize:"11px", fontWeight:700,
                   boxShadow:HILITE }}>
-                {TRANSLATIONS.map(t => <option key={t} style={{ background:"#160022" }}>{t}</option>)}
-              </select>
+                KJV
+              </span>
             </div>
           </div>
           <div style={{ flex:1, overflowY:"auto" as const, padding:"8px 10px" }}>

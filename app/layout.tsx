@@ -142,7 +142,7 @@ const softwareLd = {
   featureList: [
     "Prayers built on Scripture",
     "Real-time live sermon Bible verse detection",
-    "11 Bible translations",
+    "The complete King James Version",
     "Full Bible search by keyword, topic, or reference",
     "Cross-reference lookup",
     "No account required",

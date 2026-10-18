@@ -69,9 +69,8 @@ export default function PrivacyPage() {
             used only to identify verses in the moment.
           </p>
           <p>
-            When you use Bible search, your search query is sent to our servers and, for some translations, to a
-            third-party search service, to retrieve relevant Bible verses and cross-references. The query is not
-            stored after the response is returned.
+            When you use Bible search, your search query is sent to our servers to find the matching verses and
+            cross-references in the King James Version. The query is not stored after the response is returned.
           </p>
         </Section>
 

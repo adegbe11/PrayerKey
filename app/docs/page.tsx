@@ -52,7 +52,7 @@ const TOC = [
   { id: "prayer-generator",   label: "Prayer Generator"                    },
   { id: "bible-search",       label: "Bible Search & Cross-References"     },
   { id: "prayer-library",     label: "Prayer Library"                      },
-  { id: "translations",       label: "Bible Translations"                  },
+  { id: "translations",       label: "Bible Translation"                   },
   { id: "projector",          label: "Projector & Second Screen"           },
   { id: "browsers",           label: "Browsers & Devices"                  },
   { id: "shortcuts",          label: "Keyboard Shortcuts"                  },
@@ -68,8 +68,8 @@ const FAQ: { q: string; a: string }[] = [
     a: "Yes. PrayerKey is 100% free with no account, no subscription, and no payment of any kind. There is no premium tier. The only thing we ask is that you tell another pastor about it." },
   { q: "Do I need to create an account to use PrayerKey?",
     a: "No. Open the website and start using any feature immediately. You do not need to register, log in, or provide an email address." },
-  { q: "Which Bible translations does PrayerKey support?",
-    a: "PrayerKey supports 11 major translations: KJV, NIV, ESV, NKJV, NLT, NASB, AMP, CSB, MSG, CEV, and GNT. You can switch translations at any time from the dropdown in the live dashboard or Bible search." },
+  { q: "Which Bible translation does PrayerKey use?",
+    a: "PrayerKey uses the King James Version (KJV) for Bible search, verse pages and the live sermon projector. It is the full text of all 66 books and is in the public domain, so churches can project it freely." },
   { q: "Does the live sermon detection work without internet?",
     a: "No. Live verse detection needs an internet connection: your browser's speech recognition turns the sermon into text, and that text is matched against the Bible on our servers. A stable Wi-Fi connection of at least 1 Mbps is recommended." },
   { q: "Which browsers work with PrayerKey?",
@@ -376,10 +376,9 @@ export default function DocsPage() {
             study, and small-group discussion.
           </p>
 
-          <h3>Switching translations</h3>
+          <h3>Translation</h3>
           <p>
-            The translation dropdown affects both the search and the verse text shown. Eleven translations are
-            available (see <a href="#translations">Bible Translations</a>).
+            Search results and verse text come from the King James Version (see <a href="#translations">Bible Translation</a>).
           </p>
         </Section>
 
@@ -396,21 +395,12 @@ export default function DocsPage() {
           </p>
         </Section>
 
-        <Section id="translations" title="Bible Translations">
-          <p>PrayerKey supports 11 translations across all features:</p>
-          <dl className="rd-terms rd-terms--keep">
-            <div><dt>KJV</dt><dd>King James Version</dd></div>
-            <div><dt>NIV</dt><dd>New International Version</dd></div>
-            <div><dt>ESV</dt><dd>English Standard Version</dd></div>
-            <div><dt>NKJV</dt><dd>New King James Version</dd></div>
-            <div><dt>NLT</dt><dd>New Living Translation</dd></div>
-            <div><dt>NASB</dt><dd>New American Standard Bible</dd></div>
-            <div><dt>AMP</dt><dd>Amplified Bible</dd></div>
-            <div><dt>CSB</dt><dd>Christian Standard Bible</dd></div>
-            <div><dt>MSG</dt><dd>The Message</dd></div>
-            <div><dt>CEV</dt><dd>Contemporary English Version</dd></div>
-            <div><dt>GNT</dt><dd>Good News Translation</dd></div>
-          </dl>
+        <Section id="translations" title="Bible Translation">
+          <p>
+            PrayerKey uses the King James Version (KJV) across the website: Bible search, every verse page, the
+            verse of the day and the live sermon projector. It is the complete text of all 66 books, and because
+            it is in the public domain, a church can put any verse on its screen without a licence.
+          </p>
         </Section>
 
         <Section id="projector" title="Projector & Second Screen">

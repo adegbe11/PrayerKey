@@ -5,7 +5,7 @@ const BIBLE_URL = `${BASE_URL}/bible`;
 
 export const metadata: Metadata = {
   title:       "Free Bible Search — Keyword, Verse & Cross-Reference Lookup | PrayerKey",
-  description: "Search the entire Bible by keyword, phrase, or reference. Get instant cross-references and contextual verses across 11 translations. Free, no account required.",
+  description: "Search the entire Bible by keyword, phrase, or reference. Get instant cross-references and the verses around them in the King James Version. Free, no account required.",
   keywords: [
     "free bible search",
     "bible search engine",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   alternates: { canonical: BIBLE_URL },
   openGraph: {
     title:       "Free Bible Search — Keyword, Verse & Cross-Reference Lookup",
-    description: "Search the entire Bible by keyword, phrase, or reference. Instant cross-references across 11 translations. Free, no account required.",
+    description: "Search the entire Bible by keyword, phrase, or reference. Instant cross-references, King James Version. Free, no account required.",
     url:         BIBLE_URL,
     type:        "website",
     siteName:    "PrayerKey",
@@ -45,7 +45,7 @@ const websiteLd = {
   name:       "PrayerKey Bible Search",
   applicationCategory: "ReferenceApplication",
   operatingSystem: "Any (browser-based)",
-  description: "Free Bible search engine with keyword, phrase, and reference lookup plus cross-references across 11 translations.",
+  description: "Free Bible search engine with keyword, phrase, and reference lookup plus cross-references, in the King James Version.",
   url: BIBLE_URL,
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
 };
