@@ -6,6 +6,10 @@ import com.prayerkey.manna.platform.ioDispatcher
 import com.prayerkey.manna.platform.readAsset
 import kotlin.concurrent.Volatile
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
@@ -42,7 +46,58 @@ data class ChallengePlan(
     val promise: String,
     val cover: String,
     val written: List<ChallengePlanDay>,
+    /** When the church keeps it, for a seasonal challenge. Null for the year-round shelf. */
+    val season: ChallengeSeason? = null,
 )
+
+/**
+ * When a seasonal challenge belongs: a fixed window in the calendar (Advent,
+ * the new year's fast) or a moveable feast keyed to Easter (Lent, Holy Week,
+ * Pentecost). It is shown from a week before it begins so it can be started on
+ * day one, and leaves the top of the shelf when its window closes.
+ */
+data class ChallengeSeason(
+    val startMonth: Int = 0, val startDay: Int = 0,
+    val endMonth: Int = 0, val endDay: Int = 0,
+    val moveable: String? = null,
+) {
+    /** The first and last day of the season in a given year. */
+    fun window(year: Int): Pair<LocalDate, LocalDate>? = when (moveable) {
+        // Ash Wednesday to Holy Saturday; the forty days do not count Sundays
+        "lent" -> easter(year).let { it.minus(46, DateTimeUnit.DAY) to it.minus(1, DateTimeUnit.DAY) }
+        // Palm Sunday to Easter Sunday
+        "holy-week" -> easter(year).let { it.minus(7, DateTimeUnit.DAY) to it }
+        // the ten days between Ascension and Pentecost, ending on Pentecost
+        "pentecost" -> easter(year).let { it.plus(40, DateTimeUnit.DAY) to it.plus(49, DateTimeUnit.DAY) }
+        null -> runCatching { LocalDate(year, startMonth, startDay) to LocalDate(year, endMonth, endDay) }.getOrNull()
+        else -> null
+    }
+
+    /** True from a week before the season until its last day. */
+    fun isNear(today: LocalDate): Boolean {
+        val (start, end) = window(today.year) ?: return false
+        return today >= start.minus(7, DateTimeUnit.DAY) && today <= end
+    }
+
+    /** The line on the card: Begins Wednesday 18 February, or In season until 24 December. */
+    fun label(today: LocalDate): String {
+        val (start, end) = window(today.year) ?: return ""
+        fun d(x: LocalDate) = "${x.dayOfMonth} ${x.month.name.lowercase().replaceFirstChar { it.uppercase() }}"
+        return if (today < start) "Begins ${d(start)}" else "In season until ${d(end)}"
+    }
+
+    companion object {
+        /** Western Easter Sunday (the anonymous Gregorian computus). */
+        fun easter(year: Int): LocalDate {
+            val a = year % 19; val b = year / 100; val c = year % 100
+            val d = b / 4; val e = b % 4; val f = (b + 8) / 25; val g = (b - f + 1) / 3
+            val h = (19 * a + b - d - g + 15) % 30; val i = c / 4; val k = c % 4
+            val l = (32 + 2 * e + 2 * i - h - k) % 7; val m = (a + 11 * h + 22 * l) / 451
+            val month = (h + l - 7 * m + 114) / 31; val day = (h + l - 7 * m + 114) % 31 + 1
+            return LocalDate(year, month, day)
+        }
+    }
+}
 
 data class ChallengePlanDay(
     val day: Int,
@@ -70,6 +125,7 @@ data class ChallengePlanDay(
 object Challenges {
 
     private const val ASSET = "challenges.json"
+    private const val SEASONS = "seasons.json"
 
     @Volatile private var cache: List<ChallengePlan>? = null
 
@@ -86,8 +142,16 @@ object Challenges {
      * A malformed challenge is dropped rather than taking the shelf down with
      * it — one bad entry should cost one card, not the feature.
      */
-    private fun parse(context: PlatformContext): List<ChallengePlan> = runCatching {
-        val raw = context.readAsset(ASSET) ?: return emptyList()
+    private fun parse(context: PlatformContext): List<ChallengePlan> =
+        parse(context, ASSET) + parse(context, SEASONS)
+
+    /** Every challenge whose season is near, soonest first. */
+    suspend fun inSeason(context: PlatformContext, today: LocalDate): List<ChallengePlan> =
+        all(context).filter { it.season?.isNear(today) == true }
+            .sortedBy { it.season?.window(today.year)?.first }
+
+    private fun parse(context: PlatformContext, asset: String): List<ChallengePlan> = runCatching {
+        val raw = context.readAsset(asset) ?: return emptyList()
         val array = Json.parseToJsonElement(raw).jsonObject.getArray("challenges")
         buildList {
             for (entry in array) {
@@ -106,6 +170,13 @@ object Challenges {
             promise = o.getString("promise"),
             cover = o.optString("cover"),
             written = written.map { day(it.jsonObject) },
+            season = (o["season"] as? JsonObject)?.let {
+                ChallengeSeason(
+                    startMonth = it.optInt("startMonth", 0), startDay = it.optInt("startDay", 0),
+                    endMonth = it.optInt("endMonth", 0), endDay = it.optInt("endDay", 0),
+                    moveable = it.optString("moveable").ifBlank { null },
+                )
+            },
         )
     }
 

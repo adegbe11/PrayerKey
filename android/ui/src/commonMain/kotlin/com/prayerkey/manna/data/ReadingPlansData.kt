@@ -202,4 +202,4 @@ private val PLAN_7 = ReadingPlanDef(
     ),
 )
 
-val READING_PLANS: List<ReadingPlanDef> = listOf(PLAN_0, PLAN_1, PLAN_2, PLAN_3, PLAN_4, PLAN_5, PLAN_6, PLAN_7)
+val READING_PLANS: List<ReadingPlanDef> = listOf(PLAN_0, PLAN_1, PLAN_2, PLAN_3, PLAN_4, PLAN_5, PLAN_6, PLAN_7) + MORE_READING_PLANS

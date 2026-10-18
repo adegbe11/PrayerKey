@@ -201,6 +201,7 @@ fun WalkCelebration() {
     val days = reached.milestone ?: return
     val context = platformContext()
     val haptics = rememberHaptics()
+    val review = com.prayerkey.manna.ui.platform.rememberReviewAsk()
     val rise = remember { Animatable(0f) }
     val burst = remember { Animatable(0f) }
     LaunchedEffect(days) {
@@ -252,7 +253,11 @@ fun WalkCelebration() {
                     )
                     Text(
                         "Amen",
-                        Modifier.clip(RoundedCornerShape(50)).background(Pk.GoldLight).clickable { Walk.celebrated() }
+                        Modifier.clip(RoundedCornerShape(50)).background(Pk.GoldLight).clickable {
+                            Walk.celebrated()
+                            // a week or more walked, at peace: the one moment a review is asked for
+                            if (days in setOf(7, 21, 50, 100)) review.launch()
+                        }
                             .padding(horizontal = 30.dp, vertical = 14.dp),
                         fontFamily = UtilitySans, fontWeight = FontWeight.Bold, color = Color(0xFF2A1200),
                     )

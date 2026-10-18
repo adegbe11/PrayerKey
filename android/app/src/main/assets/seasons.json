@@ -1,0 +1,2069 @@
+{
+  "version": 1,
+  "note": "Seasonal challenges. Same shape as challenges.json - READ, REFLECT, PRAY, and a block for the house - plus a season: a fixed window (startMonth/startDay to endMonth/endDay) or a moveable feast keyed to Easter (lent, holy-week, pentecost). Scripture is a reference only, resolved from the bundled KJV.",
+  "challenges": [
+    {
+      "id": "new-year-21-days",
+      "title": "21 Days of Prayer and Fasting",
+      "days": 21,
+      "promise": "Give God the first three weeks of the year, and the rest of it with them.",
+      "cover": "discovery_cover_3",
+      "season": {
+        "startMonth": 1,
+        "startDay": 1,
+        "endMonth": 1,
+        "endDay": 21
+      },
+      "written": [
+        {
+          "day": 1,
+          "title": "Sanctify yourselves",
+          "read": {
+            "book": "Joshua",
+            "chapter": 3,
+            "verse": 5,
+            "from": 1,
+            "to": 5
+          },
+          "reflection": "Before Israel crossed the Jordan into a new land, Joshua told them, Sanctify yourselves: for to morrow the LORD will do wonders among you. They prepared first, and then they crossed.\n\nThat is what these twenty-one days are for. Many churches begin the year this way, giving God the first weeks before the rush of work and school takes over. You are not trying to earn a good year. You are making room to hear from the God who already holds it.",
+          "prayer": "Father, I give You the start of this year. Before I make my plans, I want to hear Yours. Set me apart for You in these twenty-one days. Clean my heart, quiet my mind, and do wonders among us, as You did for Israel. Prepare me for what You are about to do. In Jesus' name, Amen.",
+          "question": "What do you most want from God in these three weeks?",
+          "familyQuestion": "What is one thing we want to ask God for as a family this year?",
+          "familyPrayer": "Lord, we give You this year as a household. Prepare us, and do wonders among us."
+        },
+        {
+          "day": 2,
+          "title": "Why we fast",
+          "read": {
+            "book": "Ezra",
+            "chapter": 8,
+            "verse": 21,
+            "from": 21,
+            "to": 23
+          },
+          "reflection": "Ezra was about to lead families on a long, dangerous road. He proclaimed a fast to seek of him a right way for us, and for our little ones. Then he says simply, he was intreated of us.\n\nFasting is not a hunger strike to force God's hand. It is a way of humbling ourselves and saying, we need You more than we need food. Write down why you are fasting. A clear reason will keep you going on the days your stomach complains.",
+          "prayer": "Lord, I humble myself before You at the start of this year. I need a right way for myself, for my family and for all that I have. I am not fasting to impress You or to bargain with You. I am fasting because I need You. Hear me, as You heard Ezra. In Jesus' name, Amen.",
+          "question": "Why are you fasting, in one sentence?",
+          "familyQuestion": "What road is our family about to walk this year?",
+          "familyPrayer": "Father, show us a right way for us and for our little ones, and keep us on it."
+        },
+        {
+          "day": 3,
+          "title": "Fast wisely",
+          "read": {
+            "book": "Daniel",
+            "chapter": 1,
+            "verse": 12,
+            "from": 8,
+            "to": 16
+          },
+          "reflection": "Daniel asked to eat only pulse, which is vegetables and grains, and to drink water for ten days. This is where the Daniel fast comes from. Others fast from morning until noon or until evening, or skip one meal a day.\n\nChoose what is wise for your body. Drink water. If you are pregnant, nursing, diabetic, on medication, recovering from illness or have ever struggled with eating, speak to a doctor first, and fast from something other than food instead. Children should not do a food fast. God looks at the heart, not at how hungry you are.",
+          "prayer": "Father, help me to fast with wisdom and not with pride. Show me the fast that is right for my body and my life. Where I am weak, be my strength. Let what I give up make room for You, and let me not harm the body You gave me. In Jesus' name, Amen.",
+          "question": "What kind of fast is wise for you this year?",
+          "familyQuestion": "How can each of us take part in a way that is right for our age and health?",
+          "familyPrayer": "Lord, help each one in this house to seek You in a way that is wise and safe."
+        },
+        {
+          "day": 4,
+          "title": "A new thing",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 43,
+            "verse": 19,
+            "from": 18,
+            "to": 19
+          },
+          "reflection": "Remember ye not the former things, neither consider the things of old. God told Israel not to stay stuck in what had gone before, good or bad. Behold, I will do a new thing.\n\nLast year may have had losses you are still carrying, or successes you are trying to repeat. Both can keep you looking back. Today, hand last year to God. Thank Him for what was good, grieve what was hard, and then turn and face the way He is making in the wilderness.",
+          "prayer": "Lord, I hand last year to You, all of it. Thank You for every good thing. I bring You what hurt, and I ask You to heal it. Now I turn to face what You are doing. Make a way in my wilderness and rivers in my desert. Do a new thing, and help me to see it. In Jesus' name, Amen.",
+          "question": "What from last year do you need to leave behind?",
+          "familyQuestion": "What was the best thing God did for our family last year?",
+          "familyPrayer": "Father, thank You for last year. We trust You with the new thing You are doing."
+        },
+        {
+          "day": 5,
+          "title": "Consider your ways",
+          "read": {
+            "book": "Haggai",
+            "chapter": 1,
+            "verse": 5,
+            "from": 5,
+            "to": 7
+          },
+          "reflection": "The people in Haggai's time were busy with their own houses while God's house lay in ruins. They worked hard but never had enough. Twice God says, Consider your ways.\n\nA fast is a good time to look honestly at how you spend your days, your money and your attention. Where has God been put last? This is not about guilt. It is about putting first things first, so that your work is not like wages put into a bag with holes.",
+          "prayer": "Father, I stop and consider my ways. Show me where I have put You last and kept my own house first. I do not want to work hard and still come up empty. Help me to put You first in my time, my money and my heart this year. In Jesus' name, Amen.",
+          "question": "Where have you been putting God last?",
+          "familyQuestion": "What takes up most of our time as a family?",
+          "familyPrayer": "Lord, help us to put You first in this house, and bless the work of our hands."
+        },
+        {
+          "day": 6,
+          "title": "Write the vision",
+          "read": {
+            "book": "Habakkuk",
+            "chapter": 2,
+            "verse": 2,
+            "from": 2,
+            "to": 3
+          },
+          "reflection": "God told Habakkuk, Write the vision, and make it plain upon tables. Some things God shows us need to be written down so we remember them when life gets busy.\n\nTake time today to write what you sense God is saying about this year: for your walk with Him, your family, your work, your church. Keep it short and plain. Then hold it loosely and pray over it. though it tarry, wait for it; because it will surely come.",
+          "prayer": "Lord, I want to see what You see for this year. Speak to me, and help me to write it down plainly. Where my plans are my own, correct them. Where they are Yours, give me patience to wait and faith to keep going. In Jesus' name, Amen.",
+          "question": "What do you sense God saying about this year?",
+          "familyQuestion": "What would we like to see God do in our family this year?",
+          "familyPrayer": "Father, give our house a clear vision, and the patience to wait for it."
+        },
+        {
+          "day": 7,
+          "title": "Search me",
+          "read": {
+            "book": "Psalms",
+            "chapter": 139,
+            "verse": 23,
+            "from": 23,
+            "to": 24
+          },
+          "reflection": "Search me, O God, and know my heart. This is a brave prayer. It asks God to look into the places we would rather not look.\n\nFasting often brings things to the surface: irritation, old resentments, habits we lean on. That is part of its gift. When something comes up today, do not push it away. Bring it to God. He is not searching you to shame you, but to lead me in the way everlasting.",
+          "prayer": "Search me, O God, and know my heart. Try me, and know my thoughts. Show me any wicked way in me that I have stopped noticing. I confess it to You. Forgive me, cleanse me, and lead me in the way everlasting. In Jesus' name, Amen.",
+          "question": "What has come to the surface in you since you started fasting?",
+          "familyQuestion": "Is there anything we need to say sorry to each other for?",
+          "familyPrayer": "Lord, search our home. Where we have hurt each other, help us to make it right."
+        },
+        {
+          "day": 8,
+          "title": "Your household",
+          "read": {
+            "book": "Psalms",
+            "chapter": 128,
+            "verse": 3,
+            "from": 1,
+            "to": 6
+          },
+          "reflection": "This psalm pictures a home blessed by God: Thy wife shall be as a fruitful vine by the sides of thine house: thy children like olive plants round about thy table. It begins with every one that feareth the LORD.\n\nToday, pray for your household by name. If you are married, pray for your spouse. If you have children, pray for each one. If you live alone, pray for the family you came from and the people God has placed around you. A blessed home starts with someone who prays for it.",
+          "prayer": "Father, I bring my household to You. I pray for each one by name. Bless our home with peace. Let it be a place where You are honoured, where love is patient and words are kind. Keep us from anything that would divide us. In Jesus' name, Amen.",
+          "question": "Who in your household needs prayer most right now?",
+          "familyQuestion": "What is one thing each of us is thankful for about our home?",
+          "familyPrayer": "Lord, bless this house. Let peace live here, and let You be honoured at our table."
+        },
+        {
+          "day": 9,
+          "title": "Your children",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 54,
+            "verse": 13,
+            "from": 13,
+            "to": 14
+          },
+          "reflection": "all thy children shall be taught of the LORD; and great shall be the peace of thy children. Many parents pray this verse over their children every year.\n\nPray today for your children, or for the children in your family and church. Pray that they would know God for themselves, not only through you. Pray for their schooling, their friends and their future. If you have no children, pray for a young person you know. They need people praying for them.",
+          "prayer": "Lord, I bring the children in my life to You. Teach them Yourself. Let them know You, not just know about You. Give them peace, protect them from harm, and guide them in their studies and friendships. Let them grow up to love You. In Jesus' name, Amen.",
+          "question": "Which young person will you pray for by name today?",
+          "familyQuestion": "What do our children want God to help them with this year?",
+          "familyPrayer": "Father, teach our children Yourself, and give them great peace."
+        },
+        {
+          "day": 10,
+          "title": "Health",
+          "read": {
+            "book": "3 John",
+            "chapter": 1,
+            "verse": 2,
+            "from": 2,
+            "to": 4
+          },
+          "reflection": "John wrote to his friend Gaius, I wish above all things that thou mayest prosper and be in health, even as thy soul prospereth. He cared about the whole person, body and soul.\n\nPray today for your health and the health of those you love. Pray for anyone who is sick. Health is a gift from God, and caring for it is part of being faithful. If fasting is making you unwell, stop and eat. God would rather have you healthy and praying than unwell and proud.",
+          "prayer": "Father, thank You for the body You have given me. I pray for health this year, for myself and for my family. I bring You everyone I know who is sick. Heal them, comfort them and give wisdom to those who care for them. Help me to look after my body well. In Jesus' name, Amen.",
+          "question": "Who do you know who needs prayer for healing?",
+          "familyQuestion": "What could we do this year to look after our health as a family?",
+          "familyPrayer": "Lord, keep this family in good health, and heal those we love who are sick."
+        },
+        {
+          "day": 11,
+          "title": "Work and provision",
+          "read": {
+            "book": "Deuteronomy",
+            "chapter": 28,
+            "verse": 8,
+            "from": 8,
+            "to": 12
+          },
+          "reflection": "The LORD shall command the blessing upon thee in thy storehouses, and in all that thou settest thine hand unto. God cares about our work and our provision. He wants His people to have enough, and to be able to help others.\n\nPray today about your work, your business or your search for work. Pray about debts and bills. Ask God for honest gain and wisdom with money. And pray for people you know who are without work this year.",
+          "prayer": "Lord, I bring my work and my finances to You. Bless the work of my hands. Give me favour, wisdom and honest gain. Help me to clear my debts and to be generous. Provide for those I know who are struggling to find work. You are my provider. In Jesus' name, Amen.",
+          "question": "What do you need God to do in your work or finances this year?",
+          "familyQuestion": "How could our family be more generous this year?",
+          "familyPrayer": "Father, bless the work of our hands, and make us a family that gives."
+        },
+        {
+          "day": 12,
+          "title": "Power to the faint",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 40,
+            "verse": 29,
+            "from": 29,
+            "to": 31
+          },
+          "reflection": "You are more than halfway, and this is often where it gets hard. The excitement of day one has worn off. He giveth power to the faint; and to them that have no might he increaseth strength.\n\nIf you have slipped a day or two, do not give up. Simply begin again today. God is not counting your failures. The ones who wait upon the Lord are not the ones who never get tired. They are the ones who keep coming back to Him when they do.",
+          "prayer": "Lord, I am tired. I have not done this perfectly. But I come back to You today. Give power to me where I am faint, and increase my strength where I have none. Help me to finish these days well, not by my might but by Yours. In Jesus' name, Amen.",
+          "question": "What has been hardest about these first eleven days?",
+          "familyQuestion": "How can we encourage each other to keep going?",
+          "familyPrayer": "Lord, when we are tired, give us Your strength. Help us to finish well together."
+        },
+        {
+          "day": 13,
+          "title": "Your going out and coming in",
+          "read": {
+            "book": "Psalms",
+            "chapter": 121,
+            "verse": 8,
+            "from": 5,
+            "to": 8
+          },
+          "reflection": "The LORD shall preserve thy going out and thy coming in from this time forth, and even for evermore. People pray this over their travel, their roads, their homes.\n\nPray today for protection for yourself and your family: on the roads, at work, at school and at home. Pray for those who travel often. Fear does not have to rule this year. The Lord is thy keeper, and He does not sleep.",
+          "prayer": "Father, I ask You to keep me and my family this year. Preserve our going out and our coming in. Protect us on the roads and in our homes. Keep us from all evil. Where we are afraid, remind us that You are our keeper and You never sleep. In Jesus' name, Amen.",
+          "question": "Where do you most need God's protection this year?",
+          "familyQuestion": "Who in our family travels often, and how can we pray for them?",
+          "familyPrayer": "Lord, keep our going out and our coming in, and bring each of us home safely."
+        },
+        {
+          "day": 14,
+          "title": "The church",
+          "read": {
+            "book": "Acts",
+            "chapter": 2,
+            "verse": 42,
+            "from": 42,
+            "to": 47
+          },
+          "reflection": "The early believers continued stedfastly in the apostles' doctrine and fellowship, and in breaking of bread, and in prayers. They shared meals, cared for each other and praised God, and the Lord added to their number daily.\n\nPray today for your church: your pastors and leaders, the people in your congregation, and those who have drifted away. Pray that this year your church would be a family where people are fed, loved and sent out.",
+          "prayer": "Lord, I pray for my church. Bless our pastors and leaders with wisdom and strength. Make us a family that prays, learns and cares for one another. Bring back those who have drifted. Add to us daily such as should be saved. In Jesus' name, Amen.",
+          "question": "Who in your church could you encourage this week?",
+          "familyQuestion": "What do we love about our church?",
+          "familyPrayer": "Father, bless our church family, and help us to play our part in it."
+        },
+        {
+          "day": 15,
+          "title": "Heal our land",
+          "read": {
+            "book": "2 Chronicles",
+            "chapter": 7,
+            "verse": 14,
+            "from": 13,
+            "to": 14
+          },
+          "reflection": "If my people, which are called by my name, shall humble themselves, and pray, and seek my face, and turn from their wicked ways; then will I hear from heaven, and will forgive their sin, and will heal their land.\n\nThe healing of a nation begins with God's own people humbling themselves. Pray today for your country, whichever it is. Pray about its troubles, its poverty, its violence and its divisions. Then ask God what part He wants you to play.",
+          "prayer": "Lord, I humble myself and pray for my nation. Forgive us where we have turned from You. Heal our land. Bring peace where there is violence, provision where there is hunger, and honesty where there is corruption. Begin with Your people, and begin with me. In Jesus' name, Amen.",
+          "question": "What does your nation most need from God this year?",
+          "familyQuestion": "What can our family do to be a blessing in our community?",
+          "familyPrayer": "Lord, heal our land, and make our home a light in our community."
+        },
+        {
+          "day": 16,
+          "title": "Those in authority",
+          "read": {
+            "book": "1 Timothy",
+            "chapter": 2,
+            "verse": 1,
+            "from": 1,
+            "to": 4
+          },
+          "reflection": "Paul asks that prayers be made For kings, and for all that are in authority; that we may lead a quiet and peaceable life. He wrote this when the rulers were not believers and were often unjust.\n\nPraying for leaders is not the same as agreeing with them. Pray today for your president or prime minister, your local leaders, judges, police and those who run schools and hospitals. Pray that they would act with wisdom and justice, and that God would turn hearts toward what is right.",
+          "prayer": "Father, I pray for all who are in authority over my nation and my community. Give them wisdom, honesty and a heart for justice. Where they are doing wrong, turn their hearts. Where they are doing right, strengthen them. Let us live quiet and peaceable lives. In Jesus' name, Amen.",
+          "question": "Which leader do you find hardest to pray for?",
+          "familyQuestion": "Who are the leaders in our community we could pray for together?",
+          "familyPrayer": "Lord, give wisdom to those who lead us, and peace to our land."
+        },
+        {
+          "day": 17,
+          "title": "No weapon",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 54,
+            "verse": 17,
+            "from": 14,
+            "to": 17
+          },
+          "reflection": "No weapon that is formed against thee shall prosper. This is a favourite verse in many churches, and rightly so. But notice how it ends: This is the heritage of the servants of the LORD, and their righteousness is of me.\n\nOur protection is not a magic word. It rests on belonging to God and on the righteousness He gives. Whatever has been spoken against you, whatever you fear, bring it to Him. He is the one who establishes you.",
+          "prayer": "Lord, I bring to You every fear, every evil word spoken against me and every plan against my life. I stand in the righteousness You have given me in Christ. Let no weapon formed against me prosper. Establish me in Your peace, far from terror. In Jesus' name, Amen.",
+          "question": "What are you afraid might come against you this year?",
+          "familyQuestion": "What does it mean that we belong to God?",
+          "familyPrayer": "Father, we belong to You. Protect this house, and keep us from fear."
+        },
+        {
+          "day": 18,
+          "title": "He goes before you",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 45,
+            "verse": 2,
+            "from": 2,
+            "to": 3
+          },
+          "reflection": "God spoke to Cyrus, a king who did not yet know Him: I will go before thee, and make the crooked places straight: I will break in pieces the gates of brass. If God would go before a king who did not know Him, how much more will He go before His own children?\n\nIs there a door that has been shut for a long time? A situation that seems locked? Bring it to God today. He is able to go ahead of you and make a way.",
+          "prayer": "Father, go before me this year. Make the crooked places straight. Where doors have been shut, open them if it is Your will. Where gates have held me back, break them. And where You close a door, give me peace to trust You. In Jesus' name, Amen.",
+          "question": "What closed door do you want to bring to God?",
+          "familyQuestion": "Where do we need God to go before us as a family?",
+          "familyPrayer": "Lord, go ahead of us this year, and make a way where there seems to be none."
+        },
+        {
+          "day": 19,
+          "title": "Not by might",
+          "read": {
+            "book": "Zechariah",
+            "chapter": 4,
+            "verse": 6,
+            "from": 6,
+            "to": 7
+          },
+          "reflection": "Zerubbabel faced a great mountain of a task: rebuilding the temple with few people and little money. God's word to him was, Not by might, nor by power, but by my spirit, saith the LORD of hosts.\n\nAfter nearly three weeks of prayer and fasting, it is tempting to think the results depend on how hard you have tried. They do not. The work is done by God's Spirit. Pray today to be filled with the Holy Spirit, and to rely on Him all year.",
+          "prayer": "Holy Spirit, fill me afresh. I cannot do what this year will ask of me by my own strength. Let everything I do be done by Your Spirit. Make my mountains plains, and let me give the glory to God alone. In Jesus' name, Amen.",
+          "question": "What mountain in your life needs the Spirit's help, not more effort?",
+          "familyQuestion": "Where do we try to do things in our own strength as a family?",
+          "familyPrayer": "Holy Spirit, fill this house, and help us to rely on You."
+        },
+        {
+          "day": 20,
+          "title": "Crown the year",
+          "read": {
+            "book": "Psalms",
+            "chapter": 65,
+            "verse": 11,
+            "from": 9,
+            "to": 13
+          },
+          "reflection": "Thou crownest the year with thy goodness. The psalmist pictures fields watered, valleys full of corn, hills rejoicing. It is a picture of a year God has blessed.\n\nToday, give thanks in advance. Thank God for what He has already done in these twenty days, for answers you have seen and for those still on the way. Gratitude before the answer is a mark of faith. It says, I trust You to finish what You have started.",
+          "prayer": "Father, thank You. Thank You for these days with You, for what You have shown me and for prayers You have already answered. I thank You in advance for what You will do this year. Crown this year with Your goodness. In Jesus' name, Amen.",
+          "question": "What has God already done during these twenty days?",
+          "familyQuestion": "What are we thanking God for in advance this year?",
+          "familyPrayer": "Lord, thank You for this year. Crown it with Your goodness."
+        },
+        {
+          "day": 21,
+          "title": "From the beginning of the year",
+          "read": {
+            "book": "Deuteronomy",
+            "chapter": 11,
+            "verse": 12,
+            "from": 10,
+            "to": 12
+          },
+          "reflection": "Moses described the land God was giving His people as A land which the LORD thy God careth for: the eyes of the LORD thy God are always upon it, from the beginning of the year even unto the end of the year.\n\nThe fast ends today. Break it gently, with light food. But do not leave the closeness behind. Choose one habit from these three weeks to keep: a morning prayer, a weekly fast, a Bible reading. God's eyes will be on you all year, not just in January.",
+          "prayer": "Father, thank You for these twenty-one days. As I end this fast, I do not want to end this nearness. Keep Your eyes on me from the beginning of the year to the end. Help me to keep the habits that have drawn me close to You. In Jesus' name, Amen.",
+          "question": "What one habit from these three weeks will you keep?",
+          "familyQuestion": "How will we keep praying together after today?",
+          "familyPrayer": "Lord, Your eyes are on us all year. Keep us close to You until the very end of it."
+        }
+      ]
+    },
+    {
+      "id": "lent-40",
+      "title": "Forty Days to Easter",
+      "days": 40,
+      "promise": "Forty days to slow down, turn back to God, and walk with Jesus to the cross and the empty tomb.",
+      "cover": "discovery_cover_4",
+      "season": {
+        "moveable": "lent"
+      },
+      "written": [
+        {
+          "day": 1,
+          "title": "Dust",
+          "read": {
+            "book": "Genesis",
+            "chapter": 3,
+            "verse": 19,
+            "from": 17,
+            "to": 19
+          },
+          "reflection": "for dust thou art, and unto dust shalt thou return. Many Christians begin these forty days by remembering that we are made of dust. It sounds grim, but it is honest. Life is short and we are not God.\n\nThat honesty is where this season starts. Not with trying harder, but with admitting our need. The God who formed us from the dust is the same God who came in Jesus to raise us from it. Lent ends at an empty tomb.",
+          "prayer": "Lord, I remember today that I am dust. My life is short and my strength is small. I need You. Over these forty days, turn me back to You. Teach me to number my days, and walk with me all the way to the cross and the empty tomb. In Jesus' name, Amen.",
+          "question": "What would you change if you remembered how short life is?",
+          "familyQuestion": "What does it mean that God made us from dust?",
+          "familyPrayer": "Lord, thank You for making us. Walk with our family these forty days."
+        },
+        {
+          "day": 2,
+          "title": "While He may be found",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 55,
+            "verse": 6,
+            "from": 6,
+            "to": 7
+          },
+          "reflection": "Seek ye the LORD while he may be found, call ye upon him while he is near. God is near today. He is not hard to find for those who turn to Him.\n\nThe invitation is open to the wicked and the unrighteous. let him return unto the LORD, and he will have mercy upon him; and to our God, for he will abundantly pardon. Abundantly. Whatever you bring into these forty days, His pardon is bigger. Decide today what you will set aside to make room for Him.",
+          "prayer": "Father, I seek You today while You are near. I turn from my own ways and my own thoughts, and I return to You. Thank You that You abundantly pardon. Show me what to set aside in this season so that I can make more room for You. In Jesus' name, Amen.",
+          "question": "What will you set aside this Lent to make room for God?",
+          "familyQuestion": "Is there something we could give up or take up together as a family?",
+          "familyPrayer": "Father, we seek You together. Thank You that You are near."
+        },
+        {
+          "day": 3,
+          "title": "Wash me",
+          "read": {
+            "book": "Psalms",
+            "chapter": 51,
+            "verse": 2,
+            "from": 1,
+            "to": 4
+          },
+          "reflection": "David wrote this after his sin with Bathsheba was exposed. He does not make excuses. Wash me throughly from mine iniquity, and cleanse me from my sin. He appeals not to his own goodness but to God's lovingkindness and the multitude of thy tender mercies.\n\nRepentance is not wallowing. It is telling God the truth and trusting His mercy. Lent gives us time to do this slowly and honestly, without hurrying past what is wrong.",
+          "prayer": "Have mercy upon me, O God, according to Your lovingkindness. I acknowledge my sin; I will not hide it from You. Wash me thoroughly and cleanse me. I trust not in my goodness but in the multitude of Your tender mercies. In Jesus' name, Amen.",
+          "question": "What do you need to be honest with God about?",
+          "familyQuestion": "How do we say sorry well in this house?",
+          "familyPrayer": "Lord, wash our hearts. Help us to be honest with You and with each other."
+        },
+        {
+          "day": 4,
+          "title": "Led into the wilderness",
+          "read": {
+            "book": "Luke",
+            "chapter": 4,
+            "verse": 4,
+            "from": 1,
+            "to": 4
+          },
+          "reflection": "Lent is forty days because Jesus spent forty days in the wilderness. He was full of the Holy Ghost and led by the Spirit, and He was hungry. When the devil tempted Him to turn stone into bread, He answered, man shall not live by bread alone, but by every word of God.\n\nIf you are fasting from something this Lent, you will feel the lack. Let that feeling turn you to God's word. Read a little more. Listen a little longer.",
+          "prayer": "Lord Jesus, You went into the wilderness for me. When I feel hungry for what I have given up, turn me to Your word. Teach me that I do not live by bread alone. Feed me with every word that comes from God. In Jesus' name, Amen.",
+          "question": "What are you hungry for that only God can satisfy?",
+          "familyQuestion": "What Bible story could we read together this week?",
+          "familyPrayer": "Lord, feed this family with Your word as well as our daily bread."
+        },
+        {
+          "day": 5,
+          "title": "Him only",
+          "read": {
+            "book": "Luke",
+            "chapter": 4,
+            "verse": 8,
+            "from": 5,
+            "to": 8
+          },
+          "reflection": "The devil showed Jesus all the kingdoms of the world and offered them, if only Jesus would worship him. It was a shortcut to power without the cross.\n\nJesus refused: Thou shalt worship the Lord thy God, and him only shalt thou serve. We are offered shortcuts too: success without integrity, comfort without obedience. Every shortcut asks us to bow to something other than God. This week, notice what you are tempted to bow to.",
+          "prayer": "Lord, I worship You, and You only will I serve. Show me the shortcuts I am tempted to take, the places where I am bowing to something other than You. Give me the strength Jesus had to say no. In Jesus' name, Amen.",
+          "question": "What shortcut are you tempted to take?",
+          "familyQuestion": "What things compete for first place in our home?",
+          "familyPrayer": "Father, You alone are God in this house. Help us to serve You first."
+        },
+        {
+          "day": 6,
+          "title": "For a season",
+          "read": {
+            "book": "Luke",
+            "chapter": 4,
+            "verse": 13,
+            "from": 9,
+            "to": 13
+          },
+          "reflection": "The devil even quoted Scripture to Jesus, twisting a promise into a dare. Jesus answered with Scripture rightly understood: Thou shalt not tempt the Lord thy God.\n\nThen the devil departed from him for a season. Temptation comes back. Jesus did not win once and never face it again, and neither will we. But each time we resist, we learn that God's word is strong enough. Knowing it well helps us notice when it is being bent.",
+          "prayer": "Lord Jesus, thank You that You faced every temptation and did not fall. When temptation returns to me, remind me of Your word. Keep me from twisting Scripture to suit myself. Make me ready for the next season of testing. In Jesus' name, Amen.",
+          "question": "Which temptation keeps coming back to you?",
+          "familyQuestion": "What verse could we learn together this week?",
+          "familyPrayer": "Lord, hide Your word in our hearts so that we do not sin against You."
+        },
+        {
+          "day": 7,
+          "title": "To know what was in thine heart",
+          "read": {
+            "book": "Deuteronomy",
+            "chapter": 8,
+            "verse": 2,
+            "from": 2,
+            "to": 3
+          },
+          "reflection": "Moses told Israel to remember the forty years in the wilderness. God led them there to humble thee, and to prove thee, to know what was in thine heart.\n\nHard seasons show us what is in us. They also show us God's care. Israel was hungry, and God fed them with manna, something they had never known. If you are in a wilderness now, God has not abandoned you. He is teaching you and feeding you in ways you may only see later.",
+          "prayer": "Father, I remember all the ways You have led me, including the hard ones. Humble me, and show me what is in my heart. Feed me in this wilderness. Teach me that I live by every word that comes out of Your mouth. In Jesus' name, Amen.",
+          "question": "What has a hard season shown you about your own heart?",
+          "familyQuestion": "When has God taken care of our family in a hard time?",
+          "familyPrayer": "Lord, thank You for leading us and feeding us, even in the wilderness."
+        },
+        {
+          "day": 8,
+          "title": "He understands",
+          "read": {
+            "book": "Hebrews",
+            "chapter": 4,
+            "verse": 15,
+            "from": 14,
+            "to": 16
+          },
+          "reflection": "we have not an high priest which cannot be touched with the feeling of our infirmities; but was in all points tempted like as we are, yet without sin.\n\nJesus knows what temptation feels like. He knows hunger, tiredness, loneliness and pressure. So when you fail, you do not come to a judge who cannot understand. You come to a friend who was tempted in every way and stayed faithful. Let us therefore come boldly unto the throne of grace.",
+          "prayer": "Lord Jesus, thank You that You understand my weakness. You were tempted as I am, yet You did not sin. I come boldly to Your throne of grace today. I need mercy for where I have failed and grace to help me now. In Jesus' name, Amen.",
+          "question": "Where do you need grace to help in time of need?",
+          "familyQuestion": "How does it help to know Jesus understands how we feel?",
+          "familyPrayer": "Jesus, thank You that You understand us. Help us when we are weak."
+        },
+        {
+          "day": 9,
+          "title": "Blessed is the man that endureth",
+          "read": {
+            "book": "James",
+            "chapter": 1,
+            "verse": 12,
+            "from": 12,
+            "to": 15
+          },
+          "reflection": "Blessed is the man that endureth temptation. James is honest about where temptation comes from. It is not from God. It grows from our own desires. every man is tempted, when he is drawn away of his own lust, and enticed.\n\nSin starts small, as a desire we entertain, and grows. That is why it is wise to deal with it early, while it is still a thought. What desire have you been entertaining that you know will lead somewhere you do not want to go?",
+          "prayer": "Father, I confess that temptation often grows from my own desires. Show me the small thoughts that lead to sin, and help me to deal with them early. Give me strength to endure, and keep me for the crown of life You have promised. In Jesus' name, Amen.",
+          "question": "What small desire do you need to deal with early?",
+          "familyQuestion": "What helps us say no to things we know are wrong?",
+          "familyPrayer": "Lord, give us strength to say no to wrong and yes to You."
+        },
+        {
+          "day": 10,
+          "title": "Remember not",
+          "read": {
+            "book": "Psalms",
+            "chapter": 25,
+            "verse": 7,
+            "from": 4,
+            "to": 7
+          },
+          "reflection": "Remember not the sins of my youth, nor my transgressions: according to thy mercy remember thou me. David asks God to forget some things and remember others. Forget my sins. Remember me, according to Your mercy.\n\nSome of us carry regrets from years ago. We remember them clearly, and we assume God does too. But when we confess, God chooses to remember us by His mercy, not by our failures. You can pray this prayer for yourself today.",
+          "prayer": "Lord, remember not the sins of my youth. I bring You the regrets I still carry. According to Your mercy, remember me. Show me Your ways, teach me Your paths, and lead me in Your truth. On You I wait all the day. In Jesus' name, Amen.",
+          "question": "What old regret do you need to hand to God?",
+          "familyQuestion": "How does God want us to treat each other's past mistakes?",
+          "familyPrayer": "Father, remember us by Your mercy. Help us to forgive each other too."
+        },
+        {
+          "day": 11,
+          "title": "Take up his cross daily",
+          "read": {
+            "book": "Luke",
+            "chapter": 9,
+            "verse": 23,
+            "from": 23,
+            "to": 25
+          },
+          "reflection": "If any man will come after me, let him deny himself, and take up his cross daily, and follow me. Daily. Following Jesus is not one big decision made once. It is a choice we make every morning.\n\nDenying yourself does not mean hating yourself. It means saying no to the self that wants its own way above everything, so that you can say yes to Jesus. what is a man advantaged, if he gain the whole world, and lose himself, or be cast away?",
+          "prayer": "Lord Jesus, I choose to follow You today. Help me to deny myself where my own way pulls me from You. I take up my cross for today. Keep me from gaining the world and losing my soul. In Jesus' name, Amen.",
+          "question": "What does taking up your cross look like today?",
+          "familyQuestion": "What is one way we can put others first this week?",
+          "familyPrayer": "Jesus, help each of us to follow You today, one day at a time."
+        },
+        {
+          "day": 12,
+          "title": "He set His face",
+          "read": {
+            "book": "Luke",
+            "chapter": 9,
+            "verse": 51,
+            "from": 51,
+            "to": 56
+          },
+          "reflection": "he stedfastly set his face to go to Jerusalem. Jesus knew what waited for Him there. He went anyway, because He came to save.\n\nOn the way, a village refused Him, and James and John wanted to call down fire. Jesus rebuked them. the Son of man is not come to destroy men's lives, but to save them. Even on His way to the cross, He was teaching His followers mercy. Set your face toward Him, and keep walking.",
+          "prayer": "Lord Jesus, You set Your face toward Jerusalem for me. Help me to set my face toward You and not turn back. When I want to call down fire on those who reject me, teach me Your mercy. In Jesus' name, Amen.",
+          "question": "Where are you tempted to turn back from following Jesus?",
+          "familyQuestion": "How should we treat people who are unkind to us?",
+          "familyPrayer": "Lord, give us mercy for people who do not treat us well."
+        },
+        {
+          "day": 13,
+          "title": "Count the cost",
+          "read": {
+            "book": "Luke",
+            "chapter": 14,
+            "verse": 28,
+            "from": 27,
+            "to": 30
+          },
+          "reflection": "Jesus did not want followers who start well and quit when it gets hard. He told of a man who began to build a tower without counting the cost, and could not finish.\n\nFollowing Jesus costs something. It may cost comfort, reputation, relationships or plans. Jesus is honest about that. He would rather we count the cost and follow with our eyes open than be surprised later. And He promises that what we gain in Him is worth far more.",
+          "prayer": "Lord, I count the cost of following You, and I still choose You. Where it costs me comfort or approval, give me courage. Help me to finish what I have begun with You, and not to give up halfway. In Jesus' name, Amen.",
+          "question": "What has following Jesus cost you?",
+          "familyQuestion": "What does it cost our family to follow Jesus?",
+          "familyPrayer": "Lord, help us to follow You all the way, not only when it is easy."
+        },
+        {
+          "day": 14,
+          "title": "Loss for Christ",
+          "read": {
+            "book": "Philippians",
+            "chapter": 3,
+            "verse": 8,
+            "from": 7,
+            "to": 10
+          },
+          "reflection": "Paul had a great deal to be proud of. He gave it all up and said, I count all things but loss for the excellency of the knowledge of Christ Jesus my Lord.\n\nIt is easy to think of Lent as giving things up. Paul shows us why: not because those things are worthless in themselves, but because knowing Christ is worth more. That I may know him, and the power of his resurrection. What you give up is small next to who you gain.",
+          "prayer": "Lord Jesus, I want to know You more than anything. Show me what I am holding on to that keeps me from You. Help me to count it loss for the excellency of knowing You. Let me know the power of Your resurrection. In Jesus' name, Amen.",
+          "question": "What are you most proud of, and how does it compare with knowing Christ?",
+          "familyQuestion": "What do we love about Jesus?",
+          "familyPrayer": "Jesus, we want to know You more. Help us to love You above everything."
+        },
+        {
+          "day": 15,
+          "title": "One thing thou lackest",
+          "read": {
+            "book": "Mark",
+            "chapter": 10,
+            "verse": 21,
+            "from": 17,
+            "to": 22
+          },
+          "reflection": "A young man ran to Jesus asking how to inherit eternal life. He had kept the commandments since his youth. Then Jesus beholding him loved him. Notice that. Jesus loved him before He challenged him.\n\nThen Jesus put His finger on the one thing that held him: his wealth. The man went away grieved. Jesus does not ask everyone to sell everything. But He does ask each of us about the one thing we cannot let go. He asks because He loves us.",
+          "prayer": "Lord Jesus, You look at me and love me. Show me the one thing I lack, the one thing I hold on to more tightly than You. Give me grace not to walk away grieved but to follow You. In Jesus' name, Amen.",
+          "question": "What is the one thing you find hardest to give to Jesus?",
+          "familyQuestion": "What do we find hard to share?",
+          "familyPrayer": "Jesus, thank You that You love us. Help us to hold our things loosely."
+        },
+        {
+          "day": 16,
+          "title": "Whom say ye?",
+          "read": {
+            "book": "Matthew",
+            "chapter": 16,
+            "verse": 15,
+            "from": 13,
+            "to": 16
+          },
+          "reflection": "People had many opinions about Jesus. Some said a prophet. Some said John the Baptist come back. Jesus asked His disciples, But whom say ye that I am?\n\nPeter answered, Thou art the Christ, the Son of the living God. Halfway through Lent, this is the question that matters most. Not what your parents believe, or your church, or the people around you, but what you say. Who is Jesus to you?",
+          "prayer": "Lord Jesus, You are the Christ, the Son of the living God. I confess You today, not because others do but because I believe it. Help my faith to be my own. Show me more of who You are. In Jesus' name, Amen.",
+          "question": "Who do you say Jesus is?",
+          "familyQuestion": "If someone asked each of us who Jesus is, what would we say?",
+          "familyPrayer": "Jesus, You are the Son of God. Help each one in this house to know You for themselves."
+        },
+        {
+          "day": 17,
+          "title": "The one that was lost",
+          "read": {
+            "book": "Luke",
+            "chapter": 15,
+            "verse": 7,
+            "from": 1,
+            "to": 7
+          },
+          "reflection": "The religious leaders complained that Jesus welcomed sinners and ate with them. So He told them about a shepherd who left ninety-nine sheep to look for one that was lost, and carried it home on his shoulders rejoicing.\n\njoy shall be in heaven over one sinner that repenteth. God is not reluctant to take you back. He comes looking. And when He finds you, He does not drive you home. He carries you, rejoicing.",
+          "prayer": "Father, thank You that You came looking for me. When I wander, find me again. Thank You that heaven rejoices over one sinner who repents. I come home to You today. Carry me on Your shoulders. In Jesus' name, Amen.",
+          "question": "Have you ever felt like the one lost sheep?",
+          "familyQuestion": "Who do we know who might feel lost and far from God?",
+          "familyPrayer": "Lord, find those we love who have wandered, and bring them home rejoicing."
+        },
+        {
+          "day": 18,
+          "title": "Seek diligently",
+          "read": {
+            "book": "Luke",
+            "chapter": 15,
+            "verse": 8,
+            "from": 8,
+            "to": 10
+          },
+          "reflection": "A woman lost one silver coin. She lit a candle, swept the house and searched carefully until she found it. Then she called her neighbours to celebrate.\n\nThe coin did nothing to be found. It just lay there in the dust. That is grace. God searches for us when we cannot search for Him. If you have someone you love who is far from God, take heart. He is searching for them with more care than you are. Keep praying.",
+          "prayer": "Lord, thank You that You searched for me when I could not find my way to You. I pray for those I love who are far from You. Light a candle, sweep the house, and search for them until they are found. In Jesus' name, Amen.",
+          "question": "Who are you praying will be found by God?",
+          "familyQuestion": "What do we feel like when we find something we lost?",
+          "familyPrayer": "Father, search for the people we love, and bring them back to You."
+        },
+        {
+          "day": 19,
+          "title": "God be merciful to me",
+          "read": {
+            "book": "Luke",
+            "chapter": 18,
+            "verse": 13,
+            "from": 9,
+            "to": 14
+          },
+          "reflection": "Two men prayed in the temple. One listed his good works and thanked God he was not like other people. The other stood at a distance, would not even look up, and smote upon his breast, saying, God be merciful to me a sinner.\n\nJesus said the second man went home justified. The prayer God hears is not the impressive one. It is the honest one. You can pray the tax collector's prayer today, and mean it.",
+          "prayer": "God, be merciful to me, a sinner. I do not come with a list of good works. I come with my need. Forgive me for every time I have looked down on others. Thank You that You hear the honest prayer. In Jesus' name, Amen.",
+          "question": "Who do you secretly feel better than?",
+          "familyQuestion": "Why does God like honest prayers?",
+          "familyPrayer": "Lord, make us humble. Help us not to look down on anyone."
+        },
+        {
+          "day": 20,
+          "title": "Godly sorrow",
+          "read": {
+            "book": "2 Corinthians",
+            "chapter": 7,
+            "verse": 10,
+            "from": 9,
+            "to": 10
+          },
+          "reflection": "Paul had written a hard letter, and the church was grieved by it. But he rejoiced, because their sorrow led to change. godly sorrow worketh repentance to salvation not to be repented of: but the sorrow of the world worketh death.\n\nThere is a sorrow that only beats us down: shame, self-hatred, regret that goes nowhere. And there is a sorrow that turns us back to God and leads to life. If you feel sorry for your sin, let it lead you to Him, not away.",
+          "prayer": "Father, I am sorry for my sin. Let this sorrow lead me to You and not to despair. Take away the shame that only beats me down. Give me the godly sorrow that leads to repentance and life. In Jesus' name, Amen.",
+          "question": "Does your sorrow over sin lead you to God or away from Him?",
+          "familyQuestion": "What should we do when we feel bad about something we did?",
+          "familyPrayer": "Lord, when we do wrong, help us to come to You and not hide."
+        },
+        {
+          "day": 21,
+          "title": "Depths of the sea",
+          "read": {
+            "book": "Micah",
+            "chapter": 7,
+            "verse": 19,
+            "from": 18,
+            "to": 19
+          },
+          "reflection": "Micah asks who is a God like this, that pardoneth iniquity, and passeth by the transgression. He is amazed at God's mercy. he retaineth not his anger for ever, because he delighteth in mercy.\n\nThen he says that God will cast all their sins into the depths of the sea. Not near the shore where they can wash back up, but into the depths. Some people say God puts up a sign there: no fishing. Stop going back for what He has already thrown away.",
+          "prayer": "Lord, who is a God like You? Thank You that You delight in mercy. Thank You that You have cast my sins into the depths of the sea. Help me to stop fishing for what You have forgiven. In Jesus' name, Amen.",
+          "question": "What forgiven sin do you keep going back to?",
+          "familyQuestion": "What does it mean that God delights in mercy?",
+          "familyPrayer": "Father, thank You that You love to forgive. Help us to forgive like You."
+        },
+        {
+          "day": 22,
+          "title": "East from the west",
+          "read": {
+            "book": "Psalms",
+            "chapter": 103,
+            "verse": 12,
+            "from": 10,
+            "to": 12
+          },
+          "reflection": "He hath not dealt with us after our sins; nor rewarded us according to our iniquities. If God gave us what we deserve, none of us could stand.\n\nInstead, As far as the east is from the west, so far hath he removed our transgressions from us. North and south meet at the poles. East and west never meet. You can travel east for ever and never arrive at west. That is how far your forgiven sin has been removed.",
+          "prayer": "Father, thank You that You have not dealt with me according to my sins. Thank You that Your mercy is as high as the heavens. Thank You that You have removed my sin as far as the east is from the west. In Jesus' name, Amen.",
+          "question": "How does it feel to know your sin has been removed that far?",
+          "familyQuestion": "Can we think of how far east is from west?",
+          "familyPrayer": "Lord, thank You for Your great mercy to our family."
+        },
+        {
+          "day": 23,
+          "title": "Faithful and just",
+          "read": {
+            "book": "1 John",
+            "chapter": 1,
+            "verse": 9,
+            "from": 8,
+            "to": 9
+          },
+          "reflection": "If we say that we have no sin, we deceive ourselves. The first step is honesty. Then comes the promise: If we confess our sins, he is faithful and just to forgive us our sins, and to cleanse us from all unrighteousness.\n\nFaithful, because He keeps His promise. Just, because Jesus has already paid for those sins. Forgiveness is not God bending the rules. It is God keeping His word. Confess today, and believe that you are clean.",
+          "prayer": "Father, I will not pretend that I have no sin. I confess my sins to You now. Thank You that You are faithful and just to forgive me and to cleanse me from all unrighteousness. I believe that I am clean. In Jesus' name, Amen.",
+          "question": "What do you need to confess today?",
+          "familyQuestion": "Why is it good to tell the truth about what we have done?",
+          "familyPrayer": "Lord, thank You that You forgive us when we are honest with You."
+        },
+        {
+          "day": 24,
+          "title": "Face like a flint",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 50,
+            "verse": 7,
+            "from": 4,
+            "to": 7
+          },
+          "reflection": "This is a picture of the servant of the Lord, fulfilled in Jesus. I gave my back to the smiters, and my cheeks to them that plucked off the hair: I hid not my face from shame and spitting.\n\nHe did not shrink back. therefore have I set my face like a flint. Jesus knew the suffering ahead and did not turn away. He also knew how to speak a word in season to him that is weary. He is strong enough to suffer for you and gentle enough to speak to you when you are tired.",
+          "prayer": "Lord Jesus, You set Your face like a flint and did not hide from shame. Thank You for suffering for me. Thank You also for knowing how to speak a word to me when I am weary. Speak to me today. In Jesus' name, Amen.",
+          "question": "Where do you need a word from God for your weariness?",
+          "familyQuestion": "How was Jesus brave for us?",
+          "familyPrayer": "Jesus, thank You for being brave for us. Make us brave too."
+        },
+        {
+          "day": 25,
+          "title": "He humbled Himself",
+          "read": {
+            "book": "Philippians",
+            "chapter": 2,
+            "verse": 8,
+            "from": 5,
+            "to": 8
+          },
+          "reflection": "Let this mind be in you, which was also in Christ Jesus. Paul describes the downward steps of Jesus: from equality with God, to the form of a servant, to the likeness of men, to death, and not just any death, even the death of the cross.\n\nThis is the shape of His love. He kept going down so that He could lift us up. And Paul says, let this mind be in you. Humility is not thinking badly of yourself. It is being willing to go low for others.",
+          "prayer": "Lord Jesus, You humbled Yourself all the way to the cross. Let Your mind be in me. Where I want to be first, teach me to serve. Where I want to be seen, teach me to go low for others. In Jesus' name, Amen.",
+          "question": "Where could you go low for someone else this week?",
+          "familyQuestion": "How can we serve each other at home this week?",
+          "familyPrayer": "Jesus, You served us. Help us to serve one another."
+        },
+        {
+          "day": 26,
+          "title": "A ransom for many",
+          "read": {
+            "book": "Mark",
+            "chapter": 10,
+            "verse": 45,
+            "from": 42,
+            "to": 45
+          },
+          "reflection": "The disciples were arguing about who would be greatest. Jesus said the world's leaders lord it over people, but so shall it not be among you. In His kingdom, the great serve.\n\nThen He explained why: even the Son of man came not to be ministered unto, but to minister, and to give his life a ransom for many. Jesus was on His way to pay the price to set us free. Every act of service we offer flows from what He gave first.",
+          "prayer": "Lord Jesus, thank You that You came to serve and to give Your life as a ransom for me. Free me from wanting to be greatest. Show me how to serve at home, at work and in church this week. In Jesus' name, Amen.",
+          "question": "Where are you tempted to want to be the greatest?",
+          "familyQuestion": "Who could we serve together this week?",
+          "familyPrayer": "Lord, make our family a family that serves."
+        },
+        {
+          "day": 27,
+          "title": "A corn of wheat",
+          "read": {
+            "book": "John",
+            "chapter": 12,
+            "verse": 24,
+            "from": 23,
+            "to": 26
+          },
+          "reflection": "Except a corn of wheat fall into the ground and die, it abideth alone: but if it die, it bringeth forth much fruit. Jesus was speaking of His own death. A seed must be buried before it grows. From His death would come life for the world.\n\nThe same pattern runs through our lives. Some things must die in us before new life can grow: pride, control, old ways. It is painful, but it is not the end. It is how fruit comes.",
+          "prayer": "Lord Jesus, thank You that You fell into the ground and died so that I could live. Show me what needs to die in me so that new life can grow. I trust You with the burying, because I trust You with the harvest. In Jesus' name, Amen.",
+          "question": "What might God be asking to die in you so that something new can grow?",
+          "familyQuestion": "What happens to a seed after we plant it?",
+          "familyPrayer": "Lord, help us to trust You when things are hard, because You bring new life."
+        },
+        {
+          "day": 28,
+          "title": "The good shepherd",
+          "read": {
+            "book": "John",
+            "chapter": 10,
+            "verse": 11,
+            "from": 11,
+            "to": 15
+          },
+          "reflection": "I am the good shepherd: the good shepherd giveth his life for the sheep. A hired hand runs when the wolf comes. A shepherd stays, because the sheep are his.\n\nJesus is not a hired hand. You are His. I am the good shepherd, and know my sheep, and am known of mine. He knows you by name. And He did not just risk His life for you; He laid it down. No one took it from Him. He gave it.",
+          "prayer": "Lord Jesus, You are my good shepherd. Thank You that You know me and that You laid down Your life for me. When the wolf comes, You do not run. Help me to know Your voice and to follow You. In Jesus' name, Amen.",
+          "question": "What does it mean to you that Jesus knows you?",
+          "familyQuestion": "What does a good shepherd do for his sheep?",
+          "familyPrayer": "Jesus, our good shepherd, keep our family close to You."
+        },
+        {
+          "day": 29,
+          "title": "With His stripes",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 53,
+            "verse": 5,
+            "from": 4,
+            "to": 6
+          },
+          "reflection": "Written centuries before Jesus, this passage reads like an eyewitness account of the cross. he was wounded for our transgressions, he was bruised for our iniquities.\n\nAll we like sheep have gone astray. All of us. Not some. And the LORD hath laid on him the iniquity of us all. What should have fallen on us fell on Him. That is the heart of the gospel. Read these three verses slowly today, and put your own name in them.",
+          "prayer": "Lord Jesus, You were wounded for my transgressions and bruised for my iniquities. I have gone astray like a sheep. Thank You that the Father laid my sin on You. By Your stripes I am healed. In Jesus' name, Amen.",
+          "question": "What does it mean to you that Jesus took your place?",
+          "familyQuestion": "Why did Jesus have to suffer?",
+          "familyPrayer": "Jesus, thank You for taking our place on the cross."
+        },
+        {
+          "day": 30,
+          "title": "While we were yet sinners",
+          "read": {
+            "book": "Romans",
+            "chapter": 5,
+            "verse": 8,
+            "from": 6,
+            "to": 8
+          },
+          "reflection": "Paul says it would be rare for someone to die for a good person. But Christ died for the ungodly. God commendeth his love toward us, in that, while we were yet sinners, Christ died for us.\n\nGod did not wait for us to improve. He did not love us because we were lovable. He loved us at our worst, and proved it at the cross. You never have to wonder whether God loves you. He has already shown you.",
+          "prayer": "Father, thank You that You loved me while I was still a sinner. I did not earn it. You proved Your love at the cross before I ever turned to You. Help me to rest in that love today. In Jesus' name, Amen.",
+          "question": "Do you ever doubt that God loves you?",
+          "familyQuestion": "How did God show that He loves us?",
+          "familyPrayer": "Father, thank You for loving us even when we were far from You."
+        },
+        {
+          "day": 31,
+          "title": "In deed and in truth",
+          "read": {
+            "book": "1 John",
+            "chapter": 3,
+            "verse": 18,
+            "from": 16,
+            "to": 18
+          },
+          "reflection": "Hereby perceive we the love of God, because he laid down his life for us. Then John draws the line straight to us: we ought to lay down our lives for the brethren.\n\nHe makes it practical. If someone has enough and sees a brother in need and shuts his heart, how can God's love be in him? let us not love in word, neither in tongue; but in deed and in truth. What need around you could you meet this week?",
+          "prayer": "Lord, You laid down Your life for me. Help me to lay down my life for others in practical ways. Open my eyes to the needs around me, and open my heart and my hands. Let me love in deed and in truth. In Jesus' name, Amen.",
+          "question": "What need around you could you meet this week?",
+          "familyQuestion": "Who could we help as a family this week?",
+          "familyPrayer": "Lord, show us someone to help, and give us generous hearts."
+        },
+        {
+          "day": 32,
+          "title": "The least of these",
+          "read": {
+            "book": "Matthew",
+            "chapter": 25,
+            "verse": 40,
+            "from": 34,
+            "to": 40
+          },
+          "reflection": "Jesus described the King welcoming people who had fed the hungry, given drink to the thirsty, welcomed strangers, clothed the naked and visited the sick and the prisoner.\n\nThey were surprised. When did we do this for You? Inasmuch as ye have done it unto one of the least of these my brethren, ye have done it unto me. Jesus hides Himself in the people we might overlook. Look for Him there this week.",
+          "prayer": "Lord Jesus, help me to see You in the people I overlook: the hungry, the stranger, the sick, the prisoner. Give me courage and kindness to serve them. Let what I do for them be done for You. In Jesus' name, Amen.",
+          "question": "Who are the least of these around you?",
+          "familyQuestion": "Who do we see every week who might need kindness?",
+          "familyPrayer": "Jesus, help us to see You in the people who need help."
+        },
+        {
+          "day": 33,
+          "title": "Search and try our ways",
+          "read": {
+            "book": "Lamentations",
+            "chapter": 3,
+            "verse": 40,
+            "from": 40,
+            "to": 41
+          },
+          "reflection": "Let us search and try our ways, and turn again to the LORD. Jeremiah wrote this in the ruins of Jerusalem. He did not only blame others. He called his people to look at themselves.\n\nWe are nearing the end of these forty days. It is a good moment to look back. What has God shown you? What have you turned from? What still needs turning? Let us lift up our heart with our hands unto God in the heavens.",
+          "prayer": "Lord, I search and try my ways before You. Show me what has changed and what still needs to change. I turn again to You. I lift up my heart with my hands to You in the heavens. In Jesus' name, Amen.",
+          "question": "What has God shown you during this Lent?",
+          "familyQuestion": "What have we learned about God these past weeks?",
+          "familyPrayer": "Lord, thank You for what You have taught us. Keep turning our hearts to You."
+        },
+        {
+          "day": 34,
+          "title": "He will bind us up",
+          "read": {
+            "book": "Hosea",
+            "chapter": 6,
+            "verse": 1,
+            "from": 1,
+            "to": 3
+          },
+          "reflection": "Come, and let us return unto the LORD: for he hath torn, and he will heal us; he hath smitten, and he will bind us up.\n\nSometimes God allows things that hurt in order to bring us back. But He does not leave us torn. in the third day he will raise us up. Long before Easter, Hosea spoke of a third day. God's purpose is always healing and new life. he shall come unto us as the rain.",
+          "prayer": "Lord, I return to You. Where I am torn, heal me. Where I am wounded, bind me up. Revive me, raise me up, and let me live in Your sight. Come to me like the rain. In Jesus' name, Amen.",
+          "question": "Where do you need God to bind you up?",
+          "familyQuestion": "What does rain do for dry ground?",
+          "familyPrayer": "Lord, come to our family like rain, and make us grow."
+        },
+        {
+          "day": 35,
+          "title": "My soul longeth",
+          "read": {
+            "book": "Psalms",
+            "chapter": 84,
+            "verse": 2,
+            "from": 1,
+            "to": 4
+          },
+          "reflection": "My soul longeth, yea, even fainteth for the courts of the LORD: my heart and my flesh crieth out for the living God.\n\nThe psalmist envies the sparrow that builds a nest near God's altar. He just wants to be close. After weeks of setting things aside, some people find that the longing for God has grown. If that is you, give thanks. If you feel nothing, ask Him to give you the longing. He gives it to those who ask.",
+          "prayer": "Lord, I want to want You more. Give me a heart that longs for You and cries out for the living God. Let me be like the sparrow, at home near Your altar. Blessed are they who dwell in Your house. In Jesus' name, Amen.",
+          "question": "Has your longing for God grown or faded these past weeks?",
+          "familyQuestion": "Where do we feel close to God?",
+          "familyPrayer": "Lord, give our family hearts that long to be near You."
+        },
+        {
+          "day": 36,
+          "title": "The resurrection and the life",
+          "read": {
+            "book": "John",
+            "chapter": 11,
+            "verse": 25,
+            "from": 25,
+            "to": 27
+          },
+          "reflection": "Martha's brother Lazarus had been dead four days. Jesus said to her, I am the resurrection, and the life: he that believeth in me, though he were dead, yet shall he live.\n\nThen He asked her, Believest thou this? It is a question for you too. As Lent draws close to the cross, we remember that the cross is not the end. The One who goes to die is the resurrection and the life. Death has no final word over those who believe in Him.",
+          "prayer": "Lord Jesus, You are the resurrection and the life. I believe this. Thank You that death does not have the final word over me or over those I love who rest in You. Strengthen my faith as I come close to the cross. In Jesus' name, Amen.",
+          "question": "If Jesus asked you, believest thou this, what would you say?",
+          "familyQuestion": "What did Jesus do for Lazarus?",
+          "familyPrayer": "Jesus, You are the resurrection and the life. We believe in You."
+        },
+        {
+          "day": 37,
+          "title": "He wept over it",
+          "read": {
+            "book": "Luke",
+            "chapter": 19,
+            "verse": 41,
+            "from": 37,
+            "to": 42
+          },
+          "reflection": "Jesus rode into Jerusalem to shouts of praise. The crowd cried, Blessed be the King that cometh in the name of the Lord. But when He saw the city, He wept over it.\n\nHe knew they did not understand the things which belong unto thy peace. The same crowd would soon turn on Him. Jesus weeps over cities and people who miss Him, even while they praise Him. He sees beneath the noise. Let Him see beneath yours.",
+          "prayer": "Lord Jesus, I welcome You as my King. But look beneath my praise and see my heart. Show me the things that belong to my peace. I pray for my city and my nation, that we would know You. In Jesus' name, Amen.",
+          "question": "Do you know the things that belong to your peace?",
+          "familyQuestion": "Why did Jesus cry over the city?",
+          "familyPrayer": "Jesus, our King, we welcome You into our home."
+        },
+        {
+          "day": 38,
+          "title": "This do in remembrance",
+          "read": {
+            "book": "Luke",
+            "chapter": 22,
+            "verse": 19,
+            "from": 14,
+            "to": 20
+          },
+          "reflection": "On the night before He died, Jesus shared the Passover with His disciples. He said, With desire I have desired to eat this passover with you. He wanted to be with them.\n\nThen He took bread and said, This is my body which is given for you: this do in remembrance of me. Whatever your church calls it, the Lord's Supper, Communion or the Eucharist, it began here, with Jesus longing to be with His friends and giving Himself for them.",
+          "prayer": "Lord Jesus, thank You that You longed to be with Your friends, and that You long to be with me. Thank You for Your body given for me and Your blood shed for me. I remember You today. In Jesus' name, Amen.",
+          "question": "What does it mean to you that Jesus wanted to be with His disciples?",
+          "familyQuestion": "What did Jesus do with the bread and the cup?",
+          "familyPrayer": "Jesus, thank You for giving Yourself for us. We remember You."
+        },
+        {
+          "day": 39,
+          "title": "Into Thy hands",
+          "read": {
+            "book": "Luke",
+            "chapter": 23,
+            "verse": 46,
+            "from": 44,
+            "to": 47
+          },
+          "reflection": "Darkness covered the land from the sixth hour to the ninth. The veil in the temple was torn in two. Then Jesus cried out, Father, into thy hands I commend my spirit.\n\nEven in death, He trusted His Father. The torn veil means the way to God is now open. A Roman soldier watching it all said, Certainly this was a righteous man. Stay at the cross a while today. Do not rush to Sunday. Look at what He has done.",
+          "prayer": "Lord Jesus, I stand at Your cross. You trusted Your Father even in death. Thank You that the veil is torn and the way to God is open. I commend my spirit into the Father's hands too. In Jesus' name, Amen.",
+          "question": "What do you see when you look at the cross?",
+          "familyQuestion": "Why was the veil in the temple torn?",
+          "familyPrayer": "Jesus, thank You for dying for us. Thank You that we can come close to God."
+        },
+        {
+          "day": 40,
+          "title": "They rested",
+          "read": {
+            "book": "Luke",
+            "chapter": 23,
+            "verse": 56,
+            "from": 50,
+            "to": 56
+          },
+          "reflection": "Joseph of Arimathaea, a good man who also himself waited for the kingdom of God, took Jesus' body down and laid it in a new tomb. The women watched where He was laid, went home, prepared spices, and rested the sabbath day according to the commandment.\n\nThis is the quiet day between the cross and the resurrection. The disciples did not know what was coming. Many of us live in days like this, waiting with no answer yet. Rest today. Sunday is coming.",
+          "prayer": "Lord, today I wait at the tomb with Your friends. I do not always understand the silent days. But I trust that You are at work even when nothing seems to be happening. Thank You that Sunday is coming. In Jesus' name, Amen.",
+          "question": "What are you waiting for in silence right now?",
+          "familyQuestion": "How do you think Jesus' friends felt on this day?",
+          "familyPrayer": "Lord, help us to trust You on quiet days. Thank You that Sunday is coming."
+        }
+      ]
+    },
+    {
+      "id": "holy-week",
+      "title": "Holy Week",
+      "days": 8,
+      "promise": "Eight days with Jesus, from the palm branches to the empty tomb.",
+      "cover": "discovery_cover_6",
+      "season": {
+        "moveable": "holy-week"
+      },
+      "written": [
+        {
+          "day": 1,
+          "title": "Palm Sunday: Who is this?",
+          "read": {
+            "book": "Matthew",
+            "chapter": 21,
+            "verse": 9,
+            "from": 8,
+            "to": 11
+          },
+          "reflection": "Crowds spread their clothes and branches on the road and shouted, Hosanna to the Son of David: Blessed is he that cometh in the name of the Lord. The whole city was stirred, asking, Who is this?\n\nJesus came riding on a donkey, not a war horse. He came as a King of peace. Many in that crowd wanted a different kind of king, one who would fight their enemies. This week asks the same question of us: who is this Jesus, and what kind of King will we let Him be?",
+          "prayer": "Lord Jesus, Hosanna. Blessed are You who come in the name of the Lord. I welcome You as my King, not the king I would design, but the King You are. Come into my life this week as You came into Jerusalem. In Jesus' name, Amen.",
+          "question": "What kind of King do you want Jesus to be?",
+          "familyQuestion": "Why did people wave branches for Jesus?",
+          "familyPrayer": "Jesus, we welcome You as our King. Hosanna!"
+        },
+        {
+          "day": 2,
+          "title": "Monday: A house of prayer",
+          "read": {
+            "book": "Mark",
+            "chapter": 11,
+            "verse": 17,
+            "from": 15,
+            "to": 17
+          },
+          "reflection": "The day after He entered Jerusalem, Jesus went into the temple and overturned the tables of the moneychangers. My house shall be called of all nations the house of prayer? but ye have made it a den of thieves.\n\nThe court where this trading went on was the only place where foreigners could come to pray. Jesus was angry because people were being shut out from God. Today, ask Him to clear out anything in your heart, or your church, that keeps others from coming to Him.",
+          "prayer": "Lord Jesus, come into the temple of my heart and overturn what does not belong there. Make my life a house of prayer. Where I or my church have made it hard for others to find You, forgive us and clear the way. In Jesus' name, Amen.",
+          "question": "What needs to be cleared out of your heart this week?",
+          "familyQuestion": "How can we make our home a place of prayer?",
+          "familyPrayer": "Lord, make our home a house of prayer where everyone is welcome."
+        },
+        {
+          "day": 3,
+          "title": "Tuesday: The first commandment",
+          "read": {
+            "book": "Mark",
+            "chapter": 12,
+            "verse": 30,
+            "from": 28,
+            "to": 31
+          },
+          "reflection": "During the last week, the religious leaders tried to trap Jesus with questions. One scribe asked sincerely which commandment was first.\n\nJesus answered, thou shalt love the Lord thy God with all thy heart, and with all thy soul, and with all thy mind, and with all thy strength. Then He added the second: Thou shalt love thy neighbour as thyself. In a few days He would show what that love looks like, loving God and loving us all the way to the cross.",
+          "prayer": "Lord, I want to love You with all my heart, soul, mind and strength. Show me where my love for You is divided. Help me to love my neighbour as myself this week, especially the one I find hardest to love. In Jesus' name, Amen.",
+          "question": "Which part of you, heart, soul, mind or strength, finds it hardest to love God?",
+          "familyQuestion": "Who is our neighbour?",
+          "familyPrayer": "Lord, help us to love You with everything, and to love our neighbours too."
+        },
+        {
+          "day": 4,
+          "title": "Wednesday: She hath done what she could",
+          "read": {
+            "book": "Mark",
+            "chapter": 14,
+            "verse": 8,
+            "from": 3,
+            "to": 9
+          },
+          "reflection": "In Bethany, a woman broke a jar of costly ointment and poured it on Jesus' head. Some said it was a waste. Jesus said, Let her alone. Then: She hath done what she could.\n\nShe gave her best, and Jesus said it would be remembered wherever the gospel was preached. Love for Jesus can look extravagant to others. It does not count the cost. What could you pour out for Him today, not because it is required, but because He is worth it?",
+          "prayer": "Lord Jesus, You are worth everything. Like this woman, I want to pour out my best for You, even if others call it waste. Show me what I can give You today out of love. Let me do what I can. In Jesus' name, Amen.",
+          "question": "What could you give Jesus today out of love?",
+          "familyQuestion": "What is something precious we could give to Jesus?",
+          "familyPrayer": "Jesus, You are worth our very best. We give You our love."
+        },
+        {
+          "day": 5,
+          "title": "Thursday: Love one another",
+          "read": {
+            "book": "John",
+            "chapter": 13,
+            "verse": 34,
+            "from": 31,
+            "to": 35
+          },
+          "reflection": "On the night He was betrayed, after washing His disciples' feet, Jesus said, A new commandment I give unto you, That ye love one another; as I have loved you.\n\nAs I have loved you. That is the measure: a love that kneels and serves, a love that goes to the cross. Then He said, By this shall all men know that ye are my disciples. Not by our arguments or our buildings, but by how we love each other.",
+          "prayer": "Lord Jesus, thank You for loving me to the end. Help me to love others as You have loved me. Where I have been cold or proud toward other believers, forgive me. Let people know I am Your disciple by my love. In Jesus' name, Amen.",
+          "question": "Who do you find hardest to love in your church or family?",
+          "familyQuestion": "How can we show love to each other tonight?",
+          "familyPrayer": "Jesus, help us to love each other the way You love us."
+        },
+        {
+          "day": 6,
+          "title": "Good Friday: Remember me",
+          "read": {
+            "book": "Luke",
+            "chapter": 23,
+            "verse": 43,
+            "from": 39,
+            "to": 43
+          },
+          "reflection": "Two criminals were crucified with Jesus. One mocked Him. The other said, Lord, remember me when thou comest into thy kingdom.\n\nHe had nothing to offer. No good works, no time left to change. Just a request. And Jesus answered, To day shalt thou be with me in paradise. This is the gospel at its simplest. Salvation is not earned. It is asked for, and freely given, by a dying Saviour who still had mercy for a dying thief.",
+          "prayer": "Lord Jesus, remember me. I have nothing to offer You but my need. Thank You that on the cross You still had mercy for a thief, and You have mercy for me. Thank You for dying in my place. In Jesus' name, Amen.",
+          "question": "What does the thief's story teach you about grace?",
+          "familyQuestion": "What did Jesus say to the man on the cross next to Him?",
+          "familyPrayer": "Jesus, thank You for dying for us. Remember us in Your kingdom."
+        },
+        {
+          "day": 7,
+          "title": "Holy Saturday: Sealing the stone",
+          "read": {
+            "book": "Matthew",
+            "chapter": 27,
+            "verse": 66,
+            "from": 62,
+            "to": 66
+          },
+          "reflection": "The day after the crucifixion, the chief priests asked Pilate to guard the tomb. They remembered that Jesus had said He would rise after three days. So they made the sepulchre sure, sealing the stone, and setting a watch.\n\nThey did everything they could to keep Him in. It was not enough. No seal, guard or stone can hold back what God has promised. Today is the day of waiting. Whatever seems sealed shut in your life, bring it to Him and wait for the morning.",
+          "prayer": "Lord, today I wait. Some things in my life seem sealed shut, guarded, impossible. I bring them to You. Thank You that no stone could hold Jesus in the grave. Help me to wait in hope for the morning. In Jesus' name, Amen.",
+          "question": "What in your life seems sealed shut right now?",
+          "familyQuestion": "How do you think the disciples felt on Saturday?",
+          "familyPrayer": "Lord, help us to wait in hope. Nothing is too hard for You."
+        },
+        {
+          "day": 8,
+          "title": "Easter Sunday: He is risen",
+          "read": {
+            "book": "Matthew",
+            "chapter": 28,
+            "verse": 6,
+            "from": 1,
+            "to": 7
+          },
+          "reflection": "At dawn, the women came to the tomb. There was an earthquake, and an angel rolled back the stone and sat on it. The guards shook with fear.\n\nThe angel said, Fear not ye: for I know that ye seek Jesus, which was crucified. He is not here: for he is risen, as he said. As he said. Every promise Jesus made is now proven true. Then the angel told them, go quickly, and tell. Good news is for sharing. He is risen indeed.",
+          "prayer": "Lord Jesus, You are risen, as You said. Thank You that death could not hold You. Thank You that every promise You made is true. Fill me with joy today, and give me courage to go and tell. In Jesus' name, Amen.",
+          "question": "Who will you tell that Jesus is risen?",
+          "familyQuestion": "Why is Easter the happiest day for Christians?",
+          "familyPrayer": "Jesus, You are alive! Thank You. Fill our home with Easter joy."
+        }
+      ]
+    },
+    {
+      "id": "pentecost-10",
+      "title": "Ten Days to Pentecost",
+      "days": 10,
+      "promise": "Wait and pray, as the first disciples did, for the Holy Spirit.",
+      "cover": "discovery_cover_5",
+      "season": {
+        "moveable": "pentecost"
+      },
+      "written": [
+        {
+          "day": 1,
+          "title": "Taken up",
+          "read": {
+            "book": "Acts",
+            "chapter": 1,
+            "verse": 11,
+            "from": 9,
+            "to": 11
+          },
+          "reflection": "Forty days after Easter, Jesus was taken up into heaven while His disciples watched. Two men in white asked them, why stand ye gazing up into heaven?\n\nThey were told He would come again in the same way. Until then, there was work to do and a promise to wait for. These ten days follow the disciples between the Ascension and Pentecost. They did not know exactly what was coming. They only knew to wait and pray. That is a good place to start.",
+          "prayer": "Lord Jesus, You have gone up into heaven, and You will come again. Keep me from standing and staring when there is work to do. Over these ten days, teach me to wait and pray for Your Spirit. In Jesus' name, Amen.",
+          "question": "What do you hope God will do in you over these ten days?",
+          "familyQuestion": "Where did Jesus go when He was taken up?",
+          "familyPrayer": "Jesus, thank You that You are in heaven and that You will come again."
+        },
+        {
+          "day": 2,
+          "title": "Wait for the promise",
+          "read": {
+            "book": "Acts",
+            "chapter": 1,
+            "verse": 4,
+            "from": 4,
+            "to": 8
+          },
+          "reflection": "Jesus told His disciples to wait for the promise of the Father. They wanted to know about times and kingdoms. He said that was not for them to know. What they needed was power from the Holy Ghost.\n\nWaiting is hard for most of us. We want to get on with things. But Jesus knew that working without the Spirit would be working in our own strength. Some things are worth waiting for. The Spirit is the greatest of them.",
+          "prayer": "Father, I wait for Your promise. Forgive me for rushing ahead in my own strength. I want the power that only Your Holy Spirit can give. Teach me to wait well. In Jesus' name, Amen.",
+          "question": "Where are you rushing ahead in your own strength?",
+          "familyQuestion": "Why is waiting hard?",
+          "familyPrayer": "Father, help us to wait for You, and fill us with Your Spirit."
+        },
+        {
+          "day": 3,
+          "title": "With one accord",
+          "read": {
+            "book": "Acts",
+            "chapter": 1,
+            "verse": 14,
+            "from": 12,
+            "to": 14
+          },
+          "reflection": "After Jesus was taken up, the disciples went back to Jerusalem to an upper room. These all continued with one accord in prayer and supplication, with the women, and Mary the mother of Jesus.\n\nMen and women, old friends and family, all praying together. The Spirit came on a church that was praying with one accord. If you can, pray with others during these days: your family, a friend, a small group. Something happens when believers pray together.",
+          "prayer": "Lord, I thank You for the people I can pray with. Bring us together in one accord. Where there is division in my family or church, heal it. Let us wait and pray together for Your Spirit. In Jesus' name, Amen.",
+          "question": "Who could you pray with during these ten days?",
+          "familyQuestion": "When could we pray together as a family this week?",
+          "familyPrayer": "Lord, make us one as we pray together."
+        },
+        {
+          "day": 4,
+          "title": "It is expedient",
+          "read": {
+            "book": "John",
+            "chapter": 16,
+            "verse": 7,
+            "from": 7,
+            "to": 8
+          },
+          "reflection": "The disciples were sad that Jesus was leaving. He told them, It is expedient for you that I go away: for if I go not away, the Comforter will not come unto you.\n\nIt is better, Jesus said, to have the Spirit with you than to have Jesus beside you in the flesh. That is a staggering thought. The Spirit is not second best. Through Him, Jesus is with every believer, everywhere, all at once. You are not missing out.",
+          "prayer": "Lord Jesus, thank You for sending the Comforter. Help me to believe that the Spirit's presence with me is not second best. Make me aware of Him today. In Jesus' name, Amen.",
+          "question": "Do you ever wish you had lived when Jesus was on earth?",
+          "familyQuestion": "Who did Jesus send to be with us?",
+          "familyPrayer": "Jesus, thank You for sending the Holy Spirit to be with us."
+        },
+        {
+          "day": 5,
+          "title": "A new heart",
+          "read": {
+            "book": "Ezekiel",
+            "chapter": 36,
+            "verse": 26,
+            "from": 26,
+            "to": 27
+          },
+          "reflection": "Centuries before Pentecost, God promised, A new heart also will I give you, and a new spirit will I put within you: and I will take away the stony heart out of your flesh.\n\nA stony heart is hard, cold and unresponsive. God does not ask us to soften it ourselves. He promises to replace it. I will put my spirit within you, and cause you to walk in my statutes. The Spirit does in us what we cannot do: He gives us a heart that wants to obey.",
+          "prayer": "Father, take away my stony heart and give me a heart of flesh. Put Your Spirit within me. Cause me to walk in Your ways, not by force, but by a heart that wants to. In Jesus' name, Amen.",
+          "question": "Where has your heart grown hard?",
+          "familyQuestion": "What is the difference between a heart of stone and a heart of flesh?",
+          "familyPrayer": "Lord, give us soft hearts that love You and love each other."
+        },
+        {
+          "day": 6,
+          "title": "Breath on dry bones",
+          "read": {
+            "book": "Ezekiel",
+            "chapter": 37,
+            "verse": 10,
+            "from": 4,
+            "to": 10
+          },
+          "reflection": "Ezekiel saw a valley full of dry bones. God told him to prophesy, and the bones came together, with sinews and flesh. but there was no breath in them.\n\nThen God said, prophesy to the wind. the breath came into them, and they lived, and stood up upon their feet, an exceeding great army. A body without breath is not alive. A church, or a life, without the Spirit is the same. Pray for breath today, for yourself and for any place that feels dry.",
+          "prayer": "Breath of God, come from the four winds and breathe on me. Where my faith feels dry, bring life. Breathe on my church, my family and my nation. Let us stand up and live. In Jesus' name, Amen.",
+          "question": "What part of your life feels like dry bones?",
+          "familyQuestion": "What does breath do for a body?",
+          "familyPrayer": "Holy Spirit, breathe new life into our family."
+        },
+        {
+          "day": 7,
+          "title": "Upon all flesh",
+          "read": {
+            "book": "Joel",
+            "chapter": 2,
+            "verse": 28,
+            "from": 28,
+            "to": 29
+          },
+          "reflection": "I will pour out my spirit upon all flesh; and your sons and your daughters shall prophesy, your old men shall dream dreams, your young men shall see visions.\n\nAll flesh. Sons and daughters. Old and young. Even servants and handmaids. In Israel, the Spirit came on a few chosen leaders. Joel promised a day when He would come on every kind of person. Peter would quote this on the day of Pentecost. The Spirit is for you too.",
+          "prayer": "Father, thank You that You promised Your Spirit to all flesh, young and old, men and women. Pour out Your Spirit on me. Pour Him out on my sons and daughters, on the old and the young in my church. In Jesus' name, Amen.",
+          "question": "Do you believe the Spirit is for you?",
+          "familyQuestion": "What dreams do we have for God?",
+          "familyPrayer": "Lord, pour out Your Spirit on every person in this house, young and old."
+        },
+        {
+          "day": 8,
+          "title": "Ask Him",
+          "read": {
+            "book": "Luke",
+            "chapter": 11,
+            "verse": 13,
+            "from": 11,
+            "to": 13
+          },
+          "reflection": "Jesus asked, what father would give his son a stone when he asked for bread, or a snake when he asked for a fish? If ye then, being evil, know how to give good gifts unto your children: how much more shall your heavenly Father give the Holy Spirit to them that ask him?\n\nSome people are afraid of the Holy Spirit, unsure what they might get. Jesus says your Father gives good gifts. You can ask Him for His Spirit with confidence. He will not give you anything harmful.",
+          "prayer": "Heavenly Father, I ask You for Your Holy Spirit. I trust that You give good gifts. Take away any fear I have. Fill me with Your Spirit, today and every day. In Jesus' name, Amen.",
+          "question": "What makes you hesitant to ask God for more of His Spirit?",
+          "familyQuestion": "What good gifts has God given us?",
+          "familyPrayer": "Father, thank You for good gifts. Fill us with Your Holy Spirit."
+        },
+        {
+          "day": 9,
+          "title": "Peace be unto you",
+          "read": {
+            "book": "John",
+            "chapter": 20,
+            "verse": 22,
+            "from": 19,
+            "to": 22
+          },
+          "reflection": "On the evening of the resurrection, the disciples were behind locked doors, afraid. Jesus came and stood among them and said, Peace be unto you. He showed them His hands and side.\n\nThen He said, as my Father hath sent me, even so send I you, and He breathed on them: Receive ye the Holy Ghost. The Spirit is given to frightened people behind locked doors, and He sends them out. If you are afraid, you are exactly who He comes to.",
+          "prayer": "Lord Jesus, come into the locked rooms of my fear. Speak peace to me. Breathe on me, and let me receive Your Holy Spirit. Send me out as the Father sent You. In Jesus' name, Amen.",
+          "question": "What locked doors of fear do you need Jesus to come through?",
+          "familyQuestion": "What did Jesus say when He came to His friends?",
+          "familyPrayer": "Jesus, give our family Your peace, and send us out to share it."
+        },
+        {
+          "day": 10,
+          "title": "Pentecost: All filled",
+          "read": {
+            "book": "Acts",
+            "chapter": 2,
+            "verse": 4,
+            "from": 1,
+            "to": 4
+          },
+          "reflection": "when the day of Pentecost was fully come, they were all with one accord in one place. Then came the sound of a rushing mighty wind and tongues like fire, And they were all filled with the Holy Ghost.\n\nAll. Not just the apostles. Everyone who had been waiting and praying. Pentecost is sometimes called the birthday of the church. The Spirit who came that day is still given today to everyone who believes. Thank God for Him, and ask to be filled again.",
+          "prayer": "Holy Spirit, thank You for coming on the day of Pentecost, and thank You that You are still given today. Fill me again. Let Your fire burn in me. Give me words to speak of the wonderful works of God. In Jesus' name, Amen.",
+          "question": "How will you live differently, knowing the Spirit is with you?",
+          "familyQuestion": "Why is Pentecost called the birthday of the church?",
+          "familyPrayer": "Holy Spirit, fill us all. Thank You for the church, God's family."
+        }
+      ]
+    },
+    {
+      "id": "advent-24",
+      "title": "Advent: Waiting for Christ",
+      "days": 24,
+      "promise": "One reading a day from the first promise in Genesis to the shepherds' field on Christmas Eve.",
+      "cover": "discovery_cover_2",
+      "season": {
+        "startMonth": 12,
+        "startDay": 1,
+        "endMonth": 12,
+        "endDay": 24
+      },
+      "written": [
+        {
+          "day": 1,
+          "title": "The first promise",
+          "read": {
+            "book": "Genesis",
+            "chapter": 3,
+            "verse": 15,
+            "from": 13,
+            "to": 15
+          },
+          "reflection": "Advent means coming. For twenty-four days we wait, as God's people waited for centuries, for the coming of Christ.\n\nThe waiting begins here, in the garden, just after the first sin. God speaks to the serpent: I will put enmity between thee and the woman, and between thy seed and her seed; it shall bruise thy head, and thou shalt bruise his heel. Even in judgment, God made a promise. One would come from the woman to crush evil, though He would be wounded doing it.",
+          "prayer": "Father, thank You that from the very beginning You had a plan to save us. Even when we first turned from You, You made a promise. As I begin Advent, teach me to wait for Christ with hope. In Jesus' name, Amen.",
+          "question": "What are you waiting for this Christmas, apart from presents?",
+          "familyQuestion": "What does the word Advent mean?",
+          "familyPrayer": "Lord, as we wait for Christmas, help us to wait for Jesus."
+        },
+        {
+          "day": 2,
+          "title": "All families of the earth",
+          "read": {
+            "book": "Genesis",
+            "chapter": 12,
+            "verse": 3,
+            "from": 1,
+            "to": 3
+          },
+          "reflection": "God called Abram to leave his country and go to a land He would show him. He promised to make him a great nation and to bless him. Then came the promise that reaches all the way to us: in thee shall all families of the earth be blessed.\n\nAll families. Every nation, every tribe, every language. Through Abraham's family, Jesus would come, and through Him, the blessing would reach the whole world. Your family is one of the families God had in mind.",
+          "prayer": "Lord, thank You that Your promise to Abraham was for all families of the earth, including mine. Thank You that the blessing came through Jesus. Help my family to be a blessing to others this season. In Jesus' name, Amen.",
+          "question": "How has your family been blessed through Jesus?",
+          "familyQuestion": "Which family could we bless this Christmas?",
+          "familyPrayer": "Father, thank You for blessing our family. Help us to bless others."
+        },
+        {
+          "day": 3,
+          "title": "A throne for ever",
+          "read": {
+            "book": "2 Samuel",
+            "chapter": 7,
+            "verse": 16,
+            "from": 12,
+            "to": 16
+          },
+          "reflection": "David wanted to build God a house. Instead, God promised to build David a house, a family line that would last. thy throne shall be established for ever.\n\nDavid's kingdom rose and fell. His descendants were often unfaithful. For a long time it looked as if the promise had failed. But God was keeping it. A thousand years later, an angel told Mary that her son would be given the throne of his father David. God's promises can look broken for centuries and still come true.",
+          "prayer": "Lord, You keep Your promises, even when they seem forgotten. Thank You that Jesus is the King on David's throne for ever. Where I think Your promises to me have failed, help me to wait. In Jesus' name, Amen.",
+          "question": "Is there a promise of God you have stopped believing?",
+          "familyQuestion": "Who was King David's famous descendant?",
+          "familyPrayer": "Lord, thank You that Jesus is King for ever."
+        },
+        {
+          "day": 4,
+          "title": "Immanuel",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 7,
+            "verse": 14,
+            "from": 13,
+            "to": 14
+          },
+          "reflection": "King Ahaz was afraid and would not trust God. So God gave him a sign anyway: Behold, a virgin shall conceive, and bear a son, and shall call his name Immanuel.\n\nImmanuel means God with us. Not God far above us, or God disappointed with us, but God with us. That is the heart of Christmas. Whatever you are facing this December, you do not face it alone. The name of the child is the promise.",
+          "prayer": "Lord, thank You that You are Immanuel, God with us. Thank You that You came close. Whatever I face this month, help me to remember that You are with me. In Jesus' name, Amen.",
+          "question": "Where do you most need to know that God is with you?",
+          "familyQuestion": "What does Immanuel mean?",
+          "familyPrayer": "Immanuel, thank You for being with our family."
+        },
+        {
+          "day": 5,
+          "title": "A great light",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 9,
+            "verse": 2,
+            "from": 2,
+            "to": 3
+          },
+          "reflection": "The people that walked in darkness have seen a great light: they that dwell in the land of the shadow of death, upon them hath the light shined.\n\nDecember can be a dark month, whether in short northern days or in hard seasons of life. Some people find Christmas painful: the empty chair, the money worries, the loneliness. Isaiah does not say the darkness was not real. He says light came into it. Jesus did not wait for the world to be bright before He came.",
+          "prayer": "Lord, I bring You the dark places in my life and in my world. Thank You that Jesus came as a great light into the darkness. Shine on me, and on everyone who finds this season hard. In Jesus' name, Amen.",
+          "question": "Who do you know who finds this season hard?",
+          "familyQuestion": "Why do we put up lights at Christmas?",
+          "familyPrayer": "Lord, shine Your light on everyone who feels sad this Christmas."
+        },
+        {
+          "day": 6,
+          "title": "Unto us a child is born",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 9,
+            "verse": 6,
+            "from": 6,
+            "to": 7
+          },
+          "reflection": "For unto us a child is born, unto us a son is given. A child born, a son given. He was born as one of us, and He was given from heaven.\n\nThen come His names: Wonderful, Counsellor, The mighty God, The everlasting Father, The Prince of Peace. Each name is a gift. Which do you need most today? A counsellor for your decisions? A mighty God for your battles? A Prince of Peace for your heart? He is all of them.",
+          "prayer": "Lord Jesus, You are Wonderful, Counsellor, the mighty God, the everlasting Father, the Prince of Peace. I need You as my counsellor and my peace today. Let the government of my life be on Your shoulder. In Jesus' name, Amen.",
+          "question": "Which of Jesus' names do you need most today?",
+          "familyQuestion": "Which name for Jesus do we like best?",
+          "familyPrayer": "Prince of Peace, bring Your peace to our home."
+        },
+        {
+          "day": 7,
+          "title": "A rod out of the stem of Jesse",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 11,
+            "verse": 1,
+            "from": 1,
+            "to": 5
+          },
+          "reflection": "there shall come forth a rod out of the stem of Jesse, and a Branch shall grow out of his roots. Jesse was David's father. By Isaiah's time, the family tree looked like a stump, cut down.\n\nBut God promised a green shoot from the stump. the spirit of the LORD shall rest upon him. He would judge the poor with righteousness. God often brings new life from what looks dead. If something in your life feels like a stump, do not give up on it.",
+          "prayer": "Lord, thank You that new life came from the stump of Jesse. Where my life feels cut down, bring a green shoot. Thank You that Jesus judges the poor with righteousness and is faithful. In Jesus' name, Amen.",
+          "question": "What in your life feels like a stump?",
+          "familyQuestion": "What grows out of a cut-down tree?",
+          "familyPrayer": "Lord, bring new life to every place in our family that feels cut down."
+        },
+        {
+          "day": 8,
+          "title": "Little Bethlehem",
+          "read": {
+            "book": "Micah",
+            "chapter": 5,
+            "verse": 2,
+            "from": 2,
+            "to": 2
+          },
+          "reflection": "But thou, Bethlehem Ephratah, though thou be little among the thousands of Judah, yet out of thee shall he come forth unto me that is to be ruler in Israel.\n\nGod chose a small town for the birth of His Son. Not Rome, not Jerusalem, but Bethlehem, little among the thousands. And the ruler who came from there has goings forth that have been from of old, from everlasting. The eternal God entered the world through a small place. He is not put off by small things. He chooses them.",
+          "prayer": "Lord, thank You that You chose little Bethlehem. Thank You that You are not put off by small or overlooked places. Come into the small places of my life and make them Yours. In Jesus' name, Amen.",
+          "question": "Do you ever feel too small for God to use?",
+          "familyQuestion": "Where was Jesus born?",
+          "familyPrayer": "Lord, thank You that You love small and ordinary things."
+        },
+        {
+          "day": 9,
+          "title": "The LORD our righteousness",
+          "read": {
+            "book": "Jeremiah",
+            "chapter": 23,
+            "verse": 6,
+            "from": 5,
+            "to": 6
+          },
+          "reflection": "Israel's kings had failed again and again. Jeremiah promised a different kind of king: a righteous Branch, who would execute judgment and justice in the earth.\n\nThen his name: THE LORD OUR RIGHTEOUSNESS. Not only a righteous king who would demand righteousness from us, but one who would be our righteousness. We cannot make ourselves right with God. Christ came to give us His own righteousness as a gift. That is the best present anyone will be given this Christmas.",
+          "prayer": "Lord Jesus, You are the Lord our righteousness. I cannot make myself right with God, but You have given me Your righteousness as a gift. Thank You. Reign in my life with justice and goodness. In Jesus' name, Amen.",
+          "question": "What does it mean that Jesus is your righteousness?",
+          "familyQuestion": "What is the best gift God has given us?",
+          "familyPrayer": "Jesus, thank You for making us right with God."
+        },
+        {
+          "day": 10,
+          "title": "Comfort ye",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 40,
+            "verse": 1,
+            "from": 1,
+            "to": 5
+          },
+          "reflection": "Comfort ye, comfort ye my people, saith your God. After chapters of warning, God speaks tenderly. The hard season is over. Sins are pardoned.\n\nThen a voice cries, Prepare ye the way of the LORD. Valleys lifted, mountains made low, rough places made plain. Advent is a time to prepare: not only the house and the food, but the heart. What needs to be lifted, levelled or made straight in you before Christmas?",
+          "prayer": "Lord, comfort me today. Thank You that my sins are pardoned. Prepare the way in my heart for You. Lift what is low, bring down what is proud, and make the rough places plain. In Jesus' name, Amen.",
+          "question": "What needs to be prepared in your heart before Christmas?",
+          "familyQuestion": "How are we preparing for Christmas in our home?",
+          "familyPrayer": "Lord, as we prepare our house for Christmas, prepare our hearts for You."
+        },
+        {
+          "day": 11,
+          "title": "Like a shepherd",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 40,
+            "verse": 11,
+            "from": 9,
+            "to": 11
+          },
+          "reflection": "Isaiah calls out, Behold your God! The Lord God comes with strong hand. And then, a surprise: He shall feed his flock like a shepherd: he shall gather the lambs with his arm, and carry them in his bosom, and shall gently lead those that are with young.\n\nStrong and gentle. Mighty and tender. That is the God who came at Christmas. He carries the lambs. He is gentle with mothers. If you feel weak or worn out this season, let Him carry you.",
+          "prayer": "Lord, thank You that You are strong and gentle. Gather me in Your arms like a lamb. Gently lead those who are tired, those who are carrying young children, and those who are worn out this season. In Jesus' name, Amen.",
+          "question": "Where do you need God to carry you?",
+          "familyQuestion": "How does a shepherd look after little lambs?",
+          "familyPrayer": "Good Shepherd, carry each one of us, and be gentle with the tired."
+        },
+        {
+          "day": 12,
+          "title": "Your God will come",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 35,
+            "verse": 4,
+            "from": 1,
+            "to": 6
+          },
+          "reflection": "Isaiah paints a desert bursting into bloom. Then he says, Strengthen ye the weak hands, and confirm the feeble knees. Say to them that are of a fearful heart, Be strong, fear not: behold, your God will come.\n\nAnd when He comes, the eyes of the blind shall be opened. Jesus did exactly these things. Is your heart fearful today? This is a word for you, and a word to pass on to someone else whose knees are shaking. God has come, and He will come again.",
+          "prayer": "Lord, strengthen my weak hands and my feeble knees. To my fearful heart, say, be strong, fear not. Thank You that You came, and that You will come again. Help me to encourage someone else today. In Jesus' name, Amen.",
+          "question": "Who could you encourage with these words today?",
+          "familyQuestion": "What happened to blind and lame people when Jesus came?",
+          "familyPrayer": "Lord, make us strong and brave, and help us to encourage others."
+        },
+        {
+          "day": 13,
+          "title": "The messenger",
+          "read": {
+            "book": "Malachi",
+            "chapter": 3,
+            "verse": 1,
+            "from": 1,
+            "to": 3
+          },
+          "reflection": "Behold, I will send my messenger, and he shall prepare the way before me. This was fulfilled in John the Baptist, who prepared the way for Jesus.\n\nBut Malachi also asks, who may abide the day of his coming? The Lord comes like a refiner's fire. A refiner heats silver to burn away what is impure. Christ's coming is good news, but it is not comfortable news. He comes to make us pure, not to leave us as we are.",
+          "prayer": "Lord, I welcome You, even as a refiner's fire. Burn away what is impure in me. Thank You that You refine me because You love me and want to make me like silver. In Jesus' name, Amen.",
+          "question": "What might God want to refine in you?",
+          "familyQuestion": "Who prepared the way for Jesus?",
+          "familyPrayer": "Lord, make us pure and good, like silver made shiny."
+        },
+        {
+          "day": 14,
+          "title": "Arise, shine",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 60,
+            "verse": 1,
+            "from": 1,
+            "to": 3
+          },
+          "reflection": "Arise, shine; for thy light is come, and the glory of the LORD is risen upon thee. Darkness covers the earth, but the Lord shines on His people.\n\nThen, the Gentiles shall come to thy light, and kings to the brightness of thy rising. The wise men from the east were among the first to come. The light of Christ is not for us to keep. It shines on us so that others can find their way to Him. How could your life shine this Christmas?",
+          "prayer": "Lord, thank You that Your light has come and Your glory has risen on me. Help me to arise and shine, so that others may come to Your light through me this Christmas. In Jesus' name, Amen.",
+          "question": "How could your life shine for others this Christmas?",
+          "familyQuestion": "Who followed a star to find Jesus?",
+          "familyPrayer": "Lord, help our family to shine with Your light."
+        },
+        {
+          "day": 15,
+          "title": "Beautiful feet",
+          "read": {
+            "book": "Isaiah",
+            "chapter": 52,
+            "verse": 7,
+            "from": 7,
+            "to": 10
+          },
+          "reflection": "How beautiful upon the mountains are the feet of him that bringeth good tidings, that publisheth peace. In those days news came by runners. A messenger with good news was the most welcome sight.\n\nThe news is this: Thy God reigneth! At Christmas, many people are more open than usual to hearing about Jesus. Could you be a messenger with beautiful feet? Invite someone to a carol service. Tell them why Christmas matters to you.",
+          "prayer": "Lord, give me beautiful feet. Let me carry good news this Christmas. Show me who to invite, who to tell, and give me courage and kindness when I do. Thy God reigneth! In Jesus' name, Amen.",
+          "question": "Who could you invite to church or tell about Jesus this Christmas?",
+          "familyQuestion": "What is the good news of Christmas?",
+          "familyPrayer": "Lord, help us to share the good news of Jesus with our friends."
+        },
+        {
+          "day": 16,
+          "title": "Thy prayer is heard",
+          "read": {
+            "book": "Luke",
+            "chapter": 1,
+            "verse": 13,
+            "from": 5,
+            "to": 13
+          },
+          "reflection": "Zacharias and Elisabeth were righteous and old, and they had no child. They had surely prayed for one for years. While Zacharias was serving in the temple, an angel appeared: Fear not, Zacharias: for thy prayer is heard.\n\nThe prayer may have been decades old. He may have stopped praying it. But God had not forgotten. The silence of four hundred years between the prophets and this moment was ending. If you have an old prayer, keep praying it.",
+          "prayer": "Father, thank You that You hear prayers that are years old. I bring You my oldest prayer again. Thank You that You do not forget. Give me faith to keep praying and patience to wait for Your time. In Jesus' name, Amen.",
+          "question": "What old prayer do you still carry?",
+          "familyQuestion": "What did the angel tell Zacharias?",
+          "familyPrayer": "Lord, thank You that You hear every prayer, even old ones."
+        },
+        {
+          "day": 17,
+          "title": "Blessed is she that believed",
+          "read": {
+            "book": "Luke",
+            "chapter": 1,
+            "verse": 45,
+            "from": 39,
+            "to": 45
+          },
+          "reflection": "Mary hurried to see her cousin Elisabeth. When Elisabeth heard her greeting, the baby leaped in her womb, and she was filled with the Holy Ghost. Blessed art thou among women, and blessed is the fruit of thy womb.\n\nThen she said, blessed is she that believed. Mary was blessed not only for being chosen but for believing. She trusted that God would do what He said. Two women, one old and one young, encouraged each other in faith. Who encourages you?",
+          "prayer": "Lord, thank You for people who encourage my faith. Make me someone who encourages others. Help me to believe, as Mary did, that You will do what You have said. In Jesus' name, Amen.",
+          "question": "Who encourages your faith, and who could you encourage?",
+          "familyQuestion": "Why did baby John jump for joy?",
+          "familyPrayer": "Lord, help us to encourage each other to trust You."
+        },
+        {
+          "day": 18,
+          "title": "Joseph's dream",
+          "read": {
+            "book": "Matthew",
+            "chapter": 1,
+            "verse": 21,
+            "from": 18,
+            "to": 21
+          },
+          "reflection": "Joseph found out that Mary was expecting a child that was not his. He was a just man, and he decided to end the engagement quietly, to protect her from shame.\n\nThen an angel spoke to him in a dream: fear not to take unto thee Mary thy wife. And: thou shalt call his name JESUS: for he shall save his people from their sins. Joseph obeyed. He faced gossip and misunderstanding. Quiet obedience, like Joseph's, is often what God uses most.",
+          "prayer": "Lord, thank You for Joseph's quiet faithfulness. Give me the same courage to obey You when others do not understand. Thank You that Jesus came to save His people from their sins, including me. In Jesus' name, Amen.",
+          "question": "Where is God asking you to obey quietly, even if others misunderstand?",
+          "familyQuestion": "What does the name Jesus mean?",
+          "familyPrayer": "Lord, help us to obey You, even when it is hard."
+        },
+        {
+          "day": 19,
+          "title": "God with us",
+          "read": {
+            "book": "Matthew",
+            "chapter": 1,
+            "verse": 23,
+            "from": 22,
+            "to": 25
+          },
+          "reflection": "Matthew looks back at Isaiah's words and sees them fulfilled: they shall call his name Emmanuel, which being interpreted is, God with us.\n\nJoseph woke up and did as the angel of the Lord had bidden him. He took Mary as his wife, and when the child was born, he called his name JESUS. Seven hundred years after Isaiah, the promise was kept. God with us was no longer a hope. He was a baby in a young family, about to be born.",
+          "prayer": "Emmanuel, God with us, thank You that the promise was kept. Thank You that You did not stay far away but came to be with us. Be with me today, and let me be aware of You. In Jesus' name, Amen.",
+          "question": "How does it change things to know God is with you?",
+          "familyQuestion": "Who named baby Jesus?",
+          "familyPrayer": "Emmanuel, thank You that You are with us every day."
+        },
+        {
+          "day": 20,
+          "title": "The dayspring from on high",
+          "read": {
+            "book": "Luke",
+            "chapter": 1,
+            "verse": 78,
+            "from": 76,
+            "to": 79
+          },
+          "reflection": "When John was born, Zacharias' tongue was loosed, and he praised God. He sang that his son would prepare the way for the Lord.\n\nThen he described what was coming: the dayspring from on high hath visited us, To give light to them that sit in darkness and in the shadow of death, to guide our feet into the way of peace. Dayspring means the dawn. After a long night, the sun was about to rise. Christmas is the dawn.",
+          "prayer": "Lord, thank You for the dayspring from on high. Thank You for Your tender mercy. Give light to all who sit in darkness this Christmas, and guide my feet into the way of peace. In Jesus' name, Amen.",
+          "question": "Where do you need the dawn to break?",
+          "familyQuestion": "What happens when the sun rises in the morning?",
+          "familyPrayer": "Lord, guide our feet into the way of peace."
+        },
+        {
+          "day": 21,
+          "title": "The fulness of the time",
+          "read": {
+            "book": "Galatians",
+            "chapter": 4,
+            "verse": 4,
+            "from": 4,
+            "to": 7
+          },
+          "reflection": "when the fulness of the time was come, God sent forth his Son, made of a woman. God's timing was exact. Not too early, not too late.\n\nAnd He came To redeem them that were under the law, that we might receive the adoption of sons. Christmas is not only about a baby. It is about God making us His children. Wherefore thou art no more a servant, but a son. The Son of God became a son of man so that we could become sons and daughters of God.",
+          "prayer": "Father, thank You that You sent Your Son at just the right time. Thank You that through Him I am no longer a servant but Your child and heir. Help me to trust Your timing in my own life too. In Jesus' name, Amen.",
+          "question": "Where do you need to trust God's timing?",
+          "familyQuestion": "What does it mean to be adopted into God's family?",
+          "familyPrayer": "Father, thank You that we are Your children."
+        },
+        {
+          "day": 22,
+          "title": "In the beginning was the Word",
+          "read": {
+            "book": "John",
+            "chapter": 1,
+            "verse": 5,
+            "from": 1,
+            "to": 5
+          },
+          "reflection": "John begins the story of Jesus not in Bethlehem but before time. In the beginning was the Word, and the Word was with God, and the Word was God.\n\nThe baby in the manger made the stars. All things were made by him. And the light shineth in darkness; and the darkness comprehended it not. The darkness could not understand it, and could not put it out. With Christmas nearly here, remember who it is that comes. The Creator is coming to His creation.",
+          "prayer": "Lord Jesus, You are the eternal Word. You made all things, and You came into the world You made. Thank You that Your light shines in the darkness, and the darkness cannot overcome it. In Jesus' name, Amen.",
+          "question": "What does it mean to you that the baby in the manger is the Creator?",
+          "familyQuestion": "Who made the stars?",
+          "familyPrayer": "Lord Jesus, You made everything, and You came to be with us. Thank You."
+        },
+        {
+          "day": 23,
+          "title": "The Word was made flesh",
+          "read": {
+            "book": "John",
+            "chapter": 1,
+            "verse": 14,
+            "from": 9,
+            "to": 14
+          },
+          "reflection": "He came unto his own, and his own received him not. Many did not want Him. But as many as received him, to them gave he power to become the sons of God.\n\nThen the great sentence of Christmas: the Word was made flesh, and dwelt among us. God took on skin. He was hungry, tired and cold. He knows what it is to be human. Tomorrow we remember His birth. Today, make sure there is room for Him. Receive Him again.",
+          "prayer": "Lord Jesus, You came to Your own, and many did not receive You. I receive You today. Thank You that the Word was made flesh and dwelt among us. Make Your home in me this Christmas. In Jesus' name, Amen.",
+          "question": "Is there room for Jesus in your Christmas?",
+          "familyQuestion": "How can we make room for Jesus this Christmas?",
+          "familyPrayer": "Jesus, we receive You. Make Your home with us."
+        },
+        {
+          "day": 24,
+          "title": "Christmas Eve: Good tidings of great joy",
+          "read": {
+            "book": "Luke",
+            "chapter": 2,
+            "verse": 11,
+            "from": 8,
+            "to": 14
+          },
+          "reflection": "Shepherds were working the night shift on the hills outside Bethlehem when the sky filled with light. Fear not: for, behold, I bring you good tidings of great joy, which shall be to all people.\n\nFor unto you is born this day in the city of David a Saviour, which is Christ the Lord. Unto you. The waiting is over. The promise from the garden, to Abraham, to David, through all the prophets, is kept tonight. Glory to God in the highest, and on earth peace, good will toward men.",
+          "prayer": "Glory to God in the highest! Thank You, Father, for the Saviour born in Bethlehem. Thank You that the good tidings are for all people, and for me. Fill my home with joy and peace tonight. In Jesus' name, Amen.",
+          "question": "What does it mean to you that a Saviour was born unto you?",
+          "familyQuestion": "What did the angels sing to the shepherds?",
+          "familyPrayer": "Glory to God! Thank You for Jesus. Fill our home with joy tonight."
+        }
+      ]
+    },
+    {
+      "id": "thanksgiving-7",
+      "title": "Seven Days of Thanksgiving",
+      "days": 7,
+      "promise": "A week to count your blessings out loud and thank the One they came from.",
+      "cover": "discovery_cover_1",
+      "season": {
+        "startMonth": 11,
+        "startDay": 20,
+        "endMonth": 11,
+        "endDay": 30
+      },
+      "written": [
+        {
+          "day": 1,
+          "title": "Come before Him with thanksgiving",
+          "read": {
+            "book": "Psalms",
+            "chapter": 95,
+            "verse": 2,
+            "from": 1,
+            "to": 3
+          },
+          "reflection": "Let us come before his presence with thanksgiving, and make a joyful noise unto him with psalms. The psalm does not begin with requests. It begins with thanks and singing, because the LORD is a great God, and a great King above all gods.\n\nFor seven days, try beginning every prayer with thanks before you ask for anything. It may feel strange at first. But thanksgiving changes the way we see our needs. It reminds us who we are talking to.",
+          "prayer": "Lord, I come before Your presence with thanksgiving. You are a great God and a great King. Before I ask You for anything today, I thank You for who You are and for all You have done. In Jesus' name, Amen.",
+          "question": "What would change if you began every prayer this week with thanks?",
+          "familyQuestion": "What is one thing each of us is thankful for today?",
+          "familyPrayer": "Thank You, Lord, for this family and for everything You give us."
+        },
+        {
+          "day": 2,
+          "title": "When thou hast eaten",
+          "read": {
+            "book": "Deuteronomy",
+            "chapter": 8,
+            "verse": 10,
+            "from": 10,
+            "to": 11
+          },
+          "reflection": "When thou hast eaten and art full, then thou shalt bless the LORD thy God for the good land which he hath given thee. The very next verse warns, Beware that thou forget not the LORD thy God.\n\nFull stomachs can lead to forgetful hearts. When things are going well, it is easy to forget where they came from. Many families give thanks before meals. Today, try giving thanks after the meal too, when you are full. It is a simple way to remember.",
+          "prayer": "Father, thank You for food on my table. When I am full, let me not forget You. Thank You for every good thing You have given me. Keep my heart grateful in plenty as well as in need. In Jesus' name, Amen.",
+          "question": "When are you most likely to forget God?",
+          "familyQuestion": "Can we thank God after our meal today, as well as before?",
+          "familyPrayer": "Lord, thank You for our food. Help us never to forget that it comes from You."
+        },
+        {
+          "day": 3,
+          "title": "In every thing",
+          "read": {
+            "book": "1 Thessalonians",
+            "chapter": 5,
+            "verse": 18,
+            "from": 16,
+            "to": 18
+          },
+          "reflection": "In every thing give thanks: for this is the will of God in Christ Jesus concerning you. In every thing, not for every thing. We do not thank God for sickness or loss. But even in them, there is something to thank Him for: His presence, His promises, the people who stand with us.\n\nPeople often wonder what God's will is for their lives. Here is part of the answer, plainly written: rejoice, pray and give thanks. You can begin doing His will today.",
+          "prayer": "Lord, help me to give thanks in every thing, even in the hard things I am facing. Show me where You are present in them. Thank You that rejoicing, praying and giving thanks are Your will for me. In Jesus' name, Amen.",
+          "question": "What hard thing could you still find something to thank God for in?",
+          "familyQuestion": "What is something good that happened on a hard day?",
+          "familyPrayer": "Lord, help us to be thankful on hard days as well as good ones."
+        },
+        {
+          "day": 4,
+          "title": "What shall I render?",
+          "read": {
+            "book": "Psalms",
+            "chapter": 116,
+            "verse": 12,
+            "from": 12,
+            "to": 14
+          },
+          "reflection": "What shall I render unto the LORD for all his benefits toward me? The psalmist had been rescued from death, and he wanted to give something back.\n\nHis answer is surprising. I will take the cup of salvation, and call upon the name of the LORD. The first thing he gives is to receive more. We thank God best by trusting Him more, calling on Him again and keeping our promises to Him in front of others. Gratitude becomes worship.",
+          "prayer": "Lord, what can I give You for all Your goodness to me? I take the cup of salvation again and call on Your name. I will keep my promises to You. Let my gratitude become worship. In Jesus' name, Amen.",
+          "question": "What promise to God do you want to keep?",
+          "familyQuestion": "What could we give back to God this week?",
+          "familyPrayer": "Lord, thank You for all Your goodness. We give You our love and our lives."
+        },
+        {
+          "day": 5,
+          "title": "His unspeakable gift",
+          "read": {
+            "book": "2 Corinthians",
+            "chapter": 9,
+            "verse": 15,
+            "from": 12,
+            "to": 15
+          },
+          "reflection": "Paul was collecting a gift from the churches for poor believers in Jerusalem. He says their generosity would overflow by many thanksgivings unto God. Giving leads to thanks. Then he ends with a burst of praise: Thanks be unto God for his unspeakable gift.\n\nThe unspeakable gift is Jesus, a gift too great for words. Every other thing we thank God for flows from this one. Today, thank Him for Jesus. And think of someone your generosity could cause to give thanks.",
+          "prayer": "Thanks be to You, God, for Your unspeakable gift, Jesus Christ. Every good thing I have comes through Him. Make me generous, so that others will give thanks to You because of what I give. In Jesus' name, Amen.",
+          "question": "Whose thanksgiving could your generosity cause this week?",
+          "familyQuestion": "What is the best gift God has ever given?",
+          "familyPrayer": "Thank You, God, for Jesus. Help us to give to others too."
+        },
+        {
+          "day": 6,
+          "title": "As he did aforetime",
+          "read": {
+            "book": "Daniel",
+            "chapter": 6,
+            "verse": 10,
+            "from": 10,
+            "to": 10
+          },
+          "reflection": "Daniel knew a law had been signed against praying to anyone but the king. He went home, opened his windows toward Jerusalem, knelt three times a day, and prayed, and gave thanks before his God, as he did aforetime.\n\nHe gave thanks, knowing the lions' den was waiting. And he did it as he did aforetime. It was not new. It was his habit. Gratitude that holds up under pressure is built on ordinary days. What habit of thanks could you build?",
+          "prayer": "Lord, give me a habit of thanksgiving that holds up under pressure. Like Daniel, let me give thanks to You whatever is happening around me. Help me to build it on ordinary days. In Jesus' name, Amen.",
+          "question": "What daily habit of thanks could you begin?",
+          "familyQuestion": "When could we thank God together every day?",
+          "familyPrayer": "Lord, help us to thank You every day, in good times and in hard times."
+        },
+        {
+          "day": 7,
+          "title": "At all times",
+          "read": {
+            "book": "Psalms",
+            "chapter": 34,
+            "verse": 1,
+            "from": 1,
+            "to": 3
+          },
+          "reflection": "I will bless the LORD at all times: his praise shall continually be in my mouth. David wrote this after escaping from danger by pretending to be mad. Not his finest hour. Yet he praised God.\n\nThen he invites others: O magnify the LORD with me, and let us exalt his name together. Gratitude grows when it is shared. As this week ends, invite someone to give thanks with you. Tell each other what God has done. And the humble shall hear thereof, and be glad.",
+          "prayer": "Lord, I will bless You at all times. Let Your praise be continually in my mouth, not only this week but every week. Help me to invite others to magnify You with me. In Jesus' name, Amen.",
+          "question": "Who will you invite to give thanks with you?",
+          "familyQuestion": "What has God done for our family this year?",
+          "familyPrayer": "Lord, we bless You at all times. Thank You for this year together."
+        }
+      ]
+    },
+    {
+      "id": "back-to-school-7",
+      "title": "A Week for Students",
+      "days": 7,
+      "promise": "Seven days for the start of a school or university year: friends, study, faith and nerves.",
+      "cover": "discovery_cover_4",
+      "season": {
+        "startMonth": 9,
+        "startDay": 1,
+        "endMonth": 9,
+        "endDay": 30
+      },
+      "written": [
+        {
+          "day": 1,
+          "title": "Remember thy Creator",
+          "read": {
+            "book": "Ecclesiastes",
+            "chapter": 12,
+            "verse": 1,
+            "from": 1,
+            "to": 1
+          },
+          "reflection": "Remember now thy Creator in the days of thy youth. A new school year is full of new things: classes, teachers, timetables, friends. In all of it, it is easy to forget God until something goes wrong.\n\nThe Preacher says, remember Him now, while you are young. Not later when life slows down. Faith built now will hold you when hard days come. Begin this year by giving it to the God who made you and knows you.",
+          "prayer": "Lord, I remember You at the start of this year. You made me and You know me. I give You my studies, my friendships and my future. Be part of every day of this year, not just the hard ones. In Jesus' name, Amen.",
+          "question": "What are you most excited or nervous about this year?",
+          "familyQuestion": "What is each of us looking forward to this school year?",
+          "familyPrayer": "Lord, bless every student in this house this year. Be with them every day."
+        },
+        {
+          "day": 2,
+          "title": "Hid in mine heart",
+          "read": {
+            "book": "Psalms",
+            "chapter": 119,
+            "verse": 11,
+            "from": 9,
+            "to": 11
+          },
+          "reflection": "Wherewithal shall a young man cleanse his way? by taking heed thereto according to thy word. The psalmist asks how a young person can stay on the right path. The answer is God's word.\n\nThy word have I hid in mine heart, that I might not sin against thee. You will face pressure this year to go along with things you know are wrong. A verse you have memorised can come back to you in that moment. Choose one to learn this week.",
+          "prayer": "Lord, I want to hide Your word in my heart. Help me to learn it and remember it. When I face pressure to do wrong, bring Your word back to me. Keep me from wandering from You. In Jesus' name, Amen.",
+          "question": "Which verse will you learn this week?",
+          "familyQuestion": "Can we learn a verse together this week?",
+          "familyPrayer": "Lord, help our children to love Your word and remember it."
+        },
+        {
+          "day": 3,
+          "title": "Purposed in his heart",
+          "read": {
+            "book": "Daniel",
+            "chapter": 1,
+            "verse": 8,
+            "from": 8,
+            "to": 9
+          },
+          "reflection": "Daniel was a teenager taken to a foreign land and put in the king's school. The food and the ways were not God's ways. But Daniel purposed in his heart that he would not defile himself.\n\nHe decided ahead of time. Then he asked respectfully, and God gave him favour. It is easier to say no in the moment if you have already decided. What will you decide now about how you will live this year, before the pressure comes?",
+          "prayer": "Lord, like Daniel, I purpose in my heart to honour You this year. Help me to decide now what I will and will not do. Give me courage to stand, and give me favour with my teachers and classmates. In Jesus' name, Amen.",
+          "question": "What will you decide now, before the pressure comes?",
+          "familyQuestion": "What are some things we have decided as a family?",
+          "familyPrayer": "Lord, give our children courage to stand for what is right, and favour with others."
+        },
+        {
+          "day": 4,
+          "title": "The beginning of knowledge",
+          "read": {
+            "book": "Proverbs",
+            "chapter": 1,
+            "verse": 7,
+            "from": 7,
+            "to": 9
+          },
+          "reflection": "The fear of the LORD is the beginning of knowledge. You will learn a great deal this year: facts, skills, ideas. Proverbs says that real knowledge starts with honouring God.\n\nThen it speaks to the young: hear the instruction of thy father, and forsake not the law of thy mother. Some of the wisest lessons will not come from textbooks. They will come from parents, grandparents and others who love you and have walked further. Listen to them.",
+          "prayer": "Lord, let my learning begin with honouring You. Give me a humble heart to learn from my teachers and from those who love me. Make me wise, not just clever. In Jesus' name, Amen.",
+          "question": "Whose advice do you find hardest to listen to?",
+          "familyQuestion": "What is something wise a grandparent or parent has taught us?",
+          "familyPrayer": "Lord, make our children wise, and help us to teach them well."
+        },
+        {
+          "day": 5,
+          "title": "Good friends",
+          "read": {
+            "book": "1 Corinthians",
+            "chapter": 15,
+            "verse": 33,
+            "from": 33,
+            "to": 34
+          },
+          "reflection": "Be not deceived: evil communications corrupt good manners. In plain English: bad company ruins good character. The friends you choose this year will shape you more than almost anything else.\n\nThis does not mean avoiding everyone who is not a Christian. Jesus was a friend of sinners. But your closest friends, the ones you follow, matter. Pray for good friends. And pray that you would be a good friend to someone who needs one.",
+          "prayer": "Lord, give me good friends this year, friends who help me to be who You made me to be. Help me to be a good friend too. Show me someone who is lonely, and give me courage to be kind. In Jesus' name, Amen.",
+          "question": "Who are the friends who shape you most?",
+          "familyQuestion": "Who at school might need a friend?",
+          "familyPrayer": "Lord, give our children good friends, and make them kind to the lonely."
+        },
+        {
+          "day": 6,
+          "title": "Increased in wisdom",
+          "read": {
+            "book": "Luke",
+            "chapter": 2,
+            "verse": 52,
+            "from": 52,
+            "to": 52
+          },
+          "reflection": "And Jesus increased in wisdom and stature, and in favour with God and man. This is almost all we know of Jesus between the ages of twelve and thirty. He grew.\n\nHe grew in wisdom, His mind. In stature, His body. In favour with God, His faith. And with man, His relationships. Growth in all four is what a good year looks like. Not only top marks, but a whole person growing. Which area do you want to grow in this year?",
+          "prayer": "Lord Jesus, You grew in wisdom and stature, and in favour with God and man. Help me to grow like that this year: in my mind, my body, my faith and my friendships. In Jesus' name, Amen.",
+          "question": "Which of the four areas do you most want to grow in this year?",
+          "familyQuestion": "How have we each grown this past year?",
+          "familyPrayer": "Lord, help each of us to grow in wisdom, in body, in faith and in kindness."
+        },
+        {
+          "day": 7,
+          "title": "Good success",
+          "read": {
+            "book": "Joshua",
+            "chapter": 1,
+            "verse": 8,
+            "from": 8,
+            "to": 9
+          },
+          "reflection": "God told Joshua to keep His word in his mouth and meditate therein day and night, and then thou shalt have good success.\n\nGood success is more than passing exams. It is a life that pleases God. And God follows the promise with another: Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest. Into every classroom, every exam hall, every new friendship, He goes with you.",
+          "prayer": "Lord, I want good success this year, the kind that pleases You. Help me to keep Your word close. Make me strong and courageous. Thank You that You are with me wherever I go, in every classroom and every exam. In Jesus' name, Amen.",
+          "question": "What would good success look like for you this year?",
+          "familyQuestion": "How can we pray for each other through this year?",
+          "familyPrayer": "Lord, be with our students wherever they go. Give them good success."
+        }
+      ]
+    },
+    {
+      "id": "mothers-and-fathers",
+      "title": "Honour Your Parents",
+      "days": 5,
+      "promise": "Five days around Mother's Day and Father's Day, for thanks, for healing, and for the parents growing old.",
+      "cover": "discovery_cover_6",
+      "season": {
+        "startMonth": 5,
+        "startDay": 1,
+        "endMonth": 6,
+        "endDay": 30
+      },
+      "written": [
+        {
+          "day": 1,
+          "title": "The first commandment with promise",
+          "read": {
+            "book": "Ephesians",
+            "chapter": 6,
+            "verse": 2,
+            "from": 1,
+            "to": 3
+          },
+          "reflection": "Honour thy father and mother; (which is the first commandment with promise;). Paul points back to the Ten Commandments and notices that this one comes with a promise: That it may be well with thee.\n\nHonour is not the same as agreeing with everything your parents say or do. It means treating them with respect, speaking well of them, and caring for them. It applies whether you are seven or seventy. Today, think of one way you could honour your parents this week.",
+          "prayer": "Father God, thank You for my parents. Help me to honour them in my words and actions, whatever their age and mine. Show me one way I can honour them this week. In Jesus' name, Amen.",
+          "question": "What is one way you could honour your parents this week?",
+          "familyQuestion": "What does it mean to honour someone?",
+          "familyPrayer": "Lord, thank You for parents. Help us to honour and love each other."
+        },
+        {
+          "day": 2,
+          "title": "When she is old",
+          "read": {
+            "book": "Proverbs",
+            "chapter": 23,
+            "verse": 22,
+            "from": 22,
+            "to": 25
+          },
+          "reflection": "Hearken unto thy father that begat thee, and despise not thy mother when she is old. Parents grow old. They may become slow, forgetful or difficult. It is easy to grow impatient with them.\n\nProverbs says, do not despise them. In many cultures, caring for ageing parents is simply what children do. In others, it is easy to leave it to someone else. Either way, God sees how we treat those who once cared for us. Call your parents, or visit them, this week.",
+          "prayer": "Lord, I pray for my parents as they grow older. Give me patience and kindness toward them. Help me not to despise them when they are slow or difficult. Show me how to care for them well. In Jesus' name, Amen.",
+          "question": "How could you show care for an older parent or relative this week?",
+          "familyQuestion": "Which grandparent or older relative could we call or visit?",
+          "familyPrayer": "Lord, bless our grandparents and older relatives. Help us to care for them."
+        },
+        {
+          "day": 3,
+          "title": "Her children arise up",
+          "read": {
+            "book": "Proverbs",
+            "chapter": 31,
+            "verse": 28,
+            "from": 25,
+            "to": 31
+          },
+          "reflection": "Proverbs ends with a portrait of a woman of strength and wisdom: Strength and honour are her clothing. She works hard, speaks with kindness and cares for her household. Her children arise up, and call her blessed.\n\nMany mothers, grandmothers and women who have mothered us carry heavy loads with little thanks. Today, rise up and call them blessed. Tell them what they mean to you. Give her of the fruit of her hands; and let her own works praise her in the gates.",
+          "prayer": "Lord, thank You for the mothers and the women who have cared for me. Bless them with strength and honour. Help me to rise up and call them blessed, and to thank them in words they can hear. In Jesus' name, Amen.",
+          "question": "Who has mothered you, and how could you thank her?",
+          "familyQuestion": "What do we love about the mothers in our family?",
+          "familyPrayer": "Lord, bless the mothers and grandmothers in our family. Thank You for them."
+        },
+        {
+          "day": 4,
+          "title": "When my father and my mother forsake me",
+          "read": {
+            "book": "Psalms",
+            "chapter": 27,
+            "verse": 10,
+            "from": 10,
+            "to": 11
+          },
+          "reflection": "Not everyone has parents who were kind. Some were absent, harsh or worse. If that is your story, days like Mother's Day and Father's Day can hurt.\n\nDavid wrote, When my father and my mother forsake me, then the LORD will take me up. God is the Father who does not leave. He sees what was done to you. Honouring your parents does not mean pretending the hurt did not happen. You can bring your pain to God and let Him take you up.",
+          "prayer": "Lord, You know my story with my parents, the good and the painful. Where I was let down, take me up. Heal what was broken. Help me to honour my parents where I can, and to forgive where I must. You are my Father. In Jesus' name, Amen.",
+          "question": "What do you need to bring to God about your parents?",
+          "familyQuestion": "Who has been like a parent to us when we needed one?",
+          "familyPrayer": "Lord, thank You that You are our Father who never leaves."
+        },
+        {
+          "day": 5,
+          "title": "Behold thy mother",
+          "read": {
+            "book": "John",
+            "chapter": 19,
+            "verse": 27,
+            "from": 25,
+            "to": 27
+          },
+          "reflection": "On the cross, in terrible pain, Jesus saw His mother standing nearby. He said to her, Woman, behold thy son!, and to John, Behold thy mother! From that hour John took her into his home.\n\nWhile He was saving the world, Jesus made sure His mother would be cared for. Honouring parents is not too small a thing for the Son of God. Let His example shape how you care for your own parents, and for older people in your church who have no one.",
+          "prayer": "Lord Jesus, even on the cross You cared for Your mother. Help me to care for my parents as You cared for Yours. Show me older people in my church and community who have no one, and help me to love them. In Jesus' name, Amen.",
+          "question": "Is there an older person in your church who has no family nearby?",
+          "familyQuestion": "How did Jesus look after His mother?",
+          "familyPrayer": "Lord Jesus, help us to care for our parents and for older people who are alone."
+        }
+      ]
+    }
+  ]
+}

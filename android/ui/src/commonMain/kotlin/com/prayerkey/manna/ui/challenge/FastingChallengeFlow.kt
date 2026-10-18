@@ -1180,6 +1180,7 @@ fun ChallengeChooser(
     onPrayer: () -> Unit,
     onFast: () -> Unit,
     onClose: () -> Unit,
+    onShort: () -> Unit = {},
 ) {
     BackHandler(onBack = onClose)
     Column(
@@ -1214,5 +1215,18 @@ fun ChallengeChooser(
             of = fast.days,
             onOpen = onFast,
         )
+        /* The written challenges - three to twenty-one days, each day read,
+           reflect and pray - were built and had no door. */
+        Row(
+            Modifier.padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Color.White)
+                .clickable(onClick = onShort).padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text("Written challenges", color = Ink, fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
+                Text("Standing Against Fear, The Midnight Watch, 21 days of prayer and fasting, and more", Modifier.padding(top = 4.dp), color = Pk.Muted, fontFamily = UtilitySans, fontSize = 13.5.sp, lineHeight = 19.sp)
+            }
+            Text("›", Modifier.padding(start = 12.dp), color = Pk.Oxblood, fontSize = 28.sp)
+        }
     }
 }

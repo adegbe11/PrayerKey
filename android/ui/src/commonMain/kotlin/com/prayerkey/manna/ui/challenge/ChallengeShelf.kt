@@ -108,19 +108,40 @@ fun ChallengeShelf(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            items(challenges, key = { it.id }) { challenge ->
-                ShelfCard(
-                    challenge = challenge,
-                    done = ChallengeProgress.completed(context, challenge.id),
-                    onOpen = { onOpen(challenge) },
-                )
+            val today = com.prayerkey.manna.platform.today()
+            val near = challenges.filter { it.season?.isNear(today) == true }
+                .sortedBy { it.season?.window(today.year)?.first }
+            val yearRound = challenges.filter { it.season == null }
+            val later = challenges.filter { it.season != null && it !in near }
+            /* The church year first, when it is near: Advent in December,
+               Lent in spring. Then everything that fits any week. */
+            if (near.isNotEmpty()) item(key = "h-season") { ShelfHeading("In season") }
+            items(near, key = { it.id }) { challenge ->
+                ShelfCard(challenge, ChallengeProgress.completed(context, challenge.id), { onOpen(challenge) }, challenge.season?.label(today))
+            }
+            if (near.isNotEmpty()) item(key = "h-year") { ShelfHeading("Any time") }
+            items(yearRound, key = { it.id }) { challenge ->
+                ShelfCard(challenge, ChallengeProgress.completed(context, challenge.id), { onOpen(challenge) })
+            }
+            if (later.isNotEmpty()) item(key = "h-later") { ShelfHeading("Through the year") }
+            items(later, key = { it.id }) { challenge ->
+                ShelfCard(challenge, ChallengeProgress.completed(context, challenge.id), { onOpen(challenge) })
             }
         }
     }
 }
 
 @Composable
-private fun ShelfCard(challenge: ChallengePlan, done: Int, onOpen: () -> Unit) {
+private fun ShelfHeading(text: String) {
+    Text(
+        text.uppercase(),
+        Modifier.padding(start = 4.dp, top = 10.dp),
+        fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp, color = Pk.GoldDeep,
+    )
+}
+
+@Composable
+private fun ShelfCard(challenge: ChallengePlan, done: Int, onOpen: () -> Unit, seasonLine: String? = null) {
     val started = done > 0
     val finished = done >= challenge.days
 
@@ -133,6 +154,13 @@ private fun ShelfCard(challenge: ChallengePlan, done: Int, onOpen: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(18.dp)) {
+            if (!seasonLine.isNullOrBlank()) {
+                Text(
+                    seasonLine,
+                    Modifier.padding(bottom = 8.dp).clip(RoundedCornerShape(99.dp)).background(Color(0xFF6200ED)).padding(horizontal = 10.dp, vertical = 4.dp),
+                    fontFamily = UtilitySans, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.White,
+                )
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     "${challenge.days} days",

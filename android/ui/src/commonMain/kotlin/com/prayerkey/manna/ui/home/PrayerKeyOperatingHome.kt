@@ -153,6 +153,8 @@ fun PrayerKeyOperatingHome(
     var openChallengeId by rememberSaveable { mutableStateOf<String?>(null) }
     var prayerCalendarOpen by rememberSaveable { mutableStateOf(false) }
     var exploreOpen by rememberSaveable { mutableStateOf(false) }
+    var prayerPointsOpen by rememberSaveable { mutableStateOf(false) }
+    var namedChallengesOpen by rememberSaveable { mutableStateOf(false) }
     var selectedFeature by remember { mutableStateOf<Feature?>(null) }
 
     LaunchedEffect(initialAction) {
@@ -389,6 +391,16 @@ fun PrayerKeyOperatingHome(
             }
         }
     }
+    if (prayerPointsOpen) {
+        Dialog(onDismissRequest = { prayerPointsOpen = false }, properties = fullScreenDialog()) {
+            com.prayerkey.manna.ui.screens.PrayerPointsScreen(onClose = { prayerPointsOpen = false })
+        }
+    }
+    if (namedChallengesOpen) {
+        Dialog(onDismissRequest = { namedChallengesOpen = false }, properties = fullScreenDialog()) {
+            com.prayerkey.manna.ui.challenge.ChallengeShelfRoute(onClose = { namedChallengesOpen = false })
+        }
+    }
     if (prayerCalendarOpen) {
         Dialog(
             onDismissRequest = { prayerCalendarOpen = false },
@@ -548,6 +560,21 @@ fun PrayerKeyOperatingHome(
             // the same 14dp to the prayer card as between every card above
             Spacer(Modifier.height(14.dp))
         }
+        /* The prayers written for particular hours and moments. They were
+           finished and could not be reached; now they are one swipe away. */
+        MomentsShelf(
+            remember {
+                prayerMoments(
+                    emergency = { emergencyPrayerOpen = true },
+                    office = { requestedOffice = it; morningPrayerOpen = true },
+                    tenMinutes = { prayerSessionOpen = true },
+                    prayerPoints = { prayerPointsOpen = true },
+                )
+            },
+        )
+        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp)) {
+            Spacer(Modifier.height(14.dp))
+        }
 
         /* The morning prayer and the verse of the day, as cards.
            Both were written to be shared - SAVE and SHARE render a portrait
@@ -607,6 +634,7 @@ fun PrayerKeyOperatingHome(
                     // the chosen flow opens over Home, and the chooser steps aside
                     onPrayer = { challengeShelfOpen = false; challengeOpen = true },
                     onFast = { challengeShelfOpen = false; fastOpen = true },
+                    onShort = { challengeShelfOpen = false; namedChallengesOpen = true },
                     onClose = { challengeShelfOpen = false },
                 )
             }

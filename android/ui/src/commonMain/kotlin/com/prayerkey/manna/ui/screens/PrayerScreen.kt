@@ -8,6 +8,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -202,11 +204,15 @@ fun PrayerScreen(
 }
 
 @Composable private fun PrayerComposer(value: String, loading: Boolean, onChange: (String) -> Unit, onSend: () -> Unit) {
+    // speak the prayer instead of typing it; the words land in the box
+    val voice = com.prayerkey.manna.ui.platform.rememberDictation("Tell God what is on your heart") { spoken ->
+        onChange(if (value.isBlank()) spoken else "$value $spoken")
+    }
     Surface(Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine), shadowElevation = 4.dp) {
         Column(Modifier.padding(18.dp)) {
             androidx.compose.foundation.text.BasicTextField(value, onChange, Modifier.fillMaxWidth().heightIn(min = 88.dp), textStyle = androidx.compose.ui.text.TextStyle(color = PrayInk, fontFamily = UtilitySans, fontSize = 18.sp, lineHeight = 27.sp), decorationBox = { inner -> Box { if (value.isBlank()) Text("Tell God what is on your heart…", color = PrayMuted, fontSize = 18.sp); inner() } })
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.MicNone, "Voice prayer", tint = PrayMuted)
+                Icon(Icons.Outlined.MicNone, "Speak your prayer", Modifier.clip(CircleShape).clickable { voice.launch() }.padding(6.dp), tint = PrayViolet)
                 Spacer(Modifier.weight(1f))
                 Surface(onClick = onSend, enabled = value.isNotBlank() && !loading, shape = CircleShape, color = if (value.isNotBlank()) PrayViolet else Color(0xFFE8E3ED)) {
                     if (loading) CircularProgressIndicator(Modifier.padding(12.dp).size(21.dp), color = Color.White, strokeWidth = 2.dp) else Icon(Icons.Outlined.ArrowUpward, "Pray with me", Modifier.padding(12.dp), tint = Color.White)
