@@ -79,11 +79,13 @@ fun prayerMoments(
     bedtime: () -> Unit,
     prayingFor: () -> Unit,
     familyAltar: () -> Unit,
+    languages: () -> Unit,
 ): List<Moment> = listOf(
     Moment("Right now", "I need prayer", Res.drawable.welcome_prayer_dawn, emergency),
     Moment("Morning", "Morning Prayer", Res.drawable.rhythm_morning, { office("MORNING") }),
     Moment("Ten minutes", "Ten quiet minutes", Res.drawable.onboarding_pray_v3, tenMinutes),
     Moment("For others", "Praying for", Res.drawable.onboarding_church_v3, prayingFor),
+    Moment("Your language", "Pray in your language", Res.drawable.prayerkey_discovery_world, languages),
     Moment("Afternoon", "Midday Prayer", Res.drawable.prayerkey_hero_dawn, { office("AFTERNOON") }),
     Moment("Evening", "Evening Prayer", Res.drawable.rhythm_evening, { office("EVENING") }),
     Moment("Night", "Night Prayer", Res.drawable.rhythm_reflection, { office("NIGHT") }),

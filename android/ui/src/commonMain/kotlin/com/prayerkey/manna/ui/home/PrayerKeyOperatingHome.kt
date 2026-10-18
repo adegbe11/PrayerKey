@@ -157,6 +157,7 @@ fun PrayerKeyOperatingHome(
     var bedtimeOpen by rememberSaveable { mutableStateOf(false) }
     var prayingForOpen by rememberSaveable { mutableStateOf(false) }
     var familyAltarOpen by rememberSaveable { mutableStateOf(false) }
+    var languagesOpen by rememberSaveable { mutableStateOf(false) }
     var namedChallengesOpen by rememberSaveable { mutableStateOf(false) }
     var selectedFeature by remember { mutableStateOf<Feature?>(null) }
 
@@ -404,6 +405,11 @@ fun PrayerKeyOperatingHome(
             com.prayerkey.manna.ui.screens.PrayerPointsScreen(onClose = { prayerPointsOpen = false })
         }
     }
+    if (languagesOpen) {
+        Dialog(onDismissRequest = { languagesOpen = false }, properties = fullScreenDialog()) {
+            com.prayerkey.manna.ui.others.PrayInYourLanguageScreen(onClose = { languagesOpen = false })
+        }
+    }
     if (prayingForOpen) {
         Dialog(onDismissRequest = { prayingForOpen = false }, properties = fullScreenDialog()) {
             com.prayerkey.manna.ui.others.PrayingForScreen(onClose = { prayingForOpen = false })
@@ -598,6 +604,7 @@ fun PrayerKeyOperatingHome(
                     bedtime = { bedtimeOpen = true },
                     prayingFor = { prayingForOpen = true },
                     familyAltar = { familyAltarOpen = true },
+                    languages = { languagesOpen = true },
                 )
             },
         )
