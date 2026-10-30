@@ -13,6 +13,8 @@ interface QueueItem extends DetectedVerse { queueId: string; }
 type ServiceState = "idle" | "live" | "ended";
 /** shared with /live/projector */
 const PROJECTOR_CHANNEL = "prayerkey-live-projector";
+/** this browser's stream overlay room, kept between services */
+const OVERLAY_STORE = "prayerkey-live-overlay";
 type SearchMode   = "book" | "context";
 
 // ── Design tokens — deep navy, iOS-27 / Liquid Glass ─────────────────────────
@@ -234,7 +236,63 @@ export default function LivePage() {
     const onAir = state === "live" ? liveVerse : null;
     onAirRef.current = onAir;
     projectorRef.current?.postMessage({ type: "verse", verse: onAir });
+    pushOverlay(onAir);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveVerse, state]);
+
+  /* The stream overlay. OBS runs its own browser, so it reads the verse on air
+     from the relay instead. This browser keeps one room for good, so a church
+     sets up the overlay link in OBS once and it works every Sunday. */
+  const [overlayRoom, setOverlayRoom]     = useState<{ room: string; key: string } | null>(null);
+  const [overlayOpen, setOverlayOpen]     = useState(false);
+  const [overlayStatus, setOverlayStatus] = useState<"waiting" | "ok" | "off" | "error">("waiting");
+  const [overlayCopied, setOverlayCopied] = useState(false);
+  const overlayRoomRef = useRef<{ room: string; key: string } | null>(null);
+  const overlayQueue = useRef<{ busy: boolean; next: DetectedVerse | null | undefined }>({ busy: false, next: undefined });
+
+  useEffect(() => {
+    let saved: { room?: string; key?: string } | null = null;
+    try { saved = JSON.parse(localStorage.getItem(OVERLAY_STORE) ?? "null"); } catch { /* private mode */ }
+    let room = saved?.room ?? "", key = saved?.key ?? "";
+    if (!/^[A-Z2-9]{6}$/.test(room) || !/^[A-Za-z0-9_-]{20,64}$/.test(key)) {
+      const pick = (alphabet: string, n: number) =>
+        Array.from(crypto.getRandomValues(new Uint8Array(n)), (b) => alphabet[b % alphabet.length]).join("");
+      room = pick("ABCDEFGHJKLMNPQRSTUVWXYZ23456789", 6);
+      key = pick("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", 32);
+      try { localStorage.setItem(OVERLAY_STORE, JSON.stringify({ room, key })); } catch { /* private mode */ }
+    }
+    overlayRoomRef.current = { room, key };
+    setOverlayRoom({ room, key });
+    pushOverlay(onAirRef.current);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // one request at a time and always the latest, so a slow request never puts an old verse back
+  function pushOverlay(verse: DetectedVerse | null) {
+    const q = overlayQueue.current;
+    q.next = verse;
+    if (!q.busy) void drainOverlay();
+  }
+  async function drainOverlay() {
+    const q = overlayQueue.current;
+    const owner = overlayRoomRef.current;
+    if (!owner) return;
+    q.busy = true;
+    while (q.next !== undefined) {
+      const v = q.next; q.next = undefined;
+      try {
+        const res = await fetch("/api/live/onair", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...owner, verse: v && { verseRef: v.verseRef, verseText: v.verseText, translation: v.translation } }),
+          keepalive: true,
+        });
+        setOverlayStatus(res.ok ? "ok" : res.status === 503 ? "off" : "error");
+      } catch { setOverlayStatus("error"); }
+    }
+    q.busy = false;
+  }
+  const overlayUrl = overlayRoom && typeof window !== "undefined" ? `${window.location.origin}/live/overlay?room=${overlayRoom.room}` : "";
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -620,6 +678,53 @@ export default function LivePage() {
             letterSpacing:"0.04em", whiteSpace:"nowrap" as const, boxShadow:HILITE }}>
             Projector ↗
           </a>
+
+          {/* Stream overlay: the link a church adds to OBS / vMix once */}
+          <span style={{ position:"relative" as const }}>
+            <button onClick={() => setOverlayOpen(o => !o)} aria-expanded={overlayOpen} style={{
+              padding:"7px 14px", background: overlayOpen ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.04)",
+              border:`1px solid ${BORDER}`, borderRadius:"100px", cursor:"pointer",
+              color:T2, fontSize:"10px", fontWeight:600, letterSpacing:"0.04em",
+              whiteSpace:"nowrap" as const, boxShadow:HILITE, display:"inline-flex", alignItems:"center", gap:"6px" }}>
+              <span style={{ width:"6px", height:"6px", borderRadius:"50%",
+                background: overlayStatus === "ok" ? GREEN : overlayStatus === "waiting" ? "rgba(255,255,255,0.35)" : RED }} />
+              Stream overlay
+            </button>
+            {overlayOpen && (
+              <div role="dialog" aria-label="Stream overlay" style={{
+                position:"absolute" as const, top:"calc(100% + 10px)", right:0, width:"340px", zIndex:50,
+                padding:"16px", borderRadius:"16px", background:"#1C0A30",
+                border:`1px solid rgba(255,255,255,0.12)`, boxShadow:"0 18px 50px rgba(0,0,0,0.5)",
+                color:"#fff", fontSize:"12px", lineHeight:1.5 }}>
+                <div style={{ fontSize:"13px", fontWeight:700, marginBottom:"6px" }}>Stream overlay</div>
+                <div style={{ color:T2, marginBottom:"10px" }}>
+                  In OBS, vMix or Streamlabs, add a Browser Source with this link, 1920 × 1080.
+                </div>
+                <div style={{ display:"flex", gap:"6px" }}>
+                  <input readOnly value={overlayUrl} onFocus={(e) => e.currentTarget.select()} aria-label="Overlay link" style={{
+                    flex:1, minWidth:0, padding:"8px 10px", borderRadius:"10px", border:`1px solid rgba(255,255,255,0.14)`,
+                    background:"rgba(0,0,0,0.3)", color:"#fff", fontSize:"11px", fontFamily:"ui-monospace, Menlo, monospace" }} />
+                  <button onClick={() => { navigator.clipboard?.writeText(overlayUrl).then(() => { setOverlayCopied(true); setTimeout(() => setOverlayCopied(false), 1600); }); }} style={{
+                    padding:"8px 12px", borderRadius:"10px", border:"none", cursor:"pointer",
+                    background:"#F4D03F", color:"#1C0A30", fontWeight:700, fontSize:"11px" }}>
+                    {overlayCopied ? "Copied" : "Copy"}
+                  </button>
+                </div>
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:"10px" }}>
+                  <span style={{ display:"inline-flex", alignItems:"center", gap:"6px", color: overlayStatus === "ok" ? GREEN : overlayStatus === "waiting" ? T2 : RED }}>
+                    <span style={{ width:"6px", height:"6px", borderRadius:"50%", background:"currentColor" }} />
+                    {overlayStatus === "ok" ? "Sending to the overlay"
+                      : overlayStatus === "off" ? "The stream overlay is not switched on for this site yet"
+                      : overlayStatus === "error" ? "Can't reach the overlay. Check the internet."
+                      : "Connecting"}
+                  </span>
+                  <a href={`${overlayUrl}&preview=1`} target="_blank" rel="noreferrer" style={{ color:"#F4D03F", textDecoration:"none", fontWeight:600 }}>
+                    Preview ↗
+                  </a>
+                </div>
+              </div>
+            )}
+          </span>
 
           {/* End — refined red */}
           <button onClick={endService} style={{
