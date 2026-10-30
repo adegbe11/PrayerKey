@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import LiveStory from "./LiveStory";
+import { findSpokenRefs } from "@/lib/bible/spoken-refs";
 import "./live.css";
 
 interface DetectedVerse {
@@ -10,6 +11,8 @@ interface DetectedVerse {
 }
 interface QueueItem extends DetectedVerse { queueId: string; }
 type ServiceState = "idle" | "live" | "ended";
+/** shared with /live/projector */
+const PROJECTOR_CHANNEL = "prayerkey-live-projector";
 type SearchMode   = "book" | "context";
 
 // ── Design tokens — deep navy, iOS-27 / Liquid Glass ─────────────────────────
@@ -210,45 +213,87 @@ export default function LivePage() {
     else if (!goLive) setLiveVerse(null);
   }, [goLive, previewVerse]);
 
+  /* The projector window: whatever is on air here is on the projector there.
+     Both windows are on the church laptop, so they talk through the browser
+     itself; nothing goes through a server. A projector opened late asks what
+     is showing and is told at once. */
+  const projectorRef = useRef<BroadcastChannel | null>(null);
+  const onAirRef = useRef<DetectedVerse | null>(null);
+  useEffect(() => {
+    if (typeof BroadcastChannel === "undefined") return;
+    const channel = new BroadcastChannel(PROJECTOR_CHANNEL);
+    projectorRef.current = channel;
+    const send = () => channel.postMessage({ type: "verse", verse: onAirRef.current });
+    channel.onmessage = (e) => { if (e.data?.type === "hello") send(); };
+    send();
+    const bye = () => channel.postMessage({ type: "bye" });
+    window.addEventListener("pagehide", bye);
+    return () => { window.removeEventListener("pagehide", bye); bye(); channel.close(); projectorRef.current = null; };
+  }, []);
+  useEffect(() => {
+    const onAir = state === "live" ? liveVerse : null;
+    onAirRef.current = onAir;
+    projectorRef.current?.postMessage({ type: "verse", verse: onAir });
+  }, [liveVerse, state]);
+
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [transcriptLog, transcript]);
 
+  // "John 3 16", "John three sixteen", "first Corinthians 13 4" all read as references
   function extractExplicitRefs(text: string): string[] {
-    const pattern = /\b(Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Joshua|Judges|Ruth|Samuel|Kings|Chronicles|Ezra|Nehemiah|Esther|Job|Psalm(?:s)?|Proverbs|Ecclesiastes|Song|Isaiah|Jeremiah|Lamentations|Ezekiel|Daniel|Hosea|Joel|Amos|Obadiah|Jonah|Micah|Nahum|Habakkuk|Zephaniah|Haggai|Zechariah|Malachi|Matthew|Mark|Luke|John|Acts|Romans|Corinthians|Galatians|Ephesians|Philippians|Colossians|Thessalonians|Timothy|Titus|Philemon|Hebrews|James|Peter|Jude|Revelation|Gen|Exo?|Lev|Num|Deut?|Josh?|Judg?|Sam|Kgs?|Chr|Ps|Prov?|Eccl?|Isa|Jer|Lam|Eze?k?|Dan|Hos|Mal|Matt?|Mk|Lk|Jn|Rev|Rom|Cor|Gal|Eph|Phil|Col|Thess?|Tim|Heb)\s*\d+(?::\d+(?:-\d+)?)?/gi;
-    return [...new Set(Array.from(text.matchAll(pattern), m => m[0].trim()))];
+    return [...new Set(findSpokenRefs(text).map(r => r.label))];
   }
 
-  const detectVerses = useCallback(async (recentChunk: string) => {
-    if (recentChunk.trim().length < 12) return;
-    const explicitRefs = extractExplicitRefs(recentChunk);
-    for (const ref of explicitRefs.slice(0, 2)) {
+  /* The last minute of verses already found: a verse is shown once, not again
+     every time the sentence that named it is looked at. */
+  const recentRefsRef = useRef(new Map<string, number>());
+  function isNewRef(ref: string) {
+    const now = Date.now(), last = recentRefsRef.current.get(ref);
+    if (last && now - last < 60_000) return false;
+    recentRefsRef.current.set(ref, now);
+    return true;
+  }
+
+  // `recentText` is the last few seconds of speech, so a reference split across
+  // two phrases ("Romans 8" ... "28") is still read whole
+  const detectVerses = useCallback(async (recentText: string, newText = recentText) => {
+    if (recentText.trim().length < 4) return;
+    const explicitRefs = extractExplicitRefs(recentText);
+    // the most recently spoken references, not the first ones in the window
+    for (const ref of explicitRefs.slice(-2)) {
       try {
         const sr = await fetch(`/api/bible/search?q=${encodeURIComponent(ref)}&translation=${translation}`);
         const sd = await sr.json(); const top = (sd.results ?? [])[0]; if (!top) continue;
+        if (!isNewRef(top.ref)) continue;
         const v: DetectedVerse = { verseRef: top.ref, verseText: top.text, translation, confidence: 1.0, detectedAt: new Date().toISOString(), source: "ai" };
         setDetections(prev => [v, ...prev.filter(p => p.verseRef !== v.verseRef)].slice(0, 12));
-        // spoken reference = certain — auto-project it in auto mode
+        // a spoken verse is certain: auto-project it in auto mode. A chapter on its
+        // own ("Romans chapter eight") waits in preview for the verse number.
+        const wholeVerse = ref.includes(":");
         setAutoMode(auto => {
-          if (auto) { setPreviewVerse(v); setLiveVerse(v); setGoLive(true); }
+          if (auto && wholeVerse) { setPreviewVerse(v); setLiveVerse(v); setGoLive(true); }
           else { setPreviewVerse(prev => prev ?? v); }
           return auto;
         });
       } catch { /* continue */ }
     }
+    // a reference just said is the verse; no need to also match it as a quote
+    if (extractExplicitRefs(newText).length) return;
     try {
       // Quoted-scripture detection: confidence-gated so normal preaching
       // ("God wants to bless your family") never flashes a wrong verse.
-      const semanticQuery = recentChunk.slice(-350).trim();
+      const semanticQuery = recentText.slice(-350).trim();
       if (semanticQuery.length < 15) return;
       const dr = await fetch("/api/detect-verses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript: semanticQuery }),
+        // references are read above; the server only matches quoted words here
+        body: JSON.stringify({ transcript: semanticQuery, quotesOnly: true }),
       });
       const det = await dr.json() as { detected: boolean; ref: string; text: string; confidence: number };
       if (!det.detected || det.confidence < 0.65) return;
-      if (explicitRefs.some(ref => ref.toLowerCase().startsWith(det.ref.split(":")[0].toLowerCase()))) return;
+      if (!isNewRef(det.ref)) return;
 
       const v: DetectedVerse = {
         verseRef: det.ref, verseText: det.text, translation,
@@ -278,10 +323,11 @@ export default function LivePage() {
         if (e.results[i].isFinal) finalChunk += t + " "; else interim += t;
       }
       if (finalChunk) {
+        const before = transcriptRef.current.slice(-160);
         transcriptRef.current += finalChunk;
-        const hasRef = /\b(genesis|exodus|leviticus|numbers|deuteronomy|joshua|judges|ruth|samuel|kings|chronicles|ezra|nehemiah|esther|job|psalm|proverbs|ecclesiastes|song|isaiah|jeremiah|lamentations|ezekiel|daniel|hosea|joel|amos|obadiah|jonah|micah|nahum|habakkuk|zephaniah|haggai|zechariah|malachi|matthew|mark|luke|john|acts|romans|corinthians|galatians|ephesians|philippians|colossians|thessalonians|timothy|titus|philemon|hebrews|james|peter|jude|revelation|gen|exo|lev|num|deut|josh|judg|sam|kgs|chr|ps|prov|eccl|isa|jer|lam|ezek|dan|hos|mal|matt|mk|lk|jn|rev|rom|cor|gal|eph|phil|col|thess|tim|heb)\s*\d+/i.test(finalChunk);
+        const hasRef = findSpokenRefs(finalChunk).length > 0;
         setTranscriptLog(prev => [...prev, { text: finalChunk.trim(), detected: hasRef }].slice(-60));
-        detectVerses(finalChunk);
+        detectVerses(before + finalChunk, finalChunk);
       }
       setTranscript(interim);
     };
@@ -561,7 +607,13 @@ export default function LivePage() {
           </span>
 
           {/* Projector */}
-          <a href="/live/projector" target="_blank" style={{
+          <a href="/live/projector" target="prayerkey-projector"
+            onClick={(e) => {
+              // its own window, to drag onto the projector screen; pressing again brings the same one back
+              const w = window.open("/live/projector", "prayerkey-projector", "popup,width=1280,height=720");
+              if (w) { e.preventDefault(); w.focus(); }
+            }}
+            style={{
             padding:"7px 14px", background:"rgba(255,255,255,0.04)",
             border:`1px solid ${BORDER}`, borderRadius:"100px",
             color:T2, fontSize:"10px", fontWeight:600, textDecoration:"none",

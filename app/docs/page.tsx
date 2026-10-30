@@ -73,7 +73,7 @@ const FAQ: { q: string; a: string }[] = [
   { q: "Does the live sermon detection work without internet?",
     a: "No. Live verse detection needs an internet connection: your browser's speech recognition turns the sermon into text, and that text is matched against the Bible on our servers. A stable Wi-Fi connection of at least 1 Mbps is recommended." },
   { q: "Which browsers work with PrayerKey?",
-    a: "All features work in Chrome, Edge, Brave, and Opera. Live sermon verse detection requires the Web Speech API, which is fully supported in Chromium-based browsers. Safari and Firefox can use the prayer generator and Bible search but have limited speech recognition support." },
+    a: "Live sermon verse detection needs Chrome or Edge, which include the speech recognition it listens with. Brave and Opera block it. Safari and Firefox can use the prayer generator and Bible search but have limited speech recognition support." },
   { q: "Does PrayerKey record or store my sermon audio?",
     a: "No. Audio is turned into text in real time by your browser's speech recognition and is never stored on our servers. Only the transcribed text is sent for verse matching, and that text is discarded after the session ends." },
   { q: "How accurate is the verse detection?",
@@ -287,11 +287,11 @@ export default function DocsPage() {
 
           <h3>Setup, in about three minutes</h3>
           <Steps>
-            <li style={n(0)}>Open <code>prayerkey.com/live</code> in Chrome, Edge, or Brave.</li>
-            <li style={n(1)}>Click <strong>Allow</strong> when the browser asks for microphone access.</li>
-            <li style={n(2)}>Click <strong>Projector ↗</strong> in the header. A new window opens; drag it to your second screen and press <kbd>F11</kbd> for fullscreen.</li>
-            <li style={n(3)}>Choose your translation from the dropdown (KJV, NIV, ESV, NKJV, NLT, and more).</li>
-            <li style={n(4)}>When the pastor begins preaching, click <strong>Start Listening</strong>.</li>
+            <li style={n(0)}>Open <code>prayerkey.com/live</code> in Chrome or Edge.</li>
+            <li style={n(1)}>Tap the button to start listening, and click <strong>Allow</strong> when the browser asks for microphone access.</li>
+            <li style={n(2)}>Click <strong>Projector ↗</strong> in the header. A new window opens; drag it to your second screen and click it once for full screen.</li>
+            <li style={n(3)}>Press <kbd>A</kbd> or the <strong>Auto</strong> switch so verses go on the screen by themselves, or leave it off and choose each one.</li>
+            <li style={n(4)}>Verses appear in King James wording, whichever translation the pastor quotes from.</li>
           </Steps>
 
           <h3>The dashboard layout</h3>
@@ -424,7 +424,6 @@ export default function DocsPage() {
           <ul>
             <li>Google Chrome 110+ on Mac, Windows, or Chromebook.</li>
             <li>Microsoft Edge 110+.</li>
-            <li>Brave or Opera (Chromium-based).</li>
             <li>Stable internet, at least 1 Mbps, for live detection.</li>
             <li>A microphone, built-in or USB lapel, for live sermon mode.</li>
           </ul>

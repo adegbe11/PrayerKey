@@ -6,6 +6,8 @@
 
 import kjvData from "@/lib/bible-data/kjv.json";
 import { BIBLE_BOOKS, type BibleBook } from "@/lib/seo/bible-books";
+import { findSpokenRefs, normalizeRefQuery } from "@/lib/bible/spoken-refs";
+import { MODERN_QUOTES } from "@/lib/bible/modern-quotes";
 
 type KjvBook = { abbrev: string; chapters: string[][] };
 const KJV = kjvData as KjvBook[];
@@ -106,7 +108,8 @@ function significantWords(text: string): string[] {
 }
 
 export function searchBible(query: string, limit = 5): VerseHit[] {
-  // 1. exact reference?
+  // 1. exact reference? ("John 3 16" and "John three sixteen" read as John 3:16)
+  query = normalizeRefQuery(query);
   const refHits = parseQueryRef(query);
   if (refHits) return refHits.slice(0, limit);
 
@@ -197,46 +200,126 @@ export interface DetectionResult {
 
 const NO_DETECTION: DetectionResult = { detected: false, ref: "", text: "", confidence: 0 };
 
-export function detectVerseInTranscript(transcript: string): DetectionResult {
-  // 1. spoken references: "john chapter 3 verse 16", "john 3 16", "john 3:16"
-  const spoken = transcript.toLowerCase()
-    .replace(/\bchapter\b/g, " ")
-    .replace(/\bverses?\b/g, ":");
-  const refMatch = spoken.match(/((?:[123]|first|second|third)?\s*[a-z]{3,})\s+(\d{1,3})\s*[:\s]\s*(\d{1,3})/);
-  if (refMatch) {
-    const book = findBook(refMatch[1]);
-    if (book) {
-      const text = getVerseText(book.slug, parseInt(refMatch[2], 10), parseInt(refMatch[3], 10));
-      if (text) return { detected: true, ref: `${book.name} ${refMatch[2]}:${refMatch[3]}`, text, confidence: 1.0 };
+/** `quotesOnly`: the caller reads spoken references itself (the live page), so
+ *  a reference said a few seconds ago must not answer for a quote said now. */
+export function detectVerseInTranscript(transcript: string, { quotesOnly = false } = {}): DetectionResult {
+  // 1. spoken references: "John chapter 3 verse 16", "John three sixteen",
+  //    "first Corinthians 13 4". The most recent one wins.
+  const spokenRefs = quotesOnly ? [] : findSpokenRefs(transcript);
+  const said = spokenRefs[spokenRefs.length - 1];
+  if (said) {
+    const verse = said.verse ?? 1;
+    const text = getVerseText(said.book.slug, said.chapter, verse);
+    if (text) {
+      return {
+        detected: true,
+        ref: `${said.book.name} ${said.chapter}:${verse}`,
+        text,
+        // a chapter on its own ("turn to Psalm 23") is a good guess, not a certainty
+        confidence: said.verse === null ? 0.85 : 1.0,
+      };
     }
   }
 
-  // 2. quoted scripture: score by consecutive word-pairs shared with a verse
-  const words = transcript.toLowerCase().replace(/[^a-z\s]/g, " ").replace(/\s+/g, " ")
-    .trim().split(" ").slice(-30);
-  if (words.length < 5) return NO_DETECTION;
-  const bigrams = words.slice(0, -1).map((w, i) => `${w} ${words[i + 1]}`).filter((b) => b.length > 6);
-  if (bigrams.length < 4) return NO_DETECTION;
-  const sigCount = new Set(words.filter((w) => w.length > 2 && !STOP.has(w))).size;
+  // 2. quoted scripture, in King James words or the modern words most preachers use
+  const kjv = detectKjvQuote(transcript);
+  const modern = detectModernQuote(transcript);
+  if (kjv.detected && (!modern.detected || kjv.confidence >= modern.confidence)) return kjv;
+  return modern.detected ? modern : kjv;
+}
 
+/* Every verse as bare lowercase words, built once: "fear; but" in the text
+   has to match "fear but" as it is spoken. */
+let BARE: { ref: string; text: string; bare: string }[] | null = null;
+function bareVerses() {
+  if (!BARE) {
+    BARE = [];
+    for (const book of BIBLE_BOOKS) {
+      const chapters = TEXT_BY_SLUG.get(book.slug)!;
+      chapters.forEach((verses, c) => verses.forEach((text, v) => {
+        BARE!.push({ ref: `${book.name} ${c + 1}:${v + 1}`, text, bare: ` ${words(text).join(" ")} ` });
+      }));
+    }
+  }
+  return BARE;
+}
+
+const meaningful = (w: string) => w.length > 2 && !STOP.has(w);
+
+/** How strongly the last words said match one King James verse: the number of
+ *  word-pairs said in order that also sit side by side in the verse. Pairs of
+ *  small words ("to the", "and say") are everywhere, so a pair only counts
+ *  when it holds a word that means something. */
+export function kjvQuoteScore(transcript: string): { score: number; ref: string; text: string } | null {
+  const said = words(transcript).slice(-30);
+  if (said.length < 5) return null;
+  const seen = new Set<string>();
+  const pairs: { pair: string; recent: boolean }[] = [];
+  said.slice(0, -1).forEach((w, i) => {
+    const pair = ` ${w} ${said[i + 1]} `;
+    if (seen.has(pair) || !(meaningful(w) || meaningful(said[i + 1]))) return;
+    seen.add(pair);
+    // a quote just said sits at the end; matches scattered across older talk do not
+    pairs.push({ pair, recent: i >= said.length - 14 });
+  });
+  if (pairs.length < 3) return null;
   let best: { score: number; ref: string; text: string } | null = null;
-  for (const book of BIBLE_BOOKS) {
-    const chapters = TEXT_BY_SLUG.get(book.slug)!;
-    for (let c = 0; c < chapters.length; c++) {
-      const verses = chapters[c];
-      for (let v = 0; v < verses.length; v++) {
-        const lower = verses[v].toLowerCase();
-        let hits = 0;
-        for (const bg of bigrams) if (lower.includes(bg)) hits++;
-        if (hits >= 3 && (!best || hits > best.score)) {
-          best = { score: hits, ref: `${book.name} ${c + 1}:${v + 1}`, text: verses[v] };
-        }
-      }
+  for (const v of bareVerses()) {
+    let hits = 0, recent = 0;
+    for (const p of pairs) if (v.bare.includes(p.pair)) { hits++; if (p.recent) recent++; }
+    if (hits >= 3 && recent >= 2 && (!best || hits > best.score)) best = { score: hits, ref: v.ref, text: v.text };
+  }
+  return best;
+}
+
+/* Quoted scripture in King James words. */
+function detectKjvQuote(transcript: string): DetectionResult {
+  const best = kjvQuoteScore(transcript);
+  if (!best || best.score < KJV_MIN_PAIRS) return NO_DETECTION;
+  // 5 waits in preview for the operator; 6 or more is clear enough to put on air
+  const confidence = best.score >= KJV_MIN_PAIRS + 2 ? 0.95 : best.score >= KJV_MIN_PAIRS + 1 ? 0.85 : 0.7;
+  return { detected: true, ref: best.ref, text: best.text, confidence };
+}
+/* Measured on real quotes (5 to 11 meaningful pairs) and on ordinary preaching
+   (never above 4); scripts/check-live-detection.ts keeps both honest. */
+const KJV_MIN_PAIRS = 5;
+
+/* Quoted scripture in modern words (NIV, ESV, NLT, NKJV): recognised from a
+   short phrase list, then shown in King James words. */
+const words = (s: string) =>
+  s.toLowerCase().replace(/[’']/g, "").replace(/[^a-z\s]/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+
+const MODERN = MODERN_QUOTES.flatMap(([ref, phrases]) => {
+  const r = findSpokenRefs(ref)[0];
+  const text = r && r.verse !== null ? getVerseText(r.book.slug, r.chapter, r.verse) : null;
+  if (!r || !text) return [];
+  return phrases.map((p) => {
+    const w = words(p);
+    return { ref: `${r.book.name} ${r.chapter}:${r.verse}`, text, phrase: w.join(" "), pairs: w.slice(0, -1).map((x, i) => `${x} ${w[i + 1]}`) };
+  });
+});
+
+function detectModernQuote(transcript: string): DetectionResult {
+  const said = words(transcript).slice(-40);
+  if (said.length < 2) return NO_DETECTION; // "Jesus wept" is a whole verse
+  const saidText = ` ${said.join(" ")} `;
+  const saidPairs = new Set(said.slice(0, -1).map((x, i) => `${x} ${said[i + 1]}`));
+  let best: { score: number; length: number; ref: string; text: string } | null = null;
+  for (const m of MODERN) {
+    let score: number;
+    if (m.pairs.length < 5) {
+      // short phrases must be said exactly, or ordinary talk would match them
+      score = saidText.includes(` ${m.phrase} `) ? 1 : 0;
+    } else {
+      const hits = m.pairs.filter((p) => saidPairs.has(p)).length;
+      score = hits >= 4 ? hits / m.pairs.length : 0;
+    }
+    if (score < 0.7) continue;
+    if (!best || score > best.score || (score === best.score && m.pairs.length > best.length)) {
+      best = { score, length: m.pairs.length, ref: m.ref, text: m.text };
     }
   }
-
-  // strict gate: ≥3 shared word-pairs AND real content words present
-  if (!best || sigCount < 3) return NO_DETECTION;
-  const confidence = best.score >= 6 ? 0.95 : best.score >= 4 ? 0.8 : 0.65;
+  if (!best) return NO_DETECTION;
+  const confidence = best.score >= 0.99 && best.length >= 5 ? 0.95 : best.score >= 0.85 ? 0.9 : 0.8;
   return { detected: true, ref: best.ref, text: best.text, confidence };
 }

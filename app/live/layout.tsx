@@ -51,7 +51,7 @@ const softwareLd = {
   name:       "PrayerKey Live Sermon",
   applicationCategory: "BusinessApplication",
   applicationSubCategory: "Church Software",
-  operatingSystem: "Web Browser (Chrome, Edge, Brave)",
+  operatingSystem: "Web Browser (Chrome, Edge)",
   description: "Free real-time Bible verse detector for live sermons. Listens to a pastor's microphone with speech recognition and projects every quoted verse automatically.",
   url: LIVE_URL,
   offers: {
@@ -107,7 +107,7 @@ const faqLd = {
       acceptedAnswer: { "@type": "Answer", text: "PrayerKey runs two detection layers. The first matches direct references and exact quotes. The second compares the meaning of what was said with every verse in the Bible, so paraphrases and thematic references are caught too: a pastor saying 'God will never leave you' is correctly matched to Hebrews 13:5." } },
     { "@type": "Question",
       name: "Will PrayerKey work on a Chromebook, Mac, or Windows laptop?",
-      acceptedAnswer: { "@type": "Answer", text: "Yes. PrayerKey works on any device with Chrome, Edge, or Brave — Mac, Windows, Chromebook, and Linux. No installation required. Mobile devices can use the prayer generator and Bible search but the live sermon dashboard is desktop-first." } },
+      acceptedAnswer: { "@type": "Answer", text: "Yes. PrayerKey works on any device with Chrome or Edge — Mac, Windows, Chromebook, and Linux. No installation required. Mobile devices can use the prayer generator and Bible search but the live sermon dashboard is desktop-first." } },
     { "@type": "Question",
       name: "Does PrayerKey work for Catholic, Baptist, Methodist, or Pentecostal services?",
       acceptedAnswer: { "@type": "Answer", text: "PrayerKey is denomination-neutral and used by Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, Reformed, and non-denominational churches around the world. Verses are shown in the King James Version, which is read in churches of every tradition." } },

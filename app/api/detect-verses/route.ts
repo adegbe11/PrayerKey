@@ -13,11 +13,11 @@ import { detectVerseInTranscript } from "@/lib/bible/kjv";
  */
 export async function POST(req: NextRequest) {
   try {
-    const { transcript } = (await req.json()) as { transcript?: string };
+    const { transcript, quotesOnly } = (await req.json()) as { transcript?: string; quotesOnly?: boolean };
     if (!transcript || transcript.trim().length < 10) {
       return NextResponse.json({ detected: false, ref: "", text: "", confidence: 0 });
     }
-    const result = detectVerseInTranscript(transcript.slice(-500));
+    const result = detectVerseInTranscript(transcript.slice(-500), { quotesOnly: quotesOnly === true });
     return NextResponse.json(result);
   } catch (err) {
     console.error("[detect-verses] Error:", err);

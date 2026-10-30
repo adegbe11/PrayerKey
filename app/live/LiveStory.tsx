@@ -4,10 +4,10 @@ import InView from "@/components/home/InView";
 // who it serves, and the questions churches ask. One idea per section.
 
 const STEPS: { title: string; text: string }[] = [
-  { title: "Open prayerkey.com/live", text: "in Chrome, Edge, or Brave on the laptop you'll connect to your projector." },
-  { title: "Allow microphone access", text: "when the browser prompts." },
-  { title: "Click Projector", text: "to open a clean fullscreen verse window, and drag it to your second display." },
-  { title: "Press Start Listening", text: "when the pastor begins preaching." },
+  { title: "Open prayerkey.com/live", text: "in Chrome or Edge on the laptop you'll connect to your projector." },
+  { title: "Tap to start listening", text: "and allow microphone access when the browser asks." },
+  { title: "Click Projector", text: "to open the verse window. Drag it to your second display and click it once for full screen." },
+  { title: "Turn on Auto", text: "so verses go on the screen by themselves, or leave it off and choose each one." },
   { title: "Let it run", text: "PrayerKey transcribes the sermon, identifies every Bible verse the pastor quotes, direct references and paraphrases alike, and presents them on the projector automatically." },
 ];
 
@@ -45,7 +45,7 @@ const FAQ: { q: string; a: string }[] = [
   { q: "What if my pastor paraphrases instead of quoting Bible verses directly?",
     a: "PrayerKey runs two detection layers. The first matches direct references and exact quotes. The second compares the meaning of what was said with every verse in the Bible, so a line like God will never leave you is matched to Hebrews 13:5 even though those exact words don't appear in the verse." },
   { q: "Will it work on a Chromebook, Mac, or Windows laptop?",
-    a: "Yes. PrayerKey works in any Chromium browser (Chrome, Edge, Brave) on Mac, Windows, Chromebook, and Linux. There's nothing to install. Mobile devices can use the prayer generator and Bible search, but the live sermon dashboard is desktop-first because it needs a microphone and a second display." },
+    a: "Yes. PrayerKey works in any Chromium browser (Chrome or Edge) on Mac, Windows, Chromebook, and Linux. There's nothing to install. Mobile devices can use the prayer generator and Bible search, but the live sermon dashboard is desktop-first because it needs a microphone and a second display." },
   { q: "Does PrayerKey work for Catholic, Baptist, Methodist, or Pentecostal services?",
     a: "PrayerKey is denomination-neutral and used by Catholic, Protestant, Pentecostal, Baptist, Anglican, Methodist, Reformed, and non-denominational churches around the world. Verses are shown in the King James Version, which is read in churches of every tradition." },
   { q: "How accurate is the Bible verse detection?",

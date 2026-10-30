@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { io, type Socket } from "socket.io-client";
 import type {
   ServerToClientEvents,
@@ -8,6 +9,9 @@ import type {
   VerseDetectedPayload,
   ProjectorTheme,
 } from "@/types/sermon";
+
+/** shared with /live */
+const PROJECTOR_CHANNEL = "prayerkey-live-projector";
 
 const DEFAULT_THEME: ProjectorTheme = {
   background: "#030210",
@@ -51,21 +55,62 @@ function getAnimStyles(
   };
 }
 
+type ShownVerse = Pick<VerseDetectedPayload, "verseRef" | "verseText" | "translation">;
+
 interface ProjectorPageProps {
   searchParams: { serviceId?: string };
 }
 
+/**
+ * The congregation's screen. It shows exactly what the live page has on air:
+ * a verse stays until the operator clears it or puts up the next one.
+ * Driven from the live page on the same laptop (no server), or, for a church
+ * service with an id, from the socket server.
+ */
 export default function ProjectorPage({ searchParams }: ProjectorPageProps) {
   const serviceId = searchParams.serviceId ?? "";
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
 
-  const [currentVerse, setCurrentVerse] = useState<VerseDetectedPayload | null>(null);
+  const [mounted, setMounted]           = useState(false);
+  const [currentVerse, setCurrentVerse] = useState<ShownVerse | null>(null);
   const [visible, setVisible]           = useState(false);
-  const [transcript, setTranscript]     = useState("");
   const [theme, setTheme]               = useState<ProjectorTheme>(DEFAULT_THEME);
-  const fadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [linked, setLinked]             = useState(false);
+  const [fullscreen, setFullscreen]     = useState(false);
+  const [idle, setIdle]                 = useState(false);
+  const swapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shownRef  = useRef<string | null>(null);
 
-  // ── Socket connection ──────────────────────────────────────────────────
+  useEffect(() => { setMounted(true); }, []);
+
+  function show(verse: ShownVerse | null) {
+    const key = verse ? `${verse.verseRef}|${verse.verseText}` : null;
+    if (key === shownRef.current) return;
+    shownRef.current = key;
+    if (swapTimer.current) clearTimeout(swapTimer.current);
+    setVisible(false);
+    swapTimer.current = setTimeout(() => {
+      setCurrentVerse(verse);
+      setVisible(!!verse);
+    }, verse ? 300 : 250);
+  }
+
+  // ── From the live page on this laptop ────────────────────────────────
+  useEffect(() => {
+    if (serviceId || typeof BroadcastChannel === "undefined") return;
+    const channel = new BroadcastChannel(PROJECTOR_CHANNEL);
+    channel.onmessage = (e) => {
+      const msg = e.data as { type?: string; verse?: ShownVerse | null };
+      if (msg?.type === "verse") { setLinked(true); show(msg.verse ?? null); }
+      if (msg?.type === "bye") { setLinked(false); show(null); }
+    };
+    // opened after the service started: ask what is on air now
+    channel.postMessage({ type: "hello" });
+    return () => channel.close();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceId]);
+
+  // ── From the socket server, for a church service with an id ──────────
   useEffect(() => {
     if (!serviceId) return;
 
@@ -77,25 +122,15 @@ export default function ProjectorPage({ searchParams }: ProjectorPageProps) {
     socketRef.current = socket;
 
     socket.on("connect", () => {
+      setLinked(true);
       socket.emit("service:join", serviceId);
     });
-
-    // Auto-detected verse
-    socket.on("verse:detected", (payload) => showVerse(payload));
-
-    // Manual push from pastor's queue
-    socket.on("verse:display", (payload) => showVerse(payload));
-
-    // Suggested verse — only if confidence is high enough
+    socket.on("disconnect", () => setLinked(false));
+    socket.on("verse:detected", (payload) => show(payload));
+    socket.on("verse:display", (payload) => show(payload));
     socket.on("verse:suggested", (payload) => {
-      if (payload.confidence >= 0.70) showVerse(payload);
+      if (payload.confidence >= 0.70) show(payload);
     });
-
-    socket.on("transcript:update", ({ text, isFinal }) => {
-      if (isFinal) setTranscript(text);
-    });
-
-    // Live theme updates from pastor's theme designer
     socket.on("projector:theme", (incoming: ProjectorTheme) => {
       setTheme(incoming);
     });
@@ -106,25 +141,32 @@ export default function ProjectorPage({ searchParams }: ProjectorPageProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceId]);
 
-  function showVerse(payload: VerseDetectedPayload) {
-    if (fadeTimer.current) clearTimeout(fadeTimer.current);
-
-    setVisible(false);
-    setTimeout(() => {
-      setCurrentVerse(payload);
-      setVisible(true);
-      // Auto-hide after 15 seconds
-      fadeTimer.current = setTimeout(() => setVisible(false), 15_000);
-    }, 300);
+  // full screen on click; the pointer hides itself while the screen is still
+  useEffect(() => {
+    const onFs = () => setFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFs);
+    let t: ReturnType<typeof setTimeout>;
+    const wake = () => { setIdle(false); clearTimeout(t); t = setTimeout(() => setIdle(true), 2500); };
+    window.addEventListener("mousemove", wake);
+    wake();
+    return () => { document.removeEventListener("fullscreenchange", onFs); window.removeEventListener("mousemove", wake); clearTimeout(t); };
+  }, []);
+  function toggleFullscreen() {
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    else document.documentElement.requestFullscreen?.().catch(() => {});
   }
 
   const scale = SCALE_MAP[theme.scale];
+  if (!mounted) return null;
 
-  return (
+  return createPortal(
     <div
+      id="pk-projector"
+      onClick={toggleFullscreen}
       style={{
         position:       "fixed",
         inset:          0,
+        zIndex:         2147483647,
         background:     theme.background,
         display:        "flex",
         flexDirection:  "column",
@@ -133,9 +175,17 @@ export default function ProjectorPage({ searchParams }: ProjectorPageProps) {
         overflow:       "hidden",
         fontFamily:     "-apple-system, 'SF Pro Display', sans-serif",
         userSelect:     "none",
+        cursor:         idle ? "none" : "default",
         transition:     "background 600ms ease",
       }}
     >
+      {/* the site's banner, navigation and footer never reach the projector */}
+      <style>{`
+        html, body { overflow: hidden !important; background: ${theme.background} !important; }
+        body > *:not(#pk-projector) { display: none !important; }
+        @keyframes pkPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+      `}</style>
+
       {/* Gold cross watermark */}
       <div
         aria-hidden
@@ -166,38 +216,37 @@ export default function ProjectorPage({ searchParams }: ProjectorPageProps) {
 
       {/* Verse display */}
       <div
+        aria-live="polite"
         style={{
           position:  "relative",
-          maxWidth:  "860px",
+          maxWidth:  "1100px",
           width:     "100%",
-          padding:   "0 48px",
+          padding:   "0 6vw",
           textAlign: "center",
           ...getAnimStyles(visible, theme.animation),
         }}
       >
         {currentVerse && (
           <>
-            {/* Verse text */}
             <p
               style={{
-                fontSize:      `clamp(${18 * scale}px, ${3.2 * scale}vw, ${36 * scale}px)`,
+                fontSize:      `clamp(${22 * scale}px, ${3.6 * scale}vw, ${64 * scale}px)`,
                 fontWeight:    400,
                 fontStyle:     "italic",
                 color:         theme.textColor,
-                lineHeight:    1.55,
+                lineHeight:    1.45,
                 letterSpacing: "0.01em",
-                marginBottom:  "28px",
+                margin:        "0 0 0.9em",
                 transition:    "color 400ms ease, font-size 300ms ease",
               }}
             >
               &ldquo;{currentVerse.verseText}&rdquo;
             </p>
 
-            {/* Reference + translation */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "14px" }}>
               <span
                 style={{
-                  fontSize:      `clamp(${14 * scale}px, ${1.8 * scale}vw, ${22 * scale}px)`,
+                  fontSize:      `clamp(${16 * scale}px, ${2 * scale}vw, ${34 * scale}px)`,
                   fontWeight:    600,
                   color:         theme.refColor,
                   letterSpacing: "0.04em",
@@ -208,15 +257,15 @@ export default function ProjectorPage({ searchParams }: ProjectorPageProps) {
               </span>
               <span
                 style={{
-                  width:        "4px",
-                  height:       "4px",
+                  width:        "5px",
+                  height:       "5px",
                   borderRadius: "50%",
                   background:   `${theme.refColor}80`,
                 }}
               />
               <span
                 style={{
-                  fontSize:      `clamp(${11 * scale}px, ${1.4 * scale}vw, ${16 * scale}px)`,
+                  fontSize:      `clamp(${12 * scale}px, ${1.4 * scale}vw, ${22 * scale}px)`,
                   color:         `${theme.textColor}70`,
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
@@ -225,113 +274,43 @@ export default function ProjectorPage({ searchParams }: ProjectorPageProps) {
                 {currentVerse.translation}
               </span>
             </div>
-
-            {/* Confidence bar */}
-            <div style={{ marginTop: "32px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-              <div
-                style={{
-                  width: "120px", height: "2px",
-                  background: `${theme.textColor}14`,
-                  borderRadius: "2px", overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    height: "100%",
-                    width:  `${Math.round(currentVerse.confidence * 100)}%`,
-                    background: currentVerse.confidence >= 0.90
-                      ? "#34C759"
-                      : currentVerse.confidence >= 0.75
-                      ? theme.refColor
-                      : "#FF9F0A",
-                    transition: "width 600ms ease",
-                  }}
-                />
-              </div>
-              <span style={{ fontSize: "11px", color: `${theme.textColor}40` }}>
-                {Math.round(currentVerse.confidence * 100)}%
-              </span>
-            </div>
           </>
         )}
       </div>
 
-      {/* No verse state */}
-      {!currentVerse && (
-        <div style={{ textAlign: "center", opacity: 0.2 }}>
-          <div
-            style={{
-              width: "64px", height: "64px", borderRadius: "50%",
-              border: `1.5px solid ${theme.refColor}60`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              margin: "0 auto 16px",
-            }}
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" fill={theme.refColor} />
-            </svg>
-          </div>
-          <p style={{ color: `${theme.textColor}80`, fontSize: "15px" }}>
-            Waiting for verses&hellip;
-          </p>
+      {/* Before the live page is open, say what to do; once linked, an empty screen stays empty */}
+      {!linked && !currentVerse && (
+        <div style={{ position: "absolute", textAlign: "center", color: `${theme.textColor}66`, fontSize: "16px", lineHeight: 1.6, padding: "0 24px" }}>
+          <p style={{ margin: 0, color: `${theme.textColor}b3`, fontSize: "18px" }}>Waiting for the live page</p>
+          <p style={{ margin: "6px 0 0" }}>Open prayerkey.com/live in this browser and start the service.</p>
         </div>
       )}
 
-      {/* Live transcript ticker */}
-      {transcript && (
-        <div style={{ position: "absolute", bottom: "32px", left: "48px", right: "48px", textAlign: "center" }}>
-          <p
-            style={{
-              fontSize:     "13px",
-              color:        `${theme.textColor}30`,
-              fontStyle:    "italic",
-              overflow:     "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace:   "nowrap",
-              maxWidth:     "100%",
-            }}
-          >
-            {transcript}
-          </p>
-        </div>
-      )}
-
-      {/* LIVE indicator */}
-      {serviceId && (
-        <div
-          style={{
-            position:     "absolute",
-            top:          "20px",
-            right:        "24px",
-            display:      "flex",
-            alignItems:   "center",
-            gap:          "6px",
-            background:   "rgba(255,59,48,0.12)",
-            border:       "0.5px solid rgba(255,59,48,0.3)",
-            borderRadius: "100px",
-            padding:      "4px 10px",
-          }}
-        >
-          <span
-            style={{
-              width: "6px", height: "6px", borderRadius: "50%",
-              background: "#FF3B30",
-              animation: "livePulse 1.5s ease infinite",
-            }}
-          />
-          <span style={{ fontSize: "11px", color: "#FF3B30", letterSpacing: "0.05em", fontWeight: 600 }}>
-            LIVE
-          </span>
-        </div>
-      )}
-
-      <style>{`
-        @keyframes livePulse {
-          0%,100% { opacity: 1; }
-          50%      { opacity: 0.3; }
-        }
-      `}</style>
-    </div>
+      {/* Corner hints for whoever sets up the screen; they fade with the pointer */}
+      <div
+        style={{
+          position:   "absolute",
+          bottom:     "18px",
+          left:       0,
+          right:      0,
+          display:    "flex",
+          justifyContent: "center",
+          gap:        "18px",
+          fontSize:   "12px",
+          color:      `${theme.textColor}59`,
+          opacity:    idle ? 0 : 1,
+          transition: "opacity 400ms ease",
+          pointerEvents: "none",
+        }}
+      >
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+          <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: linked ? "#34C759" : "#FF9F0A", animation: linked ? "none" : "pkPulse 1.5s ease infinite" }} />
+          {linked ? "Connected to the live page" : "Not connected"}
+        </span>
+        {!fullscreen && <span>Click anywhere for full screen</span>}
+      </div>
+    </div>,
+    document.body,
   );
 }
 
