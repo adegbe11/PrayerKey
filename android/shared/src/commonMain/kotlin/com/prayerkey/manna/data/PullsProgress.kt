@@ -26,10 +26,12 @@ import kotlinx.datetime.todayIn
  * code that would tidy them, and it means crossing midnight mid-session does
  * not lose your place.
  */
-sealed class PullsProgress(private val file: String, private val noun: String) {
+sealed class PullsProgress(private val file: String, private val noun: String, private val unit: String = "Pull") {
 
     object Prayer : PullsProgress("prayer_session", "prayer")
     object Bible : PullsProgress("bible_session", "reading")
+    /** Today's prayer points, the session Home is built around. */
+    object Points : PullsProgress("points_session", "prayer points", "Point")
 
     private fun at(date: LocalDate) = "at_" + date.toEpochDays()
     private fun of(date: LocalDate) = "of_" + date.toEpochDays()
@@ -86,7 +88,7 @@ sealed class PullsProgress(private val file: String, private val noun: String) {
         return when {
             done <= 0 -> opening
             outOf in 1..done -> "You finished today's $noun" to "Open it again if you want to."
-            else -> "You stopped at $done" to "Pull ${done + 1} is waiting."
+            else -> "You stopped at $done" to "$unit ${done + 1} is waiting."
         }
     }
 
@@ -94,5 +96,6 @@ sealed class PullsProgress(private val file: String, private val noun: String) {
         get() = when (this) {
             Prayer -> "Today's prayer" to "Ten pulls. Four minutes. Start with the first."
             Bible -> "Today's reading" to "Ten pulls through the chapter. Start with the first."
+            Points -> "Today's prayer points" to "About ten minutes. Each point is read to you, then you pray."
         }
 }

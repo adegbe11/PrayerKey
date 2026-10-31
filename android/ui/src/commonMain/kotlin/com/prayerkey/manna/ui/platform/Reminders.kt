@@ -86,7 +86,7 @@ object ReminderContent {
     fun message(context: PlatformContext, kind: ReminderKind, date: LocalDate, isToday: Boolean): Pair<String, String>? = when (kind) {
         ReminderKind.CALENDAR -> calendarMessage(date)
         // a future day has not been started, so it gets the opening line
-        ReminderKind.PRAYER -> PullsProgress.Prayer.notificationLine(context, date).takeIf { isToday }
+        ReminderKind.PRAYER -> PullsProgress.Points.notificationLine(context, date).takeIf { isToday }
             ?: ("Today's prayer" to "Ten pulls. Four minutes. Start with the first.")
         ReminderKind.BIBLE -> PullsProgress.Bible.notificationLine(context, date).takeIf { isToday }
             ?: ("Today's reading" to "Ten pulls through the chapter. Start with the first.")

@@ -1,10 +1,24 @@
-PrayerKey helps you pray, read Scripture, and make time with God part of your everyday life.
+PrayerKey is the prayer points app. About ten minutes with God, every day.
 
 Some days you know exactly what to pray. Other days, you don't know where to begin.
 
-PrayerKey gives you a place to start.
+PrayerKey gives you a place to start, and then gives you room to pray.
 
-Tell PrayerKey what's on your heart and get a personal, Bible-grounded prayer for what you're facing. Or find prayers for your situation, pray through prayer points, start a guided session, or simply set aside quiet time.
+TODAY'S PRAYER POINTS
+
+Every day begins with the Word, then praise, covering, your petitions, standing, and the seal.
+
+Each point is read to you in a calm voice over quiet music. Then the screen goes still, so you can pray that point in your own words before the next one is read.
+
+Stop halfway and PrayerKey remembers where you were.
+
+THE PEOPLE YOU PROMISED TO PRAY FOR
+
+Add the names of the people you are praying for. Today's prayer points pray for them by name, a few each day, until God answers. Mark it when He does.
+
+SEASONS OF PRAYER
+
+The January 21-day fast, Lent, Holy Week, the ten days to Pentecost, Advent, the crossover night, and a midnight prayer week every month. PrayerKey knows the season and opens what was made for it.
 
 Everything essential works offline. There is no account to create and nothing to pay.
 
@@ -17,12 +31,6 @@ Your marriage, your children, your health, your work, your finances, a decision 
 PrayerKey turns what you carry into a prayer you can actually pray.
 
 If you'd rather choose, you can browse over 500 prayer situations and find the one that fits.
-
-PRAYER POINTS
-
-Sometimes you don't need a long prayer. You just need to know what to pray.
-
-PrayerKey includes prayer points for salvation, repentance, thanksgiving, faith, protection, healing, marriage, children, family and finances. Choose your situation and pray through them one at a time.
 
 PRAY FOR FIVE MINUTES OR AN HOUR
 
@@ -54,10 +62,6 @@ FIND VERSES FOR WHAT YOU'RE FACING
 
 Search by subject rather than reference: money and work, marriage, family, health, suffering, faith, prayer, spiritual warfare, character, church and leadership.
 
-VERSE OF THE DAY
-
-A verse each day to read, save and share. A simple way to keep Scripture in front of you.
-
 CHURCH NOTES
 
 Take PrayerKey to church. It listens during the sermon and writes down what is said, so you can stay with the preaching instead of typing through it.
@@ -74,25 +78,16 @@ Set a fast with a rhythm you can keep, and get reminded at the hour you actually
 
 PRAYERKEY INCLUDES
 
-- Personal prayers for what you are facing
+- Today's prayer points, read to you, with time to pray
+- Prayer for the people you promised to pray for
+- Seasons of prayer, fasts and challenges
 - Over 500 prayer situations
-- Structured prayer points
-- Guided prayer sessions
-- 5, 10, 15, 30 and 60 minute options
 - Morning, evening and midnight prayer
-- Warfare prayer and prayer challenges
 - 366 written devotionals
-- Verse of the Day
-- The whole King James Bible, offline
-- Audio Bible
-- Topical Bible verses
+- The whole King James Bible, offline, with audio
 - Sermon notes transcribed on your phone
-- Fasting with safe daily rhythms
-- A prayer journal
-- Saved prayers and prayer history
+- A prayer journal for answered prayer
 
-PrayerKey isn't here to pray instead of you.
-
-It's here to help you start when you don't know what to say, to give you words when they're hard to find, to keep Scripture close, and to be somewhere you keep coming back to.
+PrayerKey isn't here to pray instead of you. It reads you the point. You do the praying.
 
 Pray. Read the Bible. Keep going.

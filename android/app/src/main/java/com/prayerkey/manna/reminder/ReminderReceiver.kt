@@ -48,7 +48,7 @@ class ReminderReceiver : BroadcastReceiver() {
            the reader's own morning, and only one of the two gets opened. */
         val message = when (kind) {
             ReminderKind.CALENDAR -> calendarMessage(LocalDate.now())!!
-            ReminderKind.PRAYER -> PullsProgress.Prayer.notificationLine(context)
+            ReminderKind.PRAYER -> PullsProgress.Points.notificationLine(context)
             ReminderKind.BIBLE -> PullsProgress.Bible.notificationLine(context)
             /* The machine says what today holds, not that something is ready:
                the challenge names the day and its verse, the fast its day and

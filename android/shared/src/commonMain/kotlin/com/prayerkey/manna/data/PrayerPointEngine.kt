@@ -191,6 +191,31 @@ object PrayerPointEngine {
     /** How many distinct petitions a situation's own prayer yields. */
     fun petitionCount(topic: PrayerTopic): Int = petitionsFrom(topic.prayer).size
 
+    /** Where a point sits in the order of a prayer meeting. */
+    enum class Part(val label: String) {
+        PRAISE("PRAISE"), COVERING("COVERING"), WORD("THE WORD"), PETITION("ASK"), STANDING("STAND"), SEALING("SEAL"),
+    }
+
+    /**
+     * The daily prayer points session: the same order as [pointsFor], one of
+     * each part and four petitions, so it fits in about ten minutes with time
+     * to pray each point in your own words. Rotates by [day] like the rest.
+     */
+    fun dailyPoints(topic: PrayerTopic, day: Int): List<Pair<Part, String>> {
+        val n = day.coerceAtLeast(1)
+        val seed = seedOf(topic)
+        val petitions = rotate(petitionsFrom(topic.prayer), n, 4)
+        return buildList {
+            rotate(PRAISE, n, 1, seed).forEach { add(Part.PRAISE to seal(it)) }
+            rotate(COVERING, n, 1, seed).forEach { add(Part.COVERING to seal(it)) }
+            wordPoints(topic, n).take(1).forEach { add(Part.WORD to seal(it)) }
+            petitions.forEach { add(Part.PETITION to seal(it)) }
+            // a prayer with few petitions of its own stands on its subject instead
+            standingPoints(topic, n, 1 + (4 - petitions.size).coerceAtLeast(0)).forEach { add(Part.STANDING to seal(it)) }
+            rotate(SEALING, n, 1, seed).forEach { add(Part.SEALING to seal(it)) }
+        }.distinctBy { it.second }
+    }
+
     /* ── from this situation's scripture ──────────────────────────────── */
 
     private fun wordPoints(topic: PrayerTopic, day: Int): List<String> {

@@ -37,3 +37,7 @@ expect fun fullScreenDialog(): androidx.compose.ui.window.DialogProperties
 /** Keeps this screen out of screenshots and the recent-apps preview while [enabled]. Android only; iOS gives apps no way to block a screenshot. */
 @Composable
 expect fun SecureScreen(enabled: Boolean)
+
+/** Keeps the screen from dimming while it is shown: a prayer session runs for minutes without a touch. */
+@Composable
+expect fun KeepScreenOn()

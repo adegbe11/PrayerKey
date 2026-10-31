@@ -18,20 +18,29 @@ PrayerKey
 **Short description** (80 characters max)
 
 ```
-Pray daily, read the Bible offline, journal, and keep your sermon notes.
+Daily prayer points, read to you with time to pray. Offline Bible. Free.
 ```
 
 **Full description** (4000 characters max)
 
 ```
-PrayerKey is a place to pray, read and remember — built to be opened every
-morning, and to work whether or not you have signal.
+PrayerKey is the prayer points app: about ten minutes with God every day,
+and it works whether or not you have signal.
 
-TEN PULLS, ONE PRAYER
-Each day gives you one prayer in ten movements. It opens with an address to
-God, moves through thanksgiving, a verse, the day's asking, a declaration and
-prayer for others, and closes with Amen. Pull each one when you have prayed it.
-Stop halfway and it remembers where you were.
+TODAY'S PRAYER POINTS
+Every day starts with the Word, then praise, covering, your petitions,
+standing, and the seal. Each point is read to you in a calm voice over quiet
+music, then the screen goes still so you can pray it in your own words before
+the next one. Stop halfway and it remembers where you were.
+
+THE PEOPLE YOU PROMISED TO PRAY FOR
+Add the names of people you are praying for. Today's points pray for them by
+name, a few each day, until God answers. Mark it when He does.
+
+SEASONS OF PRAYER
+The January 21-day fast, Lent, Holy Week, the ten days to Pentecost, Advent,
+the crossover night and a midnight prayer week every month. PrayerKey knows the
+season and opens the prayer, fast or challenge made for it.
 
 A DAY THAT AGREES WITH ITSELF
 The devotional, the reading and the prayer are chosen together, not separately.

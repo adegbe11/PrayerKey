@@ -79,7 +79,7 @@ fun WelcomeScreen(onContinue: () -> Unit) {
             Spacer(Modifier.height(28.dp))
             Text("A closer walk\nwith God.", Modifier.rise(4, distance = 34f), color = Color.White, fontFamily = DisplaySerif,
                 fontSize = 38.sp, lineHeight = 41.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Medium)
-            Text("Prayer, Scripture, and space to reflect.", Modifier.padding(top = 14.dp).rise(6), color = Color.White.copy(alpha = .85f),
+            Text("Daily prayer points, read to you, with time to pray.", Modifier.padding(top = 14.dp).rise(6), color = Color.White.copy(alpha = .85f),
                 fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, textAlign = TextAlign.Center)
             Spacer(Modifier.height((availableHeight - 570.dp).coerceAtLeast(100.dp)))
             Box(Modifier.rise(9, distance = 40f).pressable()) { WelcomeAction("Get started", primary = true, onClick = onContinue) }
