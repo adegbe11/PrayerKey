@@ -115,11 +115,12 @@ fun MannaApp(
     }
     val destinations = remember {
         listOf(
-            Destination("Home", Icons.Outlined.Home),
+            /* Four places, not five. Prayer is Today; the separate Pray tab
+               was a second front door to the same thing. */
+            Destination("Today", Icons.Outlined.Home, Res.drawable.ic_notification),
             Destination("Bible", Icons.Outlined.MenuBook),
-            Destination("Pray", Icons.Outlined.AutoAwesome, Res.drawable.ic_notification),
             Destination("Church", Icons.Outlined.Church),
-            Destination("Journal", Icons.Outlined.EditNote),
+            Destination("You", Icons.Outlined.PersonOutline),
         )
     }
     var selected by rememberSaveable { mutableIntStateOf(0) }
@@ -138,8 +139,8 @@ fun MannaApp(
                notification used to end in a browsing decision — which is where
                people leave. It opens the day's ten pulls directly instead. */
             "prayer" -> { selected = 0; homeAction = "prayer_session" }
-            "church" -> selected = 3
-            "journal" -> selected = 4
+            "church" -> selected = 2
+            "journal" -> selected = 3
             "devotional", "fasting", "prayer_challenge", "midnight", "warfare" -> {
                 selected = 0
                 homeAction = notificationRoute
@@ -295,15 +296,13 @@ fun MannaApp(
                             journalCount = entries.size,
                             sermonCount = sermonNotes.size,
                             onOpenWord = { selected = 1 },
-                            onWriteDevotion = { selected = 4 },
+                            onWriteDevotion = { selected = 3 },
                             onOpenBible = { selected = 1 },
-                            onOpenPrayer = { selected = 2 },
-                            onOpenPrayerRequest = { request ->
-                                prayerDraft = request
-                                selected = 2
-                            },
-                            onOpenJournal = { selected = 4 },
-                            onOpenChurch = { selected = 3 },
+                            // prayer is on Today itself now; these stay on Today
+                            onOpenPrayer = { selected = 0 },
+                            onOpenPrayerRequest = { selected = 0 },
+                            onOpenJournal = { selected = 3 },
+                            onOpenChurch = { selected = 2 },
                             onKeepPrayer = { title, bringing ->
                                 viewModel.keepDevotionalPrayer(title, bringing)
                             },
@@ -343,12 +342,7 @@ fun MannaApp(
                         onReviewMemory = viewModel::reviewMemory,
                         reduceMotion = preferences.reduceMotion,
                     )
-                    2 -> PrayerScreen(
-                        journal, topics, topicsReady, viewModel::loadTopics, viewModel::savePrayer,
-                        initialRequest = prayerDraft,
-                        onInitialRequestConsumed = { prayerDraft = null },
-                    )
-                    3 -> ChurchScreen(
+                    2 -> ChurchScreen(
                         notes = sermonNotes,
                         language = preferences.sermonLanguage,
                         onLanguage = { viewModel.updatePreferences(preferences.copy(sermonLanguage = it)) },
@@ -358,7 +352,7 @@ fun MannaApp(
                         },
                         onDeleteNote = viewModel::deleteSermonNote,
                     )
-                    4 -> JournalScreen(
+                    3 -> JournalScreen(
                         entries = entries,
                         journalStreak = journalStreak,
                         words = saved,

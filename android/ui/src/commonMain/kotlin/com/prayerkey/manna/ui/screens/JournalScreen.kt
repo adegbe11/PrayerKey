@@ -224,20 +224,40 @@ fun JournalScreen(
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 if (tab != JournalTab.Journey) IconButton(onClick = { tab = JournalTab.Journey }) { Icon(Icons.Outlined.ArrowBack, "Back to journal") }
                 Column(Modifier.weight(1f)) {
-                    Text(when (tab) { JournalTab.Journey -> "Journal"; JournalTab.Practices -> "Practices"; JournalTab.Saved -> "Saved words"; JournalTab.Answered -> "Answered prayers" }, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 32.sp, color = headerInk)
+                    Text(when (tab) { JournalTab.Journey -> "You"; JournalTab.Practices -> "Practices"; JournalTab.Saved -> "Saved words"; JournalTab.Answered -> "Answered prayers" }, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 32.sp, color = headerInk)
                 }
                 if (tab == JournalTab.Journey) Box {
                     IconButton(onClick = { libraryOpen = true }) { Icon(Icons.Outlined.MoreHoriz, "Open journal library", tint = headerMuted) }
                     DropdownMenu(expanded = libraryOpen, onDismissRequest = { libraryOpen = false }) {
                         DropdownMenuItem(text = { Text("Practices") }, onClick = { tab = JournalTab.Practices; libraryOpen = false })
-                        DropdownMenuItem(text = { Text("Saved words · ${words.count { it.answeredAt == null }}") }, onClick = { tab = JournalTab.Saved; libraryOpen = false })
-                        DropdownMenuItem(text = { Text("Answered prayers · ${words.count { it.answeredAt != null } + entries.count { it.answeredAt != null }}") }, onClick = { tab = JournalTab.Answered; libraryOpen = false })
                     }
                 }
                 androidx.compose.material3.IconButton(onClick = onProfile) {
                     Icon(Icons.Outlined.Settings, "Settings", tint = headerMuted)
                 }
             }
+
+            /* What used to hide behind the "..." menu, in plain sight: the people
+               you carry, what God answered, and the words you kept. */
+            val youContext = platformContext()
+            val people by com.prayerkey.manna.data.PrayingFor.people.collectAsState()
+            LaunchedEffect(Unit) { com.prayerkey.manna.data.PrayingFor.load(youContext) }
+            var prayingForOpen by remember { mutableStateOf(false) }
+            if (tab == JournalTab.Journey) {
+                val answeredCount = words.count { it.answeredAt != null } + entries.count { it.answeredAt != null } + people.count { it.answered > 0 }
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 12.dp).horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    YouChip("Praying for", people.count { it.answered == 0L }) { prayingForOpen = true }
+                    YouChip("Answered", answeredCount) { tab = JournalTab.Answered }
+                    YouChip("Saved words", words.count { it.answeredAt == null }) { tab = JournalTab.Saved }
+                }
+            }
+            if (prayingForOpen) androidx.compose.ui.window.Dialog(
+                onDismissRequest = { prayingForOpen = false },
+                properties = com.prayerkey.manna.ui.platform.fullScreenDialog(),
+            ) { com.prayerkey.manna.ui.others.PrayingForScreen(onClose = { prayingForOpen = false }) }
 
             val journeyInsight = remember(entries, sermonNotes, prayers, words) {
                 JourneyInsights.build(entries, sermonNotes, prayers, words)
@@ -262,6 +282,7 @@ fun JournalScreen(
                 JournalTab.Answered -> AnsweredList(
                     entries = entries.filter { it.answeredAt != null },
                     words = words.filter { it.answeredAt != null },
+                    people = people.filter { it.answered > 0 }.sortedByDescending { it.answered },
                     onEdit = { editing = it },
                 )
             }
@@ -1155,9 +1176,14 @@ private fun EntryComposer(
 
 /** Everything God answered, whichever screen it was asked on. */
 @Composable
-private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, onEdit: (JournalEntry) -> Unit) {
+private fun AnsweredList(
+    entries: List<JournalEntry>,
+    words: List<SavedWord>,
+    people: List<com.prayerkey.manna.data.PrayerPerson> = emptyList(),
+    onEdit: (JournalEntry) -> Unit,
+) {
     val context = platformContext()
-    if (entries.isEmpty() && words.isEmpty()) {
+    if (entries.isEmpty() && words.isEmpty() && people.isEmpty()) {
         Column(Modifier.fillMaxWidth().padding(top = 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text("Nothing marked answered yet", fontWeight = FontWeight.SemiBold)
         }
@@ -1167,6 +1193,22 @@ private fun AnsweredList(entries: List<JournalEntry>, words: List<SavedWord>, on
         verticalArrangement = Arrangement.spacedBy(12.dp),
         contentPadding = PaddingValues(top = 14.dp, bottom = 130.dp),
     ) {
+        items(people, key = { "person-${it.id}" }) { person ->
+            Surface(shape = RoundedCornerShape(22.dp), color = Color(0xFFF1F8F3), border = BorderStroke(1.dp, Hairline)) {
+                Column(Modifier.fillMaxWidth().padding(18.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("God answered for ${person.name}", fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                        Text(com.prayerkey.manna.platform.formatMillis(person.answered, "d MMM yyyy"), color = Muted, fontSize = 11.sp)
+                    }
+                    if (person.request.isNotBlank()) Text(person.request, color = Muted, modifier = Modifier.padding(top = 8.dp))
+                    if (person.answerNote.isNotBlank()) Text(person.answerNote, fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 26.sp, color = Color(0xFF257345), modifier = Modifier.padding(top = 12.dp))
+                    if (person.prayed.isNotEmpty()) Text(
+                        "Prayed for on ${person.prayed.size} ${if (person.prayed.size == 1) "day" else "days"}",
+                        color = Muted, fontSize = 12.sp, modifier = Modifier.padding(top = 12.dp),
+                    )
+                }
+            }
+        }
         items(entries, key = { "entry-${it.id}" }) { entry ->
             Column {
                 EntryCard(entry, onAnswer = {}) { onEdit(entry) }
@@ -1301,5 +1343,16 @@ private fun AttachmentView(value: String) {
     } else {
         // still loading: hold the space so the page does not jump
         Box(Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(18.dp)).background(Hairline.copy(alpha = .4f)))
+    }
+}
+
+/** One of the plain-sight doors under the title: a name and how many are in it. */
+@Composable
+private fun YouChip(label: String, count: Int, open: () -> Unit) {
+    Surface(onClick = open, shape = RoundedCornerShape(99.dp), color = Color.White, border = BorderStroke(1.dp, Hairline)) {
+        Row(Modifier.padding(horizontal = 14.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(label, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, color = Ink)
+            if (count > 0) Text("  $count", fontFamily = UtilitySans, fontSize = 13.sp, color = Muted)
+        }
     }
 }

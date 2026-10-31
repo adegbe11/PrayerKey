@@ -2,6 +2,9 @@ package com.prayerkey.manna.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +53,9 @@ fun TodayPointsHero(
     done: Int,
     /** False until the day's prayer has loaded; the card waits rather than offering an empty session. */
     ready: Boolean = true,
+    /** The day's devotional, read first: the Word, then prayer. Null hides the line. */
+    devotional: String? = null,
+    openDevotional: () -> Unit = {},
     open: () -> Unit,
 ) {
     val finished = ready && points > 0 && done >= points
@@ -67,6 +73,17 @@ fun TodayPointsHero(
                 if (ready) "About $minutes ${if (minutes == 1) "minute" else "minutes"} · $points points · read to you" else "Getting today's points ready",
                 Modifier.padding(top = 10.dp), color = Color.White.copy(alpha = .66f), fontFamily = UtilitySans, fontSize = 14.sp,
             )
+            if (devotional != null) {
+                Row(
+                    Modifier.padding(top = 16.dp).clip(RoundedCornerShape(14.dp)).background(Color.White.copy(alpha = .08f))
+                        .clickable(onClick = openDevotional).padding(horizontal = 12.dp, vertical = 9.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text("Read first: ", color = Color.White.copy(alpha = .6f), fontFamily = UtilitySans, fontSize = 13.sp)
+                    Text(devotional, Modifier.weight(1f, fill = false), color = Color.White, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 13.sp, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                    Icon(Icons.Outlined.ChevronRight, null, tint = Color.White.copy(alpha = .6f), modifier = Modifier.size(18.dp))
+                }
+            }
             if (ready) {
             Spacer(Modifier.height(22.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -148,6 +165,50 @@ fun MoreWaysToPrayEntry(open: () -> Unit) {
                     "Devotional, the Bible, prayer through the day, fasting, challenges",
                     Modifier.padding(top = 4.dp), color = Pk.Muted, fontFamily = UtilitySans, fontSize = 13.5.sp, lineHeight = 19.sp,
                 )
+            }
+            Icon(Icons.Outlined.ChevronRight, null, tint = Pk.Muted)
+        }
+    }
+}
+
+/** The needs most people come to pray about, one tap each, under the prayer box. */
+@Composable
+fun PrayerNeeds(pick: (String) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 22.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        listOf(
+            "Healing" to "healing for my body",
+            "Family" to "my family",
+            "Finances" to "my finances and provision",
+            "Protection" to "protection from every evil",
+            "Fear" to "peace over my fear and anxiety",
+            "Grief" to "comfort in my grief",
+            "Breakthrough" to "a breakthrough I am waiting for",
+            "Guidance" to "guidance for a decision",
+        ).forEach { (label, need) ->
+            Surface(onClick = { pick(need) }, shape = RoundedCornerShape(99.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Pk.Hair)) {
+                Text(label, Modifier.padding(horizontal = 15.dp, vertical = 9.dp), color = Pk.Charcoal, fontFamily = UtilitySans, fontWeight = FontWeight.Medium, fontSize = 13.sp)
+            }
+        }
+    }
+}
+
+/** The longer journeys, one door: fasts, prayer challenges, seasons. */
+@Composable
+fun JourneysEntry(line: String, open: () -> Unit) {
+    Surface(
+        onClick = open,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 22.dp),
+        shape = RoundedCornerShape(22.dp),
+        color = Pk.Sunken,
+        border = androidx.compose.foundation.BorderStroke(1.dp, Pk.Hair),
+    ) {
+        Row(Modifier.padding(horizontal = 20.dp, vertical = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("Fasts and challenges", color = Pk.Charcoal, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 19.sp)
+                Text(line, Modifier.padding(top = 4.dp), color = Pk.Muted, fontFamily = UtilitySans, fontSize = 13.5.sp)
             }
             Icon(Icons.Outlined.ChevronRight, null, tint = Pk.Muted)
         }
