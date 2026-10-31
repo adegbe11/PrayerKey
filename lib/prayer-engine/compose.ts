@@ -34,6 +34,9 @@ export function detectCategories(text: string): string[] {
 
 function cleanInput(raw: string): string {
   let s = raw.trim().replace(/\s+/g, " ");
+  // "Please help me pray for peace today." is a request to us, not words to God:
+  // keep only what it is about, so the prayer reads "...at Your feet: peace today."
+  s = s.replace(/^(please\s+)?((can|could|would)\s+you\s+)?(help\s+me\s+(to\s+)?|i\s+(want|need)\s+to\s+)?pray\s+(for|about|over)\s+/i, "") || s;
   if (s.length > 180) s = s.slice(0, 180).replace(/\s\S*$/, "") + "…";
   s = s.charAt(0).toLowerCase() + s.slice(1);
   return s.replace(/[.!?,;]+$/, "");

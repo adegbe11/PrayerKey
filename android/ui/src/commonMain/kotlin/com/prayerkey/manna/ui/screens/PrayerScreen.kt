@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -206,7 +207,12 @@ fun PrayerScreen(
                         }
                     }
                 } else {
-                    GeneratedPrayerView(generated!!, speechReady, onListen = { speaker.speak("${generated!!.title}. ${generated!!.prayer}", Speaker.QUEUE_FLUSH, null, generated!!.id) }, onSave = { onSavePrayer(request, generated!!) }, onAgain = { generated = null; request = "" })
+                    GeneratedPrayerView(
+                        generated!!, speechReady,
+                        onListen = { words -> speaker.speak("${generated!!.title}. $words", Speaker.QUEUE_FLUSH, null, generated!!.id) },
+                        onSave = { words -> onSavePrayer(request, generated!!.copy(prayer = words)) },
+                        onAgain = { generated = null; request = "" },
+                    )
                 }
             }
         }
@@ -245,15 +251,37 @@ fun PrayerScreen(
     }
 }
 
-@Composable private fun GeneratedPrayerView(prayer: GeneratedPrayer, speechReady: Boolean, onListen: () -> Unit, onSave: () -> Unit, onAgain: () -> Unit) {
+/* The written prayer is a draft: it helps someone find the words, and then the
+   words are theirs to change. Edit turns the same text into a field in place, so
+   nothing moves; Keep and Listen use their version, not the one we wrote. */
+@Composable private fun GeneratedPrayerView(prayer: GeneratedPrayer, speechReady: Boolean, onListen: (String) -> Unit, onSave: (String) -> Unit, onAgain: () -> Unit) {
+    var words by remember(prayer.id) { mutableStateOf(prayer.prayer) }
+    var editing by remember(prayer.id) { mutableStateOf(false) }
+    val focus = remember { androidx.compose.ui.focus.FocusRequester() }
+    LaunchedEffect(editing) { if (editing) focus.requestFocus() }
+    val prayerStyle = androidx.compose.ui.text.TextStyle(color = PrayInk.copy(.9f), fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 31.sp)
     Text("A prayer for you", Modifier.padding(top = 34.dp), color = PrayGold, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.5.sp)
     Text(prayer.title, Modifier.padding(top = 10.dp), color = PrayInk, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 34.sp, lineHeight = 39.sp)
     prayer.verses.firstOrNull()?.let { (ref, verse) -> Surface(Modifier.fillMaxWidth().padding(top = 24.dp), shape = RoundedCornerShape(24.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayLine), shadowElevation = 2.dp) { Column(Modifier.padding(20.dp)) { Text(ref, color = PrayGold, fontSize = 13.sp, fontWeight = FontWeight.Bold); Text(verse, Modifier.padding(top = 8.dp), color = PrayInk, fontFamily = BookSerif, fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 27.sp) } } }
-    Text(prayer.prayer, Modifier.padding(top = 25.dp), color = PrayInk.copy(.9f), fontFamily = BookSerif, fontSize = 20.sp, lineHeight = 31.sp)
+    if (editing) {
+        Surface(Modifier.fillMaxWidth().padding(top = 25.dp), shape = RoundedCornerShape(22.dp), color = PrayPanel, border = BorderStroke(1.dp, PrayViolet.copy(.45f))) {
+            androidx.compose.foundation.text.BasicTextField(
+                words, { words = it },
+                Modifier.fillMaxWidth().padding(18.dp).focusRequester(focus),
+                textStyle = prayerStyle,
+                cursorBrush = androidx.compose.ui.graphics.SolidColor(PrayViolet),
+            )
+        }
+    } else {
+        Text(words, Modifier.padding(top = 25.dp), style = prayerStyle)
+    }
     if (prayer.encouragement.isNotBlank()) Text(prayer.encouragement, Modifier.padding(top = 20.dp), color = PrayMuted, fontSize = 14.sp, lineHeight = 22.sp)
     Row(Modifier.fillMaxWidth().padding(top = 28.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        OutlinedButton(onListen, enabled = speechReady, modifier = Modifier.weight(1f), border = BorderStroke(1.dp, PrayLine)) { Icon(Icons.Outlined.VolumeUp, null); Text(" LISTEN") }
-        Button(onSave, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = PrayViolet)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" KEEP") }
+        OutlinedButton({ onListen(words) }, enabled = speechReady && !editing, modifier = Modifier.weight(1f), border = BorderStroke(1.dp, PrayLine)) { Icon(Icons.Outlined.VolumeUp, null); Text(" LISTEN") }
+        OutlinedButton({ editing = !editing }, modifier = Modifier.weight(1f), border = BorderStroke(1.dp, if (editing) PrayViolet else PrayLine)) {
+            Icon(if (editing) Icons.Outlined.Check else Icons.Outlined.Edit, null); Text(if (editing) " DONE" else " EDIT")
+        }
     }
+    Button({ editing = false; onSave(words.trim().ifBlank { prayer.prayer }) }, Modifier.fillMaxWidth().padding(top = 10.dp), colors = ButtonDefaults.buttonColors(containerColor = PrayViolet)) { Icon(Icons.Outlined.BookmarkBorder, null); Text(" KEEP") }
     TextButton(onAgain, Modifier.fillMaxWidth().padding(top = 12.dp)) { Text("Pray about something else", color = PrayGold, fontSize = 13.sp) }
 }

@@ -57,7 +57,8 @@ object IosReminders : ReminderScheduler {
         scheduleKind(context, ReminderKind.BIBLE, enabled)
 
     override fun scheduleDailySuite(context: PlatformContext, enabled: Boolean) {
-        val single = context.keyValues("onboarding_plan").getBoolean("single_reminder", false)
+        // one quiet reminder a day unless someone chose more (see ReminderReceiver on Android)
+        val single = context.keyValues("onboarding_plan").getBoolean("single_reminder", true)
         val chosen = setOf(ReminderKind.PRAYER_CHALLENGE, ReminderKind.FAST)
         ReminderKind.entries.forEach {
             val on = if (it in chosen) true else enabled && (!single || it == ReminderKind.PRAYER)
