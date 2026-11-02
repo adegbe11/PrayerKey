@@ -621,15 +621,15 @@ fun PrayerKeyOperatingHome(
             com.prayerkey.manna.data.OfficeStore.officeFor(now().hour, now().minute).name
         }
         val offices = listOf(
-            HomeItem("Morning", "Morning Prayer", Res.drawable.rhythm_morning, meta = "3 min") { requestedOffice = "MORNING"; morningPrayerOpen = true },
-            HomeItem("Midday", "Midday Prayer", Res.drawable.prayerkey_hero_dawn, meta = "2 min") { requestedOffice = "AFTERNOON"; morningPrayerOpen = true },
-            HomeItem("Evening", "Evening Prayer", Res.drawable.rhythm_evening, meta = "3 min") { requestedOffice = "EVENING"; morningPrayerOpen = true },
-            HomeItem("Night", "Night Prayer", Res.drawable.rhythm_reflection, meta = "2 min") { requestedOffice = "NIGHT"; morningPrayerOpen = true },
+            HomeItem("At sunrise", "Morning Prayer", Res.drawable.rhythm_morning, meta = "3 min") { requestedOffice = "MORNING"; morningPrayerOpen = true },
+            HomeItem("At noon", "Midday Prayer", Res.drawable.prayerkey_hero_dawn, meta = "2 min") { requestedOffice = "AFTERNOON"; morningPrayerOpen = true },
+            HomeItem("At sunset", "Evening Prayer", Res.drawable.rhythm_evening, meta = "3 min") { requestedOffice = "EVENING"; morningPrayerOpen = true },
+            HomeItem("Before sleep", "Night Prayer", Res.drawable.rhythm_reflection, meta = "2 min") { requestedOffice = "NIGHT"; morningPrayerOpen = true },
             HomeItem("The watch", "Midnight Prayer", Res.drawable.discovery_cover_2, meta = "5 min") { requestedOffice = "MIDNIGHT"; morningPrayerOpen = true },
         )
         val nowOffice = offices[listOf("MORNING", "AFTERNOON", "EVENING", "NIGHT", "MIDNIGHT").indexOf(office).coerceAtLeast(0)]
         val more = buildList {
-            add(nowOffice.copy(eyebrow = "Pray now"))
+            add(nowOffice.copy(eyebrow = "Pray now · ${now().let { t -> "${(t.hour + 11) % 12 + 1}:${t.minute.toString().padStart(2, '0')} ${if (t.hour < 12) "AM" else "PM"}" }}", featured = true))
             written?.let { add(HomeItem("Devotional", it.title, Res.drawable.today_manuscript_hero, meta = "${it.minutes} min") { devotionalOpen = true }) }
             plan?.readingLabel?.takeIf { it.isNotBlank() }?.let {
                 add(HomeItem("Today's chapter", it, Res.drawable.onboarding_read_v3, meta = "$chapterMinutes min") { biblePullsOpen = true })
@@ -638,17 +638,17 @@ fun PrayerKeyOperatingHome(
             add(HomeItem("Right now", "I need prayer", Res.drawable.welcome_prayer_dawn) { emergencyPrayerOpen = true })
             add(HomeItem("For others", "Praying for", Res.drawable.onboarding_church_v3) { prayingForOpen = true })
             addAll(offices.filter { it != nowOffice })
-            if (!challenge.started) add(HomeItem("Prayer challenge", "Start a prayer challenge", Res.drawable.onboarding_pray_v3) { challengeOpen = true })
-            if (!fast.running) add(HomeItem("Fasting", "Start a fast", Res.drawable.discovery_cover_3) { fastOpen = true })
-            if (activeSeason == null) add(HomeItem("Challenges", "Seasons and short challenges", Res.drawable.discovery_cover_1) { namedChallengesOpen = true })
-            if (readingPlan == null) add(HomeItem("Bible plan", "Start a Bible plan", Res.drawable.onboarding_read_v3) { biblePlanOpen = true })
-            add(HomeItem("Be still", "A quiet moment", Res.drawable.discovery_cover_4) { meditationOpen = true })
+            if (!challenge.started) add(HomeItem("Grow", "Start a prayer challenge", Res.drawable.onboarding_pray_v3) { challengeOpen = true })
+            if (!fast.running) add(HomeItem("Draw near", "Start a fast", Res.drawable.discovery_cover_3) { fastOpen = true })
+            if (activeSeason == null) add(HomeItem("Seasons", "Short challenges for the church year", Res.drawable.discovery_cover_1) { namedChallengesOpen = true })
+            if (readingPlan == null) add(HomeItem("Read", "Start a Bible plan", Res.drawable.onboarding_read_v3) { biblePlanOpen = true })
+            add(HomeItem("Be still", "A quiet moment with God", Res.drawable.discovery_cover_4) { meditationOpen = true })
             add(HomeItem("Declare", "Prayer points", Res.drawable.discovery_cover_5) { prayerPointsOpen = true })
             add(HomeItem("Together", "Family altar", Res.drawable.discovery_cover_6) { familyAltarOpen = true })
             add(HomeItem("Sleep", "Bedtime", Res.drawable.onboarding_prayer) { bedtimeOpen = true })
             add(HomeItem("Your language", "Pray in your language", Res.drawable.prayerkey_discovery_world) { languagesOpen = true })
-            add(HomeItem("Bible", "Bible by topic", Res.drawable.bible_cover_red) { topicalBibleOpen = true })
-            add(HomeItem("Your year", "Prayer calendar", Res.drawable.onboarding_journal_v3) { prayerCalendarOpen = true })
+            add(HomeItem("Find a word", "Bible by topic", Res.drawable.bible_cover_red) { topicalBibleOpen = true })
+            add(HomeItem("Your days", "Prayer calendar", Res.drawable.onboarding_journal_v3) { prayerCalendarOpen = true })
         }
         HomeSection("More for you", more, visible = 5)
         Spacer(Modifier.height(26.dp))
