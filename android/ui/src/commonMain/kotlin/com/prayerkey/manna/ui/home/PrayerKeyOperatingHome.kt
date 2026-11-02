@@ -562,16 +562,7 @@ fun PrayerKeyOperatingHome(
         // room for the walk under the date, only once there is a walk to show
         val walkShown = com.prayerkey.manna.data.Walk.state.collectAsState().value.current(today.toEpochDays().toLong()) > 0
         Spacer(Modifier.height(if (walkShown) 98.dp else 74.dp))
-        ShortcutRail(
-            todayBadge = todayBadgeText,
-            todayPulls = { todayPullsOpen = true },
-            prayNow = onOpenPrayer,
-            challenges = { challengeShelfOpen = true },
-        )
-        /* What you want to pray about opens the guided prayer: the prayer
-           machine finds the written prayer for it and walks you through it -
-           still, the Word, worship, confession, asking, listening, Amen. */
-        CompactPrayerPrompt { request -> guidedRequest = request }
+        Spacer(Modifier.height(18.dp))
         Box(Modifier.pressable(.985f)) { PrayerOfTheDayCard(dayPrayer, today, prayerWeek, { scroll.value }) { prayerOfDayOpen = true } }
         // the verse of the day sits right under the prayer of the day
         Box(Modifier.padding(horizontal = 20.dp).padding(top = 16.dp).pressable()) { VerseCard(todayVerse, open = { biblePullsOpen = true }) }
