@@ -136,6 +136,7 @@ fun PrayerKeyOperatingHome(
     }
     val dailyPassage = remember(today) { passageFor(today) }
     var devotionalOpen by rememberSaveable { mutableStateOf(false) }
+    var prayerOfDayOpen by rememberSaveable { mutableStateOf(false) }
     var topicalBibleOpen by rememberSaveable { mutableStateOf(false) }
     var emergencyPrayerOpen by rememberSaveable { mutableStateOf(false) }
     var morningPrayerOpen by rememberSaveable { mutableStateOf(false) }
@@ -229,6 +230,29 @@ fun PrayerKeyOperatingHome(
                 context,
                 com.prayerkey.manna.data.TodayCard(today.toString(), reading.ref.label, text, written?.title.orEmpty()),
             )
+        }
+    }
+
+    /* Prayer of the day: one short prayer for the date, and the verse it comes from. */
+    var dayPrayer by remember(today) { mutableStateOf<com.prayerkey.manna.data.PrayerOfTheDay?>(null) }
+    var tomorrowPrayer by remember(today) { mutableStateOf<com.prayerkey.manna.data.PrayerOfTheDay?>(null) }
+    var prayerWeek by remember(today, prayerOfDayOpen) { mutableStateOf(com.prayerkey.manna.data.PrayersOfTheDay.week(context, today)) }
+    LaunchedEffect(today) {
+        dayPrayer = com.prayerkey.manna.data.PrayersOfTheDay.forDate(context, today)
+        tomorrowPrayer = com.prayerkey.manna.data.PrayersOfTheDay.forDate(context, today.plusDays(1))
+    }
+    if (prayerOfDayOpen) {
+        Dialog(
+            onDismissRequest = { prayerOfDayOpen = false },
+            properties = fullScreenDialog(),
+        ) {
+            dayPrayer?.let { p ->
+                PrayerOfTheDayScreen(
+                    prayer = p, date = today, tomorrow = tomorrowPrayer,
+                    onClose = { prayerOfDayOpen = false },
+                    onPrayed = { prayerWeek = com.prayerkey.manna.data.PrayersOfTheDay.week(context, today) },
+                )
+            }
         }
     }
 
@@ -550,7 +574,7 @@ fun PrayerKeyOperatingHome(
            machine finds the written prayer for it and walks you through it -
            still, the Word, worship, confession, asking, listening, Amen. */
         CompactPrayerPrompt { request -> guidedRequest = request }
-        Box(Modifier.pressable(.985f)) { HeroRail(written?.title.orEmpty(), { scroll.value }) { if (written != null) devotionalOpen = true } }
+        Box(Modifier.pressable(.985f)) { PrayerOfTheDayCard(dayPrayer, today, prayerWeek, { scroll.value }) { prayerOfDayOpen = true } }
 
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
             TodayRhythmPanel(
