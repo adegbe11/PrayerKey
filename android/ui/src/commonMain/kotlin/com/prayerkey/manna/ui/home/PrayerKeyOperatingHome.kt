@@ -1,6 +1,5 @@
 package com.prayerkey.manna.ui.home
 
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import com.prayerkey.manna.platform.toLocalDate
 import com.prayerkey.manna.ui.platform.fullScreenDialog
 import com.prayerkey.manna.platform.atStartOfDay
@@ -160,15 +159,12 @@ fun PrayerKeyOperatingHome(
     var familyAltarOpen by rememberSaveable { mutableStateOf(false) }
     var languagesOpen by rememberSaveable { mutableStateOf(false) }
     var namedChallengesOpen by rememberSaveable { mutableStateOf(false) }
-    // today's prayer points: the session Home is built around
-    var pointsOpen by rememberSaveable { mutableStateOf(false) }
     var selectedFeature by remember { mutableStateOf<Feature?>(null) }
 
     LaunchedEffect(initialAction) {
         when (initialAction) {
             "devotional" -> devotionalOpen = true
-            // the prayer reminder opens today's prayer points
-            "prayer_session" -> pointsOpen = true
+            "prayer_session" -> todayPullsOpen = true
             "bible_session" -> biblePullsOpen = true
             "midnight" -> hourCard = "midnight"
             "warfare" -> selectedFeature = Feature("Warfare prayer", "", Icons.Outlined.Shield, Hub.PRAY)
@@ -325,31 +321,6 @@ fun PrayerKeyOperatingHome(
                 startAt = remember { com.prayerkey.manna.data.PullsProgress.Prayer.resumeAt(context) },
                 onProgress = { at -> com.prayerkey.manna.data.PullsProgress.Prayer.record(context, at, session.size) },
                 onClose = { todayPullsOpen = false },
-            )
-        }
-    }
-    /* Built from the same TodayPlan as the rest of Today, with the people on
-       the Praying For list prayed for by name. Read when it opens, so a name
-       added a minute ago is in it. */
-    var pointsSeen by remember { mutableIntStateOf(0) }
-    val pointsDay = remember(plan, today, pointsOpen) {
-        com.prayerkey.manna.data.pointsDayFor(today, plan?.prayer, com.prayerkey.manna.data.PrayingFor.load(context))
-    }
-    if (pointsOpen) {
-        Dialog(
-            onDismissRequest = { pointsOpen = false; pointsSeen++ },
-            properties = fullScreenDialog(),
-        ) {
-            com.prayerkey.manna.ui.session.PrayerPointsSession(
-                day = pointsDay,
-                startAt = remember { com.prayerkey.manna.data.PullsProgress.Points.resumeAt(context) },
-                onProgress = { at -> com.prayerkey.manna.data.PullsProgress.Points.record(context, at, pointsDay.steps.size) },
-                onFinished = {
-                    val day = today.toEpochDays().toLong()
-                    pointsDay.peopleIds.forEach { com.prayerkey.manna.data.PrayingFor.prayed(context, it, day) }
-                    com.prayerkey.manna.data.Walk.mark(context)
-                },
-                onClose = { pointsOpen = false; pointsSeen++ },
             )
         }
     }
@@ -569,61 +540,104 @@ fun PrayerKeyOperatingHome(
         // room for the walk under the date, only once there is a walk to show
         val walkShown = com.prayerkey.manna.data.Walk.state.collectAsState().value.current(today.toEpochDays().toLong()) > 0
         Spacer(Modifier.height(if (walkShown) 98.dp else 74.dp))
-        val pointsDone = remember(today, pointsSeen, pointsDay) {
-            com.prayerkey.manna.data.PullsProgress.Points.progress(context, today)
-        }
-        /* Today asks three things of nobody in particular, in this order:
-           1. today's prayer (the Word, then the points),
-           2. pray about something of your own,
-           3. the longer journeys - the season, fasts and challenges.
-           Everything that used to stack up here is either inside one of those
-           or reachable from where it belongs (the Bible tab, You). */
-        Box(Modifier.pressable(.985f)) {
-            TodayPointsHero(
-                title = pointsDay.title,
-                minutes = pointsDay.minutes,
-                points = pointsDay.steps.size,
-                done = pointsDone,
-                ready = plan != null,
-                devotional = written?.title?.takeIf { it.isNotBlank() },
-                openDevotional = { devotionalOpen = true },
-                open = { if (plan != null) pointsOpen = true },
+        ShortcutRail(
+            todayBadge = todayBadgeText,
+            todayPulls = { todayPullsOpen = true },
+            prayNow = onOpenPrayer,
+            challenges = { challengeShelfOpen = true },
+        )
+        /* What you want to pray about opens the guided prayer: the prayer
+           machine finds the written prayer for it and walks you through it -
+           still, the Word, worship, confession, asking, listening, Amen. */
+        CompactPrayerPrompt { request -> guidedRequest = request }
+        Box(Modifier.pressable(.985f)) { HeroRail(written?.title.orEmpty(), { scroll.value }) { if (written != null) devotionalOpen = true } }
+
+        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
+            TodayRhythmPanel(
+                devotionalTitle = written?.title.orEmpty(),
+                devotionalMinutes = written?.minutes ?: 0,
+                readingLabel = plan?.readingLabel.orEmpty(),
+                readingMinutes = chapterMinutes,
+                morningPrayer = { hourCard = "morning" },
+                afternoonPrayer = { hourCard = "afternoon" },
+                nightPrayer = { hourCard = "night" },
+                midnightPrayer = { hourCard = "midnight" },
+                devotional = { devotionalOpen = true },
+                bible = { biblePullsOpen = true },
+                eveningPrayer = { hourCard = "evening" },
+                calendar = { prayerCalendarOpen = true },
             )
         }
 
-        TodaySectionLabel("Pray about something")
-        CompactPrayerPrompt { request -> guidedRequest = request }
-        PrayerNeeds { need -> guidedRequest = need }
         // someone on the Praying For list, still waiting for today's prayer
         PrayForTodayCard { prayingForOpen = true }
 
-        TodaySectionLabel("Seasons")
-        com.prayerkey.manna.data.seasonFor(today)?.let { season ->
-            Box(Modifier.pressable()) {
-                SeasonCard(season) {
-                    when (season.action) {
-                        "fast" -> fastOpen = true
-                        "challenge" -> challengeOpen = true
-                        "midnight" -> hourCard = "midnight"
-                        else -> pointsOpen = true
-                    }
-                }
-            }
-            Spacer(Modifier.height(12.dp))
+        /* The longer ways to seek God, seen at once rather than stacked. The
+           card for each says which day you are on once it has begun. */
+        Spacer(Modifier.height(10.dp))
+        GoDeeperGrid(
+            challengeLine = if (challenge.started) "Day ${challenge.dayFor()} of ${challenge.days}" else "Pray with purpose",
+            fastLine = if (fast.running) "Day ${fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000)} of ${fast.days}" else "Fasting",
+            onChallenge = { challengeOpen = true },
+            onFast = { fastOpen = true },
+            onStill = { meditationOpen = true },
+            onSeason = { namedChallengesOpen = true },
+        )
+        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 4.dp)) {
+            Spacer(Modifier.height(14.dp))
+            Box(Modifier.pressable()) { com.prayerkey.manna.ui.bibleplan.BiblePlanCard(refresh = biblePlanSeen) { biblePlanOpen = true } }
+            // the same 14dp to the prayer card as between every card above
+            Spacer(Modifier.height(14.dp))
         }
-        Box(Modifier.pressable()) {
-            JourneysEntry(
-                when {
-                    challenge.started -> "Prayer challenge · day ${challenge.dayFor()} of ${challenge.days}"
-                    fast.running -> "Your fast · day ${fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000)} of ${fast.days}"
-                    else -> "A fast, a prayer challenge, or a short season"
-                },
-            ) { challengeShelfOpen = true }
-        }
-        Spacer(Modifier.height(18.dp))
-        HomeBenediction()
+        /* The prayers written for particular hours and moments. They were
+           finished and could not be reached; now they are one swipe away. */
+        MomentsShelf(
+            remember {
+                prayerMoments(
+                    emergency = { emergencyPrayerOpen = true },
+                    office = { requestedOffice = it; morningPrayerOpen = true },
+                    tenMinutes = { prayerSessionOpen = true },
+                    prayerPoints = { prayerPointsOpen = true },
+                    bedtime = { bedtimeOpen = true },
+                    prayingFor = { prayingForOpen = true },
+                    familyAltar = { familyAltarOpen = true },
+                    languages = { languagesOpen = true },
+                )
+            },
+        )
+        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp)) {
+            Spacer(Modifier.height(14.dp))
         }
 
+        /* The morning prayer and the verse of the day, as cards.
+           Both were written to be shared - SAVE and SHARE render a portrait
+           image with the artwork, the words and the mark on it - and both
+           stopped being drawn when Home was rebuilt, leaving the renderer
+           with nothing to call. A card nobody can reach shares nothing. */
+        Column(
+            Modifier.fillMaxWidth().padding(horizontal = 22.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Box(Modifier.pressable()) { PrayerNowCard(todaysPrayer(), open = onOpenPrayer) }
+            Box(Modifier.pressable()) { VerseCard(todayVerse, open = { biblePullsOpen = true }) }
+        }
+        Spacer(Modifier.height(18.dp))
+
+        /* The FAST and GROW tiles are gone: the fast and the prayer challenge
+           have their own cards above now, and these opened the older versions
+           of both - two doors to one room, and the far door led somewhere
+           else. */
+        Column(Modifier.padding(vertical = 18.dp).pressable()) { TopicalBibleEntry { topicalBibleOpen = true } }
+        /* The page closes on the black Bible - the whole book, where the
+           verse card used to hand over one line of it. */
+        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 8.dp)) {
+            com.prayerkey.manna.ui.book.MonochromeBibleCard(
+                onOpen = { monoBibleOpen = true },
+                modifier = Modifier.fillMaxWidth().aspectRatio(.78f).pressable(.98f),
+            )
+        }
+        HomeBenediction()
+        }
 
         if (challengeOpen) {
             androidx.compose.ui.window.Dialog(
@@ -2643,14 +2657,4 @@ fun verseOfDay(date: LocalDate): Pair<String, String> {
         "Psalm 56:3" to "What time I am afraid, I will trust in thee.",
     )
     return words[(date.toEpochDays().toLong()).mod(words.size.toLong()).toInt()]
-}
-
-/** A quiet heading between Today's three parts. */
-@Composable
-private fun TodaySectionLabel(text: String) {
-    Text(
-        text.uppercase(),
-        Modifier.padding(start = 26.dp, top = 26.dp, bottom = 10.dp),
-        color = Pk.Muted, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 11.sp, letterSpacing = 1.5.sp,
-    )
 }

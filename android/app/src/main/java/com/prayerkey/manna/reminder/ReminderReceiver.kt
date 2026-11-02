@@ -48,7 +48,7 @@ class ReminderReceiver : BroadcastReceiver() {
            the reader's own morning, and only one of the two gets opened. */
         val message = when (kind) {
             ReminderKind.CALENDAR -> calendarMessage(LocalDate.now())!!
-            ReminderKind.PRAYER -> PullsProgress.Points.notificationLine(context)
+            ReminderKind.PRAYER -> PullsProgress.Prayer.notificationLine(context)
             ReminderKind.BIBLE -> PullsProgress.Bible.notificationLine(context)
             /* The machine says what today holds, not that something is ready:
                the challenge names the day and its verse, the fast its day and
@@ -66,8 +66,7 @@ class ReminderReceiver : BroadcastReceiver() {
             }
             ReminderKind.WALK -> {
                 val days = com.prayerkey.manna.data.Walk.load(context).days
-                // an invitation, not a countdown: no "keep it", no fear of losing it
-                (if (days == 1) "1 day with God" else "$days days with God") to "Today's prayer is here when you have a quiet moment."
+                "Keep your $days-day walk" to "One moment with God today keeps it going. Today's prayer takes about four minutes."
             }
             ReminderKind.MIDNIGHT -> {
                 val p = com.prayerkey.manna.data.hourPrayer("midnight")
@@ -140,10 +139,7 @@ class ReminderReceiver : BroadcastReceiver() {
             scheduleKind(context, ReminderKind.BIBLE, enabled)
 
         fun scheduleDailySuite(context: Context, enabled: Boolean) {
-            /* One quiet reminder a day unless someone chose more: a quiet moment
-               doesn't need a notification for every part of the app. Older
-               installs never wrote this flag, so they get the one as well. */
-            val single = context.getSharedPreferences("onboarding_plan", Context.MODE_PRIVATE).getBoolean("single_reminder", true)
+            val single = context.getSharedPreferences("onboarding_plan", Context.MODE_PRIVATE).getBoolean("single_reminder", false)
             // a reminder chosen inside the challenge or the fast is always re-armed:
             // the one-reminder preference is about the daily suite, not about
             // switches the person turned on themselves

@@ -48,12 +48,3 @@ actual fun SecureScreen(enabled: Boolean) {
         onDispose { window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE) }
     }
 }
-
-@Composable
-actual fun KeepScreenOn() {
-    val view = LocalView.current
-    androidx.compose.runtime.DisposableEffect(view) {
-        view.keepScreenOn = true
-        onDispose { view.keepScreenOn = false }
-    }
-}

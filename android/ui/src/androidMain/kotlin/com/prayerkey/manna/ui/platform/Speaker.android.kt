@@ -19,30 +19,7 @@ private class AndroidVoice(
     onReady: (Boolean) -> Unit,
     listener: () -> UtteranceListener?,
 ) : VoiceEngine {
-    private val tts: TextToSpeech = TextToSpeech(context.applicationContext) { status ->
-        if (status == TextToSpeech.SUCCESS) useBestVoice(Locale.getDefault())
-        onReady(status == TextToSpeech.SUCCESS)
-    }
-
-    /* The engine starts on its plainest voice. Most phones carry far better
-       ones for the same language; a prayer read in the flat default sounds
-       like a timetable announcement. Highest quality wins, a voice that works
-       offline beats one that needs the network, and nothing changes when the
-       phone offers no better choice. */
-    private fun useBestVoice(locale: Locale) {
-        runCatching {
-            val best = tts.voices.orEmpty()
-                .filter { it.locale.language == locale.language && !it.features.orEmpty().contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) }
-                .sortedWith(
-                    compareByDescending<android.speech.tts.Voice> { it.locale.country == locale.country }
-                        .thenByDescending { it.quality }
-                        .thenBy { it.isNetworkConnectionRequired }
-                        .thenBy { it.latency },
-                )
-                .firstOrNull()
-            if (best != null && best.quality > (tts.voice?.quality ?: 0)) tts.voice = best
-        }
-    }
+    private val tts = TextToSpeech(context.applicationContext) { onReady(it == TextToSpeech.SUCCESS) }
 
     init {
         tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
@@ -64,9 +41,7 @@ private class AndroidVoice(
     override fun setRate(rate: Float) { tts.setSpeechRate(rate) }
     override fun setPitch(pitch: Float) { tts.setPitch(pitch) }
     override fun setLanguage(tag: String?) {
-        val locale = tag?.let(Locale::forLanguageTag) ?: Locale.getDefault()
-        tts.language = locale
-        useBestVoice(locale)
+        tts.language = tag?.let(Locale::forLanguageTag) ?: Locale.getDefault()
     }
     override fun isSpeaking(): Boolean = tts.isSpeaking
 }

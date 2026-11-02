@@ -28,6 +28,3 @@ actual fun fullScreenDialog(): androidx.compose.ui.window.DialogProperties =
 
 @Composable
 actual fun SecureScreen(enabled: Boolean) = Unit
-
-@Composable
-actual fun KeepScreenOn() = Unit

@@ -55,11 +55,3 @@ actual fun fullScreenDialog(): androidx.compose.ui.window.DialogProperties =
 
 @Composable
 actual fun SecureScreen(enabled: Boolean) = Unit
-
-@Composable
-actual fun KeepScreenOn() {
-    androidx.compose.runtime.DisposableEffect(Unit) {
-        platform.UIKit.UIApplication.sharedApplication.idleTimerDisabled = true
-        onDispose { platform.UIKit.UIApplication.sharedApplication.idleTimerDisabled = false }
-    }
-}
