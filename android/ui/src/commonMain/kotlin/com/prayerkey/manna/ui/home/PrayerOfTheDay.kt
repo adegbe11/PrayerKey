@@ -282,6 +282,10 @@ fun PrayerOfTheDayScreen(
                 )
                 Text(date.spoken(), Modifier.padding(top = 6.dp), color = GoldPale.copy(alpha = .6f), fontFamily = UtilitySans, fontSize = 13.sp)
                 Text(
+                    "Everyone on PrayerKey is praying these words today", Modifier.padding(top = 4.dp),
+                    color = GoldPale.copy(alpha = .6f), fontFamily = UtilitySans, fontSize = 13.sp, textAlign = TextAlign.Center,
+                )
+                Text(
                     prayer.title, Modifier.padding(top = 14.dp),
                     color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold,
                     fontSize = 32.sp, lineHeight = 38.sp, textAlign = TextAlign.Center,

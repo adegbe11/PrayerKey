@@ -138,6 +138,8 @@ fun MannaApp(
                notification used to end in a browsing decision — which is where
                people leave. It opens the day's ten pulls directly instead. */
             "prayer" -> { selected = 0; homeAction = "prayer_session" }
+            // the 6 AM reminder opens straight onto today's Prayer of the Day
+            "prayer_of_day" -> { selected = 0; homeAction = "prayer_of_day" }
             "church" -> selected = 3
             "journal" -> selected = 4
             "devotional", "fasting", "prayer_challenge", "midnight", "warfare" -> {

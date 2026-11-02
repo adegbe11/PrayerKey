@@ -166,6 +166,7 @@ fun PrayerKeyOperatingHome(
         when (initialAction) {
             "devotional" -> devotionalOpen = true
             "prayer_session" -> todayPullsOpen = true
+            "prayer_of_day" -> prayerOfDayOpen = true
             "bible_session" -> biblePullsOpen = true
             "midnight" -> hourCard = "midnight"
             "warfare" -> selectedFeature = Feature("Warfare prayer", "", Icons.Outlined.Shield, Hub.PRAY)
