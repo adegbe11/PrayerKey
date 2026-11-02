@@ -1090,7 +1090,7 @@ private val PRAYERS_3 = listOf(
     ),
     DailyPrayer(
         ref = "Psalm 66:12",
-        title = "Into Abundance",
+        title = "Into a Wealthy Place",
         verse = "Thou hast caused men to ride over our heads; we went through fire and through water: but thou broughtest us out into a wealthy place.",
         prayer = "Lord, You have brought me through worse than this. Bring me through again, and take me to the spacious place You have in mind. Amen.",
     ),
@@ -1383,7 +1383,7 @@ private val PRAYERS_4 = listOf(
         ref = "Psalm 33:11",
         title = "His Plans Stand",
         verse = "The counsel of the LORD standeth for ever, the thoughts of his heart to all generations.",
-        prayer = "Lord, my plans change constantly. Yours do not. Align me with what will still be standing when everything else has been rearranged. Amen.",
+        prayer = "Lord, my plans change constantly. Yours do not. Fix me on what will still be standing when everything else has been rearranged. Amen.",
     ),
     DailyPrayer(
         ref = "Ephesians 1:18",

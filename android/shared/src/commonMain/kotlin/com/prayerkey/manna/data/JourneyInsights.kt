@@ -71,7 +71,7 @@ object JourneyInsights {
         }
 
         return JourneyInsight(
-            eyebrow = "A PATTERN IN YOUR JOURNEY",
+            eyebrow = "A PATTERN IN YOUR JOURNAL",
             title = theme?.let { "A season of ${it.label}" }
                 ?: recurringReference?.let { "$it keeps returning" }
                 ?: "Your story is taking shape",

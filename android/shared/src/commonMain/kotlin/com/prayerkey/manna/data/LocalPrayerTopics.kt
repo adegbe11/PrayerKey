@@ -68,7 +68,7 @@ object LocalPrayerTopics {
     /** Removes outcome guarantees and fundraising-style clichés from legacy copy. */
     private fun editorialPrayer(source: String): String {
         val edits = linkedMapOf(
-            "Cancel every debt and replace it with abundance." to "Give me discipline, honest counsel, and a workable path out of debt.",
+            "Clear every debt, and give me more than enough." to "Give me discipline, honest counsel, and a workable path out of debt.",
             "Bring unexpected income and supernatural provision." to "Provide honest opportunities, sufficient income, and wisdom for every decision.",
             "Let people be drawn to help me without knowing why, because Your hand is on my life." to "Grant me favour with people whose help is honest, wise, and timely.",
             "I trust that they are with You." to "I entrust them to Your mercy.",

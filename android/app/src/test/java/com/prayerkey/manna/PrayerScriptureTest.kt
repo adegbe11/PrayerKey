@@ -47,7 +47,10 @@ class PrayerScriptureTest {
      * Getting this wrong left "with his stripes we are healed. wounded: or,
      * tormented stripes: Heb. bruise" on the healing prayer.
      */
-    private fun clean(raw: String): String {
+    private fun clean(source: String): String {
+        // a psalm's title ("[A Psalm of David.]") is not part of the verse it is printed above
+        // and neither is Psalm 119's Hebrew letter ("BETH.") that opens each section
+        val raw = source.replace(Regex("""^\[[^\]]*\]\s*"""), "").replace(Regex("""^[A-Z]{3,}\.\s+"""), "")
         val out = StringBuilder()
         var i = 0
         while (i < raw.length) {

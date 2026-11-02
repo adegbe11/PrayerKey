@@ -75,7 +75,7 @@ object PrayerPointEngine {
      *
      * Used to tell a request apart from the narrative around it. "The house
      * feels quiet in a way I was not prepared for" is a true sentence and not a
-     * prayer point; "Help me to embrace this new chapter" is.
+     * prayer point; "Help me to welcome this new stage" is.
      */
     private val ASKING = listOf(
         "give", "help", "let", "show", "fill", "renew", "reveal", "restore", "heal",

@@ -22,7 +22,7 @@ enum class FastLength(val label: String, val blurb: String, val hours: Int) {
     TWELVE("12 hours", "Build discipline", 12),
     SUNRISE("Sunrise to sunset", "A biblical fast", 12),
     DAY("24 hours", "Go deeper", 24),
-    THREE("3 days", "Seek God intentionally", 72),
+    THREE("3 days", "Seek God", 72),
     SEVEN("7 days", "A full week", 168),
     TWENTY_ONE("21 days", "A deeper commitment", 504),
     CUSTOM("Custom", "Set your own length", 0),
@@ -47,7 +47,7 @@ val FAST_PURPOSES = listOf(
     "Direction" to "Clarity for decisions",
     "Healing" to "For you or a loved one",
     "Family" to "Lift up your family",
-    "Deliverance" to "Freedom in every area",
+    "Deliverance" to "Freedom from what holds me",
     "Spiritual growth" to "Go deeper with God",
     "Gratitude" to "A heart of thankfulness",
     "Personal request" to "Write your own",
@@ -55,7 +55,7 @@ val FAST_PURPOSES = listOf(
 
 enum class PrayerRhythm(val label: String, val blurb: String, val hour: Int) {
     MORNING("Morning", "Start your day with God", 6),
-    MIDDAY("Midday", "Stay aligned", 12),
+    MIDDAY("Midday", "Stay on course", 12),
     EVENING("Evening", "End your day with prayer", 19),
     MIDNIGHT("Midnight", "A quiet hour", 0),
 }
