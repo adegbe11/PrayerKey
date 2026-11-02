@@ -576,81 +576,82 @@ fun PrayerKeyOperatingHome(
         // the verse of the day sits right under the prayer of the day
         Box(Modifier.padding(horizontal = 20.dp).padding(top = 16.dp).pressable()) { VerseCard(todayVerse, open = { biblePullsOpen = true }) }
 
-        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
-            TodayRhythmPanel(
-                devotionalTitle = written?.title.orEmpty(),
-                devotionalMinutes = written?.minutes ?: 0,
-                readingLabel = plan?.readingLabel.orEmpty(),
-                readingMinutes = chapterMinutes,
-                morningPrayer = { hourCard = "morning" },
-                afternoonPrayer = { hourCard = "afternoon" },
-                nightPrayer = { hourCard = "night" },
-                midnightPrayer = { hourCard = "midnight" },
-                devotional = { devotionalOpen = true },
-                bible = { biblePullsOpen = true },
-                eveningPrayer = { hourCard = "evening" },
-                calendar = { prayerCalendarOpen = true },
-            )
+        /* Below the two daily cards, everything is one shape: a row with the
+           words on the left and a picture on the right. What you have started
+           comes first, under Keep going; the rest is More for you. */
+        var activeSeason by remember(namedChallengesOpen) { mutableStateOf<Pair<com.prayerkey.manna.data.ChallengePlan, Int>?>(null) }
+        LaunchedEffect(namedChallengesOpen) {
+            activeSeason = com.prayerkey.manna.data.ChallengeProgress.activeId(context)?.let { id ->
+                com.prayerkey.manna.data.Challenges.byId(context, id)?.let { plan ->
+                    plan to com.prayerkey.manna.data.ChallengeProgress.completed(context, id)
+                }
+            }
         }
+        val readingPlan = remember(biblePlanSeen) {
+            val progress = com.prayerkey.manna.data.ReadingPlanStore.load(context)
+            com.prayerkey.manna.data.ReadingPlanStore.plan(progress.planId)?.let { it to progress }
+        }
+        val nowSeconds = kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000
+        val keepGoing = buildList {
+            if (challenge.started) {
+                val day = challenge.dayFor()
+                add(HomeItem("Prayer challenge", challenge.heading, Res.drawable.onboarding_pray_v3,
+                    day = "Day $day of ${challenge.days}", progress = day / challenge.days.toFloat()) { challengeOpen = true })
+            }
+            if (fast.running) {
+                val day = fast.dayOf(nowSeconds)
+                add(HomeItem("Fast", fast.type.label, Res.drawable.discovery_cover_3,
+                    day = "Day $day of ${fast.days}", progress = day / fast.days.toFloat()) { fastOpen = true })
+            }
+            readingPlan?.let { (plan, progress) ->
+                add(HomeItem("Bible plan", plan.title, plan.art,
+                    day = "Day ${progress.current(plan.length)} of ${plan.length}",
+                    progress = progress.done.size / plan.length.toFloat()) { biblePlanOpen = true })
+            }
+            activeSeason?.let { (plan, done) ->
+                add(HomeItem("Challenge", plan.title, Res.drawable.discovery_cover_1,
+                    day = "Day ${(done + 1).coerceAtMost(plan.days)} of ${plan.days}",
+                    progress = done / plan.days.toFloat()) { openChallengeId = plan.id })
+            }
+        }
+        HomeSection("Keep going", keepGoing)
 
-        // someone on the Praying For list, still waiting for today's prayer
-        PrayForTodayCard { prayingForOpen = true }
-
-        /* The longer ways to seek God, seen at once rather than stacked. The
-           card for each says which day you are on once it has begun. */
-        Spacer(Modifier.height(10.dp))
-        GoDeeperGrid(
-            challengeLine = if (challenge.started) "Day ${challenge.dayFor()} of ${challenge.days}" else "Pray with purpose",
-            fastLine = if (fast.running) "Day ${fast.dayOf(kotlinx.datetime.Clock.System.now().toEpochMilliseconds() / 1000)} of ${fast.days}" else "Fasting",
-            onChallenge = { challengeOpen = true },
-            onFast = { fastOpen = true },
-            onStill = { meditationOpen = true },
-            onSeason = { namedChallengesOpen = true },
+        // the prayer for this hour leads; the rest of the day's offices follow it
+        val office = remember(today) {
+            com.prayerkey.manna.data.OfficeStore.officeFor(now().hour, now().minute).name
+        }
+        val offices = listOf(
+            HomeItem("Morning", "Morning Prayer", Res.drawable.rhythm_morning, meta = "3 min") { requestedOffice = "MORNING"; morningPrayerOpen = true },
+            HomeItem("Midday", "Midday Prayer", Res.drawable.prayerkey_hero_dawn, meta = "2 min") { requestedOffice = "AFTERNOON"; morningPrayerOpen = true },
+            HomeItem("Evening", "Evening Prayer", Res.drawable.rhythm_evening, meta = "3 min") { requestedOffice = "EVENING"; morningPrayerOpen = true },
+            HomeItem("Night", "Night Prayer", Res.drawable.rhythm_reflection, meta = "2 min") { requestedOffice = "NIGHT"; morningPrayerOpen = true },
+            HomeItem("The watch", "Midnight Prayer", Res.drawable.discovery_cover_2, meta = "5 min") { requestedOffice = "MIDNIGHT"; morningPrayerOpen = true },
         )
-        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 4.dp)) {
-            Spacer(Modifier.height(14.dp))
-            Box(Modifier.pressable()) { com.prayerkey.manna.ui.bibleplan.BiblePlanCard(refresh = biblePlanSeen) { biblePlanOpen = true } }
-            // the same 14dp to the prayer card as between every card above
-            Spacer(Modifier.height(14.dp))
+        val nowOffice = offices[listOf("MORNING", "AFTERNOON", "EVENING", "NIGHT", "MIDNIGHT").indexOf(office).coerceAtLeast(0)]
+        val more = buildList {
+            add(nowOffice.copy(eyebrow = "Pray now"))
+            written?.let { add(HomeItem("Devotional", it.title, Res.drawable.today_manuscript_hero, meta = "${it.minutes} min") { devotionalOpen = true }) }
+            plan?.readingLabel?.takeIf { it.isNotBlank() }?.let {
+                add(HomeItem("Today's chapter", it, Res.drawable.onboarding_read_v3, meta = "$chapterMinutes min") { biblePullsOpen = true })
+            }
+            add(HomeItem("Guided prayer", "Ten quiet minutes with God", Res.drawable.today_prayer_violet, meta = "10 min") { prayerSessionOpen = true })
+            add(HomeItem("Right now", "I need prayer", Res.drawable.welcome_prayer_dawn) { emergencyPrayerOpen = true })
+            add(HomeItem("For others", "Praying for", Res.drawable.onboarding_church_v3) { prayingForOpen = true })
+            addAll(offices.filter { it != nowOffice })
+            if (!challenge.started) add(HomeItem("Prayer challenge", "Start a prayer challenge", Res.drawable.onboarding_pray_v3) { challengeOpen = true })
+            if (!fast.running) add(HomeItem("Fasting", "Start a fast", Res.drawable.discovery_cover_3) { fastOpen = true })
+            if (activeSeason == null) add(HomeItem("Challenges", "Seasons and short challenges", Res.drawable.discovery_cover_1) { namedChallengesOpen = true })
+            if (readingPlan == null) add(HomeItem("Bible plan", "Start a Bible plan", Res.drawable.onboarding_read_v3) { biblePlanOpen = true })
+            add(HomeItem("Be still", "A quiet moment", Res.drawable.discovery_cover_4) { meditationOpen = true })
+            add(HomeItem("Declare", "Prayer points", Res.drawable.discovery_cover_5) { prayerPointsOpen = true })
+            add(HomeItem("Together", "Family altar", Res.drawable.discovery_cover_6) { familyAltarOpen = true })
+            add(HomeItem("Sleep", "Bedtime", Res.drawable.onboarding_prayer) { bedtimeOpen = true })
+            add(HomeItem("Your language", "Pray in your language", Res.drawable.prayerkey_discovery_world) { languagesOpen = true })
+            add(HomeItem("Bible", "Bible by topic", Res.drawable.bible_cover_red) { topicalBibleOpen = true })
+            add(HomeItem("Your year", "Prayer calendar", Res.drawable.onboarding_journal_v3) { prayerCalendarOpen = true })
         }
-        /* The prayers written for particular hours and moments. They were
-           finished and could not be reached; now they are one swipe away. */
-        MomentsShelf(
-            remember {
-                prayerMoments(
-                    emergency = { emergencyPrayerOpen = true },
-                    office = { requestedOffice = it; morningPrayerOpen = true },
-                    tenMinutes = { prayerSessionOpen = true },
-                    prayerPoints = { prayerPointsOpen = true },
-                    bedtime = { bedtimeOpen = true },
-                    prayingFor = { prayingForOpen = true },
-                    familyAltar = { familyAltarOpen = true },
-                    languages = { languagesOpen = true },
-                )
-            },
-        )
-        Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp)) {
-            Spacer(Modifier.height(14.dp))
-        }
-
-        /* The morning prayer and the verse of the day, as cards.
-           Both were written to be shared - SAVE and SHARE render a portrait
-           image with the artwork, the words and the mark on it - and both
-           stopped being drawn when Home was rebuilt, leaving the renderer
-           with nothing to call. A card nobody can reach shares nothing. */
-        Column(
-            Modifier.fillMaxWidth().padding(horizontal = 22.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Box(Modifier.pressable()) { PrayerNowCard(todaysPrayer(), open = onOpenPrayer) }
-        }
-        Spacer(Modifier.height(18.dp))
-
-        /* The FAST and GROW tiles are gone: the fast and the prayer challenge
-           have their own cards above now, and these opened the older versions
-           of both - two doors to one room, and the far door led somewhere
-           else. */
-        Column(Modifier.padding(vertical = 18.dp).pressable()) { TopicalBibleEntry { topicalBibleOpen = true } }
+        HomeSection("More for you", more, visible = 5)
+        Spacer(Modifier.height(26.dp))
         /* The page closes on the black Bible - the whole book, where the
            verse card used to hand over one line of it. */
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 8.dp)) {
