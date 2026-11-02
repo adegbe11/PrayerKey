@@ -573,6 +573,8 @@ fun PrayerKeyOperatingHome(
            still, the Word, worship, confession, asking, listening, Amen. */
         CompactPrayerPrompt { request -> guidedRequest = request }
         Box(Modifier.pressable(.985f)) { PrayerOfTheDayCard(dayPrayer, today, prayerWeek, { scroll.value }) { prayerOfDayOpen = true } }
+        // the verse of the day sits right under the prayer of the day
+        Box(Modifier.padding(horizontal = 20.dp).padding(top = 16.dp).pressable()) { VerseCard(todayVerse, open = { biblePullsOpen = true }) }
 
         Column(Modifier.fillMaxWidth().padding(horizontal = 22.dp, vertical = 15.dp)) {
             TodayRhythmPanel(
@@ -641,7 +643,6 @@ fun PrayerKeyOperatingHome(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Box(Modifier.pressable()) { PrayerNowCard(todaysPrayer(), open = onOpenPrayer) }
-            Box(Modifier.pressable()) { VerseCard(todayVerse, open = { biblePullsOpen = true }) }
         }
         Spacer(Modifier.height(18.dp))
 
