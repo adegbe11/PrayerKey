@@ -42,9 +42,9 @@ class ReminderReceiver : BroadcastReceiver() {
             scheduleKind(context, kind, true)
             return
         }
-        /* The 6 AM prayer is today's Prayer of the Day. Once it has been prayed
-           there is nothing to remind anyone of, so the morning stays quiet. */
-        if (kind == ReminderKind.PRAYER && com.prayerkey.manna.data.PrayersOfTheDay.prayed(context, com.prayerkey.manna.platform.today())) {
+        /* 6 AM is the morning live prayer. Once it has been prayed there is
+           nothing to remind anyone of, so the morning stays quiet. */
+        if (kind == ReminderKind.PRAYER && com.prayerkey.manna.data.LivePrayer.joined(context, com.prayerkey.manna.platform.today())) {
             scheduleKind(context, kind, true)
             return
         }
@@ -55,12 +55,8 @@ class ReminderReceiver : BroadcastReceiver() {
         val message = when (kind) {
             ReminderKind.CALENDAR -> calendarMessage(LocalDate.now())!!
             ReminderKind.PRAYER -> {
-                val p = kotlinx.coroutines.runBlocking {
-                    com.prayerkey.manna.data.PrayersOfTheDay.forDate(context, com.prayerkey.manna.platform.today())
-                }
-                // the same prayer for everyone today, named, with the verse it comes from
-                if (p == null) "Prayer of the day" to "Everyone on PrayerKey is praying the same words today. Join them."
-                else p.title to "Everyone on PrayerKey is praying these words today. Join them. ${p.ref}"
+                val theme = com.prayerkey.manna.data.LivePrayer.dayFor(com.prayerkey.manna.platform.today()).theme
+                "Live prayer is starting" to "Stand up, and let us pray. Today: $theme."
             }
             ReminderKind.BIBLE -> PullsProgress.Bible.notificationLine(context)
             /* The machine says what today holds, not that something is ready:
@@ -264,7 +260,7 @@ private enum class ReminderKind(
     val minute: Int,
     val dayOfWeek: Int? = null,
 ) {
-    PRAYER("prayer", "Prayer of the day", "" to "Your prayer is ready.", "prayer_of_day", "prayer", 6, 0),
+    PRAYER("prayer", "Prayer of the day", "" to "Your prayer is ready.", "live_prayer", "prayer", 6, 0),
     BIBLE("bible", "Bible reading", "" to "Today's passage is ready.", "bible", "scripture", 7, 30),
     DEVOTIONAL("devotional", "Today's devotional", "" to "Open today's devotional.", "devotional", "scripture", 8, 0),
     PRAYER_CHALLENGE("prayer_challenge", "Prayer challenge", "" to "Today's prayer is ready.", "prayer_challenge", "prayer", 12, 0),

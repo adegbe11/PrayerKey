@@ -137,6 +137,7 @@ fun PrayerKeyOperatingHome(
     val dailyPassage = remember(today) { passageFor(today) }
     var devotionalOpen by rememberSaveable { mutableStateOf(false) }
     var prayerOfDayOpen by rememberSaveable { mutableStateOf(false) }
+    var liveOpen by rememberSaveable { mutableStateOf(false) }
     var topicalBibleOpen by rememberSaveable { mutableStateOf(false) }
     var emergencyPrayerOpen by rememberSaveable { mutableStateOf(false) }
     var morningPrayerOpen by rememberSaveable { mutableStateOf(false) }
@@ -167,6 +168,7 @@ fun PrayerKeyOperatingHome(
             "devotional" -> devotionalOpen = true
             "prayer_session" -> todayPullsOpen = true
             "prayer_of_day" -> prayerOfDayOpen = true
+            "live_prayer" -> liveOpen = true
             "bible_session" -> biblePullsOpen = true
             "midnight" -> hourCard = "midnight"
             "warfare" -> selectedFeature = Feature("Warfare prayer", "", Icons.Outlined.Shield, Hub.PRAY)
@@ -239,6 +241,15 @@ fun PrayerKeyOperatingHome(
     var prayerWeek by remember(today, prayerOfDayOpen) { mutableStateOf(com.prayerkey.manna.data.PrayersOfTheDay.week(context, today)) }
     LaunchedEffect(today) {
         dayPrayer = com.prayerkey.manna.data.PrayersOfTheDay.forDate(context, today)
+    }
+    if (liveOpen) {
+        Dialog(onDismissRequest = { liveOpen = false }, properties = fullScreenDialog()) {
+            LivePrayerScreen(
+                date = today, todaysPrayer = dayPrayer,
+                onClose = { liveOpen = false },
+                onFinished = { prayerWeek = com.prayerkey.manna.data.PrayersOfTheDay.week(context, today) },
+            )
+        }
     }
     if (prayerOfDayOpen) {
         Dialog(
@@ -620,8 +631,18 @@ fun PrayerKeyOperatingHome(
             HomeItem("The watch", "Midnight Prayer", Res.drawable.discovery_cover_2, meta = "5 min") { requestedOffice = "MIDNIGHT"; morningPrayerOpen = true },
         )
         val nowOffice = offices[listOf("MORNING", "AFTERNOON", "EVENING", "NIGHT", "MIDNIGHT").indexOf(office).coerceAtLeast(0)]
+        // the morning live prayer leads the list until it has been prayed, then steps back
+        val liveDone = remember(today, liveOpen) { com.prayerkey.manna.data.LivePrayer.joined(context, today) }
+        val liveFeatured = !liveDone && now().hour < 12
+        val liveRow = HomeItem(
+            if (liveDone) "Prayed this morning" else "Live prayer · ${com.prayerkey.manna.data.LivePrayer.dayFor(today).theme}",
+            "Morning prayer, led", Res.drawable.onboarding_pray_v3,
+            meta = "${com.prayerkey.manna.data.LivePrayer.minutes(today)} min",
+            featured = liveFeatured,
+        ) { liveOpen = true }
         val more = buildList {
-            add(nowOffice.copy(eyebrow = "Pray now · ${now().let { t -> "${(t.hour + 11) % 12 + 1}:${t.minute.toString().padStart(2, '0')} ${if (t.hour < 12) "AM" else "PM"}" }}", featured = true))
+            add(liveRow)
+            add(nowOffice.copy(eyebrow = "Pray now · ${now().let { t -> "${(t.hour + 11) % 12 + 1}:${t.minute.toString().padStart(2, '0')} ${if (t.hour < 12) "AM" else "PM"}" }}", featured = !liveFeatured))
             written?.let { add(HomeItem("Devotional", it.title, Res.drawable.today_manuscript_hero, meta = "${it.minutes} min") { devotionalOpen = true }) }
             plan?.readingLabel?.takeIf { it.isNotBlank() }?.let {
                 add(HomeItem("Today's chapter", it, Res.drawable.onboarding_read_v3, meta = "$chapterMinutes min") { biblePullsOpen = true })
