@@ -54,10 +54,7 @@ class ReminderReceiver : BroadcastReceiver() {
            the reader's own morning, and only one of the two gets opened. */
         val message = when (kind) {
             ReminderKind.CALENDAR -> calendarMessage(LocalDate.now())!!
-            ReminderKind.PRAYER -> {
-                val theme = com.prayerkey.manna.data.LivePrayer.dayFor(com.prayerkey.manna.platform.today()).theme
-                "Live prayer is starting" to "Stand up, and let us pray. Today: $theme."
-            }
+            ReminderKind.PRAYER -> "Pray now" to "What do you want to pray about this morning? Tell God, and start praying."
             ReminderKind.BIBLE -> PullsProgress.Bible.notificationLine(context)
             /* The machine says what today holds, not that something is ready:
                the challenge names the day and its verse, the fast its day and

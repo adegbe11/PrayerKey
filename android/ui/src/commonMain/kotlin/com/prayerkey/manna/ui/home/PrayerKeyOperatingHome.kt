@@ -245,7 +245,7 @@ fun PrayerKeyOperatingHome(
     if (liveOpen) {
         Dialog(onDismissRequest = { liveOpen = false }, properties = fullScreenDialog()) {
             LivePrayerScreen(
-                date = today, todaysPrayer = dayPrayer,
+                date = today, topics = prayerTopics,
                 onClose = { liveOpen = false },
                 onFinished = { prayerWeek = com.prayerkey.manna.data.PrayersOfTheDay.week(context, today) },
             )
@@ -635,9 +635,9 @@ fun PrayerKeyOperatingHome(
         val liveDone = remember(today, liveOpen) { com.prayerkey.manna.data.LivePrayer.joined(context, today) }
         val liveFeatured = !liveDone && now().hour < 12
         val liveRow = HomeItem(
-            if (liveDone) "Prayed this morning" else "Live prayer · ${com.prayerkey.manna.data.LivePrayer.dayFor(today).theme}",
-            "Morning prayer, led", Res.drawable.onboarding_pray_v3,
-            meta = "${com.prayerkey.manna.data.LivePrayer.minutes(today)} min",
+            if (liveDone) "Live prayer · prayed today" else "Live prayer",
+            "What do you want to pray about?", Res.drawable.onboarding_pray_v3,
+            meta = "${com.prayerkey.manna.data.LivePrayer.DEFAULT_MINUTES} min",
             featured = liveFeatured,
         ) { liveOpen = true }
         val more = buildList {

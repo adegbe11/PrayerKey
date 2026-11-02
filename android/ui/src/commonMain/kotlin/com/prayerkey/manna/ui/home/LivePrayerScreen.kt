@@ -19,28 +19,29 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.MicNone
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material.icons.outlined.SkipNext
-import androidx.compose.material.icons.outlined.VolumeOff
-import androidx.compose.material.icons.outlined.VolumeUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,7 +49,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -60,218 +60,235 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.prayerkey.manna.data.LivePrayer
-import com.prayerkey.manna.data.LiveStep
-import com.prayerkey.manna.data.LiveVerse
-import com.prayerkey.manna.data.OfflineBible
-import com.prayerkey.manna.data.PrayerOfTheDay
-import com.prayerkey.manna.data.PrayersOfTheDay
+import com.prayerkey.manna.data.PrayerTopic
 import com.prayerkey.manna.ui.platform.Haptic
 import com.prayerkey.manna.ui.platform.Speaker
-import com.prayerkey.manna.ui.platform.UtteranceListener
 import com.prayerkey.manna.ui.platform.platformContext
+import com.prayerkey.manna.ui.platform.rememberDictation
 import com.prayerkey.manna.ui.platform.rememberHaptics
 import com.prayerkey.manna.ui.theme.DisplaySerif
 import com.prayerkey.manna.ui.theme.Pk
 import com.prayerkey.manna.ui.theme.UtilitySans
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.LocalDate
 
 private val LiveNight = Color(0xFF12002A)
 private val LiveGold = Color(0xFFF1DDAE)
 private val LiveRed = Color(0xFFFF4D5E)
 
+private enum class Phase { Ask, Verses, Praying, Done }
+
 /**
- * The morning live prayer, led step by step.
+ * Live prayer.
  *
- * The phone's voice leads each step the way a prayer leader would, then the
- * screen waits while you pray: a gold ring counts the time down and the phone
- * taps once when it is time to move on. Pause and skip are always there.
+ * What do you want to pray about? You say it, the screen gives you the
+ * verses for it, and when you are ready you start praying against a timer.
+ * The phone taps once when the time is up.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LivePrayerScreen(
     date: LocalDate,
-    todaysPrayer: PrayerOfTheDay?,
+    topics: List<PrayerTopic>,
     onClose: () -> Unit,
     onFinished: () -> Unit,
 ) {
     BackHandler(onBack = onClose)
     val context = platformContext()
     val haptics = rememberHaptics()
-    val day = remember(date) { LivePrayer.dayFor(date) }
-    val steps = remember(date) { LivePrayer.steps(date) }
 
-    // the KJV text of every verse the session uses
-    val verses = remember { mutableStateMapOf<LiveVerse, String>() }
-    LaunchedEffect(date) {
-        val bible = OfflineBible(context)
-        steps.forEach { step ->
-            val v = when (step) {
-                is LiveStep.Read -> step.verse
-                is LiveStep.Pray -> step.verse
-                else -> null
-            } ?: return@forEach
-            // a verse that stops on a comma is read as the end of a sentence
-            bible.chapter(v.book, v.chapter).firstOrNull { it.verse == v.verse }
-                ?.let { verses[v] = it.text.replace(Regex("""^\[[^\]]*\]\s*"""), "").trim().replace(Regex("[,;:]$"), ".") }
-        }
-    }
-
-    var index by remember { mutableIntStateOf(-1) }       // -1 is the welcome card
-    var line by remember { mutableIntStateOf(0) }         // which say-after-me line
-    var paused by remember { mutableStateOf(false) }
-    var voiceOn by remember { mutableStateOf(true) }
+    var phase by remember { mutableStateOf(Phase.Ask) }
+    var request by remember { mutableStateOf("") }
+    var topicTitle by remember { mutableStateOf<String?>(null) }
+    var verses by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
+    var minutes by remember { mutableIntStateOf(LivePrayer.DEFAULT_MINUTES) }
     var remaining by remember { mutableIntStateOf(0) }
-    var total by remember { mutableIntStateOf(0) }
-    var finished by remember { mutableStateOf(false) }
+    var paused by remember { mutableStateOf(false) }
 
     var speechReady by remember { mutableStateOf(false) }
     val speaker = remember { Speaker(context) { speechReady = it == Speaker.SUCCESS } }
-    val spoken = remember { mutableStateOf<CompletableDeferred<Unit>?>(null) }
-    DisposableEffect(speaker) {
-        speaker.setOnUtteranceProgressListener(object : UtteranceListener() {
-            override fun onDone(utteranceId: String?) { spoken.value?.complete(Unit) }
-            override fun onError(utteranceId: String?) { spoken.value?.complete(Unit) }
-        })
-        onDispose { speaker.stop(); speaker.shutdown() }
+    DisposableEffect(speaker) { onDispose { speaker.stop(); speaker.shutdown() } }
+    fun say(words: String) {
+        if (speechReady) { speaker.setSpeechRate(.9f); speaker.speak(words, Speaker.QUEUE_FLUSH, null, "live") }
     }
 
-    /* Says the words and returns when they have been said. With the voice off
-       it waits about as long as reading them would take. */
-    suspend fun say(words: String) {
-        if (voiceOn && speechReady) {
-            val done = CompletableDeferred<Unit>()
-            spoken.value = done
-            speaker.setSpeechRate(.88f)
-            speaker.speak(words, Speaker.QUEUE_FLUSH, null, "live")
-            withTimeoutOrNull(60_000) { done.await() }
-        } else {
-            delay((words.split(' ').size * 330L).coerceAtLeast(1500))
-        }
+    val dictation = rememberDictation("What do you want to pray about?") { spoken ->
+        request = if (request.isBlank()) spoken else "$request $spoken"
     }
 
-    suspend fun countdown(seconds: Int) {
-        total = seconds
-        remaining = seconds
+    fun findVerses(what: String) {
+        request = what
+        val (title, found) = LivePrayer.versesFor(what, topics)
+        topicTitle = title
+        verses = found
+        haptics.perform(Haptic.Tap)
+        phase = Phase.Verses
+    }
+
+    // the clock, which only runs while praying and not paused
+    LaunchedEffect(phase, paused) {
+        if (phase != Phase.Praying || paused) return@LaunchedEffect
         while (remaining > 0) {
             delay(1000)
-            if (!paused) remaining--
-        }
-    }
-
-    // one pass through a step; pausing stops the voice, and resuming starts the step's words again
-    LaunchedEffect(index, line, paused) {
-        if (paused || index < 0 || finished) return@LaunchedEffect
-        val step = steps.getOrNull(index) ?: return@LaunchedEffect
-        when (step) {
-            is LiveStep.Lead -> { say(step.words); if (step.seconds > 0) countdown(step.seconds) }
-            is LiveStep.Read -> {
-                say("Read it out loud with me. ${verses[step.verse].orEmpty()} ${step.verse.label}.")
-                countdown(6)
-            }
-            is LiveStep.SayAfterMe -> {
-                if (line == 0) say("Say this after me.")
-                say(step.lines[line])
-                countdown(5)
-                if (line < step.lines.lastIndex) { line++; haptics.perform(Haptic.Tick); return@LaunchedEffect }
-            }
-            is LiveStep.Pray -> { say(step.words); haptics.perform(Haptic.Tap); countdown(step.seconds) }
-            LiveStep.TodaysPrayer -> {
-                say("Let us close with today's prayer. Pray it with me.")
-                todaysPrayer?.let { say(it.text) }
-                countdown(4)
-            }
-            is LiveStep.Blessing -> { say(step.words); return@LaunchedEffect }
+            remaining--
+            if (remaining == 60) haptics.perform(Haptic.Tick)
         }
         haptics.perform(Haptic.Confirm)
-        line = 0
-        total = 0
-        if (index < steps.lastIndex) index++
+        say("Amen.")
+        LivePrayer.markJoined(context, date)
+        onFinished()
+        phase = Phase.Done
     }
 
-    fun skip() {
-        speaker.stop()
-        spoken.value?.complete(Unit)
-        line = 0
-        total = 0
-        if (index < steps.lastIndex) index++ else finished = true
-    }
-
-    Box(
-        Modifier.fillMaxSize().background(
-            Brush.verticalGradient(listOf(Color(0xFF2A0A6E), LiveNight, Color(0xFF07000F))),
-        ),
-    ) {
-        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
-            Row(Modifier.fillMaxWidth().padding(start = 8.dp, end = 18.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+    Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF2A0A6E), LiveNight, Color(0xFF07000F))))) {
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()) {
+            Row(Modifier.fillMaxWidth().padding(start = 8.dp, end = 48.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(40.dp).clip(CircleShape).clickable(onClick = onClose), contentAlignment = Alignment.Center) {
                     Icon(Icons.Outlined.Close, "Close", tint = LiveGold, modifier = Modifier.size(20.dp))
                 }
                 Spacer(Modifier.weight(1f))
                 LivePill()
                 Spacer(Modifier.weight(1f))
-                Box(Modifier.size(40.dp).clip(CircleShape).clickable { voiceOn = !voiceOn; if (!voiceOn) speaker.stop() }, contentAlignment = Alignment.Center) {
-                    Icon(if (voiceOn) Icons.Outlined.VolumeUp else Icons.Outlined.VolumeOff, if (voiceOn) "Voice on" else "Voice off", tint = LiveGold, modifier = Modifier.size(20.dp))
-                }
-            }
-            // one segment per step, filling as the morning goes on
-            Row(Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 14.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                steps.indices.forEach { i ->
-                    Box(
-                        Modifier.weight(1f).height(3.dp).clip(RoundedCornerShape(99.dp))
-                            .background(if (i <= index) Pk.GoldLight else Color.White.copy(alpha = .14f)),
-                    )
-                }
             }
 
-            Box(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 28.dp), contentAlignment = Alignment.Center) {
-                val key = if (finished) "done" else "$index-$line"
+            Box(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 26.dp), contentAlignment = Alignment.Center) {
                 AnimatedContent(
-                    key,
-                    transitionSpec = { (fadeIn(tween(500)) + slideInVertically(tween(500)) { it / 12 }) togetherWith fadeOut(tween(250)) },
-                    label = "live-step",
-                ) { _ ->
-                    when {
-                        finished -> Finished(day.theme)
-                        index < 0 -> Welcome(day.theme, LivePrayer.minutes(date))
-                        else -> StepView(steps[index], line, verses, todaysPrayer, remaining, total)
+                    phase,
+                    transitionSpec = { (fadeIn(tween(450)) + slideInVertically(tween(450)) { it / 14 }) togetherWith fadeOut(tween(200)) },
+                    label = "live-phase",
+                ) { p ->
+                    when (p) {
+                        Phase.Ask -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Eyebrow("Pray now")
+                            Text(
+                                "What do you want to pray about?", Modifier.padding(top = 14.dp),
+                                color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 38.sp, textAlign = TextAlign.Center,
+                            )
+                            Row(
+                                Modifier.padding(top = 26.dp).fillMaxWidth().clip(RoundedCornerShape(22.dp))
+                                    .background(Color.White.copy(alpha = .07f))
+                                    .border(1.dp, Pk.Gold.copy(alpha = .35f), RoundedCornerShape(22.dp))
+                                    .padding(start = 18.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                BasicTextField(
+                                    request, { request = it },
+                                    Modifier.weight(1f).heightIn(min = 44.dp).padding(vertical = 10.dp),
+                                    textStyle = TextStyle(color = Color.White, fontFamily = UtilitySans, fontSize = 18.sp),
+                                    cursorBrush = SolidColor(Pk.GoldLight),
+                                    decorationBox = { inner ->
+                                        Box { if (request.isEmpty()) Text("Type it or say it", color = Color.White.copy(alpha = .4f), fontFamily = UtilitySans, fontSize = 18.sp); inner() }
+                                    },
+                                )
+                                Box(Modifier.size(44.dp).clip(CircleShape).clickable { dictation.launch() }, contentAlignment = Alignment.Center) {
+                                    Icon(Icons.Outlined.MicNone, "Say it", tint = Pk.GoldLight, modifier = Modifier.size(24.dp))
+                                }
+                            }
+                            FlowRow(
+                                Modifier.padding(top = 18.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                LivePrayer.SUGGESTIONS.forEach { s ->
+                                    Text(
+                                        s,
+                                        Modifier.clip(RoundedCornerShape(99.dp)).background(Color.White.copy(alpha = .08f))
+                                            .clickable { findVerses(s) }.padding(horizontal = 14.dp, vertical = 9.dp),
+                                        color = LiveGold, fontFamily = UtilitySans, fontSize = 14.sp,
+                                    )
+                                }
+                            }
+                        }
+
+                        Phase.Verses -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Eyebrow(topicTitle ?: "Pray with these")
+                            Text(
+                                "“${request.trim()}”", Modifier.padding(top = 10.dp),
+                                color = Color.White.copy(alpha = .75f), fontFamily = UtilitySans, fontSize = 15.sp, textAlign = TextAlign.Center,
+                            )
+                            Text(
+                                "Pray these verses out loud.", Modifier.padding(top = 18.dp),
+                                color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 26.sp, textAlign = TextAlign.Center,
+                            )
+                            verses.forEach { (ref, text) -> VerseBlock(ref, text) }
+                            Text("How long will you pray?", Modifier.padding(top = 26.dp), color = LiveGold.copy(alpha = .7f), fontFamily = UtilitySans, fontSize = 14.sp)
+                            Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                LivePrayer.LENGTHS.forEach { m ->
+                                    val on = m == minutes
+                                    Text(
+                                        "$m min",
+                                        Modifier.clip(RoundedCornerShape(99.dp))
+                                            .background(if (on) Pk.GoldLight else Color.White.copy(alpha = .08f))
+                                            .clickable { minutes = m; haptics.perform(Haptic.Tick) }
+                                            .padding(horizontal = 16.dp, vertical = 9.dp),
+                                        color = if (on) LiveNight else LiveGold, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.size(12.dp))
+                        }
+
+                        Phase.Praying -> Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Eyebrow(if (paused) "Paused" else "Keep praying")
+                            Text(
+                                request.trim().replaceFirstChar { it.uppercase() }, Modifier.padding(top = 10.dp),
+                                color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 22.sp, textAlign = TextAlign.Center,
+                            )
+                            Ring(remaining, minutes * 60)
+                            // the verses stay in view to pray back to God
+                            verses.forEach { (ref, text) ->
+                                Text(
+                                    "$text  $ref", Modifier.padding(top = 14.dp),
+                                    color = LiveGold.copy(alpha = .7f), fontFamily = DisplaySerif, fontStyle = FontStyle.Italic, fontSize = 15.sp, lineHeight = 22.sp, textAlign = TextAlign.Center,
+                                )
+                            }
+                        }
+
+                        Phase.Done -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Eyebrow("Amen")
+                            Text(
+                                "You prayed.", Modifier.padding(top = 14.dp),
+                                color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 36.sp, textAlign = TextAlign.Center,
+                            )
+                            Text(
+                                "God heard you. Leave it with Him, and go into your day.", Modifier.padding(top = 14.dp),
+                                color = LiveGold.copy(alpha = .75f), fontFamily = UtilitySans, fontSize = 15.sp, lineHeight = 22.sp, textAlign = TextAlign.Center,
+                            )
+                        }
                     }
                 }
             }
 
-            Row(
-                Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                when {
-                    finished -> LiveButton(Icons.Outlined.Close, "Done", Modifier.weight(1f), filled = true) { onClose() }
-                    index < 0 -> LiveButton(Icons.Outlined.PlayArrow, "Start praying", Modifier.weight(1f), filled = true) {
-                        haptics.perform(Haptic.Confirm); index = 0
+            Row(Modifier.fillMaxWidth().padding(horizontal = 22.dp).padding(bottom = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                when (phase) {
+                    Phase.Ask -> LiveButton(Icons.Outlined.Check, "Find my verses", Modifier.weight(1f), filled = request.isNotBlank()) {
+                        if (request.isNotBlank()) findVerses(request)
                     }
-                    index == steps.lastIndex -> LiveButton(Icons.Outlined.Check, "Amen", Modifier.weight(1f), filled = true) {
-                        speaker.stop()
+                    Phase.Verses -> LiveButton(Icons.Outlined.PlayArrow, "Start praying", Modifier.weight(1f), filled = true) {
+                        remaining = minutes * 60
+                        paused = false
                         haptics.perform(Haptic.Confirm)
-                        LivePrayer.markJoined(context, date)
-                        PrayersOfTheDay.markPrayed(context, date)
-                        finished = true
-                        onFinished()
+                        say("Start praying.")
+                        phase = Phase.Praying
                     }
-                    else -> {
-                        LiveButton(if (paused) Icons.Outlined.PlayArrow else Icons.Outlined.Pause, if (paused) "Go on" else "Pause", Modifier.weight(1f)) {
-                            paused = !paused
-                            if (paused) { speaker.stop(); spoken.value?.complete(Unit) }
-                        }
-                        LiveButton(Icons.Outlined.SkipNext, "Next", Modifier.weight(1f)) { skip() }
+                    Phase.Praying -> {
+                        LiveButton(if (paused) Icons.Outlined.PlayArrow else Icons.Outlined.Pause, if (paused) "Go on" else "Pause", Modifier.weight(1f)) { paused = !paused }
+                        LiveButton(Icons.Outlined.Check, "Amen", Modifier.weight(1f), filled = true) { remaining = 0; paused = false; if (phase == Phase.Praying) { haptics.perform(Haptic.Confirm); LivePrayer.markJoined(context, date); onFinished(); phase = Phase.Done } }
+                    }
+                    Phase.Done -> {
+                        LiveButton(Icons.Outlined.PlayArrow, "Pray again", Modifier.weight(1f)) { request = ""; phase = Phase.Ask }
+                        LiveButton(Icons.Outlined.Close, "Done", Modifier.weight(1f), filled = true) { onClose() }
                     }
                 }
             }
@@ -302,108 +319,36 @@ private fun Eyebrow(text: String) = Text(
 )
 
 @Composable
-private fun Welcome(theme: String, minutes: Int) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Eyebrow("Live prayer")
-        val hour = com.prayerkey.manna.platform.now().hour
-        Text(
-            when { hour < 12 -> "Good morning."; hour < 17 -> "Good afternoon."; else -> "Good evening." },
-            Modifier.padding(top = 16.dp), color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 38.sp, textAlign = TextAlign.Center)
-        Text("Today we pray about", Modifier.padding(top = 22.dp), color = LiveGold.copy(alpha = .7f), fontFamily = UtilitySans, fontSize = 15.sp)
-        Text(theme, Modifier.padding(top = 6.dp), color = LiveGold, fontFamily = DisplaySerif, fontStyle = FontStyle.Italic, fontSize = 26.sp, textAlign = TextAlign.Center)
-        Text("About $minutes minutes. I will lead you. Pray out loud if you can.", Modifier.padding(top = 26.dp), color = Color.White.copy(alpha = .6f), fontFamily = UtilitySans, fontSize = 14.sp, lineHeight = 21.sp, textAlign = TextAlign.Center)
+private fun VerseBlock(ref: String, text: String) {
+    Column(
+        Modifier.padding(top = 14.dp).fillMaxWidth().clip(RoundedCornerShape(20.dp))
+            .background(Color.White.copy(alpha = .06f))
+            .border(1.dp, Pk.Gold.copy(alpha = .25f), RoundedCornerShape(20.dp))
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(text, color = Color.White, fontFamily = DisplaySerif, fontStyle = FontStyle.Italic, fontSize = 18.sp, lineHeight = 26.sp, textAlign = TextAlign.Center)
+        Text("$ref · KJV", Modifier.padding(top = 10.dp), color = Pk.GoldLight, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 12.sp)
     }
 }
 
-@Composable
-private fun StepView(step: LiveStep, line: Int, verses: Map<LiveVerse, String>, todaysPrayer: PrayerOfTheDay?, remaining: Int, total: Int) {
-    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
-        when (step) {
-            is LiveStep.Lead -> {
-                Eyebrow(step.title)
-                BigWords(step.words)
-                if (total > 0) Ring(remaining, total)
-            }
-            is LiveStep.Read -> {
-                Eyebrow(step.title)
-                Text(
-                    verses[step.verse].orEmpty(), Modifier.padding(top = 18.dp),
-                    color = Color.White, fontFamily = DisplaySerif, fontStyle = FontStyle.Italic, fontSize = 23.sp, lineHeight = 33.sp, textAlign = TextAlign.Center,
-                )
-                Text(step.verse.label + " · KJV", Modifier.padding(top = 14.dp), color = Pk.GoldLight, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            }
-            is LiveStep.SayAfterMe -> {
-                Eyebrow("Say after me")
-                Text(
-                    step.lines[line], Modifier.padding(top = 22.dp),
-                    color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 31.sp, lineHeight = 39.sp, textAlign = TextAlign.Center,
-                )
-                Row(Modifier.padding(top = 26.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    step.lines.indices.forEach { i ->
-                        Box(Modifier.size(7.dp).clip(CircleShape).background(if (i <= line) Pk.GoldLight else Color.White.copy(alpha = .18f)))
-                    }
-                }
-            }
-            is LiveStep.Pray -> {
-                Eyebrow(step.title)
-                BigWords(step.words)
-                step.verse?.let { v ->
-                    verses[v]?.let { text ->
-                        Text("$text  ${v.label}", Modifier.padding(top = 16.dp), color = LiveGold.copy(alpha = .65f), fontFamily = DisplaySerif, fontStyle = FontStyle.Italic, fontSize = 15.sp, lineHeight = 22.sp, textAlign = TextAlign.Center)
-                    }
-                }
-                if (total > 0) Ring(remaining, total)
-            }
-            LiveStep.TodaysPrayer -> {
-                Eyebrow("Today's prayer")
-                todaysPrayer?.let { p ->
-                    Text(p.title, Modifier.padding(top = 12.dp), color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 24.sp, textAlign = TextAlign.Center)
-                    p.lines.forEach { l ->
-                        Text(l, Modifier.padding(top = 6.dp), color = if (l.startsWith("Amen")) Pk.GoldLight else Color.White.copy(alpha = .9f), fontFamily = DisplaySerif, fontSize = 18.sp, lineHeight = 26.sp, textAlign = TextAlign.Center)
-                    }
-                }
-            }
-            is LiveStep.Blessing -> {
-                Eyebrow("The blessing")
-                Text(step.words, Modifier.padding(top = 18.dp), color = Color.White, fontFamily = DisplaySerif, fontStyle = FontStyle.Italic, fontSize = 22.sp, lineHeight = 32.sp, textAlign = TextAlign.Center)
-                Text("Numbers 6:24-26", Modifier.padding(top = 12.dp), color = Pk.GoldLight, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-            }
-        }
-    }
-}
-
-@Composable
-private fun BigWords(words: String) = Text(
-    words, Modifier.padding(top = 18.dp),
-    color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.SemiBold, fontSize = 25.sp, lineHeight = 34.sp, textAlign = TextAlign.Center,
-)
-
-/** The time left to pray, as a gold ring closing around the seconds. */
+/** The time left to pray, as a gold ring closing around the minutes. */
 @Composable
 private fun Ring(remaining: Int, total: Int) {
     val target = if (total > 0) remaining / total.toFloat() else 0f
     val sweep by animateFloatAsState(target, tween(950), label = "ring")
-    Box(Modifier.padding(top = 30.dp).size(132.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.padding(top = 26.dp).size(190.dp), contentAlignment = Alignment.Center) {
         Canvas(Modifier.fillMaxSize()) {
-            val stroke = 5.dp.toPx()
+            val stroke = 6.dp.toPx()
             val inset = stroke / 2
             val arc = Size(size.width - stroke, size.height - stroke)
             drawArc(Color.White.copy(alpha = .10f), 0f, 360f, false, Offset(inset, inset), arc, style = Stroke(stroke))
             drawArc(Pk.GoldLight, -90f, 360f * sweep, false, Offset(inset, inset), arc, style = Stroke(stroke, cap = StrokeCap.Round))
         }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("${remaining / 60}:${(remaining % 60).toString().padStart(2, '0')}", color = Color.White, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 26.sp)
-            Text("keep praying", color = LiveGold.copy(alpha = .6f), fontFamily = UtilitySans, fontSize = 11.sp)
-        }
-    }
-}
-
-@Composable
-private fun Finished(theme: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Eyebrow("Amen")
-        Text("You prayed today.", Modifier.padding(top = 16.dp), color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 32.sp, lineHeight = 38.sp, textAlign = TextAlign.Center)
-        Text("$theme. Go into your day. He goes with you.", Modifier.padding(top = 16.dp), color = LiveGold.copy(alpha = .75f), fontFamily = UtilitySans, fontSize = 15.sp, lineHeight = 22.sp, textAlign = TextAlign.Center)
+        Text(
+            "${remaining / 60}:${(remaining % 60).toString().padStart(2, '0')}",
+            color = Color.White, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 40.sp,
+        )
     }
 }
 
