@@ -201,14 +201,12 @@ private fun WeekDots(week: List<Pair<LocalDate, Boolean>>, onDark: Boolean, last
  * The prayer itself, said line by line.
  *
  * The lines arrive one after another, the way the prayer is prayed, then the
- * verse it came from. Amen marks the day, lights it on the week, and shows
- * tomorrow's title so there is something to come back to.
+ * verse it came from. Amen marks the day and lights it on the week.
  */
 @Composable
 fun PrayerOfTheDayScreen(
     prayer: PrayerOfTheDay,
     date: LocalDate,
-    tomorrow: PrayerOfTheDay?,
     onClose: () -> Unit,
     onPrayed: () -> Unit,
 ) {
@@ -328,12 +326,6 @@ fun PrayerOfTheDayScreen(
                 if (prayed) {
                     Column(Modifier.padding(top = 26.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         WeekDots(week, onDark = true, lastPop = pop.value)
-                        if (tomorrow != null) {
-                            Text(
-                                "Tomorrow: ${tomorrow.title}", Modifier.padding(top = 16.dp),
-                                color = GoldPale.copy(alpha = .7f), fontFamily = UtilitySans, fontSize = 13.sp, textAlign = TextAlign.Center,
-                            )
-                        }
                     }
                 }
                 Spacer(Modifier.height(24.dp))

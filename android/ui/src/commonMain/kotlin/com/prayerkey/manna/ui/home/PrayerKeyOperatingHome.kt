@@ -235,11 +235,9 @@ fun PrayerKeyOperatingHome(
 
     /* Prayer of the day: one short prayer for the date, and the verse it comes from. */
     var dayPrayer by remember(today) { mutableStateOf<com.prayerkey.manna.data.PrayerOfTheDay?>(null) }
-    var tomorrowPrayer by remember(today) { mutableStateOf<com.prayerkey.manna.data.PrayerOfTheDay?>(null) }
     var prayerWeek by remember(today, prayerOfDayOpen) { mutableStateOf(com.prayerkey.manna.data.PrayersOfTheDay.week(context, today)) }
     LaunchedEffect(today) {
         dayPrayer = com.prayerkey.manna.data.PrayersOfTheDay.forDate(context, today)
-        tomorrowPrayer = com.prayerkey.manna.data.PrayersOfTheDay.forDate(context, today.plusDays(1))
     }
     if (prayerOfDayOpen) {
         Dialog(
@@ -248,7 +246,7 @@ fun PrayerKeyOperatingHome(
         ) {
             dayPrayer?.let { p ->
                 PrayerOfTheDayScreen(
-                    prayer = p, date = today, tomorrow = tomorrowPrayer,
+                    prayer = p, date = today,
                     onClose = { prayerOfDayOpen = false },
                     onPrayed = { prayerWeek = com.prayerkey.manna.data.PrayersOfTheDay.week(context, today) },
                 )
