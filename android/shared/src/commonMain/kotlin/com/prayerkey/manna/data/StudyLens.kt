@@ -19,7 +19,7 @@ object StudyLens {
         }.keys
         val themeText = found.take(3).joinToString(", ").ifBlank { "the character of God and faithful response" }
         return listOf(
-            StudyNote("SCRIPTURE", "$reference — $verse", "Bible text"),
+            StudyNote("SCRIPTURE", "$reference, $verse", "Bible text"),
             StudyNote("OBSERVE", "This verse contains language connected with $themeText. Notice what the text says before deciding what it means for you.", "Words in the verse"),
             StudyNote("CONTEXT", "Read the full chapter and notice who is speaking, who is listening, what happens before this verse, and what response follows it.", "How to read it in context"),
             StudyNote("REFLECT", "What does this reveal about God? What response does the passage invite? Where might you need wisdom from a trusted pastor or mature reader?", "Reflection questions"),
@@ -38,7 +38,7 @@ object StudyLens {
             normalized.contains("context") || normalized.startsWith("who") || normalized.startsWith("when") -> StudyAnswer(
                 "CONTEXT PATH",
                 "This single verse cannot establish its full historical or literary context. Read the surrounding chapter and identify speaker, audience, setting, and the argument before and after $reference.",
-                "Study method — no external facts asserted",
+                "Study method, no external facts asserted",
             )
             normalized.contains("mean") || normalized.contains("say") || normalized.contains("observe") -> StudyAnswer(
                 "TEXT OBSERVATION",

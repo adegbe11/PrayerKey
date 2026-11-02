@@ -68,7 +68,7 @@ object JournalSuggestions {
             if (note.takeaway.isNotBlank()) {
                 out += Prompt(
                     kicker = "FROM SUNDAY",
-                    text = "${note.takeaway} — did you do it?",
+                    text = "${note.takeaway}, did you do it?",
                     source = "sermon",
                 )
             }

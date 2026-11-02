@@ -498,7 +498,7 @@ private fun VerseDetail(
                 Text("Ask about this passage", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(value = studyQuestion, onValueChange = { studyQuestion = it }, label = { Text("Your question") }, placeholder = { Text("What does this passage say?") }, modifier = Modifier.fillMaxWidth(), minLines = 2)
-                Button(onClick = { studyAnswer = com.prayerkey.manna.data.StudyLens.answer(reference, text, studyQuestion) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), enabled = studyQuestion.isNotBlank()) { Text("Explore carefully") }
+                Button(onClick = { studyAnswer = com.prayerkey.manna.data.StudyLens.answer(reference, text, studyQuestion) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp), enabled = studyQuestion.isNotBlank()) { Text("Ask") }
                 studyAnswer?.let { answer ->
                     Text(answer.label, color = Gold, fontSize = 9.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 14.dp))
                     Text(answer.text, fontSize = 12.5.sp, lineHeight = 19.sp, modifier = Modifier.padding(top = 4.dp))
@@ -548,11 +548,11 @@ private fun MemoryTrainer(
                 onClick = { onReview(memory.reference, false) },
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
             ) { Text("I need more practice") }
-            Button(onClick = { onAdvance(memory.reference) }, modifier = Modifier.fillMaxWidth().padding(top = 22.dp)) { Text(if (memory.stage >= 5) "Practice again" else "I recited it — hide more") }
+            Button(onClick = { onAdvance(memory.reference) }, modifier = Modifier.fillMaxWidth().padding(top = 22.dp)) { Text(if (memory.stage >= 5) "Practice again" else "I recited it, hide more") }
         }
     }
     if (connections.isNotEmpty()) {
-        Text("Woven through your journey", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp, bottom = 8.dp))
+        Text("In your journal", color = Gold, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 18.dp, bottom = 8.dp))
         connections.forEach { connection ->
             Surface(Modifier.fillMaxWidth().padding(bottom = 7.dp), shape = RoundedCornerShape(16.dp), color = Color.White, border = androidx.compose.foundation.BorderStroke(1.dp, Hairline)) {
                 Column(Modifier.padding(13.dp)) {
@@ -1262,7 +1262,7 @@ fun ProfileScreen(
             DropdownMenu(versionMenu, onDismissRequest = { versionMenu = false }) {
                 BIBLE_VERSIONS.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text("${item.id} — ${item.name}") },
+                        text = { Text("${item.id}, ${item.name}") },
                         onClick = { onUpdate(prefs.copy(translation = item.id)); versionMenu = false },
                     )
                 }
@@ -1314,8 +1314,8 @@ fun ProfileScreen(
     }
     if (confirmRestore) AlertDialog(
         onDismissRequest = { confirmRestore = false },
-        title = { Text("Restore your Journey?") },
-        text = { Text("This replaces the current Journey, prayers, sermon notes, saved words, and memory progress on this device. Export the current archive first if you may need it.") },
+        title = { Text("Restore your backup?") },
+        text = { Text("This replaces your current journal, prayers, sermon notes, saved words, and memory progress on this device. Export the current archive first if you may need it.") },
         confirmButton = { TextButton(onClick = { confirmRestore = false; restoreArchive.launch() }) { Text("Choose archive") } },
         dismissButton = { TextButton(onClick = { confirmRestore = false }) { Text("Cancel") } },
     )
@@ -1331,7 +1331,7 @@ fun ProfileScreen(
         title = { Text("PrayerKey", fontFamily = DisplaySerif, fontWeight = FontWeight.Bold) },
         text = {
             Text(
-                "Free, no ads, and your journey stays on this device.",
+                "Free, no ads, and everything stays on your phone.",
                 color = Pk.Muted, lineHeight = 21.sp,
             )
         },

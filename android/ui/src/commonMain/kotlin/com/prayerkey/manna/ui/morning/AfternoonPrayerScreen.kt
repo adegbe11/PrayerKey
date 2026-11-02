@@ -57,7 +57,7 @@ private val AFTERNOON = listOf(
     OfficeMovement(
         "Stop", "Come off the day for a moment",
         listOf(
-            "Father, I am stopping. Not because the work is finished — it is not — but because I have been going since morning and I have not looked up once. Here I am. The half of the day that is gone is Yours, and so is the half that is left.",
+            "Father, I am stopping. Not because the work is finished, it is not, but because I have been going since morning and I have not looked up once. Here I am. The half of the day that is gone is Yours, and so is the half that is left.",
         ),
     ),
     OfficeMovement(
@@ -74,7 +74,7 @@ private val AFTERNOON = listOf(
             "Isaiah 40:31",
         ),
         after = listOf(
-            "I am tired, and there is more to do. Renew my strength — not so that I can do more, but so that I can do what is actually mine to do, and do it well. Steady my attention. Keep me kind when I am rushed. Give me wisdom for the next conversation, the next decision, the next hour.",
+            "I am tired, and there is more to do. Renew my strength, not so that I can do more, but so that I can do what is actually mine to do, and do it well. Steady my attention. Keep me kind when I am rushed. Give me wisdom for the next conversation, the next decision, the next hour.",
         ),
     ),
     OfficeMovement(

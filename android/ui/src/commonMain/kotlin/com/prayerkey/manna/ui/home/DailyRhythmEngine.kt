@@ -171,7 +171,7 @@ private fun DailyRhythmPage(
                         RhythmHeading("Prayer for understanding")
                         Text("Father, search my heart in the light of Your Word. Correct what is wrong in me, strengthen what is weak, and give me grace to obey what You reveal. Let Your truth shape my thoughts, my words, and my decisions today. In Jesus' name, Amen.", fontFamily = DisplaySerif, fontSize = 22.sp, lineHeight = 31.sp, color = Pk.Charcoal)
                         RhythmHeading("Personal prayer")
-                        Text("Lord, concerning ${passage.reference}—show me what You are saying and lead me in the way that pleases You. In Jesus' name, Amen.", fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 28.sp, color = Pk.Charcoal)
+                        Text("Lord, concerning ${passage.reference}, show me what You are saying and lead me in the way that pleases You. In Jesus' name, Amen.", fontFamily = BookSerif, fontSize = 19.sp, lineHeight = 28.sp, color = Pk.Charcoal)
                         RhythmNote(note) { note = it; prefs.edit().putString("${date}_$moment", it).apply() }
                     }
                     else -> {

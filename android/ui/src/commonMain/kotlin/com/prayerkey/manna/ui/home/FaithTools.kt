@@ -50,7 +50,7 @@ In Jesus’ name, Amen.""",
 private val prayerPoints = listOf(
     "Thank God for life, mercy, and everything that carried you today.",
     "Ask God to forgive your sins and help you walk in a new direction.",
-    "Pray for protection over yourself, your family, your home, and your journey.",
+    "Pray for protection over yourself, your family, your home, and your travel.",
     "Ask for healing in your body, mind, emotions, and relationships.",
     "Pray for wisdom, clear decisions, and freedom from confusion.",
     "Ask God to bless your work, studies, business, finances, and responsibilities.",

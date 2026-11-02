@@ -152,7 +152,7 @@ fun PrayerSessionScreen(
                     color = Color.White.copy(alpha = .86f), border = BorderStroke(1.dp, Pk.Hair), shadowElevation = 2.dp,
                 ) {
                     Column {
-                        listOf("Guided" to "Prayer prompts and Scripture", "Light guidance" to "A gentle prompt when you need it", "Timer only" to "Quiet space with no prompts").forEachIndexed { index, item ->
+                        listOf("Guided" to "Prayer prompts and Scripture", "Light guidance" to "A short prompt now and then", "Timer only" to "Quiet space with no prompts").forEachIndexed { index, item ->
                             Row(
                                 Modifier.fillMaxWidth().clickable { mode = item.first }.padding(horizontal = 20.dp, vertical = 17.dp),
                                 verticalAlignment = Alignment.CenterVertically,

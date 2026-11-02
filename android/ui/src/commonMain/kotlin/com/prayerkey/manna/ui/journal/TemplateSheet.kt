@@ -250,7 +250,7 @@ fun TemplateSheet(
 
             if (template.verse.isNotBlank()) {
                 Text(
-                    template.verse + "  — " + template.verseRef,
+                    template.verse + "  · " + template.verseRef,
                     Modifier.fillMaxWidth().padding(top = 14.dp),
                     color = Pk.JournalInk.copy(alpha = .72f), fontFamily = BookSerif, fontStyle = FontStyle.Italic,
                     fontSize = 13.5.sp, lineHeight = 20.sp, textAlign = TextAlign.Center,

@@ -34,12 +34,12 @@ object RemembranceBook {
             Triple("Prayers I carried", "PRAYER", entries.filter { it.createdAt >= start && it.isPrayer }.map { it.prayerStage.label to it.body }),
             Triple("Words that stayed", "SCRIPTURE", saved.filter { it.savedAt >= start }.map { "${it.reference} · ${it.translation}" to it.verse }),
             Triple("Sundays I carried home", "CHURCH", sermons.filter { it.createdAt >= start }.map { it.title to it.takeaway }),
-            Triple("Pages from my journey", "REFLECTION", entries.filter { it.createdAt >= start && !it.isPrayer }.map { date(it.createdAt) to it.body }),
+            Triple("Pages from my journal", "REFLECTION", entries.filter { it.createdAt >= start && !it.isPrayer }.map { date(it.createdAt) to it.body }),
         )
         pageNo = drawPage(document, ++pageNo, "${name.ifBlank { "My" }} Book of Remembrance", year.toString(), listOf(
             "A YEAR HELD WITH CARE" to "This book gathers the prayers, words, sermons, gratitude, and testimonies you chose to keep in PrayerKey.",
             "THE STORY SO FAR" to "${entries.count { it.createdAt >= start }} reflections · ${prayers.count { it.createdAt >= start }} prayers · ${sermons.count { it.createdAt >= start }} sermon notes · ${saved.count { it.savedAt >= start }} saved words",
-            "REMEMBER" to "This is a record of your journey, not a measurement of your worth or faithfulness.",
+            "REMEMBER" to "This is a record of what you wrote. It is not a score.",
         ))
         groups.forEach { (title, kicker, blocks) -> blocks.chunked(4).forEach { pageNo = drawPage(document, ++pageNo, title, kicker, it) } }
         val dir = File(context.cacheDir, "shared").apply { mkdirs() }

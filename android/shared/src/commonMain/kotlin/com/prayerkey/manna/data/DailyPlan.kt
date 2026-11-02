@@ -105,7 +105,7 @@ fun bibleChallenge(date: LocalDate, doneDays: Set<Int>): Challenge {
     return Challenge(
         id = "read-the-gospels",
         title = "Read the Gospels",
-        note = "John, then Mark — one chapter a day",
+        note = "John, then Mark, one chapter a day",
         today = ChallengeDay(
             index = day + 1,
             total = plan.size,

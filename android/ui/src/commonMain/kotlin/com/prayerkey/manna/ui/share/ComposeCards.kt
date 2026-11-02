@@ -244,13 +244,13 @@ class ComposeCards(private val context: PlatformContext) {
             drawCircle(cream, 315f, Offset(540f, 500f), style = Stroke(14f))
         }
         sans(); color = cream; size = 25f; spacing = .2f
-        text("PRAYERKEY · UNLOCKED", 540f, 315f); spacing = 0f
+        text("PRAYERKEY · FINISHED", 540f, 315f); spacing = 0f
         serif(bold = true); color = Color.White; size = 58f
         charWrap(title, 22).take(3).forEachIndexed { index, line -> text(line, 540f, 445f + index * 70f) }
         sans(); color = cream; size = 25f
         text(detail.uppercase(), 540f, 690f)
         color = night; size = 26f
-        text("A faithful step, completed.", 540f, 950f)
+        text("Finished. Well done.", 540f, 950f)
         png()
     }
 

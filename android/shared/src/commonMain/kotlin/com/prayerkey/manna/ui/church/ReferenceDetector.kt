@@ -3,7 +3,7 @@ package com.prayerkey.manna.ui.church
 /**
  * Finds scripture references inside spoken text, entirely on device.
  *
- * A preacher never says "John 3:16" — he says "John chapter three verse
+ * A preacher never says "John 3:16", he says "John chapter three verse
  * sixteen", or just "John three sixteen". Speech recognisers hand back
  * words, not digits, so this parses both.
  *

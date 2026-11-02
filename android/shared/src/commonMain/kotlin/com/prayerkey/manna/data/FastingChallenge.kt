@@ -23,7 +23,7 @@ enum class FastLength(val label: String, val blurb: String, val hours: Int) {
     SUNRISE("Sunrise to sunset", "A biblical fast", 12),
     DAY("24 hours", "Go deeper", 24),
     THREE("3 days", "Seek God intentionally", 72),
-    SEVEN("7 days", "A transformational journey", 168),
+    SEVEN("7 days", "A full week", 168),
     TWENTY_ONE("21 days", "A deeper commitment", 504),
     CUSTOM("Custom", "Set your own length", 0),
     ;

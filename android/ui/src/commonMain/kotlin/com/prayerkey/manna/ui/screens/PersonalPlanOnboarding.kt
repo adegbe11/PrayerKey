@@ -170,7 +170,7 @@ private fun NeedStep(selected: PrayerNeed, choose: (PrayerNeed) -> Unit, next: (
 
 @Composable
 private fun RhythmStep(selected: String, choose: (String) -> Unit, hour: Int, chooseHour: (Int) -> Unit, next: () -> Unit) {
-    OnboardingPage("When would you like to pray?", "Choose a rhythm that fits your day.", "Continue", next) {
+    OnboardingPage("When would you like to pray?", "Pick the times that suit you.", "Continue", next) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             listOf("Morning", "Evening", "Morning and evening", "I’ll choose later").forEach { label ->
                 SelectRow(label, selected == label, Icons.Outlined.Schedule) { choose(label) }
@@ -194,7 +194,7 @@ private fun RhythmStep(selected: String, choose: (String) -> Unit, hour: Int, ch
 
 @Composable
 private fun JourneyStep(selected: FirstJourney, choose: (FirstJourney) -> Unit, next: () -> Unit) {
-    OnboardingPage("How would you like to begin?", "Start with one simple journey.", "Build my plan", next) {
+    OnboardingPage("How would you like to begin?", "Start with one small plan.", "Build my plan", next) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             firstJourneys.forEach { item ->
                 val active = item == selected
@@ -221,7 +221,7 @@ private fun JourneyStep(selected: FirstJourney, choose: (FirstJourney) -> Unit, 
 
 @Composable
 private fun PlanRevealStep(need: PrayerNeed, journey: FirstJourney, hour: Int, next: () -> Unit) {
-    OnboardingPage("Your first journey is ready.", "Built around what you need today.", "Continue", next) {
+    OnboardingPage("Your first plan is ready.", "Built around what you need today.", "Continue", next) {
         Surface(Modifier.fillMaxWidth(), color = Pk.DeepDark, shape = RoundedCornerShape(28.dp)) {
             Column(Modifier.padding(22.dp)) {
                 Text(journey.title, color = Pk.GoldLight, fontWeight = FontWeight.Bold, fontSize = 13.sp)

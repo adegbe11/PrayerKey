@@ -722,7 +722,7 @@ private fun JournalOverview(
         /* A shelf of collections that all read "0 pages" is a table of contents
            for a book nobody has written yet. Each appears when it has a page. */
         val filled = collections.filter { it.count > 0 }
-        if (filled.isNotEmpty()) Text("Your prayer journey", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
+        if (filled.isNotEmpty()) Text("Your prayers", color = ink, fontFamily = UtilitySans, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.padding(top = 25.dp, bottom = 11.dp))
         if (filled.isNotEmpty()) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             filled.forEach { item ->
                 Surface(
@@ -876,7 +876,7 @@ private fun PrayerJourneyDialog(
                 )
             }
         },
-        confirmButton = { TextButton(onClick = { onSave(stage, nextAction, testimony) }) { Text("Save journey") } },
+        confirmButton = { TextButton(onClick = { onSave(stage, nextAction, testimony) }) { Text("Save") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
     )
 

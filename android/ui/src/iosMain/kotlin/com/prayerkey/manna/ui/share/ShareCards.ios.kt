@@ -63,7 +63,7 @@ object IosShareCards : ShareCards {
 
     override fun shareStatus(context: PlatformContext, card: VerseCard) {
         scope.launch {
-            shareImage(context, cards(context).brandedStatus(card), "${card.reference}\n\n${card.verse}\n\n— PrayerKey", "Share verse image")
+            shareImage(context, cards(context).brandedStatus(card), "${card.reference}\n\n${card.verse}\n\nPrayerKey", "Share verse image")
         }
     }
 
@@ -76,7 +76,7 @@ object IosShareCards : ShareCards {
 
     override fun sharePrayerStatus(context: PlatformContext, prayer: String) {
         scope.launch {
-            shareImage(context, cards(context).prayerStatus(prayer), "$prayer\n\n— PrayerKey", "Share the prayer")
+            shareImage(context, cards(context).prayerStatus(prayer), "$prayer\n\nPrayerKey", "Share the prayer")
         }
     }
 
@@ -90,7 +90,7 @@ object IosShareCards : ShareCards {
 
     override fun shareClosingVerse(context: PlatformContext, verse: String, reference: String) {
         scope.launch {
-            shareImage(context, cards(context).closingVerseStatus(verse, reference), "$reference\n\n$verse\n\n— PrayerKey", "Share closing verse")
+            shareImage(context, cards(context).closingVerseStatus(verse, reference), "$reference\n\n$verse\n\nPrayerKey", "Share closing verse")
         }
     }
 
@@ -103,7 +103,7 @@ object IosShareCards : ShareCards {
     }
 
     override fun shareVerse(context: PlatformContext, card: VerseCard) =
-        shareImage(context, cards(context).verseCard(card), "${card.reference} — PrayerKey", "Share this word")
+        shareImage(context, cards(context).verseCard(card), "${card.reference} · PrayerKey", "Share this word")
 
     override fun sharePrayer(context: PlatformContext, topic: PrayerTopic) {
         val refs = topic.scripture.take(3).joinToString(" · ") { it.first }
@@ -112,7 +112,7 @@ object IosShareCards : ShareCards {
             buildString {
                 append(topic.title).append("\n\n").append(topic.prayer)
                 if (refs.isNotEmpty()) append("\n\n").append(refs)
-                append("\n\n— PrayerKey")
+                append("\n\nPrayerKey")
             },
             "Share this prayer",
         )
@@ -125,7 +125,7 @@ object IosShareCards : ShareCards {
         shareImage(context, cards(context).badge(title, detail), "", "Share challenge badge")
 
     override fun sharePrayerCard(context: PlatformContext, prayer: DailyPrayer, format: CardFormat) =
-        shareImage(context, cards(context).prayerOfTheDay(prayer, format), "${prayer.title} · ${prayer.ref} — prayerkey.com", "Share Prayer of the Day")
+        shareImage(context, cards(context).prayerOfTheDay(prayer, format), "${prayer.title} · ${prayer.ref}, prayerkey.com", "Share Prayer of the Day")
 
     override fun shareSundayNotes(context: PlatformContext, note: SermonNote) =
         shareText(context, sundayNotesText(note), "Share these notes")
@@ -143,7 +143,7 @@ object IosShareCards : ShareCards {
             Triple("Prayers I carried", "PRAYER", entries.filter { it.createdAt >= start && it.isPrayer }.map { it.prayerStage.label to it.body }),
             Triple("Words that stayed", "SCRIPTURE", saved.filter { it.savedAt >= start }.map { "${it.reference} · ${it.translation}" to it.verse }),
             Triple("Sundays I carried home", "CHURCH", sermons.filter { it.createdAt >= start }.map { it.title to it.takeaway }),
-            Triple("Pages from my journey", "REFLECTION", entries.filter { it.createdAt >= start && !it.isPrayer }.map { date(it.createdAt) to it.body }),
+            Triple("Pages from my journal", "REFLECTION", entries.filter { it.createdAt >= start && !it.isPrayer }.map { date(it.createdAt) to it.body }),
         )
         val c = cards(context)
         val pages = mutableListOf<ByteArray>()
@@ -152,7 +152,7 @@ object IosShareCards : ShareCards {
             listOf(
                 "A YEAR HELD WITH CARE" to "This book gathers the prayers, words, sermons, gratitude, and testimonies you chose to keep in PrayerKey.",
                 "THE STORY SO FAR" to "${entries.count { it.createdAt >= start }} reflections · ${prayers.count { it.createdAt >= start }} prayers · ${sermons.count { it.createdAt >= start }} sermon notes · ${saved.count { it.savedAt >= start }} saved words",
-                "REMEMBER" to "This is a record of your journey, not a measurement of your worth or faithfulness.",
+                "REMEMBER" to "This is a record of what you wrote. It is not a score.",
             ),
         )
         groups.forEach { (title, kicker, blocks) -> blocks.chunked(4).forEach { pages += c.remembrancePage(pages.size + 1, title, kicker, it) } }

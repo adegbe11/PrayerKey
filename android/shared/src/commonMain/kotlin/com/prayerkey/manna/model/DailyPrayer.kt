@@ -1887,7 +1887,7 @@ private val PRAYERS_6 = listOf(
         ref = "Proverbs 11:25",
         title = "A Generous Person",
         verse = "The liberal soul shall be made fat: and he that watereth shall be watered also himself.",
-        prayer = "Father, make me refreshing to be around. Let me give something away today — time, money, attention — and trust You to refill me. Amen.",
+        prayer = "Father, make me refreshing to be around. Let me give something away today, time, money, attention, and trust You to refill me. Amen.",
     ),
     DailyPrayer(
         ref = "Psalm 30:11",

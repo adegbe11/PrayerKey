@@ -313,7 +313,7 @@ private fun CaptionsOffer(onSkip: () -> Unit, onReady: () -> Unit) {
         Text(
             when (val s = state) {
                 is com.prayerkey.manna.ui.church.ModelState.Failed ->
-                    "That did not download: ${s.reason}. Recording still works — you can try again."
+                    "That did not download: ${s.reason}. Recording still works, you can try again."
                 else ->
                     "See the sermon written out as it is spoken, and catch the verses " +
                         "quoted. It runs on your phone, so it works with no signal and costs " +
@@ -569,7 +569,7 @@ private fun ListeningView(
             if (chunks.isEmpty() && partial.isBlank()) {
                 Text(
                     if (captureStatus.contains("unavailable")) {
-                        "Recording. Captions are off — the words can be added afterwards."
+                        "Recording. Captions are off, the words can be added afterwards."
                     } else {
                         "Listening…"
                     },
@@ -717,7 +717,7 @@ private fun NoteView(
         val empty = note.points.isEmpty() && note.quotes.isEmpty() && note.scriptures.isEmpty()
         if (empty) {
             Text(
-                "Nothing was caught this time. The mic may not have picked up the preaching — try sitting closer to the front, or check that offline speech is installed for your language.",
+                "Nothing was caught this time. The mic may not have picked up the preaching, try sitting closer to the front, or check that offline speech is installed for your language.",
                 color = Muted, fontSize = 13.sp, lineHeight = 20.sp, modifier = Modifier.padding(top = 30.dp),
             )
         }
@@ -916,7 +916,7 @@ private fun SavedNoteSheet(
                 Text("Share these notes")
             }
             Text(
-                "Your private Journey is never included.",
+                "Your private journal is never included.",
                 color = Muted, fontSize = 10.5.sp, lineHeight = 15.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
             )

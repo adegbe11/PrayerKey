@@ -130,7 +130,7 @@ private fun JournalTemplate.withBookRhythm(): JournalTemplate {
         "Prayer" -> TemplatePrompt("CLOSING PRAYER", "What will you place in God’s hands as you close?", "Leave the page with one honest sentence of trust.")
         "Bible & Scripture" -> TemplatePrompt("CARRY IT", "How will you carry this Scripture into today?", "Name one small response, not a perfect plan.")
         "Answered prayer" -> TemplatePrompt("REMEMBER", "What do you want your future self to remember about God’s faithfulness?", "Write it as a testimony you can return to.")
-        "Difficult seasons" -> TemplatePrompt("NEXT STEP", "What is the next faithful step you can take?", "It can be small. Faithfulness does not need to be dramatic.")
+        "Difficult seasons" -> TemplatePrompt("NEXT STEP", "What is one small thing you can do next?", "It can be small. Faithfulness does not need to be dramatic.")
         "Sermon & church" -> TemplatePrompt("RESPONSE", "What will you do with what you heard?", "Turn one insight into a prayer or action.")
         "Gratitude" -> TemplatePrompt("THANK YOU", "What final thank-you do you want to pray today?", "Name the gift so you do not forget it.")
         else -> TemplatePrompt("CLOSING", "What do you want to carry forward from this page?", "End with one sentence you can remember.")
@@ -292,7 +292,7 @@ private fun Folio(number: Int, of: Int, onBack: () -> Unit, onNext: () -> Unit) 
             modifier = Modifier.clip(CircleShape).clickable(onClick = onBack).padding(horizontal = 14.dp, vertical = 2.dp),
         )
         Text(
-            "—  " + number + "  —",
+            "·  " + number + "  ·",
             Modifier.weight(1f),
             color = Pk.JournalInk.copy(alpha = .5f), fontFamily = BookSerif,
             fontSize = 13.sp, textAlign = TextAlign.Center,

@@ -321,7 +321,7 @@ private fun BibleChallengeLanding(
                     onClick = { Share.cards.shareBadge(context, plan.title, "${plan.days} days completed") },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp).height(54.dp),
                     shape = RoundedCornerShape(18.dp), colors = ButtonDefaults.buttonColors(containerColor = Pk.VioletDeep),
-                ) { Text("Share my unlocked badge", fontWeight = FontWeight.Bold) }
+                ) { Text("Share my badge", fontWeight = FontWeight.Bold) }
                 if (missedDay) Surface(
                     onClick = onUseGrace,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 14.dp),

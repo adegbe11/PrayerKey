@@ -199,7 +199,7 @@ fun DevotionalCards(
                         }
                     }
                     CardAction(Icons.Outlined.Share, "Share", Modifier.weight(1f)) {
-                        val text = "${day.line.plain}\n\n$verse\n$reference (KJV)\n\n— PrayerKey"
+                        val text = "${day.line.plain}\n\n$verse\n$reference (KJV)\n\nPrayerKey"
                         shareText(context, text, "Share")
                     }
                     CardAction(Icons.Outlined.Check, "Done", Modifier.weight(1f), filled = true) {
@@ -646,7 +646,7 @@ fun ChapterCards(
                     }
                     CardAction(Icons.Outlined.Share, "Share", Modifier.weight(1f)) {
                         val text = (key?.text ?: verses.firstOrNull()?.text.orEmpty()) +
-                            "\n$name:${key?.verse ?: 1} (KJV)\n\n— PrayerKey"
+                            "\n$name:${key?.verse ?: 1} (KJV)\n\nPrayerKey"
                         shareText(context, text, "Share")
                     }
                     CardAction(Icons.Outlined.Check, "Done", Modifier.weight(1f), filled = true) {

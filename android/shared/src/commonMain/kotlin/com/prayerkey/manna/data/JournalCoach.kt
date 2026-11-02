@@ -19,13 +19,13 @@ object JournalCoach {
         }
         val highlight = when {
             entry.gratitude.isNotBlank() -> "Gratitude stands out: ${entry.gratitude.take(100)}"
-            entry.verseRef != null -> "This entry is anchored to ${entry.verseRef}."
+            entry.verseRef != null -> "This entry goes with ${entry.verseRef}."
             theme != null -> "A thread of $theme appears in what you wrote."
             else -> "You gave honest attention to this moment."
         }
         val questions = listOfNotNull(
             "What feeling sits underneath the words you chose?",
-            theme?.let { "Where else has $it appeared in your recent journey?" },
+            theme?.let { "Where else has $it appeared in your recent entries?" },
             entry.verseRef?.let { "How does $it challenge or comfort your first reaction?" },
             "What is one small response you want to remember tomorrow?",
         ).take(3)

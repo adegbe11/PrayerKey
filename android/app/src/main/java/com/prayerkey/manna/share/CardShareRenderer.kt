@@ -31,7 +31,7 @@ object CardShareRenderer {
 
     /** A portrait PrayerKey keepsake sized for WhatsApp/Instagram status. */
     fun shareStatus(context: Context, card: VerseCard) {
-        send(context, brandedStatus(context, card), "${card.reference}\n\n${card.verse}\n\n— PrayerKey", "Share verse image")
+        send(context, brandedStatus(context, card), "${card.reference}\n\n${card.verse}\n\nPrayerKey", "Share verse image")
     }
 
     fun saveStatus(context: Context, card: VerseCard) {
@@ -53,7 +53,7 @@ object CardShareRenderer {
     }
 
     fun sharePrayerStatus(context: Context, prayer: String) {
-        send(context, prayerStatus(context, prayer), "$prayer\n\n— PrayerKey", "Share today's prayer")
+        send(context, prayerStatus(context, prayer), "$prayer\n\nPrayerKey", "Share today's prayer")
     }
 
     fun savePrayerStatus(context: Context, prayer: String) {
@@ -75,7 +75,7 @@ object CardShareRenderer {
     }
 
     fun shareClosingVerse(context: Context, verse: String, reference: String) {
-        send(context, closingVerseStatus(context, verse, reference), "$reference\n\n$verse\n\n— PrayerKey", "Share closing verse")
+        send(context, closingVerseStatus(context, verse, reference), "$reference\n\n$verse\n\nPrayerKey", "Share closing verse")
     }
 
     fun saveClosingVerse(context: Context, verse: String, reference: String) {
@@ -198,7 +198,7 @@ object CardShareRenderer {
 
         send(
             context, bitmap,
-            caption = "${card.reference} — PrayerKey",
+            caption = "${card.reference} · PrayerKey",
             chooser = "Share this word",
         )
     }
@@ -285,7 +285,7 @@ object CardShareRenderer {
             caption = buildString {
                 append(topic.title).append("\n\n").append(topic.prayer)
                 if (refs.isNotEmpty()) append("\n\n").append(refs)
-                append("\n\n— PrayerKey")
+                append("\n\nPrayerKey")
             },
             chooser = "Share this prayer",
         )

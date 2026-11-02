@@ -189,7 +189,7 @@ private fun QuoteCinema(
             Box(
                 Modifier.fillMaxWidth().height(56.dp).clip(RoundedCornerShape(16.dp))
                     .background(Color(0xE61A1A1A)).clickable {
-                        shareText(context, "$quote — $author\n\nShared from PrayerKey", "Share quote")
+                        shareText(context, "$quote, $author\n\nShared from PrayerKey", "Share quote")
                     },
                 contentAlignment = Alignment.Center,
             ) {

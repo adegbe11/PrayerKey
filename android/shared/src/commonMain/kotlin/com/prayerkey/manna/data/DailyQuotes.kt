@@ -23,7 +23,7 @@ private val quoteOpenings = listOf(
 )
 
 private val quoteResponses = listOf(
-    "take the next faithful step.", "let grace carry what strength cannot.",
+    "take the next small step.", "let grace carry what strength cannot.",
     "begin with one honest prayer.", "remember that God is nearer than the noise.",
     "choose trust before you have proof.", "rest before you decide to give up.",
     "make room for God to surprise you.", "hold on to the truth you already know.",
@@ -33,7 +33,7 @@ private val quoteResponses = listOf(
     "remember that waiting is not the same as being forgotten.",
     "thank God for what has carried you this far.", "let today be enough for today.",
     "speak to God plainly; you do not need perfect words.",
-    "keep walking—faithfulness grows one day at a time.",
+    "keep walking, faithfulness grows one day at a time.",
     "leave space for an answer different from the one you imagined.",
 )
 

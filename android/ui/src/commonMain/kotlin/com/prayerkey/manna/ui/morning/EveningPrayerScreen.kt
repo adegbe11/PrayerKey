@@ -78,7 +78,7 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
         palette = palette,
         voice = voice,
         speaking = speaking.value,
-        colophon = "Morning Prayer opens at first light.\nTomorrow runs the other way — enter, praise,\nconfess, thank, and walk out into it.",
+        colophon = "Morning Prayer opens at first light.\nTomorrow runs the other way, enter, praise,\nconfess, thank, and walk out into it.",
         finishLabel = "Finish prayer",
         background = Res.drawable.today_prayer_violet,
         onClose = onClose,
@@ -118,11 +118,11 @@ fun EveningPrayerScreen(onClose: () -> Unit) {
 private val EVENING = listOf(
     OfficeMovement(
         "Still", "The day is finished. Put it down",
-        listOf("Father, the day is over. Whatever I did not get to will still be there in the morning, and it can wait there without me. I am putting it down now — all of it — and coming to You before I sleep."),
+        listOf("Father, the day is over. Whatever I did not get to will still be there in the morning, and it can wait there without me. I am putting it down now, all of it, and coming to You before I sleep."),
     ),
     OfficeMovement(
         "Review", "Walk back through the day with Him",
-        listOf("Take me back through today. Show me where You were in it — in the ordinary parts I rushed past, in the small mercy I called luck, in the person You put in front of me. Show me what I handled well, and let me be glad about it without pretending it was all my own doing. And show me the moments I would rather not look at."),
+        listOf("Take me back through today. Show me where You were in it, in the ordinary parts I rushed past, in the small mercy I called luck, in the person You put in front of me. Show me what I handled well, and let me be glad about it without pretending it was all my own doing. And show me the moments I would rather not look at."),
         silence = "Stop here. Let the day come back to you.",
     ),
     OfficeMovement(
@@ -138,11 +138,11 @@ private val EVENING = listOf(
     ),
     OfficeMovement(
         "Forgive", "Put down what was done to you",
-        listOf("And what was done to me today — the slight, the rudeness, the one who took and did not thank me — I am letting that go too. I will not lie in this bed rehearsing it. Help me forgive the way I have just been forgiven, tonight, before it hardens."),
+        listOf("And what was done to me today, the slight, the rudeness, the one who took and did not thank me, I am letting that go too. I will not lie in this bed rehearsing it. Help me forgive the way I have just been forgiven, tonight, before it hardens."),
     ),
     OfficeMovement(
         "Release", "Hand over what you cannot fix",
-        listOf("There are things I cannot fix tonight. The unfinished work. The conversation still open. The money, the decision I cannot see clearly yet, the person I am worried about. I am handing them to You. You do not sleep — so there is no reason for both of us to be awake with this."),
+        listOf("There are things I cannot fix tonight. The unfinished work. The conversation still open. The money, the decision I cannot see clearly yet, the person I am worried about. I am handing them to You. You do not sleep, so there is no reason for both of us to be awake with this."),
     ),
     OfficeMovement(
         "Word", "The last thing you read tonight",
@@ -158,10 +158,10 @@ private val EVENING = listOf(
     ),
     OfficeMovement(
         "Protect", "Over the house, over the night",
-        listOf("Keep this house until morning. Keep my family, wherever they are sleeping tonight. Guard my mind while I am not watching it — no fear, no dread, nothing that leaves a mark. Let me wake whole."),
+        listOf("Keep this house until morning. Keep my family, wherever they are sleeping tonight. Guard my mind while I am not watching it, no fear, no dread, nothing that leaves a mark. Let me wake whole."),
     ),
     OfficeMovement(
         "Rest", "You are not in charge tonight",
-        listOf("Into Your hands I commend my spirit. I am not running anything tonight, and I am glad of it. Thank You for this day — all of it, the good and the hard. Give me sleep, and give me mercy in the morning."),
+        listOf("Into Your hands I commend my spirit. I am not running anything tonight, and I am glad of it. Thank You for this day, all of it, the good and the hard. Give me sleep, and give me mercy in the morning."),
     ),
 )

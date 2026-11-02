@@ -115,7 +115,7 @@ fun MorningPrayerScreen(onClose: () -> Unit) {
 private val MORNING = listOf(
     OfficeMovement(
         "Enter", "Become aware of God",
-        listOf("Father, before this day takes me, I am here. I am putting down the phone, the list, and the worry I woke up with. For the next few minutes there is nothing else — only You and me."),
+        listOf("Father, before this day takes me, I am here. I am putting down the phone, the list, and the worry I woke up with. For the next few minutes there is nothing else, only You and me."),
     ),
     OfficeMovement(
         "Praise", "Worship Him for who He is",
@@ -124,8 +124,8 @@ private val MORNING = listOf(
     OfficeMovement(
         "Confess", "Examine your heart, then receive mercy",
         listOf(
-            "Now search my heart and tell me what You find. Show me what is in me that should not go into this day — the resentment I have been feeding, the sharp word I have been rehearsing, the thing I keep doing and keep excusing. Forgive what I have thought, said and done, and forgive what I left undone.",
-            "I am not going to argue with You about any of it. Have mercy on me — not because I have earned it, but because mercy is who You are. Blot it out, and let me walk into this day clean.",
+            "Now search my heart and tell me what You find. Show me what is in me that should not go into this day, the resentment I have been feeding, the sharp word I have been rehearsing, the thing I keep doing and keep excusing. Forgive what I have thought, said and done, and forgive what I left undone.",
+            "I am not going to argue with You about any of it. Have mercy on me, not because I have earned it, but because mercy is who You are. Blot it out, and let me walk into this day clean.",
         ),
     ),
     OfficeMovement(
@@ -143,15 +143,15 @@ private val MORNING = listOf(
     ),
     OfficeMovement(
         "Surrender", "Your kingdom come, Your will be done",
-        listOf("So this day is Yours before it is mine. My plans, my schedule, the decisions I have made and the ones I am still arguing with myself about — take them. Your will, not mine. If You want to change the order of today, change it. Order my steps, and go into every room before I walk into it."),
+        listOf("So this day is Yours before it is mine. My plans, my schedule, the decisions I have made and the ones I am still arguing with myself about, take them. Your will, not mine. If You want to change the order of today, change it. Order my steps, and go into every room before I walk into it."),
     ),
     OfficeMovement(
         "Ask", "Bring Him what you actually need",
-        listOf("Now I bring You what I need. Wisdom — the real kind, that knows when to speak and when to keep quiet. Provision for what today requires, and freedom from anxiety about the gap. Strength in my body and clarity in my head. Bless the work of my hands, and let what I build stand and be useful to somebody. And this, which You already know:"),
+        listOf("Now I bring You what I need. Wisdom, the real kind, that knows when to speak and when to keep quiet. Provision for what today requires, and freedom from anxiety about the gap. Strength in my body and clarity in my head. Bless the work of my hands, and let what I build stand and be useful to somebody. And this, which You already know:"),
     ),
     OfficeMovement(
         "Intercede", "Carry somebody other than yourself",
-        listOf("Remember the people I love, and meet them where I cannot reach. Remember my family and my friends, the ones who asked me to pray and the ones too tired to ask. Remember the widow, the prisoner, the refugee and the sick. Remember Your church. Remember the leaders of this land — give them a conscience they cannot ignore."),
+        listOf("Remember the people I love, and meet them where I cannot reach. Remember my family and my friends, the ones who asked me to pray and the ones too tired to ask. Remember the widow, the prisoner, the refugee and the sick. Remember Your church. Remember the leaders of this land, give them a conscience they cannot ignore."),
     ),
     OfficeMovement(
         "Protect", "Lead us not into temptation",

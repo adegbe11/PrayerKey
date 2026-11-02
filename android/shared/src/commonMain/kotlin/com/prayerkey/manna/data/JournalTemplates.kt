@@ -408,10 +408,10 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "bible-soap", "Bible & Scripture", "SOAP study",
         "Scripture, Observation, Application, Prayer",
         listOf(
-            p("SCRIPTURE — write the verse out in full"),
-            p("OBSERVATION — what does it actually say?"),
-            p("APPLICATION — what does it ask of me?"),
-            p("PRAYER — pray it back to Him"),
+            p("SCRIPTURE: write the verse out in full"),
+            p("OBSERVATION: what does it actually say?"),
+            p("APPLICATION: what does it ask of me?"),
+            p("PRAYER: pray it back to Him"),
         ),
     ),
     JournalTemplate(
@@ -460,9 +460,9 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "Slowly, one line at a time",
         listOf(
             p("The passage"),
-            p("Read it once — what do I notice?"),
-            p("Read it again — what word stays?"),
-            p("Read it a third time — what is He saying?"),
+            p("Read it once: what do I notice?"),
+            p("Read it again: what word stays?"),
+            p("Read it a third time: what is He saying?"),
         ),
     ),
     JournalTemplate(
@@ -522,7 +522,7 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         listOf(
             p("What did I ask for?"),
             p("What happened?"),
-            p("How did He answer — was it what I expected?"),
+            p("How did He answer: was it what I expected?"),
             p("What did I learn about Him?"),
         ),
     ),
@@ -787,12 +787,12 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         "war-armour", "Spiritual warfare", "The armour of God",
         "Ephesians 6, one piece at a time",
         listOf(
-            p("Truth — what lie am I putting down?"),
-            p("Righteousness — what am I making right?"),
-            p("Peace — where do I need to stand still?"),
-            p("Faith — what am I trusting Him for?"),
-            p("Salvation — what do I know is settled?"),
-            p("The Word — what am I praying back to Him?"),
+            p("Truth: what lie am I putting down?"),
+            p("Righteousness: what am I making right?"),
+            p("Peace: where do I need to stand still?"),
+            p("Faith: what am I trusting Him for?"),
+            p("Salvation: what do I know is settled?"),
+            p("The Word: what am I praying back to Him?"),
         ),
     ),
     JournalTemplate(
@@ -808,7 +808,7 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
     ),
     JournalTemplate(
         "war-protection", "Spiritual warfare", "Prayer for protection",
-        "Over people, a home, a journey",
+        "Over people, a home, a trip",
         listOf(
             p("Who or what am I covering?"),
             p("What am I asking God to guard?"),
@@ -1095,7 +1095,7 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
         listOf(
             p("What I sensed"),
             p("When and where"),
-            p("What I will do with it — if anything yet"),
+            p("What I will do with it: if anything yet"),
         ),
         journal = "Dreams",
     ),
@@ -1155,7 +1155,7 @@ val JOURNAL_TEMPLATES: List<JournalTemplate> = listOf(
             p("What am I still bringing to God?"),
             p("What has changed since I last wrote?"),
             p("What Scripture is helping me keep going?"),
-            p("What is my next faithful step?"),
+            p("What is one small thing I can do next?"),
         ),
         prayer = true,
     ),

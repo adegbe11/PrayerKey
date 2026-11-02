@@ -174,7 +174,7 @@ object SermonArranger {
         val words = theme.take(2).map { w -> w.replaceFirstChar { it.uppercase() } }
         return when {
             words.size == 2 -> "${words[0]} and ${words[1]}"
-            words.size == 1 && main != null -> "${words[0]} — $main"
+            words.size == 1 && main != null -> "${words[0]}, $main"
             words.size == 1 -> words[0]
             main != null -> main
             else -> "Sunday service"
@@ -223,6 +223,6 @@ object SermonArranger {
             appendLine(note.takeaway)
         }
         appendLine()
-        append("My notes from today — PrayerKey")
+        append("My notes from today · PrayerKey")
     }
 }

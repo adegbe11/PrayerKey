@@ -470,7 +470,7 @@ private fun RhythmStep(
 ) {
     StepFrame(
         step = 5, of = 6,
-        title = "Prayer rhythm",
+        title = "When to pray",
         subtitle = "When would you like to pray?",
         onBack = onBack,
         footer = { PrimaryButton("Next", onClick = onNext) },
@@ -1243,7 +1243,7 @@ fun ChallengeChooser(
                     color = Color.White, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 25.sp, lineHeight = 30.sp,
                 )
                 Text(
-                    "13 written journeys. Read, reflect, pray.",
+                    "13 written challenges. Read, think, pray.",
                     Modifier.padding(top = 10.dp),
                     color = Color.White.copy(alpha = .82f), fontFamily = UtilitySans, fontSize = 13.sp,
                 )

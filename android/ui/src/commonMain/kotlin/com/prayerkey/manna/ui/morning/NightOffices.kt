@@ -165,7 +165,7 @@ private val MIDNIGHT = listOf(
     OfficeMovement(
         "Repent", "Leave no ground for the enemy to stand on",
         listOf(
-            "Before I ask anything, search me. Anything in my life that gives the enemy a legal right — unforgiveness I am nursing, a habit I keep returning to, an agreement I made without knowing what I was agreeing to — show it to me now.",
+            "Before I ask anything, search me. Anything in my life that gives the enemy a legal right, unforgiveness I am nursing, a habit I keep returning to, an agreement I made without knowing what I was agreeing to, show it to me now.",
             "I confess it and I renounce it. Wash me in the blood of Jesus. I am not coming to this hour with anything hidden.",
         ),
     ),
@@ -203,6 +203,6 @@ private val MIDNIGHT = listOf(
     ),
     OfficeMovement(
         "Seal", "Thank Him before you see it",
-        listOf("Father, I thank You for hearing me at this hour. I am not going to keep repeating myself — You heard me the first time. I thank You for what You have already begun to do while I was still speaking. Now let me lie down and sleep in peace, because You alone make me dwell in safety."),
+        listOf("Father, I thank You for hearing me at this hour. I am not going to keep repeating myself, You heard me the first time. I thank You for what You have already begun to do while I was still speaking. Now let me lie down and sleep in peace, because You alone make me dwell in safety."),
     ),
 )

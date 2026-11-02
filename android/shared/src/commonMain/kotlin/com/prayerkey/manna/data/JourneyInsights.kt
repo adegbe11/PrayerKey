@@ -67,7 +67,7 @@ object JourneyInsights {
             theme?.let { add("${it.label.replaceFirstChar(Char::uppercase)} has appeared more than once in your recent reflections.") }
             recurringReference?.let { add("$it has stayed close across your words, sermons, or saved Scripture.") }
             if (openPrayers > 0) add("You are carrying $openPrayers ${if (openPrayers == 1) "open prayer" else "open prayers"}.")
-            if (answered > 0) add("Your journey also holds $answered ${if (answered == 1) "recorded answer" else "recorded answers"}.")
+            if (answered > 0) add("Your journal also holds $answered ${if (answered == 1) "recorded answer" else "recorded answers"}.")
         }
 
         return JourneyInsight(

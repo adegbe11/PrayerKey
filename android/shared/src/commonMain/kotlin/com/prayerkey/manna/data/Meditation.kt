@@ -189,7 +189,7 @@ private val TEXTS: Map<MeditationFocus, FocusText> = mapOf(
             "Father, I do not see the whole road. Show me the next step.",
             "Give me the humility to wait, and the courage to move when You say go.",
         ),
-        "Take one faithful step. He will light the next one.",
+        "Take one step. He will light the next one.",
     ),
     MeditationFocus.PSALM to FocusText(
         "The Lord is my shepherd; I shall not want.", "Psalm 23:1",

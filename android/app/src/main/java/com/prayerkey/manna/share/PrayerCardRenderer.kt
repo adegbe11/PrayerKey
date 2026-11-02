@@ -31,7 +31,7 @@ object PrayerCardRenderer {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.files", file)
         context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
             type = "image/png"; putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_TEXT, "${prayer.title} · ${prayer.ref} — prayerkey.com")
+            putExtra(Intent.EXTRA_TEXT, "${prayer.title} · ${prayer.ref}, prayerkey.com")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }, "Share Prayer of the Day"))
     }

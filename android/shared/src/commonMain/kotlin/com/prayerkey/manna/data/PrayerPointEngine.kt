@@ -261,7 +261,7 @@ object PrayerPointEngine {
             .find(clean) ?: return listOf(clean)
         val verb = head.groupValues[1]
         val rest = head.groupValues[2]
-        /* The head already carries the possessive — "Renew my" — so a part
+        /* The head already carries the possessive — "Renew my", so a part
            that repeats it produced "Renew my my friendships". Drop the echo. */
         val tail = verb.substringAfterLast(' ').lowercase()
         val parts = rest.split(Regex(""",\s*(?:and\s+)?|\s+and\s+"""))

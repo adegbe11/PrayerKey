@@ -316,12 +316,12 @@ private fun Welcome(onClose: () -> Unit, onBrowse: () -> Unit) {
         ) {
             Text("Bible plan", color = Ink, fontFamily = DisplaySerif, fontWeight = FontWeight.Bold, fontSize = 31.sp)
             Text(
-                "A journey through God's Word for a stronger you.",
+                "Read the Bible a little every day.",
                 Modifier.padding(top = 7.dp, bottom = 18.dp),
                 color = Pk.Muted, fontFamily = UtilitySans, fontSize = 15.sp, textAlign = TextAlign.Center,
             )
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Feature(Icons.Outlined.AutoStories, "Grow closer to God", "Build a daily habit")
+                Feature(Icons.Outlined.AutoStories, "A plan for every day", "A few minutes is enough")
                 Feature(Icons.Outlined.WbSunny, "Plans for every season", "Faith, healing, peace, prayer and more")
                 Feature(Icons.Outlined.InsertChart, "Stay on track", "See your progress")
             }
@@ -1023,7 +1023,7 @@ private fun Finished(plan: ReadingPlanDef, progress: PlanProgress, onAnother: ()
                     .padding(vertical = 13.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text("Share my journey", color = Pk.Oxblood, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                Text("Share my progress", color = Pk.Oxblood, fontFamily = UtilitySans, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             }
         }
     }

@@ -70,7 +70,7 @@ object LocalPrayerTopics {
         val edits = linkedMapOf(
             "Cancel every debt and replace it with abundance." to "Give me discipline, honest counsel, and a workable path out of debt.",
             "Bring unexpected income and supernatural provision." to "Provide honest opportunities, sufficient income, and wisdom for every decision.",
-            "Let people be drawn to help me without knowing why — because Your hand is on my life." to "Grant me favour with people whose help is honest, wise, and timely.",
+            "Let people be drawn to help me without knowing why, because Your hand is on my life." to "Grant me favour with people whose help is honest, wise, and timely.",
             "I trust that they are with You." to "I entrust them to Your mercy.",
             "Regulate what doctors cannot fully control." to "Give my clinicians wisdom and help me manage this condition faithfully.",
             "supernatural intervention where medicine reaches its limit" to "effective treatment, wise care, and healing according to Your mercy",
@@ -81,7 +81,7 @@ object LocalPrayerTopics {
             "supernatural, tangible relief" to "real and lasting relief",
             "By Your stripes I am healed." to "I place my hope in Your mercy and healing.",
             "I believe and receive it." to "I ask with faith and entrust the outcome to You.",
-            "Let this baby develop perfectly — every organ, every system, every cell." to "Guard this baby through every stage of development — every organ, every system, every cell.",
+            "Let this baby develop perfectly, every organ, every system, every cell." to "Guard this baby through every stage of development, every organ, every system, every cell.",
             "Guard against any complication." to "Protect this pregnancy and guide every medical decision.",
         )
         return edits.entries.fold(source) { prayer, edit -> prayer.replace(edit.key, edit.value) }

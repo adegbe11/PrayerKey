@@ -315,7 +315,7 @@ private fun PrayerPointMode(topic: PrayerTopic, requested: Int, onBack: () -> Un
             }
         } else {
             val endings = listOf(
-                Triple("DECLARATION", "God is with me.", "I trust His Word, receive His wisdom, and remain steadfast in prayer. Fear will not govern me, and despair will not have the final word."),
+                Triple("DECLARATION", "God is with me.", "I trust what God has said. I will keep praying. Fear does not get to run my life, and despair does not get the last word."),
                 Triple("PERSONAL PRAYER", "Father, You know my heart.", "I place every person, decision, fear, and hope connected to this matter before You. Intervene with mercy, guide me in truth, and establish Your will in my life."),
                 Triple("CLOSING PRAYER", "Father, thank You for hearing me.", "Strengthen me to trust You, obey You, and walk in Your peace. Let every answer bring glory to Your name. In Jesus' name, Amen."),
             )

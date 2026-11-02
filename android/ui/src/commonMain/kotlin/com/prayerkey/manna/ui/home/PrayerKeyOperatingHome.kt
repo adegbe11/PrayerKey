@@ -629,16 +629,16 @@ fun PrayerKeyOperatingHome(
             add(HomeItem("Right now", "I need prayer", Res.drawable.welcome_prayer_dawn) { emergencyPrayerOpen = true })
             add(HomeItem("For others", "Praying for", Res.drawable.onboarding_church_v3) { prayingForOpen = true })
             addAll(offices.filter { it != nowOffice })
-            if (!challenge.started) add(HomeItem("Grow", "Start a prayer challenge", Res.drawable.onboarding_pray_v3) { challengeOpen = true })
-            if (!fast.running) add(HomeItem("Draw near", "Start a fast", Res.drawable.discovery_cover_3) { fastOpen = true })
-            if (activeSeason == null) add(HomeItem("Seasons", "Short challenges for the church year", Res.drawable.discovery_cover_1) { namedChallengesOpen = true })
-            if (readingPlan == null) add(HomeItem("Read", "Start a Bible plan", Res.drawable.onboarding_read_v3) { biblePlanOpen = true })
+            if (!challenge.started) add(HomeItem("Challenge", "Start a prayer challenge", Res.drawable.onboarding_pray_v3) { challengeOpen = true })
+            if (!fast.running) add(HomeItem("Fasting", "Start a fast", Res.drawable.discovery_cover_3) { fastOpen = true })
+            if (activeSeason == null) add(HomeItem("Seasons", "Lent, Advent and short challenges", Res.drawable.discovery_cover_1) { namedChallengesOpen = true })
+            if (readingPlan == null) add(HomeItem("Bible plan", "Start a Bible plan", Res.drawable.onboarding_read_v3) { biblePlanOpen = true })
             add(HomeItem("Be still", "A quiet moment with God", Res.drawable.discovery_cover_4) { meditationOpen = true })
             add(HomeItem("Declare", "Prayer points", Res.drawable.discovery_cover_5) { prayerPointsOpen = true })
             add(HomeItem("Together", "Family altar", Res.drawable.discovery_cover_6) { familyAltarOpen = true })
             add(HomeItem("Sleep", "Bedtime", Res.drawable.onboarding_prayer) { bedtimeOpen = true })
             add(HomeItem("Your language", "Pray in your language", Res.drawable.prayerkey_discovery_world) { languagesOpen = true })
-            add(HomeItem("Your days", "Prayer calendar", Res.drawable.onboarding_journal_v3) { prayerCalendarOpen = true })
+            add(HomeItem("Calendar", "Days you prayed", Res.drawable.onboarding_journal_v3) { prayerCalendarOpen = true })
         }
         HomeSection("More for you", more, visible = 5)
         Spacer(Modifier.height(26.dp))
@@ -652,7 +652,7 @@ fun PrayerKeyOperatingHome(
         }
         // the page closes on finding a word in the Bible, under the Bible itself
         Spacer(Modifier.height(10.dp))
-        HomeSingleRow(HomeItem("Find a word", "Bible by topic", Res.drawable.bible_cover_red) { topicalBibleOpen = true })
+        HomeSingleRow(HomeItem("Bible", "Verses by topic", Res.drawable.bible_cover_red) { topicalBibleOpen = true })
         Spacer(Modifier.height(24.dp))
         }
 
@@ -2617,7 +2617,7 @@ private fun programmeCategories() = listOf(
         Feature("Topical Bible verses", "Scripture for subjects and situations", Icons.Outlined.Search, Hub.BIBLE),
     )),
     ProgrammeCategory("Fast", listOf(
-        Feature("Start a fast", "Choose a focus and a safe rhythm", Icons.Outlined.WaterDrop, Hub.PRAY),
+        Feature("Start a fast", "Pick what it is for and how long", Icons.Outlined.WaterDrop, Hub.PRAY),
         Feature("Daniel fast", "A guided Daniel fast", Icons.Outlined.Spa, Hub.PRAY),
         Feature("Esther fast", "A serious guided fast", Icons.Outlined.Shield, Hub.PRAY),
         Feature("Timed fast", "Choose the hours you will keep", Icons.Outlined.Schedule, Hub.PRAY),
