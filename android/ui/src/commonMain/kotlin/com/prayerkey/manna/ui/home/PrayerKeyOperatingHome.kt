@@ -647,7 +647,6 @@ fun PrayerKeyOperatingHome(
             add(HomeItem("Together", "Family altar", Res.drawable.discovery_cover_6) { familyAltarOpen = true })
             add(HomeItem("Sleep", "Bedtime", Res.drawable.onboarding_prayer) { bedtimeOpen = true })
             add(HomeItem("Your language", "Pray in your language", Res.drawable.prayerkey_discovery_world) { languagesOpen = true })
-            add(HomeItem("Find a word", "Bible by topic", Res.drawable.bible_cover_red) { topicalBibleOpen = true })
             add(HomeItem("Your days", "Prayer calendar", Res.drawable.onboarding_journal_v3) { prayerCalendarOpen = true })
         }
         HomeSection("More for you", more, visible = 5)
@@ -660,7 +659,10 @@ fun PrayerKeyOperatingHome(
                 modifier = Modifier.fillMaxWidth().aspectRatio(.78f).pressable(.98f),
             )
         }
-        HomeBenediction()
+        // the page closes on finding a word in the Bible, under the Bible itself
+        Spacer(Modifier.height(10.dp))
+        HomeSingleRow(HomeItem("Find a word", "Bible by topic", Res.drawable.bible_cover_red) { topicalBibleOpen = true })
+        Spacer(Modifier.height(24.dp))
         }
 
         if (challengeOpen) {

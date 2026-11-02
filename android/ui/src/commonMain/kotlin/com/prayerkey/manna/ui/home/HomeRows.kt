@@ -107,6 +107,12 @@ fun HomeSection(title: String, items: List<HomeItem>, visible: Int = items.size)
     }
 }
 
+/** One row on its own, without a heading, in the same shape as the lists. */
+@Composable
+fun HomeSingleRow(item: HomeItem) {
+    Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) { Rise { HomeRow(item) } }
+}
+
 /** Fades and lifts its content in the first time it scrolls onto the screen. */
 @Composable
 private fun Rise(content: @Composable () -> Unit) {
