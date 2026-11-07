@@ -122,11 +122,9 @@ fun PrayerScreen(
 
     Surface(Modifier.fillMaxSize(), color = PrayBlack) {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 14.dp).height(48.dp), verticalAlignment = Alignment.CenterVertically) {
                 // titled like every other tab - Church, Journal - not with the app's name
                 Text("Pray", Modifier.weight(1f), color = PrayInk, fontFamily = DisplaySerif, fontSize = 32.sp, fontWeight = FontWeight.Bold)
-                RoundAction(Icons.Outlined.AutoStories, "Prayer decks") { deckOpen = true }
-                Spacer(Modifier.width(9.dp))
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 120.dp)) {
                 if (generated == null) {
