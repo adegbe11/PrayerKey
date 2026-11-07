@@ -36,7 +36,7 @@ sealed interface DevoBlock {
 }
 
 data class VerseRef(val book: String, val chapter: Int, val verse: Int) {
-    val label: String get() = "$book $chapter:$verse"
+    val label: String get() = "${if (book == "Psalms") "Psalm" else book} $chapter:$verse"
 }
 
 /** The passage a day is built on, and the span worth reading around it. */

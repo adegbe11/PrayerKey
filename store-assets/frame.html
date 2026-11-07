@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>PrayerKey store frame</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@500;600;700&display=block" rel="stylesheet">
+<style>
+  :root {
+    --ink: #FFFFFF;
+    --gold: #F3CF7A;
+    --gold-soft: #E7C27A;
+    --violet-top: #2B0B62;
+    --violet-mid: #1C0745;
+    --violet-low: #0F0426;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100vw; height: 100vh; overflow: hidden; }
+  body {
+    background:
+      radial-gradient(ellipse 70% 38% at 50% 70%, rgba(243, 207, 122, .20), transparent 70%),
+      radial-gradient(ellipse 90% 50% at 50% 0%, rgba(120, 60, 255, .35), transparent 70%),
+      linear-gradient(180deg, var(--violet-top) 0%, var(--violet-mid) 45%, var(--violet-low) 100%);
+    font-family: "Playfair Display", Georgia, serif;
+    color: var(--ink);
+    position: relative;
+  }
+  .head {
+    position: absolute; left: 0; right: 0; top: 6.2vh;
+    text-align: center; padding: 0 7vw;
+  }
+  .eyebrow {
+    font-family: Inter, sans-serif; font-weight: 700; letter-spacing: .32em;
+    font-size: 2.7vw; color: var(--gold); text-transform: uppercase; margin-bottom: 2vh;
+  }
+  h1 {
+    font-weight: 600; font-size: 9.6vw; line-height: 1.06; letter-spacing: -.01em;
+  }
+  h1.hero { font-size: 11vw; }
+  h1 em { font-style: italic; color: var(--gold); font-weight: 500; }
+  .mark { width: 13vw; height: auto; display: block; margin: 0 auto 2vh; }
+  .wordmark {
+    font-family: "Playfair Display", serif; font-weight: 700; letter-spacing: .3em;
+    font-size: 3vw; color: #fff; margin-bottom: 3vh; padding-left: .3em;
+  }
+
+  /* the phone; --h is its height, everything else scales from it */
+  .phone {
+    --h: 75vh;
+    position: absolute; left: 50%; bottom: -3.5vh;
+    height: var(--h); aspect-ratio: 1124 / 2444;
+    transform: translateX(-50%);
+    background: #0A0A0D; border-radius: calc(var(--h) * .062);
+    padding: calc(var(--h) * .0105);
+    box-shadow:
+      0 0 0 calc(var(--h) * .0022) #2C2C33,
+      0 4vh 9vh rgba(0, 0, 0, .55),
+      0 0 14vh rgba(243, 207, 122, .14);
+  }
+  .hero-slide .phone { --h: 64vh; }
+  .screen {
+    position: relative; width: 100%; height: 100%; overflow: hidden;
+    border-radius: calc(var(--h) * .052); background: #000;
+  }
+  .screen img.shot { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .status {
+    position: absolute; top: 0; left: 0; right: 0; height: 4.4%;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 7.5% 0 8.5%;
+    font-family: Inter, sans-serif; font-weight: 600; font-size: calc(var(--h) * .0175);
+    color: #111;
+  }
+  .status.light { color: #fff; }
+  .status svg { height: calc(var(--h) * .016); width: auto; margin-left: calc(var(--h) * .006); }
+  .status .icons { display: flex; align-items: center; }
+  .punch {
+    position: absolute; top: 1.35%; left: 50%; transform: translateX(-50%);
+    width: 3.1%; aspect-ratio: 1; border-radius: 50%; background: #050505;
+  }
+
+  /* two phones, for the Bible: the cover in front, the page behind */
+  .pair .phone.back { --h: 62vh; left: 66%; bottom: 4vh; transform: translateX(-50%) rotate(7deg); }
+  .pair .phone.front { --h: 66vh; left: 38%; bottom: -3vh; transform: translateX(-50%) rotate(-4deg); }
+  .card {
+    position: absolute; left: 50%; bottom: 7vh; transform: translateX(-50%) rotate(-2deg);
+    height: 66vh; aspect-ratio: 974 / 1478; border-radius: calc(66vh * .05);
+    background: url(src/verse_card.png) center / cover; 
+    box-shadow: 0 4vh 9vh rgba(0,0,0,.55), 0 0 14vh rgba(243,207,122,.16);
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const SLIDES = {
+  "1": { hero: true, title: 'A prayer for<br><em>every</em> day', shot: 'home', light: false },
+  "2": { eyebrow: 'Pray', title: 'Tell God what is on your <em>heart</em>', shot: 'pray', light: false },
+  "3": { eyebrow: 'King James Bible', title: 'The whole Bible, like a <em>real book</em>', pair: ['page', 'cover'], light: [false, true] },
+  "4": { eyebrow: 'Praying for', title: 'Pray for the people you <em>love</em>', shot: 'prayingfor', light: true },
+  "5": { eyebrow: 'Verse of the day', title: 'A verse for <em>every</em> morning', card: true },
+  "6": { eyebrow: 'Church', title: 'Keep every word of the <em>sermon</em>', shot: 'church', light: false },
+};
+const icons = `<span class="icons">
+  <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".6" fill="currentColor"/><rect x="5" y="5.5" width="3" height="6.5" rx=".6" fill="currentColor"/><rect x="10" y="3" width="3" height="9" rx=".6" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx=".6" fill="currentColor"/></svg>
+  <svg viewBox="0 0 16 12"><path d="M8 11.5 L10.6 8.4 A4 4 0 0 0 5.4 8.4 Z M8 3 A8.5 8.5 0 0 1 14.6 6.1 L16 4.4 A10.7 10.7 0 0 0 0 4.4 L1.4 6.1 A8.5 8.5 0 0 1 8 3 Z M8 6.2 A5.4 5.4 0 0 1 12.2 8.2 L13.4 6.8 A7.3 7.3 0 0 0 2.6 6.8 L3.8 8.2 A5.4 5.4 0 0 1 8 6.2 Z" fill="currentColor"/></svg>
+  <svg viewBox="0 0 26 12"><rect x=".6" y=".6" width="22" height="10.8" rx="3" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".45"/><rect x="2.4" y="2.4" width="18.4" height="7.2" rx="1.6" fill="currentColor"/><rect x="23.8" y="4" width="1.8" height="4" rx=".9" fill="currentColor" opacity=".45"/></svg>
+</span>`;
+function phone(shot, light, cls) {
+  return `<div class="phone ${cls || ''}"><div class="screen">
+    <img class="shot" src="src/${shot}.png">
+    <div class="status ${light ? 'light' : ''}"><span>9:41</span>${icons}</div>
+    <div class="punch"></div>
+  </div></div>`;
+}
+const s = SLIDES[(location.hash || '#1').slice(1)] || SLIDES["1"];
+let head = '<div class="head">';
+if (s.hero) head += `<img class="mark" src="src/prayerkey_mark.png"><div class="wordmark">PRAYERKEY</div>`;
+else if (s.eyebrow) head += `<div class="eyebrow">${s.eyebrow}</div>`;
+head += `<h1 class="${s.hero ? 'hero' : ''}">${s.title}</h1></div>`;
+let body = s.card ? `<div class="card"></div>` : s.pair
+  ? `<div class="pair">${phone(s.pair[0], s.light[0], 'back')}${phone(s.pair[1], s.light[1], 'front')}</div>`
+  : phone(s.shot, s.light);
+document.getElementById('root').innerHTML = head + body;
+if (s.hero) document.body.classList.add('hero-slide');
+</script>
+</body>
+</html>
