@@ -106,7 +106,7 @@ class ComposeCards(private val context: PlatformContext) {
     }
 
     suspend fun closingVerseStatus(verse: String, reference: String): ByteArray = painter(1080, 1920).run {
-        stretch(art("drawable/closing_verse_violet.png"))
+        stretch(art("drawable/closing_verse_violet.webp"))
         draw { drawRect(Brush.verticalGradient(0f to Color.Transparent, 1f to Color(26, 10, 46, 230), startY = 450f, endY = 1780f)) }
         sans(); color = cream; size = 25f; spacing = .18f
         text("A WORD TO CARRY", 540f, 990f); spacing = 0f

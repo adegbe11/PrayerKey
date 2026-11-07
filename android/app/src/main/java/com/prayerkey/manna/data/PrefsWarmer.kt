@@ -41,6 +41,23 @@ object PrefsWarmer {
         "bible_challenge_machine",
         "prayer_session",
         "bible_session",
+        "challenges",
+        "live_prayer",
+        "daily_office",
+        "prayer_challenge",
+        "prayer_of_the_day",
+        "today_card",
+        "reading_plans",
+        "praying_for",
+        "book_place",
+        "walk",
+        "verse_marks",
+        "chosen_reminders",
+        "meditation",
+        "mono_bible",
+        "journal_templates",
+        "fasting_challenge",
+        "prayer_memory",
     )
 
     @Volatile private var warmed = false

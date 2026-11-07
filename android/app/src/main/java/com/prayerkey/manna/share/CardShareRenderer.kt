@@ -98,7 +98,7 @@ object CardShareRenderer {
     private fun closingVerseStatus(context: Context, verse: String, reference: String): Bitmap {
         val out = Bitmap.createBitmap(1080, 1920, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(out)
-        val art = cardArt("drawable/closing_verse_violet.png")
+        val art = cardArt("drawable/closing_verse_violet.webp")
         canvas.drawBitmap(art, null, android.graphics.Rect(0, 0, 1080, 1920), Paint(Paint.ANTI_ALIAS_FLAG)); art.recycle()
         val shade = Paint().apply { shader = LinearGradient(0f, 450f, 0f, 1780f, Color.TRANSPARENT, Color.argb(230, 26, 10, 46), Shader.TileMode.CLAMP) }
         canvas.drawRect(0f, 0f, 1080f, 1920f, shade)
