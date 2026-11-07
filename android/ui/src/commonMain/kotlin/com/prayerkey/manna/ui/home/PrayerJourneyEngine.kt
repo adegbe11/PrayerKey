@@ -88,7 +88,7 @@ private val prayerSections = listOf(
     "Repentance" to "Speak honestly about what was wrong. Ask for mercy, then receive God's forgiveness.",
     "My prayer points" to "Bring your needs to God one by one. Be clear, simple and truthful.",
     "Pray for others" to "Pray for your family, church, leaders and anyone God brings to mind.",
-    "Scripture and closing" to "Read Philippians 4:6–7 slowly. End by trusting the answer and the timing to God.",
+    "Scripture and closing" to "Read Philippians 4:6-7 slowly. End by trusting the answer and the timing to God.",
 )
 
 @Composable

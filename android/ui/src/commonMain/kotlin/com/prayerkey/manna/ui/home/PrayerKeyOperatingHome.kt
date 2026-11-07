@@ -159,7 +159,6 @@ fun PrayerKeyOperatingHome(
     var bedtimeOpen by rememberSaveable { mutableStateOf(false) }
     var prayingForOpen by rememberSaveable { mutableStateOf(false) }
     var familyAltarOpen by rememberSaveable { mutableStateOf(false) }
-    var languagesOpen by rememberSaveable { mutableStateOf(false) }
     var namedChallengesOpen by rememberSaveable { mutableStateOf(false) }
     var selectedFeature by remember { mutableStateOf<Feature?>(null) }
 
@@ -441,11 +440,6 @@ fun PrayerKeyOperatingHome(
             com.prayerkey.manna.ui.screens.PrayerPointsScreen(onClose = { prayerPointsOpen = false })
         }
     }
-    if (languagesOpen) {
-        Dialog(onDismissRequest = { languagesOpen = false }, properties = fullScreenDialog()) {
-            com.prayerkey.manna.ui.others.PrayInYourLanguageScreen(onClose = { languagesOpen = false })
-        }
-    }
     if (prayingForOpen) {
         Dialog(onDismissRequest = { prayingForOpen = false }, properties = fullScreenDialog()) {
             com.prayerkey.manna.ui.others.PrayingForScreen(onClose = { prayingForOpen = false })
@@ -661,7 +655,6 @@ fun PrayerKeyOperatingHome(
             add(HomeItem("Declare", "Prayer points", Res.drawable.discovery_cover_5) { prayerPointsOpen = true })
             add(HomeItem("Together", "Family altar", Res.drawable.discovery_cover_6) { familyAltarOpen = true })
             add(HomeItem("Sleep", "Bedtime", Res.drawable.onboarding_prayer) { bedtimeOpen = true })
-            add(HomeItem("Your language", "Pray in your language", Res.drawable.prayerkey_discovery_world) { languagesOpen = true })
             add(HomeItem("Calendar", "Days you prayed", Res.drawable.onboarding_journal_v3) { prayerCalendarOpen = true })
         }
         HomeSection("More for you", more, visible = 5)

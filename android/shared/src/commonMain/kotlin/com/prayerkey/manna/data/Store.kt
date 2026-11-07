@@ -11,7 +11,7 @@ const val DARK_THEME_ID = "vigil"
 @Serializable
 data class UserPrefs(
     val name: String = "",
-    val reminderHour: Int = 7,
+    val reminderHour: Int = 6,
     val reminderMinute: Int = 0,
     val reminderEnabled: Boolean = false,
     val reduceMotion: Boolean = false,

@@ -26,7 +26,7 @@ class JourneyInsightsTest {
         assertEquals("A season of peace", insight.title)
         assertTrue(insight.body.contains("2 open prayers"))
         assertTrue(insight.body.contains("appeared more than once"))
-        assertEquals("Philippians 4:6–7", insight.recommendedReference)
+        assertEquals("Philippians 4:6-7", insight.recommendedReference)
     }
 
     @Test fun `copy explicitly avoids divine claims`() {

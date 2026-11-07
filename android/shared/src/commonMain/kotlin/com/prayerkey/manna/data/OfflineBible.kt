@@ -47,27 +47,18 @@ class OfflineBible(private val context: PlatformContext) {
         /* A card has to be able to stand alone. The whole Bible shuffled put
            genealogies and the cleansing laws of Leviticus on the card that is
            meant to meet someone on their way to work. The deck is now the
-           verses the app's own devotionals and challenges chose, and the
-           chapters people turn to, with anything that needs its context to be
-           read rightly left in the book. */
+           verses the app's own devotionals and challenges chose, with
+           anything that needs its context to be read rightly left in the book. */
         val all = verses()
         val chosen = chosenReferences()
-        val (mine, beloved) = all.filter { v ->
-            v.reference in chosen ||
-                (Beloved[v.book]?.contains(v.chapter) == true && v.text.length in 40..260 &&
-                    v.text.trimEnd().last() in ".?!" &&
-                    Blocked.none { v.text.contains(it, ignoreCase = true) })
-        }.partition { it.reference in chosen }
-        if (mine.isEmpty() && beloved.isEmpty()) return@withContext all.shuffled()
-        // two hand-chosen verses for every one from the chapters around them
-        val a = mine.shuffled().iterator()
-        val b = beloved.shuffled().iterator()
-        buildList {
-            while (a.hasNext() || b.hasNext()) {
-                repeat(2) { if (a.hasNext()) add(a.next()) }
-                if (b.hasNext()) add(b.next())
-            }
+        /* Only the verses someone chose on purpose. Taking whole "beloved"
+           chapters as well put lines like "Philip findeth Nathanael" on a card
+           of their own, where they mean nothing. */
+        val mine = all.filter { v ->
+            v.reference in chosen && v.text.length in 40..280 && v.text.trimEnd().last() in ".?!" &&
+                Blocked.none { v.text.contains(it, ignoreCase = true) }
         }
+        mine.ifEmpty { all.filter { Beloved[it.book]?.contains(it.chapter) == true } }.shuffled()
     }
 
     /** The key verse of every devotional, challenge and season day. */

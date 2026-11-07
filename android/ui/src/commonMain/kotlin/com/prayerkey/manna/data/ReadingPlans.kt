@@ -29,7 +29,7 @@ data class PlanDay(
     val reference: String
         get() {
             val name = if (book == "Psalms") "Psalm" else book
-            return if (from == to) "$name $chapter:$from" else "$name $chapter:$from–$to"
+            return if (from == to) "$name $chapter:$from" else "$name $chapter:$from-$to"
         }
 }
 

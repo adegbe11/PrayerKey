@@ -74,7 +74,8 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
     var selectedTopics by rememberSaveable { mutableStateOf(arrayListOf<String>()) }
     // on unless they turn it off: the reminder is what brings anyone back tomorrow
     var reminders by rememberSaveable { mutableStateOf(true) }
-    var hour by rememberSaveable { mutableIntStateOf(7) }
+    // six, when the "Pray now" alert goes out
+    var hour by rememberSaveable { mutableIntStateOf(6) }
     var minute by rememberSaveable { mutableIntStateOf(0) }
     var showTime by rememberSaveable { mutableStateOf(false) }
     if (showTime) {
@@ -116,7 +117,8 @@ fun GuidedWelcome(preview: Boolean = false, onBack: () -> Unit, onDone: (Boolean
                     }
                 }
                 if (step < 3) TextButton(onClick = {
-                    when (step) { 0 -> selectedGoals = arrayListOf(); 1 -> selectedTopics = arrayListOf(); 2 -> reminders = false }
+                    // skipping the reminder step keeps the default; only the switch turns it off
+                    when (step) { 0 -> selectedGoals = arrayListOf(); 1 -> selectedTopics = arrayListOf() }
                     step++
                 }) { Text("Skip", color = Pk.Crisp, fontFamily = UtilitySans) }
                 else Spacer(Modifier.width(48.dp))

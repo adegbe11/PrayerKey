@@ -89,7 +89,7 @@ class DailyPlanTest {
     @Test
     fun `the range comes from the verses actually loaded`() {
         val p = passageFor(LocalDate.of(2026, 1, 1))
-        assertEquals("${p.book} ${p.chapter}:1–6", p.rangeOf(listOf(1, 2, 3, 4, 5, 6)))
+        assertEquals("${p.book} ${p.chapter}:1-6", p.rangeOf(listOf(1, 2, 3, 4, 5, 6)))
         // nothing loaded yet: fall back to the chapter rather than "1–0"
         assertEquals(p.reference, p.rangeOf(emptyList()))
     }

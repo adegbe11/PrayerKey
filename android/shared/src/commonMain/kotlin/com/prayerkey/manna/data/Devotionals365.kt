@@ -26,7 +26,7 @@ import kotlinx.serialization.json.jsonPrimitive
  * only, and the text is resolved against the KJV asset the app already ships.
  * That is deliberate: it makes it impossible for a devotional to quote a verse
  * that does not exist or to drift from the translation on the Bible tab, which
- * is exactly how "Psalms 23:1–9" survived in the old daily passages.
+ * is exactly how "Psalms 23:1-9" survived in the old daily passages.
  */
 
 /** A block of the body: either a paragraph or a scripture pull-quote. */
@@ -48,7 +48,7 @@ data class DevoReading(
     val to: Int,
 ) {
     val ref: VerseRef get() = VerseRef(book, chapter, verse)
-    val rangeLabel: String get() = "$book $chapter:$from–$to"
+    val rangeLabel: String get() = "$book $chapter:$from-$to"
 }
 
 /**
@@ -279,5 +279,5 @@ suspend fun availableRange(bible: OfflineBible, reading: DevoReading): String {
     val verses = bible.chapter(reading.book, reading.chapter)
     if (verses.isEmpty()) return "${reading.book} ${reading.chapter}"
     val last = minOf(reading.to, verses.maxOf { it.verse })
-    return "${reading.book} ${reading.chapter}:${reading.from}–$last"
+    return "${reading.book} ${reading.chapter}:${reading.from}-$last"
 }

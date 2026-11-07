@@ -344,12 +344,12 @@ private fun cleanTitle(title: String): String = title
     .replaceFirstChar { it.uppercase() }
 
 private fun confessionReference(topic: PrayerTopic): String = when {
-    topic.category.contains("Salvation", true) || topic.title.contains("salvation", true) -> "Romans 10:9–10"
+    topic.category.contains("Salvation", true) || topic.title.contains("salvation", true) -> "Romans 10:9-10"
     topic.title.contains("forgiv", true) || topic.title.contains("repent", true) -> "1 John 1:9"
-    else -> "Psalm 139:23–24"
+    else -> "Psalm 139:23-24"
 }
 
 private fun scriptureReference(topic: PrayerTopic): String = when {
-    topic.category.contains("Salvation", true) || topic.title.contains("salvation", true) -> "John 3:1–21"
-    else -> topic.scripture.firstOrNull()?.first ?: "Philippians 4:6–7"
+    topic.category.contains("Salvation", true) || topic.title.contains("salvation", true) -> "John 3:1-21"
+    else -> topic.scripture.firstOrNull()?.first ?: "Philippians 4:6-7"
 }

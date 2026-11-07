@@ -417,6 +417,8 @@ private fun ReadyView(
             }
         }
 
+        // before the first sermon the card is the whole page, not a card over an empty one
+        val art = if (notes.isEmpty()) 560.dp else 390.dp
         Box(
             Modifier.fillMaxWidth().padding(top = 28.dp)
                 .shadow(24.dp, Corners.card, spotColor = cs.primary.copy(alpha = .30f))
@@ -429,11 +431,11 @@ private fun ReadyView(
                said nothing about what the button does. */
             androidx.compose.foundation.Image(
                 org.jetbrains.compose.resources.painterResource(com.prayerkey.manna.resources.Res.drawable.onboarding_church_v3), null,
-                Modifier.fillMaxWidth().height(390.dp),
+                Modifier.fillMaxWidth().height(art),
                 contentScale = androidx.compose.ui.layout.ContentScale.Crop,
             )
             Box(
-                Modifier.fillMaxWidth().height(390.dp).background(
+                Modifier.fillMaxWidth().height(art).background(
                     androidx.compose.ui.graphics.Brush.verticalGradient(
                         listOf(Color(0x5512002A), Color(0x9912002A), Color(0xEE12002A)),
                     ),

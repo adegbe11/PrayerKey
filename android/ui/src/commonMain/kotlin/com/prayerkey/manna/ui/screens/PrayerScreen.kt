@@ -62,7 +62,6 @@ fun PrayerScreen(
     var category by remember { mutableStateOf<String?>(null) }
     var selectedTopic by remember { mutableStateOf<PrayerTopic?>(null) }
     var prayingForOpen by remember { mutableStateOf(false) }
-    var languagesOpen by remember { mutableStateOf(false) }
     var bedtimeOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = platformContext()
@@ -93,9 +92,6 @@ fun PrayerScreen(
     val full = com.prayerkey.manna.ui.platform.fullScreenDialog()
     if (prayingForOpen) androidx.compose.ui.window.Dialog({ prayingForOpen = false }, full) {
         com.prayerkey.manna.ui.others.PrayingForScreen(onClose = { prayingForOpen = false })
-    }
-    if (languagesOpen) androidx.compose.ui.window.Dialog({ languagesOpen = false }, full) {
-        com.prayerkey.manna.ui.others.PrayInYourLanguageScreen(onClose = { languagesOpen = false })
     }
     if (bedtimeOpen) androidx.compose.ui.window.Dialog({ bedtimeOpen = false }, full) {
         com.prayerkey.manna.ui.home.BedtimeScreen(onClose = { bedtimeOpen = false })
@@ -175,7 +171,6 @@ fun PrayerScreen(
                         onCategory = { deckOpen = true; category = it },
                         onAll = { deckOpen = true; category = null },
                         onPrayingFor = { prayingForOpen = true },
-                        onLanguages = { languagesOpen = true },
                         onBedtime = { bedtimeOpen = true },
                     )
                     if (journal.isNotEmpty()) {

@@ -979,7 +979,7 @@ private fun Leaf(
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    verses?.let { "$chapter:${it.first}–${it.last}" } ?: "KJV",
+                    verses?.let { "$chapter:${it.first}-${it.last}" } ?: "KJV",
                     color = P.caption.copy(alpha = .8f), fontFamily = BookSerif,
                     fontSize = 10.sp, letterSpacing = 1.6.sp,
                 )

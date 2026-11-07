@@ -17,9 +17,9 @@ object JourneyInsights {
     private data class Theme(val label: String, val words: Set<String>, val invitation: String, val reference: String)
 
     private val themes = listOf(
-        Theme("peace", setOf("anxious", "anxiety", "afraid", "fear", "worry", "peace"), "Return to one prayer and name what you can release today.", "Philippians 4:6–7"),
+        Theme("peace", setOf("anxious", "anxiety", "afraid", "fear", "worry", "peace"), "Return to one prayer and name what you can release today.", "Philippians 4:6-7"),
         Theme("healing", setOf("heal", "healing", "sick", "pain", "hospital", "health"), "Pause and pray for the person or place that still needs care.", "Psalm 34:18"),
-        Theme("direction", setOf("wisdom", "direction", "decision", "calling", "purpose", "choose"), "Write the next faithful step that is already clear.", "Proverbs 3:5–6"),
+        Theme("direction", setOf("wisdom", "direction", "decision", "calling", "purpose", "choose"), "Write the next faithful step that is already clear.", "Proverbs 3:5-6"),
         Theme("relationships", setOf("family", "marriage", "friend", "forgive", "relationship", "love"), "Choose one relationship to cover in prayer and one loving action.", "John 3:16"),
         Theme("gratitude", setOf("grateful", "thank", "blessing", "joy", "praise"), "Record one specific gift you do not want to forget.", "Psalm 118:24"),
     )

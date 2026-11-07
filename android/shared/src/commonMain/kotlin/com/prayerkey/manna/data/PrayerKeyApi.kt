@@ -56,11 +56,11 @@ object PrayerKeyApi {
         val lower = need.lowercase()
         val (reference, verse) = when {
             listOf("fear", "afraid", "anxious", "worry", "worried").any(lower::contains) ->
-                "Philippians 4:6–7" to "In everything, through prayer and petition with thanksgiving, present your requests to God. And the peace of God will guard your hearts and minds in Christ Jesus."
+                "Philippians 4:6-7" to "In everything, through prayer and petition with thanksgiving, present your requests to God. And the peace of God will guard your hearts and minds in Christ Jesus."
             listOf("wisdom", "decision", "direction", "confused").any(lower::contains) ->
                 "James 1:5" to "If any of you lacks wisdom, he should ask God, who gives to all generously and ungrudgingly, and it will be given to him."
             listOf("heal", "health", "sick", "pain").any(lower::contains) ->
-                "Psalm 103:2–3" to "My soul, bless the Lord, and do not forget all his benefits. He forgives all your iniquity; he heals all your diseases."
+                "Psalm 103:2-3" to "My soul, bless the Lord, and do not forget all his benefits. He forgives all your iniquity; he heals all your diseases."
             listOf("family", "marriage", "child", "children").any(lower::contains) ->
                 "Joshua 24:15" to "As for me and my family, we will worship the Lord."
             listOf("work", "job", "money", "provision", "debt").any(lower::contains) ->

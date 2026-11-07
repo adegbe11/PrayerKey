@@ -140,7 +140,7 @@ private val NIGHT = listOf(
         "Word",
         scripture = OfficeVerse(
             "He will not suffer thy foot to be moved: he that keepeth thee will not slumber. Behold, he that keepeth Israel shall neither slumber nor sleep.",
-            "Psalm 121:3–4",
+            "Psalm 121:3-4",
         ),
     ),
     OfficeMovement(

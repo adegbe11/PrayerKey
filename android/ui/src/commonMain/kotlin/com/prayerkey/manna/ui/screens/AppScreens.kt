@@ -167,7 +167,8 @@ fun BibleScreen(
 
     /* Two ways to be in the Bible, and they are different acts. The deck
        hands you a verse; the book is for sitting down and reading one. */
-    var bookMode by remember { mutableStateOf(false) }
+    // the tab opens on the book, at the chapter you were reading; the verse cards are one step back
+    var bookMode by remember { mutableStateOf(true) }
     var libraryMode by remember { mutableStateOf(false) }
     var audioMode by remember { mutableStateOf(false) }
     var myBibleMode by remember { mutableStateOf(false) }
@@ -205,6 +206,7 @@ fun BibleScreen(
             ribbon = readerRibbon,
             onRibbon = onReaderRibbon,
             onClose = { bookMode = false },
+            placeKey = "tab",
             onReadPlain = { book, chapter ->
                 bookMode = false
                 scope.launch {
@@ -1236,7 +1238,7 @@ fun ProfileScreen(
             Row(Modifier.padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) { Text(streak.toString(), color = Color.White, fontFamily = BookSerif, fontSize = 48.sp); Text(if (streak == 1) "day with God" else "days with God", color = Color.White.copy(.7f)) }
                 // the same figure as the streak beside it: a smaller number in another face read as a footnote
-                Column(horizontalAlignment = Alignment.End) { Text(savedCount.toString(), color = Pk.GoldLight, fontFamily = BookSerif, fontSize = 48.sp); Text("words saved", color = Color.White.copy(.7f)) }
+                Column(horizontalAlignment = Alignment.End) { Text(savedCount.toString(), color = Pk.GoldLight, fontFamily = BookSerif, fontSize = 48.sp); Text(if (savedCount == 1) "word saved" else "words saved", color = Color.White.copy(.7f)) }
             }
         }
         /* ── Theme ──────────────────────────────────────────────────────
@@ -1245,7 +1247,7 @@ fun ProfileScreen(
            choice about how the app looks can be changed on a whim. */
         ThemeSetting(prefs, onUpdate)
 
-        SettingRow("Daily reminder", "${prefs.reminderHour.pad2()}:${prefs.reminderMinute.pad2()}", onClick = {
+        SettingRow("Prayer reminder", "${prefs.reminderHour.pad2()}:${prefs.reminderMinute.pad2()}", onClick = {
             pickTime(context, prefs.reminderHour, prefs.reminderMinute) { hour, minute ->
                 val next = prefs.copy(reminderHour = hour, reminderMinute = minute); onUpdate(next)
                 Reminders.schedule(context, hour, minute, next.reminderEnabled)

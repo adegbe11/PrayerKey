@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontFamily
  * years. It ships under the SIL Open Font License (see res/font/OFL.txt),
  * free to bundle and redistribute, so this costs nothing but the bytes.
  *
- * One variable file carries the whole 400–800 weight range, which is why
+ * One variable file carries the whole 400-800 weight range, which is why
  * 831K buys every weight rather than one. minSdk is 26, and variable font
  * axes need 26, so every device that can run Manna can render this.
  */

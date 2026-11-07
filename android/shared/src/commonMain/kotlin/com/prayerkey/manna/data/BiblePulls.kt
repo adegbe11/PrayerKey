@@ -14,14 +14,14 @@ package com.prayerkey.manna.data
  * sentence does not.
  *
  * Verse numbers are kept on each pull so the reference stays exact — "Romans
- * 8:1–7" and not "Romans 8", because a reader who wants to go back to a line
+ * 8:1-7" and not "Romans 8", because a reader who wants to go back to a line
  * needs to be able to find it.
  */
 data class BiblePull(
     /** 1-based, because it is shown to the reader. */
     val index: Int,
     val text: String,
-    /** "Romans 8:1–7", or "Romans 8:9" for a single verse. */
+    /** "Romans 8:1-7", or "Romans 8:9" for a single verse. */
     val reference: String,
     val firstVerse: Int,
     val lastVerse: Int,
@@ -77,7 +77,7 @@ private fun pullOf(index: Int, book: String, chapter: Int, group: List<BibleVers
     return BiblePull(
         index = index,
         text = group.joinToString(" ") { it.text.trim() },
-        reference = if (first == last) "$book $chapter:$first" else "$book $chapter:$first–$last",
+        reference = if (first == last) "$book $chapter:$first" else "$book $chapter:$first-$last",
         firstVerse = first,
         lastVerse = last,
     )

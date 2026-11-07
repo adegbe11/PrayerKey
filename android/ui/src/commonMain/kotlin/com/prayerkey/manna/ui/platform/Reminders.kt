@@ -121,16 +121,16 @@ object ReminderContent {
         val d = date.dayOfMonth
         return when {
             date == easter.minus(DatePeriod(days = 46)) -> "Ash Wednesday" to "Begin Lent with prayer and repentance."
-            date == easter.minus(DatePeriod(days = 7)) -> "Palm Sunday" to "Read Matthew 21:1–11."
+            date == easter.minus(DatePeriod(days = 7)) -> "Palm Sunday" to "Read Matthew 21:1-11."
             date == easter.minus(DatePeriod(days = 3)) -> "Maundy Thursday" to "Read John 13 and remember the Lord's Supper."
             date == easter.minus(DatePeriod(days = 2)) -> "Good Friday" to "Read the crucifixion account and pray."
             date == easter -> "Easter Sunday" to "Christ is risen. Read John 20."
-            date == easter.plus(DatePeriod(days = 39)) -> "Ascension Day" to "Read Acts 1:1–11."
+            date == easter.plus(DatePeriod(days = 39)) -> "Ascension Day" to "Read Acts 1:1-11."
             date == easter.plus(DatePeriod(days = 49)) -> "Pentecost" to "Read Acts 2 and pray for the Church."
             m == 1 && d == 1 -> "New Year prayer" to "Begin the year in prayer."
             m == 1 && d == 6 -> "Epiphany" to "Read Matthew 2 today."
             m == 4 && d == 7 -> "World Health Day" to "Pray for the sick and those who care for them."
-            m == 10 && d == 31 -> "Reformation Day" to "Read Romans 1:16–17."
+            m == 10 && d == 31 -> "Reformation Day" to "Read Romans 1:16-17."
             m == 11 && date.dayOfWeek == DayOfWeek.SUNDAY && d >= 27 -> "Advent" to "Prepare your heart for the coming of Christ."
             m == 12 && d == 25 -> "Christmas Day" to "Read Luke 2 and give thanks for Christ."
             else -> null

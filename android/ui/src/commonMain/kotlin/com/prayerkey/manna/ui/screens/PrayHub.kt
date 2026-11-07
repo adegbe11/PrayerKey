@@ -85,7 +85,6 @@ fun PrayHub(
     onCategory: (String) -> Unit,
     onAll: () -> Unit,
     onPrayingFor: () -> Unit,
-    onLanguages: () -> Unit,
     onBedtime: () -> Unit,
 ) {
     val context = platformContext()
@@ -170,18 +169,15 @@ fun PrayHub(
             }
         }
 
-        // ── two quieter ways ──────────────────────────────────────
-        Row(Modifier.padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            WayTile(Res.drawable.prayerkey_discovery_world, "Your language", "Pray in Pidgin, Yoruba, Igbo, Hausa or French", Modifier.weight(1f), onLanguages)
-            WayTile(Res.drawable.onboarding_prayer, "Bedtime", "Tonight's prayer, then Scripture to sleep to", Modifier.weight(1f), onBedtime)
-        }
+        // ── a quieter way ──────────────────────────────────────
+        WayTile(Res.drawable.onboarding_prayer, "Bedtime", "Tonight's prayer, then Scripture to sleep to", Modifier.padding(top = 20.dp).fillMaxWidth(), onBedtime)
         Spacer(Modifier.height(8.dp))
     }
 }
 
 @Composable
 private fun WayTile(art: DrawableResource, title: String, line: String, modifier: Modifier, onClick: () -> Unit) {
-    Box(modifier.aspectRatio(.85f).clip(RoundedCornerShape(24.dp)).clickable(onClick = onClick)) {
+    Box(modifier.aspectRatio(1.7f).clip(RoundedCornerShape(24.dp)).clickable(onClick = onClick)) {
         Image(painterResource(art), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0f to Color.Transparent, .3f to Color.Transparent, 1f to Color(0xEE12002A))))
         Column(Modifier.align(Alignment.BottomStart).padding(14.dp)) {

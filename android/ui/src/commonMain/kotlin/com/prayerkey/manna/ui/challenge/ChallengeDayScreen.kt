@@ -336,7 +336,7 @@ fun ChallengeDayScreen(
 /** "Matthew 4:4" for one verse, "Joel 2:12-13" for more than one. */
 private fun spanLabel(read: com.prayerkey.manna.data.DevoReading): String =
     if (read.from >= read.to) "${read.book} ${read.chapter}:${read.from}"
-    else "${read.book} ${read.chapter}:${read.from}–${read.to}"
+    else "${read.book} ${read.chapter}:${read.from}-${read.to}"
 
 @Composable
 private fun DoneButton(next: Int, last: Boolean, onDone: () -> Unit) {

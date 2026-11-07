@@ -211,16 +211,16 @@ class ReminderReceiver : BroadcastReceiver() {
             val easter = easterSunday(date.year)
             return when {
             date == easter.minusDays(46) -> "Ash Wednesday" to "Begin Lent with prayer and repentance."
-            date == easter.minusDays(7) -> "Palm Sunday" to "Read Matthew 21:1–11."
+            date == easter.minusDays(7) -> "Palm Sunday" to "Read Matthew 21:1-11."
             date == easter.minusDays(3) -> "Maundy Thursday" to "Read John 13 and remember the Lord's Supper."
             date == easter.minusDays(2) -> "Good Friday" to "Read the crucifixion account and pray."
             date == easter -> "Easter Sunday" to "Christ is risen. Read John 20."
-            date == easter.plusDays(39) -> "Ascension Day" to "Read Acts 1:1–11."
+            date == easter.plusDays(39) -> "Ascension Day" to "Read Acts 1:1-11."
             date == easter.plusDays(49) -> "Pentecost" to "Read Acts 2 and pray for the Church."
             date.monthValue == 1 && date.dayOfMonth == 1 -> "New Year prayer" to "Begin the year in prayer."
             date.monthValue == 1 && date.dayOfMonth == 6 -> "Epiphany" to "Read Matthew 2 today."
             date.monthValue == 4 && date.dayOfMonth == 7 -> "World Health Day" to "Pray for the sick and those who care for them."
-            date.monthValue == 10 && date.dayOfMonth == 31 -> "Reformation Day" to "Read Romans 1:16–17."
+            date.monthValue == 10 && date.dayOfMonth == 31 -> "Reformation Day" to "Read Romans 1:16-17."
             date.monthValue == 11 && date.dayOfWeek.value == 7 && date.dayOfMonth >= 27 -> "Advent" to "Prepare your heart for the coming of Christ."
             date.monthValue == 12 && date.dayOfMonth == 25 -> "Christmas Day" to "Read Luke 2 and give thanks for Christ."
             else -> null
