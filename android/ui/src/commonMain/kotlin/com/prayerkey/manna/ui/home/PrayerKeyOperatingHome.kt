@@ -225,7 +225,9 @@ fun PrayerKeyOperatingHome(
         if (chapter.isNotEmpty()) {
             chapterMinutes = ((chapter.sumOf { it.text.split(' ').size } + 199) / 200).coerceAtLeast(1)
         }
+        // a psalm's heading and Psalm 119's letter names are printed before verse 1; the card shows only the verse
         val text = chapter.firstOrNull { it.verse == reading.verse }?.text
+            ?.replace(Regex("""^\[[^\]]*\]\s*"""), "")?.replace(Regex("""^[A-Z]{3,}\.\s+"""), "")
         if (text != null) {
             todayVerse = VerseCard(reading.ref.label, "KJV", text, "")
             // the home-screen widget shows the same verse, without opening the Bible
@@ -1261,7 +1263,7 @@ private fun CircularImageShortcut(item: HomeShortcut, modifier: Modifier = Modif
        diverged: the screen showed one verse and sharing exported another.
        Everything visible now comes from `card`. */
     val fallback = remember {
-        VerseCard("Matthew 7:7", "KJV", "Ask, and it will be given to you; seek, and you will find; knock, and the door will be opened to you.", "")
+        VerseCard("Matthew 7:7", "KJV", "Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you.", "")
     }
     val card = today ?: fallback
     Surface(

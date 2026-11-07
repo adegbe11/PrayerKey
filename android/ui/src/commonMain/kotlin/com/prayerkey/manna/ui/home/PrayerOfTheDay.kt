@@ -88,9 +88,19 @@ private val MONTH = listOf(
 
 private fun LocalDate.spoken(): String = "${WEEKDAY[dayOfWeek.ordinal]}, $dayOfMonth ${MONTH[monthNumber - 1]}"
 
-/** The line under the address: the first thing actually said to God. */
-private fun PrayerOfTheDay.opening(): String =
-    lines.drop(1).takeWhile { !it.startsWith("Amen") }.take(2).joinToString(" ")
+/**
+ * The line under the address: the first thing actually said to God, as a
+ * whole sentence with a capital letter. When that sentence is too long for two
+ * lines, its first line stands alone and trails off.
+ */
+internal fun PrayerOfTheDay.opening(): String {
+    val body = lines.drop(1).takeWhile { !it.startsWith("Amen") }
+    val first = body.indexOfFirst { it.trimEnd().takeLast(1) in setOf(".", "!", "?") }
+    val sentence = if (first >= 0) body.take(first + 1).joinToString(" ") else ""
+    val text = if (sentence.isNotEmpty() && sentence.length <= 88) sentence
+        else body.firstOrNull().orEmpty().trimEnd(',', ';', ':', ' ') + "…"
+    return text.replaceFirstChar { it.uppercase() }
+}
 
 /**
  * Home's first card. The dawn photograph it always had, carrying today's
