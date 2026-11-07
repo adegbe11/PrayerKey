@@ -91,7 +91,7 @@ fun PrayerSituationLibrary(
                 horizontalArrangement = Arrangement.spacedBy(11.dp),
                 verticalArrangement = Arrangement.spacedBy(11.dp),
             ) {
-                items(grouped, key = { it.first }) { (category, count) ->
+                items(grouped, key = { it.first }) { (category, _) ->
                     val style = situationStyles[kotlin.math.abs(category.hashCode()) % situationStyles.size]
                     Box(
                         Modifier.fillMaxWidth().height(116.dp)
@@ -122,8 +122,6 @@ fun PrayerSituationLibrary(
                         ) {
                             Text(category, color = Color.White, fontSize = 16.sp, lineHeight = 19.sp,
                                 fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                            Text("$count prayers", color = Color.White.copy(.76f), fontSize = 11.sp,
-                                modifier = Modifier.padding(top = 4.dp))
                         }
                     }
                 }
