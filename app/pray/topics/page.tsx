@@ -28,7 +28,7 @@ export default function TopicsPage() {
       <section className="pt-hero">
         <div className="pt-fan" aria-hidden>
           {fan.map((slug, i) => (
-            <PrayerCard key={slug} slug={slug} title={bySlug.get(slug)!.title} href={`/pray/${slug}`} tabIndex={-1} className="pt-fan__card" style={{ "--k": i - (fan.length - 1) / 2 } as React.CSSProperties} />
+            <PrayerCard key={slug} slug={slug} title={bySlug.get(slug)!.title} href={`/prayer/${slug}`} tabIndex={-1} className="pt-fan__card" style={{ "--k": i - (fan.length - 1) / 2 } as React.CSSProperties} />
           ))}
         </div>
         <h1 className="ph-title pt-title"><span>Prayers for</span><span>every situation.</span></h1>

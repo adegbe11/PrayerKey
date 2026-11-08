@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { parseRef, refToDisplay, getRelatedPrayers, BOOK_MAP } from "@/lib/seo/bible-books";
 import { getBookContent } from "@/lib/seo/bible-book-content";
 import { TOPIC_MAP } from "@/lib/seo/prayer-topics";
+import { INDEXED_VERSES } from "@/lib/seo/indexed-verses";
 
 const BASE_URL = "https://www.prayerkey.com";
 
@@ -37,21 +38,26 @@ export async function generateMetadata(
   const parsed = parseRef(params.ref);
   if (!parsed) return {};
 
-  const display = `${parsed.book.name} ${parsed.chapter}:${parsed.verse}`;
-  const desc    = `${display} KJV — meaning, commentary, cross-references, and a prayer based on this Bible verse. Explore Scripture with PrayerKey.`;
+  const display = displayOf(parsed.book.name, parsed.chapter, parsed.verse);
+  // a psalm's heading ("[A Psalm of David.]") is printed before verse 1; the description starts at the verse
+  const words   = verseAt(params.ref)?.replace(/^\[[^\]]*\]\s*/, "");
+  // Says what the page has: the KJV verse, its chapter, related verses and
+  // prayers. The old title promised "Meaning, Commentary" and the keywords
+  // promised the NIV; the page has neither.
+  const desc    = words
+    ? `"${words}" ${display} in the King James Version, with the chapter around it, related verses and prayers.`
+    : `${display} in the King James Version, with the chapter around it, related verses and prayers.`;
+  const title   = `${display} KJV | PrayerKey`;
 
   return {
-    title:       `${display} — Meaning, Commentary & Prayer | PrayerKey`,
+    title,
     description: desc,
-    keywords:    [
-      `${display}`, `${display} meaning`, `${display} NIV`, `${display} KJV`,
-      `${display} commentary`, `${display} explanation`, `Bible verse ${display}`,
-      `what does ${display} mean`, `${parsed.book.name} chapter ${parsed.chapter}`,
-    ].join(", "),
-    authors:     [{ name: "Collins Asein", url: `${BASE_URL}/author/collins-asein` }],
     alternates:  { canonical: `${BASE_URL}/bible/verse/${params.ref}` },
+    // See lib/seo/indexed-verses.ts: every verse opens, but only verses with
+    // search demand or a place in the site's own writing ask to be indexed.
+    robots:      INDEXED_VERSES.has(params.ref) ? undefined : { index: false, follow: true },
     openGraph: {
-      title:       `${display} — Meaning, Commentary & Prayer | PrayerKey`,
+      title,
       description: desc,
       url:         `${BASE_URL}/bible/verse/${params.ref}`,
       siteName:    "PrayerKey",
@@ -60,10 +66,16 @@ export async function generateMetadata(
     },
     twitter: {
       card:        "summary_large_image",
-      title:       `${display} | PrayerKey`,
+      title,
       description: desc,
     },
   };
+}
+
+// "Psalms 23:1" is the book's name, but a single psalm is "Psalm 23:1", which
+// is what people type.
+function displayOf(bookName: string, chapter: number, verse: number) {
+  return `${bookName === "Psalms" ? "Psalm" : bookName} ${chapter}:${verse}`;
 }
 
 /* ── Page ───────────────────────────────────────────────────────── */
@@ -72,7 +84,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
   if (!parsed) notFound();
 
   const { book, chapter, verse } = parsed;
-  const display     = `${book.name} ${chapter}:${verse}`;
+  const display     = displayOf(book.name, chapter, verse);
   const bookContent = getBookContent(book.slug);
 
   // Static KJV lookups — synchronous, no network
@@ -107,10 +119,9 @@ export default async function BibleVersePage({ params }: { params: { ref: string
       {
         "@type":         "Article",
         "@id":           `${BASE_URL}/bible/verse/${params.ref}`,
-        "headline":      `${display} — Meaning, Commentary & Prayer`,
-        "description":   `Explore the meaning of ${display}, cross-references, and a prayer inspired by this verse.`,
+        "headline":      `${display} KJV`,
+        "description":   `${display} in the King James Version, with the chapter around it, related verses and prayers.`,
         "url":           `${BASE_URL}/bible/verse/${params.ref}`,
-        "dateModified":  new Date().toISOString(),
         "author": {
           "@type": "Person",
           "name":  "Collins Asein",
@@ -246,7 +257,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
             <h2 id="vs-prayers" className="vs-h2">Pray it</h2>
             <ul>
               {relatedPrayers.slice(0, 4).map((p, i) => p && (
-                <li key={p.slug} style={{ "--i": i } as React.CSSProperties}><PrayerCard slug={p.slug} title={p.title} href={`/pray/${p.slug}`} /></li>
+                <li key={p.slug} style={{ "--i": i } as React.CSSProperties}><PrayerCard slug={p.slug} title={p.title} href={`/prayer/${p.slug}`} /></li>
               ))}
             </ul>
           </section>

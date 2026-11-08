@@ -8,8 +8,8 @@ type Extra = Partial<Pick<PrayerTopic, "metaDesc" | "context" | "prayerPoints" |
 
 const EXTRA: Record<string, Extra> = {
   "new-month-prayer": {
-    seoTitle: "New Month Prayer: Praying for a New Month",
-    metaDesc: "A new month prayer for praying over the month ahead: give God the first day, release last month, and ask for His goodness in every week to come, with Bible verses to pray.",
+    seoTitle: "New Month Prayer and Prayer Points, with Bible Verses",
+    metaDesc: "A new month prayer and prayer points to pray over the month ahead: thank God for last month, give Him the first day, and ask for His goodness in every week.",
     context: "Praying for a new month is an old habit of God's people. Israel marked the beginnings of their months before the Lord (Numbers 10:10), and the psalmist asked God to teach us to number our days. A new month prayer is not a charm for good luck. It is a way of handing the next thirty days to God before they start, and of beginning again on His mercies, which the Bible says are new every morning.",
     prayerPoints: [
       "Thank God for carrying you through last month, the parts you understood and the parts you did not.",
@@ -89,6 +89,47 @@ const EXTRA: Record<string, Extra> = {
       { q: "How do you pray the armor of God?", a: "Go through each piece of the armour in Ephesians 6, asking God to clothe you in it and saying what it means for your day, then speak a verse as your sword and finish by praying for others. The prayer on this page follows that order." },
       { q: "When should I pray the armor of God prayer?", a: "Many people pray it every morning before the day begins, and again before something they know will be hard: a difficult conversation, a temptation, a fearful night. It is a prayer for standing firm, so it fits any moment you feel under attack." },
     ],
+  },
+
+  /* Titles and descriptions for the prayers with the most search impressions
+     and the fewest clicks (Search Console, to 7 November 2026). Each title
+     uses the words people actually type for that prayer, and each description
+     says plainly what is on the page. */
+  "visa-prayer": {
+    seoTitle: "Prayer for Visa Approval and Immigration Breakthrough",
+    metaDesc: "A prayer for visa approval and immigration breakthrough, with the Bible verses to stand on while you wait for an embassy, an interview or a decision.",
+  },
+  "prayer-for-eyes-healing": {
+    seoTitle: "Prayer for Eye Healing and Eyesight",
+    metaDesc: "A healing prayer for your eyes and eyesight, with the Bible verses where Jesus opened blind eyes. Pray it for yourself or for someone you love.",
+  },
+  "prayer-for-house-warming": {
+    seoTitle: "Housewarming Prayer: Blessing a New Home",
+    metaDesc: "A housewarming prayer to bless a new home, for the day you move in or the day you gather friends, with Bible verses to read over every room.",
+  },
+  "home-protection": {
+    seoTitle: "Prayer to Protect Your Home from Evil",
+    metaDesc: "A prayer to protect your home and family from evil, with the Bible verses about God guarding your house. Pray it at the door, over each room, or at night.",
+  },
+  "prayer-for-stomach-healing": {
+    seoTitle: "Prayer for Stomach Pain and Digestive Healing",
+    metaDesc: "A prayer for stomach pain and digestive healing, with Bible verses about health and healing to pray while you wait for relief or answers from doctors.",
+  },
+  "prayer-before-presentation": {
+    seoTitle: "Short Prayer Before a Presentation",
+    metaDesc: "A short prayer to say before a presentation at work or school: for a calm heart, a clear mind and the right words, with Bible verses to steady you.",
+  },
+  "prayer-for-land-and-property": {
+    seoTitle: "Prayer for Land and Property, with Bible Verses",
+    metaDesc: "A prayer for land and property: for buying, selling, a title deed or a home of your own, with the Bible verses about God giving His people land.",
+  },
+  "prayer-for-premature-baby": {
+    seoTitle: "Prayer for a Premature Baby in the NICU",
+    metaDesc: "A prayer for a premature baby in the NICU: for strength, steady breathing and growth, for the nurses and doctors, and for the parents waiting beside the incubator.",
+  },
+  "prayer-for-legs-strength": {
+    seoTitle: "Prayer for Leg Pain, Strength and Healing",
+    metaDesc: "A prayer for leg pain, weak legs and healing, for knees and feet too, with the Bible verses where God makes the lame walk and leap.",
   },
 };
 

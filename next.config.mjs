@@ -91,9 +91,19 @@ const nextConfig = {
     ];
   },
 
-  // Redirect bare /admin to /admin (handled in page), keep /api/health public
   async redirects() {
-    return [];
+    return [
+      // Every prayer used to live at two addresses, /pray/[slug] and
+      // /prayer/[slug], each calling itself the original, so the two copies
+      // competed in search. /prayer has the most traffic and keeps it; a
+      // permanent redirect carries the other copy's standing across.
+      // /pray itself (the composer) and /pray/topics are not prayers and stay.
+      {
+        source:      "/pray/:slug((?!topics$)[^/]+)",
+        destination: "/prayer/:slug",
+        permanent:   true,
+      },
+    ];
   },
 };
 

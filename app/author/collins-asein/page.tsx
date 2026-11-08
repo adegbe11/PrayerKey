@@ -48,7 +48,7 @@ const SUBJECTS = [
 // the rest of his work on PrayerKey
 const MORE = [
   { label: "Write a prayer",        href: "/pray" },
-  { label: "Morning prayer",        href: "/pray/morning" },
+  { label: "Morning prayer",        href: "/prayer/morning" },
   { label: "PrayerKey Live",        href: "/live" },
   { label: "Every prayer topic",    href: "/pray/topics" },
   { label: "Search the Bible",      href: "/bible" },
@@ -156,7 +156,7 @@ export default function CollinsAseinPage() {
         </div>
         <div className="au-prayers__grid">
           {FEATURED_PRAYERS.map((t, i) => (
-            <PrayerCard key={t.slug} slug={t.slug} title={t.title} href={`/pray/${t.slug}`} style={{ "--i": i } as React.CSSProperties} />
+            <PrayerCard key={t.slug} slug={t.slug} title={t.title} href={`/prayer/${t.slug}`} style={{ "--i": i } as React.CSSProperties} />
           ))}
         </div>
         <Link href="/prayer" className="au-more">See every prayer</Link>
