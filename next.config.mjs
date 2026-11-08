@@ -103,6 +103,11 @@ const nextConfig = {
         destination: "/prayer/:slug",
         permanent:   true,
       },
+      // Old addresses Search Console found returning 404, sent to the page
+      // that took their place. (/prayer/joy has no matching prayer and stays 404.)
+      { source: "/prayer/guidance", destination: "/prayer/direction",       permanent: true },
+      { source: "/prayer/fasting",  destination: "/prayer/fasting-prayer",  permanent: true },
+      { source: "/author",          destination: "/author/collins-asein",   permanent: true },
     ];
   },
 };

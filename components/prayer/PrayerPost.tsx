@@ -4,6 +4,7 @@ import PrayerComposer from "@/components/PrayerComposer";
 import PrayerCard, { colourOf, splitTitle } from "@/components/prayer/PrayerCard";
 import PrayerReader from "@/components/prayer/PrayerReader";
 import { ALL_SLUGS, TOPIC_MAP, type PrayerTopic } from "@/lib/seo/prayer-topics";
+import { verseSlugOf } from "@/lib/seo/bible-books";
 
 export const AUTHOR = "Collins Asein";
 export const REVIEW_DATE = "April 2026";
@@ -21,8 +22,10 @@ function phraseOf(topic: PrayerTopic) {
   }).join(" ");
 }
 
+// "Psalm 139:23-24" -> "psalms-139-23". Lowercasing the reference made
+// "psalm-139-23-24", which no page answers.
 function refToSlug(ref: string) {
-  return ref.toLowerCase().replace(/[\s:]/g, "-").replace(/[^a-z0-9-]/g, "");
+  return verseSlugOf(ref) ?? ref.toLowerCase().replace(/[\s:]/g, "-").replace(/[^a-z0-9-]/g, "");
 }
 
 export function prayerPoints(topic: PrayerTopic): string[] {

@@ -7,7 +7,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow:    ["/"],
-        disallow: ["/admin", "/admin/", "/api/", "/(auth)/", "/_next/"],
+        // Not /_next/: that is where every page's scripts and styles live, and
+        // Google has to load them to see the page the way a reader does.
+        disallow: ["/admin", "/admin/", "/api/"],
       },
       // Give the major AI crawlers explicit access — important for 2026 AI
       // Overviews and answer-engine surfaces.

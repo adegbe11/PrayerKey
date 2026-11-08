@@ -3,8 +3,8 @@ export const revalidate = 86400; // Re-generate once per day (ISR)
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { parseRef, refToDisplay, getRelatedPrayers, BOOK_MAP } from "@/lib/seo/bible-books";
+import { notFound, permanentRedirect } from "next/navigation";
+import { parseRef, refToDisplay, getRelatedPrayers, BOOK_MAP, verseSlugOf } from "@/lib/seo/bible-books";
 import { getBookContent } from "@/lib/seo/bible-book-content";
 import { TOPIC_MAP } from "@/lib/seo/prayer-topics";
 import { INDEXED_VERSES } from "@/lib/seo/indexed-verses";
@@ -81,7 +81,12 @@ function displayOf(bookName: string, chapter: number, verse: number) {
 /* ── Page ───────────────────────────────────────────────────────── */
 export default async function BibleVersePage({ params }: { params: { ref: string } }) {
   const parsed = parseRef(params.ref);
-  if (!parsed) notFound();
+  if (!parsed) {
+    // "psalm-91-4" or "proverbs-3-5-6": a real verse at the wrong address
+    const slug = verseSlugOf(params.ref);
+    if (slug) permanentRedirect(`/bible/verse/${slug}`);
+    notFound();
+  }
 
   const { book, chapter, verse } = parsed;
   const display     = displayOf(book.name, chapter, verse);
@@ -228,7 +233,7 @@ export default async function BibleVersePage({ params }: { params: { ref: string
             <ul>
               {crossRefs.map((cr, i) => (
                 <li key={cr.ref} style={{ "--i": i } as React.CSSProperties}>
-                  <Link href={`/bible/verse/${cr.ref.toLowerCase().replace(/[\s:]/g, "-").replace(/[^a-z0-9-]/g, "")}`}>
+                  <Link href={`/bible/verse/${verseSlugOf(cr.ref) ?? cr.ref.toLowerCase().replace(/[\s:]/g, "-").replace(/[^a-z0-9-]/g, "")}`}>
                     {cr.text && <span className="vs-cross__text">{cr.text}</span>}
                     <span className="vs-cross__ref">{cr.ref}</span>
                   </Link>

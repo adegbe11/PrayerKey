@@ -102,6 +102,37 @@ export function parseRef(ref: string): { book: BibleBook; chapter: number; verse
   return { book, chapter, verse };
 }
 
+/* People and our own content write a book differently from its slug. */
+const BOOK_ALIASES: Record<string, string> = {
+  "psalm": "psalms",
+  "song-of-songs": "song-of-solomon",
+  "songs": "song-of-solomon",
+};
+
+/**
+ * The verse page address for anything that names a verse: a reference as it is
+ * written ("Psalm 139:23-24", "1 Corinthians 6:19-20") or an old address
+ * ("psalm-91-4", "proverbs-3-5-6"). A range goes to its first verse, because
+ * a verse page shows one verse with its chapter around it.
+ *
+ * Search Console listed 73 links like "psalm-4-8" and "isaiah-55-8-9" as not
+ * found: the book was singular or the address carried a range.
+ */
+export function verseSlugOf(ref: string): string | null {
+  const parts = ref.toLowerCase().replace(/[\s:\u2013\u2014]+/g, "-").replace(/[^a-z0-9-]/g, "").split("-").filter(Boolean);
+  // the book: words, plus a leading number for books like 1 Corinthians
+  let i = 0;
+  const book: string[] = [];
+  if (/^\d$/.test(parts[0] ?? "") && /^[a-z]/.test(parts[1] ?? "")) book.push(parts[i++]);
+  while (i < parts.length && /^[a-z]/.test(parts[i])) book.push(parts[i++]);
+  const chapter = parseInt(parts[i] ?? "", 10);
+  const verse   = parseInt(parts[i + 1] ?? "", 10);
+  if (!book.length || isNaN(chapter) || isNaN(verse)) return null;
+  const name = book.join("-");
+  const slug = `${BOOK_ALIASES[name] ?? name}-${chapter}-${verse}`;
+  return parseRef(slug) ? slug : null;
+}
+
 /** Total Bible verse count: sum of all verse counts */
 export const TOTAL_VERSES = BIBLE_BOOKS.reduce(
   (acc, b) => acc + b.verses.reduce((s, v) => s + v, 0),
