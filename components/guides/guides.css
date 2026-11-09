@@ -108,8 +108,9 @@
 .gd-faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 0; font: 600 17px/1.4 var(--pk-font-sans); color: var(--pk-text); }
 .gd-faq summary::-webkit-details-marker { display: none; }
 .gd-faq summary:hover { color: var(--pk-violet); }
-.gd-faq details::details-content { block-size: 0; overflow: hidden; transition: block-size 0.45s var(--g-ease), content-visibility 0.45s allow-discrete; }
-.gd-faq details[open]::details-content { block-size: auto; }
+/* answers open at once and fade in; growing their height re-laid out the page every frame */
+.gd-faq details[open] p { animation: gd-faq-in 280ms ease both; }
+@keyframes gd-faq-in { from { opacity: 0; } }
 .gd-faq details p { margin: 0 0 22px; font: 400 16px/1.7 var(--pk-font-sans); color: var(--pk-text-2); }
 .gd-faq__plus { position: relative; width: 14px; height: 14px; flex: none; }
 .gd-faq__plus::before, .gd-faq__plus::after { content: ""; position: absolute; left: 0; top: 6px; width: 14px; height: 2px; border-radius: 2px; background: var(--pk-violet); transition: transform 250ms var(--g-ease); }

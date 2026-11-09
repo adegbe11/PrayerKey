@@ -117,13 +117,14 @@
 .pp-own .pp-h2 { color: #fff; margin-bottom: 22px; }
 
 /* questions */
-.pp-faq { interpolate-size: allow-keywords; }
+/* An answer opens at once and its words fade in. Growing its height instead
+   re-laid out the whole page on every frame, and the tap felt slow. */
 .pp-faq details { border-bottom: 1px solid var(--pk-border); }
+.pp-faq details[open] p { animation: pp-faq-in 280ms ease both; }
+@keyframes pp-faq-in { from { opacity: 0; } }
 .pp-faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 0; font: 600 17px/1.4 var(--pk-font-sans); color: var(--pk-text); }
 .pp-faq summary::-webkit-details-marker { display: none; }
 .pp-faq summary:hover { color: var(--bg); }
-.pp-faq details::details-content { block-size: 0; overflow: hidden; transition: block-size 0.45s var(--pp-ease), content-visibility 0.45s allow-discrete; }
-.pp-faq details[open]::details-content { block-size: auto; }
 .pp-faq details p { margin: 0 0 22px; font: 400 16px/1.7 var(--pk-font-sans); color: var(--pk-text-2); }
 .pp-faq__plus { position: relative; width: 14px; height: 14px; flex: none; }
 .pp-faq__plus::before, .pp-faq__plus::after { content: ""; position: absolute; left: 0; top: 6px; width: 14px; height: 2px; border-radius: 2px; background: var(--bg); transition: transform 250ms var(--pp-ease); }

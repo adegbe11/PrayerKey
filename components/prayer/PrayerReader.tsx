@@ -18,20 +18,21 @@ export default function PrayerReader({ text, title, url }: { text: string; title
     const el = box.current;
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const spans = [...el.querySelectorAll<HTMLElement>("[data-s]")];
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const line = window.innerHeight * 0.7;
-      let n = 0;
-      spans.forEach((s, i) => { if (s.getBoundingClientRect().top < line) n = i + 1; });
-      setLit(n);
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    // The browser says when a sentence crosses the reading line (70% down the
+    // screen). Measuring every sentence on every scroll frame instead kept a
+    // phone too busy to answer a tap straight after scrolling.
+    const above = spans.map(() => false);
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        const i = Number((e.target as HTMLElement).dataset.s);
+        above[i] = e.isIntersecting;
+      }
+      setLit(above.lastIndexOf(true) + 1);
+      // the area reaches far above the screen, so a sentence scrolled past still counts as read
+    }, { rootMargin: "100000px 0px -30% 0px", threshold: 0 });
     setReading(true);
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); cancelAnimationFrame(raf); };
+    spans.forEach((s) => io.observe(s));
+    return () => io.disconnect();
   }, [sentences]);
 
   useEffect(() => {

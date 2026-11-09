@@ -53,28 +53,37 @@ export default function CapsuleNav() {
 
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    // Locking the page re-lays out all of it. Do that the frame after the menu
+    // shows, so the tap answers at once instead of waiting on the whole page.
+    let frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(() => { document.body.style.overflow = open ? "hidden" : ""; });
+    });
+    return () => { cancelAnimationFrame(frame); document.body.style.overflow = ""; };
   }, [open]);
   // The nav turns to dark glass whenever it sits over a section marked data-nav="dark".
+  // The browser tells us when a dark section crosses a thin line 40px down,
+  // rather than the nav measuring every section on every scroll frame, which
+  // kept a phone too busy to answer taps right after scrolling.
   useEffect(() => {
-    let frame = 0;
-    const check = () => {
-      frame = 0;
-      const line = 40;
-      setOverDark(Array.from(document.querySelectorAll<HTMLElement>('[data-nav="dark"]')).some((el) => {
-        const r = el.getBoundingClientRect();
-        return r.top <= line && r.bottom >= line;
-      }));
+    let io: IntersectionObserver | null = null;
+    const under = new Set<Element>();
+    const watch = () => {
+      io?.disconnect();
+      under.clear();
+      const below = Math.max(0, window.innerHeight - 41);
+      io = new IntersectionObserver((entries) => {
+        for (const e of entries) e.isIntersecting ? under.add(e.target) : under.delete(e.target);
+        setOverDark(under.size > 0);
+      }, { rootMargin: `-40px 0px -${below}px 0px`, threshold: 0 });
+      const dark = document.querySelectorAll('[data-nav="dark"]');
+      dark.forEach((el) => io!.observe(el));
+      if (!dark.length) setOverDark(false);
     };
-    const onScroll = () => { if (!frame) frame = requestAnimationFrame(check); };
-    check();
-    // the page below may still be laying out on the first frame; look again shortly after
-    const later = [setTimeout(check, 120), setTimeout(check, 600)];
-    window.addEventListener("load", onScroll);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => { cancelAnimationFrame(frame); later.forEach(clearTimeout); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); window.removeEventListener("load", onScroll); };
+    watch();
+    // the page below may still be arriving on the first frame; look again shortly after
+    const later = [setTimeout(watch, 120), setTimeout(watch, 600)];
+    window.addEventListener("resize", watch);
+    return () => { io?.disconnect(); later.forEach(clearTimeout); window.removeEventListener("resize", watch); };
   }, [path]);
 
   if (BARE.some((p) => path.startsWith(p))) return null;

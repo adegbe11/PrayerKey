@@ -127,8 +127,9 @@
 .vd-year summary span { font: 600 22px/1.2 var(--pk-font-display); color: var(--pk-text); }
 .vd-year summary small { font: 500 14px/1.2 var(--pk-font-sans); color: var(--pk-text-3); }
 .vd-year summary:hover span { color: var(--pk-violet); }
-.vd-year details::details-content { block-size: 0; overflow: hidden; transition: block-size 0.45s var(--vd-ease), content-visibility 0.45s allow-discrete; }
-.vd-year details[open]::details-content { block-size: auto; }
+/* a month opens at once and fades in; growing its height re-laid out the page every frame */
+.vd-year details[open] > :not(summary) { animation: vd-open-in 280ms ease both; }
+@keyframes vd-open-in { from { opacity: 0; } }
 .vd-year ol { margin: 0 0 22px; padding: 0; list-style: none; columns: 2 280px; column-gap: 36px; }
 .vd-year li { break-inside: avoid; }
 .vd-year li a { display: flex; gap: 12px; padding: 8px 0; font: 400 15px/1.4 var(--pk-font-sans); color: var(--pk-text-2); text-decoration: none; }

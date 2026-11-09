@@ -225,3 +225,11 @@
 @media (prefers-reduced-motion: reduce) {
   .sky__stage, .sky__center, .sky__row { transform: none; translate: none; opacity: 1; }
 }
+
+/* The drifting words, the floating key, its glow and the hint only move while
+   the sky is on screen. Running all day under the page, they kept the phone
+   busy and made every tap wait. */
+.sky:not(.is-live) .sky__row,
+.sky:not(.is-live) .sky__key,
+.sky:not(.is-live) .sky__halo,
+.sky:not(.is-live) .sky__hint { animation-play-state: paused; }
