@@ -93,8 +93,23 @@ export default function SkyFooter() {
     return () => { io.disconnect(); listen(false); cancelAnimationFrame(frame); };
   }, []);
 
-  // the sky itself
+  // The sky is only set up once the reader scrolls near it. Building it while
+  // the page loads kept a phone busy at the moment people first try to tap.
   useEffect(() => {
+    const st = stage.current;
+    if (!st) return;
+    let stop: (() => void) | undefined;
+    const near = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      near.disconnect();
+      stop = sky();
+    }, { rootMargin: "600px 0px" });
+    near.observe(st);
+    return () => { near.disconnect(); stop?.(); };
+  }, []);
+
+  // the sky itself
+  const sky = () => {
     const cv = canvas.current, st = stage.current;
     if (!cv || !st) return;
     const ctx = cv.getContext("2d");
@@ -321,7 +336,7 @@ export default function SkyFooter() {
     size();
 
     return () => { cancelAnimationFrame(raf); io.disconnect(); ro.disconnect(); st.removeEventListener("pointermove", move); st.removeEventListener("pointerleave", leave); engine.current = null; };
-  }, []);
+  };
 
   const send = (n: number) => {
     engine.current?.burst(n);

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { composePrayer, type ComposedPrayer } from "@/lib/prayer-engine/compose";
+import type { ComposedPrayer } from "@/lib/prayer-engine/compose";
+
+// The prayer writer and its verses are only fetched once someone starts to use
+// the box, so a prayer page does not load and set them up for every reader.
+let engine: Promise<typeof import("@/lib/prayer-engine/compose")> | null = null;
+const loadEngine = () => (engine ??= import("@/lib/prayer-engine/compose"));
 
 /* ── Palette: PrayerKey night violet, with the gold kept for the action ── */
 const C = {
@@ -44,11 +49,12 @@ export default function PrayerComposer({ seedTopic, compact }: Props) {
   const lastInput           = useRef("");
   const cardRef             = useRef<HTMLDivElement>(null);
 
-  function generate(text?: string) {
+  async function generate(text?: string) {
     const raw = (text ?? input).trim();
     if (!raw) return;
     lastInput.current = raw;
     if (text) setInput(text);
+    const { composePrayer } = await loadEngine();
     setResult(composePrayer(raw));
     setCopied(false);
     setTimeout(() => cardRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 60);
@@ -68,7 +74,7 @@ export default function PrayerComposer({ seedTopic, compact }: Props) {
     : "e.g. I have a job interview on Friday and my mother is in hospital. I need God's favour and her healing.";
 
   return (
-    <div style={{ marginBottom: compact ? "36px" : "48px" }}>
+    <div style={{ marginBottom: compact ? "36px" : "48px" }} onFocusCapture={loadEngine} onPointerDownCapture={loadEngine}>
       {/* Composer panel */}
       <div style={{
         background:   C.panel,

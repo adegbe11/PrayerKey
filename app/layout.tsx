@@ -8,7 +8,9 @@ import AppBanner from "@/components/app/AppBanner";
 
 // The app's three typefaces: Playfair for display, Lora for scripture, Inter for everything else.
 const display = Playfair_Display({ subsets: ["latin"], weight: ["600", "700"], variable: "--font-display", display: "swap" });
-const book = Lora({ subsets: ["latin"], weight: ["400", "500"], style: ["normal", "italic"], variable: "--font-book", display: "swap" });
+// Lora is only used on a few pages (Bible text, the journal), so it is fetched
+// when a page needs it rather than preloaded on every page.
+const book = Lora({ subsets: ["latin"], weight: ["400", "500"], style: ["normal", "italic"], variable: "--font-book", display: "swap", preload: false });
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 
 const BASE_URL = "https://www.prayerkey.com";
