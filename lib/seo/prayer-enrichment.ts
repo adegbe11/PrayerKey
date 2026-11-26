@@ -7,6 +7,10 @@ import type { PrayerTopic } from "@/lib/seo/prayer-topics";
 type Extra = Partial<Pick<PrayerTopic, "metaDesc" | "context" | "prayerPoints" | "howToPray" | "faqs">> & { seoTitle?: string };
 
 const EXTRA: Record<string, Extra> = {
+  "prayer-for-worship-team": {
+    seoTitle: "Prayer Points for the Worship Team, With Scriptures",
+  },
+
   "new-month-prayer": {
     seoTitle: "New Month Prayer: Praying for a New Month",
     metaDesc: "A new month prayer for praying over the month ahead: give God the first day, release last month, and ask for His goodness in every week to come, with Bible verses to pray.",
