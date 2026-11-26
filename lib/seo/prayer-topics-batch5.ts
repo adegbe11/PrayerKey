@@ -305,7 +305,7 @@ export const BATCH5_PRAYER_TOPICS: PrayerTopic[] = [
       { ref: "Proverbs 10:22", text: "The blessing of the Lord brings wealth, without painful toil for it." },
       { ref: "Deuteronomy 28:12", text: "The Lord will open the heavens, the storehouse of his bounty, to send rain on your land in season and to bless all the work of your hands." }
     ],
-    related: ["business", "entrepreneurship", "financial-breakthrough", "prayer-for-starting-a-business", "work"]
+    related: ["prayer-for-business-opening", "business", "entrepreneurship", "financial-breakthrough", "prayer-for-starting-a-business", "work"]
   },
   {
     slug: "prayer-for-work-promotion",
@@ -357,7 +357,7 @@ export const BATCH5_PRAYER_TOPICS: PrayerTopic[] = [
       { ref: "Proverbs 16:3", text: "Commit to the Lord whatever you do, and he will establish your plans." },
       { ref: "Luke 14:28", text: "Suppose one of you wants to build a tower. Won't you first sit down and estimate the cost to see if you have enough money to complete it?" }
     ],
-    related: ["entrepreneurship", "prayer-for-small-business", "business", "financial-breakthrough", "courage"]
+    related: ["prayer-for-business-opening", "entrepreneurship", "prayer-for-small-business", "business", "financial-breakthrough", "courage"]
   },
   {
     slug: "prayer-for-contract",

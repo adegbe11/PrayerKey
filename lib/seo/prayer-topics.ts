@@ -8,6 +8,7 @@ import { BATCH7_PRAYER_TOPICS } from "./prayer-topics-batch7";
 import { BATCH8_PRAYER_TOPICS } from "./prayer-topics-batch8";
 import { BATCH9_PRAYER_TOPICS } from "./prayer-topics-batch9";
 import { BATCH10_PRAYER_TOPICS } from "./prayer-topics-batch10";
+import { BATCH11_PRAYER_TOPICS } from "./prayer-topics-batch11";
 
 export interface PrayerTopic {
   slug:         string;
@@ -262,7 +263,7 @@ export const PRAYER_TOPICS: PrayerTopic[] = [
   { slug:"first-responders", title:"Prayer for First Responders", metaDesc:"A prayer for police, firefighters, paramedics, and all first responders who risk their lives serving others.", category:"Protection", keywords:["prayer for first responders","prayer for police","prayer for firefighters","prayer for paramedics","prayer for EMT"], samplePrayer:"Lord, I thank You for those who run toward danger when everyone else runs away. Cover every first responder with Your protection today. Give them quick minds, steady hands, and calm spirits. Shield them from harm. And when the weight of what they see becomes heavy, let them find rest and healing in You. In Jesus' name, Amen.", scripture:[{ref:"John 15:13",text:"Greater love has no one than this: to lay down one's life for one's friends."},{ref:"Psalm 91:11",text:"He will command his angels concerning you."}], related:["military","protection","strength","healing","courage"] },
 
   // ── SPECIFIC SITUATIONS ──────────────────────────────────────────
-  { slug:"moving", title:"Prayer for Moving to a New Home", metaDesc:"A prayer when moving to a new home or city. Ask God to bless your new space and guide this new season of life.", category:"Daily Prayer", keywords:["prayer for moving","prayer for new home","prayer before moving","prayer for new city","house blessing prayer"], samplePrayer:"Lord, as we move into this new space, we invite Your presence in before anything else. Bless every room. Let this home be a place of peace, love, laughter, and purpose. Cover it with Your protection. May everyone who walks through these doors feel Your welcome. Thank You for this new beginning. In Jesus' name, Amen.", scripture:[{ref:"Psalm 127:1",text:"Unless the Lord builds the house, the builders labor in vain."},{ref:"Joshua 24:15",text:"As for me and my household, we will serve the Lord."}], related:["home-protection","new-year","blessing","family","gratitude"] },
+  { slug:"moving", title:"Prayer for Moving to a New Home", metaDesc:"A prayer when moving to a new home or city. Ask God to bless your new space and guide this new season of life.", category:"Daily Prayer", keywords:["prayer for moving","prayer for new home","prayer before moving","prayer for new city","house blessing prayer"], samplePrayer:"Lord, as we move into this new space, we invite Your presence in before anything else. Bless every room. Let this home be a place of peace, love, laughter, and purpose. Cover it with Your protection. May everyone who walks through these doors feel Your welcome. Thank You for this new beginning. In Jesus' name, Amen.", scripture:[{ref:"Psalm 127:1",text:"Unless the Lord builds the house, the builders labor in vain."},{ref:"Joshua 24:15",text:"As for me and my household, we will serve the Lord."}], related:["prayer-for-a-new-place-to-live","home-protection","new-year","blessing","family","gratitude"] },
 
   { slug:"letting-go", title:"Prayer for Letting Go", metaDesc:"A prayer for letting go of the past, toxic relationships, old wounds, and anything that no longer serves your purpose.", category:"Mental Health", keywords:["prayer for letting go","prayer to let go","prayer for closure","prayer to release the past","prayer to move on"], samplePrayer:"Lord, I have been holding on to things You have already asked me to release. Today I open my hands and let go — the pain, the relationship, the outcome I cannot control, the version of my life I planned. I choose trust over control. Fill the spaces that empty out with more of You. In Jesus' name, Amen.", scripture:[{ref:"Isaiah 43:18",text:"Forget the former things; do not dwell on the past."},{ref:"Philippians 3:13",text:"Forgetting what is behind and straining toward what is ahead."}], related:["forgiveness","peace","healing","trust","new-year"] },
 
@@ -305,6 +306,9 @@ export const PRAYER_TOPICS: PrayerTopic[] = [
 
   // ── Batch 10 — Relationships, sins, modern struggles, life stages ─
   ...BATCH10_PRAYER_TOPICS,
+
+  // ── Batch 11 — Searches PrayerKey already ranked for with no page ─
+  ...BATCH11_PRAYER_TOPICS,
 ];
 
 // ── Merge hand-written enrichment (custom FAQs / context / how-to) ──

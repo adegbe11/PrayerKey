@@ -415,7 +415,7 @@ export const BATCH10_PRAYER_TOPICS: PrayerTopic[] = [
       { ref: "Psalm 22:9-10", text: "Yet you brought me out of the womb; you made me trust in you, even at my mother's breast. From birth I was cast on you; from my mother's womb you have been my God." },
       { ref: "Isaiah 40:11", text: "He tends his flock like a shepherd: He gathers the lambs in his arms and carries them close to his heart." }
     ],
-    related: ["nicu-prayer", "prayer-for-unborn-child", "newborn-baby", "healing", "prayer-for-baby-boy"]
+    related: ["prayer-for-nicu-parents", "nicu-prayer", "prayer-for-unborn-child", "newborn-baby", "healing", "prayer-for-baby-boy"]
   },
   {
     slug: "prayer-for-child-with-special-needs",

@@ -350,7 +350,7 @@ export const BATCH8_PRAYER_TOPICS: PrayerTopic[] = [
       { ref: "Psalm 127:1", text: "Unless the Lord builds the house, the builders labor in vain." },
       { ref: "Proverbs 24:3-4", text: "By wisdom a house is built, and through understanding it is established; through knowledge its rooms are filled with rare and beautiful treasures." }
     ],
-    related: ["prayer-for-land-and-property", "prayer-for-new-home", "prayer-for-car", "financial-breakthrough", "provision"]
+    related: ["prayer-for-a-new-place-to-live", "prayer-for-land-and-property", "prayer-for-new-home", "prayer-for-car", "financial-breakthrough", "provision"]
   },
   {
     slug: "prayer-before-driving",
@@ -415,7 +415,7 @@ export const BATCH8_PRAYER_TOPICS: PrayerTopic[] = [
       { ref: "Psalm 113:9", text: "He settles the childless woman in her home as a happy mother of children. Praise the Lord." },
       { ref: "Luke 1:37", text: "For no word from God will ever fail." }
     ],
-    related: ["infertility", "fertility-prayer", "pregnancy", "prayer-for-twins", "prayer-for-baby-boy"]
+    related: ["prayer-for-successful-implantation", "infertility", "fertility-prayer", "pregnancy", "prayer-for-twins", "prayer-for-baby-boy"]
   },
   {
     slug: "prayer-when-nothing-is-working",

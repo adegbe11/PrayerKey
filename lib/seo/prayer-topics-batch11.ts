@@ -1,0 +1,192 @@
+import type { PrayerTopic } from "./prayer-topics";
+
+// Batch 11: topics people already find PrayerKey for in search, with no page
+// of their own until now (Search Console, Nov 2026). Each one is written in
+// full, so none of them falls back to the template copy. Scripture is KJV.
+
+export const BATCH11_PRAYER_TOPICS: PrayerTopic[] = [
+  {
+    slug: "prayer-for-business-opening",
+    title: "Prayer for a Business Opening",
+    metaDesc: "A prayer for a business opening, to pray on the first day or at the opening ceremony of a new shop, office or company: dedicate it to God, ask Him to build it and bless every customer who walks in.",
+    category: "Work",
+    keywords: ["prayer for business opening", "prayer for new business opening", "prayer for opening a business", "opening prayer for new business", "business dedication prayer", "prayer for new shop opening", "prayer for new business venture"],
+    samplePrayer: "Father, today we open these doors, and before the first customer walks in we give this business to You. Except You build the house, we labour in vain, so build this one. Thank You for bringing us to this day: for every saving, every early morning, every person who helped and every door You opened along the way. We dedicate this place, its work, its money and its people to You. Let honesty be the rule here and excellence the habit. Bring the right customers and keep away every dishonest deal. Give wisdom in every decision, grace with every supplier and favour in this community. Let the staff who work here be treated well and go home blessed. When it is slow, keep us faithful; when it grows, keep us humble. Establish the work of our hands, and let all who come through these doors meet something of Your goodness. In Jesus' name, Amen.",
+    scripture: [
+      { ref: "Psalm 127:1", text: "Except the LORD build the house, they labour in vain that build it." },
+      { ref: "Proverbs 16:3", text: "Commit thy works unto the LORD, and thy thoughts shall be established." },
+    ],
+    related: ["prayer-for-starting-a-business", "prayer-for-small-business", "business", "favor"],
+    context: "Opening a business is a day many people have prayed toward for years, and a lot of them want to begin it with God. In many churches a pastor or elder is invited to pray at the opening, sometimes with the ribbon still across the door. The Bible gives the reason for the habit: Except the LORD build the house, they labour in vain that build it (Psalm 127:1). A business opening prayer is a dedication. It says out loud, before the first sale, who the work belongs to and how it will be run.",
+    prayerPoints: [
+      "Thank God for bringing you to this day: the savings, the help, the open doors and the people who believed in you.",
+      "Dedicate the business to Him by name. Commit thy works unto the LORD, and thy thoughts shall be established (Proverbs 16:3).",
+      "Pray for honesty in every price, every contract and every set of accounts.",
+      "Ask God to send the right customers and to keep the business from dishonest partners and bad deals.",
+      "Pray for the staff: that they are treated fairly, work well together and go home blessed.",
+      "Ask for wisdom in the first months, when every decision feels big. Do not despise the day of small things (Zechariah 4:10).",
+      "Pray Psalm 90:17 over the work: establish thou the work of our hands upon us.",
+    ],
+    howToPray: [
+      "Pray before the doors open for the first time, with the owner, the staff and family gathered if you can.",
+      "If someone is leading the prayer at an opening ceremony, keep it to two or three minutes, then read Psalm 127:1 aloud.",
+      "Walk through the space and pray over each part: the counter or desk, the stock, the office and the door customers will come through.",
+      "Name the business and its owners in the prayer, and dedicate the first day's takings to God with thanks.",
+      "Come back to this prayer at the end of the first week and the first month, and thank Him for what He has done.",
+    ],
+    faqs: [
+      { q: "What do you say in a prayer for a business opening?", a: "Thank God for bringing the business to this day, dedicate it and its work to Him, and ask for honesty, wisdom, good customers, favour in the community and blessing on the people who work there. The prayer on this page follows that pattern and can be read aloud at an opening ceremony." },
+      { q: "What Bible verse is good for a new business opening?", a: "Psalm 127:1: Except the LORD build the house, they labour in vain that build it. Proverbs 16:3: Commit thy works unto the LORD, and thy thoughts shall be established. Psalm 90:17 and Deuteronomy 8:18, which says it is he that giveth thee power to get wealth, are also often read at openings." },
+      { q: "Who should pray at a business opening?", a: "Anyone can. Often the owner prays, or a pastor, elder or trusted friend is asked to lead. What matters is that the business is given to God at the start, not who says the words." },
+      { q: "How is this different from a prayer for starting a business?", a: "A prayer for starting a business is prayed while the idea is still forming: for direction, funding and the courage to begin. A business opening prayer is prayed on the day the doors open, to dedicate the finished work to God and ask Him to bless what happens next." },
+    ],
+  },
+
+  {
+    slug: "prayer-for-worship-team",
+    title: "Prayer for the Worship Team",
+    metaDesc: "Prayer points for the worship team, with scriptures: pray for the singers, musicians and sound team before rehearsal or service, for unity, skill, pure hearts and God's presence in the songs.",
+    category: "Ministry",
+    keywords: ["prayer for worship team", "prayer points for worship team", "prayer points for worship team with scriptures", "prayer for praise and worship team", "worship team prayer before service", "prayer points for music ministry", "prayer for the choir and musicians"],
+    samplePrayer: "Lord, we are Your worship team, and before we sing a note we come to worship You ourselves. Let the words of our mouths and the meditation of our hearts be acceptable in Your sight. Make us one: one sound, one heart, one purpose, with no competition, no pride and no hidden offence between us. Give skill to our hands and our voices, and keep us faithful in practice so we can play skilfully for You. Guard us from performing for people. Let us lead this church to Your throne and then get out of the way. Fill the sound desk, the screens and every instrument with excellence. Where someone came today tired, grieving or far from You, let the songs reach them. And let Your presence fill this house as it filled the temple when the singers and trumpeters were as one. In Jesus' name, Amen.",
+    scripture: [
+      { ref: "Psalm 33:3", text: "Sing unto him a new song; play skilfully with a loud noise." },
+      { ref: "John 4:24", text: "God is a Spirit: and they that worship him must worship him in spirit and in truth." },
+    ],
+    related: ["worship-leaders", "worship", "praise", "church-unity"],
+    context: "Leading worship is ministry, not a set list, and worship teams pray before rehearsals and services for that reason. Scripture names skilled musicians as part of temple worship: Chenaniah led the singing because he was skilful (1 Chronicles 15:22). When the singers and trumpeters were as one, to make one sound, the house was filled with a cloud, even the house of the LORD (2 Chronicles 5:13). Prayer points for a worship team cover the people as well as the music: their unity, their hearts, their skill and the church they lead.",
+    prayerPoints: [
+      "Pray that the team worships God themselves before they lead anyone else: worship him in spirit and in truth (John 4:24).",
+      "Pray for unity, that the singers, musicians and sound team are as one, to make one sound (2 Chronicles 5:13).",
+      "Ask for skill and faithfulness in practice: sing unto him a new song; play skilfully (Psalm 33:3).",
+      "Pray against pride, competition and offence in the team, and for humility in whoever leads.",
+      "Pray Psalm 19:14 over every song: let the words of my mouth, and the meditation of my heart, be acceptable in thy sight.",
+      "Pray for the congregation, that the songs carry the word of Christ richly into their hearts (Colossians 3:16).",
+      "Pray for the people behind the scenes: sound, lights, screens and livestream, for excellence and no technical trouble.",
+    ],
+    howToPray: [
+      "Gather the whole team before rehearsal or before the service, including the sound and media team, not only the singers.",
+      "Read one scripture aloud first, such as Psalm 33:3 or 2 Chronicles 5:13.",
+      "Let a different team member pray each week, and give each person one prayer point from this page to pray.",
+      "Pray for each other by name, especially anyone who is tired, struggling or new to the team.",
+      "Finish by giving the service to God and agreeing to lead the church toward Him, not toward the stage.",
+    ],
+    faqs: [
+      { q: "What are good prayer points for a worship team?", a: "Pray that the team worships God themselves first, for unity among singers and musicians, for skill and faithfulness in practice, against pride and offence, for the words to be acceptable to God, for the congregation to meet Him, and for the technical team. The seven prayer points on this page cover each of these with a scripture." },
+      { q: "What scripture can a worship team pray?", a: "Psalm 33:3: Sing unto him a new song; play skilfully with a loud noise. John 4:24: they that worship him must worship him in spirit and in truth. 2 Chronicles 5:13–14, Colossians 3:16, Psalm 19:14 and Psalm 100:2 are also well suited to a worship team." },
+      { q: "What should a worship team pray before a service?", a: "Keep it short and real: give the service to God, ask for unity and clear hearts, pray for the people who will come in, and ask Him to fill the room with His presence. The prayer on this page takes about a minute to pray aloud together." },
+      { q: "Can these prayer points be used for a choir or music ministry?", a: "Yes. The same prayer points fit a choir, a band, a music ministry or a youth worship team. Change the names and the details, and pray them before rehearsals as well as services." },
+    ],
+  },
+
+  {
+    slug: "prayer-for-a-new-place-to-live",
+    title: "Prayer for a New Place to Live",
+    metaDesc: "A prayer for a new place to live, when you are searching for a house, flat or apartment to rent or buy: ask God to open the right door, provide what you need and lead you to a safe, peaceful home.",
+    category: "Family",
+    keywords: ["prayer for a new place to live", "prayer for a new home to live", "prayer to find a house", "prayer for finding an apartment", "prayer for a house to rent", "prayer for housing", "prayer for accommodation"],
+    samplePrayer: "Lord, I need a new place to live, and You already know where it is. You see my budget, my deadline, the listings I have looked at and the doors that have closed. You determined the bounds of my habitation before I started searching, so I ask You to lead me there. Open the right door at the right time and shut every door that would be wrong for me. Give me favour with landlords, agents and sellers. Help me see clearly past photos and promises, and give me peace when I find the place You have chosen. Let it be safe, affordable and close to what I need. Provide the deposit, the paperwork and the moving help. Calm my anxiety while I wait, and let my home, when I find it, be a peaceable habitation where You are welcome. In Jesus' name, Amen.",
+    scripture: [
+      { ref: "Isaiah 32:18", text: "And my people shall dwell in a peaceable habitation, and in sure dwellings, and in quiet resting places;" },
+      { ref: "Psalm 107:7", text: "And he led them forth by the right way, that they might go to a city of habitation." },
+    ],
+    related: ["moving", "prayer-for-house-purchase", "provision", "waiting-on-god"],
+    context: "Looking for a place to live is one of the most stressful searches there is: rising rents, tight deadlines, rejected applications and homes that look better online than in person. Many people start praying before they find the place rather than only after they move in. Scripture says God has determined the times before appointed, and the bounds of their habitation (Acts 17:26), and promises His people a peaceable habitation, and sure dwellings (Isaiah 32:18). This prayer asks Him to lead the search.",
+    prayerPoints: [
+      "Thank God that He already knows where your next home is, even if you do not. He hath determined the bounds of their habitation (Acts 17:26).",
+      "Ask Him to open the right door and close every wrong one, however good it looks.",
+      "Pray for favour with landlords, agents, sellers and anyone deciding on your application.",
+      "Ask for provision for the deposit, rent, mortgage, fees and the cost of moving.",
+      "Pray for discernment at every viewing, to see the problems and the blessings clearly.",
+      "Pray for a home that is safe and peaceful: my people shall dwell in a peaceable habitation (Isaiah 32:18).",
+      "Give Him your deadline and your worry: in all thy ways acknowledge him, and he shall direct thy paths (Proverbs 3:6).",
+    ],
+    howToPray: [
+      "Write down what you need in a home: budget, area, size, and the things you cannot do without. Pray over the list.",
+      "Pray before you search the listings each day, and before every viewing or application.",
+      "Pray Proverbs 3:6 when a door closes. A rejection can be direction.",
+      "Ask a friend or your church to pray with you, especially if you are facing a deadline or have nowhere to go.",
+      "When you find the place, pray over it before you sign, and thank God when you get the keys.",
+    ],
+    faqs: [
+      { q: "How do I pray for a new place to live?", a: "Tell God exactly what you need and by when, ask Him to open the right door and close the wrong ones, pray for favour with landlords or sellers and for the money to move, and ask for peace while you wait. The prayer on this page can be prayed daily until you find your home." },
+      { q: "What Bible verse can I pray when looking for a house?", a: "Isaiah 32:18 promises a peaceable habitation, and sure dwellings, and quiet resting places. Psalm 107:7 says he led them forth by the right way, that they might go to a city of habitation. Acts 17:26 and Proverbs 3:6 are also good verses to pray over a housing search." },
+      { q: "Can I pray for a house or apartment to rent?", a: "Yes. God cares about where you live whether you rent or buy, and about the small details: the area, the landlord, the deposit and the deadline. Pray specifically and keep praying through each application." },
+      { q: "What if I have nowhere to live right now?", a: "Pray, and get help today as well: contact your local council or housing authority, a homelessness charity or your church. God often answers through people. PrayerKey also has a prayer for homelessness you can pray while you wait." },
+    ],
+  },
+
+  {
+    slug: "prayer-for-successful-implantation",
+    title: "Prayer for Successful Implantation",
+    metaDesc: "A prayer for successful implantation after embryo transfer, and for each step of IVF: egg retrieval, embryo development, transfer day and the two-week wait. Bible verses to hold on to while you wait.",
+    category: "Family",
+    keywords: ["prayer for successful implantation", "prayer for implantation", "prayer for successful embryo transfer", "prayer for embryo implantation", "prayer for egg retrieval", "prayer for embryo development", "prayer for the two week wait", "prayer for ivf transfer day"],
+    samplePrayer: "Father, You formed every child in the womb, and I bring this embryo, this hope, to You. You covered each of us in our mother's womb before anyone knew we were there. I ask You now for implantation: let this little life settle, attach and grow. Make my body a safe and welcoming home. Bless every cell with life and every day with progress. Guide the doctors, nurses and embryologists in what they do and in what they decide. Through this wait, guard my heart and my mind. When fear rises, remind me that nothing is too hard for You. When hope feels dangerous, give me peace that passes understanding. Whatever the test says, hold me close and keep me sure of Your love. I ask for this child as Hannah did. In Jesus' name, Amen.",
+    scripture: [
+      { ref: "Psalm 139:13", text: "For thou hast possessed my reins: thou hast covered me in my mother's womb." },
+      { ref: "Psalm 113:9", text: "He maketh the barren woman to keep house, and to be a joyful mother of children. Praise ye the LORD." },
+    ],
+    related: ["prayer-for-ivf", "fertility-prayer", "healthy-pregnancy", "waiting-on-god"],
+    context: "IVF comes in steps, and each one brings its own prayer: stimulation, egg retrieval, fertilisation and embryo development, transfer day, and then the wait for implantation and the pregnancy test, usually around ten days to two weeks after transfer. Many people describe that last wait as the hardest part. The Bible does not mention IVF, but it is full of people who prayed for a child and of a God who forms life in the womb (Psalm 139:13). This prayer is for implantation and for every step that leads to it.",
+    prayerPoints: [
+      "For egg retrieval: pray for a safe procedure, a good number of healthy eggs and a quick recovery.",
+      "For embryo development: pray for fertilisation and strong growth in the lab. Thine eyes did see my substance, yet being unperfect (Psalm 139:16).",
+      "For transfer day: pray for skilled hands, a smooth transfer and peace in the room.",
+      "For implantation: ask God to let the embryo settle and grow. Thou hast covered me in my mother's womb (Psalm 139:13).",
+      "For the two-week wait: be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God (Philippians 4:6).",
+      "For your marriage or support people, that the wait draws you closer instead of apart.",
+      "For the result: pray for good news, and for God's nearness whatever the test says. The LORD is nigh unto them that are of a broken heart (Psalm 34:18).",
+    ],
+    howToPray: [
+      "Pray at each step of the cycle, not only at the end: the night before retrieval, the morning of transfer and each morning of the wait.",
+      "Pray Psalm 139:13 aloud over your body after transfer, and keep a verse card where you will see it.",
+      "When the wait gets hard, pray Philippians 4:6–7 slowly and give God the specific fear you are feeling.",
+      "Pray with your spouse or one trusted friend. Hannah poured out her soul before the LORD (1 Samuel 1:15), and you do not have to pray alone.",
+      "Follow your clinic's medical advice in everything. Prayer and treatment belong together.",
+    ],
+    faqs: [
+      { q: "What is a prayer for successful implantation?", a: "A prayer asking God to let the embryo implant and grow after transfer, to make the body a safe home for it, and to give peace through the wait for the pregnancy test. The prayer on this page can be prayed from transfer day until test day." },
+      { q: "Which Bible verses can I pray during the two-week wait?", a: "Psalm 139:13: thou hast covered me in my mother's womb. Psalm 113:9: He maketh the barren woman to keep house, and to be a joyful mother of children. Philippians 4:6–7, Isaiah 41:10, Genesis 18:14 and 1 Samuel 1:27 are also often prayed while waiting." },
+      { q: "Is it okay for Christians to pray about IVF?", a: "Yes. Whatever path you are on to have a child, you can bring every step of it to God: the procedures, the decisions, the money and the emotions. Many Christians pray through IVF and talk through its decisions with their pastor or a counsellor." },
+      { q: "How do I pray if the IVF cycle does not work?", a: "Honestly. Tell God how much it hurts. The Psalms are full of grief prayed out loud, and Psalm 56:8 says He keeps your tears. Ask Him for comfort and wisdom about what comes next, and let people around you carry some of it with you." },
+    ],
+  },
+
+  {
+    slug: "prayer-for-nicu-parents",
+    title: "Prayer for NICU Parents",
+    metaDesc: "A prayer for NICU parents with a baby in neonatal intensive care, and words of encouragement from Scripture for mothers and fathers of premature or sick newborns: strength, rest, peace and hope for each day.",
+    category: "Family",
+    keywords: ["prayer for nicu parents", "short prayer for nicu parents", "prayer for parents of premature baby", "spiritual words of encouragement for parents of premature baby", "prayer for parents with baby in nicu", "encouragement for nicu parents"],
+    samplePrayer: "Lord, You gather the lambs in Your arm and gently lead those that are with young, so I bring these parents to You. They did not expect to meet their baby through glass, wires and monitors. Hold them up. Give them strength for each day and rest when they finally sleep. Calm the alarms in their hearts as well as on the machines. Give them clear answers from the doctors and kind nurses at the bedside. Heal the mother's body and steady the father's heart. Where they feel guilty, tell them it is not their fault. Where they feel alone, send people to carry meals, messages and prayers. Keep their marriage close and their other children cared for. And watch over their little one through the night, because You neither slumber nor sleep. Bring this family home together. In Jesus' name, Amen.",
+    scripture: [
+      { ref: "Isaiah 40:11", text: "He shall feed his flock like a shepherd: he shall gather the lambs with his arm, and carry them in his bosom, and shall gently lead those that are with young." },
+      { ref: "Psalm 46:1", text: "God is our refuge and strength, a very present help in trouble." },
+    ],
+    related: ["nicu-prayer", "prayer-for-premature-baby", "strength", "hospital"],
+    context: "A NICU stay turns the first weeks of parenthood upside down: expressing milk by a machine, learning a baby's oxygen numbers, driving home each night without them. Parents often hear people praying for the baby and rarely hear anyone praying for them. Scripture speaks to exactly this. Isaiah 40:11 pictures God gathering the lambs in His arm and gently leading those that are with young, the parents as well as the little ones. This prayer and these words of encouragement are for mothers and fathers in the NICU.",
+    prayerPoints: [
+      "Pray for strength for each day, and rest when they sleep. My grace is sufficient for thee (2 Corinthians 12:9).",
+      "Pray for the mother's recovery from birth, in body and in mind.",
+      "Pray against guilt and fear, and for the peace of God, which passeth all understanding (Philippians 4:7).",
+      "Ask for clear communication with doctors and nurses, and wisdom in every decision.",
+      "Pray for their marriage, their other children and the practical help they need: meals, lifts, money and time off work.",
+      "Pray for their baby through the night: he that keepeth Israel shall neither slumber nor sleep (Psalm 121:4).",
+      "Pray for the day they bring their baby home, and for joy that outlasts these weeks.",
+    ],
+    howToPray: [
+      "If you are the parent, pray short prayers at the incubator: one verse, one sentence, as often as you need.",
+      "If you are praying for friends in the NICU, tell them you are praying and ask what they need today, then do it.",
+      "Send words of encouragement with a verse, such as Isaiah 40:11 or Psalm 46:1. Keep it short and expect no reply.",
+      "Pray for the nurses and doctors by name if you know them.",
+      "Keep praying after the baby comes home. The weeks after the NICU can be hard too.",
+    ],
+    faqs: [
+      { q: "What can I say to encourage NICU parents?", a: "Keep it short and kind: tell them you are praying, that you love them and their baby, and that they do not need to reply. A verse such as Isaiah 40:11 or Psalm 46:1 can say what words cannot. Then offer something practical, like a meal, a lift or looking after their other children." },
+      { q: "What is a short prayer for NICU parents?", a: "Lord, hold these parents as they hold their baby. Give them strength for today, rest tonight and peace in every hard moment. Watch over their little one, guide the doctors and nurses, and bring them home together. In Jesus' name, Amen." },
+      { q: "Which Bible verses comfort parents of a premature baby?", a: "Isaiah 40:11, Psalm 46:1, Psalm 139:13–16, Isaiah 41:10, 2 Corinthians 12:9 and Psalm 121:4 are often shared with NICU families. Each speaks of God's care for the weak and His nearness in trouble." },
+      { q: "How is this different from a prayer for a NICU baby?", a: "A prayer for a NICU baby prays for the baby's health and growth. This prayer is for the parents: their strength, sleep, recovery, marriage and peace while their baby is in intensive care. Many families pray both." },
+    ],
+  },
+];
